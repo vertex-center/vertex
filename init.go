@@ -1,12 +1,13 @@
 package main
 
 import (
+	"github.com/quentinguidee/installer-service/routers"
 	"log"
 	"os"
 )
 
 func main() {
-	r := initializeRouter()
+	r := routers.InitializeRouter()
 
 	err := os.Mkdir("servers", os.ModePerm)
 	if err != nil && !os.IsExist(err) {

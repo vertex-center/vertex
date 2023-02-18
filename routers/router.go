@@ -1,4 +1,4 @@
-package main
+package routers
 
 import (
 	"github.com/gin-gonic/gin"
@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func initializeRouter() *gin.Engine {
+func InitializeRouter() *gin.Engine {
 	r := router.CreateRouter()
 
 	// TODO: Change to POST and read body
