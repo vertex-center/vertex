@@ -131,6 +131,12 @@ func untarFile(basePath string, archivePath string) error {
 			if err != nil {
 				return err
 			}
+
+			err = os.Chmod(filepath, 0755)
+			if err != nil {
+				return err
+			}
+
 			file.Close()
 		default:
 			return errors.New(fmt.Sprintf("unknown flag type (%s) for file '%s'", header.Typeflag, header.Name))

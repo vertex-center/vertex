@@ -12,24 +12,51 @@ func InitializeRouter() *gin.Engine {
 
 	// TODO: Change to POST and read body
 	r.GET("/download", handleDownload)
+	r.GET("/start", handleStart)
+	r.GET("/stop", handleStop)
 
 	return r
 }
 
+// Sample service for development purposes
+var redisService = services.Service{
+	ID:           "redis-service",
+	Name:         "Redis Service",
+	Dependencies: []string{},
+	Repository:   "github.com/quentinguidee/redis-service",
+}
+
 func handleDownload(c *gin.Context) {
-	// Sample service for development purposes
-	service := services.Service{
-		ID:           "redis-service",
-		Name:         "Redis Service",
-		Dependencies: []string{},
-		Repository:   "github.com/quentinguidee/redis-service",
+
+	err := redisService.Download()
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 
-	err := service.Download()
+	c.JSON(http.StatusOK, gin.H{
+		"message": "OK",
+	})
+}
+
+func handleStart(c *gin.Context) {
+	runner := services.NewRunner(redisService)
+
+	err := runner.Start()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "OK",
+	})
+}
+
+func handleStop(c *gin.Context) {
+	err := services.GetRunner().Stop()
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
