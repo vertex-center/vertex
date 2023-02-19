@@ -1,10 +1,11 @@
-module github.com/quentinguidee/installer-service
+module github.com/vertex-center/vertex
 
 go 1.19
 
 require (
 	github.com/gin-gonic/gin v1.8.2
 	github.com/google/go-github/v50 v50.0.0
+	github.com/quentinguidee/installer-service v0.0.0-20230218182753-858c9c3b82fc
 	github.com/quentinguidee/microservice-core v0.0.0-20230216035507-9abb6c1417f4
 )
 

@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/quentinguidee/installer-service/routers"
 	"log"
 	"os"
+
+	"github.com/quentinguidee/installer-service/routers"
 )
 
 func main() {

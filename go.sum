@@ -150,6 +150,8 @@ github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e/go.mod h1:pJLUxLENpZxwdsK
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:xMI15A0UPsDsEKsMN9yxemIoYk6Tm2C1GtYGdfGttqA=
+github.com/quentinguidee/installer-service v0.0.0-20230218182753-858c9c3b82fc h1:+2XJ6ComX994rA18cHijy5rKyYgi7JM2GgudZHwDIek=
+github.com/quentinguidee/installer-service v0.0.0-20230218182753-858c9c3b82fc/go.mod h1:9j3wFIbZCwLOmxs4QAtcHgcbB5HZNQWb3yaKSZr5LOQ=
 github.com/quentinguidee/microservice-core v0.0.0-20230216035507-9abb6c1417f4 h1:RfCDYYB1vvodZg3pQI62OHl7Wd/k1JosXbx+MiGOEZc=
 github.com/quentinguidee/microservice-core v0.0.0-20230216035507-9abb6c1417f4/go.mod h1:2KSyfcBoIS06EeBHq7EoH+cav2FEWSltuGkYkysbdNA=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
