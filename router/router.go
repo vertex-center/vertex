@@ -1,10 +1,11 @@
-package routers
+package router
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/quentinguidee/installer-service/services"
-	"github.com/quentinguidee/microservice-core/router"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex-core-golang/router"
+	"github.com/vertex-center/vertex/services"
 )
 
 func InitializeRouter() *gin.Engine {
@@ -20,14 +21,13 @@ func InitializeRouter() *gin.Engine {
 
 // Sample service for development purposes
 var redisService = services.Service{
-	ID:           "redis-service",
-	Name:         "Redis Service",
+	ID:           "vertex-redis",
+	Name:         "Vertex Redis",
 	Dependencies: []string{},
-	Repository:   "github.com/quentinguidee/redis-service",
+	Repository:   "github.com/vertex-center/vertex-redis",
 }
 
 func handleDownload(c *gin.Context) {
-
 	err := redisService.Download()
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
