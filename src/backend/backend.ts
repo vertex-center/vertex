@@ -4,6 +4,7 @@ export type Service = {
     id: string;
     name: string;
     repository: string;
+    description: string;
 };
 
 export async function getInstalledServices(): Promise<Service[]> {
