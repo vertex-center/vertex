@@ -3,6 +3,7 @@ package router
 import (
 	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex-core-golang/router"
 	"github.com/vertex-center/vertex/services"
@@ -11,6 +12,7 @@ import (
 
 func InitializeRouter() *gin.Engine {
 	r := router.CreateRouter()
+	r.Use(cors.Default())
 
 	// TODO: Change to POST and read body
 	r.GET("/download", handleDownload)
@@ -18,19 +20,13 @@ func InitializeRouter() *gin.Engine {
 	r.GET("/stop", handleStop)
 
 	r.GET("/installed", handleInstalled)
+	r.GET("/available", handleAvailable)
 
 	return r
 }
 
-// Sample service for development purposes
-var redisService = services.Service{
-	ID:         "vertex-redis",
-	Name:       "Vertex Redis",
-	Repository: "github.com/vertex-center/vertex-redis",
-}
-
 func handleDownload(c *gin.Context) {
-	err := servicesmanager.Download(redisService)
+	err := servicesmanager.Download(servicesmanager.ListAvailable()[0])
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -42,7 +38,7 @@ func handleDownload(c *gin.Context) {
 }
 
 func handleStart(c *gin.Context) {
-	runner := services.NewRunner(redisService)
+	runner := services.NewRunner(servicesmanager.ListAvailable()[0])
 
 	err := runner.Start()
 	if err != nil {
@@ -68,5 +64,9 @@ func handleStop(c *gin.Context) {
 }
 
 func handleInstalled(c *gin.Context) {
-	c.JSON(http.StatusOK, servicesmanager.ListAll())
+	c.JSON(http.StatusOK, servicesmanager.ListInstalled())
+}
+
+func handleAvailable(c *gin.Context) {
+	c.JSON(http.StatusOK, servicesmanager.ListAvailable())
 }

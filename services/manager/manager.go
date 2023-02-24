@@ -17,15 +17,15 @@ import (
 	"github.com/vertex-center/vertex/services"
 )
 
-func ListAll() []services.Service {
-	dir, err := os.ReadDir("servers")
+func ListInstalled() []services.Service {
+	entries, err := os.ReadDir("servers")
 	if err != nil {
 		return nil
 	}
 
 	var allServices []services.Service
 
-	for _, entry := range dir {
+	for _, entry := range entries {
 		if entry.IsDir() {
 			service := services.Service{
 				ID:         entry.Name(),

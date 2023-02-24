@@ -3,6 +3,7 @@ module github.com/vertex-center/vertex
 go 1.19
 
 require (
+	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.8.2
 	github.com/google/go-github/v50 v50.0.0
 	github.com/vertex-center/vertex-core-golang v0.0.0-20230223184853-ca0f83873a87
