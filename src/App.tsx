@@ -1,6 +1,6 @@
-import Header from "./components/Header";
+import Header from "./components/Header/Header";
 import { HashRouter, Route, Routes } from "react-router-dom";
-import Marketplace from "./pages/Marketplace";
+import Marketplace from "./pages/Marketplace/Marketplace";
 import Installed from "./pages/Installed";
 
 function App() {

@@ -1,0 +1,31 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+
+.header
+    display: flex
+    flex-direction: row
+    align-items: center
+    padding: 16px 12px
+    gap: 4px
+
+.logo
+    padding: 6px 12px
+    border-radius: dimensions.$border-radius
+
+    &:hover
+        background-color: colors.$bg-primary-hover
+
+.items
+    display: flex
+    flex-direction: row
+    gap: 4px
+
+.item
+    border-radius: dimensions.$border-radius
+    padding: 8px 16px
+
+    &:hover
+        background-color: colors.$bg-primary-hover
+
+    &Active
+        background-color: colors.$bg-secondary
