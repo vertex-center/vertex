@@ -13,14 +13,29 @@ type ApplicationProps = {
     service: Service;
 };
 
+type AppState = "available" | "installing" | "installed";
+
 function Application({ service }: ApplicationProps) {
+    const [state, setState] = useState<AppState>("available");
+
+    const onDownloadClick = () => {
+        if (state === "available") setState("installing");
+        else if (state === "installing") setState("available");
+    };
+
     return (
         <Card>
             <div className={styles.appHeader}>
                 <Logo iconOnly />
                 <Title>{service.name}</Title>
                 <Spacer />
-                <Button rightSymbol="download">Download</Button>
+                <Button
+                    downloading={state === "installing"}
+                    rightSymbol="download"
+                    onClick={onDownloadClick}
+                >
+                    Download
+                </Button>
             </div>
             <URL href={`https://${service.repository}`}>
                 {service.repository}

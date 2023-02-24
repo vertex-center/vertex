@@ -1,12 +1,23 @@
 @use "../../styles/colors"
 @use "../../styles/dimensions"
 
+.content
+    display: flex
+    flex-direction: row
+    gap: 6px
+    align-items: center
+    max-width: 300px
+    overflow: hidden
+    transition: opacity 0.2s ease
+
+    &Downloading
+        max-width: 0
+
 .button
     display: flex
     flex-direction: row
     align-items: center
-    gap: 4px
-    padding: 8px 16px
+    position: relative
     border: none
     outline: none
     border-radius: dimensions.$border-radius
@@ -15,9 +26,11 @@
     color: colors.$fg-accent
     cursor: pointer
     font-weight: 500
-    position: relative
     overflow: hidden
     z-index: 2
+    padding: 8px 16px
+    transition: all 0.2s ease
+    justify-content: flex-end
 
     &::before
         content: ''
@@ -27,7 +40,7 @@
         left: 0
         bottom: 0
         right: 0
-        background-color: colors.$bg-accent-hover
+        background-color: rgba(0, 0, 0, 0.1)
         transition: all 0.2s ease
 
     &:hover::before
@@ -39,4 +52,22 @@
     &Large
         padding: 8px
         flex-grow: 1
-        justify-content: center
+
+    &Downloading
+        animation: downloading 1s ease infinite
+
+        & .content
+            max-width: 0
+            opacity: 0
+
+            &Downloading
+                max-width: 300px
+                opacity: 1
+
+@keyframes downloading
+    from
+        background-color: colors.$blue
+    50%
+        background-color: colors.$blue-hover
+    to
+        background-color: colors.$blue
