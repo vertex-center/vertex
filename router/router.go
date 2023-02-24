@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex-core-golang/router"
 	"github.com/vertex-center/vertex/services"
+	servicesmanager "github.com/vertex-center/vertex/services/manager"
 )
 
 func InitializeRouter() *gin.Engine {
@@ -16,19 +17,20 @@ func InitializeRouter() *gin.Engine {
 	r.GET("/start", handleStart)
 	r.GET("/stop", handleStop)
 
+	r.GET("/installed", handleInstalled)
+
 	return r
 }
 
 // Sample service for development purposes
 var redisService = services.Service{
-	ID:           "vertex-redis",
-	Name:         "Vertex Redis",
-	Dependencies: []string{},
-	Repository:   "github.com/vertex-center/vertex-redis",
+	ID:         "vertex-redis",
+	Name:       "Vertex Redis",
+	Repository: "github.com/vertex-center/vertex-redis",
 }
 
 func handleDownload(c *gin.Context) {
-	err := redisService.Download()
+	err := servicesmanager.Download(redisService)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -63,4 +65,8 @@ func handleStop(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "OK",
 	})
+}
+
+func handleInstalled(c *gin.Context) {
+	c.JSON(http.StatusOK, servicesmanager.ListAll())
 }
