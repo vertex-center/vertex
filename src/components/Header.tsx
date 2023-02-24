@@ -18,11 +18,15 @@ type ItemProps = PropsWithChildren<{
 }>;
 
 function Item({ children, to }: ItemProps) {
+    const className = "rounded-md px-3 py-1 cursor-pointer hover:bg-zinc-300";
     return (
-        <NavLink to={to}>
-            <li className="rounded-md px-3 py-1 cursor-pointer hover:bg-zinc-200">
-                {children}
-            </li>
+        <NavLink
+            to={to}
+            className={({ isActive }) =>
+                `${className} ${isActive ? "bg-zinc-200" : ""}`
+            }
+        >
+            <li>{children}</li>
         </NavLink>
     );
 }
@@ -31,7 +35,7 @@ export default function Header() {
     return (
         <div className="flex items-center flex-center block px-3 py-2 border-b text-zinc-900 border-zinc-100">
             <Logo />
-            <ul className="flex flex-row ml-4">
+            <ul className="flex flex-row ml-4 gap-1">
                 <Item to="marketplace">Marketplace</Item>
                 <Item to="installed">Installed</Item>
             </ul>

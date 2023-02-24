@@ -18,3 +18,16 @@ export async function getInstalledServices(): Promise<Service[]> {
             });
     });
 }
+
+export async function getAvailableServices(): Promise<Service[]> {
+    return new Promise((resolve, reject) => {
+        axios
+            .get("http://localhost:6130/available")
+            .then((res) => {
+                resolve(res.data);
+            })
+            .catch((err) => {
+                reject(err);
+            });
+    });
+}
