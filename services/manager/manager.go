@@ -4,6 +4,7 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -17,27 +18,32 @@ import (
 	"github.com/vertex-center/vertex/services"
 )
 
-func ListInstalled() []services.Service {
+func ListInstalled() ([]services.Service, error) {
 	entries, err := os.ReadDir("servers")
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	var allServices []services.Service
 
 	for _, entry := range entries {
 		if entry.IsDir() {
-			service := services.Service{
-				ID:         entry.Name(),
-				Name:       entry.Name(),
-				Repository: entry.Name(),
+			data, err := os.ReadFile(path.Join("servers", entry.Name(), "service.json"))
+			if err != nil {
+				return nil, err
+			}
+
+			var service services.Service
+			err = json.Unmarshal(data, &service)
+			if err != nil {
+				return nil, err
 			}
 
 			allServices = append(allServices, service)
 		}
 	}
 
-	return allServices
+	return allServices, nil
 }
 
 func Download(s services.Service) error {
@@ -72,6 +78,16 @@ func Download(s services.Service) error {
 				}
 
 				err = os.Remove(archivePath)
+				if err != nil {
+					return err
+				}
+
+				file, err := json.MarshalIndent(s, "", "\t")
+				if err != nil {
+					return err
+				}
+
+				err = os.WriteFile(path.Join(basePath, "service.json"), file, 0644)
 				if err != nil {
 					return err
 				}

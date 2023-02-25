@@ -64,7 +64,13 @@ func handleStop(c *gin.Context) {
 }
 
 func handleInstalled(c *gin.Context) {
-	c.JSON(http.StatusOK, servicesmanager.ListInstalled())
+	installed, err := servicesmanager.ListInstalled()
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, installed)
 }
 
 func handleAvailable(c *gin.Context) {
