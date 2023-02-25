@@ -1,0 +1,22 @@
+@use "../../styles/colors"
+
+.server
+    position: relative
+    height: 100vh
+
+    &::before
+        position: absolute
+        content: ''
+        width: 100px
+        height: 100%
+        background-color: colors.$bg-secondary
+        border-right: 1px solid colors.$bg-tertiary
+        z-index: -1
+
+.bays
+    display: flex
+    flex-direction: column
+    gap: 16px
+    padding: 12px
+    width: 60%
+    margin-left: 56px

@@ -1,0 +1,44 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+@use "../../styles/fonts"
+
+.bay
+    background-color: colors.$bg-secondary
+    border: 1px solid colors.$bg-tertiary
+    padding: 4px 24px
+    border-radius: dimensions.$border-radius
+    display: flex
+    flex-direction: row
+    align-items: center
+    gap: 20px
+
+.lcd
+    background-color: #000
+    border: 1px solid colors.$bg-tertiary
+    padding: 16px 20px
+    border-radius: dimensions.$border-radius
+    display: flex
+    flex-direction: column
+    flex-grow: 1
+    gap: 10px
+    font-family: fonts.$font-family-code
+    font-size: 15px
+
+    &Red
+        color: colors.$red
+
+    &Green
+        color: colors.$green
+
+.led
+    width: 14px
+    height: 14px
+    border-radius: 50%
+    background-color: colors.$red
+    border: 1px solid black
+
+    &Red
+        background-color: colors.$red
+
+    &Green
+        background-color: colors.$green

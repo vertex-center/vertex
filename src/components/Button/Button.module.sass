@@ -27,27 +27,9 @@
     cursor: pointer
     font-weight: 500
     overflow: hidden
-    z-index: 2
     padding: 8px 16px
-    transition: all 0.2s ease
+    transition: all 0.05s ease
     justify-content: flex-end
-
-    &::before
-        content: ''
-        position: absolute
-        z-index: 1
-        top: 100%
-        left: 0
-        bottom: 0
-        right: 0
-        background-color: rgba(0, 0, 0, 0.1)
-        transition: all 0.2s ease
-
-    &:hover::before
-        top: 0
-
-    & > *
-        z-index: 2
 
     &Large
         padding: 8px
@@ -63,6 +45,13 @@
             &Downloading
                 max-width: 300px
                 opacity: 1
+
+    &Transparent
+        background-color: transparent
+        color: colors.$fg-primary
+
+        &:hover
+            background-color: colors.$bg-secondary-hover
 
 @keyframes downloading
     from

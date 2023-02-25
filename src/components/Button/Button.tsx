@@ -6,7 +6,7 @@ import classNames from "classnames";
 
 type Props = PropsWithChildren<{
     rightSymbol: string;
-    type?: "normal" | "large";
+    type?: "normal" | "large" | "transparent";
     downloading?: boolean;
     onClick: () => void;
 }>;
@@ -33,6 +33,7 @@ export default function Button(props: Props) {
             className={classNames({
                 [styles.button]: true,
                 [styles.buttonLarge]: type === "large",
+                [styles.buttonTransparent]: type === "transparent",
                 [styles.buttonDownloading]: downloading,
             })}
             type="button"
