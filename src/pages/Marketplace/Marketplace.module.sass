@@ -1,27 +1,41 @@
 @use "../../styles/colors"
+@use "../../styles/dimensions"
 
-.cards
+.marketplace
+    display: flex
+    height: 100vh
+    width: 100vw
+    flex-direction: column
+    align-items: center
+    justify-content: center
+
+.content
+    display: flex
+    flex-direction: column
+    width: 50%
+    align-items: center
+    justify-content: center
+
+.server
+    width: 100%
+    padding: 20px 0 32px
+    //border-bottom: 1px solid colors.$bg-secondary
+    margin-bottom: 32px
+
+.step
+    display: flex
+    flex-direction: column
+    gap: 20px
+    width: 100%
+
+    &Title
+        display: flex
+        flex-direction: row
+        align-items: center
+        gap: 10px
+
+.buttons
     display: grid
     grid-template-columns: repeat(2, 1fr)
-    padding: 0 12px
     gap: 12px
 
-.appHeader
-    display: flex
-    flex-direction: row
-    align-items: center
-    gap: 10px
-    margin-bottom: 12px
-
-.appDescription
-    display: block
-    margin-top: 12px
-
-.appActions
-    display: flex
-    flex-direction: row
-    justify-content: flex-end
-    gap: 6px
-    margin-top: 20px
-    padding: 10px !important
-    border-top: 1px solid colors.$bg-secondary-hover

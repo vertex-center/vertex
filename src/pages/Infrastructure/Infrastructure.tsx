@@ -2,6 +2,8 @@ import styles from "./Infrastructure.module.sass";
 import Bay from "../../components/Bay/Bay";
 import { useEffect, useState } from "react";
 import { getInstalledServices, Service } from "../../backend/backend";
+import Symbol from "../../components/Symbol/Symbol";
+import { Link } from "react-router-dom";
 
 export default function Infrastructure() {
     const [installed, setInstalled] = useState<Service[]>([]);
@@ -17,6 +19,9 @@ export default function Infrastructure() {
                 {installed?.map((service) => (
                     <Bay key={service.id} name={service.name} status="error" />
                 ))}
+                <Link to="/marketplace" className={styles.addBay}>
+                    <Symbol name="add" />
+                </Link>
             </div>
         </div>
     );

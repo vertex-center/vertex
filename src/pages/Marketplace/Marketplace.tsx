@@ -1,73 +1,145 @@
-import { getAvailableServices, Service } from "../../backend/backend";
-import { useEffect, useState } from "react";
-import Card from "../../components/Card/Card";
-import { Caption, Title } from "../../components/Text/Text";
+import {
+    getAvailableServices,
+    postDownloadService,
+    Service,
+} from "../../backend/backend";
+import { Fragment, useEffect, useState } from "react";
+import { Title } from "../../components/Text/Text";
 
 import styles from "./Marketplace.module.sass";
-import Logo from "../../components/Logo/Logo";
-import URL from "../../components/URL/URL";
-import Spacer from "../../components/Spacer/Spacer";
-import classNames from "classnames";
 import Button from "../../components/Button/Button";
+import Bay from "../../components/Bay/Bay";
+import Symbol from "../../components/Symbol/Symbol";
+import Select, { Option } from "../../components/Input/Select";
+import { Error } from "../../components/Error/Error";
+import Loading from "../../components/Loading/Loading";
 
-type ApplicationProps = {
-    service: Service;
+type DownloadMethod = "marketplace" | "manual";
+
+type StepDownloadProps = {
+    onDownload: (service: Service) => void;
 };
 
-type AppState = "available" | "installing" | "installed";
+function StepDownload(props: StepDownloadProps) {
+    const { onDownload } = props;
 
-function Application({ service }: ApplicationProps) {
-    const [state, setState] = useState<AppState>("available");
+    const [available, setAvailable] = useState<Service[]>([]);
 
-    const onDownloadClick = () => {
-        if (state === "available") setState("installing");
-        else if (state === "installing") setState("available");
+    const [service, setService] = useState<Service>();
+
+    const [method, setMethod] = useState<DownloadMethod>();
+    const [error, setError] = useState<string>();
+
+    const [isLoadingMarketplace, setIsLoadingMarketplace] =
+        useState<boolean>(false);
+    const [isDownloading, setIsDownloading] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (method === "marketplace") {
+            setIsLoadingMarketplace(true);
+            setError(undefined);
+            setTimeout(() => {
+                getAvailableServices()
+                    .then(setAvailable)
+                    .catch((err) => {
+                        setError(
+                            `An error occurred while fetching services from the Marketplace: ${err.message}`
+                        );
+                        console.error(err);
+                    })
+                    .finally(() => setIsLoadingMarketplace(false));
+            }, 500);
+        }
+    }, [method]);
+
+    const onServiceChange = (e: any) => {
+        let service = available.find((s: Service) => s.id === e.target.value);
+        setService(service);
     };
 
-    return (
-        <Card>
-            <div className={styles.appHeader}>
-                <Logo iconOnly />
-                <Title>{service.name}</Title>
+    const download = () => {
+        onDownload(service);
+        setIsDownloading(true);
+    };
+
+    const form = (
+        <Fragment>
+            <div className={styles.stepTitle}>
+                <Symbol name="counter_1" />
+                <Title>Download</Title>
             </div>
-            <URL href={`https://${service.repository}`}>
-                {service.repository}
-            </URL>
-            <Caption className={styles.appDescription}>
-                {service.description}
-            </Caption>
-            <Spacer />
-            <div
-                className={classNames({
-                    [styles.appActions]: true,
-                    [styles.downloadBarDownloading]: state === "installing",
-                })}
-                onClick={onDownloadClick}
-            >
+            <div className={styles.buttons}>
                 <Button
-                    type="transparent"
-                    rightSymbol="download"
-                    onClick={onDownloadClick}
+                    onClick={() => setMethod("marketplace")}
+                    leftSymbol="precision_manufacturing"
+                    selectable
+                    selected={method === "marketplace"}
                 >
-                    Download
+                    Marketplace
+                </Button>
+                <Button
+                    onClick={() => setMethod("manual")}
+                    leftSymbol="hand_gesture"
+                    selectable
+                    selected={method === "manual"}
+                >
+                    Manual
                 </Button>
             </div>
-        </Card>
+            {method === "marketplace" && !isLoadingMarketplace && !error && (
+                <Select label="Service" onChange={onServiceChange}>
+                    <Option />
+                    {available.map((service) => (
+                        <Option key={service.id} value={service.id}>
+                            {service.name}
+                        </Option>
+                    ))}
+                </Select>
+            )}
+            {method === "marketplace" && isLoadingMarketplace && <Loading />}
+            <Button
+                primary
+                large
+                rightSymbol="download"
+                disabled={!service}
+                onClick={download}
+            >
+                Download
+            </Button>
+        </Fragment>
+    );
+
+    return (
+        <div className={styles.step}>
+            {!isDownloading && form}
+            <Error error={error} />
+        </div>
     );
 }
 
 export default function Installed() {
-    const [installed, setInstalled] = useState<Service[]>([]);
+    const [isDownloading, setIsDownloading] = useState<boolean>(false);
+    const [service, setService] = useState<Service>();
 
-    useEffect(() => {
-        getAvailableServices().then((installed) => setInstalled(installed));
-    }, []);
+    const download = (service: Service) => {
+        setIsDownloading(true);
+        setService(service);
+        postDownloadService(service).then(() => {
+            setIsDownloading(false);
+        });
+    };
 
     return (
-        <div className={styles.cards}>
-            {installed.map((service) => (
-                <Application key={service.id} service={service} />
-            ))}
+        <div className={styles.marketplace}>
+            <div className={styles.content}>
+                <div className={styles.server}>
+                    <Bay
+                        name={service?.name ?? "Empty server"}
+                        status={isDownloading ? "downloading" : "off"}
+                    />
+                </div>
+                <StepDownload onDownload={download} />
+            </div>
         </div>
     );
 }

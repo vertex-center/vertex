@@ -1,4 +1,5 @@
 @use "../../styles/colors"
+@use "../../styles/dimensions"
 
 .server
     position: relative
@@ -17,6 +18,25 @@
     display: flex
     flex-direction: column
     gap: 16px
-    padding: 12px
+    padding: 20px 12px 12px
     width: 60%
     margin-left: 56px
+
+.addBay
+    display: flex
+    flex-direction: row
+    align-items: center
+    justify-content: center
+    width: 64px
+    height: 64px
+    border-radius: dimensions.$border-radius
+    background-color: colors.$bg-primary
+    border: 1px solid colors.$bg-tertiary
+    cursor: pointer
+    transition: height 0.1s ease 0.03s, width 0.2s ease
+
+    &:hover
+        background-color: colors.$bg-primary-hover
+        height: 82px
+        width: 100%
+        transition: height 0.1s ease, width 0.2s ease 0.03s

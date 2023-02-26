@@ -18,27 +18,48 @@
     padding: 16px 20px
     border-radius: dimensions.$border-radius
     display: flex
-    flex-direction: column
+    flex-direction: row
+    align-items: center
     flex-grow: 1
     gap: 10px
     font-family: fonts.$font-family-code
     font-size: 15px
 
+    &Gray
+        color: colors.$fg-primary
+        opacity: 0.6
+
     &Red
         color: colors.$red
+        opacity: 1
+
+    &Orange
+        color: colors.$orange
+        opacity: 1
 
     &Green
         color: colors.$green
+        opacity: 1
 
 .led
     width: 14px
     height: 14px
     border-radius: 50%
-    background-color: colors.$red
-    border: 1px solid black
+    background-color: transparent
+    border: 1px solid colors.$bg-tertiary
+    transition: all 1s ease
 
-    &Red
+    &Error
         background-color: colors.$red
 
-    &Green
+    &Downloading
+        animation: pulse-orange 0.4s ease infinite alternate-reverse
+
+    &Running
         background-color: colors.$green
+
+@keyframes pulse-orange
+    from
+        background-color: colors.$orange
+    to
+        background-color: transparent

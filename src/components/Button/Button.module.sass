@@ -1,62 +1,36 @@
 @use "../../styles/colors"
 @use "../../styles/dimensions"
 
-.content
-    display: flex
-    flex-direction: row
-    gap: 6px
-    align-items: center
-    max-width: 300px
-    overflow: hidden
-    transition: opacity 0.2s ease
-
-    &Downloading
-        max-width: 0
-
 .button
     display: flex
     flex-direction: row
+    gap: 10px
     align-items: center
-    position: relative
-    border: none
-    outline: none
+    background-color: colors.$bg-secondary
+    padding: 12px 16px
     border-radius: dimensions.$border-radius
-    font-size: 16px
-    background-color: colors.$bg-accent
-    color: colors.$fg-accent
+    border: 1px solid colors.$bg-tertiary
     cursor: pointer
+    font-size: 16px
+    color: colors.$fg-primary
+
+    &:hover
+        background-color: colors.$bg-secondary-hover
+
+.primary
+    background-color: colors.$bg-accent
+    border-color: colors.$bg-accent-hover
+    color: colors.$fg-accent
     font-weight: 500
-    overflow: hidden
-    padding: 8px 16px
-    transition: all 0.05s ease
-    justify-content: flex-end
 
-    &Large
-        padding: 8px
-        flex-grow: 1
+    &:hover
+        background-color: colors.$bg-accent-hover
 
-    &Downloading
-        animation: downloading 1s ease infinite
+.large
+    justify-content: center
 
-        & .content
-            max-width: 0
-            opacity: 0
+.selected
+    border-color: colors.$bg-accent
 
-            &Downloading
-                max-width: 300px
-                opacity: 1
-
-    &Transparent
-        background-color: transparent
-        color: colors.$fg-primary
-
-        &:hover
-            background-color: colors.$bg-secondary-hover
-
-@keyframes downloading
-    from
-        background-color: colors.$blue
-    50%
-        background-color: colors.$blue-hover
-    to
-        background-color: colors.$blue
+.disabled
+    cursor: not-allowed

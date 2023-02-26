@@ -1,6 +1,7 @@
 import styles from "./Bay.module.sass";
 import Symbol from "../Symbol/Symbol";
 import classNames from "classnames";
+import { Vertical } from "../Layouts/Layouts";
 
 type ButtonProps = {
     symbol: string;
@@ -11,7 +12,7 @@ function Button({ symbol }: ButtonProps) {
 }
 
 type LEDProps = {
-    status: Status;
+    status: Status | string;
 };
 
 function LED({ status }: LEDProps) {
@@ -19,18 +20,19 @@ function LED({ status }: LEDProps) {
         <div
             className={classNames({
                 [styles.led]: true,
-                [styles.ledGreen]: status === "running",
-                [styles.ledRed]: status === "error",
+                [styles.ledRunning]: status === "running",
+                [styles.ledError]: status === "error",
+                [styles.ledDownloading]: status === "downloading",
             })}
         ></div>
     );
 }
 
-type Status = "running" | "error";
+type Status = "running" | "error" | "downloading";
 
 type LCDProps = {
     name: string;
-    status: Status;
+    status: Status | string;
 };
 
 function LCD(props: LCDProps) {
@@ -44,26 +46,35 @@ function LCD(props: LCDProps) {
         case "error":
             message = "Fatal error";
             break;
+        case "downloading":
+            message = "Downloading...";
+            break;
+        default:
+            message = status;
     }
 
     return (
         <div className={styles.lcd}>
-            <div>{name}</div>
-            <div
-                className={classNames({
-                    [styles.lcdGreen]: status === "running",
-                    [styles.lcdRed]: status === "error",
-                })}
-            >
-                {message}
-            </div>
+            <Vertical gap={10}>
+                <div>{name}</div>
+                <div
+                    className={classNames({
+                        [styles.lcdGray]: true,
+                        [styles.lcdGreen]: status === "running",
+                        [styles.lcdRed]: status === "error",
+                        [styles.lcdOrange]: status === "downloading",
+                    })}
+                >
+                    {message}
+                </div>
+            </Vertical>
         </div>
     );
 }
 
 type Props = {
     name: string;
-    status: Status;
+    status: Status | string;
 };
 
 export default function Bay(props: Props) {

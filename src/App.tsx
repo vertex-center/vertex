@@ -1,6 +1,5 @@
 import { HashRouter, Route, Routes } from "react-router-dom";
 import Marketplace from "./pages/Marketplace/Marketplace";
-import Installed from "./pages/Installed";
 import Infrastructure from "./pages/Infrastructure/Infrastructure";
 
 function App() {
@@ -10,7 +9,6 @@ function App() {
                 {/*<Header />*/}
                 <Routes>
                     <Route path="/marketplace" element={<Marketplace />} />
-                    <Route path="/installed" element={<Installed />} />
                     <Route
                         path="/infrastructure"
                         element={<Infrastructure />}

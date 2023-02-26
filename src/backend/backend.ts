@@ -32,3 +32,16 @@ export async function getAvailableServices(): Promise<Service[]> {
             });
     });
 }
+
+export async function postDownloadService(service: Service) {
+    return new Promise((resolve, reject) => {
+        axios
+            .post("http://localhost:6130/download", { service })
+            .then((res) => {
+                resolve(res.data);
+            })
+            .catch((err) => {
+                reject(err);
+            });
+    });
+}
