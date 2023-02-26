@@ -15,8 +15,11 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v50/github"
+	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex/services"
 )
+
+var logger = console.New("vertex::services-manager")
 
 func ListInstalled() ([]services.Service, error) {
 	entries, err := os.ReadDir("servers")
@@ -28,9 +31,10 @@ func ListInstalled() ([]services.Service, error) {
 
 	for _, entry := range entries {
 		if entry.IsDir() {
-			data, err := os.ReadFile(path.Join("servers", entry.Name(), "service.json"))
+			data, err := os.ReadFile(path.Join("servers", entry.Name(), ".vertex", "service.json"))
 			if err != nil {
-				return nil, err
+				logger.Warn(fmt.Sprintf("service %s has no '.vertex/service.json' file", entry.Name()))
+				continue
 			}
 
 			var service services.Service
@@ -78,16 +82,6 @@ func Download(s services.Service) error {
 				}
 
 				err = os.Remove(archivePath)
-				if err != nil {
-					return err
-				}
-
-				file, err := json.MarshalIndent(s, "", "\t")
-				if err != nil {
-					return err
-				}
-
-				err = os.WriteFile(path.Join(basePath, "service.json"), file, 0644)
 				if err != nil {
 					return err
 				}
@@ -151,11 +145,16 @@ func untarFile(basePath string, archivePath string) error {
 
 		switch header.Typeflag {
 		case tar.TypeDir:
-			err = os.Mkdir(filepath, os.ModePerm)
+			err = os.MkdirAll(filepath, os.ModePerm)
 			if err != nil {
 				return err
 			}
 		case tar.TypeReg:
+			err := os.MkdirAll(path.Dir(filepath), os.ModePerm)
+			if err != nil {
+				return err
+			}
+
 			file, err := os.Create(filepath)
 			if err != nil {
 				return err
