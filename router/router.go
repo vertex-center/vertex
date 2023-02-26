@@ -1,6 +1,7 @@
 package router
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
@@ -15,26 +16,15 @@ func InitializeRouter() *gin.Engine {
 	r.Use(cors.Default())
 
 	// TODO: Change to POST and read body
-	r.GET("/download", handleDownload)
 	r.GET("/start", handleStart)
 	r.GET("/stop", handleStop)
 
 	r.GET("/installed", handleInstalled)
 	r.GET("/available", handleAvailable)
 
+	r.POST("/download", handleDownload)
+
 	return r
-}
-
-func handleDownload(c *gin.Context) {
-	err := servicesmanager.Download(servicesmanager.ListAvailable()[0])
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "OK",
-	})
 }
 
 func handleStart(c *gin.Context) {
@@ -75,4 +65,27 @@ func handleInstalled(c *gin.Context) {
 
 func handleAvailable(c *gin.Context) {
 	c.JSON(http.StatusOK, servicesmanager.ListAvailable())
+}
+
+type DownloadBody struct {
+	Service services.Service `json:"service"`
+}
+
+func handleDownload(c *gin.Context) {
+	var body DownloadBody
+	err := c.BindJSON(&body)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("failed to parse body: %v", err))
+		return
+	}
+
+	err = servicesmanager.Download(body.Service)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "OK",
+	})
 }
