@@ -121,12 +121,18 @@ export default function Installed() {
     const [isDownloading, setIsDownloading] = useState<boolean>(false);
     const [service, setService] = useState<Service>();
 
+    const [error, setError] = useState<string>();
+
     const download = (service: Service) => {
         setIsDownloading(true);
         setService(service);
-        postDownloadService(service).then(() => {
-            setIsDownloading(false);
-        });
+        postDownloadService(service)
+            .then(() => {})
+            .catch((error) => {
+                console.log(error);
+                setError(`${error.message}: ${error.response.data.message}`);
+            })
+            .finally(() => setIsDownloading(false));
     };
 
     return (
@@ -139,6 +145,7 @@ export default function Installed() {
                     />
                 </div>
                 <StepDownload onDownload={download} />
+                <Error error={error} />
             </div>
         </div>
     );
