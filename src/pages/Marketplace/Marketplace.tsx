@@ -139,6 +139,14 @@ export default function Installed() {
         <div className={styles.marketplace}>
             <div className={styles.content}>
                 <div className={styles.server}>
+                    {isDownloading && (
+                        <Fragment>
+                            <div className={styles.cloud}>
+                                <Symbol name="cloud" />
+                            </div>
+                            <div className={styles.cable}></div>
+                        </Fragment>
+                    )}
                     <Bay
                         name={service?.name ?? "Empty server"}
                         status={isDownloading ? "downloading" : "off"}

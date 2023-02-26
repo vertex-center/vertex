@@ -62,7 +62,7 @@ function LCD(props: LCDProps) {
                         [styles.lcdGray]: true,
                         [styles.lcdGreen]: status === "running",
                         [styles.lcdRed]: status === "error",
-                        [styles.lcdOrange]: status === "downloading",
+                        [styles.lcdDownloading]: status === "downloading",
                     })}
                 >
                     {message}
