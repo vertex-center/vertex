@@ -1,10 +1,9 @@
-package servicesmanager
+package services
 
 import (
 	"archive/tar"
 	"compress/gzip"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -15,54 +14,16 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v50/github"
-	"github.com/vertex-center/vertex-core-golang/console"
-	"github.com/vertex-center/vertex/services"
-	"github.com/vertex-center/vertex/services/runners"
 )
 
-var logger = console.New("vertex::services-manager")
-
-func ListInstalled() (map[string]*services.InstalledService, error) {
-	entries, err := os.ReadDir("servers")
-	if err != nil {
-		return nil, err
-	}
-
-	var allServices = map[string]*services.InstalledService{}
-
-	for _, entry := range entries {
-		if entry.IsDir() {
-			data, err := os.ReadFile(path.Join("servers", entry.Name(), ".vertex", "service.json"))
-			if err != nil {
-				logger.Warn(fmt.Sprintf("service %s has no '.vertex/service.json' file", entry.Name()))
-				continue
-			}
-
-			var service services.Service
-			err = json.Unmarshal(data, &service)
-			if err != nil {
-				return nil, err
-			}
-
-			allServices[service.ID] = &services.InstalledService{
-				Service: service,
-				Status:  "off",
-			}
-		}
-	}
-
-	for key, service := range allServices {
-		runner, err := runners.GetRunner(key)
-		if err != nil {
-			continue
-		}
-		service.Status = runner.Status()
-	}
-
-	return allServices, nil
+type Service struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Repository  string `json:"repository"`
+	Description string `json:"description"`
 }
 
-func Download(s services.Service) error {
+func (s Service) Download() error {
 	if strings.HasPrefix(s.Repository, "github") {
 		client := github.NewClient(nil)
 
@@ -100,6 +61,11 @@ func Download(s services.Service) error {
 
 				break
 			}
+		}
+
+		_, err = s.Instantiate()
+		if err != nil {
+			return err
 		}
 	}
 

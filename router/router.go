@@ -10,7 +10,6 @@ import (
 	"github.com/vertex-center/vertex-core-golang/router"
 	"github.com/vertex-center/vertex/services"
 	servicesmanager "github.com/vertex-center/vertex/services/manager"
-	"github.com/vertex-center/vertex/services/runners"
 )
 
 func InitializeRouter() *gin.Engine {
@@ -30,12 +29,7 @@ func InitializeRouter() *gin.Engine {
 }
 
 func handleServicesInstalled(c *gin.Context) {
-	installed, err := servicesmanager.ListInstalled()
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
+	installed := services.ListInstalled()
 	c.JSON(http.StatusOK, installed)
 }
 
@@ -55,7 +49,7 @@ func handleServiceDownload(c *gin.Context) {
 		return
 	}
 
-	err = servicesmanager.Download(body.Service)
+	err = body.Service.Download()
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -73,13 +67,13 @@ func handleServiceStart(c *gin.Context) {
 		return
 	}
 
-	runner, err := runners.NewRunner(serviceID)
+	service, err := services.GetInstalled(serviceID)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	err = runner.Start()
+	err = service.Start()
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -97,13 +91,13 @@ func handleServiceStop(c *gin.Context) {
 		return
 	}
 
-	runner, err := runners.GetRunner(serviceID)
+	service, err := services.GetInstalled(serviceID)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	err = runner.Stop()
+	err = service.Stop()
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return

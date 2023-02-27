@@ -6,6 +6,7 @@ import (
 
 	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex/router"
+	servicesmanager "github.com/vertex-center/vertex/services/manager"
 )
 
 var logger = console.New("vertex")
@@ -22,6 +23,12 @@ func main() {
 	err = os.Mkdir("clients", os.ModePerm)
 	if err != nil && !os.IsExist(err) {
 		logger.Error(fmt.Errorf("couldn't create 'clients' directory: %v", err))
+		return
+	}
+
+	err = servicesmanager.ReloadAllInstalled()
+	if err != nil {
+		logger.Error(err)
 		return
 	}
 
