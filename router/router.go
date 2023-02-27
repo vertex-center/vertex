@@ -17,14 +17,14 @@ func InitializeRouter() *gin.Engine {
 	r := router.CreateRouter()
 	r.Use(cors.Default())
 
-	r.GET("/installed", handleInstalled)
-	r.GET("/available", handleAvailable)
-
-	r.POST("/download", handleDownload)
+	servicesGroup := r.Group("/services")
+	servicesGroup.GET("/installed", handleInstalled)
+	servicesGroup.GET("/available", handleAvailable)
+	servicesGroup.POST("/download", handleDownload)
 
 	serviceGroup := r.Group("/service/:service_id")
-	serviceGroup.GET("/start", handleStart)
-	serviceGroup.GET("/stop", handleStop)
+	serviceGroup.POST("/start", handleStart)
+	serviceGroup.POST("/stop", handleStop)
 
 	return r
 }
