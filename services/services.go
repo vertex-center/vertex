@@ -6,3 +6,8 @@ type Service struct {
 	Repository  string `json:"repository"`
 	Description string `json:"description"`
 }
+
+type InstalledService struct {
+	Service
+	Status string `json:"status"`
+}

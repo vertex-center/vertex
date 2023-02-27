@@ -8,6 +8,12 @@ import (
 	"path"
 )
 
+const (
+	StatusOff     = "off"
+	StatusRunning = "running"
+	StatusError   = "error"
+)
+
 var runners = map[string]*Runner{}
 
 type Runner struct {
@@ -53,6 +59,19 @@ func (r *Runner) Stop() error {
 
 	r.cmd = nil
 	return nil
+}
+
+func (r *Runner) Status() string {
+	if r.cmd == nil {
+		return StatusOff
+	}
+
+	state := r.cmd.ProcessState
+	if state == nil {
+		return StatusRunning
+	}
+
+	return StatusError
 }
 
 func GetRunner(serviceID string) (*Runner, error) {

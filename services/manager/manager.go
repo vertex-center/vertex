@@ -17,17 +17,18 @@ import (
 	"github.com/google/go-github/v50/github"
 	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex/services"
+	"github.com/vertex-center/vertex/services/runners"
 )
 
 var logger = console.New("vertex::services-manager")
 
-func ListInstalled() ([]services.Service, error) {
+func ListInstalled() (map[string]*services.InstalledService, error) {
 	entries, err := os.ReadDir("servers")
 	if err != nil {
 		return nil, err
 	}
 
-	var allServices []services.Service
+	var allServices = map[string]*services.InstalledService{}
 
 	for _, entry := range entries {
 		if entry.IsDir() {
@@ -43,8 +44,19 @@ func ListInstalled() ([]services.Service, error) {
 				return nil, err
 			}
 
-			allServices = append(allServices, service)
+			allServices[service.ID] = &services.InstalledService{
+				Service: service,
+				Status:  "off",
+			}
 		}
+	}
+
+	for key, service := range allServices {
+		runner, err := runners.GetRunner(key)
+		if err != nil {
+			continue
+		}
+		service.Status = runner.Status()
 	}
 
 	return allServices, nil

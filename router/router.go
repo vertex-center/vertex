@@ -18,18 +18,18 @@ func InitializeRouter() *gin.Engine {
 	r.Use(cors.Default())
 
 	servicesGroup := r.Group("/services")
-	servicesGroup.GET("/installed", handleInstalled)
-	servicesGroup.GET("/available", handleAvailable)
-	servicesGroup.POST("/download", handleDownload)
+	servicesGroup.GET("", handleServicesInstalled)
+	servicesGroup.GET("/available", handleServicesAvailable)
+	servicesGroup.POST("/download", handleServiceDownload)
 
 	serviceGroup := r.Group("/service/:service_id")
-	serviceGroup.POST("/start", handleStart)
-	serviceGroup.POST("/stop", handleStop)
+	serviceGroup.POST("/start", handleServiceStart)
+	serviceGroup.POST("/stop", handleServiceStop)
 
 	return r
 }
 
-func handleInstalled(c *gin.Context) {
+func handleServicesInstalled(c *gin.Context) {
 	installed, err := servicesmanager.ListInstalled()
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -39,7 +39,7 @@ func handleInstalled(c *gin.Context) {
 	c.JSON(http.StatusOK, installed)
 }
 
-func handleAvailable(c *gin.Context) {
+func handleServicesAvailable(c *gin.Context) {
 	c.JSON(http.StatusOK, servicesmanager.ListAvailable())
 }
 
@@ -47,7 +47,7 @@ type DownloadBody struct {
 	Service services.Service `json:"service"`
 }
 
-func handleDownload(c *gin.Context) {
+func handleServiceDownload(c *gin.Context) {
 	var body DownloadBody
 	err := c.BindJSON(&body)
 	if err != nil {
@@ -66,7 +66,7 @@ func handleDownload(c *gin.Context) {
 	})
 }
 
-func handleStart(c *gin.Context) {
+func handleServiceStart(c *gin.Context) {
 	serviceID := c.Param("service_id")
 	if serviceID == "" {
 		c.AbortWithError(http.StatusBadRequest, errors.New("service_id was missing in the URL"))
@@ -90,7 +90,7 @@ func handleStart(c *gin.Context) {
 	})
 }
 
-func handleStop(c *gin.Context) {
+func handleServiceStop(c *gin.Context) {
 	serviceID := c.Param("service_id")
 	if serviceID == "" {
 		c.AbortWithError(http.StatusBadRequest, errors.New("service_id was missing in the URL"))
