@@ -23,6 +23,7 @@ export default function Infrastructure() {
                 setStatus("running");
             })
             .catch(() => {
+                setInstalled({});
                 setStatus("off");
             });
     };
