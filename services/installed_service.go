@@ -7,6 +7,8 @@ import (
 	"os"
 	"os/exec"
 	"path"
+
+	"github.com/vertex-center/vertex-core-golang/console"
 )
 
 const (
@@ -15,11 +17,31 @@ const (
 	StatusError   = "error"
 )
 
-var installed = map[string]*InstalledService{}
+var (
+	logger    = console.New("vertex::services-manager")
+	installed = map[string]*InstalledService{}
+)
 
 type InstalledService struct {
 	Service
 	cmd *exec.Cmd
+}
+
+func FromDisk(serviceID string) (*InstalledService, error) {
+	data, err := os.ReadFile(path.Join("servers", serviceID, ".vertex", "service.json"))
+	if err != nil {
+		logger.Warn(fmt.Sprintf("service '%s' has no '.vertex/service.json' file", serviceID))
+	}
+
+	var service Service
+	err = json.Unmarshal(data, &service)
+	if err != nil {
+		return nil, err
+	}
+
+	return &InstalledService{
+		Service: service,
+	}, nil
 }
 
 func (s *InstalledService) Start() error {
@@ -78,9 +100,9 @@ func (s Service) Instantiate() (*InstalledService, error) {
 		return nil, fmt.Errorf("the service '%s' is already running", s.ID)
 	}
 
-	is := &InstalledService{
-		Service: s,
-		cmd:     nil,
+	is, err := FromDisk(s.ID)
+	if err != nil {
+		return nil, err
 	}
 
 	installed[s.ID] = is

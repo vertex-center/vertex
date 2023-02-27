@@ -1,10 +1,8 @@
 package servicesmanager
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
-	"path"
 
 	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex/services"
@@ -20,14 +18,7 @@ func ReloadAllInstalled() error {
 
 	for _, entry := range entries {
 		if entry.IsDir() {
-			data, err := os.ReadFile(path.Join("servers", entry.Name(), ".vertex", "service.json"))
-			if err != nil {
-				logger.Warn(fmt.Sprintf("service '%s' has no '.vertex/service.json' file", entry.Name()))
-				continue
-			}
-
-			var service services.Service
-			err = json.Unmarshal(data, &service)
+			service, err := services.FromDisk(entry.Name())
 			if err != nil {
 				return err
 			}

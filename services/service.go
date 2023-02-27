@@ -16,14 +16,24 @@ import (
 	"github.com/google/go-github/v50/github"
 )
 
-type Service struct {
-	ID          string `json:"id"`
+type EnvVariable struct {
+	Type        string `json:"type"`
 	Name        string `json:"name"`
-	Repository  string `json:"repository"`
+	DisplayName string `json:"display_name"`
+	Secret      bool   `json:"secret,omitempty"`
+	Default     string `json:"default,omitempty"`
 	Description string `json:"description"`
 }
 
-func (s Service) Download() error {
+type Service struct {
+	ID           string        `json:"id"`
+	Name         string        `json:"name"`
+	Repository   string        `json:"repository"`
+	Description  string        `json:"description"`
+	EnvVariables []EnvVariable `json:"environment,omitempty"`
+}
+
+func (s Service) Install() (*InstalledService, error) {
 	if strings.HasPrefix(s.Repository, "github") {
 		client := github.NewClient(nil)
 
@@ -34,7 +44,7 @@ func (s Service) Download() error {
 
 		release, _, err := client.Repositories.GetLatestRelease(context.Background(), owner, repo)
 		if err != nil {
-			return errors.New(fmt.Sprintf("failed to retrieve the latest github release for %s", s.Repository))
+			return nil, errors.New(fmt.Sprintf("failed to retrieve the latest github release for %s", s.Repository))
 		}
 
 		platform := fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH)
@@ -46,30 +56,32 @@ func (s Service) Download() error {
 
 				err := downloadFile(*asset.BrowserDownloadURL, basePath, archivePath)
 				if err != nil {
-					return err
+					return nil, err
 				}
 
 				err = untarFile(basePath, archivePath)
 				if err != nil {
-					return err
+					return nil, err
 				}
 
 				err = os.Remove(archivePath)
 				if err != nil {
-					return err
+					return nil, err
 				}
 
 				break
 			}
 		}
 
-		_, err = s.Instantiate()
+		instance, err := s.Instantiate()
 		if err != nil {
-			return err
+			return nil, err
 		}
+
+		return instance, nil
 	}
 
-	return nil
+	return nil, errors.New("this repository is not supported")
 }
 
 func downloadFile(url string, basePath string, archivePath string) error {

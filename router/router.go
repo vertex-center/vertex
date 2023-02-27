@@ -49,7 +49,7 @@ func handleServiceDownload(c *gin.Context) {
 		return
 	}
 
-	err = body.Service.Download()
+	service, err := body.Service.Install()
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -57,6 +57,7 @@ func handleServiceDownload(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "OK",
+		"service": service,
 	})
 }
 
