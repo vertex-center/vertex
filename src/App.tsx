@@ -8,12 +8,8 @@ function App() {
             <HashRouter>
                 {/*<Header />*/}
                 <Routes>
+                    <Route path="/" element={<Infrastructure />} />
                     <Route path="/marketplace" element={<Marketplace />} />
-                    <Route
-                        path="/infrastructure"
-                        element={<Infrastructure />}
-                    />
-                    <Route path="/" element={<></>} />
                 </Routes>
             </HashRouter>
         </div>

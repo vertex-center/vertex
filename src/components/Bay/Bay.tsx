@@ -5,10 +5,13 @@ import { Vertical } from "../Layouts/Layouts";
 
 type ButtonProps = {
     symbol: string;
+    onClick: () => void;
 };
 
-function Button({ symbol }: ButtonProps) {
-    return <Symbol name={symbol} />;
+function Button({ symbol, onClick }: ButtonProps) {
+    return (
+        <Symbol style={{ cursor: "pointer" }} name={symbol} onClick={onClick} />
+    );
 }
 
 type LEDProps = {
@@ -28,7 +31,7 @@ function LED({ status }: LEDProps) {
     );
 }
 
-type Status = "running" | "error" | "downloading";
+type Status = "off" | "running" | "error" | "downloading";
 
 type LCDProps = {
     name: string;
@@ -40,6 +43,9 @@ function LCD(props: LCDProps) {
 
     let message;
     switch (status) {
+        case "off":
+            message = "Off";
+            break;
         case "running":
             message = "Running";
             break;
@@ -75,15 +81,17 @@ function LCD(props: LCDProps) {
 type Props = {
     name: string;
     status: Status | string;
+
+    onPower?: () => void;
 };
 
 export default function Bay(props: Props) {
-    const { name, status } = props;
+    const { name, status, onPower } = props;
     return (
         <div className={styles.bay}>
             <LED status={status} />
             <LCD name={name} status={status} />
-            <Button symbol="power_rounded" />
+            {onPower && <Button symbol="power_rounded" onClick={onPower} />}
         </div>
     );
 }
