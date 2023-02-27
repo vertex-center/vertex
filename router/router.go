@@ -1,6 +1,7 @@
 package router
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -9,48 +10,23 @@ import (
 	"github.com/vertex-center/vertex-core-golang/router"
 	"github.com/vertex-center/vertex/services"
 	servicesmanager "github.com/vertex-center/vertex/services/manager"
+	"github.com/vertex-center/vertex/services/runners"
 )
 
 func InitializeRouter() *gin.Engine {
 	r := router.CreateRouter()
 	r.Use(cors.Default())
 
-	// TODO: Change to POST and read body
-	r.GET("/start", handleStart)
-	r.GET("/stop", handleStop)
-
 	r.GET("/installed", handleInstalled)
 	r.GET("/available", handleAvailable)
 
 	r.POST("/download", handleDownload)
 
+	serviceGroup := r.Group("/service/:service_id")
+	serviceGroup.GET("/start", handleStart)
+	serviceGroup.GET("/stop", handleStop)
+
 	return r
-}
-
-func handleStart(c *gin.Context) {
-	runner := services.NewRunner(servicesmanager.ListAvailable()[0])
-
-	err := runner.Start()
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "OK",
-	})
-}
-
-func handleStop(c *gin.Context) {
-	err := services.GetRunner().Stop()
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "OK",
-	})
 }
 
 func handleInstalled(c *gin.Context) {
@@ -80,6 +56,54 @@ func handleDownload(c *gin.Context) {
 	}
 
 	err = servicesmanager.Download(body.Service)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "OK",
+	})
+}
+
+func handleStart(c *gin.Context) {
+	serviceID := c.Param("service_id")
+	if serviceID == "" {
+		c.AbortWithError(http.StatusBadRequest, errors.New("service_id was missing in the URL"))
+		return
+	}
+
+	runner, err := runners.NewRunner(serviceID)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	err = runner.Start()
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "OK",
+	})
+}
+
+func handleStop(c *gin.Context) {
+	serviceID := c.Param("service_id")
+	if serviceID == "" {
+		c.AbortWithError(http.StatusBadRequest, errors.New("service_id was missing in the URL"))
+		return
+	}
+
+	runner, err := runners.GetRunner(serviceID)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	err = runner.Stop()
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
