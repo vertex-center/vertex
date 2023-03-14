@@ -1,10 +1,11 @@
 import {
+    EnvVariable,
     getAvailableServices,
     postDownloadService,
     Service,
 } from "../../backend/backend";
 import { Fragment, useEffect, useState } from "react";
-import { Title } from "../../components/Text/Text";
+import { Caption, Title } from "../../components/Text/Text";
 
 import styles from "./Marketplace.module.sass";
 import Button from "../../components/Button/Button";
@@ -13,6 +14,8 @@ import Symbol from "../../components/Symbol/Symbol";
 import Select, { Option } from "../../components/Input/Select";
 import { Error } from "../../components/Error/Error";
 import Loading from "../../components/Loading/Loading";
+import Input from "../../components/Input/Input";
+import { Vertical } from "../../components/Layouts/Layouts";
 
 type DownloadMethod = "marketplace" | "manual";
 
@@ -117,29 +120,85 @@ function StepDownload(props: StepDownloadProps) {
     );
 }
 
+type VariableInputProps = {
+    env: EnvVariable;
+};
+
+function VariableInput(props: VariableInputProps) {
+    const { env } = props;
+    return (
+        <Vertical gap={6}>
+            <Input label={env.display_name} value={env.default} />
+            <Caption className={styles.inputDescription}>
+                {env.description}
+            </Caption>
+        </Vertical>
+    );
+}
+
+type StepConfigureProps = {
+    service: Service;
+};
+
+function StepConfigure(props: StepConfigureProps) {
+    const { service } = props;
+
+    return (
+        <div className={styles.step}>
+            <div className={styles.stepTitle}>
+                <Symbol name="counter_2" />
+                <Title>Configure</Title>
+            </div>
+            <Vertical gap={30}>
+                {service?.environment?.map((env: any) => (
+                    <VariableInput env={env} />
+                ))}
+            </Vertical>
+        </div>
+    );
+}
+
+type Step = "download" | "downloading" | "configure";
+
 export default function Installed() {
-    const [isDownloading, setIsDownloading] = useState<boolean>(false);
+    const [step, setStep] = useState<Step>("download");
+
     const [service, setService] = useState<Service>();
 
     const [error, setError] = useState<string>();
 
     const download = (service: Service) => {
-        setIsDownloading(true);
-        setService(service);
+        setStep("downloading");
         postDownloadService(service)
-            .then(() => {})
+            .then((data: any) => {
+                console.log(data.service);
+                setStep("configure");
+                setService(data.service);
+            })
             .catch((error) => {
                 console.log(error);
                 setError(`${error.message}: ${error.response.data.message}`);
-            })
-            .finally(() => setIsDownloading(false));
+            });
     };
+
+    let status;
+    switch (step) {
+        case "download":
+            status = "off";
+            break;
+        case "downloading":
+            status = "downloading";
+            break;
+        case "configure":
+            status = "waiting";
+            break;
+    }
 
     return (
         <div className={styles.marketplace}>
             <div className={styles.content}>
                 <div className={styles.server}>
-                    {isDownloading && (
+                    {step === "downloading" && !error && (
                         <Fragment>
                             <div className={styles.cloud}>
                                 <Symbol name="cloud" />
@@ -149,10 +208,11 @@ export default function Installed() {
                     )}
                     <Bay
                         name={service?.name ?? "Empty server"}
-                        status={isDownloading ? "downloading" : "off"}
+                        status={status}
                     />
                 </div>
-                <StepDownload onDownload={download} />
+                {step === "download" && <StepDownload onDownload={download} />}
+                {step === "configure" && <StepConfigure service={service} />}
                 <Error error={error} />
             </div>
         </div>

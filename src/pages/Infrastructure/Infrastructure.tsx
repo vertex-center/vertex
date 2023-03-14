@@ -3,7 +3,6 @@ import Bay from "../../components/Bay/Bay";
 import { useEffect, useState } from "react";
 import {
     getInstalledServices,
-    InstalledService,
     InstalledServices,
     startService,
     stopService,
@@ -33,11 +32,11 @@ export default function Infrastructure() {
         return () => clearInterval(interval);
     }, []);
 
-    const toggleService = async (service: InstalledService) => {
-        if (installed[service.id].status === "off") {
-            await startService(service);
+    const toggleService = async (uuid: string) => {
+        if (installed[uuid].status === "off") {
+            await startService(uuid);
         } else {
-            await stopService(service);
+            await stopService(uuid);
         }
     };
 
@@ -45,12 +44,12 @@ export default function Infrastructure() {
         <div className={styles.server}>
             <div className={styles.bays}>
                 <Bay name="Vertex" status={status} />
-                {Object.keys(installed)?.map((key) => (
+                {Object.keys(installed)?.map((uuid) => (
                     <Bay
-                        key={installed[key].id}
-                        name={installed[key].name}
-                        status={installed[key].status}
-                        onPower={() => toggleService(installed[key])}
+                        key={installed[uuid].id}
+                        name={installed[uuid].name}
+                        status={installed[uuid].status}
+                        onPower={() => toggleService(uuid)}
                     />
                 ))}
                 <Link to="/marketplace" className={styles.addBay}>
