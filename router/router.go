@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/router"
 	"github.com/vertex-center/vertex/services"
 	servicesmanager "github.com/vertex-center/vertex/services/manager"
@@ -21,7 +22,7 @@ func InitializeRouter() *gin.Engine {
 	servicesGroup.GET("/available", handleServicesAvailable)
 	servicesGroup.POST("/download", handleServiceDownload)
 
-	serviceGroup := r.Group("/service/:service_id")
+	serviceGroup := r.Group("/service/:service_uuid")
 	serviceGroup.POST("/start", handleServiceStart)
 	serviceGroup.POST("/stop", handleServiceStop)
 
@@ -29,7 +30,7 @@ func InitializeRouter() *gin.Engine {
 }
 
 func handleServicesInstalled(c *gin.Context) {
-	installed := services.ListInstalled()
+	installed := services.ListInstances()
 	c.JSON(http.StatusOK, installed)
 }
 
@@ -62,13 +63,19 @@ func handleServiceDownload(c *gin.Context) {
 }
 
 func handleServiceStart(c *gin.Context) {
-	serviceID := c.Param("service_id")
-	if serviceID == "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New("service_id was missing in the URL"))
+	serviceUUIDParam := c.Param("service_uuid")
+	if serviceUUIDParam == "" {
+		c.AbortWithError(http.StatusBadRequest, errors.New("service_uuid was missing in the URL"))
 		return
 	}
 
-	service, err := services.GetInstalled(serviceID)
+	serviceUUID, err := uuid.Parse(serviceUUIDParam)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse service_uuid: %v", err))
+		return
+	}
+
+	service, err := services.GetInstalled(serviceUUID)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -86,13 +93,19 @@ func handleServiceStart(c *gin.Context) {
 }
 
 func handleServiceStop(c *gin.Context) {
-	serviceID := c.Param("service_id")
-	if serviceID == "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New("service_id was missing in the URL"))
+	serviceUUIDParam := c.Param("service_uuid")
+	if serviceUUIDParam == "" {
+		c.AbortWithError(http.StatusBadRequest, errors.New("service_uuid was missing in the URL"))
 		return
 	}
 
-	service, err := services.GetInstalled(serviceID)
+	serviceUUID, err := uuid.Parse(serviceUUIDParam)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse service_uuid: %v", err))
+		return
+	}
+
+	service, err := services.GetInstalled(serviceUUID)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex/services"
 )
@@ -18,14 +19,16 @@ func ReloadAllInstalled() error {
 
 	for _, entry := range entries {
 		if entry.IsDir() {
-			service, err := services.FromDisk(entry.Name())
+			logger.Log(fmt.Sprintf("found service uuid=%s", entry.Name()))
+			serviceUUID, err := uuid.Parse(entry.Name())
 			if err != nil {
 				return err
 			}
 
-			if !service.IsInstalled() {
-				logger.Log(fmt.Sprintf("service found: '%s'", service.ID))
-				_, err = service.Instantiate()
+			if !services.IsInstantiated(serviceUUID) {
+				logger.Log(fmt.Sprintf("instantiate service uuid=%s", entry.Name()))
+
+				_, err = services.Instantiate(serviceUUID)
 				if err != nil {
 					return err
 				}

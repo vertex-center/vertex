@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v50/github"
+	"github.com/google/uuid"
 )
 
 type EnvVariable struct {
@@ -33,7 +34,7 @@ type Service struct {
 	EnvVariables []EnvVariable `json:"environment,omitempty"`
 }
 
-func (s Service) Install() (*InstalledService, error) {
+func (s Service) Install() (*Instance, error) {
 	if strings.HasPrefix(s.Repository, "github") {
 		client := github.NewClient(nil)
 
@@ -49,9 +50,11 @@ func (s Service) Install() (*InstalledService, error) {
 
 		platform := fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH)
 
+		serviceUUID := uuid.New()
+
 		for _, asset := range release.Assets {
 			if strings.Contains(*asset.Name, platform) {
-				basePath := path.Join("servers", s.ID)
+				basePath := path.Join("servers", serviceUUID.String())
 				archivePath := path.Join(basePath, fmt.Sprintf("%s.tar.gz", s.ID))
 
 				err := downloadFile(*asset.BrowserDownloadURL, basePath, archivePath)
@@ -73,7 +76,7 @@ func (s Service) Install() (*InstalledService, error) {
 			}
 		}
 
-		instance, err := s.Instantiate()
+		instance, err := Instantiate(serviceUUID)
 		if err != nil {
 			return nil, err
 		}
