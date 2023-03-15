@@ -3,13 +3,17 @@ package router
 import (
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
+	"time"
 
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/sse"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/router"
 	"github.com/vertex-center/vertex/services"
+	"github.com/vertex-center/vertex/services/instances"
 	servicesmanager "github.com/vertex-center/vertex/services/manager"
 )
 
@@ -26,11 +30,20 @@ func InitializeRouter() *gin.Engine {
 	serviceGroup.POST("/start", handleServiceStart)
 	serviceGroup.POST("/stop", handleServiceStop)
 
+	r.GET("/events", func(c *gin.Context) {
+		c.Writer.Header().Set("Content-Type", sse.ContentType)
+		c.Writer.Header().Set("Cache-Control", "no-cache")
+		c.Writer.Header().Set("Connection", "keep-alive")
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Origin", "*")
+		c.Writer.Header().Set("X-Accel-Buffering", "no")
+	}, handleEvents)
+
 	return r
 }
 
 func handleServicesInstalled(c *gin.Context) {
-	installed := services.ListInstances()
+	installed := instances.List()
 	c.JSON(http.StatusOK, installed)
 }
 
@@ -50,15 +63,15 @@ func handleServiceDownload(c *gin.Context) {
 		return
 	}
 
-	service, err := body.Service.Install()
+	instance, err := instances.Install(body.Service)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "OK",
-		"service": service,
+		"message":  "OK",
+		"instance": instance,
 	})
 }
 
@@ -75,13 +88,7 @@ func handleServiceStart(c *gin.Context) {
 		return
 	}
 
-	service, err := services.GetInstalled(serviceUUID)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	err = service.Start()
+	err = instances.Start(serviceUUID)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -105,13 +112,7 @@ func handleServiceStop(c *gin.Context) {
 		return
 	}
 
-	service, err := services.GetInstalled(serviceUUID)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	err = service.Stop()
+	err = instances.Stop(serviceUUID)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -119,5 +120,37 @@ func handleServiceStop(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "OK",
+	})
+}
+
+func handleEvents(c *gin.Context) {
+	channel := make(chan sse.Event)
+
+	instancesChan := make(chan instances.Event)
+
+	go func() {
+		defer close(channel)
+
+		instances.Register(instancesChan)
+
+		for {
+			select {
+			case e := <-instancesChan:
+				channel <- sse.Event{
+					Event: e.Name,
+					Data:  e.Name,
+				}
+			}
+
+			time.Sleep(1 * time.Second)
+		}
+	}()
+
+	c.Stream(func(w io.Writer) bool {
+		if event, ok := <-channel; ok {
+			err := sse.Encode(w, event)
+			return err == nil
+		}
+		return false
 	})
 }
