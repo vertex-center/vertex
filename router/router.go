@@ -29,6 +29,7 @@ func InitializeRouter() *gin.Engine {
 	servicesGroup.POST("/download", handleServiceDownload)
 
 	serviceGroup := r.Group("/service/:service_uuid")
+	serviceGroup.GET("", handleGetService)
 	serviceGroup.POST("/start", handleServiceStart)
 	serviceGroup.POST("/stop", handleServiceStop)
 
@@ -75,6 +76,28 @@ func handleServiceDownload(c *gin.Context) {
 		"message":  "OK",
 		"instance": instance,
 	})
+}
+
+func handleGetService(c *gin.Context) {
+	serviceUUIDParam := c.Param("service_uuid")
+	if serviceUUIDParam == "" {
+		c.AbortWithError(http.StatusBadRequest, errors.New("service_uuid was missing in the URL"))
+		return
+	}
+
+	serviceUUID, err := uuid.Parse(serviceUUIDParam)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse service_uuid: %v", err))
+		return
+	}
+
+	instance, err := instances.Get(serviceUUID)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, instance)
 }
 
 func handleServiceStart(c *gin.Context) {
