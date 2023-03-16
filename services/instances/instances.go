@@ -2,16 +2,13 @@ package instances
 
 import (
 	"archive/tar"
-	"bufio"
 	"compress/gzip"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
-	"os/exec"
 	"path"
 	"runtime"
 	"strings"
@@ -20,144 +17,74 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex/services"
+	"github.com/vertex-center/vertex/services/instance"
 )
 
-var logger = console.New("vertex::services-manager")
-
-var instances = Instances{
-	all:       map[uuid.UUID]*Instance{},
-	listeners: map[uuid.UUID]chan Event{},
-}
-
-const (
-	StatusOff     = "off"
-	StatusRunning = "running"
-	StatusError   = "error"
+var (
+	instancesObserver chan instance.Event
+	logger            = console.New("vertex::services-manager")
 )
 
+var instances = newInstances()
+
 const (
-	EventChange       = "change"
-	EventStatusChange = "status_change"
-	EventStdout       = "stdout"
+	EventChange = "change"
 )
 
 type Event struct {
 	Name string
 }
 
-type InstanceEvent struct {
-	Name string
-	Data string
-}
-
 type Instances struct {
-	all map[uuid.UUID]*Instance
+	all map[uuid.UUID]*instance.Instance
 
 	listeners map[uuid.UUID]chan Event
 }
 
-type Instance struct {
-	services.Service
+func newInstances() *Instances {
+	instancesObserver = make(chan instance.Event)
 
-	Status string `json:"status"`
-
-	uuid uuid.UUID
-	cmd  *exec.Cmd
-
-	listeners map[uuid.UUID]chan InstanceEvent
-}
-
-func Start(uuid uuid.UUID) error {
-	instance, err := Get(uuid)
-	if err != nil {
-		return err
+	instances := &Instances{
+		all:       map[uuid.UUID]*instance.Instance{},
+		listeners: map[uuid.UUID]chan Event{},
 	}
 
-	if instance.cmd != nil {
-		logger.Error(fmt.Errorf("runner %s already started", instance.Name))
-	}
-
-	instance.cmd = exec.Command(fmt.Sprintf("./%s", instance.ID))
-	instance.cmd.Dir = path.Join("servers", instance.uuid.String())
-
-	//instance.cmd.Stdout = os.Stdout
-	instance.cmd.Stderr = os.Stderr
-	instance.cmd.Stdin = os.Stdin
-
-	stdoutReader, err := instance.cmd.StdoutPipe()
-	if err != nil {
-		return err
-	}
-	stdoutScanner := bufio.NewScanner(stdoutReader)
 	go func() {
-		for stdoutScanner.Scan() {
-			for _, listener := range instance.listeners {
-				listener <- InstanceEvent{
-					Name: EventStdout,
-					Data: stdoutScanner.Text(),
+		defer close(instancesObserver)
+
+		for {
+			select {
+			case _ = <-instancesObserver:
+				for _, listener := range instances.listeners {
+					listener <- Event{
+						Name: EventChange,
+					}
 				}
 			}
 		}
 	}()
 
-	setStatus(instance, StatusRunning)
+	return instances
+}
 
-	err = instance.cmd.Start()
+func Start(uuid uuid.UUID) error {
+	i, err := Get(uuid)
 	if err != nil {
 		return err
 	}
-
-	go func() {
-		err := instance.cmd.Wait()
-		if err != nil {
-			logger.Error(fmt.Errorf("%s: %v", instance.Service.Name, err))
-		}
-		setStatus(instance, StatusOff)
-	}()
-
-	return nil
+	return i.Start()
 }
 
 func Stop(uuid uuid.UUID) error {
-	instance, err := Get(uuid)
+	i, err := Get(uuid)
 	if err != nil {
 		return err
 	}
-
-	err = instance.cmd.Process.Signal(os.Interrupt)
-	if err != nil {
-		return err
-	}
-
-	// TODO: Remove runner from runners
-	// TODO: Force kill if the process continues
-
-	instance.cmd = nil
-	return nil
+	return i.Stop()
 }
 
-func CreateFromDisk(instanceUUID uuid.UUID) (*Instance, error) {
-	data, err := os.ReadFile(path.Join("servers", instanceUUID.String(), ".vertex", "service.json"))
-	if err != nil {
-		logger.Warn(fmt.Sprintf("service '%s' has no '.vertex/service.json' file", instanceUUID))
-	}
-
-	var service services.Service
-	err = json.Unmarshal(data, &service)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Instance{
-		Service:   service,
-		Status:    StatusOff,
-		uuid:      instanceUUID,
-		listeners: map[uuid.UUID]chan InstanceEvent{},
-	}, nil
-}
-
-func Add(uuid uuid.UUID, instance *Instance) {
-	instances.all[uuid] = instance
+func Add(uuid uuid.UUID, i *instance.Instance) {
+	instances.all[uuid] = i
 	for _, listener := range instances.listeners {
 		listener <- Event{
 			Name: EventChange,
@@ -169,31 +96,33 @@ func Exists(uuid uuid.UUID) bool {
 	return instances.all[uuid] != nil
 }
 
-func Instantiate(uuid uuid.UUID) (*Instance, error) {
+func Instantiate(uuid uuid.UUID) (*instance.Instance, error) {
 	if Exists(uuid) {
 		return nil, fmt.Errorf("the service '%s' is already running", uuid)
 	}
 
-	instance, err := CreateFromDisk(uuid)
+	i, err := instance.CreateFromDisk(uuid)
 	if err != nil {
 		return nil, err
 	}
 
-	Add(uuid, instance)
+	Add(uuid, i)
 
-	return instance, nil
+	i.Register(instancesObserver)
+
+	return i, nil
 }
 
-func List() map[uuid.UUID]*Instance {
+func List() map[uuid.UUID]*instance.Instance {
 	return instances.all
 }
 
-func Get(uuid uuid.UUID) (*Instance, error) {
-	instance := instances.all[uuid]
-	if instance == nil {
+func Get(uuid uuid.UUID) (*instance.Instance, error) {
+	i := instances.all[uuid]
+	if i == nil {
 		return nil, fmt.Errorf("the service '%s' is not instances", uuid)
 	}
-	return instance, nil
+	return i, nil
 }
 
 func Register(channel chan Event) uuid.UUID {
@@ -208,19 +137,7 @@ func Unregister(uuid uuid.UUID) {
 	logger.Log(fmt.Sprintf("channel %s unregistered from instances", uuid))
 }
 
-func (i *Instance) Register(channel chan InstanceEvent) uuid.UUID {
-	id := uuid.New()
-	i.listeners[id] = channel
-	logger.Log(fmt.Sprintf("channel %s registered to instance uuid=%s", id, i.uuid))
-	return id
-}
-
-func (i *Instance) Unregister(uuid uuid.UUID) {
-	delete(i.listeners, uuid)
-	logger.Log(fmt.Sprintf("channel %s unregistered from instance uuid=%s", uuid, i.uuid))
-}
-
-func Install(s services.Service) (*Instance, error) {
+func Install(s services.Service) (*instance.Instance, error) {
 	if strings.HasPrefix(s.Repository, "github") {
 		client := github.NewClient(nil)
 
@@ -262,12 +179,12 @@ func Install(s services.Service) (*Instance, error) {
 			}
 		}
 
-		instance, err := Instantiate(serviceUUID)
+		i, err := Instantiate(serviceUUID)
 		if err != nil {
 			return nil, err
 		}
 
-		return instance, nil
+		return i, nil
 	}
 
 	return nil, errors.New("this repository is not supported")
@@ -356,19 +273,4 @@ func untarFile(basePath string, archivePath string) error {
 	}
 
 	return nil
-}
-
-func setStatus(instance *Instance, status string) {
-	instance.Status = status
-	for _, listener := range instances.listeners {
-		listener <- Event{
-			Name: EventChange,
-		}
-	}
-	for _, listener := range instance.listeners {
-		listener <- InstanceEvent{
-			Name: EventStatusChange,
-			Data: status,
-		}
-	}
 }

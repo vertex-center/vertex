@@ -13,6 +13,7 @@ import (
 	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex-core-golang/router"
 	"github.com/vertex-center/vertex/services"
+	"github.com/vertex-center/vertex/services/instance"
 	"github.com/vertex-center/vertex/services/instances"
 	servicesmanager "github.com/vertex-center/vertex/services/manager"
 )
@@ -204,17 +205,17 @@ func handleServiceEvent(c *gin.Context) {
 		return
 	}
 
-	instance, err := instances.Get(serviceUUID)
+	i, err := instances.Get(serviceUUID)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get service %s: %v", serviceUUID, err))
 		return
 	}
 
-	instanceChan := make(chan instances.InstanceEvent)
-	id := instance.Register(instanceChan)
+	instanceChan := make(chan instance.Event)
+	id := i.Register(instanceChan)
 
 	defer func() {
-		instance.Unregister(id)
+		i.Unregister(id)
 		close(instanceChan)
 	}()
 
