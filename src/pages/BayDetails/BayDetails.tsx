@@ -6,7 +6,7 @@ import {
     startService,
     stopService,
 } from "../../backend/backend";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import styles from "./BayDetails.module.sass";
 import Symbol from "../../components/Symbol/Symbol";
@@ -15,20 +15,23 @@ import SSE from "../../backend/sse";
 import Logs from "../../components/Logs/Logs";
 
 type MenuItemProps = {
+    to: string;
     symbol: string;
     name: string;
 };
 
 function MenuItem(props: MenuItemProps) {
-    const { symbol, name } = props;
+    const { to, symbol, name } = props;
 
     return (
-        <div className={styles.menuItem}>
-            <Horizontal alignItems="center" gap={12}>
-                <Symbol name={symbol} />
-                {name}
-            </Horizontal>
-        </div>
+        <Link to={to}>
+            <div className={styles.menuItem}>
+                <Horizontal alignItems="center" gap={12}>
+                    <Symbol name={symbol} />
+                    {name}
+                </Horizontal>
+            </div>
+        </Link>
     );
 }
 
@@ -98,7 +101,12 @@ export default function BayDetails() {
             </div>
             <Horizontal className={styles.content}>
                 <div className={styles.menu}>
-                    <MenuItem symbol="terminal" name="Console" />
+                    <MenuItem to="/" symbol="arrow_back" name="Back" />
+                    <MenuItem
+                        to={`/bay/${uuid}/logs`}
+                        symbol="terminal"
+                        name="Console"
+                    />
                     {/*<MenuItem symbol="hub" name="Connections" />*/}
                     {/*<MenuItem symbol="settings" name="Settings" />*/}
                 </div>
