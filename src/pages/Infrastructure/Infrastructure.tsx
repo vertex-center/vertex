@@ -29,7 +29,7 @@ export default function Infrastructure() {
     };
 
     useEffect(() => {
-        const sse = new SSE();
+        const sse = new SSE("http://localhost:6130/services/events");
 
         sse.on("open", (e) => {
             console.log(e);

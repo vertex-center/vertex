@@ -1,9 +1,9 @@
 export default class SSE {
     public events?: EventSource;
 
-    public constructor() {
+    public constructor(url: string) {
         console.log("SSE opened");
-        this.events = new EventSource("http://localhost:6130/events");
+        this.events = new EventSource(url);
         this.events.onmessage = (e: any) => console.log(e);
         this.events.onerror = (e: any) => console.error(e);
     }
