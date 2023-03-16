@@ -36,6 +36,7 @@ type Instance struct {
 	services.Service
 
 	Status string `json:"status"`
+	Logs   Logs   `json:"logs"`
 
 	uuid uuid.UUID
 	cmd  *exec.Cmd
@@ -66,10 +67,20 @@ func (i *Instance) Start() error {
 	stdoutScanner := bufio.NewScanner(stdoutReader)
 	go func() {
 		for stdoutScanner.Scan() {
+			line := i.Logs.Add(LogLine{
+				Kind:    LogKindOut,
+				Message: stdoutScanner.Text(),
+			})
+
+			data, err := json.Marshal(line)
+			if err != nil {
+				logger.Error(err)
+			}
+
 			for _, listener := range i.listeners {
 				listener <- Event{
 					Name: EventStdout,
-					Data: stdoutScanner.Text(),
+					Data: string(data),
 				}
 			}
 		}
@@ -78,10 +89,20 @@ func (i *Instance) Start() error {
 	stderrScanner := bufio.NewScanner(stderrReader)
 	go func() {
 		for stderrScanner.Scan() {
+			line := i.Logs.Add(LogLine{
+				Kind:    LogKindErr,
+				Message: stderrScanner.Text(),
+			})
+
+			data, err := json.Marshal(line)
+			if err != nil {
+				logger.Error(err)
+			}
+
 			for _, listener := range i.listeners {
 				listener <- Event{
 					Name: EventStderr,
-					Data: stderrScanner.Text(),
+					Data: string(data),
 				}
 			}
 		}
@@ -156,6 +177,7 @@ func CreateFromDisk(instanceUUID uuid.UUID) (*Instance, error) {
 	return &Instance{
 		Service:   service,
 		Status:    StatusOff,
+		Logs:      Logs{},
 		uuid:      instanceUUID,
 		listeners: map[uuid.UUID]chan Event{},
 	}, nil
