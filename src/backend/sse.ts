@@ -4,12 +4,17 @@ export default class SSE {
     public constructor(url: string) {
         console.log("SSE opened");
         this.events = new EventSource(url);
-        this.events.onmessage = (e: any) => console.log(e);
-        this.events.onerror = (e: any) => console.error(e);
+        this.events.onerror = console.error;
     }
 
     public on(key: string, handler: (e: any) => void) {
-        this.events.addEventListener(key, handler);
+        this.events.addEventListener(key, (e) => {
+            console.log("%c SSE ", "background-color:orange;color:black;", {
+                event: key,
+                data: e.data,
+            });
+            handler(e);
+        });
     }
 
     public close() {

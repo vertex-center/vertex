@@ -1,5 +1,5 @@
 import Bay from "../../components/Bay/Bay";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
     getService,
     InstalledService,
@@ -39,22 +39,20 @@ export default function BayDetails() {
 
     const [logs, setLogs] = useState<any[]>([]);
 
-    useEffect(() => {
+    const fetchInstance = useCallback(() => {
         getService(uuid).then((instance: InstalledService) => {
             setInstance(instance);
         });
     }, [uuid]);
 
     useEffect(() => {
+        fetchInstance();
+    }, [fetchInstance, uuid]);
+
+    useEffect(() => {
         const sse = new SSE(`http://localhost:6130/service/${uuid}/events`);
 
-        sse.on("open", (e) => {
-            console.log(e);
-        });
-
         sse.on("stdout", (e) => {
-            console.log(e);
-
             setLogs((logs) => [
                 ...logs,
                 {
@@ -63,8 +61,12 @@ export default function BayDetails() {
             ]);
         });
 
+        sse.on("status_change", (e) => {
+            setInstance((instance) => ({ ...instance, status: e.data }));
+        });
+
         return () => sse.close();
-    }, [instance]);
+    }, [fetchInstance, uuid]);
 
     const toggleService = async (uuid: string) => {
         if (instance.status === "off") {
