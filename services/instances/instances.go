@@ -35,8 +35,7 @@ const (
 )
 
 const (
-	EventAdd          = "service_add"
-	EventStatusChange = "status_change"
+	EventChange = "change"
 )
 
 type Event struct {
@@ -134,7 +133,7 @@ func Add(uuid uuid.UUID, instance *Instance) {
 	instances.all[uuid] = instance
 	for _, listener := range instances.listeners {
 		listener <- Event{
-			Name: EventAdd,
+			Name: EventChange,
 		}
 	}
 }
@@ -324,7 +323,7 @@ func setStatus(instance *Instance, status string) {
 	instance.Status = status
 	for _, listener := range instances.listeners {
 		listener <- Event{
-			Name: EventStatusChange,
+			Name: EventChange,
 		}
 	}
 }

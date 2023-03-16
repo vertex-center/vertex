@@ -136,7 +136,22 @@ func handleEvents(c *gin.Context) {
 		close(instancesChan)
 	}()
 
+	first := true
+
 	c.Stream(func(w io.Writer) bool {
+		if first {
+			err := sse.Encode(w, sse.Event{
+				Event: "open",
+			})
+
+			if err != nil {
+				logger.Error(err)
+				return false
+			}
+			first = false
+			return true
+		}
+
 		select {
 		case e := <-instancesChan:
 			err := sse.Encode(w, sse.Event{
