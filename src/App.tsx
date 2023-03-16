@@ -5,16 +5,14 @@ import BayDetails from "./pages/BayDetails/BayDetails";
 
 function App() {
     return (
-        <div className="bg-zinc-50 min-h-screen">
-            <HashRouter>
-                {/*<Header />*/}
-                <Routes>
-                    <Route path="/" element={<Infrastructure />} />
-                    <Route path="/marketplace" element={<Marketplace />} />
-                    <Route path="/bay/:uuid" element={<BayDetails />} />
-                </Routes>
-            </HashRouter>
-        </div>
+        <HashRouter>
+            {/*<Header />*/}
+            <Routes>
+                <Route path="/" element={<Infrastructure />} />
+                <Route path="/marketplace" element={<Marketplace />} />
+                <Route path="/bay/:uuid" element={<BayDetails />} />
+            </Routes>
+        </HashRouter>
     );
 }
 
