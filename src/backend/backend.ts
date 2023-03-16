@@ -50,6 +50,15 @@ export async function postDownloadService(service: Service) {
     });
 }
 
+export async function getService(uuid: string) {
+    return new Promise((resolve, reject) => {
+        axios
+            .get(`http://localhost:6130/service/${uuid}`)
+            .then((res) => resolve(res.data))
+            .catch((err) => reject(err));
+    });
+}
+
 export async function startService(uuid: string) {
     return new Promise((resolve, reject) => {
         axios

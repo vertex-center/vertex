@@ -1,0 +1,32 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+
+.details
+    position: relative
+    width: 100vw
+    height: 100vh
+
+.menu
+    display: flex
+    flex-direction: column
+    width: 350px
+    height: 100vh
+    border-right: 1px solid colors.$bg-secondary
+    z-index: -1
+    padding: 12px
+    box-sizing: border-box
+
+    &Item
+        padding: 12px 20px
+        cursor: pointer
+        border-radius: dimensions.$border-radius
+        border: 1px solid transparent
+        transition: all 0.1s ease
+
+        &:hover
+            background-color: colors.$bg-primary-hover
+            border-color: colors.$bg-accent
+
+.bay
+    padding: 40px 10%
+    border-bottom: 1px solid colors.$bg-secondary

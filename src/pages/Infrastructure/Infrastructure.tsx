@@ -58,9 +58,10 @@ export default function Infrastructure() {
                 <Bay name="Vertex" status={status} />
                 {Object.keys(installed)?.map((uuid) => (
                     <Bay
-                        key={installed[uuid].id}
+                        key={uuid}
                         name={installed[uuid].name}
                         status={installed[uuid].status}
+                        to={`/bay/${uuid}`}
                         onPower={() => toggleService(uuid)}
                     />
                 ))}
