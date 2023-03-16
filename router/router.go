@@ -27,22 +27,22 @@ func InitializeRouter() *gin.Engine {
 	servicesGroup.GET("", handleServicesInstalled)
 	servicesGroup.GET("/available", handleServicesAvailable)
 	servicesGroup.POST("/download", handleServiceDownload)
+	servicesGroup.GET("/events", headersSSE, handleEvents)
 
 	serviceGroup := r.Group("/service/:service_uuid")
 	serviceGroup.GET("", handleGetService)
 	serviceGroup.POST("/start", handleServiceStart)
 	serviceGroup.POST("/stop", handleServiceStop)
-
-	r.GET("/events", func(c *gin.Context) {
-		c.Writer.Header().Set("Content-Type", sse.ContentType)
-		c.Writer.Header().Set("Cache-Control", "no-cache")
-		c.Writer.Header().Set("Connection", "keep-alive")
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Origin", "*")
-		c.Writer.Header().Set("X-Accel-Buffering", "no")
-	}, handleEvents)
+	serviceGroup.GET("/events", headersSSE, handleServiceEvent)
 
 	return r
+}
+
+func headersSSE(c *gin.Context) {
+	c.Writer.Header().Set("Content-Type", sse.ContentType)
+	c.Writer.Header().Set("Cache-Control", "no-cache")
+	c.Writer.Header().Set("Connection", "keep-alive")
+	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 }
 
 func handleServicesInstalled(c *gin.Context) {
@@ -180,6 +180,67 @@ func handleEvents(c *gin.Context) {
 			err := sse.Encode(w, sse.Event{
 				Event: e.Name,
 				Data:  e.Name,
+			})
+			if err != nil {
+				logger.Error(err)
+			}
+			return true
+		case <-done:
+			return false
+		}
+	})
+}
+
+func handleServiceEvent(c *gin.Context) {
+	serviceUUIDParam := c.Param("service_uuid")
+	if serviceUUIDParam == "" {
+		c.AbortWithError(http.StatusBadRequest, errors.New("service_uuid was missing in the URL"))
+		return
+	}
+
+	serviceUUID, err := uuid.Parse(serviceUUIDParam)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse service_uuid: %v", err))
+		return
+	}
+
+	instance, err := instances.Get(serviceUUID)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get service %s: %v", serviceUUID, err))
+		return
+	}
+
+	instanceChan := make(chan instances.InstanceEvent)
+	id := instance.Register(instanceChan)
+
+	defer func() {
+		instance.Unregister(id)
+		close(instanceChan)
+	}()
+
+	done := c.Request.Context().Done()
+
+	first := true
+
+	c.Stream(func(w io.Writer) bool {
+		if first {
+			err := sse.Encode(w, sse.Event{
+				Event: "open",
+			})
+
+			if err != nil {
+				logger.Error(err)
+				return false
+			}
+			first = false
+			return true
+		}
+
+		select {
+		case e := <-instanceChan:
+			err := sse.Encode(w, sse.Event{
+				Event: e.Name,
+				Data:  e.Data,
 			})
 			if err != nil {
 				logger.Error(err)

@@ -2,6 +2,7 @@ package instances
 
 import (
 	"archive/tar"
+	"bufio"
 	"compress/gzip"
 	"context"
 	"encoding/json"
@@ -36,10 +37,16 @@ const (
 
 const (
 	EventChange = "change"
+	EventStdout = "stdout"
 )
 
 type Event struct {
 	Name string
+}
+
+type InstanceEvent struct {
+	Name string
+	Data string
 }
 
 type Instances struct {
@@ -55,6 +62,8 @@ type Instance struct {
 
 	uuid uuid.UUID
 	cmd  *exec.Cmd
+
+	listeners map[uuid.UUID]chan InstanceEvent
 }
 
 func Start(uuid uuid.UUID) error {
@@ -70,9 +79,25 @@ func Start(uuid uuid.UUID) error {
 	instance.cmd = exec.Command(fmt.Sprintf("./%s", instance.ID))
 	instance.cmd.Dir = path.Join("servers", instance.uuid.String())
 
-	instance.cmd.Stdout = os.Stdout
+	//instance.cmd.Stdout = os.Stdout
 	instance.cmd.Stderr = os.Stderr
 	instance.cmd.Stdin = os.Stdin
+
+	stdoutReader, err := instance.cmd.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	stdoutScanner := bufio.NewScanner(stdoutReader)
+	go func() {
+		for stdoutScanner.Scan() {
+			for _, listener := range instance.listeners {
+				listener <- InstanceEvent{
+					Name: EventStdout,
+					Data: stdoutScanner.Text(),
+				}
+			}
+		}
+	}()
 
 	setStatus(instance, StatusRunning)
 
@@ -110,10 +135,10 @@ func Stop(uuid uuid.UUID) error {
 	return nil
 }
 
-func CreateFromDisk(uuid uuid.UUID) (*Instance, error) {
-	data, err := os.ReadFile(path.Join("servers", uuid.String(), ".vertex", "service.json"))
+func CreateFromDisk(instanceUUID uuid.UUID) (*Instance, error) {
+	data, err := os.ReadFile(path.Join("servers", instanceUUID.String(), ".vertex", "service.json"))
 	if err != nil {
-		logger.Warn(fmt.Sprintf("service '%s' has no '.vertex/service.json' file", uuid))
+		logger.Warn(fmt.Sprintf("service '%s' has no '.vertex/service.json' file", instanceUUID))
 	}
 
 	var service services.Service
@@ -123,9 +148,10 @@ func CreateFromDisk(uuid uuid.UUID) (*Instance, error) {
 	}
 
 	return &Instance{
-		Service: service,
-		Status:  StatusOff,
-		uuid:    uuid,
+		Service:   service,
+		Status:    StatusOff,
+		uuid:      instanceUUID,
+		listeners: map[uuid.UUID]chan InstanceEvent{},
 	}, nil
 }
 
@@ -179,6 +205,18 @@ func Register(channel chan Event) uuid.UUID {
 func Unregister(uuid uuid.UUID) {
 	delete(instances.listeners, uuid)
 	logger.Log(fmt.Sprintf("channel %s unregistered from instances", uuid))
+}
+
+func (i *Instance) Register(channel chan InstanceEvent) uuid.UUID {
+	id := uuid.New()
+	i.listeners[id] = channel
+	logger.Log(fmt.Sprintf("channel %s registered to instance uuid=%s", id, i.uuid))
+	return id
+}
+
+func (i *Instance) Unregister(uuid uuid.UUID) {
+	delete(i.listeners, uuid)
+	logger.Log(fmt.Sprintf("channel %s unregistered from instance uuid=%s", uuid, i.uuid))
 }
 
 func Install(s services.Service) (*Instance, error) {
