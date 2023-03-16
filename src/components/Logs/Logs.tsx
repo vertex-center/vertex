@@ -9,7 +9,9 @@ type LineProps = {
 function Line(props: LineProps) {
     const { text } = props;
 
-    return <div>{text}</div>;
+    if (text === "") return null;
+
+    return <div className={styles.line}>{text}</div>;
 }
 
 type Props = HTMLProps<HTMLDivElement> & {
