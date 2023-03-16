@@ -9,6 +9,7 @@ import {
 } from "../../backend/backend";
 import Symbol from "../../components/Symbol/Symbol";
 import { Link } from "react-router-dom";
+import SSE from "../../backend/sse";
 
 export default function Infrastructure() {
     const [status, setStatus] = useState("Checking...");
@@ -28,8 +29,19 @@ export default function Infrastructure() {
     };
 
     useEffect(() => {
-        const interval = setInterval(fetchServices, 1000);
-        return () => clearInterval(interval);
+        const sse = new SSE();
+
+        sse.on("open", (e) => {
+            console.log(e);
+            fetchServices();
+        });
+
+        sse.on("change", (e) => {
+            console.log(e);
+            fetchServices();
+        });
+
+        return () => sse.close();
     }, []);
 
     const toggleService = async (uuid: string) => {
