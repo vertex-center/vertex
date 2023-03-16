@@ -1,24 +1,55 @@
-export default class SSE {
-    public events?: EventSource;
+import { v4 as uuidv4 } from "uuid";
 
-    public constructor(url: string) {
-        console.log("SSE opened");
-        this.events = new EventSource(url);
-        this.events.onerror = console.error;
+type UUID = string;
+
+type SSE = {
+    eventSource: EventSource;
+    url: string;
+    watchers: number;
+};
+
+const allSSE: { [uuid: UUID]: SSE } = {};
+
+export function registerSSE(url: string): UUID {
+    let uuid = Object.keys(allSSE).find((uuid) => allSSE[uuid].url === url);
+
+    if (uuid !== undefined) {
+        allSSE[uuid].watchers++;
+        console.log(allSSE[uuid].watchers, "registered on", uuid);
+        return uuid;
     }
 
-    public on(key: string, handler: (e: any) => void) {
-        this.events.addEventListener(key, (e) => {
-            console.log("%c SSE ", "background-color:orange;color:black;", {
-                event: key,
-                data: e.data,
-            });
-            handler(e);
-        });
-    }
+    uuid = uuidv4();
+    const eventSource = new EventSource(url);
+    allSSE[uuid] = { url, eventSource, watchers: 1 };
+    console.log("SSE", uuid, "opened.");
+    console.log(allSSE[uuid].watchers, "registered on", uuid);
 
-    public close() {
-        console.log("SSE closed");
-        this.events?.close();
+    return uuid;
+}
+
+export function unregisterSSE(uuid: UUID) {
+    allSSE[uuid].watchers--;
+    console.log(allSSE[uuid].watchers, "registered on", uuid);
+    if (allSSE[uuid].watchers === 0) {
+        console.log("SSE", uuid, "closed.");
+        allSSE[uuid].eventSource.close();
+        delete allSSE[uuid];
     }
+}
+
+export function registerSSEEvent(
+    uuid: UUID,
+    key: string,
+    handler: (e: any) => void
+) {
+    allSSE[uuid].eventSource.addEventListener(key, handler);
+}
+
+export function unregisterSSEEvent(
+    uuid: UUID,
+    key: string,
+    handler: (e: any) => void
+) {
+    allSSE[uuid].eventSource.removeEventListener(key, handler);
 }

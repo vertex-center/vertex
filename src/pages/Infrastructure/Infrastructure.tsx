@@ -9,7 +9,12 @@ import {
 } from "../../backend/backend";
 import Symbol from "../../components/Symbol/Symbol";
 import { Link } from "react-router-dom";
-import SSE from "../../backend/sse";
+import {
+    registerSSE,
+    registerSSEEvent,
+    unregisterSSE,
+    unregisterSSEEvent,
+} from "../../backend/sse";
 
 export default function Infrastructure() {
     const [status, setStatus] = useState("Checking...");
@@ -29,19 +34,27 @@ export default function Infrastructure() {
     };
 
     useEffect(() => {
-        const sse = new SSE("http://localhost:6130/services/events");
+        const sse = registerSSE("http://localhost:6130/services/events");
 
-        sse.on("open", (e) => {
+        const onOpen = (e) => {
             console.log(e);
             fetchServices();
-        });
+        };
 
-        sse.on("change", (e) => {
+        const onChange = (e) => {
             console.log(e);
             fetchServices();
-        });
+        };
 
-        return () => sse.close();
+        registerSSEEvent(sse, "open", onOpen);
+        registerSSEEvent(sse, "change", onChange);
+
+        return () => {
+            unregisterSSEEvent(sse, "open", onOpen);
+            unregisterSSEEvent(sse, "change", onChange);
+
+            unregisterSSE(sse);
+        };
     }, []);
 
     const toggleService = async (uuid: string) => {

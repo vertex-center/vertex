@@ -6,13 +6,17 @@ import {
     startService,
     stopService,
 } from "../../backend/backend";
-import { Link, useParams } from "react-router-dom";
+import { Link, Outlet, useParams } from "react-router-dom";
 
 import styles from "./BayDetails.module.sass";
 import Symbol from "../../components/Symbol/Symbol";
 import { Horizontal } from "../../components/Layouts/Layouts";
-import SSE from "../../backend/sse";
-import Logs from "../../components/Logs/Logs";
+import {
+    registerSSE,
+    registerSSEEvent,
+    unregisterSSE,
+    unregisterSSEEvent,
+} from "../../backend/sse";
 
 type MenuItemProps = {
     to: string;
@@ -40,8 +44,6 @@ export default function BayDetails() {
 
     const [instance, setInstance] = useState<InstalledService>();
 
-    const [logs, setLogs] = useState<any[]>([]);
-
     const fetchInstance = useCallback(() => {
         getService(uuid).then((instance: InstalledService) => {
             setInstance(instance);
@@ -53,33 +55,19 @@ export default function BayDetails() {
     }, [fetchInstance, uuid]);
 
     useEffect(() => {
-        const sse = new SSE(`http://localhost:6130/service/${uuid}/events`);
+        const sse = registerSSE(`http://localhost:6130/service/${uuid}/events`);
 
-        sse.on("stdout", (e) => {
-            setLogs((logs) => [
-                ...logs,
-                {
-                    type: "message",
-                    message: e.data,
-                },
-            ]);
-        });
-
-        sse.on("stderr", (e) => {
-            setLogs((logs) => [
-                ...logs,
-                {
-                    type: "error",
-                    message: e.data,
-                },
-            ]);
-        });
-
-        sse.on("status_change", (e) => {
+        const onStatusChange = (e) => {
             setInstance((instance) => ({ ...instance, status: e.data }));
-        });
+        };
 
-        return () => sse.close();
+        registerSSEEvent(sse, "status_change", onStatusChange);
+
+        return () => {
+            unregisterSSEEvent(sse, "status_change", onStatusChange);
+
+            unregisterSSE(sse);
+        };
     }, [fetchInstance, uuid]);
 
     const toggleService = async (uuid: string) => {
@@ -111,7 +99,7 @@ export default function BayDetails() {
                     {/*<MenuItem symbol="settings" name="Settings" />*/}
                 </div>
                 <div className={styles.side}>
-                    <Logs lines={logs} />
+                    <Outlet />
                 </div>
             </Horizontal>
         </div>
