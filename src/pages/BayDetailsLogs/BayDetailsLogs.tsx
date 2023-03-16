@@ -7,13 +7,22 @@ import {
     unregisterSSEEvent,
 } from "../../backend/sse";
 import { useParams } from "react-router-dom";
+import { getService, InstalledService } from "../../backend/backend";
 
 export default function BayDetailsLogs() {
     const { uuid } = useParams();
 
-    const [logs, setLogs] = useState<any[]>([]);
+    const [logs, setLogs] = useState<any[]>(undefined);
 
     useEffect(() => {
+        getService(uuid).then((instance: InstalledService) => {
+            setLogs(instance.logs.lines ?? []);
+        });
+    }, [uuid]);
+
+    useEffect(() => {
+        if (logs === undefined) return;
+
         const sse = registerSSE(`http://localhost:6130/service/${uuid}/events`);
 
         const onStdout = (e) => {
@@ -35,7 +44,9 @@ export default function BayDetailsLogs() {
 
             unregisterSSE(sse);
         };
-    }, [uuid]);
+    }, [logs]);
+
+    if (!logs) return null;
 
     return <Logs lines={logs} />;
 }
