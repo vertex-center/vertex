@@ -5,17 +5,19 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sse"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex-core-golang/router"
 	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/services/instances"
 	servicesmanager "github.com/vertex-center/vertex/services/manager"
 )
+
+var logger = console.New("vertex::router")
 
 func InitializeRouter() *gin.Engine {
 	r := router.CreateRouter()
@@ -124,33 +126,29 @@ func handleServiceStop(c *gin.Context) {
 }
 
 func handleEvents(c *gin.Context) {
-	channel := make(chan sse.Event)
-
 	instancesChan := make(chan instances.Event)
+	id := instances.Register(instancesChan)
 
-	go func() {
-		defer close(channel)
+	done := c.Request.Context().Done()
 
-		instances.Register(instancesChan)
-
-		for {
-			select {
-			case e := <-instancesChan:
-				channel <- sse.Event{
-					Event: e.Name,
-					Data:  e.Name,
-				}
-			}
-
-			time.Sleep(1 * time.Second)
-		}
+	defer func() {
+		instances.Unregister(id)
+		close(instancesChan)
 	}()
 
 	c.Stream(func(w io.Writer) bool {
-		if event, ok := <-channel; ok {
-			err := sse.Encode(w, event)
-			return err == nil
+		select {
+		case e := <-instancesChan:
+			err := sse.Encode(w, sse.Event{
+				Event: e.Name,
+				Data:  e.Name,
+			})
+			if err != nil {
+				logger.Error(err)
+			}
+			return true
+		case <-done:
+			return false
 		}
-		return false
 	})
 }

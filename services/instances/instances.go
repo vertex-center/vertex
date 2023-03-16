@@ -24,7 +24,8 @@ import (
 var logger = console.New("vertex::services-manager")
 
 var instances = Instances{
-	all: map[uuid.UUID]*Instance{},
+	all:       map[uuid.UUID]*Instance{},
+	listeners: map[uuid.UUID]chan Event{},
 }
 
 const (
@@ -45,7 +46,7 @@ type Event struct {
 type Instances struct {
 	all map[uuid.UUID]*Instance
 
-	listeners []chan Event
+	listeners map[uuid.UUID]chan Event
 }
 
 type Instance struct {
@@ -64,7 +65,7 @@ func Start(uuid uuid.UUID) error {
 	}
 
 	if instance.cmd != nil {
-		return fmt.Errorf("runner %s already started", instance.Name)
+		logger.Error(fmt.Errorf("runner %s already started", instance.Name))
 	}
 
 	instance.cmd = exec.Command(fmt.Sprintf("./%s", instance.ID))
@@ -74,14 +75,18 @@ func Start(uuid uuid.UUID) error {
 	instance.cmd.Stderr = os.Stderr
 	instance.cmd.Stdin = os.Stdin
 
-	go func() {
-		setStatus(instance, StatusRunning)
+	setStatus(instance, StatusRunning)
 
-		err := instance.cmd.Run()
+	err = instance.cmd.Start()
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		err := instance.cmd.Wait()
 		if err != nil {
 			logger.Error(fmt.Errorf("%s: %v", instance.Service.Name, err))
 		}
-
 		setStatus(instance, StatusOff)
 	}()
 
@@ -165,8 +170,16 @@ func Get(uuid uuid.UUID) (*Instance, error) {
 	return instance, nil
 }
 
-func Register(channel chan Event) {
-	instances.listeners = append(instances.listeners, channel)
+func Register(channel chan Event) uuid.UUID {
+	id := uuid.New()
+	instances.listeners[id] = channel
+	logger.Log(fmt.Sprintf("channel %s registered to instances", id))
+	return id
+}
+
+func Unregister(uuid uuid.UUID) {
+	delete(instances.listeners, uuid)
+	logger.Log(fmt.Sprintf("channel %s unregistered from instances", uuid))
 }
 
 func Install(s services.Service) (*Instance, error) {
