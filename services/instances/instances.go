@@ -36,8 +36,9 @@ const (
 )
 
 const (
-	EventChange = "change"
-	EventStdout = "stdout"
+	EventChange       = "change"
+	EventStatusChange = "status_change"
+	EventStdout       = "stdout"
 )
 
 type Event struct {
@@ -362,6 +363,12 @@ func setStatus(instance *Instance, status string) {
 	for _, listener := range instances.listeners {
 		listener <- Event{
 			Name: EventChange,
+		}
+	}
+	for _, listener := range instance.listeners {
+		listener <- InstanceEvent{
+			Name: EventStatusChange,
+			Data: status,
 		}
 	}
 }
