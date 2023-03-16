@@ -56,6 +56,17 @@ export default function BayDetails() {
             setLogs((logs) => [
                 ...logs,
                 {
+                    type: "message",
+                    message: e.data,
+                },
+            ]);
+        });
+
+        sse.on("stderr", (e) => {
+            setLogs((logs) => [
+                ...logs,
+                {
+                    type: "error",
                     message: e.data,
                 },
             ]);
@@ -85,13 +96,13 @@ export default function BayDetails() {
                     onPower={() => toggleService(uuid)}
                 />
             </div>
-            <Horizontal>
+            <Horizontal className={styles.content}>
                 <div className={styles.menu}>
                     <MenuItem symbol="terminal" name="Console" />
                     {/*<MenuItem symbol="hub" name="Connections" />*/}
                     {/*<MenuItem symbol="settings" name="Settings" />*/}
                 </div>
-                <div className={styles.content}>
+                <div className={styles.side}>
                     <Logs lines={logs} />
                 </div>
             </Horizontal>
