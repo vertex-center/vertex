@@ -5,12 +5,12 @@
 .bay
     background-color: colors.$bg-secondary
     border: 1px solid colors.$bg-tertiary
-    padding: 4px 24px
+    padding: 4px 14px 4px 16px
     border-radius: dimensions.$border-radius
     display: flex
     flex-direction: row
     align-items: center
-    gap: 20px
+    gap: 12px
 
 .lcd
     background-color: #000
@@ -24,6 +24,13 @@
     gap: 10px
     font-family: fonts.$font-family-code
     font-size: 15px
+    letter-spacing: 1px
+    cursor: pointer
+    transition: all 0.1s ease
+
+    &:hover
+        background-color: #0b0b0b
+        border-color: colors.$bg-accent
 
     &Gray
         color: colors.$fg-primary
@@ -63,3 +70,14 @@
         background-color: transparent
     to
         background-color: colors.$blue
+
+.button
+    cursor: pointer
+    padding: 8px
+    border: 1px solid transparent
+    border-radius: 50%
+
+    &:hover
+        background-color: colors.$bg-secondary-hover
+        //border-color: colors.$bg-tertiary
+        border-color: colors.$bg-accent

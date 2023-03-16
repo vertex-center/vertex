@@ -9,9 +9,7 @@ type ButtonProps = {
 };
 
 function Button({ symbol, onClick }: ButtonProps) {
-    return (
-        <Symbol style={{ cursor: "pointer" }} name={symbol} onClick={onClick} />
-    );
+    return <Symbol className={styles.button} name={symbol} onClick={onClick} />;
 }
 
 type LEDProps = {

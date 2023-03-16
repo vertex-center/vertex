@@ -33,10 +33,11 @@
     background-color: colors.$bg-primary
     border: 1px solid colors.$bg-tertiary
     cursor: pointer
-    transition: height 0.1s ease 0.03s, width 0.2s ease
+    transition: border-color 0.1s ease, height 0.1s ease 0.03s, width 0.2s ease
 
     &:hover
         background-color: colors.$bg-primary-hover
+        border-color: colors.$bg-accent
         height: 82px
         width: 100%
-        transition: height 0.1s ease, width 0.2s ease 0.03s
+        transition: border-color 0.1s ease, height 0.1s ease, width 0.2s ease 0.03s
