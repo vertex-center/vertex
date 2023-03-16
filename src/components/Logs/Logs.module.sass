@@ -12,6 +12,9 @@
     overflow: scroll
 
 .line
+    display: flex
+    flex-direction: row
+    gap: 12px
     padding: 2px 8px
     border-radius: 4px
 
@@ -20,3 +23,7 @@
 
     &:hover
         background-color: colors.$bg-tertiary-hover
+
+.number
+    color: colors.$fg-primary
+    opacity: 0.4

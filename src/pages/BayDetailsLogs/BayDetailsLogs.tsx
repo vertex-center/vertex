@@ -17,23 +17,13 @@ export default function BayDetailsLogs() {
         const sse = registerSSE(`http://localhost:6130/service/${uuid}/events`);
 
         const onStdout = (e) => {
-            setLogs((logs) => [
-                ...logs,
-                {
-                    type: "message",
-                    message: e.data,
-                },
-            ]);
+            const logLine = JSON.parse(e.data);
+            setLogs((logs) => [...logs, logLine]);
         };
 
         const onStderr = (e) => {
-            setLogs((logs) => [
-                ...logs,
-                {
-                    type: "error",
-                    message: e.data,
-                },
-            ]);
+            const logLine = JSON.parse(e.data);
+            setLogs((logs) => [...logs, logLine]);
         };
 
         registerSSEEvent(sse, "stdout", onStdout);

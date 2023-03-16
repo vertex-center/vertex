@@ -1,5 +1,15 @@
 import axios from "axios";
 
+export type LogLine = {
+    id: number;
+    kind: string;
+    message: string;
+};
+
+export type Logs = {
+    lines: LogLine[];
+};
+
 export type EnvVariable = {
     type: string;
     name: string;
@@ -19,6 +29,7 @@ export type Service = {
 
 export type InstalledService = Service & {
     status: string;
+    logs: Logs;
 };
 
 export type InstalledServices = { [uuid: string]: InstalledService };
