@@ -14,11 +14,11 @@ type LogLine struct {
 // TODO: Use a better structure than array
 
 type Logs struct {
-	Lines []LogLine
+	Lines []LogLine `json:"lines"`
 }
 
 func (l *Logs) Add(line LogLine) LogLine {
-	line.Id = len(l.Lines)
+	line.Id = len(l.Lines) + 1
 	l.Lines = append(l.Lines, line)
 	return line
 }
