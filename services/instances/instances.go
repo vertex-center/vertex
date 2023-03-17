@@ -92,6 +92,28 @@ func Add(uuid uuid.UUID, i *instance.Instance) {
 	}
 }
 
+func Delete(uuid uuid.UUID) error {
+	i, err := Get(uuid)
+	if err != nil {
+		return err
+	}
+
+	err = i.Delete()
+	if err != nil {
+		return err
+	}
+
+	delete(instances.all, uuid)
+
+	for _, listener := range instances.listeners {
+		listener <- Event{
+			Name: EventChange,
+		}
+	}
+
+	return nil
+}
+
 func Exists(uuid uuid.UUID) bool {
 	return instances.all[uuid] != nil
 }

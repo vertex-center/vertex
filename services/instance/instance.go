@@ -162,6 +162,25 @@ func (i *Instance) Unregister(uuid uuid.UUID) {
 	logger.Log(fmt.Sprintf("channel %s unregistered from instance uuid=%s", uuid, i.uuid))
 }
 
+func (i *Instance) IsRunning() bool {
+	return i.Status == StatusRunning
+}
+
+func (i *Instance) Delete() error {
+	if i.IsRunning() {
+		err := i.Stop()
+		if err != nil {
+			return err
+		}
+	}
+
+	err := os.RemoveAll(path.Join("servers", i.uuid.String()))
+	if err != nil {
+		return fmt.Errorf("failed to delete server uuid=%s: %v", i.uuid, err)
+	}
+	return nil
+}
+
 func CreateFromDisk(instanceUUID uuid.UUID) (*Instance, error) {
 	data, err := os.ReadFile(path.Join("servers", instanceUUID.String(), ".vertex", "service.json"))
 	if err != nil {

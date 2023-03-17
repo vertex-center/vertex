@@ -34,6 +34,7 @@ func InitializeRouter() *gin.Engine {
 
 	serviceGroup := r.Group("/instance/:instance_uuid")
 	serviceGroup.GET("", handleGetInstance)
+	serviceGroup.DELETE("", handleDeleteInstance)
 	serviceGroup.POST("/start", handleStartInstance)
 	serviceGroup.POST("/stop", handleStopInstance)
 	serviceGroup.GET("/events", headersSSE, handleInstanceEvents)
@@ -101,6 +102,30 @@ func handleGetInstance(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, i)
+}
+
+func handleDeleteInstance(c *gin.Context) {
+	instanceUUIDParam := c.Param("instance_uuid")
+	if instanceUUIDParam == "" {
+		c.AbortWithError(http.StatusBadRequest, errors.New("instance_uuid was missing in the URL"))
+		return
+	}
+
+	instanceUUID, err := uuid.Parse(instanceUUIDParam)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse instance_uuid: %v", err))
+		return
+	}
+
+	err = instances.Delete(instanceUUID)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "OK",
+	})
 }
 
 func handleStartInstance(c *gin.Context) {
