@@ -4,9 +4,9 @@ import styles from "./Input.module.sass";
 import classNames from "classnames";
 import { Vertical } from "../Layouts/Layouts";
 
-type Props = HTMLProps<HTMLInputElement> & {};
+export type InputProps = HTMLProps<HTMLInputElement> & {};
 
-export default function Input(props: Props) {
+export default function Input(props: InputProps) {
     const { className, label, ...others } = props;
 
     return (

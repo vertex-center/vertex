@@ -16,6 +16,7 @@ import { Error } from "../../components/Error/Error";
 import Loading from "../../components/Loading/Loading";
 import Input from "../../components/Input/Input";
 import { Vertical } from "../../components/Layouts/Layouts";
+import PortInput from "../../components/Input/PortInput";
 
 type DownloadMethod = "marketplace" | "manual";
 
@@ -122,13 +123,30 @@ function StepDownload(props: StepDownloadProps) {
 
 type VariableInputProps = {
     env: EnvVariable;
+    value: any;
+    onChange: (value: any) => void;
 };
 
 function VariableInput(props: VariableInputProps) {
-    const { env } = props;
+    const { env, value, onChange } = props;
+
+    const inputProps = {
+        value,
+        label: env.display_name,
+        name: env.name,
+        onChange: (e) => onChange(e.target.value),
+    };
+
+    let input;
+    if (env.type === "port") {
+        input = <PortInput {...inputProps} />;
+    } else {
+        input = <Input {...inputProps} />;
+    }
+
     return (
         <Vertical gap={6}>
-            <Input label={env.display_name} value={env.default} />
+            {input}
             <Caption className={styles.inputDescription}>
                 {env.description}
             </Caption>
@@ -143,6 +161,26 @@ type StepConfigureProps = {
 function StepConfigure(props: StepConfigureProps) {
     const { service } = props;
 
+    const [env, setEnv] = useState<any[]>();
+
+    useEffect(() => {
+        setEnv(
+            service.environment.map((e) => ({
+                env: e,
+                value: e.default ?? "",
+            }))
+        );
+    }, [service.environment]);
+
+    const onChange = (i: number, value: any) => {
+        setEnv((prev) =>
+            prev.map((el, index) => {
+                if (index !== i) return el;
+                return { ...el, value };
+            })
+        );
+    };
+
     return (
         <div className={styles.step}>
             <div className={styles.stepTitle}>
@@ -150,8 +188,13 @@ function StepConfigure(props: StepConfigureProps) {
                 <Title>Configure</Title>
             </div>
             <Vertical gap={30}>
-                {service?.environment?.map((env: any) => (
-                    <VariableInput env={env} />
+                {env?.map((e, i) => (
+                    <VariableInput
+                        key={i}
+                        env={e.env}
+                        value={e.value}
+                        onChange={(v: any) => onChange(i, v)}
+                    />
                 ))}
             </Vertical>
         </div>
