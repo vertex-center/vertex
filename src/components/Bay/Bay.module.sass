@@ -24,12 +24,7 @@
     font-family: fonts.$font-family-code
     font-size: 15px
     letter-spacing: 1px
-    cursor: pointer
     transition: all 0.1s ease
-
-    &:hover
-        background-color: #0b0b0b
-        border-color: colors.$bg-accent
 
     &Gray
         color: colors.$fg-primary
@@ -46,6 +41,15 @@
     &Green
         color: colors.$green
         opacity: 1
+
+    &Clickable
+        cursor: pointer
+        border: 1px solid transparent
+
+        &:hover
+            background-color: #0b0b0b
+            border-color: colors.$bg-accent
+
 
 .led
     width: 14px

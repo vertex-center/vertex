@@ -77,7 +77,13 @@ function LCD(props: LCDProps) {
 
     if (to)
         return (
-            <Link to={to} className={styles.lcd}>
+            <Link
+                to={to}
+                className={classNames({
+                    [styles.lcd]: true,
+                    [styles.lcdClickable]: to,
+                })}
+            >
                 {content}
             </Link>
         );
