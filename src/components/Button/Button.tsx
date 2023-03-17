@@ -1,11 +1,11 @@
-import { Fragment, PropsWithChildren } from "react";
+import { Fragment, HTMLProps } from "react";
 
 import styles from "./Button.module.sass";
 import Symbol from "../Symbol/Symbol";
 import classNames from "classnames";
 import Spacer from "../Spacer/Spacer";
 
-type Props = PropsWithChildren<{
+type Props = HTMLProps<HTMLButtonElement> & {
     leftSymbol?: string;
     rightSymbol?: string;
 
@@ -19,7 +19,7 @@ type Props = PropsWithChildren<{
     // types
     primary?: boolean;
     large?: boolean;
-}>;
+};
 
 export default function Button(props: Props) {
     const {
@@ -32,6 +32,9 @@ export default function Button(props: Props) {
         selected,
         selectable,
         onClick,
+        className,
+        type,
+        ...others
     } = props;
 
     return (
@@ -42,9 +45,11 @@ export default function Button(props: Props) {
                 [styles.large]: large,
                 [styles.selected]: selected,
                 [styles.disabled]: disabled,
+                [className]: true,
             })}
             type="button"
             onClick={disabled ? () => {} : onClick}
+            {...others}
         >
             {leftSymbol && <Symbol name={leftSymbol} />}
             <div>{children}</div>

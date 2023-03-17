@@ -18,20 +18,79 @@ import Input from "../../components/Input/Input";
 import { Vertical } from "../../components/Layouts/Layouts";
 import PortInput from "../../components/Input/PortInput";
 
-type DownloadMethod = "marketplace" | "manual";
+type DownloadMethod = "marketplace" | "localstorage";
+
+type StepSelectMethodProps = {
+    method: DownloadMethod;
+    onMethodChange: (method: DownloadMethod) => void;
+    onNextStep: () => void;
+};
+
+function StepSelectMethod(props: StepSelectMethodProps) {
+    const { method, onMethodChange, onNextStep } = props;
+
+    return (
+        <div className={styles.step}>
+            <div className={styles.stepTitle}>
+                <Title>Installation method</Title>
+            </div>
+            <div className={styles.buttons}>
+                <Button
+                    className={styles.button}
+                    onClick={() => onMethodChange("marketplace")}
+                    leftSymbol="precision_manufacturing"
+                    selectable
+                    selected={method === "marketplace"}
+                >
+                    <div className={styles.buttonContent}>
+                        <div>Marketplace</div>
+                        <div className={styles.buttonDescription}>
+                            Download services from our online and certified
+                            repository.
+                        </div>
+                    </div>
+                </Button>
+                <Button
+                    className={styles.button}
+                    onClick={() => onMethodChange("localstorage")}
+                    leftSymbol="storage"
+                    selectable
+                    selected={method === "localstorage"}
+                >
+                    <div className={styles.buttonContent}>
+                        <div>Local storage</div>
+                        <div className={styles.buttonDescription}>
+                            Point to vertex the path of an existing service on
+                            your computer. Vertex will keep it installed there.
+                        </div>
+                    </div>
+                </Button>
+            </div>
+            <Button
+                primary
+                large
+                disabled={method === undefined}
+                rightSymbol="navigate_next"
+                onClick={onNextStep}
+            >
+                Next
+            </Button>
+        </div>
+    );
+}
 
 type StepDownloadProps = {
+    method: DownloadMethod;
     onDownload: (service: Service) => void;
 };
 
 function StepDownload(props: StepDownloadProps) {
-    const { onDownload } = props;
+    const { method, onDownload } = props;
 
     const [available, setAvailable] = useState<Service[]>([]);
 
     const [service, setService] = useState<Service>();
 
-    const [method, setMethod] = useState<DownloadMethod>();
     const [error, setError] = useState<string>();
 
     const [isLoadingMarketplace, setIsLoadingMarketplace] =
@@ -67,26 +126,7 @@ function StepDownload(props: StepDownloadProps) {
     const form = (
         <Fragment>
             <div className={styles.stepTitle}>
-                <Symbol name="counter_1" />
                 <Title>Download</Title>
-            </div>
-            <div className={styles.buttons}>
-                <Button
-                    onClick={() => setMethod("marketplace")}
-                    leftSymbol="precision_manufacturing"
-                    selectable
-                    selected={method === "marketplace"}
-                >
-                    Marketplace
-                </Button>
-                <Button
-                    onClick={() => setMethod("manual")}
-                    leftSymbol="hand_gesture"
-                    selectable
-                    selected={method === "manual"}
-                >
-                    Manual
-                </Button>
             </div>
             {method === "marketplace" && !isLoadingMarketplace && !error && (
                 <Select label="Service" onChange={onServiceChange}>
@@ -99,6 +139,7 @@ function StepDownload(props: StepDownloadProps) {
                 </Select>
             )}
             {method === "marketplace" && isLoadingMarketplace && <Loading />}
+            {method === "localstorage" && <></>}
             <Button
                 primary
                 large
@@ -199,12 +240,13 @@ function StepConfigure(props: StepConfigureProps) {
     );
 }
 
-type Step = "download" | "downloading" | "configure";
+type Step = "select-method" | "download" | "downloading" | "configure";
 
 export default function Installed() {
-    const [step, setStep] = useState<Step>("download");
+    const [step, setStep] = useState<Step>("select-method");
 
     const [service, setService] = useState<Service>();
+    const [method, setMethod] = useState<DownloadMethod>();
 
     const [error, setError] = useState<string>();
 
@@ -249,10 +291,19 @@ export default function Installed() {
                     )}
                     <Bay
                         name={service?.name ?? "Empty server"}
-                        status={status}
+                        status={status ?? "off"}
                     />
                 </div>
-                {step === "download" && <StepDownload onDownload={download} />}
+                {step === "select-method" && (
+                    <StepSelectMethod
+                        method={method}
+                        onMethodChange={(m) => setMethod(m)}
+                        onNextStep={() => setStep("download")}
+                    />
+                )}
+                {step === "download" && (
+                    <StepDownload method={method} onDownload={download} />
+                )}
                 {step === "configure" && <StepConfigure service={service} />}
                 <Error error={error} />
             </div>
