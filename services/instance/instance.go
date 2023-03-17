@@ -3,6 +3,7 @@ package instance
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -49,8 +50,29 @@ func (i *Instance) Start() error {
 		logger.Error(fmt.Errorf("runner %s already started", i.Name))
 	}
 
-	i.cmd = exec.Command(fmt.Sprintf("./%s", i.ID))
-	i.cmd.Dir = path.Join("servers", i.uuid.String())
+	dir := path.Join("servers", i.uuid.String())
+	executable := i.ID
+	command := "./" + i.ID
+
+	// Try to find the executable
+	// For a service of ID=vertex-id, the executable can be:
+	// - vertex-id
+	// - vertex-id.sh
+	_, err := os.Stat(path.Join(dir, executable))
+	if errors.Is(err, os.ErrNotExist) {
+		_, err = os.Stat(path.Join(dir, executable+".sh"))
+		if errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("the executable %s (or %s.sh) was not found at path", i.ID, i.ID)
+		} else if err != nil {
+			return err
+		}
+		command = fmt.Sprintf("./%s.sh", i.ID)
+	} else if err != nil {
+		return err
+	}
+
+	i.cmd = exec.Command(command)
+	i.cmd.Dir = dir
 
 	i.cmd.Stdin = os.Stdin
 
@@ -127,7 +149,7 @@ func (i *Instance) Start() error {
 }
 
 func (i *Instance) Stop() error {
-	err := i.cmd.Process.Signal(os.Interrupt)
+	err := i.cmd.Process.Signal(os.Kill)
 	if err != nil {
 		return err
 	}
@@ -182,19 +204,13 @@ func (i *Instance) Delete() error {
 }
 
 func CreateFromDisk(instanceUUID uuid.UUID) (*Instance, error) {
-	data, err := os.ReadFile(path.Join("servers", instanceUUID.String(), ".vertex", "service.json"))
-	if err != nil {
-		logger.Warn(fmt.Sprintf("service '%s' has no '.vertex/service.json' file", instanceUUID))
-	}
-
-	var service services.Service
-	err = json.Unmarshal(data, &service)
+	service, err := services.ReadFromDisk(path.Join("servers", instanceUUID.String()))
 	if err != nil {
 		return nil, err
 	}
 
 	return &Instance{
-		Service:   service,
+		Service:   *service,
 		Status:    StatusOff,
 		Logs:      Logs{},
 		uuid:      instanceUUID,

@@ -159,28 +159,28 @@ func Unregister(uuid uuid.UUID) {
 	logger.Log(fmt.Sprintf("channel %s unregistered from instances", uuid))
 }
 
-func Install(s services.Service) (*instance.Instance, error) {
-	if strings.HasPrefix(s.Repository, "github") {
+func Install(repo string) (*instance.Instance, error) {
+	serviceUUID := uuid.New()
+
+	if strings.HasPrefix(repo, "github") {
 		client := github.NewClient(nil)
 
-		split := strings.Split(s.Repository, "/")
+		split := strings.Split(repo, "/")
 
 		owner := split[1]
 		repo := split[2]
 
 		release, _, err := client.Repositories.GetLatestRelease(context.Background(), owner, repo)
 		if err != nil {
-			return nil, errors.New(fmt.Sprintf("failed to retrieve the latest github release for %s", s.Repository))
+			return nil, errors.New(fmt.Sprintf("failed to retrieve the latest github release for %s", repo))
 		}
 
 		platform := fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH)
 
-		serviceUUID := uuid.New()
-
 		for _, asset := range release.Assets {
 			if strings.Contains(*asset.Name, platform) {
 				basePath := path.Join("servers", serviceUUID.String())
-				archivePath := path.Join(basePath, fmt.Sprintf("%s.tar.gz", s.ID))
+				archivePath := path.Join(basePath, "temp.tar.gz")
 
 				err := downloadFile(*asset.BrowserDownloadURL, basePath, archivePath)
 				if err != nil {
@@ -199,6 +199,25 @@ func Install(s services.Service) (*instance.Instance, error) {
 
 				break
 			}
+		}
+
+		i, err := Instantiate(serviceUUID)
+		if err != nil {
+			return nil, err
+		}
+
+		return i, nil
+	} else if strings.HasPrefix(repo, "localstorage:") {
+		basePath := strings.Split(repo, ":")[1]
+
+		_, err := services.ReadFromDisk(basePath)
+		if err != nil {
+			return nil, fmt.Errorf("%s is not a compatible Vertex service", basePath)
+		}
+
+		err = os.Symlink(basePath, path.Join("servers", serviceUUID.String()))
+		if err != nil {
+			return nil, err
 		}
 
 		i, err := Instantiate(serviceUUID)

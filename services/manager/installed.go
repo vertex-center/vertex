@@ -18,7 +18,14 @@ func ReloadAllInstalled() error {
 	}
 
 	for _, entry := range entries {
-		if entry.IsDir() {
+		info, err := entry.Info()
+		if err != nil {
+			return err
+		}
+
+		isInstance := entry.IsDir() || info.Mode()&os.ModeSymlink != 0
+
+		if isInstance {
 			logger.Log(fmt.Sprintf("found service uuid=%s", entry.Name()))
 			serviceUUID, err := uuid.Parse(entry.Name())
 			if err != nil {

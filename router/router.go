@@ -12,7 +12,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex-core-golang/router"
-	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/services/instance"
 	"github.com/vertex-center/vertex/services/instances"
 	servicesmanager "github.com/vertex-center/vertex/services/manager"
@@ -59,7 +58,7 @@ func handleServicesAvailable(c *gin.Context) {
 }
 
 type DownloadBody struct {
-	Service services.Service `json:"service"`
+	Repository string `json:"repository"`
 }
 
 func handleServiceDownload(c *gin.Context) {
@@ -70,7 +69,7 @@ func handleServiceDownload(c *gin.Context) {
 		return
 	}
 
-	i, err := instances.Install(body.Service)
+	i, err := instances.Install(body.Repository)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
