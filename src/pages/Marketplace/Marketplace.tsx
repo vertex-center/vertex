@@ -42,17 +42,15 @@ function StepDownload(props: StepDownloadProps) {
         if (method === "marketplace") {
             setIsLoadingMarketplace(true);
             setError(undefined);
-            setTimeout(() => {
-                getAvailableServices()
-                    .then(setAvailable)
-                    .catch((err) => {
-                        setError(
-                            `An error occurred while fetching services from the Marketplace: ${err.message}`
-                        );
-                        console.error(err);
-                    })
-                    .finally(() => setIsLoadingMarketplace(false));
-            }, 500);
+            getAvailableServices()
+                .then(setAvailable)
+                .catch((err) => {
+                    setError(
+                        `An error occurred while fetching services from the Marketplace: ${err.message}`
+                    );
+                    console.error(err);
+                })
+                .finally(() => setIsLoadingMarketplace(false));
         }
     }, [method]);
 
