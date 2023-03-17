@@ -16,14 +16,15 @@ type Step = "select-method" | "download" | "downloading" | "configure";
 export default function Installed() {
     const [step, setStep] = useState<Step>("select-method");
 
+    const [repository, setRepository] = useState<string>();
     const [service, setService] = useState<Service>();
     const [method, setMethod] = useState<DownloadMethod>();
 
     const [error, setError] = useState<string>();
 
-    const download = (service: Service) => {
+    const download = (repository: string) => {
         setStep("downloading");
-        downloadService(service)
+        downloadService(repository)
             .then((data: any) => {
                 console.log(data.instance);
                 setStep("configure");
@@ -75,9 +76,9 @@ export default function Installed() {
                 {step === "download" && (
                     <StepDownload
                         method={method}
-                        service={service}
-                        onServiceChange={(s) => setService(s)}
-                        onNextStep={() => download(service)}
+                        repository={repository}
+                        onRepositoryChange={(r) => setRepository(r)}
+                        onNextStep={() => download(repository)}
                     />
                 )}
                 {step === "configure" && <StepConfigure service={service} />}

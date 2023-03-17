@@ -2,7 +2,7 @@ import { EnvVariable, Service } from "../../backend/backend";
 import PortInput from "../../components/Input/PortInput";
 import Input from "../../components/Input/Input";
 import { Vertical } from "../../components/Layouts/Layouts";
-import { Caption, Title } from "../../components/Text/Text";
+import { Title } from "../../components/Text/Text";
 import styles from "./Marketplace.module.sass";
 import { useEffect, useState } from "react";
 import Symbol from "../../components/Symbol/Symbol";
@@ -20,6 +20,7 @@ function VariableInput(props: VariableInputProps) {
         value,
         label: env.display_name,
         name: env.name,
+        description: env.description,
         onChange: (e) => onChange(e.target.value),
     };
 
@@ -30,14 +31,7 @@ function VariableInput(props: VariableInputProps) {
         input = <Input {...inputProps} />;
     }
 
-    return (
-        <Vertical gap={6}>
-            {input}
-            <Caption className={styles.inputDescription}>
-                {env.description}
-            </Caption>
-        </Vertical>
-    );
+    return <Vertical gap={6}>{input}</Vertical>;
 }
 
 type StepConfigureProps = {

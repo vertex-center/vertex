@@ -52,10 +52,10 @@ export async function getAvailableServices(): Promise<Service[]> {
     });
 }
 
-export async function downloadService(service: Service) {
+export async function downloadService(repository: string) {
     return new Promise((resolve, reject) => {
         axios
-            .post("http://localhost:6130/services/download", { service })
+            .post("http://localhost:6130/services/download", { repository })
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });

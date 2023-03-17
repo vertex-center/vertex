@@ -7,15 +7,16 @@ import Loading from "../../components/Loading/Loading";
 import Button from "../../components/Button/Button";
 import { Error } from "../../components/Error/Error";
 import { DownloadMethod } from "./Marketplace";
+import Input from "../../components/Input/Input";
 
 type StepDownloadMarketplaceProps = {
     onNextStep: () => void;
-    service: Service;
-    onServiceChange: (service: Service) => void;
+    repository: string;
+    onRepositoryChange: (repository: string) => void;
 };
 
 function StepDownloadMarketplace(props: StepDownloadMarketplaceProps) {
-    const { service, onNextStep } = props;
+    const { repository, onNextStep } = props;
 
     const [available, setAvailable] = useState<Service[]>([]);
 
@@ -39,8 +40,7 @@ function StepDownloadMarketplace(props: StepDownloadMarketplaceProps) {
     }, []);
 
     const onServiceChange = (e: any) => {
-        let service = available.find((s: Service) => s.id === e.target.value);
-        props.onServiceChange(service);
+        props.onRepositoryChange(e.target.value);
     };
 
     return (
@@ -49,7 +49,7 @@ function StepDownloadMarketplace(props: StepDownloadMarketplaceProps) {
                 <Select label="Service" onChange={onServiceChange}>
                     <Option />
                     {available.map((service) => (
-                        <Option key={service.id} value={service.id}>
+                        <Option key={service.id} value={service.repository}>
                             {service.name}
                         </Option>
                     ))}
@@ -60,7 +60,7 @@ function StepDownloadMarketplace(props: StepDownloadMarketplaceProps) {
                 primary
                 large
                 rightSymbol="download"
-                disabled={!service}
+                disabled={!repository}
                 onClick={onNextStep}
             >
                 Download
@@ -72,23 +72,50 @@ function StepDownloadMarketplace(props: StepDownloadMarketplaceProps) {
 
 type StepDownloadLocalStorageProps = {
     onNextStep: () => void;
-    service: Service;
-    onServiceChange: (service: Service) => void;
+    repository: string;
+    onRepositoryChange: (repository: string) => void;
 };
 
 function StepDownloadLocalStorage(props: StepDownloadLocalStorageProps) {
-    return null;
+    const { onNextStep, repository, onRepositoryChange } = props;
+
+    const [path, setPath] = useState();
+
+    const onPathChange = (e: any) => {
+        setPath(e.target.value);
+        onRepositoryChange(`localstorage:${e.target.value}`);
+    };
+
+    return (
+        <Fragment>
+            <Input
+                value={path}
+                onChange={onPathChange}
+                label="Service path"
+                description="Absolute path on your local machine"
+            />
+            <Button
+                primary
+                large
+                rightSymbol="link"
+                disabled={!repository}
+                onClick={onNextStep}
+            >
+                Link to Vertex
+            </Button>
+        </Fragment>
+    );
 }
 
 type StepDownloadProps = {
     method: DownloadMethod;
-    service: Service;
-    onServiceChange: (service: Service) => void;
+    repository: string;
+    onRepositoryChange: (repository: string) => void;
     onNextStep: () => void;
 };
 
 export default function StepDownload(props: StepDownloadProps) {
-    const { method, service, onServiceChange, onNextStep } = props;
+    const { method, repository, onRepositoryChange, onNextStep } = props;
 
     return (
         <div className={styles.step}>
@@ -98,15 +125,15 @@ export default function StepDownload(props: StepDownloadProps) {
             {method === "marketplace" && (
                 <StepDownloadMarketplace
                     onNextStep={onNextStep}
-                    service={service}
-                    onServiceChange={onServiceChange}
+                    repository={repository}
+                    onRepositoryChange={onRepositoryChange}
                 />
             )}
             {method === "localstorage" && (
                 <StepDownloadLocalStorage
                     onNextStep={onNextStep}
-                    service={service}
-                    onServiceChange={onServiceChange}
+                    repository={repository}
+                    onRepositoryChange={onRepositoryChange}
                 />
             )}
         </div>
