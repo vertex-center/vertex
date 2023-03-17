@@ -171,9 +171,9 @@ export default function Installed() {
         setStep("downloading");
         downloadService(service)
             .then((data: any) => {
-                console.log(data.service);
+                console.log(data.instance);
                 setStep("configure");
-                setService(data.service);
+                setService(data.instance);
             })
             .catch((error) => {
                 console.log(error);

@@ -70,6 +70,15 @@ export async function getInstance(uuid: string) {
     });
 }
 
+export async function deleteInstance(uuid: string) {
+    return new Promise((resolve, reject) => {
+        axios
+            .delete(`http://localhost:6130/instance/${uuid}`)
+            .then((res) => resolve(res.data))
+            .catch((err) => reject(err));
+    });
+}
+
 export async function startInstance(uuid: string) {
     return new Promise((resolve, reject) => {
         axios
