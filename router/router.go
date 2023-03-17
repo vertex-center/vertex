@@ -25,16 +25,18 @@ func InitializeRouter() *gin.Engine {
 	r.Use(cors.Default())
 
 	servicesGroup := r.Group("/services")
-	servicesGroup.GET("", handleServicesInstalled)
 	servicesGroup.GET("/available", handleServicesAvailable)
 	servicesGroup.POST("/download", handleServiceDownload)
-	servicesGroup.GET("/events", headersSSE, handleEvents)
 
-	serviceGroup := r.Group("/service/:service_uuid")
-	serviceGroup.GET("", handleGetService)
-	serviceGroup.POST("/start", handleServiceStart)
-	serviceGroup.POST("/stop", handleServiceStop)
-	serviceGroup.GET("/events", headersSSE, handleServiceEvent)
+	instancesGroup := r.Group("/instances")
+	instancesGroup.GET("", handleGetInstances)
+	instancesGroup.GET("/events", headersSSE, handleInstancesEvents)
+
+	serviceGroup := r.Group("/instance/:instance_uuid")
+	serviceGroup.GET("", handleGetInstance)
+	serviceGroup.POST("/start", handleStartInstance)
+	serviceGroup.POST("/stop", handleStopInstance)
+	serviceGroup.GET("/events", headersSSE, handleInstanceEvents)
 
 	return r
 }
@@ -46,7 +48,7 @@ func headersSSE(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 }
 
-func handleServicesInstalled(c *gin.Context) {
+func handleGetInstances(c *gin.Context) {
 	installed := instances.List()
 	c.JSON(http.StatusOK, installed)
 }
@@ -67,7 +69,7 @@ func handleServiceDownload(c *gin.Context) {
 		return
 	}
 
-	instance, err := instances.Install(body.Service)
+	i, err := instances.Install(body.Service)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -75,70 +77,46 @@ func handleServiceDownload(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message":  "OK",
-		"instance": instance,
+		"instance": i,
 	})
 }
 
-func handleGetService(c *gin.Context) {
-	serviceUUIDParam := c.Param("service_uuid")
-	if serviceUUIDParam == "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New("service_uuid was missing in the URL"))
+func handleGetInstance(c *gin.Context) {
+	instanceUUIDParam := c.Param("instance_uuid")
+	if instanceUUIDParam == "" {
+		c.AbortWithError(http.StatusBadRequest, errors.New("instance_uuid was missing in the URL"))
 		return
 	}
 
-	serviceUUID, err := uuid.Parse(serviceUUIDParam)
+	instanceUUID, err := uuid.Parse(instanceUUIDParam)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse service_uuid: %v", err))
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse instance_uuid: %v", err))
 		return
 	}
 
-	instance, err := instances.Get(serviceUUID)
+	i, err := instances.Get(instanceUUID)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, instance)
+	c.JSON(http.StatusOK, i)
 }
 
-func handleServiceStart(c *gin.Context) {
-	serviceUUIDParam := c.Param("service_uuid")
-	if serviceUUIDParam == "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New("service_uuid was missing in the URL"))
+func handleStartInstance(c *gin.Context) {
+	instanceUUIDParam := c.Param("instance_uuid")
+	if instanceUUIDParam == "" {
+		c.AbortWithError(http.StatusBadRequest, errors.New("instance_uuid was missing in the URL"))
 		return
 	}
 
-	serviceUUID, err := uuid.Parse(serviceUUIDParam)
+	instanceUUID, err := uuid.Parse(instanceUUIDParam)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse service_uuid: %v", err))
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse instance_uuid: %v", err))
 		return
 	}
 
-	err = instances.Start(serviceUUID)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "OK",
-	})
-}
-
-func handleServiceStop(c *gin.Context) {
-	serviceUUIDParam := c.Param("service_uuid")
-	if serviceUUIDParam == "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New("service_uuid was missing in the URL"))
-		return
-	}
-
-	serviceUUID, err := uuid.Parse(serviceUUIDParam)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse service_uuid: %v", err))
-		return
-	}
-
-	err = instances.Stop(serviceUUID)
+	err = instances.Start(instanceUUID)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -149,7 +127,31 @@ func handleServiceStop(c *gin.Context) {
 	})
 }
 
-func handleEvents(c *gin.Context) {
+func handleStopInstance(c *gin.Context) {
+	instanceUUIDParam := c.Param("instance_uuid")
+	if instanceUUIDParam == "" {
+		c.AbortWithError(http.StatusBadRequest, errors.New("instance_uuid was missing in the URL"))
+		return
+	}
+
+	instanceUUID, err := uuid.Parse(instanceUUIDParam)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse instance_uuid: %v", err))
+		return
+	}
+
+	err = instances.Stop(instanceUUID)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "OK",
+	})
+}
+
+func handleInstancesEvents(c *gin.Context) {
 	instancesChan := make(chan instances.Event)
 	id := instances.Register(instancesChan)
 
@@ -192,22 +194,22 @@ func handleEvents(c *gin.Context) {
 	})
 }
 
-func handleServiceEvent(c *gin.Context) {
-	serviceUUIDParam := c.Param("service_uuid")
-	if serviceUUIDParam == "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New("service_uuid was missing in the URL"))
+func handleInstanceEvents(c *gin.Context) {
+	instanceUUIDParam := c.Param("instance_uuid")
+	if instanceUUIDParam == "" {
+		c.AbortWithError(http.StatusBadRequest, errors.New("instance_uuid was missing in the URL"))
 		return
 	}
 
-	serviceUUID, err := uuid.Parse(serviceUUIDParam)
+	instanceUUID, err := uuid.Parse(instanceUUIDParam)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse service_uuid: %v", err))
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse instance_uuid: %v", err))
 		return
 	}
 
-	i, err := instances.Get(serviceUUID)
+	i, err := instances.Get(instanceUUID)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get service %s: %v", serviceUUID, err))
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get service %s: %v", instanceUUID, err))
 		return
 	}
 
