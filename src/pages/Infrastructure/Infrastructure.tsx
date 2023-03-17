@@ -2,10 +2,10 @@ import styles from "./Infrastructure.module.sass";
 import Bay from "../../components/Bay/Bay";
 import { useEffect, useState } from "react";
 import {
-    getInstalledServices,
-    InstalledServices,
-    startService,
-    stopService,
+    getInstances,
+    Instances,
+    startInstance,
+    stopInstance,
 } from "../../backend/backend";
 import Symbol from "../../components/Symbol/Symbol";
 import { Link } from "react-router-dom";
@@ -18,10 +18,10 @@ import {
 
 export default function Infrastructure() {
     const [status, setStatus] = useState("Checking...");
-    const [installed, setInstalled] = useState<InstalledServices>({});
+    const [installed, setInstalled] = useState<Instances>({});
 
     const fetchServices = () => {
-        getInstalledServices()
+        getInstances()
             .then((installed) => {
                 console.log(installed);
                 setInstalled(installed);
@@ -34,7 +34,7 @@ export default function Infrastructure() {
     };
 
     useEffect(() => {
-        const sse = registerSSE("http://localhost:6130/services/events");
+        const sse = registerSSE("http://localhost:6130/instances/events");
 
         const onOpen = (e) => {
             console.log(e);
@@ -57,11 +57,11 @@ export default function Infrastructure() {
         };
     }, []);
 
-    const toggleService = async (uuid: string) => {
+    const toggleInstance = async (uuid: string) => {
         if (installed[uuid].status === "off") {
-            await startService(uuid);
+            await startInstance(uuid);
         } else {
-            await stopService(uuid);
+            await stopInstance(uuid);
         }
     };
 
@@ -75,7 +75,7 @@ export default function Infrastructure() {
                         name={installed[uuid].name}
                         status={installed[uuid].status}
                         to={`/bay/${uuid}`}
-                        onPower={() => toggleService(uuid)}
+                        onPower={() => toggleInstance(uuid)}
                     />
                 ))}
                 <Link to="/marketplace" className={styles.addBay}>

@@ -27,17 +27,17 @@ export type Service = {
     environment: EnvVariable[];
 };
 
-export type InstalledService = Service & {
+export type Instance = Service & {
     status: string;
     logs: Logs;
 };
 
-export type InstalledServices = { [uuid: string]: InstalledService };
+export type Instances = { [uuid: string]: Instance };
 
-export async function getInstalledServices(): Promise<InstalledServices> {
+export async function getInstances(): Promise<Instances> {
     return new Promise((resolve, reject) => {
         axios
-            .get("http://localhost:6130/services")
+            .get("http://localhost:6130/instances")
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });
@@ -52,7 +52,7 @@ export async function getAvailableServices(): Promise<Service[]> {
     });
 }
 
-export async function postDownloadService(service: Service) {
+export async function downloadService(service: Service) {
     return new Promise((resolve, reject) => {
         axios
             .post("http://localhost:6130/services/download", { service })
@@ -61,28 +61,28 @@ export async function postDownloadService(service: Service) {
     });
 }
 
-export async function getService(uuid: string) {
+export async function getInstance(uuid: string) {
     return new Promise((resolve, reject) => {
         axios
-            .get(`http://localhost:6130/service/${uuid}`)
+            .get(`http://localhost:6130/instance/${uuid}`)
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });
 }
 
-export async function startService(uuid: string) {
+export async function startInstance(uuid: string) {
     return new Promise((resolve, reject) => {
         axios
-            .post(`http://localhost:6130/service/${uuid}/start`)
+            .post(`http://localhost:6130/instance/${uuid}/start`)
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });
 }
 
-export async function stopService(uuid: string) {
+export async function stopInstance(uuid: string) {
     return new Promise((resolve, reject) => {
         axios
-            .post(`http://localhost:6130/service/${uuid}/stop`)
+            .post(`http://localhost:6130/instance/${uuid}/stop`)
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });

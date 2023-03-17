@@ -1,7 +1,7 @@
 import {
+    downloadService,
     EnvVariable,
     getAvailableServices,
-    postDownloadService,
     Service,
 } from "../../backend/backend";
 import { Fragment, useEffect, useState } from "react";
@@ -169,7 +169,7 @@ export default function Installed() {
 
     const download = (service: Service) => {
         setStep("downloading");
-        postDownloadService(service)
+        downloadService(service)
             .then((data: any) => {
                 console.log(data.service);
                 setStep("configure");

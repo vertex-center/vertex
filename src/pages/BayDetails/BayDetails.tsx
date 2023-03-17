@@ -1,10 +1,10 @@
 import Bay from "../../components/Bay/Bay";
 import { useCallback, useEffect, useState } from "react";
 import {
-    getService,
-    InstalledService,
-    startService,
-    stopService,
+    getInstance,
+    Instance,
+    startInstance,
+    stopInstance,
 } from "../../backend/backend";
 import { Link, Outlet, useParams } from "react-router-dom";
 
@@ -42,10 +42,10 @@ function MenuItem(props: MenuItemProps) {
 export default function BayDetails() {
     const { uuid } = useParams();
 
-    const [instance, setInstance] = useState<InstalledService>();
+    const [instance, setInstance] = useState<Instance>();
 
     const fetchInstance = useCallback(() => {
-        getService(uuid).then((instance: InstalledService) => {
+        getInstance(uuid).then((instance: Instance) => {
             setInstance(instance);
         });
     }, [uuid]);
@@ -55,7 +55,9 @@ export default function BayDetails() {
     }, [fetchInstance, uuid]);
 
     useEffect(() => {
-        const sse = registerSSE(`http://localhost:6130/service/${uuid}/events`);
+        const sse = registerSSE(
+            `http://localhost:6130/instance/${uuid}/events`
+        );
 
         const onStatusChange = (e) => {
             setInstance((instance) => ({ ...instance, status: e.data }));
@@ -70,11 +72,11 @@ export default function BayDetails() {
         };
     }, [fetchInstance, uuid]);
 
-    const toggleService = async (uuid: string) => {
+    const toggleInstance = async (uuid: string) => {
         if (instance.status === "off") {
-            await startService(uuid);
+            await startInstance(uuid);
         } else {
-            await stopService(uuid);
+            await stopInstance(uuid);
         }
     };
 
@@ -84,7 +86,7 @@ export default function BayDetails() {
                 <Bay
                     name={instance?.name}
                     status={instance?.status}
-                    onPower={() => toggleService(uuid)}
+                    onPower={() => toggleInstance(uuid)}
                 />
             </div>
             <Horizontal className={styles.content}>
