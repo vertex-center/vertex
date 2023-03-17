@@ -6,7 +6,7 @@ import Bay from "../../components/Bay/Bay";
 import Symbol from "../../components/Symbol/Symbol";
 import { Error } from "../../components/Error/Error";
 import StepSelectMethod from "./StepSelectMethod";
-import StepDownload from "./StepDownloadStep";
+import StepDownload from "./StepDownload";
 import StepConfigure from "./StepConfigure";
 
 export type DownloadMethod = "marketplace" | "localstorage";
@@ -73,7 +73,12 @@ export default function Installed() {
                     />
                 )}
                 {step === "download" && (
-                    <StepDownload method={method} onDownload={download} />
+                    <StepDownload
+                        method={method}
+                        service={service}
+                        onServiceChange={(s) => setService(s)}
+                        onNextStep={() => download(service)}
+                    />
                 )}
                 {step === "configure" && <StepConfigure service={service} />}
                 <Error error={error} />
