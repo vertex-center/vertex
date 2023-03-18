@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/console"
@@ -33,11 +34,14 @@ type Event struct {
 	Data string
 }
 
+type EnvVariables = map[string]string
+
 type Instance struct {
 	services.Service
 
-	Status string `json:"status"`
-	Logs   Logs   `json:"logs"`
+	Status       string       `json:"status"`
+	Logs         Logs         `json:"logs"`
+	EnvVariables EnvVariables `json:"env"`
 
 	uuid uuid.UUID
 	cmd  *exec.Cmd
@@ -209,11 +213,39 @@ func CreateFromDisk(instanceUUID uuid.UUID) (*Instance, error) {
 		return nil, err
 	}
 
+	env, err := readEnv(path.Join("servers", instanceUUID.String(), ".env"))
+	if err != nil {
+		return nil, err
+	}
+
 	return &Instance{
-		Service:   *service,
-		Status:    StatusOff,
-		Logs:      Logs{},
-		uuid:      instanceUUID,
-		listeners: map[uuid.UUID]chan Event{},
+		Service:      *service,
+		Status:       StatusOff,
+		Logs:         Logs{},
+		EnvVariables: env,
+		uuid:         instanceUUID,
+		listeners:    map[uuid.UUID]chan Event{},
 	}, nil
+}
+
+func readEnv(filepath string) (EnvVariables, error) {
+	var variables = EnvVariables{}
+
+	file, err := os.Open(filepath)
+	if err != nil {
+		return EnvVariables{}, err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.Split(scanner.Text(), "=")
+		if len(line) < 2 {
+			return EnvVariables{}, errors.New("failed to read .env")
+		}
+
+		variables[line[0]] = line[1]
+	}
+
+	return variables, nil
 }
