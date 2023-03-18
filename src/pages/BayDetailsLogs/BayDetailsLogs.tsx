@@ -1,5 +1,5 @@
 import Logs from "../../components/Logs/Logs";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
     registerSSE,
     registerSSEEvent,
@@ -8,6 +8,7 @@ import {
 } from "../../backend/sse";
 import { useParams } from "react-router-dom";
 import { getInstance, Instance } from "../../backend/backend";
+import { Title } from "../../components/Text/Text";
 
 export default function BayDetailsLogs() {
     const { uuid } = useParams();
@@ -50,5 +51,10 @@ export default function BayDetailsLogs() {
 
     if (!logs) return null;
 
-    return <Logs lines={logs} />;
+    return (
+        <Fragment>
+            <Title>Logs</Title>
+            <Logs lines={logs} />
+        </Fragment>
+    );
 }

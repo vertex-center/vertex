@@ -1,38 +1,10 @@
-import { EnvVariable, Service } from "../../backend/backend";
-import PortInput from "../../components/Input/PortInput";
-import Input from "../../components/Input/Input";
+import { Service } from "../../backend/backend";
 import { Vertical } from "../../components/Layouts/Layouts";
 import { Title } from "../../components/Text/Text";
 import styles from "./Marketplace.module.sass";
 import { useEffect, useState } from "react";
 import Symbol from "../../components/Symbol/Symbol";
-
-type VariableInputProps = {
-    env: EnvVariable;
-    value: any;
-    onChange: (value: any) => void;
-};
-
-function VariableInput(props: VariableInputProps) {
-    const { env, value, onChange } = props;
-
-    const inputProps = {
-        value,
-        label: env.display_name,
-        name: env.name,
-        description: env.description,
-        onChange: (e) => onChange(e.target.value),
-    };
-
-    let input;
-    if (env.type === "port") {
-        input = <PortInput {...inputProps} />;
-    } else {
-        input = <Input {...inputProps} />;
-    }
-
-    return <Vertical gap={6}>{input}</Vertical>;
-}
+import EnvVariableInput from "../../components/EnvVariableInput/EnvVariableInput";
 
 type StepConfigureProps = {
     service: Service;
@@ -69,7 +41,7 @@ export default function StepConfigure(props: StepConfigureProps) {
             </div>
             <Vertical gap={30}>
                 {env?.map((e, i) => (
-                    <VariableInput
+                    <EnvVariableInput
                         key={i}
                         env={e.env}
                         value={e.value}

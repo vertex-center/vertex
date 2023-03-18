@@ -3,6 +3,7 @@ import Marketplace from "./pages/Marketplace/Marketplace";
 import Infrastructure from "./pages/Infrastructure/Infrastructure";
 import BayDetails from "./pages/BayDetails/BayDetails";
 import BayDetailsLogs from "./pages/BayDetailsLogs/BayDetailsLogs";
+import BayDetailsEnv from "./pages/BayDetailsEnv/BayDetailsEnv";
 
 function App() {
     return (
@@ -15,6 +16,10 @@ function App() {
                     <Route
                         path="/bay/:uuid/logs"
                         element={<BayDetailsLogs />}
+                    />
+                    <Route
+                        path="/bay/:uuid/environment"
+                        element={<BayDetailsEnv />}
                     />
                 </Route>
             </Routes>

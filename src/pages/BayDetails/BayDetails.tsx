@@ -107,7 +107,12 @@ export default function BayDetails() {
                     <MenuItem
                         to={`/bay/${uuid}/logs`}
                         symbol="terminal"
-                        name="Console"
+                        name="Logs"
+                    />
+                    <MenuItem
+                        to={`/bay/${uuid}/environment`}
+                        symbol="tune"
+                        name="Environment"
                     />
                     <MenuItem
                         onClick={onDeleteInstance}
