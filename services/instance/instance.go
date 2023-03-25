@@ -232,6 +232,9 @@ func readEnv(filepath string) (EnvVariables, error) {
 	var variables = EnvVariables{}
 
 	file, err := os.Open(filepath)
+	if os.IsNotExist(err) {
+		return EnvVariables{}, nil
+	}
 	if err != nil {
 		return EnvVariables{}, err
 	}
