@@ -31,12 +31,13 @@ func InitializeRouter() *gin.Engine {
 	instancesGroup.GET("", handleGetInstances)
 	instancesGroup.GET("/events", headersSSE, handleInstancesEvents)
 
-	serviceGroup := r.Group("/instance/:instance_uuid")
-	serviceGroup.GET("", handleGetInstance)
-	serviceGroup.DELETE("", handleDeleteInstance)
-	serviceGroup.POST("/start", handleStartInstance)
-	serviceGroup.POST("/stop", handleStopInstance)
-	serviceGroup.GET("/events", headersSSE, handleInstanceEvents)
+	instanceGroup := r.Group("/instance/:instance_uuid")
+	instanceGroup.GET("", handleGetInstance)
+	instanceGroup.DELETE("", handleDeleteInstance)
+	instanceGroup.POST("/start", handleStartInstance)
+	instanceGroup.POST("/stop", handleStopInstance)
+	instanceGroup.PATCH("/environment", handlePatchEnvironment)
+	instanceGroup.GET("/events", headersSSE, handleInstanceEvents)
 
 	return r
 }
@@ -276,5 +277,42 @@ func handleInstanceEvents(c *gin.Context) {
 		case <-done:
 			return false
 		}
+	})
+}
+
+func handlePatchEnvironment(c *gin.Context) {
+	var environment map[string]string
+	err := c.BindJSON(&environment)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("failed to parse body: %v", err))
+		return
+	}
+
+	instanceUUIDParam := c.Param("instance_uuid")
+	if instanceUUIDParam == "" {
+		c.AbortWithError(http.StatusBadRequest, errors.New("instance_uuid was missing in the URL"))
+		return
+	}
+
+	instanceUUID, err := uuid.Parse(instanceUUIDParam)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse instance_uuid: %v", err))
+		return
+	}
+
+	i, err := instances.Get(instanceUUID)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get service %s: %v", instanceUUID, err))
+		return
+	}
+
+	err = i.SetEnv(environment)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to save environment: %v", err))
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "OK",
 	})
 }

@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"strings"
 
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/console"
@@ -34,8 +33,6 @@ type Event struct {
 	Data string
 }
 
-type EnvVariables = map[string]string
-
 type Instance struct {
 	services.Service
 
@@ -43,7 +40,7 @@ type Instance struct {
 	Logs         Logs         `json:"logs"`
 	EnvVariables EnvVariables `json:"env"`
 
-	uuid uuid.UUID
+	UUID uuid.UUID `json:"uuid"`
 	cmd  *exec.Cmd
 
 	listeners map[uuid.UUID]chan Event
@@ -54,7 +51,7 @@ func (i *Instance) Start() error {
 		logger.Error(fmt.Errorf("runner %s already started", i.Name))
 	}
 
-	dir := path.Join("servers", i.uuid.String())
+	dir := path.Join("servers", i.UUID.String())
 	executable := i.ID
 	command := "./" + i.ID
 
@@ -179,13 +176,13 @@ func (i *Instance) setStatus(status string) {
 func (i *Instance) Register(channel chan Event) uuid.UUID {
 	id := uuid.New()
 	i.listeners[id] = channel
-	logger.Log(fmt.Sprintf("channel %s registered to instance uuid=%s", id, i.uuid))
+	logger.Log(fmt.Sprintf("channel %s registered to instance uuid=%s", id, i.UUID))
 	return id
 }
 
 func (i *Instance) Unregister(uuid uuid.UUID) {
 	delete(i.listeners, uuid)
-	logger.Log(fmt.Sprintf("channel %s unregistered from instance uuid=%s", uuid, i.uuid))
+	logger.Log(fmt.Sprintf("channel %s unregistered from instance uuid=%s", uuid, i.UUID))
 }
 
 func (i *Instance) IsRunning() bool {
@@ -200,9 +197,9 @@ func (i *Instance) Delete() error {
 		}
 	}
 
-	err := os.RemoveAll(path.Join("servers", i.uuid.String()))
+	err := os.RemoveAll(path.Join("servers", i.UUID.String()))
 	if err != nil {
-		return fmt.Errorf("failed to delete server uuid=%s: %v", i.uuid, err)
+		return fmt.Errorf("failed to delete server uuid=%s: %v", i.UUID, err)
 	}
 	return nil
 }
@@ -213,42 +210,15 @@ func CreateFromDisk(instanceUUID uuid.UUID) (*Instance, error) {
 		return nil, err
 	}
 
-	env, err := readEnv(path.Join("servers", instanceUUID.String(), ".env"))
-	if err != nil {
-		return nil, err
-	}
-
-	return &Instance{
+	i := &Instance{
 		Service:      *service,
 		Status:       StatusOff,
 		Logs:         Logs{},
-		EnvVariables: env,
-		uuid:         instanceUUID,
+		EnvVariables: *NewEnvVariables(),
+		UUID:         instanceUUID,
 		listeners:    map[uuid.UUID]chan Event{},
-	}, nil
-}
-
-func readEnv(filepath string) (EnvVariables, error) {
-	var variables = EnvVariables{}
-
-	file, err := os.Open(filepath)
-	if os.IsNotExist(err) {
-		return EnvVariables{}, nil
-	}
-	if err != nil {
-		return EnvVariables{}, err
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := strings.Split(scanner.Text(), "=")
-		if len(line) < 2 {
-			return EnvVariables{}, errors.New("failed to read .env")
-		}
-
-		variables[line[0]] = line[1]
 	}
 
-	return variables, nil
+	err = i.LoadEnvFromDisk()
+	return i, err
 }
