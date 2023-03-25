@@ -10,6 +10,8 @@ export type Logs = {
     lines: LogLine[];
 };
 
+export type Env = { [key: string]: string };
+
 export type EnvVariable = {
     type: string;
     name: string;
@@ -93,6 +95,15 @@ export async function stopInstance(uuid: string) {
     return new Promise((resolve, reject) => {
         axios
             .post(`http://localhost:6130/instance/${uuid}/stop`)
+            .then((res) => resolve(res.data))
+            .catch((err) => reject(err));
+    });
+}
+
+export async function saveInstanceEnv(uuid: string, env: Env) {
+    return new Promise((resolve, reject) => {
+        axios
+            .patch(`http://localhost:6130/instance/${uuid}/environment`, env)
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });

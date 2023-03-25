@@ -7,10 +7,11 @@ type Props = {
     env: EnvVariable;
     value: any;
     onChange: (value: any) => void;
+    disabled?: boolean;
 };
 
 export default function EnvVariableInput(props: Props) {
-    const { env, value, onChange } = props;
+    const { env, value, onChange, disabled } = props;
 
     const inputProps = {
         value,
@@ -18,6 +19,7 @@ export default function EnvVariableInput(props: Props) {
         name: env.name,
         description: env.description,
         onChange: (e) => onChange(e.target.value),
+        disabled,
     };
 
     let input;

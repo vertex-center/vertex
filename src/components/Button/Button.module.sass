@@ -32,10 +32,13 @@
 .selected
     border-color: colors.$bg-accent
 
-.disabled
+.disabled, .loading
     background-color: colors.$bg-tertiary
     border-color: colors.$bg-tertiary
     cursor: not-allowed
 
     &:hover
         background-color: colors.$bg-tertiary
+
+.loading
+    cursor: progress

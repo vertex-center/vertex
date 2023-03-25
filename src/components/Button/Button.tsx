@@ -12,6 +12,7 @@ type Props = HTMLProps<HTMLButtonElement> & {
     selected?: boolean;
     selectable?: boolean;
 
+    loading?: boolean;
     disabled?: boolean;
 
     onClick: () => void;
@@ -26,6 +27,7 @@ export default function Button(props: Props) {
         children,
         leftSymbol,
         rightSymbol,
+        loading,
         disabled,
         primary,
         large,
@@ -45,10 +47,11 @@ export default function Button(props: Props) {
                 [styles.large]: large,
                 [styles.selected]: selected,
                 [styles.disabled]: disabled,
+                [styles.loading]: loading,
                 [className]: true,
             })}
             type="button"
-            onClick={disabled ? () => {} : onClick}
+            onClick={disabled || loading ? () => {} : onClick}
             {...others}
         >
             {leftSymbol && <Symbol name={leftSymbol} />}
