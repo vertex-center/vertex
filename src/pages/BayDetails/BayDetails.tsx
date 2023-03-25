@@ -18,6 +18,8 @@ import {
     unregisterSSE,
     unregisterSSEEvent,
 } from "../../backend/sse";
+import Spacer from "../../components/Spacer/Spacer";
+import classNames from "classnames";
 
 type MenuItemProps = {
     to?: string;
@@ -25,13 +27,21 @@ type MenuItemProps = {
 
     symbol: string;
     name: string;
+
+    red?: boolean;
 };
 
 function MenuItem(props: MenuItemProps) {
-    const { to, symbol, name, onClick } = props;
+    const { to, symbol, name, onClick, red } = props;
 
     const content = (
-        <div className={styles.menuItem} onClick={onClick}>
+        <div
+            className={classNames({
+                [styles.menuItem]: true,
+                [styles.menuItemRed]: red,
+            })}
+            onClick={onClick}
+        >
             <Horizontal alignItems="center" gap={12}>
                 <Symbol name={symbol} />
                 {name}
@@ -114,10 +124,12 @@ export default function BayDetails() {
                         symbol="tune"
                         name="Environment"
                     />
+                    <Spacer />
                     <MenuItem
                         onClick={onDeleteInstance}
                         symbol="delete"
                         name="Delete"
+                        red
                     />
                     {/*<MenuItem symbol="hub" name="Connections" />*/}
                     {/*<MenuItem symbol="settings" name="Settings" />*/}
