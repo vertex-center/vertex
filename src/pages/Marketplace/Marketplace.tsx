@@ -1,4 +1,4 @@
-import { downloadService, Service } from "../../backend/backend";
+import { downloadService, Instance } from "../../backend/backend";
 import { Fragment, useState } from "react";
 
 import styles from "./Marketplace.module.sass";
@@ -8,16 +8,19 @@ import { Error } from "../../components/Error/Error";
 import StepSelectMethod from "./StepSelectMethod";
 import StepDownload from "./StepDownload";
 import StepConfigure from "./StepConfigure";
+import { useNavigate } from "react-router-dom";
 
 export type DownloadMethod = "marketplace" | "localstorage";
 
 type Step = "select-method" | "download" | "downloading" | "configure";
 
 export default function Installed() {
+    const navigate = useNavigate();
+
     const [step, setStep] = useState<Step>("select-method");
 
     const [repository, setRepository] = useState<string>();
-    const [service, setService] = useState<Service>();
+    const [instance, setInstance] = useState<Instance>();
     const [method, setMethod] = useState<DownloadMethod>();
 
     const [error, setError] = useState<string>();
@@ -28,7 +31,7 @@ export default function Installed() {
             .then((data: any) => {
                 console.log(data.instance);
                 setStep("configure");
-                setService(data.instance);
+                setInstance(data.instance);
             })
             .catch((error) => {
                 console.log(error);
@@ -62,7 +65,7 @@ export default function Installed() {
                         </Fragment>
                     )}
                     <Bay
-                        name={service?.name ?? "Empty server"}
+                        name={instance?.name ?? "Empty server"}
                         status={status ?? "off"}
                     />
                 </div>
@@ -81,7 +84,12 @@ export default function Installed() {
                         onNextStep={() => download(repository)}
                     />
                 )}
-                {step === "configure" && <StepConfigure service={service} />}
+                {step === "configure" && (
+                    <StepConfigure
+                        onNextStep={() => navigate(`/bay/${instance.uuid}`)}
+                        instance={instance}
+                    />
+                )}
                 <Error error={error} />
             </div>
         </div>

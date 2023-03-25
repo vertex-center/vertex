@@ -30,6 +30,7 @@ export type Service = {
 };
 
 export type Instance = Service & {
+    uuid: string;
     status: string;
     logs: Logs;
     env: { [key: string]: string };

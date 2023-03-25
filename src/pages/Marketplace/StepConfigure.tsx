@@ -1,28 +1,31 @@
-import { Service } from "../../backend/backend";
+import { Env, Instance, saveInstanceEnv } from "../../backend/backend";
 import { Vertical } from "../../components/Layouts/Layouts";
 import { Title } from "../../components/Text/Text";
 import styles from "./Marketplace.module.sass";
 import { useEffect, useState } from "react";
-import Symbol from "../../components/Symbol/Symbol";
 import EnvVariableInput from "../../components/EnvVariableInput/EnvVariableInput";
+import Button from "../../components/Button/Button";
 
 type StepConfigureProps = {
-    service: Service;
+    onNextStep: () => void;
+    instance: Instance;
 };
 
 export default function StepConfigure(props: StepConfigureProps) {
-    const { service } = props;
+    const { onNextStep, instance } = props;
 
     const [env, setEnv] = useState<any[]>();
 
+    const [uploading, setUploading] = useState(false);
+
     useEffect(() => {
         setEnv(
-            service.environment.map((e) => ({
+            instance.environment.map((e) => ({
                 env: e,
                 value: e.default ?? "",
             }))
         );
-    }, [service.environment]);
+    }, [instance.environment]);
 
     const onChange = (i: number, value: any) => {
         setEnv((prev) =>
@@ -33,10 +36,25 @@ export default function StepConfigure(props: StepConfigureProps) {
         );
     };
 
+    const save = () => {
+        const _env: Env = {};
+        env.forEach((e) => {
+            _env[e.env.name] = e.value;
+        });
+        setUploading(true);
+        saveInstanceEnv(instance.uuid, _env)
+            .then(() => {
+                onNextStep();
+            })
+            .catch(console.error)
+            .finally(() => {
+                setUploading(false);
+            });
+    };
+
     return (
         <div className={styles.step}>
             <div className={styles.stepTitle}>
-                <Symbol name="counter_2" />
                 <Title>Configure</Title>
             </div>
             <Vertical gap={30}>
@@ -46,9 +64,19 @@ export default function StepConfigure(props: StepConfigureProps) {
                         env={e.env}
                         value={e.value}
                         onChange={(v: any) => onChange(i, v)}
+                        disabled={uploading}
                     />
                 ))}
             </Vertical>
+            <Button
+                primary
+                large
+                rightSymbol="save"
+                onClick={save}
+                loading={uploading}
+            >
+                Save
+            </Button>
         </div>
     );
 }
