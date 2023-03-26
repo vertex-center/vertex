@@ -172,7 +172,7 @@ func Install(repo string) (*instance.Instance, error) {
 
 		release, _, err := client.Repositories.GetLatestRelease(context.Background(), owner, repo)
 		if err != nil {
-			return nil, errors.New(fmt.Sprintf("failed to retrieve the latest github release for %s", repo))
+			return nil, errors.New(fmt.Sprintf("failed to retrieve the latest github release for %s: %v", repo, err))
 		}
 
 		platform := fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH)

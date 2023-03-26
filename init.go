@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/vertex-center/vertex-core-golang/console"
+	"github.com/vertex-center/vertex/client"
 	"github.com/vertex-center/vertex/router"
 	servicesmanager "github.com/vertex-center/vertex/services/manager"
 )
@@ -12,13 +13,19 @@ import (
 var logger = console.New("vertex")
 
 func main() {
-	r := router.InitializeRouter()
-
 	err := os.Mkdir("servers", os.ModePerm)
 	if err != nil && !os.IsExist(err) {
 		logger.Error(fmt.Errorf("couldn't create 'servers' directory: %v", err))
 		return
 	}
+
+	err = client.Setup()
+	if err != nil {
+		logger.Error(fmt.Errorf("failed to setup the web client: %v", err))
+		return
+	}
+
+	r := router.InitializeRouter()
 
 	err = servicesmanager.ReloadAllInstalled()
 	if err != nil {

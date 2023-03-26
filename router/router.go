@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"path"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sse"
@@ -24,7 +25,7 @@ func InitializeRouter() *gin.Engine {
 	r := router.CreateRouter()
 	r.Use(cors.Default())
 
-	r.Use(static.Serve("/", static.LocalFile("./client", true)))
+	r.Use(static.Serve("/", static.LocalFile(path.Join(".", "clients", "build"), true)))
 
 	api := r.Group("/api")
 
