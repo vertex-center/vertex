@@ -7,7 +7,7 @@ import {
     unregisterSSEEvent,
 } from "../../backend/sse";
 import { useParams } from "react-router-dom";
-import { getInstance, Instance } from "../../backend/backend";
+import { getInstance, Instance, route } from "../../backend/backend";
 import { Title } from "../../components/Text/Text";
 
 export default function BayDetailsLogs() {
@@ -24,9 +24,7 @@ export default function BayDetailsLogs() {
     useEffect(() => {
         if (logs === undefined) return;
 
-        const sse = registerSSE(
-            `http://localhost:6130/instance/${uuid}/events`
-        );
+        const sse = registerSSE(route(`/instance/${uuid}/events`));
 
         const onStdout = (e) => {
             const logLine = JSON.parse(e.data);

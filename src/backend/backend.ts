@@ -38,10 +38,14 @@ export type Instance = Service & {
 
 export type Instances = { [uuid: string]: Instance };
 
+export function route(path: string) {
+    return `http://localhost:6130/api${path}`;
+}
+
 export async function getInstances(): Promise<Instances> {
     return new Promise((resolve, reject) => {
         axios
-            .get("http://localhost:6130/instances")
+            .get(route("/instances"))
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });
@@ -50,7 +54,7 @@ export async function getInstances(): Promise<Instances> {
 export async function getAvailableServices(): Promise<Service[]> {
     return new Promise((resolve, reject) => {
         axios
-            .get("http://localhost:6130/services/available")
+            .get(route("/services/available"))
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });
@@ -59,7 +63,7 @@ export async function getAvailableServices(): Promise<Service[]> {
 export async function downloadService(repository: string) {
     return new Promise((resolve, reject) => {
         axios
-            .post("http://localhost:6130/services/download", { repository })
+            .post(route("/services/download"), { repository })
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });
@@ -68,7 +72,7 @@ export async function downloadService(repository: string) {
 export async function getInstance(uuid: string) {
     return new Promise((resolve, reject) => {
         axios
-            .get(`http://localhost:6130/instance/${uuid}`)
+            .get(route(`/instance/${uuid}`))
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });
@@ -77,7 +81,7 @@ export async function getInstance(uuid: string) {
 export async function deleteInstance(uuid: string) {
     return new Promise((resolve, reject) => {
         axios
-            .delete(`http://localhost:6130/instance/${uuid}`)
+            .delete(route(`/instance/${uuid}`))
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });
@@ -86,7 +90,7 @@ export async function deleteInstance(uuid: string) {
 export async function startInstance(uuid: string) {
     return new Promise((resolve, reject) => {
         axios
-            .post(`http://localhost:6130/instance/${uuid}/start`)
+            .post(route(`/instance/${uuid}/start`))
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });
@@ -95,7 +99,7 @@ export async function startInstance(uuid: string) {
 export async function stopInstance(uuid: string) {
     return new Promise((resolve, reject) => {
         axios
-            .post(`http://localhost:6130/instance/${uuid}/stop`)
+            .post(route(`/instance/${uuid}/stop`))
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });
@@ -104,7 +108,7 @@ export async function stopInstance(uuid: string) {
 export async function saveInstanceEnv(uuid: string, env: Env) {
     return new Promise((resolve, reject) => {
         axios
-            .patch(`http://localhost:6130/instance/${uuid}/environment`, env)
+            .patch(route(`/instance/${uuid}/environment`), env)
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });

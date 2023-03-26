@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
     getInstances,
     Instances,
+    route,
     startInstance,
     stopInstance,
 } from "../../backend/backend";
@@ -34,7 +35,7 @@ export default function Infrastructure() {
     };
 
     useEffect(() => {
-        const sse = registerSSE("http://localhost:6130/instances/events");
+        const sse = registerSSE(route("/instances/events"));
 
         const onOpen = (e) => {
             console.log(e);
