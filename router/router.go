@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sse"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/console"
@@ -23,15 +24,19 @@ func InitializeRouter() *gin.Engine {
 	r := router.CreateRouter()
 	r.Use(cors.Default())
 
-	servicesGroup := r.Group("/services")
+	r.Use(static.Serve("/", static.LocalFile("./client", true)))
+
+	api := r.Group("/api")
+
+	servicesGroup := api.Group("/services")
 	servicesGroup.GET("/available", handleServicesAvailable)
 	servicesGroup.POST("/download", handleServiceDownload)
 
-	instancesGroup := r.Group("/instances")
+	instancesGroup := api.Group("/instances")
 	instancesGroup.GET("", handleGetInstances)
 	instancesGroup.GET("/events", headersSSE, handleInstancesEvents)
 
-	instanceGroup := r.Group("/instance/:instance_uuid")
+	instanceGroup := api.Group("/instance/:instance_uuid")
 	instanceGroup.GET("", handleGetInstance)
 	instanceGroup.DELETE("", handleDeleteInstance)
 	instanceGroup.POST("/start", handleStartInstance)
