@@ -22,7 +22,7 @@ export default function BayDetailsLogs() {
     }, [uuid]);
 
     useEffect(() => {
-        if (logs === undefined) return;
+        if (uuid === undefined || logs === undefined) return;
 
         const sse = registerSSE(route(`/instance/${uuid}/events`));
 
@@ -45,7 +45,7 @@ export default function BayDetailsLogs() {
 
             unregisterSSE(sse);
         };
-    }, [logs]);
+    }, [uuid, logs]);
 
     if (!logs) return null;
 
