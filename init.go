@@ -20,12 +20,6 @@ func main() {
 		return
 	}
 
-	err = os.Mkdir("clients", os.ModePerm)
-	if err != nil && !os.IsExist(err) {
-		logger.Error(fmt.Errorf("couldn't create 'clients' directory: %v", err))
-		return
-	}
-
 	err = servicesmanager.ReloadAllInstalled()
 	if err != nil {
 		logger.Error(err)
