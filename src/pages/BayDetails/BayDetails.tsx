@@ -4,6 +4,7 @@ import {
     deleteInstance,
     getInstance,
     Instance,
+    route,
     startInstance,
     stopInstance,
 } from "../../backend/backend";
@@ -71,9 +72,9 @@ export default function BayDetails() {
     }, [fetchInstance, uuid]);
 
     useEffect(() => {
-        const sse = registerSSE(
-            `http://localhost:6130/instance/${uuid}/events`
-        );
+        if (uuid === undefined) return;
+
+        const sse = registerSSE(route(`/instance/${uuid}/events`));
 
         const onStatusChange = (e) => {
             setInstance((instance) => ({ ...instance, status: e.data }));
@@ -86,7 +87,7 @@ export default function BayDetails() {
 
             unregisterSSE(sse);
         };
-    }, [fetchInstance, uuid]);
+    }, [uuid]);
 
     const toggleInstance = async (uuid: string) => {
         if (instance.status === "off") {
