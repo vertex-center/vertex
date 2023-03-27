@@ -10,7 +10,7 @@ require (
 	github.com/goccy/go-json v0.9.11
 	github.com/google/go-github/v50 v50.0.0
 	github.com/google/uuid v1.3.0
-	github.com/vertex-center/vertex-core-golang v0.0.0-20230327005800-506314b10748
+	github.com/vertex-center/vertex-core-golang v0.0.0-20230327174744-2ac235efcc9f
 )
 
 require (
