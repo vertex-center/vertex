@@ -82,7 +82,6 @@ func handleServiceDownload(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":  "OK",
 		"instance": i,
 	})
 }
@@ -128,9 +127,7 @@ func handleDeleteInstance(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "OK",
-	})
+	c.Status(http.StatusOK)
 }
 
 func handleStartInstance(c *gin.Context) {
@@ -152,9 +149,7 @@ func handleStartInstance(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "OK",
-	})
+	c.Status(http.StatusOK)
 }
 
 func handleStopInstance(c *gin.Context) {
@@ -176,9 +171,7 @@ func handleStopInstance(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "OK",
-	})
+	c.Status(http.StatusOK)
 }
 
 func handleInstancesEvents(c *gin.Context) {
@@ -317,7 +310,5 @@ func handlePatchEnvironment(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "OK",
-	})
+	c.Status(http.StatusOK)
 }
