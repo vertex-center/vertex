@@ -23,12 +23,10 @@ import (
 var logger = console.New("vertex::router")
 
 func InitializeRouter() *gin.Engine {
-	r := router.CreateRouter()
+	r, api := router.CreateRouter()
 	r.Use(cors.Default())
 
 	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.PathClient, "build"), true)))
-
-	api := r.Group("/api")
 
 	servicesGroup := api.Group("/services")
 	servicesGroup.GET("/available", handleServicesAvailable)

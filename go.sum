@@ -194,8 +194,8 @@ github.com/ugorji/go v1.2.7/go.mod h1:nF9osbDWLy6bDVv/Rtoh6QgnvNDpmCalQV5urGCCS6
 github.com/ugorji/go/codec v1.1.7/go.mod h1:Ax+UKWsSmolVDwsd+7N3ZtXu+yMGCf907BLYF3GoBXY=
 github.com/ugorji/go/codec v1.2.7 h1:YPXUKf7fYbp/y8xloBqZOw2qaVggbfwMlI8WM3wZUJ0=
 github.com/ugorji/go/codec v1.2.7/go.mod h1:WGN1fab3R1fzQlVQTkfxVtIBhWDRqOviHU95kRgeqEY=
-github.com/vertex-center/vertex-core-golang v0.0.0-20230223184853-ca0f83873a87 h1:pbkDpNP9KOYLe9TN9jEmuB0MKyaDY8EqRw5SVZLJpZQ=
-github.com/vertex-center/vertex-core-golang v0.0.0-20230223184853-ca0f83873a87/go.mod h1:LW8yo6JkIKZxVJKhgbLsf1CAocMWnDYz1luF04juh/g=
+github.com/vertex-center/vertex-core-golang v0.0.0-20230327005800-506314b10748 h1:j62BMHNx56u6EVrKGlh5ZXB7pPX0es856b1u4kHsIPY=
+github.com/vertex-center/vertex-core-golang v0.0.0-20230327005800-506314b10748/go.mod h1:LW8yo6JkIKZxVJKhgbLsf1CAocMWnDYz1luF04juh/g=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
