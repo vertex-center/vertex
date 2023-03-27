@@ -13,12 +13,13 @@ import (
 
 	"github.com/google/go-github/v50/github"
 	"github.com/vertex-center/vertex-core-golang/console"
+	"github.com/vertex-center/vertex/storage"
 )
 
 var logger = console.New("client")
 
 func Setup() error {
-	err := os.Mkdir("clients", os.ModePerm)
+	err := os.Mkdir(storage.PathClient, os.ModePerm)
 	if os.IsExist(err) {
 		// The client is already setup.
 		return nil
@@ -51,7 +52,7 @@ func Setup() error {
 				return err
 			}
 
-			err = os.Remove(path.Join("clients", "temp.zip"))
+			err = os.Remove(path.Join(storage.PathClient, "temp.zip"))
 			if err != nil {
 				return err
 			}
@@ -68,7 +69,7 @@ func download(url string) error {
 	}
 	defer res.Body.Close()
 
-	file, err := os.Create(path.Join("clients", "temp.zip"))
+	file, err := os.Create(path.Join(storage.PathClient, "temp.zip"))
 	if err != nil {
 		return err
 	}
@@ -79,13 +80,13 @@ func download(url string) error {
 }
 
 func unarchive() error {
-	reader, err := zip.OpenReader(path.Join("clients", "temp.zip"))
+	reader, err := zip.OpenReader(path.Join(storage.PathClient, "temp.zip"))
 	if err != nil {
 		return err
 	}
 
 	for _, header := range reader.File {
-		filepath := path.Join("clients", header.Name)
+		filepath := path.Join(storage.PathClient, header.Name)
 
 		if header.FileInfo().IsDir() {
 			err = os.MkdirAll(filepath, os.ModePerm)

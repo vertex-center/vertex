@@ -17,6 +17,7 @@ import (
 	"github.com/vertex-center/vertex/services/instance"
 	"github.com/vertex-center/vertex/services/instances"
 	servicesmanager "github.com/vertex-center/vertex/services/manager"
+	"github.com/vertex-center/vertex/storage"
 )
 
 var logger = console.New("vertex::router")
@@ -25,7 +26,7 @@ func InitializeRouter() *gin.Engine {
 	r := router.CreateRouter()
 	r.Use(cors.Default())
 
-	r.Use(static.Serve("/", static.LocalFile(path.Join(".", "clients", "build"), true)))
+	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.PathClient, "build"), true)))
 
 	api := r.Group("/api")
 

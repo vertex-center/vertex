@@ -7,12 +7,13 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex/services/instances"
+	"github.com/vertex-center/vertex/storage"
 )
 
 var logger = console.New("vertex::services-manager")
 
 func ReloadAllInstalled() error {
-	entries, err := os.ReadDir("servers")
+	entries, err := os.ReadDir(storage.PathInstances)
 	if err != nil {
 		return err
 	}

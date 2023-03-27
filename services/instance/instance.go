@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex/services"
+	"github.com/vertex-center/vertex/storage"
 )
 
 var logger = console.New("vertex::instance")
@@ -51,7 +52,7 @@ func (i *Instance) Start() error {
 		logger.Error(fmt.Errorf("runner %s already started", i.Name))
 	}
 
-	dir := path.Join("servers", i.UUID.String())
+	dir := path.Join(storage.PathInstances, i.UUID.String())
 	executable := i.ID
 	command := "./" + i.ID
 
@@ -197,7 +198,7 @@ func (i *Instance) Delete() error {
 		}
 	}
 
-	err := os.RemoveAll(path.Join("servers", i.UUID.String()))
+	err := os.RemoveAll(path.Join(storage.PathInstances, i.UUID.String()))
 	if err != nil {
 		return fmt.Errorf("failed to delete server uuid=%s: %v", i.UUID, err)
 	}
@@ -205,7 +206,7 @@ func (i *Instance) Delete() error {
 }
 
 func CreateFromDisk(instanceUUID uuid.UUID) (*Instance, error) {
-	service, err := services.ReadFromDisk(path.Join("servers", instanceUUID.String()))
+	service, err := services.ReadFromDisk(path.Join(storage.PathInstances, instanceUUID.String()))
 	if err != nil {
 		return nil, err
 	}

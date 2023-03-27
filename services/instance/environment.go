@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/goccy/go-json"
+	"github.com/vertex-center/vertex/storage"
 )
 
 type EnvVariables struct {
@@ -19,7 +20,7 @@ func NewEnvVariables() *EnvVariables {
 }
 
 func (i *Instance) LoadEnvFromDisk() error {
-	filepath := path.Join("servers", i.UUID.String(), ".env")
+	filepath := path.Join(storage.PathInstances, i.UUID.String(), ".env")
 
 	file, err := os.Open(filepath)
 	if os.IsNotExist(err) {
@@ -44,7 +45,7 @@ func (i *Instance) LoadEnvFromDisk() error {
 }
 
 func (i *Instance) SetEnv(variables map[string]string) error {
-	filepath := path.Join("servers", i.UUID.String(), ".env")
+	filepath := path.Join(storage.PathInstances, i.UUID.String(), ".env")
 
 	file, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE, os.ModePerm)
 	if err != nil {

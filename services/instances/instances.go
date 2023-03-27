@@ -18,6 +18,7 @@ import (
 	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/services/instance"
+	"github.com/vertex-center/vertex/storage"
 )
 
 var (
@@ -179,7 +180,7 @@ func Install(repo string) (*instance.Instance, error) {
 
 		for _, asset := range release.Assets {
 			if strings.Contains(*asset.Name, platform) {
-				basePath := path.Join("servers", serviceUUID.String())
+				basePath := path.Join(storage.PathInstances, serviceUUID.String())
 				archivePath := path.Join(basePath, "temp.tar.gz")
 
 				err := downloadFile(*asset.BrowserDownloadURL, basePath, archivePath)
@@ -215,7 +216,7 @@ func Install(repo string) (*instance.Instance, error) {
 			return nil, fmt.Errorf("%s is not a compatible Vertex service", basePath)
 		}
 
-		err = os.Symlink(basePath, path.Join("servers", serviceUUID.String()))
+		err = os.Symlink(basePath, path.Join(storage.PathInstances, serviceUUID.String()))
 		if err != nil {
 			return nil, err
 		}

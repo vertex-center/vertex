@@ -8,14 +8,15 @@ import (
 	"github.com/vertex-center/vertex/client"
 	"github.com/vertex-center/vertex/router"
 	servicesmanager "github.com/vertex-center/vertex/services/manager"
+	"github.com/vertex-center/vertex/storage"
 )
 
 var logger = console.New("vertex")
 
 func main() {
-	err := os.Mkdir("servers", os.ModePerm)
+	err := os.MkdirAll(storage.PathInstances, os.ModePerm)
 	if err != nil && !os.IsExist(err) {
-		logger.Error(fmt.Errorf("couldn't create 'servers' directory: %v", err))
+		logger.Error(fmt.Errorf("couldn't create '%s' directory: %v", storage.PathInstances, err))
 		return
 	}
 
