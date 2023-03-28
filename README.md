@@ -23,7 +23,18 @@ This repository contains Vertex Core, which allows to install services easily.
 
 ## Installation process
 
-*Coming soon...*
+*Builds are not yet available.*
+
+To run Vertex:
+1. Clone this repository
+   ```bash
+   git clone https://github.com/vertex-center/vertex
+   ```
+2. Run Vertex
+   ```bash
+   go run .
+   ```
+3. Access from http://localhost:6130/
 
 ## Services
 
