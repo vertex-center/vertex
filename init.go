@@ -6,6 +6,7 @@ import (
 
 	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex/client"
+	"github.com/vertex-center/vertex/dependencies"
 	"github.com/vertex-center/vertex/router"
 	servicesmanager "github.com/vertex-center/vertex/services/manager"
 	"github.com/vertex-center/vertex/storage"
@@ -23,6 +24,12 @@ func main() {
 	err = client.Setup()
 	if err != nil {
 		logger.Error(fmt.Errorf("failed to setup the web client: %v", err))
+		return
+	}
+
+	err = dependencies.Reload()
+	if err != nil {
+		logger.Error(fmt.Errorf("failed to reload dependencies: %v", err))
 		return
 	}
 
