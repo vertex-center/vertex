@@ -27,9 +27,10 @@ type Service struct {
 	// Repository describes where to find the service.
 	// - Example for GitHub: github.com/vertex-center/vertex-spotify
 	// - Example for LocalStorage: localstorage:/Users/username/service
-	Repository   string        `json:"repository"`
-	Description  string        `json:"description"`
-	EnvVariables []EnvVariable `json:"environment,omitempty"`
+	Repository   string          `json:"repository"`
+	Description  string          `json:"description"`
+	EnvVariables []EnvVariable   `json:"environment,omitempty"`
+	Dependencies map[string]bool `json:"dependencies,omitempty"`
 }
 
 func ReadFromDisk(servicePath string) (*Service, error) {
@@ -40,8 +41,5 @@ func ReadFromDisk(servicePath string) (*Service, error) {
 
 	var service Service
 	err = json.Unmarshal(data, &service)
-	if err != nil {
-		return nil, err
-	}
-	return &service, nil
+	return &service, err
 }
