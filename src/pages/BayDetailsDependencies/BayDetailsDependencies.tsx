@@ -5,26 +5,35 @@ import Spacer from "../../components/Spacer/Spacer";
 import Symbol from "../../components/Symbol/Symbol";
 
 import styles from "./BayDetailsDependencies.module.sass";
-import { getInstance, Instance } from "../../backend/backend";
+import {
+    Dependencies,
+    Dependency as DependencyModel,
+    getInstanceDependencies,
+} from "../../backend/backend";
 import { useParams } from "react-router-dom";
+import classNames from "classnames";
 
 type Props = {
-    dependency: string;
+    name: string;
+    dependency: DependencyModel;
 };
 
 export function Dependency(props: Props) {
-    const { dependency } = props;
+    const { name, dependency } = props;
     return (
         <Horizontal alignItems="center">
-            <div>{dependency}</div>
+            <div>{name}</div>
             <Spacer />
             <Horizontal
-                className={styles.installed}
+                className={classNames({
+                    [styles.installed]: dependency.installed,
+                    [styles.notInstalled]: !dependency.installed,
+                })}
                 alignItems="center"
                 gap={4}
             >
-                <Symbol name="check" />
-                Installed
+                <Symbol name={dependency.installed ? "check" : "error"} />
+                {dependency.installed ? "Installed" : "Not installed"}
             </Horizontal>
         </Horizontal>
     );
@@ -33,18 +42,18 @@ export function Dependency(props: Props) {
 export default function BayDetailsDependencies() {
     const { uuid } = useParams();
 
-    const [instance, setInstance] = useState<Instance>();
+    const [dependencies, setDependencies] = useState<Dependencies>({});
 
     useEffect(() => {
-        getInstance(uuid).then((i: Instance) => setInstance(i));
+        getInstanceDependencies(uuid).then((deps) => setDependencies(deps));
     }, [uuid]);
 
     return (
         <Fragment>
             <Title>Dependencies</Title>
             <Vertical gap={12}>
-                {Object.keys(instance?.dependencies ?? []).map((dep) => (
-                    <Dependency dependency={dep} />
+                {Object.entries(dependencies).map(([name, dep]) => (
+                    <Dependency name={name} dependency={dep} />
                 ))}
             </Vertical>
         </Fragment>

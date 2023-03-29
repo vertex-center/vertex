@@ -37,6 +37,21 @@ export type Instance = Service & {
     env: { [key: string]: string };
 };
 
+export type Package = {
+    name: string;
+    description?: string;
+    homepage?: string;
+    license?: string;
+    check?: string;
+    install_package?: { [pm: string]: string };
+};
+
+export type Dependency = Package & {
+    installed: boolean;
+};
+
+export type Dependencies = { [id: string]: Dependency };
+
 export type Instances = { [uuid: string]: Instance };
 
 export function route(path: string) {
@@ -110,6 +125,17 @@ export async function saveInstanceEnv(uuid: string, env: Env) {
     return new Promise((resolve, reject) => {
         axios
             .patch(route(`/instance/${uuid}/environment`), env)
+            .then((res) => resolve(res.data))
+            .catch((err) => reject(err));
+    });
+}
+
+export async function getInstanceDependencies(
+    uuid: string
+): Promise<Dependencies> {
+    return new Promise((resolve, reject) => {
+        axios
+            .get(route(`/instance/${uuid}/dependencies`))
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });
