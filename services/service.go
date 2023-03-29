@@ -7,6 +7,8 @@ import (
 	"path"
 
 	"github.com/vertex-center/vertex-core-golang/console"
+	"github.com/vertex-center/vertex/dependencies"
+	"github.com/vertex-center/vertex/dependencies/packages"
 )
 
 var logger = console.New("vertex::services")
@@ -42,4 +44,26 @@ func ReadFromDisk(servicePath string) (*Service, error) {
 	var service Service
 	err = json.Unmarshal(data, &service)
 	return &service, err
+}
+
+func (s *Service) MarshalJSON() ([]byte, error) {
+	var deps = map[string]packages.Package{}
+
+	for name, _ := range s.Dependencies {
+		dep, err := dependencies.Get(name)
+		if err != nil {
+			continue
+		}
+		deps[name] = *dep
+	}
+
+	type ServiceAlias Service
+
+	return json.Marshal(&struct {
+		*ServiceAlias
+		Deps map[string]packages.Package `json:"dependencies"`
+	}{
+		ServiceAlias: (*ServiceAlias)(s),
+		Deps:         deps,
+	})
 }

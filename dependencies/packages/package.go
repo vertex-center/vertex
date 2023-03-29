@@ -28,7 +28,7 @@ type Package struct {
 	InstallPackage map[string]string `json:"install"`
 }
 
-func New(id string) (*Package, error) {
+func Read(id string) (*Package, error) {
 	p := path.Join(storage.PathDependencies, "packages", id, fmt.Sprintf("%s.json", id))
 
 	file, err := os.ReadFile(p)
