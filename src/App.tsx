@@ -4,6 +4,7 @@ import Infrastructure from "./pages/Infrastructure/Infrastructure";
 import BayDetails from "./pages/BayDetails/BayDetails";
 import BayDetailsLogs from "./pages/BayDetailsLogs/BayDetailsLogs";
 import BayDetailsEnv from "./pages/BayDetailsEnv/BayDetailsEnv";
+import BayDetailsDependencies from "./pages/BayDetailsDependencies";
 
 function App() {
     return (
@@ -20,6 +21,10 @@ function App() {
                     <Route
                         path="/bay/:uuid/environment"
                         element={<BayDetailsEnv />}
+                    />
+                    <Route
+                        path="/bay/:uuid/dependencies"
+                        element={<BayDetailsDependencies />}
                     />
                 </Route>
             </Routes>

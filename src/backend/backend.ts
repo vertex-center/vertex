@@ -27,6 +27,7 @@ export type Service = {
     repository: string;
     description: string;
     environment: EnvVariable[];
+    dependencies?: { [name: string]: boolean };
 };
 
 export type Instance = Service & {

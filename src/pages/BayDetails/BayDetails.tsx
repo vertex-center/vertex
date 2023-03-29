@@ -125,6 +125,11 @@ export default function BayDetails() {
                         symbol="tune"
                         name="Environment"
                     />
+                    <MenuItem
+                        to={`/bay/${uuid}/dependencies`}
+                        symbol="widgets"
+                        name="Dependencies"
+                    />
                     <Spacer />
                     <MenuItem
                         onClick={onDeleteInstance}
