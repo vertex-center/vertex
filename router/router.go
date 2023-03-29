@@ -14,6 +14,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex-core-golang/router"
+	"github.com/vertex-center/vertex/dependencies"
+	"github.com/vertex-center/vertex/dependencies/dependency"
 	"github.com/vertex-center/vertex/services/instance"
 	"github.com/vertex-center/vertex/services/instances"
 	servicesmanager "github.com/vertex-center/vertex/services/manager"
@@ -41,6 +43,7 @@ func InitializeRouter() *gin.Engine {
 	instanceGroup.POST("/stop", handleStopInstance)
 	instanceGroup.PATCH("/environment", handlePatchEnvironment)
 	instanceGroup.GET("/events", headersSSE, handleInstanceEvents)
+	instanceGroup.GET("/dependencies", handleGetDependencies)
 
 	return r
 }
@@ -309,4 +312,38 @@ func handlePatchEnvironment(c *gin.Context) {
 	}
 
 	c.Status(http.StatusOK)
+}
+
+func handleGetDependencies(c *gin.Context) {
+	instanceUUIDParam := c.Param("instance_uuid")
+	if instanceUUIDParam == "" {
+		c.AbortWithError(http.StatusBadRequest, errors.New("instance_uuid was missing in the URL"))
+		return
+	}
+
+	instanceUUID, err := uuid.Parse(instanceUUIDParam)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse instance_uuid: %v", err))
+		return
+	}
+
+	i, err := instances.Get(instanceUUID)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get service %s: %v", instanceUUID, err))
+		return
+	}
+
+	var deps = map[string]dependency.Dependency{}
+
+	for name, _ := range i.Dependencies {
+		dep, err := dependencies.Get(name)
+		if err != nil {
+			logger.Error(err)
+			continue
+		}
+
+		deps[name] = *dep
+	}
+
+	c.JSON(http.StatusOK, deps)
 }

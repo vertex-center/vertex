@@ -29,7 +29,7 @@ type Package struct {
 }
 
 func Read(id string) (*Package, error) {
-	p := path.Join(storage.PathDependencies, "packages", id, fmt.Sprintf("%s.json", id))
+	p := path.Join(GetPath(id), fmt.Sprintf("%s.json", id))
 
 	file, err := os.ReadFile(p)
 	if err != nil {
@@ -39,6 +39,10 @@ func Read(id string) (*Package, error) {
 	var pkg Package
 	err = json.Unmarshal(file, &pkg)
 	return &pkg, err
+}
+
+func GetPath(id string) string {
+	return path.Join(storage.PathDependencies, "packages", id)
 }
 
 func (p *Package) Install(pm string) error {
