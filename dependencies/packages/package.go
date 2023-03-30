@@ -46,7 +46,13 @@ func GetPath(id string) string {
 }
 
 func (p *Package) Install(pm string) error {
-	return p.InstallationCommand(pm).Run()
+	cmd := p.InstallationCommand(pm)
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+
+	return cmd.Run()
 }
 
 func (p *Package) InstallationCommand(pm string) *exec.Cmd {
