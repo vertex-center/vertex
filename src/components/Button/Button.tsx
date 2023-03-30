@@ -6,8 +6,8 @@ import classNames from "classnames";
 import Spacer from "../Spacer/Spacer";
 
 export type ButtonProps = HTMLProps<HTMLButtonElement> & {
-    leftSymbol?: string;
-    rightSymbol?: string;
+    leftSymbol?: string | any;
+    rightSymbol?: string | any;
 
     selected?: boolean;
     selectable?: boolean;

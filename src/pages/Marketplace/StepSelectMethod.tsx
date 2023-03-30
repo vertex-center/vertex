@@ -2,6 +2,7 @@ import styles from "./Marketplace.module.sass";
 import { Title } from "../../components/Text/Text";
 import Button from "../../components/Button/Button";
 import { DownloadMethod } from "./Marketplace";
+import { SiGit } from "@icons-pack/react-simple-icons";
 
 type StepSelectMethodProps = {
     method: DownloadMethod;
@@ -30,6 +31,20 @@ export default function StepSelectMethod(props: StepSelectMethodProps) {
                         <div className={styles.buttonDescription}>
                             Download services from our online and certified
                             repository.
+                        </div>
+                    </div>
+                </Button>
+                <Button
+                    className={styles.button}
+                    onClick={() => onMethodChange("git")}
+                    leftSymbol={<SiGit />}
+                    selectable
+                    selected={method === "git"}
+                >
+                    <div className={styles.buttonContent}>
+                        <div>Git</div>
+                        <div className={styles.buttonDescription}>
+                            Clone services from GitHub, GitLab...
                         </div>
                     </div>
                 </Button>

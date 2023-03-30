@@ -40,7 +40,7 @@ function StepDownloadMarketplace(props: StepDownloadMarketplaceProps) {
     }, []);
 
     const onServiceChange = (e: any) => {
-        props.onRepositoryChange(e.target.value);
+        props.onRepositoryChange(`marketplace:${e.target.value}`);
     };
 
     return (
@@ -66,6 +66,39 @@ function StepDownloadMarketplace(props: StepDownloadMarketplaceProps) {
                 Download
             </Button>
             <Error error={error} />
+        </Fragment>
+    );
+}
+
+type StepDownloadGitHubProps = {
+    onNextStep: () => void;
+    repository: string;
+    onRepositoryChange: (repository: string) => void;
+};
+
+function StepDownloadGitHub(props: StepDownloadGitHubProps) {
+    const { repository, onNextStep } = props;
+
+    const onLinkChange = (e: any) => {
+        props.onRepositoryChange(`git:${e.target.value}`);
+    };
+
+    return (
+        <Fragment>
+            <Input
+                label="Repository"
+                placeholder="https://github.com/..."
+                onChange={onLinkChange}
+            />
+            <Button
+                primary
+                large
+                rightSymbol="download"
+                disabled={!repository}
+                onClick={onNextStep}
+            >
+                Download
+            </Button>
         </Fragment>
     );
 }
@@ -124,6 +157,13 @@ export default function StepDownload(props: StepDownloadProps) {
             </div>
             {method === "marketplace" && (
                 <StepDownloadMarketplace
+                    onNextStep={onNextStep}
+                    repository={repository}
+                    onRepositoryChange={onRepositoryChange}
+                />
+            )}
+            {method === "git" && (
+                <StepDownloadGitHub
                     onNextStep={onNextStep}
                     repository={repository}
                     onRepositoryChange={onRepositoryChange}

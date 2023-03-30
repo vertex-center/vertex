@@ -10,7 +10,7 @@ import StepDownload from "./StepDownload";
 import StepConfigure from "./StepConfigure";
 import { useNavigate } from "react-router-dom";
 
-export type DownloadMethod = "marketplace" | "localstorage";
+export type DownloadMethod = "marketplace" | "git" | "localstorage";
 
 type Step = "select-method" | "download" | "downloading" | "configure";
 
