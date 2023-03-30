@@ -1,7 +1,6 @@
 package dependency
 
 import (
-	"fmt"
 	"os/exec"
 	"path"
 	"strings"
@@ -23,27 +22,30 @@ func New(id string) (*Dependency, error) {
 
 	p := packages.GetPath(id)
 
-	if !strings.HasPrefix(pkg.Check, "script:") {
-		return nil, fmt.Errorf("the value '%s' has no script: prefix", pkg.Check)
-	}
+	isScript := strings.HasPrefix(pkg.Check, "script:")
+	installed := false
 
-	script := strings.Split(pkg.Check, ":")[1]
+	if isScript {
+		script := strings.Split(pkg.Check, ":")[1]
 
-	cmd := exec.Command(path.Join(p, script))
+		cmd := exec.Command(path.Join(p, script))
 
-	err = cmd.Run()
-	if cmd.ProcessState.ExitCode() == 1 {
-		return &Dependency{
-			Package:   pkg,
-			Installed: false,
-		}, nil
-	}
-	if err != nil {
-		return nil, err
+		err = cmd.Run()
+		if cmd.ProcessState.ExitCode() == 0 {
+			installed = true
+		}
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		_, err := exec.LookPath(pkg.Check)
+		if err == nil {
+			installed = true
+		}
 	}
 
 	return &Dependency{
 		Package:   pkg,
-		Installed: true,
+		Installed: installed,
 	}, nil
 }
