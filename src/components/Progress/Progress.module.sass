@@ -1,0 +1,38 @@
+@use "../../styles/colors"
+
+.progress
+    position: relative
+    background-color: colors.$bg-secondary
+    height: 6px
+    min-width: 120px
+    border-radius: 3px
+    overflow: hidden
+
+.bar
+    position: absolute
+    top: 0
+    bottom: 0
+    left: 0
+    right: 50%
+    background-color: colors.$bg-accent
+    border-radius: 3px
+
+    &Infinite
+        animation: bar-infinite 1s linear infinite
+
+@keyframes bar-infinite
+    0%
+        left: 0
+        right: 100%
+
+    30%
+        left: 0
+        right: 30%
+
+    70%
+        left: 30%
+        right: 0
+
+    100%
+        left: 100%
+        right: 0

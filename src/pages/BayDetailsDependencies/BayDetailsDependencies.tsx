@@ -16,6 +16,7 @@ import classNames from "classnames";
 import Button from "../../components/Button/Button";
 import { SiHomebrew, SiSnapcraft } from "@icons-pack/react-simple-icons";
 import { SegmentedButtons } from "../../components/SegmentedButton";
+import Progress from "../../components/Progress";
 
 const pmIcons = {
     brew: <SiHomebrew />,
@@ -52,7 +53,7 @@ export function Dependency(props: Props) {
         <Horizontal alignItems="center" gap={16}>
             <div>{name}</div>
             <Spacer />
-            {!dependency?.installed && (
+            {!installing && !dependency?.installed && (
                 <Horizontal alignItems="center" gap={12}>
                     Install with
                     <SegmentedButtons
@@ -73,7 +74,8 @@ export function Dependency(props: Props) {
                     </Button>
                 </Horizontal>
             )}
-            {dependency?.installed && (
+            {installing && <Progress infinite />}
+            {!installing && dependency?.installed && (
                 <Horizontal
                     className={classNames({
                         [styles.installed]: dependency.installed,
