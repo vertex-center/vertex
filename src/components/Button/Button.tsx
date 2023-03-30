@@ -5,7 +5,7 @@ import Symbol from "../Symbol/Symbol";
 import classNames from "classnames";
 import Spacer from "../Spacer/Spacer";
 
-type Props = HTMLProps<HTMLButtonElement> & {
+export type ButtonProps = HTMLProps<HTMLButtonElement> & {
     leftSymbol?: string;
     rightSymbol?: string;
 
@@ -22,7 +22,7 @@ type Props = HTMLProps<HTMLButtonElement> & {
     large?: boolean;
 };
 
-export default function Button(props: Props) {
+export default function Button(props: ButtonProps) {
     const {
         children,
         leftSymbol,

@@ -12,6 +12,15 @@ import {
 } from "../../backend/backend";
 import { useParams } from "react-router-dom";
 import classNames from "classnames";
+import Button from "../../components/Button/Button";
+import { SiHomebrew, SiSnapcraft } from "@icons-pack/react-simple-icons";
+import { SegmentedButtons } from "../../components/SegmentedButton/SegmentedButton";
+
+const pmIcons = {
+    brew: <SiHomebrew />,
+    snap: <SiSnapcraft />,
+    sources: <Symbol name="folder_zip" />,
+};
 
 type Props = {
     name: string;
@@ -20,21 +29,45 @@ type Props = {
 
 export function Dependency(props: Props) {
     const { name, dependency } = props;
+
+    const [packageManager, setPackageManager] = useState();
+
+    const onPackageManagerChange = (pm: any) => setPackageManager(pm);
+
+    const install = () => {};
+
     return (
-        <Horizontal alignItems="center">
+        <Horizontal alignItems="center" gap={16}>
             <div>{name}</div>
             <Spacer />
-            <Horizontal
-                className={classNames({
-                    [styles.installed]: dependency.installed,
-                    [styles.notInstalled]: !dependency.installed,
-                })}
-                alignItems="center"
-                gap={4}
-            >
-                <Symbol name={dependency.installed ? "check" : "error"} />
-                {dependency.installed ? "Installed" : "Not installed"}
-            </Horizontal>
+            {!dependency?.installed && (
+                <Horizontal alignItems="center" gap={12}>
+                    Install with
+                    <SegmentedButtons
+                        value={packageManager}
+                        onChange={onPackageManagerChange}
+                        items={Object.keys(dependency?.install ?? {}).map(
+                            (pm) => ({ value: pm })
+                        )}
+                    />
+                    <Button rightSymbol="download" onClick={install}>
+                        Install
+                    </Button>
+                </Horizontal>
+            )}
+            {dependency?.installed && (
+                <Horizontal
+                    className={classNames({
+                        [styles.installed]: dependency.installed,
+                        [styles.notInstalled]: !dependency.installed,
+                    })}
+                    alignItems="center"
+                    gap={4}
+                >
+                    <Symbol name="check" />
+                    Installed
+                </Horizontal>
+            )}
         </Horizontal>
     );
 }

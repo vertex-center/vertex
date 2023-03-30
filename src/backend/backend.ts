@@ -43,7 +43,7 @@ export type Package = {
     homepage?: string;
     license?: string;
     check?: string;
-    install_package?: { [pm: string]: string };
+    install?: { [pm: string]: string };
 };
 
 export type Dependency = Package & {

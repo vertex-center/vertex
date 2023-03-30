@@ -19,7 +19,7 @@ export default function Select(props: Props) {
 
     return (
         <Vertical gap={6}>
-            <label className={styles.label}>{label}</label>
+            {label && <label className={styles.label}>{label}</label>}
             <select
                 className={classNames(styles.input, className)}
                 {...others}

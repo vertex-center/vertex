@@ -1,0 +1,11 @@
+@use "../../styles/dimensions"
+
+.button
+    margin: 0
+    border-radius: 0
+
+    &:first-of-type
+        border-radius: dimensions.$border-radius 0 0 dimensions.$border-radius
+
+    &:last-of-type
+        border-radius: 0 dimensions.$border-radius dimensions.$border-radius 0
