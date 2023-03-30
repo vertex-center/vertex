@@ -45,6 +45,9 @@ func InitializeRouter() *gin.Engine {
 	instanceGroup.GET("/events", headersSSE, handleInstanceEvents)
 	instanceGroup.GET("/dependencies", handleGetDependencies)
 
+	dependencyGroup := api.Group("/dependency/:dependency_id")
+	dependencyGroup.POST("/install", handleInstallDependency)
+
 	return r
 }
 
@@ -346,4 +349,37 @@ func handleGetDependencies(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, deps)
+}
+
+type InstallDependencyBody struct {
+	PackageManager string `json:"package_manager"`
+}
+
+func handleInstallDependency(c *gin.Context) {
+	var body InstallDependencyBody
+	err := c.BindJSON(&body)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("failed to parse body: %v", err))
+		return
+	}
+
+	dependencyID := c.Param("dependency_id")
+	if dependencyID == "" {
+		c.AbortWithError(http.StatusBadRequest, errors.New("dependency_id was missing in the URL"))
+		return
+	}
+
+	dep, err := dependencies.Get(dependencyID)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get dependency %s: %v", dependencyID, err))
+		return
+	}
+
+	err = dep.Install(body.PackageManager)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.Status(http.StatusOK)
 }
