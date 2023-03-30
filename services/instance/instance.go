@@ -151,7 +151,7 @@ func (i *Instance) Start() error {
 }
 
 func (i *Instance) Stop() error {
-	err := i.cmd.Process.Signal(os.Kill)
+	err := i.cmd.Process.Signal(os.Interrupt)
 	if err != nil {
 		return err
 	}
