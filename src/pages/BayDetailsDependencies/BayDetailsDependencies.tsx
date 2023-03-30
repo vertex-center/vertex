@@ -94,9 +94,13 @@ export default function BayDetailsDependencies() {
     const { uuid } = useParams();
 
     const [dependencies, setDependencies] = useState<Dependencies>({});
+    const [isLoading, setIsLoading] = useState(false);
 
     const reload = useCallback(() => {
-        getInstanceDependencies(uuid).then((deps) => setDependencies(deps));
+        setIsLoading(true);
+        getInstanceDependencies(uuid)
+            .then((deps) => setDependencies(deps))
+            .finally(() => setIsLoading(false));
     }, [uuid]);
 
     useEffect(() => {
@@ -106,6 +110,16 @@ export default function BayDetailsDependencies() {
     return (
         <Fragment>
             <Title>Dependencies</Title>
+            <Horizontal alignItems="center">
+                <Button
+                    rightSymbol="refresh"
+                    loading={isLoading}
+                    disabled={isLoading}
+                    onClick={reload}
+                >
+                    Reload
+                </Button>
+            </Horizontal>
             <Vertical gap={12}>
                 {Object.entries(dependencies).map(([name, dep]) => (
                     <Dependency
