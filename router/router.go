@@ -45,8 +45,8 @@ func InitializeRouter() *gin.Engine {
 	instanceGroup.GET("/events", headersSSE, handleInstanceEvents)
 	instanceGroup.GET("/dependencies", handleGetDependencies)
 
-	dependencyGroup := api.Group("/dependency/:dependency_id")
-	dependencyGroup.POST("/install", handleInstallDependency)
+	dependenciesGroup := api.Group("/dependencies")
+	dependenciesGroup.POST("/install", handleInstallDependencies)
 
 	return r
 }
@@ -352,10 +352,13 @@ func handleGetDependencies(c *gin.Context) {
 }
 
 type InstallDependencyBody struct {
-	PackageManager string `json:"package_manager"`
+	Dependencies []struct {
+		Name           string `json:"name"`
+		PackageManager string `json:"package_manager"`
+	} `json:"dependencies"`
 }
 
-func handleInstallDependency(c *gin.Context) {
+func handleInstallDependencies(c *gin.Context) {
 	var body InstallDependencyBody
 	err := c.BindJSON(&body)
 	if err != nil {
@@ -363,22 +366,22 @@ func handleInstallDependency(c *gin.Context) {
 		return
 	}
 
-	dependencyID := c.Param("dependency_id")
-	if dependencyID == "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New("dependency_id was missing in the URL"))
-		return
-	}
+	for _, d := range body.Dependencies {
+		dep, err := dependencies.Get(d.Name)
+		if err != nil {
+			logger.Warn(fmt.Sprintf("dependency '%s' not found", d.Name))
+			continue
+		}
 
-	dep, err := dependencies.Get(dependencyID)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get dependency %s: %v", dependencyID, err))
-		return
-	}
+		logger.Log(fmt.Sprintf("installing package name='%s' with package_manager=%s", d.Name, d.PackageManager))
 
-	err = dep.Install(body.PackageManager)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
+		err = dep.Install(d.PackageManager)
+		if err != nil {
+			logger.Error(err)
+			continue
+		}
+
+		logger.Log(fmt.Sprintf("package name=%s installed successfully", d.Name))
 	}
 
 	c.Status(http.StatusOK)
