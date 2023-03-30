@@ -14,15 +14,8 @@ import {
 import { useParams } from "react-router-dom";
 import classNames from "classnames";
 import Button from "../../components/Button/Button";
-import { SiHomebrew, SiSnapcraft } from "@icons-pack/react-simple-icons";
 import { SegmentedButtons } from "../../components/SegmentedButton";
 import Progress from "../../components/Progress";
-
-const pmIcons = {
-    brew: <SiHomebrew />,
-    snap: <SiSnapcraft />,
-    sources: <Symbol name="folder_zip" />,
-};
 
 type Props = {
     name: string;
