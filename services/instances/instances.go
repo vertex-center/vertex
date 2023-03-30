@@ -13,6 +13,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/go-git/go-git/v5"
 	"github.com/google/go-github/v50/github"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/console"
@@ -162,8 +163,9 @@ func Unregister(uuid uuid.UUID) {
 
 func Install(repo string) (*instance.Instance, error) {
 	serviceUUID := uuid.New()
+	basePath := path.Join(storage.PathInstances, serviceUUID.String())
 
-	if strings.HasPrefix(repo, "github") {
+	if strings.HasPrefix(repo, "marketplace:") {
 		client := github.NewClient(nil)
 
 		split := strings.Split(repo, "/")
@@ -180,7 +182,6 @@ func Install(repo string) (*instance.Instance, error) {
 
 		for _, asset := range release.Assets {
 			if strings.Contains(*asset.Name, platform) {
-				basePath := path.Join(storage.PathInstances, serviceUUID.String())
 				archivePath := path.Join(basePath, "temp.tar.gz")
 
 				err := downloadFile(*asset.BrowserDownloadURL, basePath, archivePath)
@@ -201,35 +202,38 @@ func Install(repo string) (*instance.Instance, error) {
 				break
 			}
 		}
-
-		i, err := Instantiate(serviceUUID)
-		if err != nil {
-			return nil, err
-		}
-
-		return i, nil
 	} else if strings.HasPrefix(repo, "localstorage:") {
-		basePath := strings.Split(repo, ":")[1]
+		p := strings.Split(repo, ":")[1]
 
-		_, err := services.ReadFromDisk(basePath)
+		_, err := services.ReadFromDisk(p)
 		if err != nil {
 			return nil, fmt.Errorf("%s is not a compatible Vertex service", basePath)
 		}
 
-		err = os.Symlink(basePath, path.Join(storage.PathInstances, serviceUUID.String()))
+		err = os.Symlink(p, basePath)
 		if err != nil {
 			return nil, err
 		}
+	} else if strings.HasPrefix(repo, "git:") {
+		url := strings.SplitN(repo, ":", 2)[1]
 
-		i, err := Instantiate(serviceUUID)
+		_, err := git.PlainClone(basePath, false, &git.CloneOptions{
+			URL:      url,
+			Progress: os.Stdout,
+		})
+
 		if err != nil {
 			return nil, err
 		}
-
-		return i, nil
+	} else {
+		return nil, fmt.Errorf("this protocol is not supported")
 	}
 
-	return nil, errors.New("this repository is not supported")
+	i, err := Instantiate(serviceUUID)
+	if err != nil {
+		return nil, err
+	}
+	return i, nil
 }
 
 func downloadFile(url string, basePath string, archivePath string) error {
