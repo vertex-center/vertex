@@ -9,7 +9,7 @@ import {
     Dependencies,
     Dependency as DependencyModel,
     getInstanceDependencies,
-    installDependency,
+    installDependencies,
 } from "../../backend/backend";
 import { useParams } from "react-router-dom";
 import classNames from "classnames";
@@ -40,7 +40,7 @@ export function Dependency(props: Props) {
 
     const install = () => {
         setInstalling(true);
-        installDependency(name, packageManager)
+        installDependencies([{ name, package_manager: packageManager }])
             .then(() => {
                 onChange();
             })
