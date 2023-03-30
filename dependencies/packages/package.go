@@ -69,7 +69,7 @@ func (p *Package) InstallationCommand(pm string) *exec.Cmd {
 	case PmBrew:
 		return exec.Command("brew", "install", packageName)
 	case PmPacman:
-		return exec.Command("pacman", "-S", packageName)
+		return exec.Command("pacman", "-S", "--noconfirm", packageName)
 	case PmSnap:
 		return exec.Command("snap", "install", packageName)
 	}
