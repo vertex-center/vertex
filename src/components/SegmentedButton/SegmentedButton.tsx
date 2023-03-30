@@ -28,7 +28,7 @@ type Props = HTMLProps<HTMLDivElement> & {
 };
 
 export function SegmentedButtons(props: Props) {
-    const { value, onChange, items } = props;
+    const { value, onChange, items, disabled } = props;
 
     return (
         <Horizontal className={styles.wrapper}>
@@ -38,6 +38,7 @@ export function SegmentedButtons(props: Props) {
                         value={item.value}
                         onClick={() => onChange(item.value)}
                         selected={value === item.value}
+                        disabled={disabled}
                     >
                         {item.value}
                     </SegmentedButton>

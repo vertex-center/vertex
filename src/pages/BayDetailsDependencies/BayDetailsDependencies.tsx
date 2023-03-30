@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { Title } from "../../components/Text/Text";
 import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import Spacer from "../../components/Spacer/Spacer";
@@ -9,12 +9,13 @@ import {
     Dependencies,
     Dependency as DependencyModel,
     getInstanceDependencies,
+    installDependency,
 } from "../../backend/backend";
 import { useParams } from "react-router-dom";
 import classNames from "classnames";
 import Button from "../../components/Button/Button";
 import { SiHomebrew, SiSnapcraft } from "@icons-pack/react-simple-icons";
-import { SegmentedButtons } from "../../components/SegmentedButton/SegmentedButton";
+import { SegmentedButtons } from "../../components/SegmentedButton";
 
 const pmIcons = {
     brew: <SiHomebrew />,
@@ -25,16 +26,27 @@ const pmIcons = {
 type Props = {
     name: string;
     dependency: DependencyModel;
+    onChange: () => void;
 };
 
 export function Dependency(props: Props) {
-    const { name, dependency } = props;
+    const { name, dependency, onChange } = props;
 
     const [packageManager, setPackageManager] = useState();
 
     const onPackageManagerChange = (pm: any) => setPackageManager(pm);
 
-    const install = () => {};
+    const [installing, setInstalling] = useState(false);
+
+    const install = () => {
+        setInstalling(true);
+        installDependency(name, packageManager)
+            .then(() => {
+                onChange();
+            })
+            .catch(console.error)
+            .finally(() => setInstalling(false));
+    };
 
     return (
         <Horizontal alignItems="center" gap={16}>
@@ -49,8 +61,14 @@ export function Dependency(props: Props) {
                         items={Object.keys(dependency?.install ?? {}).map(
                             (pm) => ({ value: pm })
                         )}
+                        disabled={installing}
                     />
-                    <Button rightSymbol="download" onClick={install}>
+                    <Button
+                        rightSymbol="download"
+                        onClick={install}
+                        loading={installing}
+                        disabled={installing}
+                    >
                         Install
                     </Button>
                 </Horizontal>
@@ -77,16 +95,25 @@ export default function BayDetailsDependencies() {
 
     const [dependencies, setDependencies] = useState<Dependencies>({});
 
-    useEffect(() => {
+    const reload = useCallback(() => {
         getInstanceDependencies(uuid).then((deps) => setDependencies(deps));
     }, [uuid]);
+
+    useEffect(() => {
+        reload();
+    }, [reload]);
 
     return (
         <Fragment>
             <Title>Dependencies</Title>
             <Vertical gap={12}>
                 {Object.entries(dependencies).map(([name, dep]) => (
-                    <Dependency name={name} dependency={dep} />
+                    <Dependency
+                        key={name}
+                        name={name}
+                        dependency={dep}
+                        onChange={reload}
+                    />
                 ))}
             </Vertical>
         </Fragment>
