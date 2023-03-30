@@ -54,9 +54,13 @@ export default function Button(props: ButtonProps) {
             onClick={disabled || loading ? () => {} : onClick}
             {...others}
         >
-            {leftSymbol && <Symbol name={leftSymbol} />}
+            {leftSymbol && (
+                <Symbol className={styles.symbol} name={leftSymbol} />
+            )}
             <div>{children}</div>
-            {rightSymbol && <Symbol name={rightSymbol} />}
+            {rightSymbol && (
+                <Symbol className={styles.symbol} name={rightSymbol} />
+            )}
             {selectable && (
                 <Fragment>
                     <Spacer />
