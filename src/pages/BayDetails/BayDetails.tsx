@@ -8,7 +8,7 @@ import {
     startInstance,
     stopInstance,
 } from "../../backend/backend";
-import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
+import { NavLink, Outlet, useNavigate, useParams } from "react-router-dom";
 
 import styles from "./BayDetails.module.sass";
 import Symbol from "../../components/Symbol/Symbol";
@@ -21,6 +21,24 @@ import {
 } from "../../backend/sse";
 import Spacer from "../../components/Spacer/Spacer";
 import classNames from "classnames";
+
+export const bayNavItems = [
+    {
+        label: "Logs",
+        to: "/logs",
+        symbol: "terminal",
+    },
+    {
+        label: "Environment",
+        to: "/environment",
+        symbol: "tune",
+    },
+    {
+        label: "Dependencies",
+        to: "/dependencies",
+        symbol: "widgets",
+    },
+];
 
 type MenuItemProps = {
     to?: string;
@@ -36,23 +54,37 @@ function MenuItem(props: MenuItemProps) {
     const { to, symbol, name, onClick, red } = props;
 
     const content = (
-        <div
-            className={classNames({
-                [styles.menuItem]: true,
-                [styles.menuItemRed]: red,
-            })}
-            onClick={onClick}
-        >
-            <Horizontal alignItems="center" gap={12}>
-                <Symbol name={symbol} />
-                {name}
-            </Horizontal>
-        </div>
+        <Horizontal alignItems="center" gap={12}>
+            <Symbol name={symbol} />
+            {name}
+        </Horizontal>
     );
 
-    if (!to) return content;
+    const className = classNames({
+        [styles.menuItem]: true,
+        [styles.menuItemRed]: red,
+    });
 
-    return <Link to={to}>{content}</Link>;
+    if (!to)
+        return (
+            <div className={className} onClick={onClick}>
+                {content}
+            </div>
+        );
+
+    return (
+        <NavLink
+            to={to}
+            className={({ isActive }) =>
+                classNames({
+                    [className]: true,
+                    [styles.menuItemActive]: isActive,
+                })
+            }
+        >
+            {content}
+        </NavLink>
+    );
 }
 
 export default function BayDetails() {
@@ -115,21 +147,15 @@ export default function BayDetails() {
             <Horizontal className={styles.content}>
                 <div className={styles.menu}>
                     <MenuItem to="/" symbol="arrow_back" name="Back" />
-                    <MenuItem
-                        to={`/bay/${uuid}/logs`}
-                        symbol="terminal"
-                        name="Logs"
-                    />
-                    <MenuItem
-                        to={`/bay/${uuid}/environment`}
-                        symbol="tune"
-                        name="Environment"
-                    />
-                    <MenuItem
-                        to={`/bay/${uuid}/dependencies`}
-                        symbol="widgets"
-                        name="Dependencies"
-                    />
+                    <MenuItem to={`/bay/${uuid}/`} symbol="home" name="Home" />
+                    <div className={styles.separator} />
+                    {bayNavItems.map((item) => (
+                        <MenuItem
+                            to={`/bay/${uuid}${item.to}`}
+                            symbol={item.symbol}
+                            name={item.label}
+                        />
+                    ))}
                     <Spacer />
                     <MenuItem
                         onClick={onDeleteInstance}

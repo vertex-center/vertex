@@ -17,7 +17,7 @@
     box-sizing: border-box
 
     &Item
-        padding: 12px 20px
+        padding: 10px 16px
         cursor: pointer
         border-radius: dimensions.$border-radius
         border: 1px solid transparent
@@ -30,6 +30,9 @@
         &Red:hover
             border-color: colors.$red
             color: colors.$red
+
+        &Active
+            background-color: colors.$bg-secondary
 
 .bay
     padding: 40px 10%
@@ -50,3 +53,7 @@
 
     & > *
         margin: 0 24px
+
+.separator
+    margin: 12px
+    border-bottom: 1px solid colors.$bg-secondary

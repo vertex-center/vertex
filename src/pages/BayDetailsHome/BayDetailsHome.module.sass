@@ -1,0 +1,27 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+@use "../../styles/fonts"
+
+.nav
+    display: grid
+    grid-template-columns: repeat(3, 1fr)
+    gap: 20px
+
+    &Item
+        display: flex
+        flex-direction: column
+        gap: 12px
+        background-color: colors.$bg-secondary
+        border-radius: dimensions.$border-radius
+        padding: 16px 24px 20px
+        font-size: 18px
+        border: 1px solid colors.$bg-secondary
+        transition: all 0.1s ease
+        cursor: pointer
+
+        &:hover
+            background-color: colors.$bg-secondary-hover
+            border-color: colors.$bg-accent
+
+        &Symbol
+            font-size: 32px

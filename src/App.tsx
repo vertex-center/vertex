@@ -5,6 +5,7 @@ import BayDetails from "./pages/BayDetails/BayDetails";
 import BayDetailsLogs from "./pages/BayDetailsLogs/BayDetailsLogs";
 import BayDetailsEnv from "./pages/BayDetailsEnv/BayDetailsEnv";
 import BayDetailsDependencies from "./pages/BayDetailsDependencies";
+import BayDetailsHome from "./pages/BayDetailsHome/BayDetailsHome";
 
 function App() {
     return (
@@ -14,6 +15,7 @@ function App() {
                 <Route path="/" element={<Infrastructure />} index />
                 <Route path="/marketplace" element={<Marketplace />} />
                 <Route path="/bay/:uuid/" element={<BayDetails />}>
+                    <Route path="/bay/:uuid/" element={<BayDetailsHome />} />
                     <Route
                         path="/bay/:uuid/logs"
                         element={<BayDetailsLogs />}
