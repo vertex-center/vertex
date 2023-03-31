@@ -11,6 +11,8 @@ require (
 	github.com/goccy/go-json v0.9.11
 	github.com/google/go-github/v50 v50.0.0
 	github.com/google/uuid v1.3.0
+	github.com/pkg/errors v0.9.1
+	github.com/stretchr/testify v1.8.2
 	github.com/vertex-center/vertex-core-golang v0.0.0-20230327174744-2ac235efcc9f
 )
 
@@ -19,6 +21,7 @@ require (
 	github.com/ProtonMail/go-crypto v0.0.0-20230217124315-7d5c6f04bbb8 // indirect
 	github.com/acomagu/bufpipe v1.0.4 // indirect
 	github.com/cloudflare/circl v1.1.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fatih/color v1.14.1 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
@@ -39,6 +42,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/skeema/knownhosts v1.1.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
@@ -52,4 +56,5 @@ require (
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

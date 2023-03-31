@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/goccy/go-json"
+	errors2 "github.com/pkg/errors"
 	"github.com/vertex-center/vertex/storage"
 )
 
@@ -19,6 +20,10 @@ const (
 	PmBrew   = "brew"
 	PmPacman = "pacman"
 	PmSnap   = "snap"
+)
+
+var (
+	ErrPkgNotFound = errors2.New("package not found")
 )
 
 var pkgs map[string]Package
@@ -32,8 +37,8 @@ type Package struct {
 	InstallPackage map[string]string `json:"install"`
 }
 
-func Read(id string) (*Package, error) {
-	p := path.Join(GetPath(id), fmt.Sprintf("%s.json", id))
+func read(pathDependencies string, id string) (*Package, error) {
+	p := path.Join(getPath(pathDependencies, id), fmt.Sprintf("%s.json", id))
 
 	file, err := os.ReadFile(p)
 	if err != nil {
@@ -46,7 +51,11 @@ func Read(id string) (*Package, error) {
 }
 
 func GetPath(id string) string {
-	return path.Join(storage.PathDependencies, "packages", id)
+	return getPath(storage.PathDependencies, id)
+}
+
+func getPath(pathDependencies string, id string) string {
+	return path.Join(pathDependencies, "packages", id)
 }
 
 func (p *Package) Install(pm string) error {
@@ -81,14 +90,18 @@ func (p *Package) InstallationCommand(pm string) *exec.Cmd {
 }
 
 func Reload() error {
+	return reload(storage.PathDependencies)
+}
+
+func reload(dependenciesPath string) error {
 	pkgs = map[string]Package{}
 
-	err := ReloadRepository()
+	err := reloadRepository(dependenciesPath)
 	if err != nil {
 		return err
 	}
 
-	dir, err := os.ReadDir(path.Join(storage.PathDependencies, "packages"))
+	dir, err := os.ReadDir(path.Join(dependenciesPath, "packages"))
 	if err != nil {
 		return err
 	}
@@ -100,7 +113,7 @@ func Reload() error {
 
 		name := entry.Name()
 
-		pkg, err := Read(name)
+		pkg, err := read(dependenciesPath, name)
 		if err != nil {
 			return err
 		}
@@ -111,14 +124,14 @@ func Reload() error {
 	return nil
 }
 
-func ReloadRepository() error {
-	_, err := git.PlainClone(storage.PathDependencies, false, &git.CloneOptions{
+func reloadRepository(dependenciesPath string) error {
+	_, err := git.PlainClone(dependenciesPath, false, &git.CloneOptions{
 		URL:      "https://github.com/vertex-center/vertex-dependencies",
 		Progress: os.Stdout,
 	})
 
 	if errors.Is(err, git.ErrRepositoryAlreadyExists) {
-		repo, err := git.PlainOpen(storage.PathDependencies)
+		repo, err := git.PlainOpen(dependenciesPath)
 		if err != nil {
 			return err
 		}
@@ -142,7 +155,7 @@ func ReloadRepository() error {
 func Get(id string) (*Package, error) {
 	pkg, ok := pkgs[id]
 	if !ok {
-		return nil, fmt.Errorf("the dependency %s was not found", id)
+		return nil, ErrPkgNotFound
 	}
 	return &pkg, nil
 }
