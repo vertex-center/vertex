@@ -24,44 +24,45 @@ func addInstanceRoutes(r *gin.RouterGroup) {
 	r.GET("/dependencies", handleGetDependencies)
 }
 
-func handleGetInstance(c *gin.Context) {
-	instanceUUIDParam := c.Param("instance_uuid")
-	if instanceUUIDParam == "" {
+func getInstanceUUID(c *gin.Context) *uuid.UUID {
+	p := c.Param("instance_uuid")
+	if p == "" {
 		c.AbortWithError(http.StatusBadRequest, errors.New("instance_uuid was missing in the URL"))
-		return
+		return nil
 	}
 
-	instanceUUID, err := uuid.Parse(instanceUUIDParam)
+	uid, err := uuid.Parse(p)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse instance_uuid: %v", err))
-		return
+		return nil
 	}
 
-	i, err := instances.Get(instanceUUID)
+	return &uid
+}
+
+func getInstance(c *gin.Context) *instance.Instance {
+	uid := getInstanceUUID(c)
+
+	i, err := instances.Get(*uid)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to retrieve instance %s: %v", uid, err))
+		return nil
 	}
 
+	return i
+}
+
+func handleGetInstance(c *gin.Context) {
+	i := getInstance(c)
 	c.JSON(http.StatusOK, i)
 }
 
 func handleDeleteInstance(c *gin.Context) {
-	instanceUUIDParam := c.Param("instance_uuid")
-	if instanceUUIDParam == "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New("instance_uuid was missing in the URL"))
-		return
-	}
+	uid := getInstanceUUID(c)
 
-	instanceUUID, err := uuid.Parse(instanceUUIDParam)
+	err := instances.Delete(*uid)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse instance_uuid: %v", err))
-		return
-	}
-
-	err = instances.Delete(instanceUUID)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to delete instance %s: %v", uid, err))
 		return
 	}
 
@@ -69,19 +70,9 @@ func handleDeleteInstance(c *gin.Context) {
 }
 
 func handleStartInstance(c *gin.Context) {
-	instanceUUIDParam := c.Param("instance_uuid")
-	if instanceUUIDParam == "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New("instance_uuid was missing in the URL"))
-		return
-	}
+	uid := getInstanceUUID(c)
 
-	instanceUUID, err := uuid.Parse(instanceUUIDParam)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse instance_uuid: %v", err))
-		return
-	}
-
-	err = instances.Start(instanceUUID)
+	err := instances.Start(*uid)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -91,19 +82,9 @@ func handleStartInstance(c *gin.Context) {
 }
 
 func handleStopInstance(c *gin.Context) {
-	instanceUUIDParam := c.Param("instance_uuid")
-	if instanceUUIDParam == "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New("instance_uuid was missing in the URL"))
-		return
-	}
+	uid := getInstanceUUID(c)
 
-	instanceUUID, err := uuid.Parse(instanceUUIDParam)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse instance_uuid: %v", err))
-		return
-	}
-
-	err = instances.Stop(instanceUUID)
+	err := instances.Stop(*uid)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -120,23 +101,7 @@ func handlePatchEnvironment(c *gin.Context) {
 		return
 	}
 
-	instanceUUIDParam := c.Param("instance_uuid")
-	if instanceUUIDParam == "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New("instance_uuid was missing in the URL"))
-		return
-	}
-
-	instanceUUID, err := uuid.Parse(instanceUUIDParam)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse instance_uuid: %v", err))
-		return
-	}
-
-	i, err := instances.Get(instanceUUID)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get service %s: %v", instanceUUID, err))
-		return
-	}
+	i := getInstance(c)
 
 	err = i.SetEnv(environment)
 	if err != nil {
@@ -148,23 +113,7 @@ func handlePatchEnvironment(c *gin.Context) {
 }
 
 func handleInstanceEvents(c *gin.Context) {
-	instanceUUIDParam := c.Param("instance_uuid")
-	if instanceUUIDParam == "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New("instance_uuid was missing in the URL"))
-		return
-	}
-
-	instanceUUID, err := uuid.Parse(instanceUUIDParam)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse instance_uuid: %v", err))
-		return
-	}
-
-	i, err := instances.Get(instanceUUID)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get service %s: %v", instanceUUID, err))
-		return
-	}
+	i := getInstance(c)
 
 	instanceChan := make(chan instance.Event)
 	id := i.Register(instanceChan)
@@ -209,23 +158,7 @@ func handleInstanceEvents(c *gin.Context) {
 }
 
 func handleGetDependencies(c *gin.Context) {
-	instanceUUIDParam := c.Param("instance_uuid")
-	if instanceUUIDParam == "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New("instance_uuid was missing in the URL"))
-		return
-	}
-
-	instanceUUID, err := uuid.Parse(instanceUUIDParam)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse instance_uuid: %v", err))
-		return
-	}
-
-	i, err := instances.Get(instanceUUID)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to get service %s: %v", instanceUUID, err))
-		return
-	}
+	i := getInstance(c)
 
 	var deps = map[string]dependency.Dependency{}
 
