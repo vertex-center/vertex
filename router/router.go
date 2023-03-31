@@ -14,8 +14,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex-core-golang/router"
-	"github.com/vertex-center/vertex/dependencies"
-	"github.com/vertex-center/vertex/dependencies/dependency"
+	"github.com/vertex-center/vertex/dependency"
 	"github.com/vertex-center/vertex/services/instance"
 	"github.com/vertex-center/vertex/services/instances"
 	servicesmanager "github.com/vertex-center/vertex/services/manager"
@@ -339,7 +338,7 @@ func handleGetDependencies(c *gin.Context) {
 	var deps = map[string]dependency.Dependency{}
 
 	for name, _ := range i.Dependencies {
-		dep, err := dependencies.Get(name)
+		dep, err := dependency.Get(name)
 		if err != nil {
 			logger.Error(err)
 			continue
@@ -367,7 +366,7 @@ func handleInstallDependencies(c *gin.Context) {
 	}
 
 	for _, d := range body.Dependencies {
-		dep, err := dependencies.Get(d.Name)
+		dep, err := dependency.Get(d.Name)
 		if err != nil {
 			logger.Warn(fmt.Sprintf("dependency '%s' not found", d.Name))
 			continue

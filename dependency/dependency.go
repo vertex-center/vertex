@@ -5,22 +5,22 @@ import (
 	"path"
 	"strings"
 
-	"github.com/vertex-center/vertex/dependencies/packages"
+	"github.com/vertex-center/vertex/dependency/package"
 )
 
 type Dependency struct {
-	*packages.Package
+	*_package.Package
 
 	Installed bool `json:"installed"`
 }
 
-func New(id string) (*Dependency, error) {
-	pkg, err := packages.Get(id)
+func Get(id string) (*Dependency, error) {
+	pkg, err := _package.Get(id)
 	if err != nil {
 		return nil, err
 	}
 
-	p := packages.GetPath(id)
+	p := _package.GetPath(id)
 
 	isScript := strings.HasPrefix(pkg.Check, "script:")
 	installed := false
