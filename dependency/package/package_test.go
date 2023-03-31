@@ -34,14 +34,6 @@ func testReload(t *testing.T) {
 	err := os.MkdirAll(PathDependencies, os.ModePerm)
 	assert.NoError(t, err)
 
-	// reload to test Clone()
-	err = reload(PathDependencies)
-	assert.NoError(t, err)
-	assert.NotEqual(t, 0, len(pkgs))
-	assert.Equal(t, "Redis", pkgs["redis"].Name)
-	assert.Equal(t, "BSD-3", pkgs["redis"].License)
-
-	// reload to test Pull()
 	err = reload(PathDependencies)
 	assert.NoError(t, err)
 	assert.NotEqual(t, 0, len(pkgs))

@@ -1,14 +1,12 @@
 package _package
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
 
-	"github.com/go-git/go-git/v5"
 	"github.com/goccy/go-json"
 	errors2 "github.com/pkg/errors"
 	"github.com/vertex-center/vertex/storage"
@@ -96,7 +94,9 @@ func Reload() error {
 func reload(dependenciesPath string) error {
 	pkgs = map[string]Package{}
 
-	err := reloadRepository(dependenciesPath)
+	url := "https://github.com/vertex-center/vertex-dependencies"
+
+	err := storage.DownloadLatestRepository(dependenciesPath, url)
 	if err != nil {
 		return err
 	}
@@ -119,34 +119,6 @@ func reload(dependenciesPath string) error {
 		}
 
 		pkgs[name] = *pkg
-	}
-
-	return nil
-}
-
-func reloadRepository(dependenciesPath string) error {
-	_, err := git.PlainClone(dependenciesPath, false, &git.CloneOptions{
-		URL:      "https://github.com/vertex-center/vertex-dependencies",
-		Progress: os.Stdout,
-	})
-
-	if errors.Is(err, git.ErrRepositoryAlreadyExists) {
-		repo, err := git.PlainOpen(dependenciesPath)
-		if err != nil {
-			return err
-		}
-
-		worktree, err := repo.Worktree()
-		if err != nil {
-			return err
-		}
-
-		err = worktree.Pull(&git.PullOptions{})
-		if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) {
-			return err
-		}
-	} else if err != nil {
-		return err
 	}
 
 	return nil

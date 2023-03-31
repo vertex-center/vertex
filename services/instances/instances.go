@@ -165,75 +165,100 @@ func Install(repo string) (*instance.Instance, error) {
 	serviceUUID := uuid.New()
 	basePath := path.Join(storage.PathInstances, serviceUUID.String())
 
+	var err error
 	if strings.HasPrefix(repo, "marketplace:") {
-		client := github.NewClient(nil)
+		err = downloadFromMarketplace(basePath, repo)
+		// If there are no releases available, that may mean that the repository
+		// should be cloned. This happens when there are repositories that don't
+		// need to compile things, but only run a bash script.
+		if errors.Is(err, ErrNoReleasesPublished) {
+			split := strings.Split(repo, ":")
+			repo = "git:https://" + split[1]
 
-		split := strings.Split(repo, "/")
-
-		owner := split[1]
-		repo := split[2]
-
-		release, _, err := client.Repositories.GetLatestRelease(context.Background(), owner, repo)
-		if err != nil {
-			return nil, errors.New(fmt.Sprintf("failed to retrieve the latest github release for %s: %v", repo, err))
-		}
-
-		platform := fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH)
-
-		for _, asset := range release.Assets {
-			if strings.Contains(*asset.Name, platform) {
-				archivePath := path.Join(basePath, "temp.tar.gz")
-
-				err := downloadFile(*asset.BrowserDownloadURL, basePath, archivePath)
-				if err != nil {
-					return nil, err
-				}
-
-				err = untarFile(basePath, archivePath)
-				if err != nil {
-					return nil, err
-				}
-
-				err = os.Remove(archivePath)
-				if err != nil {
-					return nil, err
-				}
-
-				break
+			err = downloadFromGit(basePath, repo)
+			if err != nil {
+				return nil, err
 			}
 		}
 	} else if strings.HasPrefix(repo, "localstorage:") {
-		p := strings.Split(repo, ":")[1]
-
-		_, err := services.ReadFromDisk(p)
-		if err != nil {
-			return nil, fmt.Errorf("%s is not a compatible Vertex service", basePath)
-		}
-
-		err = os.Symlink(p, basePath)
-		if err != nil {
-			return nil, err
-		}
+		err = downloadFromLocalstorage(basePath, repo)
 	} else if strings.HasPrefix(repo, "git:") {
-		url := strings.SplitN(repo, ":", 2)[1]
-
-		_, err := git.PlainClone(basePath, false, &git.CloneOptions{
-			URL:      url,
-			Progress: os.Stdout,
-		})
-
-		if err != nil {
-			return nil, err
-		}
+		err = downloadFromGit(basePath, repo)
 	} else {
 		return nil, fmt.Errorf("this protocol is not supported")
 	}
 
-	i, err := Instantiate(serviceUUID)
 	if err != nil {
 		return nil, err
 	}
-	return i, nil
+
+	return Instantiate(serviceUUID)
+}
+
+var (
+	ErrNoReleasesPublished = errors.New("this repository has no existing releases")
+	ErrNoReleasesForThisOS = errors.New("this repository has no releases appropriate for this OS")
+)
+
+func downloadFromMarketplace(p string, repo string) error {
+	client := github.NewClient(nil)
+
+	split := strings.Split(repo, "/")
+
+	owner := split[1]
+	repository := split[2]
+
+	release, _, err := client.Repositories.GetLatestRelease(context.Background(), owner, repository)
+	if err != nil {
+		return ErrNoReleasesPublished
+	}
+
+	platform := fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH)
+
+	for _, asset := range release.Assets {
+		if strings.Contains(*asset.Name, platform) {
+			archivePath := path.Join(p, "temp.tar.gz")
+
+			err := downloadFile(*asset.BrowserDownloadURL, p, archivePath)
+			if err != nil {
+				return err
+			}
+
+			err = untarFile(p, archivePath)
+			if err != nil {
+				return err
+			}
+
+			err = os.Remove(archivePath)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		}
+	}
+
+	return ErrNoReleasesForThisOS
+}
+
+func downloadFromGit(path string, repo string) error {
+	url := strings.SplitN(repo, ":", 2)[1]
+	_, err := git.PlainClone(path, false, &git.CloneOptions{
+		URL:      url,
+		Progress: os.Stdout,
+	})
+	return err
+}
+
+func downloadFromLocalstorage(path string, repo string) error {
+	p := strings.Split(repo, ":")[1]
+
+	_, err := services.ReadFromDisk(p)
+	if err != nil {
+		return fmt.Errorf("%s is not a compatible Vertex service", repo)
+	}
+
+	return os.Symlink(p, path)
 }
 
 func downloadFile(url string, basePath string, archivePath string) error {

@@ -33,6 +33,12 @@ func main() {
 		return
 	}
 
+	err = servicesmanager.Reload()
+	if err != nil {
+		logger.Error(fmt.Errorf("failed to reload available services: %v", err))
+		return
+	}
+
 	r := router.InitializeRouter()
 
 	err = servicesmanager.ReloadAllInstalled()
