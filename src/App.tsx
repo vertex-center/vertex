@@ -6,31 +6,48 @@ import BayDetailsLogs from "./pages/BayDetailsLogs/BayDetailsLogs";
 import BayDetailsEnv from "./pages/BayDetailsEnv/BayDetailsEnv";
 import BayDetailsDependencies from "./pages/BayDetailsDependencies";
 import BayDetailsHome from "./pages/BayDetailsHome/BayDetailsHome";
+import Settings from "./pages/Settings/Settings";
+import SettingsTheme from "./pages/SettingsTheme/SettingsTheme";
+import { useContext } from "react";
+import { ThemeContext } from "./index";
+import classNames from "classnames";
 
 function App() {
+    const { theme } = useContext(ThemeContext);
+
     return (
-        <HashRouter>
-            {/*<Header />*/}
-            <Routes>
-                <Route path="/" element={<Infrastructure />} index />
-                <Route path="/marketplace" element={<Marketplace />} />
-                <Route path="/bay/:uuid/" element={<BayDetails />}>
-                    <Route path="/bay/:uuid/" element={<BayDetailsHome />} />
-                    <Route
-                        path="/bay/:uuid/logs"
-                        element={<BayDetailsLogs />}
-                    />
-                    <Route
-                        path="/bay/:uuid/environment"
-                        element={<BayDetailsEnv />}
-                    />
-                    <Route
-                        path="/bay/:uuid/dependencies"
-                        element={<BayDetailsDependencies />}
-                    />
-                </Route>
-            </Routes>
-        </HashRouter>
+        <div className={classNames("app", theme)}>
+            <HashRouter>
+                <Routes>
+                    <Route path="/" element={<Infrastructure />} index />
+                    <Route path="/settings" element={<Settings />}>
+                        <Route
+                            path="/settings/theme"
+                            element={<SettingsTheme />}
+                        />
+                    </Route>
+                    <Route path="/marketplace" element={<Marketplace />} />
+                    <Route path="/bay/:uuid/" element={<BayDetails />}>
+                        <Route
+                            path="/bay/:uuid/"
+                            element={<BayDetailsHome />}
+                        />
+                        <Route
+                            path="/bay/:uuid/logs"
+                            element={<BayDetailsLogs />}
+                        />
+                        <Route
+                            path="/bay/:uuid/environment"
+                            element={<BayDetailsEnv />}
+                        />
+                        <Route
+                            path="/bay/:uuid/dependencies"
+                            element={<BayDetailsDependencies />}
+                        />
+                    </Route>
+                </Routes>
+            </HashRouter>
+        </div>
     );
 }
 
