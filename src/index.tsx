@@ -1,8 +1,14 @@
-import React, { createContext, PropsWithChildren, useState } from "react";
+import React, {
+    createContext,
+    PropsWithChildren,
+    useEffect,
+    useState,
+} from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./reset.css";
 import "./index.sass";
+import { useCookies } from "react-cookie";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -17,7 +23,12 @@ export const ThemeContext = createContext<{
 });
 
 function ThemeProvider({ children }: PropsWithChildren) {
-    const [theme, setTheme] = useState<Theme>();
+    const [cookies, setCookie] = useCookies(["theme"]);
+    const [theme, setTheme] = useState<Theme>(cookies.theme);
+
+    useEffect(() => {
+        if (cookies.theme !== theme) setCookie("theme", theme);
+    }, [cookies.theme, setCookie, theme]);
 
     return (
         <ThemeContext.Provider value={{ theme, setTheme }}>
