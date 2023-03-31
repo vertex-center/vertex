@@ -1,0 +1,29 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+
+.navbar
+    display: flex
+    flex-direction: column
+    min-width: 350px
+    height: 100%
+    border-right: 1px solid colors.$bg-secondary
+    padding: 12px
+    box-sizing: border-box
+
+    &Item
+        padding: 10px 16px
+        cursor: pointer
+        border-radius: dimensions.$border-radius
+        border: 1px solid transparent
+        transition: all 0.1s ease
+
+        &:hover
+            background-color: colors.$bg-primary-hover
+            border-color: colors.$bg-accent
+
+        &Red:hover
+            border-color: colors.$red
+            color: colors.$red
+
+        &Active
+            background-color: colors.$bg-secondary

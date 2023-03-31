@@ -22,6 +22,7 @@ import {
 import Spacer from "../../components/Spacer/Spacer";
 import classNames from "classnames";
 import Header from "../../components/Header/Header";
+import Sidebar, { SidebarItem } from "../../components/Sidebar/Sidebar";
 
 export const bayNavItems = [
     {
@@ -147,27 +148,29 @@ export default function BayDetails() {
                 />
             </div>
             <Horizontal className={styles.content}>
-                <div className={styles.menu}>
-                    <MenuItem to="/" symbol="arrow_back" name="Back" />
-                    <MenuItem to={`/bay/${uuid}/`} symbol="home" name="Home" />
+                <Sidebar>
+                    <SidebarItem to="/" symbol="arrow_back" name="Back" />
+                    <SidebarItem
+                        to={`/bay/${uuid}/`}
+                        symbol="home"
+                        name="Home"
+                    />
                     <div className={styles.separator} />
                     {bayNavItems.map((item) => (
-                        <MenuItem
+                        <SidebarItem
                             to={`/bay/${uuid}${item.to}`}
                             symbol={item.symbol}
                             name={item.label}
                         />
                     ))}
                     <Spacer />
-                    <MenuItem
+                    <SidebarItem
                         onClick={onDeleteInstance}
                         symbol="delete"
                         name="Delete"
                         red
                     />
-                    {/*<MenuItem symbol="hub" name="Connections" />*/}
-                    {/*<MenuItem symbol="settings" name="Settings" />*/}
-                </div>
+                </Sidebar>
                 <div className={styles.side}>
                     <Outlet />
                 </div>
