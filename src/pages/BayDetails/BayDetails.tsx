@@ -21,6 +21,7 @@ import {
 } from "../../backend/sse";
 import Spacer from "../../components/Spacer/Spacer";
 import classNames from "classnames";
+import Header from "../../components/Header/Header";
 
 export const bayNavItems = [
     {
@@ -137,6 +138,7 @@ export default function BayDetails() {
 
     return (
         <div className={styles.details}>
+            <Header />
             <div className={styles.bay}>
                 <Bay
                     name={instance?.name}

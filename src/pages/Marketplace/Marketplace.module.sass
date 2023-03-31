@@ -3,7 +3,6 @@
 
 .marketplace
     display: flex
-    min-height: 100vh
     width: 100vw
     flex-direction: column
     align-items: center
@@ -24,14 +23,14 @@
     margin-bottom: 32px
 
 .cloud
-    display: flex
+    display: inline-flex
     justify-content: center
     align-items: center
     background-color: colors.$bg-secondary
     border: 1px solid colors.$bg-tertiary
     border-radius: dimensions.$border-radius
-    width: 64px
-    height: 64px
+    padding: 12px 20px
+    gap: 10px
 
     & > *
         font-size: 32px
@@ -44,13 +43,13 @@
     margin-left: 27px
     background: linear-gradient(0, colors.$bg-secondary, colors.$bg-secondary, colors.$blue, colors.$bg-secondary, colors.$bg-secondary)
     background-size: 100% 500%
-    animation: cable-transfer 0.8s ease infinite 0.2s
+    animation: cable-transfer 0.8s ease infinite 0.3s
 
 @keyframes cable-transfer
     from
-        background-position: 100% 100%
-    to
         background-position: 0 0
+    to
+        background-position: 100% 100%
 
 .step
     display: flex

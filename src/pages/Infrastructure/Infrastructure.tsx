@@ -16,6 +16,7 @@ import {
     unregisterSSE,
     unregisterSSEEvent,
 } from "../../backend/sse";
+import { HeaderHome } from "../../components/Header/Header";
 
 export default function Infrastructure() {
     const [status, setStatus] = useState("Checking...");
@@ -68,6 +69,7 @@ export default function Infrastructure() {
 
     return (
         <div className={styles.server}>
+            <HeaderHome />
             <div className={styles.bays}>
                 <Bay name="Vertex" status={status} />
                 {Object.keys(installed)?.map((uuid) => (

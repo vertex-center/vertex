@@ -1,15 +1,17 @@
-import { PropsWithChildren } from "react";
+import { HTMLProps, PropsWithChildren } from "react";
 import { Link, NavLink } from "react-router-dom";
 
 import styles from "./Header.module.sass";
 import Logo from "../Logo/Logo";
 import classNames from "classnames";
+import Symbol from "../Symbol/Symbol";
 
 type ItemProps = PropsWithChildren<{
     to: string;
+    symbol: string;
 }>;
 
-function Item({ children, to }: ItemProps) {
+function Item({ children, to, symbol }: ItemProps) {
     return (
         <NavLink
             to={to}
@@ -20,23 +22,38 @@ function Item({ children, to }: ItemProps) {
                 })
             }
         >
-            <li>{children}</li>
+            <li className={styles.itemContent}>
+                <Symbol className={styles.itemSymbol} name={symbol} />
+                <div>{children}</div>
+            </li>
         </NavLink>
     );
 }
 
-export default function Header() {
+export default function Header({ children }: HTMLProps<HTMLHeadingElement>) {
     return (
         <header className={styles.header}>
             <Link to="/" className={styles.logo}>
                 <Logo />
             </Link>
+            {children}
+        </header>
+    );
+}
+
+export function HeaderHome() {
+    return (
+        <Header>
             <nav>
                 <ul className={styles.items}>
-                    <Item to="marketplace">Marketplace</Item>
-                    <Item to="installed">Installed</Item>
+                    <Item to="/" symbol="storage">
+                        Servers
+                    </Item>
+                    <Item to="/settings" symbol="settings">
+                        Settings
+                    </Item>
                 </ul>
             </nav>
-        </header>
+        </Header>
     );
 }

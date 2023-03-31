@@ -9,6 +9,8 @@ import StepSelectMethod from "./StepSelectMethod";
 import StepDownload from "./StepDownload";
 import StepConfigure from "./StepConfigure";
 import { useNavigate } from "react-router-dom";
+import Header from "../../components/Header/Header";
+import { SiGithub } from "@icons-pack/react-simple-icons";
 
 export type DownloadMethod = "marketplace" | "git" | "localstorage";
 
@@ -53,44 +55,51 @@ export default function Installed() {
     }
 
     return (
-        <div className={styles.marketplace}>
-            <div className={styles.content}>
-                <div className={styles.server}>
-                    {step === "downloading" && !error && (
-                        <Fragment>
-                            <div className={styles.cloud}>
-                                <Symbol name="cloud" />
-                            </div>
-                            <div className={styles.cable}></div>
-                        </Fragment>
+        <div>
+            <Header />
+            <div className={styles.marketplace}>
+                <div className={styles.content}>
+                    <div className={styles.server}>
+                        <Bay
+                            name={instance?.name ?? "Empty server"}
+                            status={status ?? "off"}
+                        />
+                        {step === "downloading" && !error && (
+                            <Fragment>
+                                <div className={styles.cable}></div>
+                                <div className={styles.cloud}>
+                                    {method === "localstorage" ? (
+                                        <Symbol name="storage" />
+                                    ) : (
+                                        <SiGithub />
+                                    )}
+                                </div>
+                            </Fragment>
+                        )}
+                    </div>
+                    {step === "select-method" && (
+                        <StepSelectMethod
+                            method={method}
+                            onMethodChange={(m) => setMethod(m)}
+                            onNextStep={() => setStep("download")}
+                        />
                     )}
-                    <Bay
-                        name={instance?.name ?? "Empty server"}
-                        status={status ?? "off"}
-                    />
+                    {step === "download" && (
+                        <StepDownload
+                            method={method}
+                            repository={repository}
+                            onRepositoryChange={(r) => setRepository(r)}
+                            onNextStep={() => download(repository)}
+                        />
+                    )}
+                    {step === "configure" && (
+                        <StepConfigure
+                            onNextStep={() => navigate(`/bay/${instance.uuid}`)}
+                            instance={instance}
+                        />
+                    )}
+                    <Error error={error} />
                 </div>
-                {step === "select-method" && (
-                    <StepSelectMethod
-                        method={method}
-                        onMethodChange={(m) => setMethod(m)}
-                        onNextStep={() => setStep("download")}
-                    />
-                )}
-                {step === "download" && (
-                    <StepDownload
-                        method={method}
-                        repository={repository}
-                        onRepositoryChange={(r) => setRepository(r)}
-                        onNextStep={() => download(repository)}
-                    />
-                )}
-                {step === "configure" && (
-                    <StepConfigure
-                        onNextStep={() => navigate(`/bay/${instance.uuid}`)}
-                        instance={instance}
-                    />
-                )}
-                <Error error={error} />
             </div>
         </div>
     );
