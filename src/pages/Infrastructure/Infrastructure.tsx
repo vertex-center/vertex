@@ -96,7 +96,7 @@ export default function Infrastructure() {
                             name: instance.name,
                             status: instance.status,
                             count: instances.length > 1 ? i + 1 : undefined,
-                            to: `/bay/${instance.uuid}`,
+                            to: `/bay/${instance.uuid}/`,
                             onPower: () => toggleInstance(instance.uuid),
                         }))}
                     />

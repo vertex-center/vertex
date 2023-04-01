@@ -98,7 +98,9 @@ export default function Installed() {
                     )}
                     {step === "configure" && (
                         <StepConfigure
-                            onNextStep={() => navigate(`/bay/${instance.uuid}`)}
+                            onNextStep={() =>
+                                navigate(`/bay/${instance.uuid}/`)
+                            }
                             instance={instance}
                         />
                     )}
