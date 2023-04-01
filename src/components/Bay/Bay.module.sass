@@ -14,12 +14,13 @@
     &:first-of-type
         border-top-left-radius: dimensions.$border-radius
         border-top-right-radius: dimensions.$border-radius
+
+    &:not(&:last-of-type)
         border-bottom: none
 
     &:last-of-type
         border-bottom-left-radius: dimensions.$border-radius
         border-bottom-right-radius: dimensions.$border-radius
-        border-bottom: 1px solid colors.$bg-tertiary
 
 .lcd
     background-color: #000
