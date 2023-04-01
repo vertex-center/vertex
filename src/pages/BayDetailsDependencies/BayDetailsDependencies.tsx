@@ -104,7 +104,7 @@ export default function BayDetailsDependencies() {
 
     return (
         <Fragment>
-            <Title>Dependencies</Title>
+            <Title>Dependencies ({Object.keys(dependencies).length})</Title>
             <Horizontal alignItems="center">
                 <Button
                     rightSymbol="refresh"
