@@ -13,22 +13,26 @@
 
 ### Vertex
 
-Vertex aims to be an ecosystem of self-hosted services. Eventually, the idea is to be able to install new services on your HomeLab in one click.
+Vertex is a program that allows you to create your self-hosted server easily. Install, configure and start new services in less than a minute.
+
+<img width="1515" alt="image" src="https://user-images.githubusercontent.com/12123721/229261331-b2c8de51-f88a-458d-9eff-0ea73c83a0ad.png">
 
 Vertex is designed to be installed on low-powered computers like Raspberry Pi, so avoiding systems like Docker and prioritizing compiled languages like Go, Rust or C++.
 
-### Vertex Installer
+## Installation
 
-This repository contains Vertex Core, which allows to install services easily.
+### Method 1: From binaries
 
-## Installation process
+Binaries are released regularly. The latest release is available [here](https://github.com/vertex-center/vertex/releases/).
 
-*Builds are not yet available.*
+Decompress and execute the binary. Then, go to http://localhost:6130/. Enjoy!
 
-To run Vertex:
+### Method 2: Manual
+
 1. Clone this repository
    ```bash
    git clone https://github.com/vertex-center/vertex
+   cd vertex
    ```
 2. Run Vertex
    ```bash
@@ -36,16 +40,17 @@ To run Vertex:
    ```
 3. Access from http://localhost:6130/
 
-## Services
+## Available services
 
-- [Vertex Discord](https://github.com/vertex-center/vertex-discord)
-- [Vertex Spotify](https://github.com/vertex-center/vertex-spotify)
-- [Vertex Redis](https://github.com/vertex-center/vertex-redis)
+<img width="822" alt="image" src="https://user-images.githubusercontent.com/12123721/229261568-399c5970-600b-4023-96b1-bddd7feba81e.png">
 
-Related repositories:
+There are 3 methods to install new services:
 
-- [Vertex Core for golang](https://github.com/vertex-center/vertex-core-golang)
-- [Vertex Design](https://github.com/vertex-center/vertex-design)
+1. **From Marketplace.** These are services officially [released](https://github.com/vertex-center/vertex-services) by the Vertex team. Simply select the service you want from the UI, and install.
+2. **From Git.** For unofficial services, you can easily provide a link to the repository. Vertex will clone and start the project automatically.
+3. **From Local storage.** This method is useful while contributing to Vertex. You can select the path of a service on your computer, and Vertex will handle it automatically.
+
+With all these methods, Vertex aims to be a flexible way to manage all your services.
 
 ## License
 
