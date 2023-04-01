@@ -6,6 +6,15 @@ import { ThemeContext } from "../../index";
 
 type Props = {};
 
+const themes = [
+    { key: "vertex-dark", label: "Vertex Dark" },
+    { key: "vertex-light", label: "Vertex Light" },
+    { key: "catppuccin-mocha", label: "Catppuccin Mocha" },
+    { key: "catppuccin-macchiato", label: "Catppuccin Macchiato" },
+    { key: "catppuccin-frappe", label: "Catppuccin Frappé" },
+    { key: "catppuccin-latte", label: "Catppuccin Latte" },
+];
+
 export default function SettingsTheme(props: Props) {
     const { theme, setTheme } = useContext(ThemeContext);
 
@@ -13,20 +22,15 @@ export default function SettingsTheme(props: Props) {
         <Fragment>
             <Title>Theme</Title>
             <Vertical gap={8}>
-                <Button
-                    onClick={() => setTheme("vertex-dark")}
-                    selectable
-                    selected={theme === "vertex-dark"}
-                >
-                    Vertex Dark
-                </Button>
-                <Button
-                    onClick={() => setTheme("vertex-light")}
-                    selectable
-                    selected={theme === "vertex-light"}
-                >
-                    Vertex Light
-                </Button>
+                {themes.map((t) => (
+                    <Button
+                        onClick={() => setTheme(t.key)}
+                        selectable
+                        selected={theme === t.key}
+                    >
+                        {t.label}
+                    </Button>
+                ))}
             </Vertical>
         </Fragment>
     );

@@ -25,4 +25,6 @@ without any technical knowledge.
 
 ## License
 
-[Vertex Web UI](https://github.com/vertex-center/vertex) is released under the [MIT License](./LICENSE.md).
+* [Vertex WebUI](https://github.com/vertex-center/vertex) is released under the [MIT License](./LICENSE.md).
+* All 4 Catppuccin themes come from [Catppuccin](https://github.com/catppuccin/catppuccin), also released under
+  the [MIT License](https://github.com/catppuccin/catppuccin/blob/main/LICENSE)

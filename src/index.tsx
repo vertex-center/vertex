@@ -12,7 +12,13 @@ import { useCookies } from "react-cookie";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
-export type Theme = "vertex-dark" | "vertex-light";
+export type Theme =
+    | "vertex-dark"
+    | "vertex-light"
+    | "catppuccin-mocha"
+    | "catppuccin-macchiato"
+    | "catppuccin-frappe"
+    | "catppuccin-latte";
 
 export const ThemeContext = createContext<{
     theme: string;
