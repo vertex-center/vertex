@@ -19,9 +19,27 @@ without any technical knowledge.
 <img width="1515" alt="image" src="https://user-images.githubusercontent.com/12123721/229261331-b2c8de51-f88a-458d-9eff-0ea73c83a0ad.png">
 <img width="822" alt="image" src="https://user-images.githubusercontent.com/12123721/229261568-399c5970-600b-4023-96b1-bddd7feba81e.png">
 
-### Vertex Installer
+## Install
 
-(soon) The Web UI is downloaded by default on your [Vertex](https://github.com/vertex-center/vertex) server.
+### Method 1: From Vertex
+
+When you start [Vertex](https://github.com/vertex-center/vertex), the Web UI is automatically downloaded. Access the UI
+from http://localhost:6130/
+
+### Method 2: From sources
+
+1. Clone this repository
+    ```bash
+    https://github.com/vertex-center/vertex-webui.git
+    cd vertex-webui
+    ```
+
+2. Start the server
+    ```bash
+    npm run start
+    ```
+
+3. Access from http://localhost:3000/
 
 ## License
 
