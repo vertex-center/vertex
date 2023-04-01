@@ -87,10 +87,11 @@ export default function Infrastructure() {
         <div className={styles.server}>
             <HeaderHome />
             <div className={styles.bays}>
-                <Bay instances={[{ name: "Vertex", status }]} />
+                <Bay showCables instances={[{ name: "Vertex", status }]} />
                 {installedGrouped?.map((instances, i) => (
                     <Bay
                         key={i}
+                        showCables
                         instances={instances.map((instance, i) => ({
                             name: instance.name,
                             status: instance.status,

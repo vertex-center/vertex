@@ -10,6 +10,7 @@
     flex-direction: row
     align-items: center
     gap: 20px
+    position: relative
 
     &:first-of-type
         border-top-left-radius: dimensions.$border-radius
@@ -21,6 +22,20 @@
     &:last-of-type
         border-bottom-left-radius: dimensions.$border-radius
         border-bottom-right-radius: dimensions.$border-radius
+
+    &::before
+        position: absolute
+        content: ''
+        height: 2px
+        width: 0
+        max-width: 0
+        background-color: colors.$bg-tertiary
+        right: 100%
+        transition: max-width 0.3s ease
+
+    &WithCable::before
+        width: 100px
+        max-width: 100px
 
 .lcd
     background-color: #000

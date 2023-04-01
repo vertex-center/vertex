@@ -107,15 +107,22 @@ type Props = {
 
         onPower?: () => void;
     }[];
+    showCables?: boolean;
 };
 
 export default function Bay(props: Props) {
-    const { instances } = props;
+    const { instances, showCables } = props;
 
     return (
         <div className={styles.group}>
             {instances.map((instance) => (
-                <div className={styles.bay}>
+                <div
+                    className={classNames({
+                        [styles.bay]: true,
+                        [styles.bayWithCable]:
+                            showCables && instance.status !== "off",
+                    })}
+                >
                     <LED status={instance.status} />
                     <LCD
                         name={instance.name}
