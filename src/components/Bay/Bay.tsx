@@ -1,8 +1,9 @@
 import styles from "./Bay.module.sass";
 import Symbol from "../Symbol/Symbol";
 import classNames from "classnames";
-import { Vertical } from "../Layouts/Layouts";
+import { Horizontal, Vertical } from "../Layouts/Layouts";
 import { Link } from "react-router-dom";
+import Spacer from "../Spacer/Spacer";
 
 type ButtonProps = {
     symbol: string;
@@ -36,10 +37,11 @@ type LCDProps = {
     name: string;
     status: Status | string;
     to?: string;
+    count?: number;
 };
 
 function LCD(props: LCDProps) {
-    const { name, status, to } = props;
+    const { name, status, to, count } = props;
 
     let message;
     switch (status) {
@@ -61,7 +63,11 @@ function LCD(props: LCDProps) {
 
     let content = (
         <Vertical gap={10}>
-            <div>{name}</div>
+            <Horizontal>
+                <div>{name}</div>
+                <Spacer />
+                <div className={styles.lcdCount}>{count}</div>
+            </Horizontal>
             <div
                 className={classNames({
                     [styles.lcdGray]: true,
@@ -92,22 +98,39 @@ function LCD(props: LCDProps) {
 }
 
 type Props = {
-    name: string;
-    status: Status | string;
+    instances: {
+        name: string;
+        status: Status | string;
+        count?: number;
 
-    to?: string;
+        to?: string;
 
-    onPower?: () => void;
+        onPower?: () => void;
+    }[];
 };
 
 export default function Bay(props: Props) {
-    const { name, status, to, onPower } = props;
+    const { instances } = props;
 
     return (
-        <div className={styles.bay}>
-            <LED status={status} />
-            <LCD name={name} status={status} to={to} />
-            {onPower && <Button symbol="power_rounded" onClick={onPower} />}
+        <div className={styles.group}>
+            {instances.map((instance) => (
+                <div className={styles.bay}>
+                    <LED status={instance.status} />
+                    <LCD
+                        name={instance.name}
+                        count={instance.count}
+                        status={instance.status}
+                        to={instance.to}
+                    />
+                    {instance?.onPower && (
+                        <Button
+                            symbol="power_rounded"
+                            onClick={instance.onPower}
+                        />
+                    )}
+                </div>
+            ))}
         </div>
     );
 }

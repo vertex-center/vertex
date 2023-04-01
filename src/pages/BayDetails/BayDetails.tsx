@@ -93,9 +93,13 @@ export default function BayDetails() {
             <Header />
             <div className={styles.bay}>
                 <Bay
-                    name={instance?.name}
-                    status={instance?.status}
-                    onPower={() => toggleInstance(uuid)}
+                    instances={[
+                        {
+                            name: instance?.name,
+                            status: instance?.status,
+                            onPower: () => toggleInstance(uuid),
+                        },
+                    ]}
                 />
             </div>
             <Horizontal className={styles.content}>

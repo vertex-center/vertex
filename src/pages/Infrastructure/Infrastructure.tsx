@@ -3,6 +3,7 @@ import Bay from "../../components/Bay/Bay";
 import { useEffect, useState } from "react";
 import {
     getInstances,
+    Instance,
     Instances,
     route,
     startInstance,
@@ -21,6 +22,21 @@ import { HeaderHome } from "../../components/Header/Header";
 export default function Infrastructure() {
     const [status, setStatus] = useState("Checking...");
     const [installed, setInstalled] = useState<Instances>({});
+
+    const [installedGrouped, setInstalledGrouped] = useState<Instance[][]>([]);
+
+    useEffect(() => {
+        const ids = new Set<string>(Object.values(installed).map((i) => i.id));
+        const final = [];
+        ids.forEach((id) => {
+            final.push(
+                Object.entries(installed)
+                    .filter(([_, i]) => i.id === id)
+                    .map(([_, i]) => i)
+            );
+        });
+        setInstalledGrouped(final);
+    }, [installed]);
 
     const fetchServices = () => {
         getInstances()
@@ -71,14 +87,17 @@ export default function Infrastructure() {
         <div className={styles.server}>
             <HeaderHome />
             <div className={styles.bays}>
-                <Bay name="Vertex" status={status} />
-                {Object.keys(installed)?.map((uuid) => (
+                <Bay instances={[{ name: "Vertex", status }]} />
+                {installedGrouped?.map((instances, i) => (
                     <Bay
-                        key={uuid}
-                        name={installed[uuid].name}
-                        status={installed[uuid].status}
-                        to={`/bay/${uuid}`}
-                        onPower={() => toggleInstance(uuid)}
+                        key={i}
+                        instances={instances.map((instance, i) => ({
+                            name: instance.name,
+                            status: instance.status,
+                            count: instances.length > 1 ? i + 1 : undefined,
+                            to: `/bay/${instance.uuid}`,
+                            onPower: () => toggleInstance(instance.uuid),
+                        }))}
                     />
                 ))}
                 <Link to="/marketplace" className={styles.addBay}>

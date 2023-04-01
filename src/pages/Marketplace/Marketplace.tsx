@@ -61,8 +61,12 @@ export default function Installed() {
                 <div className={styles.content}>
                     <div className={styles.server}>
                         <Bay
-                            name={instance?.name ?? "Empty server"}
-                            status={status ?? "off"}
+                            instances={[
+                                {
+                                    name: instance?.name ?? "Empty server",
+                                    status: status ?? "off",
+                                },
+                            ]}
                         />
                         {step === "downloading" && !error && (
                             <Fragment>

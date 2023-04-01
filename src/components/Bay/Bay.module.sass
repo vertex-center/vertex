@@ -6,19 +6,28 @@
     background-color: colors.$bg-primary
     border: 1px solid colors.$bg-tertiary
     padding: 0 20px 0 24px
-    border-radius: dimensions.$border-radius
     display: flex
     flex-direction: row
     align-items: center
     gap: 20px
+
+    &:first-of-type
+        border-top-left-radius: dimensions.$border-radius
+        border-top-right-radius: dimensions.$border-radius
+        border-bottom: none
+
+    &:last-of-type
+        border-bottom-left-radius: dimensions.$border-radius
+        border-bottom-right-radius: dimensions.$border-radius
+        border-bottom: 1px solid colors.$bg-tertiary
 
 .lcd
     background-color: #000
     border: 1px solid transparent
     padding: 16px 20px
     display: flex
-    flex-direction: row
-    align-items: center
+    flex-direction: column
+    align-items: stretch
     flex-grow: 1
     gap: 10px
     font-family: fonts.$font-family-code
@@ -51,6 +60,8 @@
             background-color: #0b0b0b
             border-color: colors.$bg-accent
 
+    &Count
+        color: colors.$fg-tertiary
 
 .led
     width: 14px
