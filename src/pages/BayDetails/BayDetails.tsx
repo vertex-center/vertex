@@ -8,10 +8,9 @@ import {
     startInstance,
     stopInstance,
 } from "../../backend/backend";
-import { NavLink, Outlet, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 
 import styles from "./BayDetails.module.sass";
-import Symbol from "../../components/Symbol/Symbol";
 import { Horizontal } from "../../components/Layouts/Layouts";
 import {
     registerSSE,
@@ -20,7 +19,6 @@ import {
     unregisterSSEEvent,
 } from "../../backend/sse";
 import Spacer from "../../components/Spacer/Spacer";
-import classNames from "classnames";
 import Header from "../../components/Header/Header";
 import Sidebar, { SidebarItem } from "../../components/Sidebar/Sidebar";
 
@@ -41,53 +39,6 @@ export const bayNavItems = [
         symbol: "widgets",
     },
 ];
-
-type MenuItemProps = {
-    to?: string;
-    onClick?: () => void;
-
-    symbol: string;
-    name: string;
-
-    red?: boolean;
-};
-
-function MenuItem(props: MenuItemProps) {
-    const { to, symbol, name, onClick, red } = props;
-
-    const content = (
-        <Horizontal alignItems="center" gap={12}>
-            <Symbol name={symbol} />
-            {name}
-        </Horizontal>
-    );
-
-    const className = classNames({
-        [styles.menuItem]: true,
-        [styles.menuItemRed]: red,
-    });
-
-    if (!to)
-        return (
-            <div className={className} onClick={onClick}>
-                {content}
-            </div>
-        );
-
-    return (
-        <NavLink
-            to={to}
-            className={({ isActive }) =>
-                classNames({
-                    [className]: true,
-                    [styles.menuItemActive]: isActive,
-                })
-            }
-        >
-            {content}
-        </NavLink>
-    );
-}
 
 export default function BayDetails() {
     const { uuid } = useParams();
