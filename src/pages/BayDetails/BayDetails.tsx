@@ -93,6 +93,7 @@ export default function BayDetails() {
             <Header />
             <div className={styles.bay}>
                 <Bay
+                    showCables
                     instances={[
                         {
                             name: instance?.name,
