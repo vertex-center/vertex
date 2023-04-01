@@ -20,7 +20,7 @@ export function SidebarItem(props: ItemProps) {
 
     const content = (
         <Horizontal alignItems="center" gap={12}>
-            <Symbol name={symbol} />
+            <Symbol className={styles.symbol} name={symbol} />
             {name}
         </Horizontal>
     );

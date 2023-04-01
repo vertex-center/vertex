@@ -7,23 +7,36 @@
     min-width: 350px
     height: 100%
     border-right: 1px solid colors.$bg-secondary
-    padding: 12px
+    padding: 12px 12px 12px 40px
     box-sizing: border-box
 
     &Item
-        padding: 10px 16px
+        padding: 10px 14px
         cursor: pointer
         border-radius: dimensions.$border-radius
         border: 1px solid transparent
         transition: all 0.1s ease
 
         &:hover
-            background-color: colors.$bg-primary-hover
-            border-color: colors.$bg-accent
+            background-color: colors.$bg-secondary-hover
 
         &Red:hover
             border-color: colors.$red
             color: colors.$red
 
         &Active
-            background-color: colors.$bg-secondary
+            position: relative
+
+            &::after
+                position: absolute
+                content: ''
+                top: 10px
+                bottom: 10px
+                left: -3px
+                width: 3px
+                border-radius: 2px
+                background-color: colors.$fg-secondary
+
+.symbol
+    margin-top: -1px
+    font-size: 20px
