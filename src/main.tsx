@@ -10,8 +10,6 @@ import "./reset.css";
 import "./index.sass";
 import { useCookies } from "react-cookie";
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-
 export type Theme =
     | "vertex-dark"
     | "vertex-light"
@@ -42,6 +40,8 @@ function ThemeProvider({ children }: PropsWithChildren) {
         </ThemeContext.Provider>
     );
 }
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
     <React.StrictMode>

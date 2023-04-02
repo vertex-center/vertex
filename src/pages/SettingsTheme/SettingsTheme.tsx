@@ -2,7 +2,7 @@ import { Fragment, useContext } from "react";
 import Button from "../../components/Button/Button";
 import { Vertical } from "../../components/Layouts/Layouts";
 import { Title } from "../../components/Text/Text";
-import { ThemeContext } from "../../index";
+import { ThemeContext } from "../../main";
 
 type Props = {};
 

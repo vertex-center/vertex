@@ -9,7 +9,7 @@ import BayDetailsHome from "./pages/BayDetailsHome/BayDetailsHome";
 import Settings from "./pages/Settings/Settings";
 import SettingsTheme from "./pages/SettingsTheme/SettingsTheme";
 import { useContext } from "react";
-import { ThemeContext } from "./index";
+import { ThemeContext } from "./main";
 import classNames from "classnames";
 
 function App() {

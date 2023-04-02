@@ -33,7 +33,7 @@ jobs:
         run: npm run build
 
       - name: Create .zip
-        run: zip vertex-webui.zip ./build -r
+        run: zip vertex-webui.zip ./dist -r
 
       - name: Publish
         uses: softprops/action-gh-release@v1
