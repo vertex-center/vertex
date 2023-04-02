@@ -16,7 +16,7 @@ var logger = console.New("vertex::router")
 
 func InitializeRouter() *gin.Engine {
 	r, api := router.CreateRouter(cors.Default())
-	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.PathClient, "build"), true)))
+	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.PathClient, "dist"), true)))
 
 	addServicesRoutes(api.Group("/services"))
 	addInstancesRoutes(api.Group("/instances"))
