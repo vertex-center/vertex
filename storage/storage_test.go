@@ -31,12 +31,12 @@ func (suite *RepositoryTestSuite) TestDownloadLatestRepository() {
 	url := "https://github.com/vertex-center/vertex-services"
 
 	// reload to test Clone()
-	err = DownloadLatestRepository(PathRepo, url)
+	err = CloneOrPullRepository(url, PathRepo)
 	assert.NoError(suite.T(), err)
 	assert.DirExists(suite.T(), PathRepo)
 
 	// reload to test Pull()
-	err = DownloadLatestRepository(PathRepo, url)
+	err = CloneOrPullRepository(url, PathRepo)
 	assert.NoError(suite.T(), err)
 	assert.DirExists(suite.T(), PathRepo)
 }

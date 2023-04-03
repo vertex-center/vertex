@@ -96,7 +96,7 @@ func reload(dependenciesPath string) error {
 
 	url := "https://github.com/vertex-center/vertex-dependencies"
 
-	err := storage.DownloadLatestRepository(dependenciesPath, url)
+	err := storage.CloneOrPullRepository(url, dependenciesPath)
 	if err != nil {
 		return err
 	}

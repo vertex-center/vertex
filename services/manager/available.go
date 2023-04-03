@@ -18,7 +18,7 @@ func Reload() error {
 func reload(servicesPath string) error {
 	url := "https://github.com/vertex-center/vertex-services"
 
-	err := storage.DownloadLatestRepository(servicesPath, url)
+	err := storage.CloneOrPullRepository(url, servicesPath)
 	if err != nil {
 		return err
 	}

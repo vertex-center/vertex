@@ -1,20 +1,13 @@
 package instances
 
 import (
-	"archive/tar"
-	"compress/gzip"
-	"context"
 	"errors"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"path"
-	"runtime"
 	"strings"
 
 	"github.com/go-git/go-git/v5"
-	"github.com/google/go-github/v50/github"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex/services"
@@ -171,7 +164,7 @@ func Install(repo string) (*instance.Instance, error) {
 		// If there are no releases available, that may mean that the repository
 		// should be cloned. This happens when there are repositories that don't
 		// need to compile things, but only run a bash script.
-		if errors.Is(err, ErrNoReleasesPublished) {
+		if errors.Is(err, storage.ErrNoReleasesPublished) {
 			split := strings.Split(repo, ":")
 			repo = "git:https://" + split[1]
 
@@ -195,50 +188,13 @@ func Install(repo string) (*instance.Instance, error) {
 	return Instantiate(serviceUUID)
 }
 
-var (
-	ErrNoReleasesPublished = errors.New("this repository has no existing releases")
-	ErrNoReleasesForThisOS = errors.New("this repository has no releases appropriate for this OS")
-)
-
-func downloadFromMarketplace(p string, repo string) error {
-	client := github.NewClient(nil)
-
+func downloadFromMarketplace(dest string, repo string) error {
 	split := strings.Split(repo, "/")
 
 	owner := split[1]
 	repository := split[2]
 
-	release, _, err := client.Repositories.GetLatestRelease(context.Background(), owner, repository)
-	if err != nil {
-		return ErrNoReleasesPublished
-	}
-
-	platform := fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH)
-
-	for _, asset := range release.Assets {
-		if strings.Contains(*asset.Name, platform) {
-			archivePath := path.Join(p, "temp.tar.gz")
-
-			err := downloadFile(*asset.BrowserDownloadURL, p, archivePath)
-			if err != nil {
-				return err
-			}
-
-			err = untarFile(p, archivePath)
-			if err != nil {
-				return err
-			}
-
-			err = os.Remove(archivePath)
-			if err != nil {
-				return err
-			}
-
-			return nil
-		}
-	}
-
-	return ErrNoReleasesForThisOS
+	return storage.DownloadLatestGithubRelease(owner, repository, dest)
 }
 
 func downloadFromGit(path string, repo string) error {
@@ -259,89 +215,4 @@ func downloadFromLocalstorage(path string, repo string) error {
 	}
 
 	return os.Symlink(p, path)
-}
-
-func downloadFile(url string, basePath string, archivePath string) error {
-	err := os.Mkdir(basePath, os.ModePerm)
-	if err != nil {
-		return err
-	}
-
-	res, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-
-	file, err := os.Create(archivePath)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	_, err = io.Copy(file, res.Body)
-	return err
-}
-
-func untarFile(basePath string, archivePath string) error {
-	archive, err := os.Open(archivePath)
-	if err != nil {
-		return err
-	}
-	defer archive.Close()
-
-	stream, err := gzip.NewReader(archive)
-	if err != nil {
-		return err
-	}
-	defer stream.Close()
-
-	reader := tar.NewReader(stream)
-
-	for {
-		header, err := reader.Next()
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			return err
-		}
-
-		filepath := path.Join(basePath, header.Name)
-
-		switch header.Typeflag {
-		case tar.TypeDir:
-			err = os.MkdirAll(filepath, os.ModePerm)
-			if err != nil {
-				return err
-			}
-		case tar.TypeReg:
-			err := os.MkdirAll(path.Dir(filepath), os.ModePerm)
-			if err != nil {
-				return err
-			}
-
-			file, err := os.Create(filepath)
-			if err != nil {
-				return err
-			}
-
-			_, err = io.Copy(file, reader)
-			if err != nil {
-				return err
-			}
-
-			err = os.Chmod(filepath, 0755)
-			if err != nil {
-				return err
-			}
-
-			file.Close()
-		default:
-			return errors.New(fmt.Sprintf("unknown flag type (%b) for file '%s'", header.Typeflag, header.Name))
-		}
-	}
-
-	return nil
 }
