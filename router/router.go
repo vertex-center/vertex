@@ -1,6 +1,7 @@
 package router
 
 import (
+	"net/http"
 	"path"
 
 	"github.com/gin-contrib/cors"
@@ -14,7 +15,13 @@ import (
 
 var logger = console.New("vertex::router")
 
-func InitializeRouter() *gin.Engine {
+type About struct {
+	Version string `json:"version"`
+	Commit  string `json:"commit"`
+	Date    string `json:"date"`
+}
+
+func InitializeRouter(about About) *gin.Engine {
 	r, api := router.CreateRouter(cors.Default())
 	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.PathClient, "dist"), true)))
 
@@ -22,6 +29,10 @@ func InitializeRouter() *gin.Engine {
 	addInstancesRoutes(api.Group("/instances"))
 	addInstanceRoutes(api.Group("/instance/:instance_uuid"))
 	addDependenciesRoutes(api.Group("/dependencies"))
+
+	api.GET("/about", func(c *gin.Context) {
+		c.JSON(http.StatusOK, about)
+	})
 
 	return r
 }

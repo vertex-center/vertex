@@ -55,7 +55,11 @@ func main() {
 		return
 	}
 
-	r := router.InitializeRouter()
+	r := router.InitializeRouter(router.About{
+		Version: version,
+		Commit:  commit,
+		Date:    date,
+	})
 
 	err = servicesmanager.ReloadAllInstalled()
 	if err != nil {
