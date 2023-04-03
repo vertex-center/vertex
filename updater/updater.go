@@ -15,10 +15,10 @@ import (
 var logger = console.New("updater")
 
 func CheckForUpdates(currentVersion string) error {
-	//if currentVersion == "dev" {
-	//	logger.Log("skipping update in 'dev' version")
-	//	return nil
-	//}
+	if currentVersion == "dev" {
+		logger.Log("skipping update in 'dev' version")
+		return nil
+	}
 
 	// remove previous old version if it exists.
 	err := os.Remove("vertex-old")
