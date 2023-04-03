@@ -18,6 +18,11 @@ export default function Settings(props: Props) {
                         symbol="palette"
                         name="Theme"
                     />
+                    <SidebarItem
+                        to="/settings/about"
+                        symbol="info"
+                        name="About"
+                    />
                 </Sidebar>
                 <div className={styles.side}>
                     <Outlet />

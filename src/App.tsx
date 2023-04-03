@@ -11,6 +11,7 @@ import SettingsTheme from "./pages/SettingsTheme/SettingsTheme";
 import { useContext } from "react";
 import { ThemeContext } from "./main";
 import classNames from "classnames";
+import SettingsAbout from "./pages/SettingsAbout/SettingsAbout";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -24,6 +25,10 @@ function App() {
                         <Route
                             path="/settings/theme"
                             element={<SettingsTheme />}
+                        />
+                        <Route
+                            path="/settings/about"
+                            element={<SettingsAbout />}
                         />
                     </Route>
                     <Route path="/marketplace" element={<Marketplace />} />

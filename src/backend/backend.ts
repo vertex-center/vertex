@@ -50,6 +50,12 @@ export type Dependency = Package & {
     installed: boolean;
 };
 
+export type About = {
+    version: string;
+    commit: string;
+    date: string;
+};
+
 export type Dependencies = { [id: string]: Dependency };
 
 export type Instances = { [uuid: string]: Instance };
@@ -147,5 +153,14 @@ export async function installDependencies(dependencies) {
             .post(route(`/dependencies/install`), { dependencies })
             .then((res) => resolve(res))
             .catch((err) => reject(err));
+    });
+}
+
+export async function getAbout(): Promise<About> {
+    return new Promise((resolve, reject) => {
+        axios
+            .get(route("/about"))
+            .then((res) => resolve(res.data))
+            .catch((err) => resolve(err));
     });
 }
