@@ -38,7 +38,7 @@
         max-width: 100px
 
 .lcd
-    background-color: #000
+    background-color: colors.$bg-no-color
     border: 1px solid transparent
     padding: 16px 20px
     display: flex
@@ -49,11 +49,11 @@
     font-family: fonts.$font-family-code
     font-size: 15px
     letter-spacing: 1px
-    color: white
+    color: colors.$fg-primary
     transition: all 0.1s ease
 
     &Gray
-        color: lightgray
+        color: colors.$fg-secondary
         opacity: 0.6
 
     &Red
@@ -73,7 +73,6 @@
         border: 1px solid transparent
 
         &:hover
-            background-color: #0b0b0b
             border-color: colors.$bg-accent
 
     &Count
