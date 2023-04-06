@@ -24,18 +24,23 @@
             border-color: colors.$red
             color: colors.$red
 
+        &::after
+            position: absolute
+            content: ''
+            top: 50%
+            bottom: 50%
+            left: -3px
+            width: 3px
+            border-radius: 2px
+            background-color: colors.$fg-secondary
+            transition: all 0.1s ease-in-out
+
         &Active
             position: relative
 
             &::after
-                position: absolute
-                content: ''
                 top: 10px
                 bottom: 10px
-                left: -3px
-                width: 3px
-                border-radius: 2px
-                background-color: colors.$fg-secondary
 
 .symbol
     margin-top: -1px
