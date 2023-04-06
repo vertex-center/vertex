@@ -187,7 +187,7 @@ func UntarFile(basePath string, archivePath string) error {
 
 			file.Close()
 		default:
-			return errors.New(fmt.Sprintf("unknown flag type (%b) for file '%s'", header.Typeflag, header.Name))
+			return fmt.Errorf("unknown flag type (%b) for file '%s'", header.Typeflag, header.Name)
 		}
 	}
 

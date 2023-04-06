@@ -36,9 +36,7 @@ func CheckForUpdates(currentVersion string) error {
 
 	// check if the version is different
 	releaseVersion := *release.TagName
-	if strings.HasPrefix(releaseVersion, "v") {
-		releaseVersion = releaseVersion[1:]
-	}
+	releaseVersion = strings.TrimPrefix(releaseVersion, "v")
 
 	if currentVersion == releaseVersion {
 		logger.Log("vertex is already up-to-date")

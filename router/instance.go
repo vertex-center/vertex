@@ -27,13 +27,13 @@ func addInstanceRoutes(r *gin.RouterGroup) {
 func getInstanceUUID(c *gin.Context) *uuid.UUID {
 	p := c.Param("instance_uuid")
 	if p == "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New("instance_uuid was missing in the URL"))
+		_ = c.AbortWithError(http.StatusBadRequest, errors.New("instance_uuid was missing in the URL"))
 		return nil
 	}
 
 	uid, err := uuid.Parse(p)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse instance_uuid: %v", err))
+		_ = c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to parse instance_uuid: %v", err))
 		return nil
 	}
 
@@ -45,7 +45,7 @@ func getInstance(c *gin.Context) *instance.Instance {
 
 	i, err := instances.Get(*uid)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to retrieve instance %s: %v", uid, err))
+		_ = c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to retrieve instance %s: %v", uid, err))
 		return nil
 	}
 
@@ -62,7 +62,7 @@ func handleDeleteInstance(c *gin.Context) {
 
 	err := instances.Delete(*uid)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to delete instance %s: %v", uid, err))
+		_ = c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to delete instance %s: %v", uid, err))
 		return
 	}
 
@@ -74,7 +74,7 @@ func handleStartInstance(c *gin.Context) {
 
 	err := instances.Start(*uid)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -86,7 +86,7 @@ func handleStopInstance(c *gin.Context) {
 
 	err := instances.Stop(*uid)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -97,7 +97,7 @@ func handlePatchEnvironment(c *gin.Context) {
 	var environment map[string]string
 	err := c.BindJSON(&environment)
 	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("failed to parse body: %v", err))
+		_ = c.AbortWithError(http.StatusBadRequest, fmt.Errorf("failed to parse body: %v", err))
 		return
 	}
 
@@ -105,7 +105,7 @@ func handlePatchEnvironment(c *gin.Context) {
 
 	err = i.SetEnv(environment)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to save environment: %v", err))
+		_ = c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to save environment: %v", err))
 		return
 	}
 
@@ -162,7 +162,7 @@ func handleGetDependencies(c *gin.Context) {
 
 	var deps = map[string]dependency.Dependency{}
 
-	for name, _ := range i.Dependencies {
+	for name := range i.Dependencies {
 		dep, err := dependency.Get(name)
 		if err != nil {
 			logger.Error(err)

@@ -3,7 +3,6 @@ package client
 import (
 	"archive/zip"
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -35,7 +34,7 @@ func Setup() error {
 
 	release, _, err := client.Repositories.GetLatestRelease(context.Background(), owner, repo)
 	if err != nil {
-		return errors.New(fmt.Sprintf("failed to retrieve the latest github release for %s: %v", repo, err))
+		return fmt.Errorf("failed to retrieve the latest github release for %s: %v", repo, err)
 	}
 
 	logger.Log("Downloading vertex-webui client...")

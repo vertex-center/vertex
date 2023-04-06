@@ -48,12 +48,10 @@ func newInstances() *Instances {
 		defer close(instancesObserver)
 
 		for {
-			select {
-			case _ = <-instancesObserver:
-				for _, listener := range instances.listeners {
-					listener <- Event{
-						Name: EventChange,
-					}
+			<-instancesObserver
+			for _, listener := range instances.listeners {
+				listener <- Event{
+					Name: EventChange,
 				}
 			}
 		}

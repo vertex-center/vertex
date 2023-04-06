@@ -23,7 +23,7 @@ func handleInstallDependencies(c *gin.Context) {
 	var body InstallDependencyBody
 	err := c.BindJSON(&body)
 	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("failed to parse body: %v", err))
+		_ = c.AbortWithError(http.StatusBadRequest, fmt.Errorf("failed to parse body: %v", err))
 		return
 	}
 

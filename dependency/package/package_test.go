@@ -56,6 +56,6 @@ func (suite *PackageTestSuite) TestGet() {
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), pkg.Name, "Redis")
 
-	pkg, err = Get("undefined_package_name")
+	_, err = Get("undefined_package_name")
 	assert.ErrorIs(suite.T(), err, ErrPkgNotFound)
 }

@@ -26,13 +26,13 @@ func handleServiceDownload(c *gin.Context) {
 	var body downloadBody
 	err := c.BindJSON(&body)
 	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("failed to parse body: %v", err))
+		_ = c.AbortWithError(http.StatusBadRequest, fmt.Errorf("failed to parse body: %v", err))
 		return
 	}
 
 	i, err := instances.Install(body.Repository)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
