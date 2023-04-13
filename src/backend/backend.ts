@@ -151,7 +151,7 @@ export async function installDependencies(dependencies) {
     return new Promise((resolve, reject) => {
         axios
             .post(route(`/dependencies/install`), { dependencies })
-            .then((res) => resolve(res))
+            .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });
 }

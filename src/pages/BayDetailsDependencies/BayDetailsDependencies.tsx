@@ -16,15 +16,17 @@ import classNames from "classnames";
 import Button from "../../components/Button/Button";
 import { SegmentedButtons } from "../../components/SegmentedButton";
 import Progress from "../../components/Progress";
+import { Error } from "../../components/Error/Error";
 
 type Props = {
     name: string;
     dependency: DependencyModel;
     onChange: () => void;
+    onNeedsSudo: (command: string) => void;
 };
 
 export function Dependency(props: Props) {
-    const { name, dependency, onChange } = props;
+    const { name, dependency, onChange, onNeedsSudo } = props;
 
     const [packageManager, setPackageManager] = useState();
 
@@ -35,8 +37,12 @@ export function Dependency(props: Props) {
     const install = () => {
         setInstalling(true);
         installDependencies([{ name, package_manager: packageManager }])
-            .then(() => {
-                onChange();
+            .then((data: any) => {
+                if (data?.command) {
+                    onNeedsSudo(data?.command);
+                } else {
+                    onChange();
+                }
             })
             .catch(console.error)
             .finally(() => setInstalling(false));
@@ -90,6 +96,7 @@ export default function BayDetailsDependencies() {
 
     const [dependencies, setDependencies] = useState<Dependencies>({});
     const [isLoading, setIsLoading] = useState(false);
+    const [command, setCommand] = useState<string>();
 
     const reload = useCallback(() => {
         setIsLoading(true);
@@ -101,6 +108,10 @@ export default function BayDetailsDependencies() {
     useEffect(() => {
         reload();
     }, [reload]);
+
+    const onNeedsSudo = (command: string) => {
+        setCommand(command);
+    };
 
     return (
         <Fragment>
@@ -116,12 +127,19 @@ export default function BayDetailsDependencies() {
                 </Button>
             </Horizontal>
             <Vertical gap={12}>
+                {/* TODO: Show the command properly in a custom popup. */}
+                {command && (
+                    <Error
+                        error={`This package manager needs sudo permissions. Install manually: ${command}`}
+                    />
+                )}
                 {Object.entries(dependencies).map(([name, dep]) => (
                     <Dependency
                         key={name}
                         name={name}
                         dependency={dep}
                         onChange={reload}
+                        onNeedsSudo={onNeedsSudo}
                     />
                 ))}
             </Vertical>
