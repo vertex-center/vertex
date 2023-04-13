@@ -21,7 +21,8 @@ const (
 )
 
 var (
-	ErrPkgNotFound = errors2.New("package not found")
+	ErrPkgNotFound        = errors2.New("package not found")
+	ErrPkgManagerNotFound = errors2.New("package manager not found")
 )
 
 var pkgs map[string]Package
@@ -33,6 +34,11 @@ type Package struct {
 	License        string            `json:"license"`
 	Check          string            `json:"check"`
 	InstallPackage map[string]string `json:"install"`
+}
+
+type InstallCmd struct {
+	Cmd  string
+	Sudo bool
 }
 
 func read(pathDependencies string, id string) (*Package, error) {
@@ -56,8 +62,9 @@ func getPath(pathDependencies string, id string) string {
 	return path.Join(pathDependencies, "packages", id)
 }
 
-func (p *Package) Install(pm string) error {
-	cmd := p.InstallationCommand(pm)
+func (c *InstallCmd) Exec() error {
+	args := strings.Fields(c.Cmd)
+	cmd := exec.Command(args[0], args[1:]...)
 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -66,25 +73,40 @@ func (p *Package) Install(pm string) error {
 	return cmd.Run()
 }
 
-func (p *Package) InstallationCommand(pm string) *exec.Cmd {
+func (p *Package) InstallationCommand(pm string) (InstallCmd, error) {
 	if strings.HasPrefix(p.InstallPackage[pm], "script:") {
-		script := strings.Split(p.InstallPackage[pm], ":")[1]
-		return exec.Command(script)
+		return InstallCmd{
+			Cmd:  strings.Split(p.InstallPackage[pm], ":")[1],
+			Sudo: false,
+		}, nil
 	}
 
 	packageName := p.InstallPackage[pm]
 
 	switch pm {
 	case PmAptGet:
-		return exec.Command("apt-get", "install", packageName)
+		return InstallCmd{
+			Cmd:  "sudo apt-get install " + packageName,
+			Sudo: true,
+		}, nil
 	case PmBrew:
-		return exec.Command("brew", "install", packageName)
+		return InstallCmd{
+			Cmd:  "brew install " + packageName,
+			Sudo: false,
+		}, nil
 	case PmPacman:
-		return exec.Command("pacman", "-S", "--noconfirm", packageName)
+		return InstallCmd{
+			Cmd:  "sudo pacman -S --noconfirm " + packageName,
+			Sudo: true,
+		}, nil
 	case PmSnap:
-		return exec.Command("snap", "install", packageName)
+		return InstallCmd{
+			Cmd:  "sudo snap install " + packageName,
+			Sudo: true,
+		}, nil
 	}
-	return nil
+
+	return InstallCmd{}, ErrPkgManagerNotFound
 }
 
 func Reload() error {

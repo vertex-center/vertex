@@ -1,6 +1,7 @@
 package router
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -36,14 +37,30 @@ func handleInstallDependencies(c *gin.Context) {
 
 		logger.Log(fmt.Sprintf("installing package name='%s' with package_manager=%s", d.Name, d.PackageManager))
 
-		err = dep.Install(d.PackageManager)
+		cmd, err := dep.InstallationCommand(d.PackageManager)
 		if err != nil {
 			logger.Error(err)
 			continue
 		}
 
+		if cmd.Sudo {
+			// Command needs sudo. Sending the command to the client for manual execution.
+			c.JSON(http.StatusOK, gin.H{
+				"command": cmd.Cmd,
+			})
+		} else {
+			err = cmd.Exec()
+			if err != nil {
+				logger.Error(err)
+				continue
+			}
+		}
+
 		logger.Log(fmt.Sprintf("package name=%s installed successfully", d.Name))
+
+		c.Status(http.StatusOK)
+		return
 	}
 
-	c.Status(http.StatusOK)
+	_ = c.AbortWithError(http.StatusNotFound, errors.New("failed to find this package manager"))
 }
