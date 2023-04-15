@@ -20,7 +20,7 @@ import {
 import { HeaderHome } from "../../components/Header/Header";
 
 export default function Infrastructure() {
-    const [status, setStatus] = useState("Checking...");
+    const [status, setStatus] = useState("Waiting server response...");
     const [installed, setInstalled] = useState<Instances>({});
 
     const [installedGrouped, setInstalledGrouped] = useState<Instance[][]>([]);
