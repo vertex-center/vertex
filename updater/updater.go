@@ -44,10 +44,10 @@ func CheckForVertexUpdate(currentVersion string) (*Update, *github.RepositoryRel
 		UpToDate:       true,
 	}
 
-	//if currentVersion == "dev" {
-	//	logger.Log("skipping update in 'dev' version")
-	//	return update, nil, nil
-	//}
+	if currentVersion == "dev" {
+		logger.Log("skipping update in 'dev' version")
+		return update, nil, nil
+	}
 
 	// remove previous old version if it exists.
 	err := os.Remove("vertex-old")
