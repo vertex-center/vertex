@@ -63,10 +63,7 @@ export default function SettingsUpdates(props: Props) {
     const reload = useCallback(() => {
         setUpdates([]);
         getUpdates()
-            .then((updates) => {
-                setShowMessage(true);
-                setUpdates(updates);
-            })
+            .then((updates) => setUpdates(updates))
             .catch((err) => {
                 setError(err?.response?.data?.message ?? err?.message);
             });
@@ -74,6 +71,7 @@ export default function SettingsUpdates(props: Props) {
 
     const updateService = (name: string) => {
         executeUpdates([{ name }])
+            .then(() => setShowMessage(true))
             .catch((err) => {
                 setError(err?.response?.data?.message ?? err?.message);
             })
