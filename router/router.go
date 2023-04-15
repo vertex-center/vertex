@@ -29,6 +29,7 @@ func InitializeRouter(about About) *gin.Engine {
 	addInstancesRoutes(api.Group("/instances"))
 	addInstanceRoutes(api.Group("/instance/:instance_uuid"))
 	addDependenciesRoutes(api.Group("/dependencies"))
+	addUpdatesRoutes(api.Group("/updates"), about.Version)
 
 	api.GET("/about", func(c *gin.Context) {
 		c.JSON(http.StatusOK, about)

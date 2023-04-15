@@ -11,7 +11,6 @@ import (
 	"github.com/vertex-center/vertex/router"
 	servicesmanager "github.com/vertex-center/vertex/services/manager"
 	"github.com/vertex-center/vertex/storage"
-	"github.com/vertex-center/vertex/updater"
 )
 
 // version, commit and date will be overridden by goreleaser
@@ -26,12 +25,7 @@ var logger = console.New("vertex")
 func main() {
 	parseArgs()
 
-	err := updater.CheckForUpdates(version)
-	if err != nil {
-		logger.Warn(fmt.Sprintf("Failed to check for updates: %v", err))
-	}
-
-	err = os.MkdirAll(storage.PathInstances, os.ModePerm)
+	err := os.MkdirAll(storage.PathInstances, os.ModePerm)
 	if err != nil && !os.IsExist(err) {
 		logger.Error(fmt.Errorf("couldn't create '%s' directory: %v", storage.PathInstances, err))
 		return
