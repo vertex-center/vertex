@@ -56,6 +56,14 @@ export type About = {
     date: string;
 };
 
+export type Update = {
+    id: string;
+    name: string;
+    current_version: string;
+    latest_version: string;
+    up_to_date: boolean;
+};
+
 export type Dependencies = { [id: string]: Dependency };
 
 export type Instances = { [uuid: string]: Instance };
@@ -161,6 +169,24 @@ export async function getAbout(): Promise<About> {
         axios
             .get(route("/about"))
             .then((res) => resolve(res.data))
-            .catch((err) => resolve(err));
+            .catch((err) => reject(err));
+    });
+}
+
+export async function getUpdates(): Promise<Update[]> {
+    return new Promise((resolve, reject) => {
+        axios
+            .get(route("/updates"))
+            .then((res) => resolve(res.data))
+            .catch((err) => reject(err));
+    });
+}
+
+export async function executeUpdates(updates: { name: string }[]) {
+    return new Promise((resolve, reject) => {
+        axios
+            .post(route("/updates"), { updates })
+            .then((res) => resolve(res.data))
+            .catch((err) => reject(err));
     });
 }

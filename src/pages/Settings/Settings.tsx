@@ -19,6 +19,11 @@ export default function Settings(props: Props) {
                         name="Theme"
                     />
                     <SidebarItem
+                        to="/settings/updates"
+                        symbol="update"
+                        name="Updates"
+                    />
+                    <SidebarItem
                         to="/settings/about"
                         symbol="info"
                         name="About"

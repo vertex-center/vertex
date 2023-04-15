@@ -12,6 +12,7 @@ import { useContext } from "react";
 import { ThemeContext } from "./main";
 import classNames from "classnames";
 import SettingsAbout from "./pages/SettingsAbout/SettingsAbout";
+import SettingsUpdates from "./pages/SettingsUpdates/SettingsUpdates";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -25,6 +26,10 @@ function App() {
                         <Route
                             path="/settings/theme"
                             element={<SettingsTheme />}
+                        />
+                        <Route
+                            path="/settings/updates"
+                            element={<SettingsUpdates />}
                         />
                         <Route
                             path="/settings/about"
