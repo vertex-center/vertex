@@ -17,6 +17,8 @@ export type ButtonProps = HTMLProps<HTMLButtonElement> & {
 
     onClick: () => void;
 
+    color?: "default" | "red";
+
     // types
     primary?: boolean;
     large?: boolean;
@@ -36,6 +38,7 @@ export default function Button(props: ButtonProps) {
         onClick,
         className,
         type,
+        color,
         ...others
     } = props;
 
@@ -48,6 +51,7 @@ export default function Button(props: ButtonProps) {
                 [styles.selected]: selected,
                 [styles.disabled]: disabled,
                 [styles.loading]: loading,
+                [styles.colorRed]: color === "red",
                 [className]: true,
             })}
             type="button"

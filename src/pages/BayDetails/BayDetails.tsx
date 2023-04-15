@@ -21,6 +21,10 @@ import {
 import Spacer from "../../components/Spacer/Spacer";
 import Header from "../../components/Header/Header";
 import Sidebar, { SidebarItem } from "../../components/Sidebar/Sidebar";
+import Popup from "../../components/Popup/Popup";
+import { Text, Title } from "../../components/Text/Text";
+import Button from "../../components/Button/Button";
+import Progress from "../../components/Progress";
 
 export const bayNavItems = [
     {
@@ -45,6 +49,8 @@ export default function BayDetails() {
     const navigate = useNavigate();
 
     const [instance, setInstance] = useState<Instance>();
+    const [showDeletePopup, setShowDeletePopup] = useState<boolean>();
+    const [deleting, setDeleting] = useState<boolean>(false);
 
     const fetchInstance = useCallback(() => {
         getInstance(uuid).then((instance: Instance) => {
@@ -83,9 +89,14 @@ export default function BayDetails() {
     };
 
     const onDeleteInstance = () => {
+        setDeleting(true);
         deleteInstance(uuid).then(() => {
             navigate("/");
         });
+    };
+
+    const dismissDeletePopup = () => {
+        setShowDeletePopup(false);
     };
 
     return (
@@ -121,7 +132,7 @@ export default function BayDetails() {
                     ))}
                     <Spacer />
                     <SidebarItem
-                        onClick={onDeleteInstance}
+                        onClick={() => setShowDeletePopup(true)}
                         symbol="delete"
                         name="Delete"
                         red
@@ -130,6 +141,29 @@ export default function BayDetails() {
                 <div className={styles.side}>
                     <Outlet />
                 </div>
+                <Popup show={showDeletePopup} onDismiss={dismissDeletePopup}>
+                    <Title>Delete {instance?.name}?</Title>
+                    <Text>
+                        Are you sure you want to delete {instance?.name}? All
+                        data will be permanently deleted.
+                    </Text>
+                    {deleting && <Progress infinite />}
+                    <Horizontal gap={12}>
+                        <Spacer />
+                        <Button onClick={onDeleteInstance} disabled={deleting}>
+                            Cancel
+                        </Button>
+                        <Button
+                            primary
+                            color="red"
+                            onClick={onDeleteInstance}
+                            disabled={deleting}
+                            rightSymbol="delete"
+                        >
+                            Confirm
+                        </Button>
+                    </Horizontal>
+                </Popup>
             </Horizontal>
         </div>
     );
