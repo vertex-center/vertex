@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
-import { Title } from "../../components/Text/Text";
+import { Text, Title } from "../../components/Text/Text";
 import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import Spacer from "../../components/Spacer/Spacer";
 import Symbol from "../../components/Symbol/Symbol";
@@ -16,13 +16,14 @@ import classNames from "classnames";
 import Button from "../../components/Button/Button";
 import { SegmentedButtons } from "../../components/SegmentedButton";
 import Progress from "../../components/Progress";
-import { Error } from "../../components/Error/Error";
+import Popup from "../../components/Popup/Popup";
+import Code from "../../components/Code/Code";
 
 type Props = {
     name: string;
     dependency: DependencyModel;
     onChange: () => void;
-    onNeedsSudo: (command: string) => void;
+    onNeedsSudo: (command: string, packageManager: string) => void;
 };
 
 export function Dependency(props: Props) {
@@ -39,7 +40,7 @@ export function Dependency(props: Props) {
         installDependencies([{ name, package_manager: packageManager }])
             .then((data: any) => {
                 if (data?.command) {
-                    onNeedsSudo(data?.command);
+                    onNeedsSudo(data?.command, packageManager);
                 } else {
                     onChange();
                 }
@@ -97,6 +98,7 @@ export default function BayDetailsDependencies() {
     const [dependencies, setDependencies] = useState<Dependencies>({});
     const [isLoading, setIsLoading] = useState(false);
     const [command, setCommand] = useState<string>();
+    const [packageManager, setPackageManager] = useState<string>();
 
     const reload = useCallback(() => {
         setIsLoading(true);
@@ -109,8 +111,14 @@ export default function BayDetailsDependencies() {
         reload();
     }, [reload]);
 
-    const onNeedsSudo = (command: string) => {
+    const onNeedsSudo = (command: string, packageManager: string) => {
         setCommand(command);
+        setPackageManager(packageManager);
+    };
+
+    const dismissPopup = () => {
+        setCommand(undefined);
+        setPackageManager(undefined);
     };
 
     return (
@@ -127,12 +135,6 @@ export default function BayDetailsDependencies() {
                 </Button>
             </Horizontal>
             <Vertical gap={12}>
-                {/* TODO: Show the command properly in a custom popup. */}
-                {command && (
-                    <Error
-                        error={`This package manager needs sudo permissions. Install manually: ${command}`}
-                    />
-                )}
                 {Object.entries(dependencies).map(([name, dep]) => (
                     <Dependency
                         key={name}
@@ -143,6 +145,25 @@ export default function BayDetailsDependencies() {
                     />
                 ))}
             </Vertical>
+            <Popup show={command !== undefined} onDismiss={dismissPopup}>
+                <Title>Install dependencies</Title>
+                <Text>
+                    Vertex cannot install this dependency automatically, because{" "}
+                    <code>{packageManager}</code> needs admin permissions.
+                    Install manually using the command below, or try another
+                    package manager.
+                </Text>
+                <Code
+                    code={command ?? "FAILED TO RETRIEVE THE COMMAND."}
+                    language={"bash"}
+                />
+                <Horizontal>
+                    <Spacer />
+                    <Button onClick={dismissPopup} primary rightSymbol="check">
+                        OK
+                    </Button>
+                </Horizontal>
+            </Popup>
         </Fragment>
     );
 }
