@@ -152,29 +152,19 @@ func Unregister(uuid uuid.UUID) {
 	logger.Log(fmt.Sprintf("channel %s unregistered from instances", uuid))
 }
 
-func Install(repo string) (*instance.Instance, error) {
+func Install(repo string, useDocker *bool, useReleases *bool) (*instance.Instance, error) {
 	serviceUUID := uuid.New()
 	basePath := path.Join(storage.PathInstances, serviceUUID.String())
 
+	forceClone := (useDocker != nil && *useDocker) || (useReleases == nil || !*useReleases)
+
 	var err error
 	if strings.HasPrefix(repo, "marketplace:") {
-		err = downloadFromMarketplace(basePath, repo)
-		// If there are no releases available, that may mean that the repository
-		// should be cloned. This happens when there are repositories that don't
-		// need to compile things, but only run a bash script.
-		if errors.Is(err, storage.ErrNoReleasesPublished) {
-			split := strings.Split(repo, ":")
-			repo = "git:https://" + split[1]
-
-			err = downloadFromGit(basePath, repo)
-			if err != nil {
-				return nil, err
-			}
-		}
+		err = download(basePath, repo, forceClone)
 	} else if strings.HasPrefix(repo, "localstorage:") {
-		err = downloadFromLocalstorage(basePath, repo)
+		err = symlink(basePath, repo)
 	} else if strings.HasPrefix(repo, "git:") {
-		err = downloadFromGit(basePath, repo)
+		err = download(basePath, repo, forceClone)
 	} else {
 		return nil, fmt.Errorf("this protocol is not supported")
 	}
@@ -186,7 +176,41 @@ func Install(repo string) (*instance.Instance, error) {
 	return Instantiate(serviceUUID)
 }
 
-func downloadFromMarketplace(dest string, repo string) error {
+func symlink(path string, repo string) error {
+	p := strings.Split(repo, ":")[1]
+
+	_, err := services.ReadFromDisk(p)
+	if err != nil {
+		return fmt.Errorf("%s is not a compatible Vertex service", repo)
+	}
+
+	return os.Symlink(p, path)
+}
+
+func download(dest string, repo string, forceClone bool) error {
+	var err error
+
+	if forceClone {
+		logger.Log("force-clone enabled.")
+	} else {
+		logger.Log("force-clone disabled. try to download the releases first")
+		err = downloadFromReleases(dest, repo)
+	}
+
+	if forceClone || errors.Is(err, storage.ErrNoReleasesPublished) {
+		split := strings.Split(repo, ":")
+		repo = "git:https://" + split[1]
+
+		err = downloadFromGit(dest, repo)
+		if err != nil {
+			return err
+		}
+	}
+
+	return err
+}
+
+func downloadFromReleases(dest string, repo string) error {
 	split := strings.Split(repo, "/")
 
 	owner := split[1]
@@ -202,15 +226,4 @@ func downloadFromGit(path string, repo string) error {
 		Progress: os.Stdout,
 	})
 	return err
-}
-
-func downloadFromLocalstorage(path string, repo string) error {
-	p := strings.Split(repo, ":")[1]
-
-	_, err := services.ReadFromDisk(p)
-	if err != nil {
-		return fmt.Errorf("%s is not a compatible Vertex service", repo)
-	}
-
-	return os.Symlink(p, path)
 }
