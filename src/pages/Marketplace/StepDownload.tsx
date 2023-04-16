@@ -1,22 +1,36 @@
 import { getAvailableServices, Service } from "../../backend/backend";
 import { Fragment, useEffect, useState } from "react";
 import styles from "./Marketplace.module.sass";
-import { Title } from "../../components/Text/Text";
+import { Text, Title } from "../../components/Text/Text";
 import Select, { Option } from "../../components/Input/Select";
 import Loading from "../../components/Loading/Loading";
 import Button from "../../components/Button/Button";
 import { Error } from "../../components/Error/Error";
 import { DownloadMethod } from "./Marketplace";
 import Input from "../../components/Input/Input";
+import { SegmentedButtons } from "../../components/SegmentedButton";
+import { Horizontal } from "../../components/Layouts/Layouts";
+import Spacer from "../../components/Spacer/Spacer";
 
 type StepDownloadMarketplaceProps = {
     onNextStep: () => void;
     repository: string;
+    useDocker?: boolean;
+    useReleases?: boolean;
     onRepositoryChange: (repository: string) => void;
+    onUseDockerChange: (useDocker: boolean) => void;
+    onUseReleasesChange: (useReleases: boolean) => void;
 };
 
 function StepDownloadMarketplace(props: StepDownloadMarketplaceProps) {
-    const { repository, onNextStep } = props;
+    const {
+        onNextStep,
+        repository,
+        useDocker,
+        useReleases,
+        onUseDockerChange,
+        onUseReleasesChange,
+    } = props;
 
     const [available, setAvailable] = useState<Service[]>([]);
 
@@ -40,6 +54,10 @@ function StepDownloadMarketplace(props: StepDownloadMarketplaceProps) {
     }, []);
 
     const onServiceChange = (e: any) => {
+        console.log(e.target.value);
+        if (e.target.value === "UNDEFINED")
+            return props.onRepositoryChange(undefined);
+
         props.onRepositoryChange(`marketplace:${e.target.value}`);
     };
 
@@ -47,7 +65,7 @@ function StepDownloadMarketplace(props: StepDownloadMarketplaceProps) {
         <Fragment>
             {!isLoadingMarketplace && !error && (
                 <Select label="Service" onChange={onServiceChange}>
-                    <Option />
+                    <Option value="UNDEFINED" />
                     {available.map((service) => (
                         <Option key={service.id} value={service.repository}>
                             {service.name}
@@ -55,12 +73,58 @@ function StepDownloadMarketplace(props: StepDownloadMarketplaceProps) {
                     ))}
                 </Select>
             )}
+            <Horizontal alignItems="center">
+                <Text>Use Docker?</Text>
+                <Spacer />
+                <SegmentedButtons
+                    value={useDocker}
+                    onChange={(v) => onUseDockerChange(v)}
+                    items={[
+                        {
+                            label: "Yes",
+                            value: true,
+                            rightSymbol: "check",
+                        },
+                        {
+                            label: "No",
+                            value: false,
+                            rightSymbol: "close",
+                        },
+                    ]}
+                />
+            </Horizontal>
+            {useDocker === false && (
+                <Horizontal alignItems="center">
+                    <Text>Download the precompiled release?</Text>
+                    <Spacer />
+                    <SegmentedButtons
+                        value={useReleases}
+                        onChange={(v) => onUseReleasesChange(v)}
+                        items={[
+                            {
+                                label: "Yes",
+                                value: true,
+                                rightSymbol: "check",
+                            },
+                            {
+                                label: "No",
+                                value: false,
+                                rightSymbol: "close",
+                            },
+                        ]}
+                    />
+                </Horizontal>
+            )}
             {isLoadingMarketplace && <Loading />}
             <Button
                 primary
                 large
                 rightSymbol="download"
-                disabled={!repository}
+                disabled={
+                    !repository ||
+                    useDocker === undefined ||
+                    (useReleases === undefined && useDocker === false)
+                }
                 onClick={onNextStep}
             >
                 Download
@@ -143,12 +207,25 @@ function StepDownloadLocalStorage(props: StepDownloadLocalStorageProps) {
 type StepDownloadProps = {
     method: DownloadMethod;
     repository: string;
+    useDocker?: boolean;
+    useReleases?: boolean;
     onRepositoryChange: (repository: string) => void;
+    onUseDockerChange: (useDocker: boolean) => void;
+    onUseReleasesChange: (useReleases: boolean) => void;
     onNextStep: () => void;
 };
 
 export default function StepDownload(props: StepDownloadProps) {
-    const { method, repository, onRepositoryChange, onNextStep } = props;
+    const {
+        method,
+        repository,
+        useDocker,
+        useReleases,
+        onRepositoryChange,
+        onUseDockerChange,
+        onUseReleasesChange,
+        onNextStep,
+    } = props;
 
     return (
         <div className={styles.step}>
@@ -159,7 +236,11 @@ export default function StepDownload(props: StepDownloadProps) {
                 <StepDownloadMarketplace
                     onNextStep={onNextStep}
                     repository={repository}
+                    useDocker={useDocker}
+                    useReleases={useReleases}
                     onRepositoryChange={onRepositoryChange}
+                    onUseDockerChange={onUseDockerChange}
+                    onUseReleasesChange={onUseReleasesChange}
                 />
             )}
             {method === "git" && (

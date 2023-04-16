@@ -22,14 +22,21 @@ export default function Installed() {
     const [step, setStep] = useState<Step>("select-method");
 
     const [repository, setRepository] = useState<string>();
+    const [useDocker, setUseDocker] = useState<boolean>();
+    const [useReleases, setUseReleases] = useState<boolean>();
+
     const [instance, setInstance] = useState<Instance>();
     const [method, setMethod] = useState<DownloadMethod>();
 
     const [error, setError] = useState<string>();
 
-    const download = (repository: string) => {
+    const download = (
+        repository: string,
+        useDocker?: boolean,
+        useReleases?: boolean
+    ) => {
         setStep("downloading");
-        downloadService(repository)
+        downloadService(repository, useDocker, useReleases)
             .then((data: any) => {
                 console.log(data.instance);
                 setStep("configure");
@@ -92,8 +99,14 @@ export default function Installed() {
                         <StepDownload
                             method={method}
                             repository={repository}
-                            onRepositoryChange={(r) => setRepository(r)}
-                            onNextStep={() => download(repository)}
+                            useDocker={useDocker}
+                            useReleases={useReleases}
+                            onRepositoryChange={(v) => setRepository(v)}
+                            onUseDockerChange={(v) => setUseDocker(v)}
+                            onUseReleasesChange={(v) => setUseReleases(v)}
+                            onNextStep={() =>
+                                download(repository, useDocker, useReleases)
+                            }
                         />
                     )}
                     {step === "configure" && (

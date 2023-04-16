@@ -90,10 +90,18 @@ export async function getAvailableServices(): Promise<Service[]> {
     });
 }
 
-export async function downloadService(repository: string) {
+export async function downloadService(
+    repository: string,
+    use_docker?: boolean,
+    use_releases?: boolean
+) {
     return new Promise((resolve, reject) => {
         axios
-            .post(route("/services/download"), { repository })
+            .post(route("/services/download"), {
+                repository,
+                use_docker,
+                use_releases,
+            })
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });

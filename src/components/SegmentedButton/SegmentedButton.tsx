@@ -1,7 +1,6 @@
 import { Horizontal } from "../Layouts/Layouts";
 
 import styles from "./SegmentedButton.module.sass";
-import { HTMLProps } from "react";
 import Button, { ButtonProps } from "../Button/Button";
 import classNames from "classnames";
 
@@ -19,11 +18,14 @@ export function SegmentedButton(props: SegmentedButtonProps) {
     );
 }
 
-type Props = HTMLProps<HTMLDivElement> & {
+type Props = {
+    disabled?: boolean;
     value: any;
     onChange: (value: any) => void;
     items: {
-        value: string;
+        label?: string;
+        value: any;
+        rightSymbol?: string;
     }[];
 };
 
@@ -39,8 +41,9 @@ export function SegmentedButtons(props: Props) {
                         onClick={() => onChange(item.value)}
                         selected={value === item.value}
                         disabled={disabled}
+                        rightSymbol={item.rightSymbol}
                     >
-                        {item.value}
+                        {item.label ?? item.value}
                     </SegmentedButton>
                 );
             })}
