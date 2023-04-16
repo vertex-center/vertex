@@ -55,7 +55,7 @@ function Update(props: Props) {
     );
 }
 
-export default function SettingsUpdates(props: Props) {
+export default function SettingsUpdates() {
     const [updates, setUpdates] = useState([]);
     const [error, setError] = useState();
     const [showMessage, setShowMessage] = useState<boolean>(false);

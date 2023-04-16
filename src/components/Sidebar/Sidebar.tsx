@@ -9,7 +9,7 @@ type ItemProps = {
     to?: string;
     onClick?: () => void;
 
-    symbol: string;
+    symbol: string | any;
     name: string;
 
     red?: boolean;

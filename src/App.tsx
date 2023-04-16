@@ -13,6 +13,7 @@ import { ThemeContext } from "./main";
 import classNames from "classnames";
 import SettingsAbout from "./pages/SettingsAbout/SettingsAbout";
 import SettingsUpdates from "./pages/SettingsUpdates/SettingsUpdates";
+import BayDetailsDocker from "./pages/BayDetailsDocker/BayDetailsDocker";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -41,6 +42,10 @@ function App() {
                         <Route
                             path="/bay/:uuid/"
                             element={<BayDetailsHome />}
+                        />
+                        <Route
+                            path="/bay/:uuid/docker"
+                            element={<BayDetailsDocker />}
                         />
                         <Route
                             path="/bay/:uuid/logs"

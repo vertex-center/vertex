@@ -25,6 +25,7 @@ import Popup from "../../components/Popup/Popup";
 import { Text, Title } from "../../components/Text/Text";
 import Button from "../../components/Button/Button";
 import Progress from "../../components/Progress";
+import { SiDocker } from "@icons-pack/react-simple-icons";
 
 export const bayNavItems = [
     {
@@ -123,6 +124,11 @@ export default function BayDetails() {
                         name="Home"
                     />
                     <div className={styles.separator} />
+                    <SidebarItem
+                        to={`/bay/${uuid}/docker`}
+                        symbol={<SiDocker size={20} />}
+                        name="Docker"
+                    />
                     {bayNavItems.map((item) => (
                         <SidebarItem
                             to={`/bay/${uuid}${item.to}`}
