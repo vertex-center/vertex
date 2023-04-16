@@ -173,7 +173,24 @@ func Install(repo string, useDocker *bool, useReleases *bool) (*instance.Instanc
 		return nil, err
 	}
 
-	return Instantiate(serviceUUID)
+	i, err := Instantiate(serviceUUID)
+	if err != nil {
+		return nil, err
+	}
+
+	if useDocker != nil {
+		i.Metadata.UseDocker = *useDocker
+	}
+	if useReleases != nil {
+		i.Metadata.UseReleases = *useReleases
+	}
+
+	err = i.WriteMetadata()
+	if err != nil {
+		return nil, err
+	}
+
+	return i, nil
 }
 
 func symlink(path string, repo string) error {

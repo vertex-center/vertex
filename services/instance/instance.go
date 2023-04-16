@@ -34,8 +34,14 @@ type Event struct {
 	Data string
 }
 
+type Metadata struct {
+	UseDocker   bool `json:"use_docker"`
+	UseReleases bool `json:"use_releases"`
+}
+
 type Instance struct {
 	services.Service
+	Metadata
 
 	Status       string       `json:"status"`
 	Logs         Logs         `json:"logs"`
@@ -211,8 +217,28 @@ func CreateFromDisk(instanceUUID uuid.UUID) (*Instance, error) {
 		return nil, err
 	}
 
+	meta := Metadata{
+		UseDocker:   false,
+		UseReleases: false,
+	}
+
+	metaPath := path.Join(storage.PathInstances, instanceUUID.String(), ".vertex", "instance_metadata.json")
+	metaBytes, err := os.ReadFile(metaPath)
+
+	if errors.Is(err, os.ErrNotExist) {
+		logger.Log("instance_metadata.json not found. using default.")
+	} else if err != nil {
+		return nil, err
+	} else {
+		err = json.Unmarshal(metaBytes, &meta)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	i := &Instance{
 		Service:      *service,
+		Metadata:     meta,
 		Status:       StatusOff,
 		Logs:         Logs{},
 		EnvVariables: *NewEnvVariables(),
@@ -222,4 +248,20 @@ func CreateFromDisk(instanceUUID uuid.UUID) (*Instance, error) {
 
 	err = i.LoadEnvFromDisk()
 	return i, err
+}
+
+func (i *Instance) WriteMetadata() error {
+	metaPath := path.Join(storage.PathInstances, i.UUID.String(), ".vertex", "instance_metadata.json")
+
+	metaBytes, err := json.MarshalIndent(i.Metadata, "", "\t")
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(metaPath, metaBytes, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
