@@ -35,6 +35,8 @@ export type Instance = Service & {
     status: string;
     logs: Logs;
     env: { [key: string]: string };
+    use_docker?: boolean;
+    use_releases?: boolean;
 };
 
 export type Package = {
