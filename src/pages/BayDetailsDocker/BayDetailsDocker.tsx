@@ -1,12 +1,16 @@
 import { Fragment } from "react";
-import { Title } from "../../components/Text/Text";
+import { Text, Title } from "../../components/Text/Text";
 
-type Props = {};
+import styles from "./BayDetailsDocker.module.sass";
 
-export default function BayDetailsDocker(props: Props) {
+export default function BayDetailsDocker() {
     return (
         <Fragment>
             <Title>Docker</Title>
+            <Text>
+                Docker is <span className={styles.disabled}>disabled</span> for
+                this instance.
+            </Text>
         </Fragment>
     );
 }
