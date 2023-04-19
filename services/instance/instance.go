@@ -70,6 +70,15 @@ func (i *Instance) dockerContainerName() string {
 	return "VERTEX_CONTAINER_" + i.UUID.String()
 }
 
+func (i *Instance) dockerDeleteContainer(cli *client.Client) error {
+	id, err := i.dockerContainerID(cli)
+	if err != nil {
+		return err
+	}
+
+	return cli.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
+}
+
 func (i *Instance) dockerContainerID(cli *client.Client) (string, error) {
 	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{All: true})
 	if err != nil {
@@ -340,6 +349,18 @@ func (i *Instance) IsRunning() bool {
 }
 
 func (i *Instance) Delete() error {
+	if i.UseDocker {
+		cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+		if err != nil {
+			return err
+		}
+
+		err = i.dockerDeleteContainer(cli)
+		if err != nil {
+			return err
+		}
+	}
+
 	if i.IsRunning() {
 		err := i.Stop()
 		if err != nil {
