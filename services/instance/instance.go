@@ -2,6 +2,7 @@ package instance
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,6 +10,10 @@ import (
 	"os/exec"
 	"path"
 
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/archive"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex/services"
@@ -39,6 +44,10 @@ type Metadata struct {
 	UseReleases bool `json:"use_releases"`
 }
 
+var (
+	errContainerNotFound = errors.New("container not found")
+)
+
 type Instance struct {
 	services.Service
 	Metadata
@@ -53,7 +62,48 @@ type Instance struct {
 	listeners map[uuid.UUID]chan Event
 }
 
+func (i *Instance) dockerImageName() string {
+	return "vertex_image_" + i.UUID.String()
+}
+
+func (i *Instance) dockerContainerName() string {
+	return "VERTEX_CONTAINER_" + i.UUID.String()
+}
+
+func (i *Instance) dockerContainerID(cli *client.Client) (string, error) {
+	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	if err != nil {
+		return "", err
+	}
+
+	var containerID string
+
+	for _, c := range containers {
+		name := c.Names[0]
+		if name == "/"+i.dockerContainerName() {
+			containerID = c.ID
+			break
+		}
+	}
+
+	if containerID == "" {
+		return "", errContainerNotFound
+	}
+
+	return containerID, nil
+}
+
 func (i *Instance) Start() error {
+	var err error
+	if i.UseDocker {
+		err = i.startWithDocker()
+	} else {
+		err = i.startManually()
+	}
+	return err
+}
+
+func (i *Instance) startManually() error {
 	if i.cmd != nil {
 		logger.Error(fmt.Errorf("runner %s already started", i.Name))
 	}
@@ -156,7 +206,100 @@ func (i *Instance) Start() error {
 	return nil
 }
 
+func (i *Instance) startWithDocker() error {
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return err
+	}
+
+	imageName := i.dockerImageName()
+	containerName := i.dockerContainerName()
+
+	buildOptions := types.ImageBuildOptions{
+		Dockerfile: "Dockerfile",
+		Tags:       []string{imageName},
+		Remove:     true,
+	}
+
+	reader, err := archive.TarWithOptions(path.Join(storage.PathInstances, i.UUID.String()), &archive.TarOptions{
+		ExcludePatterns: []string{".git/**/*"},
+	})
+	if err != nil {
+		return err
+	}
+
+	i.setStatus(StatusRunning)
+
+	res, err := cli.ImageBuild(context.Background(), reader, buildOptions)
+	if err != nil {
+		i.setStatus(StatusOff)
+		return err
+	}
+	defer res.Body.Close()
+
+	scanner := bufio.NewScanner(res.Body)
+	for scanner.Scan() {
+		if scanner.Err() != nil {
+			i.setStatus(StatusOff)
+			return scanner.Err()
+		}
+		logger.Log(scanner.Text())
+	}
+
+	logger.Log("Docker build: success.")
+
+	id, err := i.dockerContainerID(cli)
+	if err == errContainerNotFound {
+		logger.Log(fmt.Sprintf("container %s doesn't exists, create it.", containerName))
+		res, err := cli.ContainerCreate(context.Background(), &container.Config{
+			Image: imageName,
+		}, nil, nil, nil, containerName)
+		if err != nil {
+			i.setStatus(StatusOff)
+			return err
+		}
+		id = res.ID
+	} else if err != nil {
+		i.setStatus(StatusOff)
+		return err
+	}
+
+	logger.Log("starting container...")
+
+	err = cli.ContainerStart(context.Background(), id, types.ContainerStartOptions{})
+	if err != nil {
+		i.setStatus(StatusOff)
+		return err
+	}
+	return nil
+}
+
 func (i *Instance) Stop() error {
+	var err error
+	if i.UseDocker {
+		err = i.stopWithDocker()
+	} else {
+		err = i.stopManually()
+	}
+	i.setStatus(StatusOff)
+	return err
+}
+
+func (i *Instance) stopWithDocker() error {
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return err
+	}
+
+	id, err := i.dockerContainerID(cli)
+	if err != nil {
+		return err
+	}
+
+	return cli.ContainerStop(context.Background(), id, container.StopOptions{})
+}
+
+func (i *Instance) stopManually() error {
 	err := i.cmd.Process.Signal(os.Interrupt)
 	if err != nil {
 		return err
