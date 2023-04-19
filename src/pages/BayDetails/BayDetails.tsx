@@ -38,11 +38,6 @@ export const bayNavItems = [
         to: "/environment",
         symbol: "tune",
     },
-    {
-        label: "Dependencies",
-        to: "/dependencies",
-        symbol: "widgets",
-    },
 ];
 
 export default function BayDetails() {
@@ -124,11 +119,6 @@ export default function BayDetails() {
                         name="Home"
                     />
                     <div className={styles.separator} />
-                    <SidebarItem
-                        to={`/bay/${uuid}/docker`}
-                        symbol={<SiDocker size={20} />}
-                        name="Docker"
-                    />
                     {bayNavItems.map((item) => (
                         <SidebarItem
                             to={`/bay/${uuid}${item.to}`}
@@ -136,6 +126,20 @@ export default function BayDetails() {
                             name={item.label}
                         />
                     ))}
+                    {instance?.use_docker && (
+                        <SidebarItem
+                            to={`/bay/${uuid}/docker`}
+                            symbol={<SiDocker size={20} />}
+                            name="Docker"
+                        />
+                    )}
+                    {!instance?.use_docker && (
+                        <SidebarItem
+                            to={`/bay/${uuid}/dependencies`}
+                            symbol="widgets"
+                            name="Dependencies"
+                        />
+                    )}
                     <Spacer />
                     <SidebarItem
                         onClick={() => setShowDeletePopup(true)}
