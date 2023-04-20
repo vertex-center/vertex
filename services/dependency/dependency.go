@@ -5,7 +5,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/vertex-center/vertex/dependency/package"
+	"github.com/vertex-center/vertex/services/package"
 )
 
 type Dependency struct {

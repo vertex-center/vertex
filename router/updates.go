@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/updater"
+	"github.com/vertex-center/vertex/services/updater"
 )
 
 func addUpdatesRoutes(r *gin.RouterGroup, currentVertexVersion string) {

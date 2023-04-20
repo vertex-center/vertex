@@ -9,7 +9,7 @@ import (
 	"github.com/gin-contrib/sse"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/dependency"
+	"github.com/vertex-center/vertex/services/dependency"
 	"github.com/vertex-center/vertex/services/instance"
 )
 

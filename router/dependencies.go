@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/dependency"
+	"github.com/vertex-center/vertex/services/dependency"
 )
 
 func addDependenciesRoutes(r *gin.RouterGroup) {

@@ -7,9 +7,9 @@ import (
 
 	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex/client"
-	"github.com/vertex-center/vertex/dependency/package"
 	"github.com/vertex-center/vertex/router"
 	servicesmanager "github.com/vertex-center/vertex/services/instance"
+	"github.com/vertex-center/vertex/services/package"
 	"github.com/vertex-center/vertex/services/service"
 	"github.com/vertex-center/vertex/storage"
 )
