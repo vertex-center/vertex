@@ -6,31 +6,29 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/services/dependency"
-	"github.com/vertex-center/vertex/services/pkg"
 )
 
-func addDependenciesRoutes(r *gin.RouterGroup) {
-	r.POST("/install", handleInstallDependencies)
+func addPackagesRoutes(r *gin.RouterGroup) {
+	r.POST("/install", handleInstallPackages)
 }
 
-type InstallDependencyBody struct {
-	Dependencies []struct {
+type InstallPackagesBody struct {
+	Packages []struct {
 		Name           string `json:"name"`
 		PackageManager string `json:"package_manager"`
-	} `json:"dependencies"`
+	} `json:"packages"`
 }
 
-func handleInstallDependencies(c *gin.Context) {
-	var body InstallDependencyBody
+func handleInstallPackages(c *gin.Context) {
+	var body InstallPackagesBody
 	err := c.BindJSON(&body)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, fmt.Errorf("failed to parse body: %v", err))
 		return
 	}
 
-	for _, d := range body.Dependencies {
-		dep, err := dependency.Get(d.Name)
+	for _, d := range body.Packages {
+		pkg, err := packageService.Get(d.Name)
 		if err != nil {
 			logger.Warn(fmt.Sprintf("dependency '%s' not found", d.Name))
 			continue
@@ -38,7 +36,7 @@ func handleInstallDependencies(c *gin.Context) {
 
 		logger.Log(fmt.Sprintf("installing package name='%s' with package_manager=%s", d.Name, d.PackageManager))
 
-		cmd, err := pkg.InstallationCommand(dep.Package, d.PackageManager)
+		cmd, err := packageService.InstallationCommand(&pkg, d.PackageManager)
 		if err != nil {
 			logger.Error(err)
 			continue
@@ -50,7 +48,7 @@ func handleInstallDependencies(c *gin.Context) {
 				"command": cmd.Cmd,
 			})
 		} else {
-			err = cmd.Exec()
+			err = packageService.Install(cmd)
 			if err != nil {
 				logger.Error(err)
 				continue

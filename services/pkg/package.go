@@ -1,39 +1,36 @@
 package pkg
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
 
-	"github.com/goccy/go-json"
 	errors2 "github.com/pkg/errors"
-	"github.com/vertex-center/vertex/storage"
+	"github.com/vertex-center/vertex/repository"
 	"github.com/vertex-center/vertex/types"
 )
 
-const (
-	PmNone   = "sources"
-	PmAptGet = "apt-get"
-	PmBrew   = "brew"
-	PmPacman = "pacman"
-	PmSnap   = "snap"
-)
-
 var (
-	ErrPkgNotFound        = errors2.New("package not found")
 	ErrPkgManagerNotFound = errors2.New("package manager not found")
 )
 
-var pkgs map[string]types.Package
+type PackageService struct {
+	repo repository.PackageRepository
+}
+
+func NewPackageService() PackageService {
+	return PackageService{
+		repo: repository.NewPackageRepo(nil),
+	}
+}
 
 type InstallCmd struct {
 	Cmd  string
 	Sudo bool
 }
 
-func (c *InstallCmd) Exec() error {
+func (s *PackageService) Install(c InstallCmd) error {
 	args := strings.Fields(c.Cmd)
 	cmd := exec.Command(args[0], args[1:]...)
 
@@ -44,28 +41,7 @@ func (c *InstallCmd) Exec() error {
 	return cmd.Run()
 }
 
-func read(pathDependencies string, id string) (*types.Package, error) {
-	p := path.Join(getPath(pathDependencies, id), fmt.Sprintf("%s.json", id))
-
-	file, err := os.ReadFile(p)
-	if err != nil {
-		return nil, err
-	}
-
-	var pkg types.Package
-	err = json.Unmarshal(file, &pkg)
-	return &pkg, err
-}
-
-func GetPath(packageID string) string {
-	return getPath(storage.PathDependencies, packageID)
-}
-
-func getPath(pathDependencies string, id string) string {
-	return path.Join(pathDependencies, "packages", id)
-}
-
-func InstallationCommand(p *types.Package, pm string) (InstallCmd, error) {
+func (s *PackageService) InstallationCommand(p *types.Package, pm string) (InstallCmd, error) {
 	if strings.HasPrefix(p.InstallPackage[pm], "script:") {
 		return InstallCmd{
 			Cmd:  strings.Split(p.InstallPackage[pm], ":")[1],
@@ -76,22 +52,22 @@ func InstallationCommand(p *types.Package, pm string) (InstallCmd, error) {
 	packageName := p.InstallPackage[pm]
 
 	switch pm {
-	case PmAptGet:
+	case types.PmAptGet:
 		return InstallCmd{
 			Cmd:  "sudo apt-get install " + packageName,
 			Sudo: true,
 		}, nil
-	case PmBrew:
+	case types.PmBrew:
 		return InstallCmd{
 			Cmd:  "brew install " + packageName,
 			Sudo: false,
 		}, nil
-	case PmPacman:
+	case types.PmPacman:
 		return InstallCmd{
 			Cmd:  "sudo pacman -S --noconfirm " + packageName,
 			Sudo: true,
 		}, nil
-	case PmSnap:
+	case types.PmSnap:
 		return InstallCmd{
 			Cmd:  "sudo snap install " + packageName,
 			Sudo: true,
@@ -101,47 +77,36 @@ func InstallationCommand(p *types.Package, pm string) (InstallCmd, error) {
 	return InstallCmd{}, ErrPkgManagerNotFound
 }
 
-func Reload() error {
-	return reload(storage.PathDependencies)
-}
-
-func reload(dependenciesPath string) error {
-	pkgs = map[string]types.Package{}
-
-	url := "https://github.com/vertex-center/vertex-dependencies"
-
-	err := storage.CloneOrPullRepository(url, dependenciesPath)
+func (s *PackageService) Get(id string) (types.Package, error) {
+	p, err := s.repo.Get(id)
 	if err != nil {
-		return err
+		return types.Package{}, err
 	}
 
-	dir, err := os.ReadDir(path.Join(dependenciesPath, "packages"))
-	if err != nil {
-		return err
-	}
+	pkgPath := s.repo.GetPkgPath(id)
 
-	for _, entry := range dir {
-		if !entry.IsDir() {
-			continue
+	isScript := strings.HasPrefix(p.Check, "script:")
+	installed := false
+
+	if isScript {
+		script := strings.Split(p.Check, ":")[1]
+
+		cmd := exec.Command(path.Join(pkgPath, script))
+
+		err = cmd.Run()
+		if cmd.ProcessState.ExitCode() == 0 {
+			installed = true
 		}
-
-		name := entry.Name()
-
-		pkg, err := read(dependenciesPath, name)
 		if err != nil {
-			return err
+			return types.Package{}, err
 		}
-
-		pkgs[name] = *pkg
+	} else {
+		_, err := exec.LookPath(p.Check)
+		if err == nil {
+			installed = true
+		}
 	}
 
-	return nil
-}
-
-func Get(id string) (*types.Package, error) {
-	pkg, ok := pkgs[id]
-	if !ok {
-		return nil, ErrPkgNotFound
-	}
-	return &pkg, nil
+	p.Installed = &installed
+	return p, nil
 }

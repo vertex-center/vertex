@@ -9,7 +9,6 @@ import (
 	"github.com/gin-contrib/sse"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/services/dependency"
 	"github.com/vertex-center/vertex/services/instance"
 	"github.com/vertex-center/vertex/types"
 )
@@ -160,16 +159,16 @@ func handleInstanceEvents(c *gin.Context) {
 func handleGetDependencies(c *gin.Context) {
 	i := getInstance(c)
 
-	var deps = map[string]types.Dependency{}
+	var deps = map[string]types.Package{}
 
 	for name := range i.Dependencies {
-		dep, err := dependency.Get(name)
+		dep, err := packageService.Get(name)
 		if err != nil {
 			logger.Error(err)
 			continue
 		}
 
-		deps[name] = *dep
+		deps[name] = dep
 	}
 
 	c.JSON(http.StatusOK, deps)
