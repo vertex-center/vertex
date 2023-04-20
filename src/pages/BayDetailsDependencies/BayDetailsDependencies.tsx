@@ -9,7 +9,7 @@ import {
     Dependencies,
     Dependency as DependencyModel,
     getInstanceDependencies,
-    installDependencies,
+    installPackages,
 } from "../../backend/backend";
 import { useParams } from "react-router-dom";
 import classNames from "classnames";
@@ -37,7 +37,7 @@ export function Dependency(props: Props) {
 
     const install = () => {
         setInstalling(true);
-        installDependencies([{ name, package_manager: packageManager }])
+        installPackages([{ name, package_manager: packageManager }])
             .then((data: any) => {
                 if (data?.command) {
                     onNeedsSudo(data?.command, packageManager);

@@ -165,10 +165,10 @@ export async function getInstanceDependencies(
     });
 }
 
-export async function installDependencies(dependencies) {
+export async function installPackages(packages) {
     return new Promise((resolve, reject) => {
         axios
-            .post(route(`/dependencies/install`), { dependencies })
+            .post(route(`/packages/install`), { packages })
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });
