@@ -9,7 +9,7 @@ import (
 	"github.com/vertex-center/vertex/client"
 	"github.com/vertex-center/vertex/router"
 	servicesmanager "github.com/vertex-center/vertex/services/instance"
-	"github.com/vertex-center/vertex/services/package"
+	"github.com/vertex-center/vertex/services/pkg"
 	"github.com/vertex-center/vertex/services/service"
 	"github.com/vertex-center/vertex/storage"
 )
@@ -38,7 +38,7 @@ func main() {
 		return
 	}
 
-	err = _package.Reload()
+	err = pkg.Reload()
 	if err != nil {
 		logger.Error(fmt.Errorf("failed to reload dependencies: %v", err))
 		return

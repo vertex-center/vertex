@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/services/dependency"
 	"github.com/vertex-center/vertex/services/instance"
+	"github.com/vertex-center/vertex/types"
 )
 
 func addInstanceRoutes(r *gin.RouterGroup) {
@@ -159,7 +160,7 @@ func handleInstanceEvents(c *gin.Context) {
 func handleGetDependencies(c *gin.Context) {
 	i := getInstance(c)
 
-	var deps = map[string]dependency.Dependency{}
+	var deps = map[string]types.Dependency{}
 
 	for name := range i.Dependencies {
 		dep, err := dependency.Get(name)

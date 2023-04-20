@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/services/dependency"
+	"github.com/vertex-center/vertex/services/pkg"
 )
 
 func addDependenciesRoutes(r *gin.RouterGroup) {
@@ -37,7 +38,7 @@ func handleInstallDependencies(c *gin.Context) {
 
 		logger.Log(fmt.Sprintf("installing package name='%s' with package_manager=%s", d.Name, d.PackageManager))
 
-		cmd, err := dep.InstallationCommand(d.PackageManager)
+		cmd, err := pkg.InstallationCommand(dep.Package, d.PackageManager)
 		if err != nil {
 			logger.Error(err)
 			continue

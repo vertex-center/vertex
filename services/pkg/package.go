@@ -1,4 +1,4 @@
-package _package
+package pkg
 
 import (
 	"fmt"
@@ -10,6 +10,7 @@ import (
 	"github.com/goccy/go-json"
 	errors2 "github.com/pkg/errors"
 	"github.com/vertex-center/vertex/storage"
+	"github.com/vertex-center/vertex/types"
 )
 
 const (
@@ -25,41 +26,11 @@ var (
 	ErrPkgManagerNotFound = errors2.New("package manager not found")
 )
 
-var pkgs map[string]Package
-
-type Package struct {
-	Name           string            `json:"name"`
-	Description    string            `json:"description"`
-	Homepage       string            `json:"homepage"`
-	License        string            `json:"license"`
-	Check          string            `json:"check"`
-	InstallPackage map[string]string `json:"install"`
-}
+var pkgs map[string]types.Package
 
 type InstallCmd struct {
 	Cmd  string
 	Sudo bool
-}
-
-func read(pathDependencies string, id string) (*Package, error) {
-	p := path.Join(getPath(pathDependencies, id), fmt.Sprintf("%s.json", id))
-
-	file, err := os.ReadFile(p)
-	if err != nil {
-		return nil, err
-	}
-
-	var pkg Package
-	err = json.Unmarshal(file, &pkg)
-	return &pkg, err
-}
-
-func GetPath(id string) string {
-	return getPath(storage.PathDependencies, id)
-}
-
-func getPath(pathDependencies string, id string) string {
-	return path.Join(pathDependencies, "packages", id)
 }
 
 func (c *InstallCmd) Exec() error {
@@ -73,7 +44,28 @@ func (c *InstallCmd) Exec() error {
 	return cmd.Run()
 }
 
-func (p *Package) InstallationCommand(pm string) (InstallCmd, error) {
+func read(pathDependencies string, id string) (*types.Package, error) {
+	p := path.Join(getPath(pathDependencies, id), fmt.Sprintf("%s.json", id))
+
+	file, err := os.ReadFile(p)
+	if err != nil {
+		return nil, err
+	}
+
+	var pkg types.Package
+	err = json.Unmarshal(file, &pkg)
+	return &pkg, err
+}
+
+func GetPath(packageID string) string {
+	return getPath(storage.PathDependencies, packageID)
+}
+
+func getPath(pathDependencies string, id string) string {
+	return path.Join(pathDependencies, "packages", id)
+}
+
+func InstallationCommand(p *types.Package, pm string) (InstallCmd, error) {
 	if strings.HasPrefix(p.InstallPackage[pm], "script:") {
 		return InstallCmd{
 			Cmd:  strings.Split(p.InstallPackage[pm], ":")[1],
@@ -114,7 +106,7 @@ func Reload() error {
 }
 
 func reload(dependenciesPath string) error {
-	pkgs = map[string]Package{}
+	pkgs = map[string]types.Package{}
 
 	url := "https://github.com/vertex-center/vertex-dependencies"
 
@@ -146,7 +138,7 @@ func reload(dependenciesPath string) error {
 	return nil
 }
 
-func Get(id string) (*Package, error) {
+func Get(id string) (*types.Package, error) {
 	pkg, ok := pkgs[id]
 	if !ok {
 		return nil, ErrPkgNotFound

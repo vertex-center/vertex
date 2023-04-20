@@ -5,30 +5,25 @@ import (
 	"path"
 	"strings"
 
-	"github.com/vertex-center/vertex/services/package"
+	"github.com/vertex-center/vertex/services/pkg"
+	"github.com/vertex-center/vertex/types"
 )
 
-type Dependency struct {
-	*_package.Package
-
-	Installed bool `json:"installed"`
-}
-
-func Get(id string) (*Dependency, error) {
-	pkg, err := _package.Get(id)
+func Get(id string) (*types.Dependency, error) {
+	p, err := pkg.Get(id)
 	if err != nil {
 		return nil, err
 	}
 
-	p := _package.GetPath(id)
+	pkgPath := pkg.GetPath(id)
 
-	isScript := strings.HasPrefix(pkg.Check, "script:")
+	isScript := strings.HasPrefix(p.Check, "script:")
 	installed := false
 
 	if isScript {
-		script := strings.Split(pkg.Check, ":")[1]
+		script := strings.Split(p.Check, ":")[1]
 
-		cmd := exec.Command(path.Join(p, script))
+		cmd := exec.Command(path.Join(pkgPath, script))
 
 		err = cmd.Run()
 		if cmd.ProcessState.ExitCode() == 0 {
@@ -38,14 +33,14 @@ func Get(id string) (*Dependency, error) {
 			return nil, err
 		}
 	} else {
-		_, err := exec.LookPath(pkg.Check)
+		_, err := exec.LookPath(p.Check)
 		if err == nil {
 			installed = true
 		}
 	}
 
-	return &Dependency{
-		Package:   pkg,
+	return &types.Dependency{
+		Package:   p,
 		Installed: installed,
 	}, nil
 }
