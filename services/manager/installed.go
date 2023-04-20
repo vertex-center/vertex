@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/console"
-	"github.com/vertex-center/vertex/services/instances"
+	"github.com/vertex-center/vertex/services/instance"
 	"github.com/vertex-center/vertex/storage"
 )
 
@@ -33,10 +33,10 @@ func ReloadAllInstalled() error {
 				return err
 			}
 
-			if !instances.Exists(serviceUUID) {
+			if !instance.Exists(serviceUUID) {
 				logger.Log(fmt.Sprintf("instantiate service uuid=%s", entry.Name()))
 
-				_, err = instances.Instantiate(serviceUUID)
+				_, err = instance.Instantiate(serviceUUID)
 				if err != nil {
 					return err
 				}

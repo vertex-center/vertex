@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-contrib/sse"
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/services/instances"
+	"github.com/vertex-center/vertex/services/instance"
 )
 
 func addInstancesRoutes(r *gin.RouterGroup) {
@@ -15,18 +15,18 @@ func addInstancesRoutes(r *gin.RouterGroup) {
 }
 
 func handleGetInstances(c *gin.Context) {
-	installed := instances.List()
+	installed := instance.All()
 	c.JSON(http.StatusOK, installed)
 }
 
 func handleInstancesEvents(c *gin.Context) {
-	instancesChan := make(chan instances.Event)
-	id := instances.Register(instancesChan)
+	instancesChan := make(chan instance.Event)
+	id := instance.Register(instancesChan)
 
 	done := c.Request.Context().Done()
 
 	defer func() {
-		instances.Unregister(id)
+		instance.Unregister(id)
 		close(instancesChan)
 	}()
 

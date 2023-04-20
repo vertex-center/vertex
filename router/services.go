@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/services/instances"
+	"github.com/vertex-center/vertex/services/instance"
 	servicesmanager "github.com/vertex-center/vertex/services/manager"
 )
 
@@ -32,7 +32,7 @@ func handleServiceDownload(c *gin.Context) {
 		return
 	}
 
-	i, err := instances.Install(body.Repository, body.UseDocker, body.UseReleases)
+	i, err := instance.Install(body.Repository, body.UseDocker, body.UseReleases)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

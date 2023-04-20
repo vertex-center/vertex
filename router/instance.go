@@ -11,7 +11,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/dependency"
 	"github.com/vertex-center/vertex/services/instance"
-	"github.com/vertex-center/vertex/services/instances"
 )
 
 func addInstanceRoutes(r *gin.RouterGroup) {
@@ -43,7 +42,7 @@ func getInstanceUUID(c *gin.Context) *uuid.UUID {
 func getInstance(c *gin.Context) *instance.Instance {
 	uid := getInstanceUUID(c)
 
-	i, err := instances.Get(*uid)
+	i, err := instance.Get(*uid)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to retrieve instance %s: %v", uid, err))
 		return nil
@@ -60,7 +59,7 @@ func handleGetInstance(c *gin.Context) {
 func handleDeleteInstance(c *gin.Context) {
 	uid := getInstanceUUID(c)
 
-	err := instances.Delete(*uid)
+	err := instance.Delete(*uid)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to delete instance %s: %v", uid, err))
 		return
@@ -72,7 +71,7 @@ func handleDeleteInstance(c *gin.Context) {
 func handleStartInstance(c *gin.Context) {
 	uid := getInstanceUUID(c)
 
-	err := instances.Start(*uid)
+	err := instance.Start(*uid)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -84,7 +83,7 @@ func handleStartInstance(c *gin.Context) {
 func handleStopInstance(c *gin.Context) {
 	uid := getInstanceUUID(c)
 
-	err := instances.Stop(*uid)
+	err := instance.Stop(*uid)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
