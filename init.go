@@ -9,7 +9,8 @@ import (
 	"github.com/vertex-center/vertex/client"
 	"github.com/vertex-center/vertex/dependency/package"
 	"github.com/vertex-center/vertex/router"
-	servicesmanager "github.com/vertex-center/vertex/services/manager"
+	servicesmanager "github.com/vertex-center/vertex/services/instance"
+	"github.com/vertex-center/vertex/services/service"
 	"github.com/vertex-center/vertex/storage"
 )
 
@@ -43,7 +44,7 @@ func main() {
 		return
 	}
 
-	err = servicesmanager.Reload()
+	err = service.ReloadAvailableServices()
 	if err != nil {
 		logger.Error(fmt.Errorf("failed to reload available services: %v", err))
 		return

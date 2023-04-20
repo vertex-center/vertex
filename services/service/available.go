@@ -1,21 +1,20 @@
-package servicesmanager
+package service
 
 import (
 	"os"
 	"path"
 
 	"github.com/goccy/go-json"
-	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/storage"
 )
 
-var available []services.Service
+var available []Service
 
-func Reload() error {
-	return reload(storage.PathServices)
+func ReloadAvailableServices() error {
+	return reloadAvailableServices(storage.PathServices)
 }
 
-func reload(servicesPath string) error {
+func reloadAvailableServices(servicesPath string) error {
 	url := "https://github.com/vertex-center/vertex-services"
 
 	err := storage.CloneOrPullRepository(url, servicesPath)
@@ -28,13 +27,13 @@ func reload(servicesPath string) error {
 		return err
 	}
 
-	var availableMap map[string]services.Service
+	var availableMap map[string]Service
 	err = json.Unmarshal(file, &availableMap)
 	if err != nil {
 		return err
 	}
 
-	available = []services.Service{}
+	available = []Service{}
 	for key, service := range availableMap {
 		service.ID = key
 		available = append(available, service)
@@ -43,6 +42,6 @@ func reload(servicesPath string) error {
 	return nil
 }
 
-func ListAvailable() []services.Service {
+func ListAvailable() []Service {
 	return available
 }

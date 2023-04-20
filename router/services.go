@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/services/instance"
-	servicesmanager "github.com/vertex-center/vertex/services/manager"
+	servicesmanager "github.com/vertex-center/vertex/services/service"
 )
 
 func addServicesRoutes(r *gin.RouterGroup) {

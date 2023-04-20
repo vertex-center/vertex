@@ -1,4 +1,4 @@
-package servicesmanager
+package service
 
 import (
 	"os"
@@ -34,7 +34,7 @@ func testReload(t *testing.T) {
 	err := os.MkdirAll(PathServices, os.ModePerm)
 	assert.NoError(t, err)
 
-	err = reload(PathServices)
+	err = reloadAvailableServices(PathServices)
 	assert.NoError(t, err)
 
 	assert.NotZero(t, len(available))

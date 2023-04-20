@@ -1,16 +1,12 @@
-package servicesmanager
+package instance
 
 import (
 	"fmt"
 	"os"
 
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex-core-golang/console"
-	"github.com/vertex-center/vertex/services/instance"
 	"github.com/vertex-center/vertex/storage"
 )
-
-var logger = console.New("vertex::services-manager")
 
 func ReloadAllInstalled() error {
 	entries, err := os.ReadDir(storage.PathInstances)
@@ -33,10 +29,10 @@ func ReloadAllInstalled() error {
 				return err
 			}
 
-			if !instance.Exists(serviceUUID) {
+			if !Exists(serviceUUID) {
 				logger.Log(fmt.Sprintf("instantiate service uuid=%s", entry.Name()))
 
-				_, err = instance.Instantiate(serviceUUID)
+				_, err = Instantiate(serviceUUID)
 				if err != nil {
 					return err
 				}

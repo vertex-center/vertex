@@ -18,7 +18,7 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/console"
-	"github.com/vertex-center/vertex/services"
+	"github.com/vertex-center/vertex/services/service"
 	"github.com/vertex-center/vertex/storage"
 )
 
@@ -55,7 +55,7 @@ var (
 )
 
 type Instance struct {
-	services.Service
+	service.Service
 	Metadata
 
 	Status       string       `json:"status"`
@@ -428,7 +428,7 @@ func (i *Instance) Delete() error {
 }
 
 func CreateFromDisk(instanceUUID uuid.UUID) (*Instance, error) {
-	service, err := services.ReadFromDisk(path.Join(storage.PathInstances, instanceUUID.String()))
+	service, err := service.ReadFromDisk(path.Join(storage.PathInstances, instanceUUID.String()))
 	if err != nil {
 		return nil, err
 	}
@@ -602,7 +602,7 @@ func Install(repo string, useDocker *bool, useReleases *bool) (*Instance, error)
 func symlink(path string, repo string) error {
 	p := strings.Split(repo, ":")[1]
 
-	_, err := services.ReadFromDisk(p)
+	_, err := service.ReadFromDisk(p)
 	if err != nil {
 		return fmt.Errorf("%s is not a compatible Vertex service", repo)
 	}
