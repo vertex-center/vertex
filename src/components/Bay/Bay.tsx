@@ -31,7 +31,13 @@ function LED({ status }: LEDProps) {
     );
 }
 
-type Status = "off" | "running" | "error" | "downloading";
+type Status =
+    | "off"
+    | "building"
+    | "starting"
+    | "running"
+    | "error"
+    | "downloading";
 
 type LCDProps = {
     name: string;
@@ -47,6 +53,12 @@ function LCD(props: LCDProps) {
     switch (status) {
         case "off":
             message = "Off";
+            break;
+        case "building":
+            message = "Building...";
+            break;
+        case "starting":
+            message = "Starting...";
             break;
         case "running":
             message = "Running";
@@ -72,6 +84,8 @@ function LCD(props: LCDProps) {
                 className={classNames({
                     [styles.lcdGray]: true,
                     [styles.lcdGreen]: status === "running",
+                    [styles.lcdYellow]: status === "building",
+                    [styles.lcdOrange]: status === "starting",
                     [styles.lcdRed]: status === "error",
                     [styles.lcdDownloading]: status === "downloading",
                 })}
