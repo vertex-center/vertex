@@ -20,6 +20,7 @@ var (
 	packageService  services.PackageService
 	serviceService  services.ServiceService
 	instanceService services.InstanceService
+	updateService   services.UpdateService
 )
 
 type About struct {
@@ -35,6 +36,7 @@ func InitializeRouter(about About) *gin.Engine {
 	packageService = services.NewPackageService()
 	serviceService = services.NewServiceService()
 	instanceService = services.NewInstanceService()
+	updateService = services.NewUpdateService()
 
 	addServicesRoutes(api.Group("/services"))
 	addInstancesRoutes(api.Group("/instances"))

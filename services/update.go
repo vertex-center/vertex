@@ -1,4 +1,4 @@
-package updater
+package services
 
 import (
 	"context"
@@ -8,24 +8,20 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v50/github"
-	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex/storage"
+	"github.com/vertex-center/vertex/types"
 )
 
-var logger = console.New("updater")
+type UpdateService struct{}
 
-type Update struct {
-	Id             string `json:"id"`
-	Name           string `json:"name"`
-	CurrentVersion string `json:"current_version"`
-	LatestVersion  string `json:"latest_version"`
-	UpToDate       bool   `json:"up_to_date"`
+func NewUpdateService() UpdateService {
+	return UpdateService{}
 }
 
-func CheckForUpdates(currentVertexVersion string) ([]Update, error) {
-	var updates []Update
+func (s UpdateService) CheckForUpdates(currentVertexVersion string) ([]types.Update, error) {
+	var updates []types.Update
 
-	vertexUpdate, _, err := CheckForVertexUpdate(currentVertexVersion)
+	vertexUpdate, _, err := s.CheckForVertexUpdate(currentVertexVersion)
 	if err != nil {
 		return nil, err
 	} else {
@@ -35,8 +31,8 @@ func CheckForUpdates(currentVertexVersion string) ([]Update, error) {
 	return updates, nil
 }
 
-func CheckForVertexUpdate(currentVersion string) (*Update, *github.RepositoryRelease, error) {
-	update := &Update{
+func (s UpdateService) CheckForVertexUpdate(currentVersion string) (*types.Update, *github.RepositoryRelease, error) {
+	update := &types.Update{
 		Id:             "vertex",
 		Name:           "Vertex",
 		CurrentVersion: currentVersion,
@@ -80,8 +76,8 @@ func CheckForVertexUpdate(currentVersion string) (*Update, *github.RepositoryRel
 	return update, release, nil
 }
 
-func InstallVertexUpdate(currentVersion string) error {
-	_, release, err := CheckForVertexUpdate(currentVersion)
+func (s UpdateService) InstallVertexUpdate(currentVersion string) error {
+	_, release, err := s.CheckForVertexUpdate(currentVersion)
 	if err != nil {
 		return err
 	}

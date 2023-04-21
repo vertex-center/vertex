@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/services/updater"
 )
 
 func addUpdatesRoutes(r *gin.RouterGroup, currentVertexVersion string) {
@@ -19,7 +18,7 @@ func addUpdatesRoutes(r *gin.RouterGroup, currentVertexVersion string) {
 }
 
 func handleGetUpdates(c *gin.Context, currentVertexVersion string) {
-	updates, err := updater.CheckForUpdates(currentVertexVersion)
+	updates, err := updateService.CheckForUpdates(currentVertexVersion)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -49,7 +48,7 @@ func handleExecuteUpdates(c *gin.Context, currentVertexVersion string) {
 
 		switch update.Name {
 		case "vertex":
-			err = updater.InstallVertexUpdate(currentVertexVersion)
+			err = updateService.InstallVertexUpdate(currentVertexVersion)
 		default:
 			logger.Error(fmt.Errorf("the service name %s is not valid for an update", update.Name))
 		}
