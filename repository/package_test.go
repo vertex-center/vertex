@@ -9,8 +9,7 @@ import (
 )
 
 const (
-	PathLive         = "live_test"
-	PathDependencies = "live_test/dependencies"
+	PathPackages = "package_test_live"
 )
 
 type PackageRepositoryTestSuite struct {
@@ -25,10 +24,10 @@ func TestPackageRepositoryTestSuite(t *testing.T) {
 
 func (suite *PackageRepositoryTestSuite) SetupSuite() {
 	suite.repo = NewPackageRepo(&PackageRepositoryParams{
-		dependenciesPath: PathDependencies,
+		dependenciesPath: PathPackages,
 	})
 
-	err := os.MkdirAll(PathDependencies, os.ModePerm)
+	err := os.MkdirAll(PathPackages, os.ModePerm)
 	assert.NoError(suite.T(), err)
 
 	err = suite.repo.reload()
@@ -40,13 +39,13 @@ func (suite *PackageRepositoryTestSuite) SetupSuite() {
 }
 
 func (suite *PackageRepositoryTestSuite) TearDownSuite() {
-	err := os.RemoveAll(PathLive)
+	err := os.RemoveAll(PathPackages)
 	assert.NoError(suite.T(), err)
 }
 
 func (suite *PackageRepositoryTestSuite) TestGetPath() {
 	p := suite.repo.GetPkgPath("redis")
-	assert.Equal(suite.T(), "live_test/dependencies/packages/redis", p)
+	assert.Equal(suite.T(), "package_test_live/packages/redis", p)
 }
 
 func (suite *PackageRepositoryTestSuite) TestReload() {

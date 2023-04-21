@@ -10,14 +10,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex-core-golang/router"
-	"github.com/vertex-center/vertex/services/pkg"
+	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/storage"
 )
 
 var logger = console.New("vertex::router")
 
 var (
-	packageService pkg.PackageService
+	packageService services.PackageService
+	serviceService services.ServiceService
 )
 
 type About struct {
@@ -30,7 +31,8 @@ func InitializeRouter(about About) *gin.Engine {
 	r, api := router.CreateRouter(cors.Default())
 	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.PathClient, "dist"), true)))
 
-	packageService = pkg.NewPackageService()
+	packageService = services.NewPackageService()
+	serviceService = services.NewServiceService()
 
 	addServicesRoutes(api.Group("/services"))
 	addInstancesRoutes(api.Group("/instances"))

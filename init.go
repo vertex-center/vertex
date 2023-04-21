@@ -9,7 +9,6 @@ import (
 	"github.com/vertex-center/vertex/client"
 	"github.com/vertex-center/vertex/router"
 	servicesmanager "github.com/vertex-center/vertex/services/instance"
-	"github.com/vertex-center/vertex/services/service"
 	"github.com/vertex-center/vertex/storage"
 )
 
@@ -34,12 +33,6 @@ func main() {
 	err = client.Setup()
 	if err != nil {
 		logger.Error(fmt.Errorf("failed to setup the web client: %v", err))
-		return
-	}
-
-	err = service.ReloadAvailableServices()
-	if err != nil {
-		logger.Error(fmt.Errorf("failed to reload available services: %v", err))
 		return
 	}
 

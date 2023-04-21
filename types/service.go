@@ -1,15 +1,4 @@
-package service
-
-import (
-	"encoding/json"
-	"fmt"
-	"os"
-	"path"
-
-	"github.com/vertex-center/vertex-core-golang/console"
-)
-
-var logger = console.New("vertex::services")
+package types
 
 type EnvVariable struct {
 	Type        string `json:"type"`
@@ -33,13 +22,6 @@ type Service struct {
 	Dependencies map[string]bool `json:"dependencies,omitempty"`
 }
 
-func ReadFromDisk(servicePath string) (*Service, error) {
-	data, err := os.ReadFile(path.Join(servicePath, ".vertex", "service.json"))
-	if err != nil {
-		logger.Warn(fmt.Sprintf("service at '%s' has no '.vertex/service.json' file", path.Dir(servicePath)))
-	}
-
-	var service Service
-	err = json.Unmarshal(data, &service)
-	return &service, err
+type ServiceRepository interface {
+	GetAvailable() []Service
 }

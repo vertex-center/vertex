@@ -1,4 +1,4 @@
-package pkg
+package services
 
 import (
 	"os"

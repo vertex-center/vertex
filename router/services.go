@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/services/instance"
-	servicesmanager "github.com/vertex-center/vertex/services/service"
 )
 
 func addServicesRoutes(r *gin.RouterGroup) {
@@ -15,7 +14,7 @@ func addServicesRoutes(r *gin.RouterGroup) {
 }
 
 func handleServicesAvailable(c *gin.Context) {
-	c.JSON(http.StatusOK, servicesmanager.ListAvailable())
+	c.JSON(http.StatusOK, serviceService.ListAvailable())
 }
 
 type downloadBody struct {

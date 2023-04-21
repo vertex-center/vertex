@@ -11,15 +11,16 @@ import (
 	"path"
 	"strings"
 
-	"github.com/docker/docker/api/types"
+	dockertypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
 	"github.com/go-git/go-git/v5"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/console"
-	"github.com/vertex-center/vertex/services/service"
+	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/storage"
+	"github.com/vertex-center/vertex/types"
 )
 
 var logger = console.New("vertex::instance")
@@ -55,7 +56,7 @@ var (
 )
 
 type Instance struct {
-	service.Service
+	types.Service
 	Metadata
 
 	Status       string       `json:"status"`
@@ -112,11 +113,11 @@ func (i *Instance) dockerDeleteContainer(cli *client.Client) error {
 		return err
 	}
 
-	return cli.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
+	return cli.ContainerRemove(context.Background(), id, dockertypes.ContainerRemoveOptions{})
 }
 
 func (i *Instance) dockerContainerID(cli *client.Client) (string, error) {
-	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	containers, err := cli.ContainerList(context.Background(), dockertypes.ContainerListOptions{All: true})
 	if err != nil {
 		return "", err
 	}
@@ -268,7 +269,7 @@ func (i *Instance) startWithDocker() error {
 	imageName := i.dockerImageName()
 	containerName := i.dockerContainerName()
 
-	buildOptions := types.ImageBuildOptions{
+	buildOptions := dockertypes.ImageBuildOptions{
 		Dockerfile: "Dockerfile",
 		Tags:       []string{imageName},
 		Remove:     true,
@@ -319,7 +320,7 @@ func (i *Instance) startWithDocker() error {
 
 	logger.Log("starting container...")
 
-	err = cli.ContainerStart(context.Background(), id, types.ContainerStartOptions{})
+	err = cli.ContainerStart(context.Background(), id, dockertypes.ContainerStartOptions{})
 	if err != nil {
 		i.setStatus(StatusOff)
 		return err
@@ -428,7 +429,7 @@ func (i *Instance) Delete() error {
 }
 
 func CreateFromDisk(instanceUUID uuid.UUID) (*Instance, error) {
-	service, err := service.ReadFromDisk(path.Join(storage.PathInstances, instanceUUID.String()))
+	service, err := services.ReadFromDisk(path.Join(storage.PathInstances, instanceUUID.String()))
 	if err != nil {
 		return nil, err
 	}
@@ -602,7 +603,7 @@ func Install(repo string, useDocker *bool, useReleases *bool) (*Instance, error)
 func symlink(path string, repo string) error {
 	p := strings.Split(repo, ":")[1]
 
-	_, err := service.ReadFromDisk(p)
+	_, err := services.ReadFromDisk(p)
 	if err != nil {
 		return fmt.Errorf("%s is not a compatible Vertex service", repo)
 	}

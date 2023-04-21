@@ -21,11 +21,11 @@ import (
 var logger = console.New("storage")
 
 const (
-	PathClient       = "live/client"
-	PathDependencies = "live/dependencies"
-	PathInstances    = "live/instances"
-	PathServices     = "live/services"
-	PathUpdates      = "live/updates"
+	PathClient    = "live/client"
+	PathPackages  = "live/packages"
+	PathInstances = "live/instances"
+	PathServices  = "live/services"
+	PathUpdates   = "live/updates"
 )
 
 var (

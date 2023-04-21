@@ -30,18 +30,18 @@ func NewPackageRepo(params *PackageRepositoryParams) PackageRepository {
 		params = &PackageRepositoryParams{}
 	}
 	if params.dependenciesPath == "" {
-		params.dependenciesPath = storage.PathDependencies
+		params.dependenciesPath = storage.PathPackages
 	}
 
-	pr := PackageRepository{
+	repo := PackageRepository{
 		dependenciesPath: params.dependenciesPath,
 		pkgs:             map[string]types.Package{},
 	}
-	err := pr.reload()
+	err := repo.reload()
 	if err != nil {
 		log.Fatalf("failed to reload package repository: %v", err)
 	}
-	return pr
+	return repo
 }
 
 func (r *PackageRepository) Get(id string) (types.Package, error) {
