@@ -57,13 +57,15 @@ func (s *InstanceService) Delete(uuid uuid.UUID) error {
 
 	if i.UseDocker {
 		containerID, err := s.dockerRepo.GetContainerID(i.DockerContainerName())
-		if err != nil {
+		if err == repository.ErrContainerNotFound {
+			logger.Warn(err.Error())
+		} else if err != nil {
 			return err
-		}
-
-		err = s.dockerRepo.RemoveContainer(containerID)
-		if err != nil {
-			return err
+		} else {
+			err = s.dockerRepo.RemoveContainer(containerID)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
