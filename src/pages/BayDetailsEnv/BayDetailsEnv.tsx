@@ -1,17 +1,12 @@
 import { Fragment, useEffect, useState } from "react";
 import { Title } from "../../components/Text/Text";
-import {
-    Env,
-    EnvVariable,
-    getInstance,
-    Instance,
-    saveInstanceEnv,
-} from "../../backend/backend";
+import { Env, EnvVariable, saveInstanceEnv } from "../../backend/backend";
 import { useParams } from "react-router-dom";
 import EnvVariableInput from "../../components/EnvVariableInput/EnvVariableInput";
 import Button from "../../components/Button/Button";
 import Symbol from "../../components/Symbol/Symbol";
 import { Horizontal } from "../../components/Layouts/Layouts";
+import useInstance from "../../hooks/useInstance";
 
 type Props = {};
 
@@ -20,7 +15,7 @@ export default function BayDetailsEnv(props: Props) {
 
     const [env, setEnv] = useState<{ env: EnvVariable; value: any }[]>();
 
-    const [instance, setInstance] = useState<Instance>();
+    const { instance } = useInstance(uuid);
 
     const [uploading, setUploading] = useState(false);
 
@@ -45,10 +40,6 @@ export default function BayDetailsEnv(props: Props) {
         );
         setSaved(false);
     };
-
-    useEffect(() => {
-        getInstance(uuid).then((i: Instance) => setInstance(i));
-    }, [uuid]);
 
     const save = () => {
         const _env: Env = {};

@@ -1,19 +1,15 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment } from "react";
 import { Text, Title } from "../../components/Text/Text";
 
 import styles from "./BayDetailsDocker.module.sass";
-import { getInstance, Instance } from "../../backend/backend";
 import { useParams } from "react-router-dom";
 import Loading from "../../components/Loading/Loading";
+import useInstance from "../../hooks/useInstance";
 
 export default function BayDetailsDocker() {
     const { uuid } = useParams();
 
-    const [instance, setInstance] = useState<Instance>();
-
-    useEffect(() => {
-        getInstance(uuid).then((i: Instance) => setInstance(i));
-    }, [uuid]);
+    const { instance } = useInstance(uuid);
 
     let label;
 

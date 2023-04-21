@@ -109,7 +109,7 @@ export async function downloadService(
     });
 }
 
-export async function getInstance(uuid: string) {
+export async function getInstance(uuid: string): Promise<Instance> {
     return new Promise((resolve, reject) => {
         axios
             .get(route(`/instance/${uuid}`))

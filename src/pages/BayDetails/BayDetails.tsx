@@ -1,9 +1,7 @@
 import Bay from "../../components/Bay/Bay";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     deleteInstance,
-    getInstance,
-    Instance,
     route,
     startInstance,
     stopInstance,
@@ -26,6 +24,7 @@ import { Text, Title } from "../../components/Text/Text";
 import Button from "../../components/Button/Button";
 import Progress from "../../components/Progress";
 import { SiDocker } from "@icons-pack/react-simple-icons";
+import useInstance from "../../hooks/useInstance";
 
 export const bayNavItems = [
     {
@@ -44,19 +43,10 @@ export default function BayDetails() {
     const { uuid } = useParams();
     const navigate = useNavigate();
 
-    const [instance, setInstance] = useState<Instance>();
+    const { instance, setInstance } = useInstance(uuid);
+
     const [showDeletePopup, setShowDeletePopup] = useState<boolean>();
     const [deleting, setDeleting] = useState<boolean>(false);
-
-    const fetchInstance = useCallback(() => {
-        getInstance(uuid).then((instance: Instance) => {
-            setInstance(instance);
-        });
-    }, [uuid]);
-
-    useEffect(() => {
-        fetchInstance();
-    }, [fetchInstance, uuid]);
 
     useEffect(() => {
         if (uuid === undefined) return;

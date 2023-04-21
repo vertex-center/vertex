@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useEffect } from "react";
 import { Title } from "../../components/Text/Text";
 import Symbol from "../../components/Symbol/Symbol";
 
@@ -6,7 +6,7 @@ import styles from "./BayDetailsHome.module.sass";
 import { useParams } from "react-router-dom";
 import { Horizontal } from "../../components/Layouts/Layouts";
 import Spacer from "../../components/Spacer/Spacer";
-import { getInstance, Instance, route } from "../../backend/backend";
+import { route } from "../../backend/backend";
 import classNames from "classnames";
 import {
     registerSSE,
@@ -14,21 +14,12 @@ import {
     unregisterSSE,
     unregisterSSEEvent,
 } from "../../backend/sse";
+import useInstance from "../../hooks/useInstance";
 
 export default function BayDetailsHome() {
     const { uuid } = useParams();
 
-    const [instance, setInstance] = useState<Instance>();
-
-    const fetchInstance = useCallback(() => {
-        getInstance(uuid).then((instance: Instance) => {
-            setInstance(instance);
-        });
-    }, [uuid]);
-
-    useEffect(() => {
-        fetchInstance();
-    }, [fetchInstance, uuid]);
+    const { instance, setInstance } = useInstance(uuid);
 
     useEffect(() => {
         if (uuid === undefined) return;

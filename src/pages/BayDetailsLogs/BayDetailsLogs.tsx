@@ -7,19 +7,20 @@ import {
     unregisterSSEEvent,
 } from "../../backend/sse";
 import { useParams } from "react-router-dom";
-import { getInstance, Instance, route } from "../../backend/backend";
+import { route } from "../../backend/backend";
 import { Title } from "../../components/Text/Text";
+import useInstance from "../../hooks/useInstance";
 
 export default function BayDetailsLogs() {
     const { uuid } = useParams();
 
+    const { instance } = useInstance(uuid);
+
     const [logs, setLogs] = useState<any[]>(undefined);
 
     useEffect(() => {
-        getInstance(uuid).then((instance: Instance) => {
-            setLogs(instance.logs.lines ?? []);
-        });
-    }, [uuid]);
+        setLogs(instance?.logs.lines ?? []);
+    }, [instance]);
 
     useEffect(() => {
         if (uuid === undefined) return;
