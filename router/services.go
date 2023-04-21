@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/services/instance"
 )
 
 func addServicesRoutes(r *gin.RouterGroup) {
@@ -31,7 +30,7 @@ func handleServiceDownload(c *gin.Context) {
 		return
 	}
 
-	i, err := instance.Install(body.Repository, body.UseDocker, body.UseReleases)
+	i, err := instanceService.Install(body.Repository, body.UseDocker, body.UseReleases)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

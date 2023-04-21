@@ -8,7 +8,6 @@ import (
 	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex/client"
 	"github.com/vertex-center/vertex/router"
-	servicesmanager "github.com/vertex-center/vertex/services/instance"
 	"github.com/vertex-center/vertex/storage"
 )
 
@@ -41,12 +40,6 @@ func main() {
 		Commit:  commit,
 		Date:    date,
 	})
-
-	err = servicesmanager.ReloadAllInstalled()
-	if err != nil {
-		logger.Error(err)
-		return
-	}
 
 	err = r.Run(":6130")
 	if err != nil {

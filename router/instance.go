@@ -9,7 +9,6 @@ import (
 	"github.com/gin-contrib/sse"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/services/instance"
 	"github.com/vertex-center/vertex/types"
 )
 
@@ -23,7 +22,7 @@ func addInstanceRoutes(r *gin.RouterGroup) {
 	r.GET("/dependencies", handleGetDependencies)
 }
 
-func getInstanceUUID(c *gin.Context) *uuid.UUID {
+func getParamInstanceUUID(c *gin.Context) *uuid.UUID {
 	p := c.Param("instance_uuid")
 	if p == "" {
 		_ = c.AbortWithError(http.StatusBadRequest, errors.New("instance_uuid was missing in the URL"))
@@ -39,12 +38,12 @@ func getInstanceUUID(c *gin.Context) *uuid.UUID {
 	return &uid
 }
 
-func getInstance(c *gin.Context) *instance.Instance {
-	uid := getInstanceUUID(c)
+func getInstance(c *gin.Context) *types.Instance {
+	instanceUUID := getParamInstanceUUID(c)
 
-	i, err := instance.Get(*uid)
+	i, err := instanceService.Get(*instanceUUID)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to retrieve instance %s: %v", uid, err))
+		_ = c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to retrieve instance %s: %v", instanceUUID, err))
 		return nil
 	}
 
@@ -57,9 +56,9 @@ func handleGetInstance(c *gin.Context) {
 }
 
 func handleDeleteInstance(c *gin.Context) {
-	uid := getInstanceUUID(c)
+	uid := getParamInstanceUUID(c)
 
-	err := instance.Delete(*uid)
+	err := instanceService.Delete(*uid)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to delete instance %s: %v", uid, err))
 		return
@@ -69,9 +68,9 @@ func handleDeleteInstance(c *gin.Context) {
 }
 
 func handleStartInstance(c *gin.Context) {
-	uid := getInstanceUUID(c)
+	uid := getParamInstanceUUID(c)
 
-	err := instance.Start(*uid)
+	err := instanceService.Start(*uid)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -81,9 +80,9 @@ func handleStartInstance(c *gin.Context) {
 }
 
 func handleStopInstance(c *gin.Context) {
-	uid := getInstanceUUID(c)
+	uid := getParamInstanceUUID(c)
 
-	err := instance.Stop(*uid)
+	err := instanceService.Stop(*uid)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -100,9 +99,9 @@ func handlePatchEnvironment(c *gin.Context) {
 		return
 	}
 
-	i := getInstance(c)
+	uid := getParamInstanceUUID(c)
 
-	err = i.SetEnv(environment)
+	err = instanceService.WriteEnv(*uid, environment)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to save environment: %v", err))
 		return
@@ -114,7 +113,7 @@ func handlePatchEnvironment(c *gin.Context) {
 func handleInstanceEvents(c *gin.Context) {
 	i := getInstance(c)
 
-	instanceChan := make(chan instance.Event)
+	instanceChan := make(chan types.InstanceEvent)
 	id := i.Register(instanceChan)
 
 	defer func() {

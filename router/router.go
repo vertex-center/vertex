@@ -17,8 +17,9 @@ import (
 var logger = console.New("vertex::router")
 
 var (
-	packageService services.PackageService
-	serviceService services.ServiceService
+	packageService  services.PackageService
+	serviceService  services.ServiceService
+	instanceService services.InstanceService
 )
 
 type About struct {
@@ -33,6 +34,7 @@ func InitializeRouter(about About) *gin.Engine {
 
 	packageService = services.NewPackageService()
 	serviceService = services.NewServiceService()
+	instanceService = services.NewInstanceService()
 
 	addServicesRoutes(api.Group("/services"))
 	addInstancesRoutes(api.Group("/instances"))

@@ -1,4 +1,4 @@
-package instance
+package types
 
 const (
 	LogKindOut = "out"
