@@ -2,7 +2,6 @@ package services
 
 import (
 	"bufio"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -14,11 +13,6 @@ import (
 	"github.com/vertex-center/vertex/repository"
 	"github.com/vertex-center/vertex/storage"
 	"github.com/vertex-center/vertex/types"
-)
-
-const (
-	EventStdout = "stdout"
-	EventStderr = "stderr"
 )
 
 var (
@@ -91,6 +85,11 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 	} else {
 		err = s.startManually(i)
 	}
+
+	if err != nil {
+		i.SetStatus(types.InstanceStatusError)
+	}
+
 	return err
 }
 
@@ -105,7 +104,11 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 	} else {
 		err = s.stopManually(i)
 	}
-	i.SetStatus(types.InstanceStatusOff)
+
+	if err != nil {
+		i.SetStatus(types.InstanceStatusOff)
+	}
+
 	return err
 }
 
@@ -120,7 +123,6 @@ func (s *InstanceService) startWithDocker(i *types.Instance) error {
 	// Build
 	err := s.dockerRepo.BuildImage(instancePath, imageName)
 	if err != nil {
-		i.SetStatus(types.InstanceStatusError)
 		return err
 	}
 
@@ -130,11 +132,9 @@ func (s *InstanceService) startWithDocker(i *types.Instance) error {
 		logger.Log(fmt.Sprintf("container %s doesn't exists, create it.", containerName))
 		id, err = s.dockerRepo.CreateContainer(imageName, containerName)
 		if err != nil {
-			i.SetStatus(types.InstanceStatusError)
 			return err
 		}
 	} else if err != nil {
-		i.SetStatus(types.InstanceStatusError)
 		return err
 	}
 
@@ -143,7 +143,6 @@ func (s *InstanceService) startWithDocker(i *types.Instance) error {
 	// Start
 	err = s.dockerRepo.StartContainer(id)
 	if err != nil {
-		i.SetStatus(types.InstanceStatusOff)
 		return err
 	}
 
@@ -195,19 +194,9 @@ func (s *InstanceService) startManually(i *types.Instance) error {
 	stdoutScanner := bufio.NewScanner(stdoutReader)
 	go func() {
 		for stdoutScanner.Scan() {
-			line := i.Logs.Add(types.LogLine{
+			s.repo.AppendLogLine(i, &types.LogLine{
 				Kind:    types.LogKindOut,
 				Message: stdoutScanner.Text(),
-			})
-
-			data, err := json.Marshal(line)
-			if err != nil {
-				logger.Error(err)
-			}
-
-			i.NotifyListeners(types.InstanceEvent{
-				Name: EventStdout,
-				Data: string(data),
 			})
 		}
 	}()
@@ -215,19 +204,9 @@ func (s *InstanceService) startManually(i *types.Instance) error {
 	stderrScanner := bufio.NewScanner(stderrReader)
 	go func() {
 		for stderrScanner.Scan() {
-			line := i.Logs.Add(types.LogLine{
+			s.repo.AppendLogLine(i, &types.LogLine{
 				Kind:    types.LogKindErr,
 				Message: stderrScanner.Text(),
-			})
-
-			data, err := json.Marshal(line)
-			if err != nil {
-				logger.Error(err)
-			}
-
-			i.NotifyListeners(types.InstanceEvent{
-				Name: EventStderr,
-				Data: string(data),
 			})
 		}
 	}()

@@ -24,6 +24,8 @@ var (
 )
 
 const (
+	EventStdout = "stdout"
+	EventStderr = "stderr"
 	EventChange = "change"
 )
 
@@ -311,6 +313,28 @@ func (r *InstanceRepository) Download(dest string, repo string, forceClone bool)
 	}
 
 	return err
+}
+
+func (r *InstanceRepository) AppendLogLine(i *types.Instance, line *types.LogLine) {
+	i.Logs.Lines = append(i.Logs.Lines, *line)
+
+	data, err := json.Marshal(line)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	var name string
+	switch line.Kind {
+	case EventStderr:
+		name = EventStderr
+	default:
+		name = EventStdout
+	}
+
+	i.NotifyListeners(types.InstanceEvent{
+		Name: name,
+		Data: string(data),
+	})
 }
 
 func downloadFromReleases(dest string, repo string) error {
