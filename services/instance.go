@@ -111,14 +111,14 @@ func (s *InstanceService) startWithDocker(i *types.Instance) error {
 	imageName := i.DockerImageName()
 	containerName := i.DockerContainerName()
 
-	i.SetStatus(types.InstanceStatusRunning)
+	i.SetStatus(types.InstanceStatusBuilding)
 
 	instancePath := s.repo.GetPath(i)
 
 	// Build
 	err := s.dockerRepo.BuildImage(instancePath, imageName)
 	if err != nil {
-		i.SetStatus(types.InstanceStatusOff)
+		i.SetStatus(types.InstanceStatusError)
 		return err
 	}
 
@@ -128,13 +128,15 @@ func (s *InstanceService) startWithDocker(i *types.Instance) error {
 		logger.Log(fmt.Sprintf("container %s doesn't exists, create it.", containerName))
 		id, err = s.dockerRepo.CreateContainer(imageName, containerName)
 		if err != nil {
-			i.SetStatus(types.InstanceStatusOff)
+			i.SetStatus(types.InstanceStatusError)
 			return err
 		}
 	} else if err != nil {
-		i.SetStatus(types.InstanceStatusOff)
+		i.SetStatus(types.InstanceStatusError)
 		return err
 	}
+
+	i.SetStatus(types.InstanceStatusStarting)
 
 	// Start
 	err = s.dockerRepo.StartContainer(id)
@@ -142,6 +144,8 @@ func (s *InstanceService) startWithDocker(i *types.Instance) error {
 		i.SetStatus(types.InstanceStatusOff)
 		return err
 	}
+
+	i.SetStatus(types.InstanceStatusRunning)
 	return nil
 }
 

@@ -9,9 +9,11 @@ import (
 )
 
 const (
-	InstanceStatusOff     = "off"
-	InstanceStatusRunning = "running"
-	InstanceStatusError   = "error"
+	InstanceStatusOff      = "off"
+	InstanceStatusBuilding = "building"
+	InstanceStatusStarting = "starting"
+	InstanceStatusRunning  = "running"
+	InstanceStatusError    = "error"
 
 	InstanceEventStatusChange = "status_change"
 )
@@ -64,7 +66,7 @@ func (i *Instance) DockerContainerName() string {
 }
 
 func (i *Instance) IsRunning() bool {
-	return i.Status == InstanceStatusRunning
+	return i.Status != InstanceStatusOff
 }
 
 func (i *Instance) Register(channel chan InstanceEvent) uuid.UUID {
