@@ -1,8 +1,10 @@
 package types
 
 const (
-	LogKindOut = "out"
-	LogKindErr = "err"
+	LogKindOut       = "out"
+	LogKindErr       = "err"
+	LogKindVertexOut = "vertex_out"
+	LogKindVertexErr = "vertex_err"
 )
 
 type LogLine struct {

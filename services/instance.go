@@ -82,7 +82,16 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		return err
 	}
 
+	s.repo.AppendLogLine(i, &types.LogLine{
+		Kind:    types.LogKindVertexOut,
+		Message: "Starting instance...",
+	})
+
 	if i.IsRunning() {
+		s.repo.AppendLogLine(i, &types.LogLine{
+			Kind:    types.LogKindVertexErr,
+			Message: ErrInstanceAlreadyRunning.Error(),
+		})
 		return ErrInstanceAlreadyRunning
 	}
 
@@ -94,6 +103,11 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 
 	if err != nil {
 		i.SetStatus(types.InstanceStatusError)
+	} else {
+		s.repo.AppendLogLine(i, &types.LogLine{
+			Kind:    types.LogKindVertexOut,
+			Message: "Instance started.",
+		})
 	}
 
 	return err
@@ -105,7 +119,16 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 		return err
 	}
 
+	s.repo.AppendLogLine(i, &types.LogLine{
+		Kind:    types.LogKindVertexOut,
+		Message: "Stopping instance...",
+	})
+
 	if !i.IsRunning() {
+		s.repo.AppendLogLine(i, &types.LogLine{
+			Kind:    types.LogKindVertexErr,
+			Message: ErrInstanceNotRunning.Error(),
+		})
 		return ErrInstanceNotRunning
 	}
 
@@ -116,6 +139,10 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 	}
 
 	if err == nil {
+		s.repo.AppendLogLine(i, &types.LogLine{
+			Kind:    types.LogKindVertexOut,
+			Message: "Instance stopped.",
+		})
 		i.SetStatus(types.InstanceStatusOff)
 	}
 
