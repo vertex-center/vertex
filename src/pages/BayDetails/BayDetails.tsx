@@ -67,7 +67,7 @@ export default function BayDetails() {
     }, [uuid]);
 
     const toggleInstance = async (uuid: string) => {
-        if (instance.status === "off") {
+        if (instance.status === "off" || instance.status === "error") {
             await startInstance(uuid);
         } else {
             await stopInstance(uuid);

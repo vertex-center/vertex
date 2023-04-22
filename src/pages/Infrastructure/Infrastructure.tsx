@@ -76,7 +76,10 @@ export default function Infrastructure() {
     }, []);
 
     const toggleInstance = async (uuid: string) => {
-        if (installed[uuid].status === "off") {
+        if (
+            installed[uuid].status === "off" ||
+            installed[uuid].status === "error"
+        ) {
             await startInstance(uuid);
         } else {
             await stopInstance(uuid);
