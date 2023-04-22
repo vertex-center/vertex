@@ -16,7 +16,9 @@ import (
 )
 
 var (
-	ErrContainerStillRunning = errors.New("the container is still running")
+	ErrContainerStillRunning  = errors.New("the container is still running")
+	ErrInstanceAlreadyRunning = errors.New("the instance is already running")
+	ErrInstanceNotRunning     = errors.New("the instance is not running")
 )
 
 type InstanceService struct {
@@ -80,6 +82,10 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		return err
 	}
 
+	if i.IsRunning() {
+		return ErrInstanceAlreadyRunning
+	}
+
 	if i.UseDocker {
 		err = s.startWithDocker(i)
 	} else {
@@ -99,13 +105,17 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 		return err
 	}
 
+	if !i.IsRunning() {
+		return ErrInstanceNotRunning
+	}
+
 	if i.UseDocker {
 		err = s.stopWithDocker(i)
 	} else {
 		err = s.stopManually(i)
 	}
 
-	if err != nil {
+	if err == nil {
 		i.SetStatus(types.InstanceStatusOff)
 	}
 

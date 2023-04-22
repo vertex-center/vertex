@@ -66,7 +66,7 @@ func (i *Instance) DockerContainerName() string {
 }
 
 func (i *Instance) IsRunning() bool {
-	return i.Status != InstanceStatusOff
+	return i.Status != InstanceStatusOff && i.Status != InstanceStatusError
 }
 
 func (i *Instance) Register(channel chan InstanceEvent) uuid.UUID {
