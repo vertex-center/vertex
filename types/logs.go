@@ -19,8 +19,7 @@ type Logs struct {
 	Lines []LogLine `json:"lines"`
 }
 
-func (l *Logs) Add(line LogLine) LogLine {
+func (l *Logs) Add(line *LogLine) {
 	line.Id = len(l.Lines) + 1
-	l.Lines = append(l.Lines, line)
-	return line
+	l.Lines = append(l.Lines, *line)
 }

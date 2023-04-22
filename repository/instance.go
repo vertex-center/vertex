@@ -316,7 +316,7 @@ func (r *InstanceRepository) Download(dest string, repo string, forceClone bool)
 }
 
 func (r *InstanceRepository) AppendLogLine(i *types.Instance, line *types.LogLine) {
-	i.Logs.Lines = append(i.Logs.Lines, *line)
+	i.Logs.Add(line)
 
 	data, err := json.Marshal(line)
 	if err != nil {
