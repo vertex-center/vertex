@@ -92,7 +92,7 @@ func (l *Logger) NewLine(tag string, kind string, color color.Attribute, message
 
 	if message != "" {
 		messageColored = formattedKeyValue(color, "msg", message)
-		messagePlain = "msg=" + message
+		messagePlain = "msg=" + message + " "
 	}
 
 	return &Line{
