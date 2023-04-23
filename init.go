@@ -19,6 +19,9 @@ var (
 )
 
 func main() {
+	logger.DefaultLogger = logger.NewDefaultLogger()
+	defer logger.DefaultLogger.Close()
+
 	parseArgs()
 
 	err := os.MkdirAll(storage.PathInstances, os.ModePerm)
