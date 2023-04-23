@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v50/github"
+	"github.com/vertex-center/vertex/logger"
 	"github.com/vertex-center/vertex/storage"
 	"github.com/vertex-center/vertex/types"
 )
@@ -41,7 +42,7 @@ func (s UpdateService) CheckForVertexUpdate(currentVersion string) (*types.Updat
 	}
 
 	if currentVersion == "dev" {
-		logger.Log("skipping update in 'dev' version")
+		logger.Log("skipping update in 'dev' version").Print()
 		return update, nil, nil
 	}
 
@@ -66,11 +67,14 @@ func (s UpdateService) CheckForVertexUpdate(currentVersion string) (*types.Updat
 	update.LatestVersion = releaseVersion
 
 	if currentVersion == releaseVersion {
-		logger.Log("vertex is already up-to-date")
+		logger.Log("vertex is already up-to-date").Print()
 		return update, nil, nil
 	}
 
-	logger.Log(fmt.Sprintf("a new release for Vertex is available ('%s'), currently using '%s'", releaseVersion, currentVersion))
+	logger.Log("a new release for Vertex is available").
+		AddKeyValue("current", currentVersion).
+		AddKeyValue("release", releaseVersion).
+		Print()
 
 	update.UpToDate = false
 	return update, release, nil
@@ -97,6 +101,6 @@ func (s UpdateService) InstallVertexUpdate(currentVersion string) error {
 		return err
 	}
 
-	logger.Warn("A new Vertex update has been installed. Please restart Vertex.")
+	logger.Warn("a new Vertex update has been installed. please restart Vertex.").Print()
 	return nil
 }

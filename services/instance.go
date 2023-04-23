@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/logger"
 	"github.com/vertex-center/vertex/repository"
 	"github.com/vertex-center/vertex/storage"
 	"github.com/vertex-center/vertex/types"
@@ -54,7 +55,7 @@ func (s *InstanceService) Delete(uuid uuid.UUID) error {
 	if i.UseDocker {
 		containerID, err := s.dockerRepo.GetContainerID(i.DockerContainerName())
 		if err == repository.ErrContainerNotFound {
-			logger.Warn(err.Error())
+			logger.Warn(err.Error()).Print()
 		} else if err != nil {
 			return err
 		} else {
@@ -166,7 +167,10 @@ func (s *InstanceService) startWithDocker(i *types.Instance) error {
 	// Create
 	id, err := s.dockerRepo.GetContainerID(containerName)
 	if err == repository.ErrContainerNotFound {
-		logger.Log(fmt.Sprintf("container %s doesn't exists, create it.", containerName))
+		logger.Log("container doesn't exists, create it.").
+			AddKeyValue("container_name", containerName).
+			Print()
+
 		id, err = s.dockerRepo.CreateContainer(imageName, containerName)
 		if err != nil {
 			return err
@@ -189,7 +193,9 @@ func (s *InstanceService) startWithDocker(i *types.Instance) error {
 
 func (s *InstanceService) startManually(i *types.Instance) error {
 	if i.Cmd != nil {
-		logger.Error(fmt.Errorf("runner %s already started", i.Name))
+		logger.Error(errors.New("runner already started")).
+			AddKeyValue("name", i.Name).
+			Print()
 	}
 
 	dir := s.repo.GetPath(i)
@@ -258,7 +264,9 @@ func (s *InstanceService) startManually(i *types.Instance) error {
 	go func() {
 		err := i.Cmd.Wait()
 		if err != nil {
-			logger.Error(fmt.Errorf("%s: %v", i.Service.Name, err))
+			logger.Error(err).
+				AddKeyValue("name", i.Service.Name).
+				Print()
 		}
 		i.SetStatus(types.InstanceStatusOff)
 	}()

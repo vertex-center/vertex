@@ -12,14 +12,12 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex-core-golang/console"
+	"github.com/vertex-center/vertex/logger"
 	"github.com/vertex-center/vertex/storage"
 	"github.com/vertex-center/vertex/types"
 )
 
 var (
-	logger = console.New("vertex::repository")
-
 	ErrContainerNotFound = errors.New("container not found")
 )
 
@@ -105,13 +103,20 @@ func (r *InstanceRepository) Create(uuid uuid.UUID, i *types.Instance) {
 func (r *InstanceRepository) AddListener(channel chan types.InstanceEvent) uuid.UUID {
 	id := uuid.New()
 	r.listeners[id] = channel
-	logger.Log(fmt.Sprintf("channel %s registered to instances", id))
+
+	logger.Log("registered to instance").
+		AddKeyValue("channel", id).
+		Print()
+
 	return id
 }
 
 func (r *InstanceRepository) RemoveListener(uuid uuid.UUID) {
 	delete(r.listeners, uuid)
-	logger.Log(fmt.Sprintf("channel %s unregistered from instances", uuid))
+
+	logger.Log("unregistered from instance").
+		AddKeyValue("channel", uuid).
+		Print()
 }
 
 func (r *InstanceRepository) SaveMetadata(i *types.Instance) error {
@@ -168,15 +173,16 @@ func (r *InstanceRepository) reload() {
 		isInstance := entry.IsDir() || info.Mode()&os.ModeSymlink != 0
 
 		if isInstance {
-			logger.Log(fmt.Sprintf("found service uuid=%s", entry.Name()))
+			logger.Log("found service").
+				AddKeyValue("uuid", entry.Name()).
+				Print()
+
 			serviceUUID, err := uuid.Parse(entry.Name())
 			if err != nil {
 				log.Fatal(err)
 			}
 
 			if !r.Exists(serviceUUID) {
-				logger.Log(fmt.Sprintf("instantiate service uuid=%s", entry.Name()))
-
 				_, err = r.Instantiate(serviceUUID)
 				if err != nil {
 					log.Fatal(err)
@@ -201,7 +207,7 @@ func (r *InstanceRepository) load(instanceUUID uuid.UUID) (*types.Instance, erro
 	metaBytes, err := os.ReadFile(metaPath)
 
 	if errors.Is(err, os.ErrNotExist) {
-		logger.Log("instance_metadata.json not found. using default.")
+		logger.Log("instance_metadata.json not found. using default.").Print()
 	} else if err != nil {
 		return nil, err
 	} else {
@@ -228,7 +234,9 @@ func (r *InstanceRepository) load(instanceUUID uuid.UUID) (*types.Instance, erro
 func (r *InstanceRepository) readService(servicePath string) (*types.Service, error) {
 	data, err := os.ReadFile(path.Join(servicePath, ".vertex", "service.json"))
 	if err != nil {
-		logger.Warn(fmt.Sprintf("service at '%s' has no '.vertex/service.json' file", path.Dir(servicePath)))
+		logger.Warn("service has no '.vertex/service.json' file").
+			AddKeyValue("path", path.Dir(servicePath)).
+			Print()
 	}
 
 	var service types.Service
@@ -296,9 +304,9 @@ func (r *InstanceRepository) Download(dest string, repo string, forceClone bool)
 	var err error
 
 	if forceClone {
-		logger.Log("force-clone enabled.")
+		logger.Log("force-clone enabled.").Print()
 	} else {
-		logger.Log("force-clone disabled. try to download the releases first")
+		logger.Log("force-clone disabled. try to download the releases first").Print()
 		err = downloadFromReleases(dest, repo)
 	}
 
@@ -320,7 +328,7 @@ func (r *InstanceRepository) AppendLogLine(i *types.Instance, line *types.LogLin
 
 	data, err := json.Marshal(line)
 	if err != nil {
-		logger.Error(err)
+		logger.Error(err).Print()
 	}
 
 	var name string

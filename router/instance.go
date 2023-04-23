@@ -9,6 +9,7 @@ import (
 	"github.com/gin-contrib/sse"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/logger"
 	"github.com/vertex-center/vertex/types"
 )
 
@@ -132,7 +133,7 @@ func handleInstanceEvents(c *gin.Context) {
 			})
 
 			if err != nil {
-				logger.Error(err)
+				logger.Error(err).Print()
 				return false
 			}
 			first = false
@@ -146,7 +147,7 @@ func handleInstanceEvents(c *gin.Context) {
 				Data:  e.Data,
 			})
 			if err != nil {
-				logger.Error(err)
+				logger.Error(err).Print()
 			}
 			return true
 		case <-done:
@@ -163,7 +164,7 @@ func handleGetDependencies(c *gin.Context) {
 	for name := range i.Dependencies {
 		dep, err := packageService.Get(name)
 		if err != nil {
-			logger.Error(err)
+			logger.Error(err).Print()
 			continue
 		}
 

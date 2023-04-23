@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex/client"
+	"github.com/vertex-center/vertex/logger"
 	"github.com/vertex-center/vertex/router"
 	"github.com/vertex-center/vertex/storage"
 )
@@ -18,20 +18,22 @@ var (
 	date    = "unknown"
 )
 
-var logger = console.New("vertex")
-
 func main() {
 	parseArgs()
 
 	err := os.MkdirAll(storage.PathInstances, os.ModePerm)
 	if err != nil && !os.IsExist(err) {
-		logger.Error(fmt.Errorf("couldn't create '%s' directory: %v", storage.PathInstances, err))
+		logger.Error(fmt.Errorf("failed to create directory: %v", err)).
+			AddKeyValue("message", "failed to create directory").
+			AddKeyValue("path", storage.PathInstances).
+			Print()
+
 		return
 	}
 
 	err = client.Setup()
 	if err != nil {
-		logger.Error(fmt.Errorf("failed to setup the web client: %v", err))
+		logger.Error(fmt.Errorf("failed to setup the web client: %v", err)).Print()
 		return
 	}
 
@@ -43,7 +45,7 @@ func main() {
 
 	err = r.Run(":6130")
 	if err != nil {
-		logger.Error(fmt.Errorf("error while starting server: %v", err))
+		logger.Error(fmt.Errorf("error while starting server: %v", err)).Print()
 		return
 	}
 }
@@ -62,7 +64,6 @@ func parseArgs() {
 	if *flagDate {
 		fmt.Println(date)
 		os.Exit(0)
-
 	}
 	if *flagCommit {
 		fmt.Println(commit)

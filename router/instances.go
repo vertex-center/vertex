@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-contrib/sse"
 	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/logger"
 	"github.com/vertex-center/vertex/types"
 )
 
@@ -39,7 +40,7 @@ func handleInstancesEvents(c *gin.Context) {
 			})
 
 			if err != nil {
-				logger.Error(err)
+				logger.Error(err).Print()
 				return false
 			}
 			first = false
@@ -53,7 +54,7 @@ func handleInstancesEvents(c *gin.Context) {
 				Data:  e.Name,
 			})
 			if err != nil {
-				logger.Error(err)
+				logger.Error(err).Print()
 			}
 			return true
 		case <-done:

@@ -1,6 +1,7 @@
 package router
 
 import (
+	"errors"
 	"net/http"
 	"path"
 
@@ -8,13 +9,11 @@ import (
 	"github.com/gin-contrib/sse"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex-core-golang/console"
 	"github.com/vertex-center/vertex-core-golang/router"
+	"github.com/vertex-center/vertex/logger"
 	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/storage"
 )
-
-var logger = console.New("vertex::router")
 
 var (
 	packageService  services.PackageService
@@ -30,7 +29,26 @@ type About struct {
 }
 
 func InitializeRouter(about About) *gin.Engine {
-	r, api := router.CreateRouter(cors.Default())
+	gin.SetMode(gin.ReleaseMode)
+	r, api := router.CreateRouter(
+		cors.Default(),
+		gin.LoggerWithFormatter(func(params gin.LogFormatterParams) string {
+			request := logger.Request().
+				AddKeyValue("method", params.Method).
+				AddKeyValue("status", params.StatusCode).
+				AddKeyValue("path", params.Path).
+				AddKeyValue("latency", params.Latency).
+				AddKeyValue("ip", params.ClientIP).
+				AddKeyValue("size", params.BodySize).
+				String()
+
+			if params.ErrorMessage != "" {
+				request += logger.Error(errors.New(params.ErrorMessage)).String()
+			}
+
+			return request
+		}),
+	)
 	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.PathClient, "dist"), true)))
 
 	packageService = services.NewPackageService()

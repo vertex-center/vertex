@@ -8,6 +8,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
+	"github.com/vertex-center/vertex/logger"
 )
 
 type DockerRepository struct {
@@ -17,7 +18,10 @@ type DockerRepository struct {
 func NewDockerRepository() DockerRepository {
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
-		logger.Warn("Couldn't connect Docker cli.")
+		logger.Warn("couldn't connect with the Docker cli.").
+			AddKeyValue("error", err.Error()).
+			Print()
+
 		return DockerRepository{}
 	}
 
@@ -55,10 +59,10 @@ func (r DockerRepository) BuildImage(instancePath string, imageName string) erro
 		if scanner.Err() != nil {
 			return scanner.Err()
 		}
-		logger.Log(scanner.Text())
+		logger.Log(scanner.Text()).Print()
 	}
 
-	logger.Log("Docker build: success.")
+	logger.Log("Docker build: success.").Print()
 	return nil
 }
 

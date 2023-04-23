@@ -1,11 +1,10 @@
 package types
 
 import (
-	"fmt"
 	"os/exec"
 
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex-core-golang/console"
+	"github.com/vertex-center/vertex/logger"
 )
 
 const (
@@ -16,10 +15,6 @@ const (
 	InstanceStatusError    = "error"
 
 	InstanceEventStatusChange = "status_change"
-)
-
-var (
-	logger = console.New("vertex::types")
 )
 
 type InstanceMetadata struct {
@@ -72,13 +67,22 @@ func (i *Instance) IsRunning() bool {
 func (i *Instance) Register(channel chan InstanceEvent) uuid.UUID {
 	id := uuid.New()
 	i.Listeners[id] = channel
-	logger.Log(fmt.Sprintf("channel %s registered to instance uuid=%s", id, i.UUID))
+
+	logger.Log("registered to instance").
+		AddKeyValue("channel", id).
+		AddKeyValue("instance_uuid", i.UUID).
+		Print()
+
 	return id
 }
 
 func (i *Instance) Unregister(uuid uuid.UUID) {
 	delete(i.Listeners, uuid)
-	logger.Log(fmt.Sprintf("channel %s unregistered from instance uuid=%s", uuid, i.UUID))
+
+	logger.Log("unregistered from instance").
+		AddKeyValue("channel", uuid).
+		AddKeyValue("instance_uuid", i.UUID).
+		Print()
 }
 
 func (i *Instance) SetStatus(status string) {

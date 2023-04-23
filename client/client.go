@@ -11,11 +11,9 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v50/github"
-	"github.com/vertex-center/vertex-core-golang/console"
+	"github.com/vertex-center/vertex/logger"
 	"github.com/vertex-center/vertex/storage"
 )
-
-var logger = console.New("client")
 
 func Setup() error {
 	err := os.Mkdir(storage.PathClient, os.ModePerm)
@@ -37,7 +35,7 @@ func Setup() error {
 		return fmt.Errorf("failed to retrieve the latest github release for %s: %v", repo, err)
 	}
 
-	logger.Log("Downloading vertex-webui client...")
+	logger.Log("downloading vertex-webui client...").Print()
 
 	for _, asset := range release.Assets {
 		if strings.Contains(*asset.Name, "vertex-webui") {
