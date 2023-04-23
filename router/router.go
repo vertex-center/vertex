@@ -1,9 +1,9 @@
 package router
 
 import (
-	"errors"
 	"net/http"
 	"path"
+	"strings"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sse"
@@ -33,20 +33,20 @@ func InitializeRouter(about About) *gin.Engine {
 	r, api := router.CreateRouter(
 		cors.Default(),
 		gin.LoggerWithFormatter(func(params gin.LogFormatterParams) string {
-			request := logger.Request().
+			l := logger.Request().
 				AddKeyValue("method", params.Method).
 				AddKeyValue("status", params.StatusCode).
 				AddKeyValue("path", params.Path).
 				AddKeyValue("latency", params.Latency).
 				AddKeyValue("ip", params.ClientIP).
-				AddKeyValue("size", params.BodySize).
-				String()
+				AddKeyValue("size", params.BodySize)
 
 			if params.ErrorMessage != "" {
-				request += logger.Error(errors.New(params.ErrorMessage)).String()
+				err, _ := strings.CutSuffix(params.ErrorMessage, "\n")
+				l.AddKeyValue("error", err)
 			}
 
-			return request
+			return l.String()
 		}),
 	)
 	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.PathClient, "dist"), true)))
