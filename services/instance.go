@@ -88,6 +88,10 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		Message: "Starting instance...",
 	})
 
+	logger.Log("starting instance").
+		AddKeyValue("uuid", uuid).
+		Print()
+
 	if i.IsRunning() {
 		s.repo.AppendLogLine(i, &types.LogLine{
 			Kind:    types.LogKindVertexErr,
@@ -109,6 +113,10 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 			Kind:    types.LogKindVertexOut,
 			Message: "Instance started.",
 		})
+
+		logger.Log("instance started").
+			AddKeyValue("uuid", uuid).
+			Print()
 	}
 
 	return err
@@ -124,6 +132,10 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 		Kind:    types.LogKindVertexOut,
 		Message: "Stopping instance...",
 	})
+
+	logger.Log("stopping instance").
+		AddKeyValue("uuid", uuid).
+		Print()
 
 	if !i.IsRunning() {
 		s.repo.AppendLogLine(i, &types.LogLine{
@@ -144,6 +156,11 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 			Kind:    types.LogKindVertexOut,
 			Message: "Instance stopped.",
 		})
+
+		logger.Log("instance stopped").
+			AddKeyValue("uuid", uuid).
+			Print()
+
 		i.SetStatus(types.InstanceStatusOff)
 	}
 
