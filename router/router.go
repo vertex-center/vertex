@@ -46,6 +46,8 @@ func InitializeRouter(about About) *gin.Engine {
 				l.AddKeyValue("error", err)
 			}
 
+			l.PrintInExternalFiles()
+
 			return l.String()
 		}),
 	)

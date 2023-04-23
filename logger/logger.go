@@ -86,80 +86,51 @@ func Error(err error) *Line {
 	return DefaultLogger.Error(err)
 }
 
-func (l *Logger) Log(message string) *Line {
+func (l *Logger) NewLine(tag string, kind string, color color.Attribute, message string) *Line {
+	messageColored := ""
+	messagePlain := ""
+
+	if message != "" {
+		messageColored = formattedKeyValue(color, "msg", message)
+		messagePlain = "msg=" + message
+	}
+
 	return &Line{
 		logger:         l,
-		tag:            tagInfo,
-		kind:           LogKindOut,
-		color:          color.FgBlue,
+		tag:            tag,
+		kind:           kind,
+		color:          color,
 		date:           l.Date(),
-		messageColored: formattedKeyValue(color.FgBlue, "msg", message),
-		messagePlain:   "msg=" + message,
+		messageColored: messageColored,
+		messagePlain:   messagePlain,
 		json: map[string]any{
 			"seconds":     time.Now().Unix(),
 			"nanoseconds": time.Now().UnixNano(),
-			"kind":        "info",
+			"kind":        tag,
 			"msg":         message,
 		},
 	}
+}
+
+func (l *Logger) Log(message string) *Line {
+	return l.NewLine(tagInfo, LogKindOut, color.FgBlue, message)
 }
 
 func (l *Logger) Request() *Line {
-	return &Line{
-		logger:         l,
-		tag:            tagRequest,
-		kind:           LogKindOut,
-		color:          color.FgGreen,
-		date:           l.Date(),
-		messageColored: "",
-		messagePlain:   "",
-		json: map[string]any{
-			"seconds":     time.Now().Unix(),
-			"nanoseconds": time.Now().UnixNano(),
-			"kind":        "request",
-		},
-	}
+	return l.NewLine(tagRequest, LogKindOut, color.FgGreen, "")
 }
 
 func (l *Logger) Warn(message string) *Line {
-	return &Line{
-		logger:         l,
-		tag:            tagWarn,
-		kind:           LogKindOut,
-		color:          color.FgYellow,
-		date:           l.Date(),
-		messageColored: formattedKeyValue(color.FgYellow, "msg", message),
-		messagePlain:   "msg=" + message,
-		json: map[string]any{
-			"seconds":     time.Now().Unix(),
-			"nanoseconds": time.Now().UnixNano(),
-			"kind":        "warn",
-			"msg":         message,
-		},
-	}
+	return l.NewLine(tagWarn, LogKindOut, color.FgYellow, message)
 }
 
 func (l *Logger) Error(err error) *Line {
-	return &Line{
-		logger:         l,
-		tag:            tagError,
-		kind:           LogKindErr,
-		color:          color.FgRed,
-		date:           l.Date(),
-		messageColored: formattedKeyValue(color.FgRed, "msg", err.Error()),
-		messagePlain:   "msg=" + err.Error(),
-		json: map[string]any{
-			"seconds":     time.Now().Unix(),
-			"nanoseconds": time.Now().UnixNano(),
-			"kind":        "error",
-			"msg":         err.Error(),
-		},
-	}
+	return l.NewLine(tagError, LogKindErr, color.FgRed, err.Error())
 }
 
 func (l *Line) AddKeyValue(key string, value any) *Line {
 	l.messageColored += formattedKeyValue(l.color, key, value)
-	l.messagePlain += fmt.Sprintf("%s=%v", key, value)
+	l.messagePlain += fmt.Sprintf("%s=%v ", key, value)
 	l.json[key] = value
 	return l
 }
@@ -190,6 +161,10 @@ func (l *Line) Print() {
 	} else {
 		_, _ = fmt.Fprint(l.logger.out, l.String())
 	}
+	l.PrintInExternalFiles()
+}
+
+func (l *Line) PrintInExternalFiles() {
 	if l.logger.text != nil {
 		_, _ = fmt.Fprint(l.logger.text, l.StringPlain())
 	}
