@@ -44,18 +44,14 @@ type Line struct {
 	json           map[string]any
 }
 
-func NewDefaultLogger() Logger {
-	_ = os.MkdirAll(logsPath, os.ModePerm)
-
-	l := Logger{
+func CreateDefaultLogger() {
+	DefaultLogger = Logger{
 		out: os.Stdout,
 		err: os.Stderr,
 	}
 
-	l.OpenLogFiles()
-	l.StartCron()
-
-	return l
+	DefaultLogger.OpenLogFiles()
+	DefaultLogger.StartCron()
 }
 
 func (l *Logger) StartCron() {
@@ -76,6 +72,8 @@ func (l *Logger) CloseLogFiles() {
 }
 
 func (l *Logger) OpenLogFiles() {
+	_ = os.MkdirAll(logsPath, os.ModePerm)
+
 	filename := fmt.Sprintf("vertex_logs_%s.txt", time.Now().Format(time.DateOnly))
 	t, err := os.OpenFile(path.Join(logsPath, filename), os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
 	if err != nil {

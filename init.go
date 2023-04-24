@@ -19,7 +19,7 @@ var (
 )
 
 func main() {
-	logger.DefaultLogger = logger.NewDefaultLogger()
+	logger.CreateDefaultLogger()
 	defer logger.DefaultLogger.CloseLogFiles()
 
 	logger.Log("Vertex starting...").Print()
