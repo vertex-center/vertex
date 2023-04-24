@@ -20,7 +20,7 @@ var (
 
 func main() {
 	logger.DefaultLogger = logger.NewDefaultLogger()
-	defer logger.DefaultLogger.Close()
+	defer logger.DefaultLogger.CloseLogFiles()
 
 	parseArgs()
 

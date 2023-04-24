@@ -61,7 +61,7 @@ func NewDefaultLogger() *Logger {
 func (l *Logger) StartCron() {
 	s := gocron.NewScheduler(time.Local)
 	_, err := s.Every(1).Day().At("00:00").Do(func() {
-		l.Close()
+		l.CloseLogFiles()
 		l.OpenLogFiles()
 	})
 	if err != nil {
@@ -70,7 +70,7 @@ func (l *Logger) StartCron() {
 	s.StartAsync()
 }
 
-func (l *Logger) Close() {
+func (l *Logger) CloseLogFiles() {
 	l.text.Close()
 	l.json.Close()
 }
