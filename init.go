@@ -22,6 +22,8 @@ func main() {
 	logger.DefaultLogger = logger.NewDefaultLogger()
 	defer logger.DefaultLogger.CloseLogFiles()
 
+	logger.Log("Vertex starting...").Print()
+
 	parseArgs()
 
 	err := os.MkdirAll(storage.PathInstances, os.ModePerm)
@@ -46,11 +48,14 @@ func main() {
 		Date:    date,
 	})
 
+	logger.Log("Vertex started.").Print()
+
 	err = r.Run(":6130")
 	if err != nil {
 		logger.Error(fmt.Errorf("error while starting server: %v", err)).Print()
-		return
 	}
+
+	logger.Log("Vertex stopped.").Print()
 }
 
 func parseArgs() {
