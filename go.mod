@@ -9,6 +9,7 @@ require (
 	github.com/gin-contrib/sse v0.1.0
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.8.2
+	github.com/go-co-op/gocron v1.23.0
 	github.com/go-git/go-git/v5 v5.6.1
 	github.com/google/go-github/v50 v50.0.0
 	github.com/google/uuid v1.3.0
@@ -57,6 +58,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/skeema/knownhosts v1.1.0 // indirect

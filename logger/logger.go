@@ -8,10 +8,11 @@ import (
 	"time"
 
 	"github.com/fatih/color"
+	"github.com/go-co-op/gocron"
 )
 
 var (
-	DefaultLogger Logger
+	DefaultLogger *Logger
 
 	LogKindOut = "out"
 	LogKindErr = "err"
@@ -20,6 +21,8 @@ var (
 	tagWarn    = "WRN"
 	tagError   = "ERR"
 	tagRequest = "REQ"
+
+	logsPath = path.Join("live", "logs")
 )
 
 type Logger struct {
@@ -41,34 +44,54 @@ type Line struct {
 	json           map[string]any
 }
 
-func NewDefaultLogger() Logger {
-	logsPath := path.Join("live", "logs")
-
+func NewDefaultLogger() *Logger {
 	_ = os.MkdirAll(logsPath, os.ModePerm)
 
-	t, err := os.OpenFile(path.Join(logsPath, "vertex_logs.txt"), os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "failed to open vertex_logs.txt: %v\n", err)
-		t = nil
+	l := &Logger{
+		out: os.Stdout,
+		err: os.Stderr,
 	}
 
-	// jsonl stands for the json lines format. https://jsonlines.org/
-	j, err := os.OpenFile(path.Join(logsPath, "vertex_logs.jsonl"), os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "failed to open vertex_logs.jsonl: %v\n", err)
-		j = nil
-	}
+	l.OpenLogFiles()
+	l.StartCron()
 
-	return Logger{
-		out:  os.Stdout,
-		err:  os.Stderr,
-		text: t,
-		json: j,
+	return l
+}
+
+func (l *Logger) StartCron() {
+	s := gocron.NewScheduler(time.Local)
+	_, err := s.Every(1).Day().At("00:00").Do(func() {
+		l.Close()
+		l.OpenLogFiles()
+	})
+	if err != nil {
+		_, _ = fmt.Fprint(os.Stderr, err.Error())
 	}
+	s.StartAsync()
 }
 
 func (l *Logger) Close() {
+	l.text.Close()
 	l.json.Close()
+}
+
+func (l *Logger) OpenLogFiles() {
+	filename := fmt.Sprintf("vertex_logs_%s.txt", time.Now().Format(time.DateOnly))
+	t, err := os.OpenFile(path.Join(logsPath, filename), os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
+	if err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "failed to open %s: %v\n", filename, err)
+		t = nil
+	}
+	l.text = t
+
+	// jsonl stands for the json lines format. https://jsonlines.org/
+	filename = fmt.Sprintf("vertex_logs_%s.jsonl", time.Now().Format(time.DateOnly))
+	j, err := os.OpenFile(path.Join(logsPath, filename), os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
+	if err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "failed to open %s: %v\n", filename, err)
+		j = nil
+	}
+	l.json = j
 }
 
 func (l *Logger) Date() string {
