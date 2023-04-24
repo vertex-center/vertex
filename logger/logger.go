@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path"
 	"time"
 
 	"github.com/fatih/color"
@@ -41,16 +42,20 @@ type Line struct {
 }
 
 func NewDefaultLogger() Logger {
-	t, err := os.OpenFile("vertex_logs.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
+	logsPath := path.Join("live", "logs")
+
+	_ = os.MkdirAll(logsPath, os.ModePerm)
+
+	t, err := os.OpenFile(path.Join(logsPath, "vertex_logs.txt"), os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
 	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "failed to open vertex.logs: %v", err)
+		_, _ = fmt.Fprintf(os.Stderr, "failed to open vertex_logs.txt: %v\n", err)
 		t = nil
 	}
 
 	// jsonl stands for the json lines format. https://jsonlines.org/
-	j, err := os.OpenFile("vertex_logs.jsonl", os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
+	j, err := os.OpenFile(path.Join(logsPath, "vertex_logs.jsonl"), os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
 	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "failed to open vertex.logs: %v", err)
+		_, _ = fmt.Fprintf(os.Stderr, "failed to open vertex_logs.jsonl: %v\n", err)
 		j = nil
 	}
 
