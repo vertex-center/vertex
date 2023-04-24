@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	DefaultLogger *Logger
+	DefaultLogger Logger
 
 	LogKindOut = "out"
 	LogKindErr = "err"
@@ -44,10 +44,10 @@ type Line struct {
 	json           map[string]any
 }
 
-func NewDefaultLogger() *Logger {
+func NewDefaultLogger() Logger {
 	_ = os.MkdirAll(logsPath, os.ModePerm)
 
-	l := &Logger{
+	l := Logger{
 		out: os.Stdout,
 		err: os.Stderr,
 	}
