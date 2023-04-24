@@ -5,6 +5,7 @@ import Loading from "../../components/Loading/Loading";
 import Symbol from "../../components/Symbol/Symbol";
 
 import styles from "./SettingsAbout.module.sass";
+import { Error } from "../../components/Error/Error";
 
 type Props = {};
 
@@ -14,21 +15,27 @@ export default function SettingsAbout(props: Props) {
     const [date, setDate] = useState<string>();
 
     const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState();
 
     useEffect(() => {
         setLoading(true);
-        getAbout().then((about) => {
-            setVersion(about.version);
-            setCommit(about.commit);
-            setDate(about.date);
-            setLoading(false);
-        });
+        getAbout()
+            .then((about) => {
+                setVersion(about.version);
+                setCommit(about.commit);
+                setDate(about.date);
+                setLoading(false);
+            })
+            .catch((err) =>
+                setError(err?.response?.data?.message ?? err?.message)
+            );
     }, []);
 
     return (
         <Fragment>
             <Title>About</Title>
-            {loading && <Loading />}
+            {error && <Error error={error} />}
+            {loading && !error && <Loading />}
             {!loading && (
                 <table>
                     <tbody>
