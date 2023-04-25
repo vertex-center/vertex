@@ -31,9 +31,9 @@ type Instance struct {
 	Service
 	InstanceMetadata
 
-	Status       string       `json:"status"`
-	Logs         Logs         `json:"logs"`
-	EnvVariables EnvVariables `json:"env"`
+	Status       string          `json:"status"`
+	Logger       *InstanceLogger `json:"-"`
+	EnvVariables EnvVariables    `json:"env"`
 
 	UUID uuid.UUID `json:"uuid"`
 	Cmd  *exec.Cmd `json:"-"`

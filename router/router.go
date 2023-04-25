@@ -28,7 +28,7 @@ type About struct {
 	Date    string `json:"date"`
 }
 
-func InitializeRouter(about About) *gin.Engine {
+func Create(about About) *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	r, api := router.CreateRouter(
 		cors.Default(),
@@ -69,6 +69,10 @@ func InitializeRouter(about About) *gin.Engine {
 	})
 
 	return r
+}
+
+func Unload() {
+	instanceService.Unload()
 }
 
 func headersSSE(c *gin.Context) {

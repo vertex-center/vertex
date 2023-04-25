@@ -42,11 +42,12 @@ func main() {
 		return
 	}
 
-	r := router.InitializeRouter(router.About{
+	r := router.Create(router.About{
 		Version: version,
 		Commit:  commit,
 		Date:    date,
 	})
+	defer router.Unload()
 
 	logger.Log("Vertex started.").Print()
 

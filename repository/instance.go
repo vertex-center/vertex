@@ -159,6 +159,8 @@ func (r *InstanceRepository) Instantiate(uuid uuid.UUID) (*types.Instance, error
 }
 
 func (r *InstanceRepository) reload() {
+	r.unloadAll()
+
 	entries, err := os.ReadDir(storage.PathInstances)
 	if err != nil {
 		log.Fatal(err)
@@ -193,7 +195,9 @@ func (r *InstanceRepository) reload() {
 }
 
 func (r *InstanceRepository) load(instanceUUID uuid.UUID) (*types.Instance, error) {
-	service, err := r.readService(path.Join(storage.PathInstances, instanceUUID.String()))
+	instancePath := path.Join(storage.PathInstances, instanceUUID.String())
+
+	service, err := r.readService(instancePath)
 	if err != nil {
 		return nil, err
 	}
@@ -203,7 +207,7 @@ func (r *InstanceRepository) load(instanceUUID uuid.UUID) (*types.Instance, erro
 		UseReleases: false,
 	}
 
-	metaPath := path.Join(storage.PathInstances, instanceUUID.String(), ".vertex", "instance_metadata.json")
+	metaPath := path.Join(instancePath, ".vertex", "instance_metadata.json")
 	metaBytes, err := os.ReadFile(metaPath)
 
 	if errors.Is(err, os.ErrNotExist) {
@@ -217,11 +221,16 @@ func (r *InstanceRepository) load(instanceUUID uuid.UUID) (*types.Instance, erro
 		}
 	}
 
+	instanceLogger, err := types.NewInstanceLogger(instancePath)
+	if err != nil {
+		return nil, err
+	}
+
 	i := &types.Instance{
 		Service:          *service,
 		InstanceMetadata: meta,
 		Status:           types.InstanceStatusOff,
-		Logs:             types.Logs{},
+		Logger:           instanceLogger,
 		EnvVariables:     *types.NewEnvVariables(),
 		UUID:             instanceUUID,
 		Listeners:        map[uuid.UUID]chan types.InstanceEvent{},
@@ -229,6 +238,16 @@ func (r *InstanceRepository) load(instanceUUID uuid.UUID) (*types.Instance, erro
 
 	err = r.readEnv(i)
 	return i, err
+}
+
+func (r *InstanceRepository) unloadAll() {
+	for _, i := range r.instances {
+		i.Logger.Close()
+	}
+}
+
+func (r *InstanceRepository) Unload() {
+	r.unloadAll()
 }
 
 func (r *InstanceRepository) readService(servicePath string) (*types.Service, error) {
@@ -323,8 +342,8 @@ func (r *InstanceRepository) Download(dest string, repo string, forceClone bool)
 	return err
 }
 
-func (r *InstanceRepository) AppendLogLine(i *types.Instance, line *types.LogLine) {
-	i.Logs.Add(line)
+func (r *InstanceRepository) WriteLogLine(i *types.Instance, line *types.LogLine) {
+	i.Logger.Write(line)
 
 	data, err := json.Marshal(line)
 	if err != nil {

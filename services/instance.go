@@ -34,6 +34,10 @@ func NewInstanceService() InstanceService {
 	}
 }
 
+func (s *InstanceService) Unload() {
+	s.repo.Unload()
+}
+
 func (s *InstanceService) Get(uuid uuid.UUID) (*types.Instance, error) {
 	return s.repo.Get(uuid)
 }
@@ -83,7 +87,7 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		return err
 	}
 
-	s.repo.AppendLogLine(i, &types.LogLine{
+	s.repo.WriteLogLine(i, &types.LogLine{
 		Kind:    types.LogKindVertexOut,
 		Message: "Starting instance...",
 	})
@@ -93,7 +97,7 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		Print()
 
 	if i.IsRunning() {
-		s.repo.AppendLogLine(i, &types.LogLine{
+		s.repo.WriteLogLine(i, &types.LogLine{
 			Kind:    types.LogKindVertexErr,
 			Message: ErrInstanceAlreadyRunning.Error(),
 		})
@@ -109,7 +113,7 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 	if err != nil {
 		i.SetStatus(types.InstanceStatusError)
 	} else {
-		s.repo.AppendLogLine(i, &types.LogLine{
+		s.repo.WriteLogLine(i, &types.LogLine{
 			Kind:    types.LogKindVertexOut,
 			Message: "Instance started.",
 		})
@@ -128,7 +132,7 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 		return err
 	}
 
-	s.repo.AppendLogLine(i, &types.LogLine{
+	s.repo.WriteLogLine(i, &types.LogLine{
 		Kind:    types.LogKindVertexOut,
 		Message: "Stopping instance...",
 	})
@@ -138,7 +142,7 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 		Print()
 
 	if !i.IsRunning() {
-		s.repo.AppendLogLine(i, &types.LogLine{
+		s.repo.WriteLogLine(i, &types.LogLine{
 			Kind:    types.LogKindVertexErr,
 			Message: ErrInstanceNotRunning.Error(),
 		})
@@ -152,7 +156,7 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 	}
 
 	if err == nil {
-		s.repo.AppendLogLine(i, &types.LogLine{
+		s.repo.WriteLogLine(i, &types.LogLine{
 			Kind:    types.LogKindVertexOut,
 			Message: "Instance stopped.",
 		})
@@ -254,7 +258,7 @@ func (s *InstanceService) startManually(i *types.Instance) error {
 	stdoutScanner := bufio.NewScanner(stdoutReader)
 	go func() {
 		for stdoutScanner.Scan() {
-			s.repo.AppendLogLine(i, &types.LogLine{
+			s.repo.WriteLogLine(i, &types.LogLine{
 				Kind:    types.LogKindOut,
 				Message: stdoutScanner.Text(),
 			})
@@ -264,7 +268,7 @@ func (s *InstanceService) startManually(i *types.Instance) error {
 	stderrScanner := bufio.NewScanner(stderrReader)
 	go func() {
 		for stderrScanner.Scan() {
-			s.repo.AppendLogLine(i, &types.LogLine{
+			s.repo.WriteLogLine(i, &types.LogLine{
 				Kind:    types.LogKindErr,
 				Message: stderrScanner.Text(),
 			})
