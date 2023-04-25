@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/fatih/color"
@@ -165,12 +166,12 @@ func (l *Line) String() string {
 	return fmt.Sprintf("%s %s %s\n",
 		color.New(color.FgHiWhite).Sprintf(l.date),
 		color.New(l.color).Sprintf(l.tag),
-		l.messageColored,
+		strings.TrimSpace(l.messageColored),
 	)
 }
 
 func (l *Line) StringPlain() string {
-	return fmt.Sprintf("%s %s %s\n", l.date, l.tag, l.messagePlain)
+	return fmt.Sprintf("%s %s %s\n", l.date, l.tag, strings.TrimSpace(l.messagePlain))
 }
 
 func (l *Line) Json() string {
