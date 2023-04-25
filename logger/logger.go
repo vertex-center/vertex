@@ -63,6 +63,7 @@ func (l *Logger) StartCron() {
 	})
 	if err != nil {
 		_, _ = fmt.Fprint(os.Stderr, err.Error())
+		return
 	}
 	s.StartAsync()
 }

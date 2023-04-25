@@ -221,16 +221,11 @@ func (r *InstanceRepository) load(instanceUUID uuid.UUID) (*types.Instance, erro
 		}
 	}
 
-	instanceLogger, err := types.NewInstanceLogger(instancePath)
-	if err != nil {
-		return nil, err
-	}
-
 	i := &types.Instance{
 		Service:          *service,
 		InstanceMetadata: meta,
 		Status:           types.InstanceStatusOff,
-		Logger:           instanceLogger,
+		Logger:           types.NewInstanceLogger(instancePath),
 		EnvVariables:     *types.NewEnvVariables(),
 		UUID:             instanceUUID,
 		Listeners:        map[uuid.UUID]chan types.InstanceEvent{},
@@ -242,7 +237,7 @@ func (r *InstanceRepository) load(instanceUUID uuid.UUID) (*types.Instance, erro
 
 func (r *InstanceRepository) unloadAll() {
 	for _, i := range r.instances {
-		i.Logger.Close()
+		i.Logger.CloseLogFile()
 	}
 }
 
