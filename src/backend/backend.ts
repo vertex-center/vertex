@@ -6,10 +6,6 @@ export type LogLine = {
     message: string;
 };
 
-export type Logs = {
-    lines: LogLine[];
-};
-
 export type Env = { [key: string]: string };
 
 export type EnvVariable = {
@@ -33,7 +29,6 @@ export type Service = {
 export type Instance = Service & {
     uuid: string;
     status: string;
-    logs: Logs;
     env: { [key: string]: string };
     use_docker?: boolean;
     use_releases?: boolean;
