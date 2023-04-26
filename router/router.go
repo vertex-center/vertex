@@ -19,7 +19,7 @@ var (
 	packageService  services.PackageService
 	serviceService  services.ServiceService
 	instanceService services.InstanceService
-	updateService   services.UpdateService
+	updateService   services.UpdateDependenciesService
 )
 
 type About struct {
@@ -56,13 +56,13 @@ func Create(about About) *gin.Engine {
 	packageService = services.NewPackageService()
 	serviceService = services.NewServiceService()
 	instanceService = services.NewInstanceService()
-	updateService = services.NewUpdateService()
+	updateService = services.NewUpdateDependenciesService(about.Version)
 
 	addServicesRoutes(api.Group("/services"))
 	addInstancesRoutes(api.Group("/instances"))
 	addInstanceRoutes(api.Group("/instance/:instance_uuid"))
 	addPackagesRoutes(api.Group("/packages"))
-	addUpdatesRoutes(api.Group("/updates"), about.Version)
+	addUpdatesRoutes(api.Group("/updates"))
 
 	api.GET("/about", func(c *gin.Context) {
 		c.JSON(http.StatusOK, about)

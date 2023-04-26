@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -11,45 +12,70 @@ import (
 	"github.com/vertex-center/vertex/logger"
 	"github.com/vertex-center/vertex/storage"
 	"github.com/vertex-center/vertex/types"
+	"golang.org/x/exp/slices"
 )
 
-type UpdateService struct{}
-
-func NewUpdateService() UpdateService {
-	return UpdateService{}
+type UpdateDependenciesService struct {
+	dependencies []types.Dependency
 }
 
-func (s UpdateService) CheckForUpdates(currentVertexVersion string) ([]types.Update, error) {
+func NewUpdateDependenciesService(currentVertexVersion string) UpdateDependenciesService {
+	return UpdateDependenciesService{
+		dependencies: []types.Dependency{
+			&vertexDependency{currentVersion: currentVertexVersion},
+		},
+	}
+}
+
+func (s UpdateDependenciesService) CheckForUpdates() ([]types.Update, error) {
 	var updates []types.Update
 
-	vertexUpdate, _, err := s.CheckForVertexUpdate(currentVertexVersion)
-	if err != nil {
-		return nil, err
-	} else {
-		updates = append(updates, *vertexUpdate)
+	for _, dependency := range s.dependencies {
+		update, err := dependency.CheckForUpdate()
+		if err != nil {
+			return nil, err
+		}
+		if update != nil {
+			updates = append(updates, *update)
+		}
 	}
 
 	return updates, nil
 }
 
-func (s UpdateService) CheckForVertexUpdate(currentVersion string) (*types.Update, *github.RepositoryRelease, error) {
-	update := &types.Update{
-		Id:             "vertex",
-		Name:           "Vertex",
-		CurrentVersion: currentVersion,
-		LatestVersion:  currentVersion,
-		UpToDate:       true,
+func (s UpdateDependenciesService) InstallUpdates(dependenciesID []string) error {
+	for _, dependency := range s.dependencies {
+		if slices.Contains(dependenciesID, dependency.GetID()) {
+			err := dependency.InstallUpdate()
+			if err != nil {
+				return err
+			}
+		}
 	}
+	return nil
+}
 
-	if currentVersion == "dev" {
+// Vertex: https://github.com/vertex-center/vertex
+type vertexDependency struct {
+	// The current version of Vertex.
+	currentVersion string
+
+	// The update found by the CheckForUpdate function.
+	update *types.Update
+	// The GitHub release associated with the update
+	release *github.RepositoryRelease
+}
+
+func (d *vertexDependency) CheckForUpdate() (*types.Update, error) {
+	if d.currentVersion == "dev" {
 		logger.Log("skipping update in 'dev' version").Print()
-		return update, nil, nil
+		return nil, nil
 	}
 
 	// remove previous old version if it exists.
 	err := os.Remove("vertex-old")
 	if err != nil && !os.IsNotExist(err) {
-		return nil, nil, err
+		return nil, err
 	}
 
 	client := github.NewClient(nil)
@@ -57,36 +83,40 @@ func (s UpdateService) CheckForVertexUpdate(currentVersion string) (*types.Updat
 	// get the latest release
 	release, _, err := client.Repositories.GetLatestRelease(context.Background(), "vertex-center", "vertex")
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
+	d.release = release
 
 	// check if the version is different
 	releaseVersion := *release.TagName
 	releaseVersion = strings.TrimPrefix(releaseVersion, "v")
 
-	update.LatestVersion = releaseVersion
-
-	if currentVersion == releaseVersion {
+	if d.currentVersion == releaseVersion {
 		logger.Log("vertex is already up-to-date").Print()
-		return update, nil, nil
+		return nil, nil
+	}
+
+	d.update = &types.Update{
+		ID:             d.GetID(),
+		Name:           "Vertex",
+		CurrentVersion: d.currentVersion,
+		LatestVersion:  releaseVersion,
 	}
 
 	logger.Log("a new release for Vertex is available").
-		AddKeyValue("current", currentVersion).
+		AddKeyValue("current", d.currentVersion).
 		AddKeyValue("release", releaseVersion).
 		Print()
 
-	update.UpToDate = false
-	return update, release, nil
+	return d.update, nil
 }
 
-func (s UpdateService) InstallVertexUpdate(currentVersion string) error {
-	_, release, err := s.CheckForVertexUpdate(currentVersion)
-	if err != nil {
-		return err
+func (d *vertexDependency) InstallUpdate() error {
+	if d.release == nil {
+		return errors.New("the release has not been fetched before installing the update")
 	}
 
-	err = storage.DownloadGithubRelease(release, storage.PathUpdates)
+	err := storage.DownloadGithubRelease(d.release, storage.PathUpdates)
 	if err != nil {
 		return err
 	}
@@ -101,6 +131,15 @@ func (s UpdateService) InstallVertexUpdate(currentVersion string) error {
 		return err
 	}
 
-	logger.Warn("a new Vertex update has been installed. please restart Vertex.").Print()
+	d.currentVersion = d.update.LatestVersion
+	d.release = nil
+	d.update = nil
+
+	logger.Warn("a new Vertex update has been installed. please restart Vertex to apply changes.").Print()
+
 	return nil
+}
+
+func (d *vertexDependency) GetID() string {
+	return "vertex"
 }

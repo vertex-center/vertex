@@ -5,21 +5,15 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/logger"
 )
 
-func addUpdatesRoutes(r *gin.RouterGroup, currentVertexVersion string) {
-	r.GET("", func(c *gin.Context) {
-		handleGetUpdates(c, currentVertexVersion)
-	})
-
-	r.POST("", func(c *gin.Context) {
-		handleExecuteUpdates(c, currentVertexVersion)
-	})
+func addUpdatesRoutes(r *gin.RouterGroup) {
+	r.GET("", handleGetUpdates)
+	r.POST("", handleExecuteUpdates)
 }
 
-func handleGetUpdates(c *gin.Context, currentVertexVersion string) {
-	updates, err := updateService.CheckForUpdates(currentVertexVersion)
+func handleGetUpdates(c *gin.Context) {
+	updates, err := updateService.CheckForUpdates()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -34,7 +28,7 @@ type executeUpdatesBody struct {
 	}
 }
 
-func handleExecuteUpdates(c *gin.Context, currentVertexVersion string) {
+func handleExecuteUpdates(c *gin.Context) {
 	var body executeUpdatesBody
 	err := c.BindJSON(&body)
 	if err != nil {
@@ -42,30 +36,14 @@ func handleExecuteUpdates(c *gin.Context, currentVertexVersion string) {
 		return
 	}
 
-	var errors []error
-
+	var updates []string
 	for _, update := range body.Updates {
-		var err error
-
-		switch update.Name {
-		case "vertex":
-			err = updateService.InstallVertexUpdate(currentVertexVersion)
-		default:
-			logger.Error(fmt.Errorf("the service name is not valid for an update")).
-				AddKeyValue("name", update.Name).
-				Print()
-		}
-
-		if err != nil {
-			errors = append(errors, err)
-		}
+		updates = append(updates, update.Name)
 	}
 
-	if len(errors) != 0 {
-		for _, err := range errors {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-		}
-		return
+	err = updateService.InstallUpdates(updates)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
 	}
 
 	c.Status(http.StatusOK)
