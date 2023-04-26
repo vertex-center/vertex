@@ -9,6 +9,12 @@ import { Error } from "../../components/Error/Error";
 import Progress from "../../components/Progress";
 import Popup from "../../components/Popup/Popup";
 import Loading from "../../components/Loading/Loading";
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en";
+
+TimeAgo.addDefaultLocale(en);
+
+const timeAgo = new TimeAgo("en-US");
 
 type Props = {
     name: string;
@@ -101,7 +107,10 @@ export default function SettingsUpdates() {
                     {updates?.last_checked && (
                         <Caption>
                             Last refresh:{" "}
-                            {new Date(updates?.last_checked).toLocaleString()}
+                            {timeAgo.format(
+                                new Date(updates?.last_checked),
+                                "round"
+                            )}
                         </Caption>
                     )}
                 </Horizontal>
