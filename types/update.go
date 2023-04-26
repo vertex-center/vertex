@@ -5,4 +5,5 @@ type Update struct {
 	Name           string `json:"name"`
 	CurrentVersion string `json:"current_version"`
 	LatestVersion  string `json:"latest_version"`
+	NeedsRestart   bool   `json:"needs_restart"`
 }

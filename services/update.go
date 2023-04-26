@@ -104,6 +104,7 @@ func (d *vertexDependency) CheckForUpdate() (*types.Update, error) {
 		Name:           "Vertex",
 		CurrentVersion: d.currentVersion,
 		LatestVersion:  latestVersion,
+		NeedsRestart:   true,
 	}
 
 	logger.Log("a new release for Vertex is available").
@@ -178,6 +179,7 @@ func (d *VertexClientDependency) CheckForUpdate() (*types.Update, error) {
 		Name:           "Vertex Client",
 		CurrentVersion: d.currentVersion,
 		LatestVersion:  latestVersion,
+		NeedsRestart:   false,
 	}
 	return d.update, nil
 }
