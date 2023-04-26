@@ -8,6 +8,7 @@ import { executeUpdates, getUpdates } from "../../backend/backend";
 import { Error } from "../../components/Error/Error";
 import Progress from "../../components/Progress";
 import Popup from "../../components/Popup/Popup";
+import Loading from "../../components/Loading/Loading";
 
 type Props = {
     name: string;
@@ -56,17 +57,22 @@ function Update(props: Props) {
 }
 
 export default function SettingsUpdates() {
-    const [updates, setUpdates] = useState([]);
+    const [updates, setUpdates] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState();
     const [showMessage, setShowMessage] = useState<boolean>(false);
 
     const reload = useCallback(() => {
-        setUpdates([]);
+        setIsLoading(true);
+        setUpdates(null);
         getUpdates()
-            .then((updates) => setUpdates(updates))
+            .then((updates) => {
+                setUpdates(updates);
+            })
             .catch((err) => {
                 setError(err?.response?.data?.message ?? err?.message);
-            });
+            })
+            .finally(() => setIsLoading(false));
     }, []);
 
     const updateService = (name: string) => {
@@ -87,6 +93,13 @@ export default function SettingsUpdates() {
     return (
         <Fragment>
             <Title>Updates</Title>
+            {!error && !isLoading && updates === null && (
+                <Horizontal alignItems="center">
+                    <Symbol name="check" />
+                    <Text>Everything is up-to-date.</Text>
+                </Horizontal>
+            )}
+            {isLoading && <Loading />}
             {updates?.map((update) => (
                 <Update
                     key={update.name}
