@@ -53,6 +53,11 @@ export type About = {
     date: string;
 };
 
+export type Updates = {
+    last_checked: string;
+    items: Update[];
+};
+
 export type Update = {
     id: string;
     name: string;
@@ -178,10 +183,10 @@ export async function getAbout(): Promise<About> {
     });
 }
 
-export async function getUpdates(): Promise<Update[]> {
+export async function getUpdates(reload?: boolean): Promise<Updates> {
     return new Promise((resolve, reject) => {
         axios
-            .get(route("/updates"))
+            .get(route(`/updates${reload ? "?reload=true" : ""}`))
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });

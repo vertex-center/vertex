@@ -1,10 +1,10 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
-import { Text, Title } from "../../components/Text/Text";
+import { Caption, Text, Title } from "../../components/Text/Text";
 import { Horizontal } from "../../components/Layouts/Layouts";
 import Button from "../../components/Button/Button";
 import Spacer from "../../components/Spacer/Spacer";
 import Symbol from "../../components/Symbol/Symbol";
-import { executeUpdates, getUpdates } from "../../backend/backend";
+import { executeUpdates, getUpdates, Updates } from "../../backend/backend";
 import { Error } from "../../components/Error/Error";
 import Progress from "../../components/Progress";
 import Popup from "../../components/Popup/Popup";
@@ -57,15 +57,15 @@ function Update(props: Props) {
 }
 
 export default function SettingsUpdates() {
-    const [updates, setUpdates] = useState(null);
+    const [updates, setUpdates] = useState<Updates>();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState();
     const [showMessage, setShowMessage] = useState<boolean>(false);
 
-    const reload = useCallback(() => {
+    const reload = useCallback((refresh?: boolean) => {
         setIsLoading(true);
-        setUpdates(null);
-        getUpdates()
+        setUpdates(undefined);
+        getUpdates(refresh)
             .then((updates) => {
                 setUpdates(updates);
             })
@@ -93,14 +93,27 @@ export default function SettingsUpdates() {
     return (
         <Fragment>
             <Title>Updates</Title>
-            {!error && !isLoading && updates === null && (
+            {!isLoading && (
+                <Horizontal alignItems="center" gap={20}>
+                    <Button onClick={() => reload(true)} rightSymbol="refresh">
+                        Check for updates
+                    </Button>
+                    {updates?.last_checked && (
+                        <Caption>
+                            Last refresh:{" "}
+                            {new Date(updates?.last_checked).toLocaleString()}
+                        </Caption>
+                    )}
+                </Horizontal>
+            )}
+            {isLoading && <Loading />}
+            {!error && !isLoading && updates?.items?.length === 0 && (
                 <Horizontal alignItems="center">
                     <Symbol name="check" />
                     <Text>Everything is up-to-date.</Text>
                 </Horizontal>
             )}
-            {isLoading && <Loading />}
-            {updates?.map((update) => (
+            {updates?.items?.map((update) => (
                 <Update
                     key={update.name}
                     name={update.name}
