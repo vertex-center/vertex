@@ -92,11 +92,10 @@ func (d *vertexDependency) CheckForUpdate() (*types.Update, error) {
 	d.release = release
 
 	// check if the version is different
-	releaseVersion := *release.TagName
-	releaseVersion = strings.TrimPrefix(releaseVersion, "v")
+	latestVersion := *release.TagName
+	latestVersion = strings.TrimPrefix(latestVersion, "v")
 
-	if d.currentVersion == releaseVersion {
-		logger.Log("vertex is already up-to-date").Print()
+	if d.currentVersion == latestVersion {
 		return nil, nil
 	}
 
@@ -104,12 +103,12 @@ func (d *vertexDependency) CheckForUpdate() (*types.Update, error) {
 		ID:             d.GetID(),
 		Name:           "Vertex",
 		CurrentVersion: d.currentVersion,
-		LatestVersion:  releaseVersion,
+		LatestVersion:  latestVersion,
 	}
 
 	logger.Log("a new release for Vertex is available").
 		AddKeyValue("current", d.currentVersion).
-		AddKeyValue("release", releaseVersion).
+		AddKeyValue("release", latestVersion).
 		Print()
 
 	return d.update, nil
@@ -149,27 +148,42 @@ func (d *vertexDependency) GetID() string {
 }
 
 type VertexClientDependency struct {
-	release *github.RepositoryRelease
+	currentVersion string
+	release        *github.RepositoryRelease
+	update         *types.Update
 }
 
 func (d *VertexClientDependency) CheckForUpdate() (*types.Update, error) {
+	version, err := os.ReadFile(path.Join(storage.PathClient, "dist", "version.txt"))
+	if err != nil {
+		return nil, err
+	}
+	d.currentVersion = strings.TrimSpace(string(version))
+
 	client := github.NewClient(nil)
 
 	owner := "vertex-center"
 	repo := "vertex-webui"
 
-	var err error
-	d.release, _, err = client.Repositories.GetLatestRelease(context.Background(), owner, repo)
+	release, _, err := client.Repositories.GetLatestRelease(context.Background(), owner, repo)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve the latest github release for %s: %v", repo, err)
 	}
 
-	return &types.Update{
+	latestVersion := *release.TagName
+
+	if d.currentVersion == latestVersion {
+		return nil, nil
+	}
+
+	d.release = release
+	d.update = &types.Update{
 		ID:             d.GetID(),
 		Name:           "Vertex Client",
-		CurrentVersion: "undefined",
-		LatestVersion:  "undefined",
-	}, nil
+		CurrentVersion: d.currentVersion,
+		LatestVersion:  latestVersion,
+	}
+	return d.update, nil
 }
 
 func (d *VertexClientDependency) InstallUpdate() error {
