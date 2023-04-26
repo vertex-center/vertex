@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/google/go-github/v50/github"
 	"github.com/vertex-center/vertex/logger"
@@ -20,6 +21,8 @@ import (
 
 type UpdateDependenciesService struct {
 	dependencies []types.Dependency
+
+	updates types.Updates
 }
 
 func NewUpdateDependenciesService(currentVertexVersion string) UpdateDependenciesService {
@@ -31,23 +34,31 @@ func NewUpdateDependenciesService(currentVertexVersion string) UpdateDependencie
 	}
 }
 
-func (s UpdateDependenciesService) CheckForUpdates() ([]types.Update, error) {
-	var updates []types.Update
+func (s *UpdateDependenciesService) GetCachedUpdates() types.Updates {
+	return s.updates
+}
+
+func (s *UpdateDependenciesService) CheckForUpdates() (types.Updates, error) {
+	logger.Log("fetching all updates").Print()
+
+	s.updates.Items = []types.Update{}
 
 	for _, dependency := range s.dependencies {
 		update, err := dependency.CheckForUpdate()
 		if err != nil {
-			return nil, err
+			return types.Updates{}, err
 		}
 		if update != nil {
-			updates = append(updates, *update)
+			s.updates.Items = append(s.updates.Items, *update)
 		}
 	}
 
-	return updates, nil
+	t := time.Now()
+	s.updates.LastChecked = &(t)
+	return s.updates, nil
 }
 
-func (s UpdateDependenciesService) InstallUpdates(dependenciesID []string) error {
+func (s *UpdateDependenciesService) InstallUpdates(dependenciesID []string) error {
 	for _, dependency := range s.dependencies {
 		if slices.Contains(dependenciesID, dependency.GetID()) {
 			err := dependency.InstallUpdate()
@@ -56,6 +67,7 @@ func (s UpdateDependenciesService) InstallUpdates(dependenciesID []string) error
 			}
 		}
 	}
+	s.updates.Items = []types.Update{}
 	return nil
 }
 
@@ -72,7 +84,7 @@ type vertexDependency struct {
 
 func (d *vertexDependency) CheckForUpdate() (*types.Update, error) {
 	if d.currentVersion == "dev" {
-		logger.Log("skipping update in 'dev' version").Print()
+		logger.Log("skipping vertex update in 'dev' version").Print()
 		return nil, nil
 	}
 

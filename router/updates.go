@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/types"
 )
 
 func addUpdatesRoutes(r *gin.RouterGroup) {
@@ -13,10 +14,18 @@ func addUpdatesRoutes(r *gin.RouterGroup) {
 }
 
 func handleGetUpdates(c *gin.Context) {
-	updates, err := updateService.CheckForUpdates()
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		return
+	reload := c.Query("reload")
+
+	var updates types.Updates
+	if reload == "true" {
+		var err error
+		updates, err = updateService.CheckForUpdates()
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+	} else {
+		updates = updateService.GetCachedUpdates()
 	}
 
 	c.JSON(http.StatusOK, updates)
