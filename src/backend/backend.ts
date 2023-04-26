@@ -58,7 +58,7 @@ export type Update = {
     name: string;
     current_version: string;
     latest_version: string;
-    up_to_date: boolean;
+    needs_restart?: boolean;
 };
 
 export type Dependencies = { [id: string]: Dependency };

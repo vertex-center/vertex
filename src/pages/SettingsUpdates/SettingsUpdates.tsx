@@ -15,11 +15,12 @@ type Props = {
     update: () => void;
     current_version: string;
     latest_version: string;
-    upToDate: boolean;
+    needs_restart?: boolean;
 };
 
 function Update(props: Props) {
-    const { name, update, current_version, latest_version, upToDate } = props;
+    const { name, update, current_version, latest_version, needs_restart } =
+        props;
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -32,26 +33,25 @@ function Update(props: Props) {
         <Horizontal gap={24} alignItems="center">
             <Text>{name}</Text>
             <Spacer />
+            {needs_restart && (
+                <Horizontal
+                    gap={6}
+                    alignItems="center"
+                    style={{ color: "var(--orange)" }}
+                >
+                    <Symbol name="warning" />
+                    You'll need to restart the server
+                </Horizontal>
+            )}
             <code>
-                {current_version} {!upToDate && "->"}{" "}
-                {!upToDate && latest_version}
+                {current_version} {"->"} {latest_version}
             </code>
-            {!upToDate && !isLoading && (
+            {!isLoading && (
                 <Button onClick={onUpdate} rightSymbol="download">
                     Update
                 </Button>
             )}
-            {!upToDate && isLoading && <Progress infinite />}
-            {upToDate && (
-                <Horizontal
-                    gap={6}
-                    alignItems="center"
-                    style={{ color: "var(--green)" }}
-                >
-                    <Symbol name="check" />
-                    Up to date
-                </Horizontal>
-            )}
+            {isLoading && <Progress infinite />}
         </Horizontal>
     );
 }
@@ -106,7 +106,7 @@ export default function SettingsUpdates() {
                     name={update.name}
                     latest_version={update.latest_version}
                     current_version={update.current_version}
-                    upToDate={update.up_to_date}
+                    needs_restart={update.needs_restart}
                     update={() => updateService(update.id)}
                 />
             ))}
