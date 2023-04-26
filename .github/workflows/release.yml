@@ -32,6 +32,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Add version file
+        run: echo ${{ github.ref_name }} > ./dist/version.txt
+
       - name: Create .zip
         run: zip vertex-webui.zip ./dist -r
 
