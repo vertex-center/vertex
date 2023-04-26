@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/vertex-center/vertex/client"
 	"github.com/vertex-center/vertex/logger"
 	"github.com/vertex-center/vertex/router"
+	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/storage"
 )
 
@@ -36,7 +36,7 @@ func main() {
 		return
 	}
 
-	err = client.Setup()
+	err = setupClient()
 	if err != nil {
 		logger.Error(fmt.Errorf("failed to setup the web client: %v", err)).Print()
 		return
@@ -78,4 +78,24 @@ func parseArgs() {
 		fmt.Println(commit)
 		os.Exit(0)
 	}
+}
+
+func setupClient() error {
+	err := os.Mkdir(storage.PathClient, os.ModePerm)
+	if os.IsExist(err) {
+		// The client is already setup.
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+
+	// download client
+	d := services.VertexClientDependency{}
+	_, err = d.CheckForUpdate()
+	if err != nil {
+		return err
+	}
+
+	return d.InstallUpdate()
 }

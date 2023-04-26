@@ -1,9 +1,12 @@
 package services
 
 import (
+	"archive/zip"
 	"context"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"path"
 	"strings"
@@ -23,6 +26,7 @@ func NewUpdateDependenciesService(currentVertexVersion string) UpdateDependencie
 	return UpdateDependenciesService{
 		dependencies: []types.Dependency{
 			&vertexDependency{currentVersion: currentVertexVersion},
+			&VertexClientDependency{},
 		},
 	}
 }
@@ -142,4 +146,131 @@ func (d *vertexDependency) InstallUpdate() error {
 
 func (d *vertexDependency) GetID() string {
 	return "vertex"
+}
+
+type VertexClientDependency struct {
+	release *github.RepositoryRelease
+}
+
+func (d *VertexClientDependency) CheckForUpdate() (*types.Update, error) {
+	client := github.NewClient(nil)
+
+	owner := "vertex-center"
+	repo := "vertex-webui"
+
+	var err error
+	d.release, _, err = client.Repositories.GetLatestRelease(context.Background(), owner, repo)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve the latest github release for %s: %v", repo, err)
+	}
+
+	return &types.Update{
+		ID:             d.GetID(),
+		Name:           "Vertex Client",
+		CurrentVersion: "undefined",
+		LatestVersion:  "undefined",
+	}, nil
+}
+
+func (d *VertexClientDependency) InstallUpdate() error {
+	logger.Log("downloading vertex-webui client...").Print()
+
+	for _, asset := range d.release.Assets {
+		if strings.Contains(*asset.Name, "vertex-webui") {
+			err := os.RemoveAll(storage.PathClient)
+			if err != nil {
+				return err
+			}
+
+			err = os.MkdirAll(storage.PathClient, os.ModePerm)
+			if err != nil {
+				return err
+			}
+
+			err = download(*asset.BrowserDownloadURL)
+			if err != nil {
+				return err
+			}
+
+			err = unarchive()
+			if err != nil {
+				return err
+			}
+
+			err = os.Remove(path.Join(storage.PathClient, "temp.zip"))
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (d *VertexClientDependency) GetID() string {
+	return "vertex-webui"
+}
+
+func download(url string) error {
+	res, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	file, err := os.Create(path.Join(storage.PathClient, "temp.zip"))
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = io.Copy(file, res.Body)
+	return err
+}
+
+func unarchive() error {
+	reader, err := zip.OpenReader(path.Join(storage.PathClient, "temp.zip"))
+	if err != nil {
+		return err
+	}
+
+	for _, header := range reader.File {
+		filepath := path.Join(storage.PathClient, header.Name)
+
+		if header.FileInfo().IsDir() {
+			err = os.MkdirAll(filepath, os.ModePerm)
+			if err != nil {
+				return err
+			}
+		} else {
+			err = os.MkdirAll(path.Dir(filepath), os.ModePerm)
+			if err != nil {
+				return err
+			}
+
+			file, err := os.Create(filepath)
+			if err != nil {
+				return err
+			}
+
+			content, err := header.Open()
+			if err != nil {
+				return err
+			}
+
+			_, err = io.Copy(file, content)
+			if err != nil {
+				return err
+			}
+
+			err = os.Chmod(filepath, 0755)
+			if err != nil {
+				return err
+			}
+
+			file.Close()
+		}
+	}
+
+	return nil
 }
