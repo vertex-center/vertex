@@ -154,11 +154,7 @@ type VertexClientDependency struct {
 }
 
 func (d *VertexClientDependency) CheckForUpdate() (*types.Update, error) {
-	version, err := os.ReadFile(path.Join(storage.PathClient, "dist", "version.txt"))
-	if err != nil {
-		return nil, err
-	}
-	d.currentVersion = strings.TrimSpace(string(version))
+	d.FetchCurrentVersion()
 
 	client := github.NewClient(nil)
 
@@ -218,11 +214,23 @@ func (d *VertexClientDependency) InstallUpdate() error {
 		}
 	}
 
+	d.FetchCurrentVersion()
+	d.update = nil
+	d.release = nil
+
 	return nil
 }
 
 func (d *VertexClientDependency) GetID() string {
 	return "vertex-webui"
+}
+
+func (d *VertexClientDependency) FetchCurrentVersion() {
+	version, err := os.ReadFile(path.Join(storage.PathClient, "dist", "version.txt"))
+	if err != nil {
+		return
+	}
+	d.currentVersion = strings.TrimSpace(string(version))
 }
 
 func download(url string) error {
