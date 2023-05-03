@@ -4,6 +4,7 @@ import styles from "./Logs.module.sass";
 import classNames from "classnames";
 import useScrollPercentage from "react-scroll-percentage-hook";
 import { LogLine } from "../../backend/backend";
+import { Text } from "../Text/Text";
 
 type LineProps = {
     line: LogLine;
@@ -31,6 +32,10 @@ type Props = HTMLProps<HTMLDivElement> & {
 
 export default function Logs(props: Props) {
     const { lines } = props;
+
+    if (lines.length === 0) {
+        return <Text>Waiting for logs...</Text>;
+    }
 
     const { ref } = useScrollPercentage<HTMLDivElement>({
         onProgress: (percentage) => {
