@@ -2,6 +2,8 @@ package router
 
 import (
 	"net/http"
+	"os"
+	"os/signal"
 	"path"
 	"strings"
 
@@ -58,6 +60,9 @@ func Create(about About) *gin.Engine {
 	instanceService = services.NewInstanceService()
 	updateService = services.NewUpdateDependenciesService(about.Version)
 
+	instanceService.StartAll()
+	handleSignals()
+
 	addServicesRoutes(api.Group("/services"))
 	addInstancesRoutes(api.Group("/instances"))
 	addInstanceRoutes(api.Group("/instance/:instance_uuid"))
@@ -69,6 +74,17 @@ func Create(about About) *gin.Engine {
 	})
 
 	return r
+}
+
+func handleSignals() {
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		<-c
+		logger.Log("shutdown signal sent").Print()
+		instanceService.StopAll()
+		os.Exit(0)
+	}()
 }
 
 func Unload() {

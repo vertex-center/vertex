@@ -126,6 +126,15 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 	return err
 }
 
+func (s *InstanceService) StartAll() {
+	for _, i := range s.repo.GetAll() {
+		err := s.Start(i.UUID)
+		if err != nil {
+			logger.Error(err).Print()
+		}
+	}
+}
+
 func (s *InstanceService) Stop(uuid uuid.UUID) error {
 	i, err := s.repo.Get(uuid)
 	if err != nil {
@@ -169,6 +178,18 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 	}
 
 	return err
+}
+
+func (s *InstanceService) StopAll() {
+	for _, i := range s.repo.GetAll() {
+		if !i.IsRunning() {
+			continue
+		}
+		err := s.Stop(i.UUID)
+		if err != nil {
+			logger.Error(err).Print()
+		}
+	}
 }
 
 func (s *InstanceService) startWithDocker(i *types.Instance) error {
