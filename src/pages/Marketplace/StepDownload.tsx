@@ -151,7 +151,7 @@ function StepDownloadGitHub(props: StepDownloadGitHubProps) {
         <Fragment>
             <Input
                 label="Repository"
-                placeholder="https://github.com/..."
+                placeholder="github.com/user/repo"
                 onChange={onLinkChange}
             />
             <Button
