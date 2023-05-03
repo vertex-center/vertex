@@ -96,6 +96,7 @@ export default function BayDetails() {
                             name: instance?.name,
                             status: instance?.status,
                             onPower: () => toggleInstance(uuid),
+                            use_docker: instance?.use_docker,
                         },
                     ]}
                 />

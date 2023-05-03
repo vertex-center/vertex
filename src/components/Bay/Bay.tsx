@@ -4,6 +4,7 @@ import classNames from "classnames";
 import { Horizontal, Vertical } from "../Layouts/Layouts";
 import { Link } from "react-router-dom";
 import Spacer from "../Spacer/Spacer";
+import { SiDocker } from "@icons-pack/react-simple-icons";
 
 type ButtonProps = {
     symbol: string;
@@ -44,10 +45,11 @@ type LCDProps = {
     status: Status | string;
     to?: string;
     count?: number;
+    dockerized?: boolean;
 };
 
 function LCD(props: LCDProps) {
-    const { name, status, to, count } = props;
+    const { name, status, to, count, dockerized } = props;
 
     let message;
     switch (status) {
@@ -75,8 +77,14 @@ function LCD(props: LCDProps) {
 
     let content = (
         <Vertical gap={10}>
-            <Horizontal>
+            <Horizontal gap={8}>
                 <div>{name}</div>
+                {dockerized && (
+                    <SiDocker
+                        size={15}
+                        style={{ marginTop: -1, opacity: 0.5 }}
+                    />
+                )}
                 <Spacer />
                 <div className={styles.lcdCount}>{count}</div>
             </Horizontal>
@@ -116,6 +124,7 @@ type Props = {
         name: string;
         status: Status | string;
         count?: number;
+        use_docker?: boolean;
 
         to?: string;
 
@@ -143,6 +152,7 @@ export default function Bay(props: Props) {
                         count={instance.count}
                         status={instance.status}
                         to={instance.to}
+                        dockerized={instance.use_docker}
                     />
                     {instance?.onPower && (
                         <Button
