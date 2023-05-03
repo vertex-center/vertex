@@ -128,6 +128,10 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 
 func (s *InstanceService) StartAll() {
 	for _, i := range s.repo.GetAll() {
+		launchOnStartup := i.InstanceMetadata.LaunchOnStartup
+		if launchOnStartup != nil && !*launchOnStartup {
+			continue
+		}
 		err := s.Start(i.UUID)
 		if err != nil {
 			logger.Error(err).Print()
@@ -397,4 +401,19 @@ func (s *InstanceService) Install(repo string, useDocker *bool, useReleases *boo
 	}
 
 	return i, nil
+}
+
+func (s *InstanceService) SetLaunchOnStartup(uuid uuid.UUID, value bool) error {
+	i, err := s.Get(uuid)
+	if err != nil {
+		return err
+	}
+
+	i.InstanceMetadata.LaunchOnStartup = &value
+	err = s.repo.SaveMetadata(i)
+	if err != nil {
+		return err
+	}
+
+	return err
 }

@@ -20,6 +20,10 @@ const (
 type InstanceMetadata struct {
 	UseDocker   bool `json:"use_docker"`
 	UseReleases bool `json:"use_releases"`
+
+	// LaunchOnStartup indicates if the instance needs to start automatically when Vertex
+	// starts. The default value is true.
+	LaunchOnStartup *bool `json:"launch_on_startup"`
 }
 
 type InstanceEvent struct {

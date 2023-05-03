@@ -16,6 +16,7 @@ import (
 func addInstanceRoutes(r *gin.RouterGroup) {
 	r.GET("", handleGetInstance)
 	r.DELETE("", handleDeleteInstance)
+	r.PATCH("", handlePatchInstance)
 	r.POST("/start", handleStartInstance)
 	r.POST("/stop", handleStopInstance)
 	r.PATCH("/environment", handlePatchEnvironment)
@@ -63,6 +64,31 @@ func handleDeleteInstance(c *gin.Context) {
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to delete instance %s: %v", uid, err))
 		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
+type handlePatchInstanceBody struct {
+	LaunchOnStartup *bool `json:"launch_on_startup"`
+}
+
+func handlePatchInstance(c *gin.Context) {
+	uid := getParamInstanceUUID(c)
+
+	var body handlePatchInstanceBody
+	err := c.BindJSON(&body)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, fmt.Errorf("failed to parse body: %v", err))
+		return
+	}
+
+	if body.LaunchOnStartup != nil {
+		err = instanceService.SetLaunchOnStartup(*uid, *body.LaunchOnStartup)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
 	}
 
 	c.Status(http.StatusOK)
