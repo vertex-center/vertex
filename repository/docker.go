@@ -3,6 +3,7 @@ package repository
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -13,6 +14,10 @@ import (
 
 type DockerRepository struct {
 	cli *client.Client
+}
+
+type dockerMessage struct {
+	Stream string `json:"stream"`
 }
 
 func NewDockerRepository() DockerRepository {
@@ -34,7 +39,7 @@ func (r DockerRepository) RemoveContainer(id string) error {
 	return r.cli.ContainerRemove(context.Background(), id, dockertypes.ContainerRemoveOptions{})
 }
 
-func (r DockerRepository) BuildImage(instancePath string, imageName string) error {
+func (r DockerRepository) BuildImage(instancePath string, imageName string, onMsg func(msg string)) error {
 	buildOptions := dockertypes.ImageBuildOptions{
 		Dockerfile: "Dockerfile",
 		Tags:       []string{imageName},
@@ -59,7 +64,17 @@ func (r DockerRepository) BuildImage(instancePath string, imageName string) erro
 		if scanner.Err() != nil {
 			return scanner.Err()
 		}
-		logger.Log(scanner.Text()).Print()
+		msg := dockerMessage{}
+		err := json.Unmarshal(scanner.Bytes(), &msg)
+		if err != nil {
+			logger.Warn("Failed to parse message:").
+				AddKeyValue("msg", scanner.Text()).
+				Print()
+		} else {
+			if msg.Stream != "" {
+				onMsg(msg.Stream)
+			}
+		}
 	}
 
 	logger.Log("Docker build: success.").Print()
@@ -70,6 +85,11 @@ func (r DockerRepository) CreateContainer(imageName string, containerName string
 	res, err := r.cli.ContainerCreate(context.Background(), &container.Config{
 		Image: imageName,
 	}, nil, nil, nil, containerName)
+	for _, warn := range res.Warnings {
+		logger.Warn("warning while creating container").
+			AddKeyValue("warning", warn).
+			Print()
+	}
 	return res.ID, err
 }
 

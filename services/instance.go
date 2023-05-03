@@ -179,9 +179,20 @@ func (s *InstanceService) startWithDocker(i *types.Instance) error {
 
 	instancePath := s.repo.GetPath(i)
 
+	onMsg := func(msg string) {
+		s.repo.WriteLogLine(i, &types.LogLine{
+			Kind:    types.LogKindOut,
+			Message: msg,
+		})
+	}
+
 	// Build
-	err := s.dockerRepo.BuildImage(instancePath, imageName)
+	err := s.dockerRepo.BuildImage(instancePath, imageName, onMsg)
 	if err != nil {
+		s.repo.WriteLogLine(i, &types.LogLine{
+			Kind:    types.LogKindErr,
+			Message: err.Error(),
+		})
 		return err
 	}
 
