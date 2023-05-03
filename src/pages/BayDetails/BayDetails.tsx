@@ -131,6 +131,11 @@ export default function BayDetails() {
                             name="Dependencies"
                         />
                     )}
+                    <SidebarItem
+                        to={`/bay/${uuid}/settings`}
+                        symbol="settings"
+                        name="Settings"
+                    />
                     <Spacer />
                     <SidebarItem
                         onClick={() => setShowDeletePopup(true)}

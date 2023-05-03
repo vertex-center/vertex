@@ -14,6 +14,7 @@ import classNames from "classnames";
 import SettingsAbout from "./pages/SettingsAbout/SettingsAbout";
 import SettingsUpdates from "./pages/SettingsUpdates/SettingsUpdates";
 import BayDetailsDocker from "./pages/BayDetailsDocker/BayDetailsDocker";
+import BayDetailsSettings from "./pages/BayDetailsSettings/BayDetailsSettings";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -58,6 +59,10 @@ function App() {
                         <Route
                             path="/bay/:uuid/dependencies"
                             element={<BayDetailsDependencies />}
+                        />
+                        <Route
+                            path="/bay/:uuid/settings"
+                            element={<BayDetailsSettings />}
                         />
                     </Route>
                 </Routes>

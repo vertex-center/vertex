@@ -32,6 +32,7 @@ export type Instance = Service & {
     env: { [key: string]: string };
     use_docker?: boolean;
     use_releases?: boolean;
+    launch_on_startup?: boolean;
 };
 
 export type Package = {
@@ -122,6 +123,15 @@ export async function deleteInstance(uuid: string) {
     return new Promise((resolve, reject) => {
         axios
             .delete(route(`/instance/${uuid}`))
+            .then((res) => resolve(res.data))
+            .catch((err) => reject(err));
+    });
+}
+
+export async function patchInstance(uuid: string, params: any) {
+    return new Promise((resolve, reject) => {
+        axios
+            .patch(route(`/instance/${uuid}`), params)
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });
