@@ -26,19 +26,6 @@ import Progress from "../../components/Progress";
 import { SiDocker } from "@icons-pack/react-simple-icons";
 import useInstance from "../../hooks/useInstance";
 
-export const bayNavItems = [
-    {
-        label: "Logs",
-        to: "/logs",
-        symbol: "terminal",
-    },
-    {
-        label: "Environment",
-        to: "/environment",
-        symbol: "tune",
-    },
-];
-
 export default function BayDetails() {
     const { uuid } = useParams();
     const navigate = useNavigate();
@@ -110,13 +97,21 @@ export default function BayDetails() {
                         name="Home"
                     />
                     <div className={styles.separator} />
-                    {bayNavItems.map((item) => (
-                        <SidebarItem
-                            to={`/bay/${uuid}${item.to}`}
-                            symbol={item.symbol}
-                            name={item.label}
-                        />
-                    ))}
+                    <SidebarItem
+                        to={`/bay/${uuid}/logs`}
+                        symbol="terminal"
+                        name="Logs"
+                    />
+                    <SidebarItem
+                        to={`/bay/${uuid}/status`}
+                        symbol="vital_signs"
+                        name="Status"
+                    />
+                    <SidebarItem
+                        to={`/bay/${uuid}/environment`}
+                        symbol="tune"
+                        name="Environment"
+                    />
                     {instance?.use_docker && (
                         <SidebarItem
                             to={`/bay/${uuid}/docker`}
