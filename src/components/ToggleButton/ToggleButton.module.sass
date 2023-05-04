@@ -1,0 +1,41 @@
+@use "../../styles/colors"
+
+.toggle
+    background-color: colors.$bg-tertiary
+    border-radius: 50px
+    height: 32px
+    width: 56px
+    position: relative
+    cursor: pointer
+    user-select: none
+    transition: background-color 0.15s ease-in-out
+
+.on
+    background-color: colors.$green
+
+.dot
+    display: flex
+    align-items: center
+    justify-content: center
+    position: absolute
+    top: 2px
+    left: 2px
+    width: 28px
+    height: 28px
+    border-radius: 50%
+    transition: all 0.15s ease-in-out
+    user-select: none
+
+.on .dot
+    left: 26px
+
+.symbol
+    font-size: 16px
+    color: colors.$fg-primary
+    font-weight: bold
+    -webkit-user-select: none
+    -ms-user-select: none
+    user-select: none
+
+.on .symbol
+    color: colors.$fg-accent

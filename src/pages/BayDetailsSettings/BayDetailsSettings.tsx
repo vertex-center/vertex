@@ -1,6 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
 import { Text, Title } from "../../components/Text/Text";
-import { SegmentedButtons } from "../../components/SegmentedButton";
 import { Horizontal } from "../../components/Layouts/Layouts";
 import Spacer from "../../components/Spacer/Spacer";
 import Button from "../../components/Button/Button";
@@ -10,6 +9,7 @@ import { useParams } from "react-router-dom";
 import useInstance from "../../hooks/useInstance";
 import Progress from "../../components/Progress";
 import Symbol from "../../components/Symbol/Symbol";
+import ToggleButton from "../../components/ToggleButton/ToggleButton";
 
 type Props = {};
 
@@ -26,7 +26,8 @@ export default function BayDetailsSettings(props: Props) {
     const [error, setError] = useState<string>();
 
     useEffect(() => {
-        setAutostart(instance?.launch_on_startup || true);
+        console.log(instance);
+        setAutostart(instance?.launch_on_startup ?? true);
     }, [instance]);
 
     const save = () => {
@@ -49,25 +50,12 @@ export default function BayDetailsSettings(props: Props) {
             <Horizontal alignItems="center">
                 <Text>Launch on Startup</Text>
                 <Spacer />
-                <SegmentedButtons
+                <ToggleButton
                     value={autostart}
                     onChange={(v) => {
                         setAutostart(v);
                         setSaved(false);
                     }}
-                    disabled={uploading}
-                    items={[
-                        {
-                            label: "Yes",
-                            value: true,
-                            rightSymbol: "check",
-                        },
-                        {
-                            label: "No",
-                            value: false,
-                            rightSymbol: "close",
-                        },
-                    ]}
                 />
             </Horizontal>
             <Button
