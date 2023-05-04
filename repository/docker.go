@@ -11,6 +11,7 @@ import (
 	"github.com/docker/docker/pkg/archive"
 	"github.com/docker/go-connections/nat"
 	"github.com/vertex-center/vertex/logger"
+	"github.com/vertex-center/vertex/types"
 )
 
 type DockerRepository struct {
@@ -148,4 +149,22 @@ func (r DockerRepository) GetContainerID(containerName string) (string, error) {
 	}
 
 	return containerID, nil
+}
+
+func (r DockerRepository) GetContainerInfo(containerName string) (*types.DockerContainerInfo, error) {
+	id, err := r.GetContainerID(containerName)
+	if err != nil {
+		return nil, err
+	}
+	info, err := r.cli.ContainerInspect(context.Background(), id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.DockerContainerInfo{
+		ID:       info.ID,
+		Name:     info.Name,
+		Image:    info.Image,
+		Platform: info.Platform,
+	}, nil
 }

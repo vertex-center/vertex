@@ -465,3 +465,21 @@ func (s *InstanceService) SetLaunchOnStartup(uuid uuid.UUID, value bool) error {
 
 	return err
 }
+
+func (s *InstanceService) GetDockerContainerInfo(uuid uuid.UUID) (*types.DockerContainerInfo, error) {
+	i, err := s.Get(uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	if i.UseDocker == false {
+		return nil, errors.New("instance is not using docker")
+	}
+
+	info, err := s.dockerRepo.GetContainerInfo(i.DockerContainerName())
+	if err != nil {
+		return nil, err
+	}
+
+	return info, nil
+}
