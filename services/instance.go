@@ -7,8 +7,10 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"strings"
 
+	"github.com/docker/go-connections/nat"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/logger"
 	"github.com/vertex-center/vertex/repository"
@@ -212,7 +214,15 @@ func (s *InstanceService) startWithDocker(i *types.Instance) error {
 	}
 
 	// Build
-	err := s.dockerRepo.BuildImage(instancePath, imageName, onMsg)
+	var err error
+	if i.Methods.Docker.Dockerfile != nil {
+		err = s.dockerRepo.BuildImageFromDockerfile(instancePath, imageName, onMsg)
+	} else if i.Methods.Docker.Image != nil {
+		err = s.dockerRepo.BuildImageFromName(*i.Methods.Docker.Image, onMsg)
+	} else {
+		return errors.New("no Docker methods found")
+	}
+
 	if err != nil {
 		s.repo.WriteLogLine(i, &types.LogLine{
 			Kind:    types.LogKindErr,
@@ -228,7 +238,45 @@ func (s *InstanceService) startWithDocker(i *types.Instance) error {
 			AddKeyValue("container_name", containerName).
 			Print()
 
-		id, err = s.dockerRepo.CreateContainer(imageName, containerName)
+		exposedPorts := nat.PortSet{}
+		portBindings := nat.PortMap{}
+		if i.Methods.Docker.Ports != nil {
+			var all []string
+
+			for _, out := range *i.Methods.Docker.Ports {
+				in := ""
+				for _, e := range i.EnvDefinitions {
+					if e.Type == "port" && e.Default == out {
+						in = i.EnvVariables.Entries[e.Name]
+						all = append(all, in+":"+out)
+						break
+					}
+				}
+			}
+
+			var err error
+			exposedPorts, portBindings, err = nat.ParsePortSpecs(all)
+			if err != nil {
+				return err
+			}
+		}
+
+		var binds []string
+		if i.Methods.Docker.Volumes != nil {
+			for source, target := range *i.Methods.Docker.Volumes {
+				source, err = filepath.Abs(path.Join(instancePath, "volumes", source))
+				if err != nil {
+					return err
+				}
+				binds = append(binds, source+":"+target)
+			}
+		}
+
+		if i.Methods.Docker.Dockerfile != nil {
+			id, err = s.dockerRepo.CreateContainer(imageName, containerName, exposedPorts, portBindings, binds)
+		} else if i.Methods.Docker.Image != nil {
+			id, err = s.dockerRepo.CreateContainer(*i.Methods.Docker.Image, containerName, exposedPorts, portBindings, binds)
+		}
 		if err != nil {
 			return err
 		}
@@ -262,16 +310,16 @@ func (s *InstanceService) startManually(i *types.Instance) error {
 	// Try to find the executable
 	// For a service of ID=vertex-id, the executable can be:
 	// - vertex-id
-	// - vertex-id.sh
+	// - script-filename.sh
 	_, err := os.Stat(path.Join(dir, executable))
 	if errors.Is(err, os.ErrNotExist) {
-		_, err = os.Stat(path.Join(dir, executable+".sh"))
+		_, err = os.Stat(path.Join(dir, i.Methods.Script.Filename))
 		if errors.Is(err, os.ErrNotExist) {
-			return fmt.Errorf("the executable %s (or %s.sh) was not found at path", i.ID, i.ID)
+			return fmt.Errorf("executables %s and %s were not found", i.ID, i.Methods.Script.Filename)
 		} else if err != nil {
 			return err
 		}
-		command = fmt.Sprintf("./%s.sh", i.ID)
+		command = fmt.Sprintf("./%s", i.Methods.Script.Filename)
 	} else if err != nil {
 		return err
 	}

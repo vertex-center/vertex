@@ -9,6 +9,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
+	"github.com/docker/go-connections/nat"
 	"github.com/vertex-center/vertex/logger"
 )
 
@@ -39,7 +40,24 @@ func (r DockerRepository) RemoveContainer(id string) error {
 	return r.cli.ContainerRemove(context.Background(), id, dockertypes.ContainerRemoveOptions{})
 }
 
-func (r DockerRepository) BuildImage(instancePath string, imageName string, onMsg func(msg string)) error {
+func (r DockerRepository) BuildImageFromName(imageName string, onMsg func(msg string)) error {
+	res, err := r.cli.ImagePull(context.Background(), imageName, dockertypes.ImagePullOptions{})
+	if err != nil {
+		return err
+	}
+
+	scanner := bufio.NewScanner(res)
+	for scanner.Scan() {
+		if scanner.Err() != nil {
+			return scanner.Err()
+		}
+		onMsg(scanner.Text())
+	}
+
+	return nil
+}
+
+func (r DockerRepository) BuildImageFromDockerfile(instancePath string, imageName string, onMsg func(msg string)) error {
 	buildOptions := dockertypes.ImageBuildOptions{
 		Dockerfile: "Dockerfile",
 		Tags:       []string{imageName},
@@ -81,10 +99,18 @@ func (r DockerRepository) BuildImage(instancePath string, imageName string, onMs
 	return nil
 }
 
-func (r DockerRepository) CreateContainer(imageName string, containerName string) (string, error) {
-	res, err := r.cli.ContainerCreate(context.Background(), &container.Config{
-		Image: imageName,
-	}, nil, nil, nil, containerName)
+func (r DockerRepository) CreateContainer(imageName string, containerName string, exposedPorts nat.PortSet, portBindinds nat.PortMap, binds []string) (string, error) {
+	config := container.Config{
+		Image:        imageName,
+		ExposedPorts: exposedPorts,
+	}
+
+	hostConfig := container.HostConfig{
+		Binds:        binds,
+		PortBindings: portBindinds,
+	}
+
+	res, err := r.cli.ContainerCreate(context.Background(), &config, &hostConfig, nil, nil, containerName)
 	for _, warn := range res.Warnings {
 		logger.Warn("warning while creating container").
 			AddKeyValue("warning", warn).

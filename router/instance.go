@@ -185,16 +185,21 @@ func handleInstanceEvents(c *gin.Context) {
 func handleGetDependencies(c *gin.Context) {
 	i := getInstance(c)
 
+	if i.Methods.Script == nil {
+		_ = c.AbortWithError(http.StatusNotFound, errors.New("this service doesn't use scripts, so it doesn't have dependencies"))
+	}
+
 	var deps = map[string]types.Package{}
 
-	for name := range i.Dependencies {
-		dep, err := packageService.Get(name)
-		if err != nil {
-			logger.Error(err).Print()
-			continue
+	if i.Methods.Script.Dependencies != nil {
+		for name := range *i.Methods.Script.Dependencies {
+			dep, err := packageService.Get(name)
+			if err != nil {
+				logger.Error(err).Print()
+				continue
+			}
+			deps[name] = dep
 		}
-
-		deps[name] = dep
 	}
 
 	c.JSON(http.StatusOK, deps)
