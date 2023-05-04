@@ -42,6 +42,15 @@ export type DockerContainerInfo = {
     platform: string;
 };
 
+export type Uptime = {
+    name: string;
+    ping_url?: string;
+    current: string;
+    history: {
+        status: string;
+    }[];
+};
+
 export type Package = {
     name: string;
     description?: string;
@@ -188,6 +197,15 @@ export async function getInstanceDockerContainerInfo(
     return new Promise((resolve, reject) => {
         axios
             .get(route(`/instance/${uuid}/docker`))
+            .then((res) => resolve(res.data))
+            .catch((err) => reject(err));
+    });
+}
+
+export async function getInstanceStatus(uuid: string): Promise<Uptime[]> {
+    return new Promise((resolve, reject) => {
+        axios
+            .get(route(`/instance/${uuid}/status`))
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });
