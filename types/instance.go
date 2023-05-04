@@ -2,8 +2,10 @@ package types
 
 import (
 	"os/exec"
+	"time"
 
 	"github.com/google/uuid"
+	"github.com/nakabonne/tstorage"
 	"github.com/vertex-center/vertex/logger"
 )
 
@@ -23,7 +25,7 @@ type InstanceMetadata struct {
 
 	// LaunchOnStartup indicates if the instance needs to start automatically when Vertex
 	// starts. The default value is true.
-	LaunchOnStartup *bool `json:"launch_on_startup"`
+	LaunchOnStartup *bool `json:"launch_on_startup,omitempty"`
 }
 
 type InstanceEvent struct {
@@ -39,8 +41,10 @@ type Instance struct {
 	Logger       *InstanceLogger `json:"-"`
 	EnvVariables EnvVariables    `json:"env"`
 
-	UUID uuid.UUID `json:"uuid"`
-	Cmd  *exec.Cmd `json:"-"`
+	UUID               uuid.UUID        `json:"uuid"`
+	Cmd                *exec.Cmd        `json:"-"`
+	UptimeStorage      tstorage.Storage `json:"-"`
+	UptimeStopChannels []*chan bool     `json:"-"`
 
 	Listeners map[uuid.UUID]chan InstanceEvent `json:"-"`
 }
@@ -104,4 +108,22 @@ func (i *Instance) NotifyListeners(event InstanceEvent) {
 	for _, listener := range i.Listeners {
 		listener <- event
 	}
+}
+
+func (i *Instance) PushStatus(name string, status float64) error {
+	return i.UptimeStorage.InsertRows([]tstorage.Row{
+		{
+			Metric: "status_change",
+			Labels: []tstorage.Label{
+				{
+					Name:  "name",
+					Value: name,
+				},
+			},
+			DataPoint: tstorage.DataPoint{
+				Timestamp: time.Now().Unix(),
+				Value:     status,
+			},
+		},
+	})
 }

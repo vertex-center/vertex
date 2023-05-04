@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/docker/docker v23.0.3+incompatible
+	github.com/docker/go-connections v0.4.0
 	github.com/fatih/color v1.14.1
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/sse v0.1.0
@@ -13,9 +14,11 @@ require (
 	github.com/go-git/go-git/v5 v5.6.1
 	github.com/google/go-github/v50 v50.0.0
 	github.com/google/uuid v1.3.0
+	github.com/nakabonne/tstorage v0.3.6
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.2
 	github.com/vertex-center/vertex-core-golang v0.0.0-20230423023245-a01db2466031
+	golang.org/x/exp v0.0.0-20230425010034-47ecfdc1ba53
 )
 
 require (
@@ -26,7 +29,6 @@ require (
 	github.com/containerd/containerd v1.7.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
-	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
@@ -65,7 +67,6 @@ require (
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
-	golang.org/x/exp v0.0.0-20230425010034-47ecfdc1ba53 // indirect
 	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/oauth2 v0.4.0 // indirect
