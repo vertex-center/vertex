@@ -60,7 +60,10 @@ func Create(about About) *gin.Engine {
 	instanceService = services.NewInstanceService()
 	updateService = services.NewUpdateDependenciesService(about.Version)
 
-	instanceService.StartAll()
+	go func() {
+		instanceService.StartAll()
+	}()
+
 	handleSignals()
 
 	addServicesRoutes(api.Group("/services"))
