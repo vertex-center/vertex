@@ -1,6 +1,16 @@
 @use "../../styles/colors"
 @use "../../styles/dimensions"
 
+.livedot
+    width: 12px
+    height: 12px
+    border-radius: 50%
+    background-color: colors.$bg-tertiary
+    transition: background-color .1s ease
+
+    &Tick
+        background-color: colors.$green
+
 .graph
     border: 1px solid colors.$bg-tertiary
     padding: 10px

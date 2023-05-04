@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import UptimeGraph from "../../components/UptimeGraph/UptimeGraph";
+import UptimeGraphs from "../../components/UptimeGraph/UptimeGraph";
 import { Title } from "../../components/Text/Text";
 import { useParams } from "react-router-dom";
 import { getInstanceStatus, Uptime } from "../../backend/backend";
@@ -21,7 +21,7 @@ export default function BayDetailsStatus(props: Props) {
     return (
         <Fragment>
             <Title>Status</Title>
-            <UptimeGraph uptimes={uptimes} />
+            <UptimeGraphs uptimes={uptimes} />
         </Fragment>
     );
 }
