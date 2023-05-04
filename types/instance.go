@@ -111,7 +111,7 @@ func (i *Instance) NotifyListeners(event InstanceEvent) {
 }
 
 func (i *Instance) PushStatus(name string, status float64) error {
-	return i.UptimeStorage.InsertRows([]tstorage.Row{
+	err := i.UptimeStorage.InsertRows([]tstorage.Row{
 		{
 			Metric: "status_change",
 			Labels: []tstorage.Label{
@@ -126,4 +126,11 @@ func (i *Instance) PushStatus(name string, status float64) error {
 			},
 		},
 	})
+
+	i.NotifyListeners(InstanceEvent{
+		Name: "uptime_status_change",
+		Data: UptimeStatus(status),
+	})
+
+	return err
 }
