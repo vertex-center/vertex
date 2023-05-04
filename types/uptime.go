@@ -21,10 +21,12 @@ type UptimePoint struct {
 }
 
 type Uptime struct {
-	Name    string        `json:"name"`
-	PingURL *string       `json:"ping_url,omitempty"`
-	Current string        `json:"current"`
-	History []UptimePoint `json:"history"`
+	Name             string        `json:"name"`
+	PingURL          *string       `json:"ping_url,omitempty"`
+	Current          string        `json:"current"`
+	IntervalSeconds  int           `json:"interval_seconds"`
+	RemainingSeconds int           `json:"remaining_seconds"`
+	History          []UptimePoint `json:"history"`
 }
 
 func UptimeStatus(value float64) string {

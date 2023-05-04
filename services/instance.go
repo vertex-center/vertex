@@ -556,21 +556,24 @@ func (s *InstanceService) GetAllStatus(uuid uuid.UUID, since StatusSince) ([]typ
 	}
 
 	var (
-		uptimes  []types.Uptime
-		from     time.Time
-		count    int
-		interval time.Duration
+		uptimes   []types.Uptime
+		from      time.Time
+		count     int
+		interval  time.Duration
+		remaining int
 	)
 
 	switch since {
 	case StatusSinceTwoDay:
-		from = time.Now().Add(-time.Hour * 48)
+		from = time.Now().Add(-time.Hour * 48).Truncate(time.Hour)
 		count = 48
 		interval = time.Hour
+		remaining = 3600 - time.Now().Hour()
 	case StatusSinceOneHour:
-		from = time.Now().Add(-time.Hour)
+		from = time.Now().Add(-time.Hour).Truncate(time.Minute)
 		count = 60
 		interval = time.Minute
+		remaining = 60 - time.Now().Second()
 	}
 
 	for _, url := range i.URLs {
@@ -616,10 +619,12 @@ func (s *InstanceService) GetAllStatus(uuid uuid.UUID, since StatusSince) ([]typ
 		}
 
 		uptimes = append(uptimes, types.Uptime{
-			Name:    url.Name,
-			PingURL: url.PingRoute,
-			Current: types.UptimeStatus(currentStatusFloat),
-			History: history,
+			Name:             url.Name,
+			PingURL:          url.PingRoute,
+			Current:          types.UptimeStatus(currentStatusFloat),
+			IntervalSeconds:  int(interval.Seconds()),
+			RemainingSeconds: remaining,
+			History:          history,
 		})
 	}
 
