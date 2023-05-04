@@ -35,6 +35,13 @@ export type Instance = Service & {
     launch_on_startup?: boolean;
 };
 
+export type DockerContainerInfo = {
+    id: string;
+    name: string;
+    image: string;
+    platform: string;
+};
+
 export type Package = {
     name: string;
     description?: string;
@@ -170,6 +177,17 @@ export async function getInstanceDependencies(
     return new Promise((resolve, reject) => {
         axios
             .get(route(`/instance/${uuid}/dependencies`))
+            .then((res) => resolve(res.data))
+            .catch((err) => reject(err));
+    });
+}
+
+export async function getInstanceDockerContainerInfo(
+    uuid: string
+): Promise<DockerContainerInfo> {
+    return new Promise((resolve, reject) => {
+        axios
+            .get(route(`/instance/${uuid}/docker`))
             .then((res) => resolve(res.data))
             .catch((err) => reject(err));
     });
