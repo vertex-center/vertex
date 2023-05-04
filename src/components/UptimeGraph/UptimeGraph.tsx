@@ -24,7 +24,6 @@ function UptimeGraph({ uptime }: { uptime: Uptime }) {
         const sse = registerSSE(route(`/instance/${uuid}/events`));
 
         const onStatusChange = (e) => {
-            console.log(e.data);
             if (e.data == "on") {
                 setTick(true);
                 setTimeout(() => setTick(false), 200);
@@ -50,7 +49,7 @@ function UptimeGraph({ uptime }: { uptime: Uptime }) {
                     })}
                 />
             </Horizontal>
-            <Horizontal gap={6} className={styles.graph}>
+            <Horizontal gap={6} className={styles.graph} alignItems="flex-end">
                 {uptime.history.map((point, i) => (
                     <div
                         key={i}

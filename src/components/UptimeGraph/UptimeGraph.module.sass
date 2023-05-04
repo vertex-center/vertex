@@ -20,19 +20,13 @@
     height: 50px
     width: 4px
     border-radius: 2px
+    transition: height .2s ease-in-out
 
     &Current
         background-color: colors.$green
-        animation: pulse .7s ease infinite alternate
 
     &On
         background-color: colors.$green
 
     &Off
         background-color: colors.$bg-tertiary
-
-@keyframes pulse
-    from
-        opacity: 0.2
-    to
-        opacity: 1
