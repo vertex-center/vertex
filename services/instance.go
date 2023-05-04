@@ -472,7 +472,7 @@ func (s *InstanceService) GetDockerContainerInfo(uuid uuid.UUID) (*types.DockerC
 		return nil, err
 	}
 
-	if i.UseDocker == false {
+	if !i.UseDocker {
 		return nil, errors.New("instance is not using docker")
 	}
 
