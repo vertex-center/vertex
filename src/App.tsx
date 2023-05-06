@@ -15,6 +15,7 @@ import SettingsAbout from "./pages/SettingsAbout/SettingsAbout";
 import SettingsUpdates from "./pages/SettingsUpdates/SettingsUpdates";
 import BayDetailsDocker from "./pages/BayDetailsDocker/BayDetailsDocker";
 import BayDetailsSettings from "./pages/BayDetailsSettings/BayDetailsSettings";
+import BayDetailsStatus from "./pages/BayDetailsStatus/BayDetailsStatus";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -51,6 +52,10 @@ function App() {
                         <Route
                             path="/bay/:uuid/logs"
                             element={<BayDetailsLogs />}
+                        />
+                        <Route
+                            path="/bay/:uuid/status"
+                            element={<BayDetailsStatus />}
                         />
                         <Route
                             path="/bay/:uuid/environment"
