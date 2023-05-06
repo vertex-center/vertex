@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/google/uuid"
+	"github.com/nakabonne/tstorage"
 	"github.com/vertex-center/vertex/logger"
 	"github.com/vertex-center/vertex/storage"
 	"github.com/vertex-center/vertex/types"
@@ -221,6 +222,15 @@ func (r *InstanceRepository) load(instanceUUID uuid.UUID) (*types.Instance, erro
 		}
 	}
 
+	uptimeStorage, err := tstorage.NewStorage(
+		tstorage.WithDataPath(path.Join(instancePath, ".vertex", "timestorage")),
+		tstorage.WithTimestampPrecision(tstorage.Seconds),
+		tstorage.WithWALBufferedSize(0),
+	)
+	if err != nil {
+		return nil, errors.New("failed to initialize time-storage")
+	}
+
 	i := &types.Instance{
 		Service:          *service,
 		InstanceMetadata: meta,
@@ -228,6 +238,7 @@ func (r *InstanceRepository) load(instanceUUID uuid.UUID) (*types.Instance, erro
 		Logger:           types.NewInstanceLogger(instancePath),
 		EnvVariables:     *types.NewEnvVariables(),
 		UUID:             instanceUUID,
+		UptimeStorage:    uptimeStorage,
 		Listeners:        map[uuid.UUID]chan types.InstanceEvent{},
 	}
 
@@ -238,6 +249,10 @@ func (r *InstanceRepository) load(instanceUUID uuid.UUID) (*types.Instance, erro
 func (r *InstanceRepository) unloadAll() {
 	for _, i := range r.instances {
 		i.Logger.CloseLogFile()
+		err := i.UptimeStorage.Close()
+		if err != nil {
+			logger.Error(err).Print()
+		}
 	}
 }
 

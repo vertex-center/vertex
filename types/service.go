@@ -1,5 +1,9 @@
 package types
 
+const (
+	URLKindClient = "client"
+)
+
 type EnvVariable struct {
 	Type        string `json:"type"`
 	Name        string `json:"name"`
@@ -26,6 +30,13 @@ type ServiceMethods struct {
 	Docker *ServiceMethodDocker `json:"docker,omitempty"`
 }
 
+type URL struct {
+	Name      string  `json:"name"`
+	Port      string  `json:"port"`
+	PingRoute *string `json:"ping,omitempty"`
+	Kind      string  `json:"kind"`
+}
+
 type Service struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
@@ -36,6 +47,7 @@ type Service struct {
 	Repository     string         `json:"repository"`
 	Description    string         `json:"description"`
 	EnvDefinitions []EnvVariable  `json:"environment,omitempty"`
+	URLs           []URL          `json:"urls,omitempty"`
 	Methods        ServiceMethods `json:"methods"`
 }
 
