@@ -8,15 +8,20 @@ import (
 	"os/exec"
 	"path"
 
+	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/logger"
 	"github.com/vertex-center/vertex/storage"
 	"github.com/vertex-center/vertex/types"
 )
 
-type FSRunnerRepository struct{}
+type FSRunnerRepository struct {
+	commands map[uuid.UUID]*exec.Cmd
+}
 
 func NewFSRunnerRepository() FSRunnerRepository {
-	return FSRunnerRepository{}
+	return FSRunnerRepository{
+		commands: map[uuid.UUID]*exec.Cmd{},
+	}
 }
 
 func (r FSRunnerRepository) Delete(instance *types.Instance) error {
@@ -24,7 +29,7 @@ func (r FSRunnerRepository) Delete(instance *types.Instance) error {
 }
 
 func (r FSRunnerRepository) Start(instance *types.Instance) error {
-	if instance.Cmd != nil {
+	if r.commands[instance.UUID] != nil {
 		logger.Error(errors.New("runner already started")).
 			AddKeyValue("name", instance.Name).
 			Print()
@@ -51,17 +56,19 @@ func (r FSRunnerRepository) Start(instance *types.Instance) error {
 		return err
 	}
 
-	instance.Cmd = exec.Command(command)
-	instance.Cmd.Dir = dir
+	r.commands[instance.UUID] = exec.Command(command)
 
-	instance.Cmd.Stdin = os.Stdin
+	cmd := r.commands[instance.UUID]
+	cmd.Dir = dir
 
-	stdoutReader, err := instance.Cmd.StdoutPipe()
+	cmd.Stdin = os.Stdin
+
+	stdoutReader, err := cmd.StdoutPipe()
 	if err != nil {
 		return err
 	}
 
-	stderrReader, err := instance.Cmd.StderrPipe()
+	stderrReader, err := cmd.StderrPipe()
 	if err != nil {
 		return err
 	}
@@ -88,13 +95,13 @@ func (r FSRunnerRepository) Start(instance *types.Instance) error {
 
 	instance.SetStatus(types.InstanceStatusRunning)
 
-	err = instance.Cmd.Start()
+	err = cmd.Start()
 	if err != nil {
 		return err
 	}
 
 	go func() {
-		err := instance.Cmd.Wait()
+		err := cmd.Wait()
 		if err != nil {
 			logger.Error(err).
 				AddKeyValue("name", instance.Service.Name).
@@ -107,14 +114,16 @@ func (r FSRunnerRepository) Start(instance *types.Instance) error {
 }
 
 func (r FSRunnerRepository) Stop(instance *types.Instance) error {
-	err := instance.Cmd.Process.Signal(os.Interrupt)
+	cmd := r.commands[instance.UUID]
+
+	err := cmd.Process.Signal(os.Interrupt)
 	if err != nil {
 		return err
 	}
 
 	// TODO: Force kill if the process continues
 
-	instance.Cmd = nil
+	delete(r.commands, instance.UUID)
 
 	return nil
 }

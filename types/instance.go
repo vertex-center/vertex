@@ -3,7 +3,6 @@ package types
 import (
 	"encoding/json"
 	"errors"
-	"os/exec"
 	"path"
 	"time"
 
@@ -47,7 +46,6 @@ type Instance struct {
 	EnvVariables EnvVariables    `json:"env"`
 
 	UUID               uuid.UUID        `json:"uuid"`
-	Cmd                *exec.Cmd        `json:"-"`
 	UptimeStorage      tstorage.Storage `json:"-"`
 	UptimeStopChannels []*chan bool     `json:"-"`
 
