@@ -18,7 +18,7 @@ import (
 	"github.com/vertex-center/vertex/types"
 )
 
-type DockerRunnerRepository struct {
+type RunnerDockerRepository struct {
 	cli *client.Client
 }
 
@@ -26,22 +26,22 @@ type dockerMessage struct {
 	Stream string `json:"stream"`
 }
 
-func NewDockerRunnerRepository() DockerRunnerRepository {
+func NewRunnerDockerRepository() RunnerDockerRepository {
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		logger.Warn("couldn't connect with the Docker cli.").
 			AddKeyValue("error", err.Error()).
 			Print()
 
-		return DockerRunnerRepository{}
+		return RunnerDockerRepository{}
 	}
 
-	return DockerRunnerRepository{
+	return RunnerDockerRepository{
 		cli: cli,
 	}
 }
 
-func (r DockerRunnerRepository) Delete(instance *types.Instance) error {
+func (r RunnerDockerRepository) Delete(instance *types.Instance) error {
 	id, err := r.getID(*instance)
 	if err != nil {
 		return err
@@ -50,7 +50,7 @@ func (r DockerRunnerRepository) Delete(instance *types.Instance) error {
 	return r.cli.ContainerRemove(context.Background(), id, dockertypes.ContainerRemoveOptions{})
 }
 
-func (r DockerRunnerRepository) Start(instance *types.Instance) error {
+func (r RunnerDockerRepository) Start(instance *types.Instance) error {
 	imageName := instance.DockerImageName()
 	containerName := instance.DockerContainerName()
 
@@ -147,7 +147,7 @@ func (r DockerRunnerRepository) Start(instance *types.Instance) error {
 	return nil
 }
 
-func (r DockerRunnerRepository) Stop(instance *types.Instance) error {
+func (r RunnerDockerRepository) Stop(instance *types.Instance) error {
 	id, err := r.getID(*instance)
 	if err != nil {
 		return err
@@ -156,7 +156,7 @@ func (r DockerRunnerRepository) Stop(instance *types.Instance) error {
 	return r.cli.ContainerStop(context.Background(), id, container.StopOptions{})
 }
 
-func (r DockerRunnerRepository) Info(instance types.Instance) (map[string]any, error) {
+func (r RunnerDockerRepository) Info(instance types.Instance) (map[string]any, error) {
 	id, err := r.getID(instance)
 	if err != nil {
 		return nil, err
@@ -175,7 +175,7 @@ func (r DockerRunnerRepository) Info(instance types.Instance) (map[string]any, e
 	}, nil
 }
 
-func (r DockerRunnerRepository) getID(instance types.Instance) (string, error) {
+func (r RunnerDockerRepository) getID(instance types.Instance) (string, error) {
 	containers, err := r.cli.ContainerList(context.Background(), dockertypes.ContainerListOptions{
 		All: true,
 	})
@@ -200,7 +200,7 @@ func (r DockerRunnerRepository) getID(instance types.Instance) (string, error) {
 	return containerID, nil
 }
 
-func (r DockerRunnerRepository) buildImageFromName(imageName string, onMsg func(msg string)) error {
+func (r RunnerDockerRepository) buildImageFromName(imageName string, onMsg func(msg string)) error {
 	res, err := r.cli.ImagePull(context.Background(), imageName, dockertypes.ImagePullOptions{})
 	if err != nil {
 		return err
@@ -217,7 +217,7 @@ func (r DockerRunnerRepository) buildImageFromName(imageName string, onMsg func(
 	return nil
 }
 
-func (r DockerRunnerRepository) buildImageFromDockerfile(instancePath string, imageName string, onMsg func(msg string)) error {
+func (r RunnerDockerRepository) buildImageFromDockerfile(instancePath string, imageName string, onMsg func(msg string)) error {
 	buildOptions := dockertypes.ImageBuildOptions{
 		Dockerfile: "Dockerfile",
 		Tags:       []string{imageName},
@@ -259,7 +259,7 @@ func (r DockerRunnerRepository) buildImageFromDockerfile(instancePath string, im
 	return nil
 }
 
-func (r DockerRunnerRepository) createContainer(imageName string, containerName string, exposedPorts nat.PortSet, portBindings nat.PortMap, binds []string) (string, error) {
+func (r RunnerDockerRepository) createContainer(imageName string, containerName string, exposedPorts nat.PortSet, portBindings nat.PortMap, binds []string) (string, error) {
 	config := container.Config{
 		Image:        imageName,
 		ExposedPorts: exposedPorts,

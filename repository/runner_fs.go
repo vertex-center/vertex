@@ -14,21 +14,21 @@ import (
 	"github.com/vertex-center/vertex/types"
 )
 
-type FSRunnerRepository struct {
+type RunnerFSRepository struct {
 	commands map[uuid.UUID]*exec.Cmd
 }
 
-func NewFSRunnerRepository() FSRunnerRepository {
-	return FSRunnerRepository{
+func NewRunnerFSRepository() RunnerFSRepository {
+	return RunnerFSRepository{
 		commands: map[uuid.UUID]*exec.Cmd{},
 	}
 }
 
-func (r FSRunnerRepository) Delete(instance *types.Instance) error {
+func (r RunnerFSRepository) Delete(instance *types.Instance) error {
 	return nil
 }
 
-func (r FSRunnerRepository) Start(instance *types.Instance) error {
+func (r RunnerFSRepository) Start(instance *types.Instance) error {
 	if r.commands[instance.UUID] != nil {
 		logger.Error(errors.New("runner already started")).
 			AddKeyValue("name", instance.Name).
@@ -113,7 +113,7 @@ func (r FSRunnerRepository) Start(instance *types.Instance) error {
 	return nil
 }
 
-func (r FSRunnerRepository) Stop(instance *types.Instance) error {
+func (r RunnerFSRepository) Stop(instance *types.Instance) error {
 	cmd := r.commands[instance.UUID]
 
 	err := cmd.Process.Signal(os.Interrupt)
@@ -128,10 +128,10 @@ func (r FSRunnerRepository) Stop(instance *types.Instance) error {
 	return nil
 }
 
-func (r FSRunnerRepository) Info(instance types.Instance) (map[string]any, error) {
+func (r RunnerFSRepository) Info(instance types.Instance) (map[string]any, error) {
 	return map[string]any{}, nil
 }
 
-func (r FSRunnerRepository) getPath(instance types.Instance) string {
+func (r RunnerFSRepository) getPath(instance types.Instance) string {
 	return path.Join(storage.PathInstances, instance.UUID.String())
 }

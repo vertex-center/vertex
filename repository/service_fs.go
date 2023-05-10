@@ -10,7 +10,7 @@ import (
 	"github.com/vertex-center/vertex/types"
 )
 
-type ServiceRepository struct {
+type ServiceFSRepository struct {
 	servicesPath string
 	services     []types.Service
 }
@@ -19,7 +19,7 @@ type ServiceRepositoryParams struct {
 	servicesPath string
 }
 
-func NewServiceRepository(params *ServiceRepositoryParams) ServiceRepository {
+func NewServiceFSRepository(params *ServiceRepositoryParams) ServiceFSRepository {
 	if params == nil {
 		params = &ServiceRepositoryParams{}
 	}
@@ -27,7 +27,7 @@ func NewServiceRepository(params *ServiceRepositoryParams) ServiceRepository {
 		params.servicesPath = storage.PathServices
 	}
 
-	repo := ServiceRepository{
+	repo := ServiceFSRepository{
 		servicesPath: params.servicesPath,
 	}
 	err := repo.reload()
@@ -37,11 +37,11 @@ func NewServiceRepository(params *ServiceRepositoryParams) ServiceRepository {
 	return repo
 }
 
-func (r *ServiceRepository) GetAll() []types.Service {
+func (r *ServiceFSRepository) GetAll() []types.Service {
 	return r.services
 }
 
-func (r *ServiceRepository) reload() error {
+func (r *ServiceFSRepository) reload() error {
 	url := "https://github.com/vertex-center/vertex-services"
 
 	err := storage.CloneOrPullRepository(url, r.servicesPath)

@@ -16,7 +16,7 @@ var (
 	ErrPkgNotFound = errors2.New("package not found")
 )
 
-type PackageRepository struct {
+type PackageFSRepository struct {
 	pkgs             map[string]types.Package
 	dependenciesPath string
 }
@@ -25,7 +25,7 @@ type PackageRepositoryParams struct {
 	dependenciesPath string
 }
 
-func NewPackageRepo(params *PackageRepositoryParams) PackageRepository {
+func NewPackageFSRepository(params *PackageRepositoryParams) PackageFSRepository {
 	if params == nil {
 		params = &PackageRepositoryParams{}
 	}
@@ -33,7 +33,7 @@ func NewPackageRepo(params *PackageRepositoryParams) PackageRepository {
 		params.dependenciesPath = storage.PathPackages
 	}
 
-	repo := PackageRepository{
+	repo := PackageFSRepository{
 		dependenciesPath: params.dependenciesPath,
 		pkgs:             map[string]types.Package{},
 	}
@@ -44,7 +44,7 @@ func NewPackageRepo(params *PackageRepositoryParams) PackageRepository {
 	return repo
 }
 
-func (r *PackageRepository) Get(id string) (types.Package, error) {
+func (r *PackageFSRepository) Get(id string) (types.Package, error) {
 	pkg, ok := r.pkgs[id]
 	if !ok {
 		return types.Package{}, ErrPkgNotFound
@@ -52,11 +52,11 @@ func (r *PackageRepository) Get(id string) (types.Package, error) {
 	return pkg, nil
 }
 
-func (r *PackageRepository) GetPath(id string) string {
+func (r *PackageFSRepository) GetPath(id string) string {
 	return path.Join(r.dependenciesPath, "packages", id)
 }
 
-func (r *PackageRepository) reload() error {
+func (r *PackageFSRepository) reload() error {
 	url := "https://github.com/vertex-center/vertex-dependencies"
 
 	err := storage.CloneOrPullRepository(url, r.dependenciesPath)
@@ -87,7 +87,7 @@ func (r *PackageRepository) reload() error {
 	return nil
 }
 
-func (r *PackageRepository) readPkgFromDisk(id string) (*types.Package, error) {
+func (r *PackageFSRepository) readPkgFromDisk(id string) (*types.Package, error) {
 	p := path.Join(r.GetPath(id), fmt.Sprintf("%s.json", id))
 
 	file, err := os.ReadFile(p)

@@ -15,7 +15,7 @@ const (
 type PackageRepositoryTestSuite struct {
 	suite.Suite
 
-	repo PackageRepository
+	repo PackageFSRepository
 }
 
 func TestPackageRepositoryTestSuite(t *testing.T) {
@@ -23,7 +23,7 @@ func TestPackageRepositoryTestSuite(t *testing.T) {
 }
 
 func (suite *PackageRepositoryTestSuite) SetupSuite() {
-	suite.repo = NewPackageRepo(&PackageRepositoryParams{
+	suite.repo = NewPackageFSRepository(&PackageRepositoryParams{
 		dependenciesPath: PathPackages,
 	})
 

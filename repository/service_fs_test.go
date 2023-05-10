@@ -15,7 +15,7 @@ const (
 type AvailableTestSuite struct {
 	suite.Suite
 
-	repo ServiceRepository
+	repo ServiceFSRepository
 }
 
 func TestAvailableTestSuite(t *testing.T) {
@@ -23,7 +23,7 @@ func TestAvailableTestSuite(t *testing.T) {
 }
 
 func (suite *AvailableTestSuite) SetupSuite() {
-	suite.repo = NewServiceRepository(&ServiceRepositoryParams{
+	suite.repo = NewServiceFSRepository(&ServiceRepositoryParams{
 		servicesPath: PathServices,
 	})
 
