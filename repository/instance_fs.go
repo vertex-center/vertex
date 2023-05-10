@@ -292,5 +292,5 @@ func (r *InstanceFSRepository) Load(uuid uuid.UUID) (*types.Instance, error) {
 		return nil, err
 	}
 
-	return &instance, nil
+	return r.instances[uuid], nil
 }

@@ -56,7 +56,7 @@ func (s *InstanceService) Delete(uuid uuid.UUID) error {
 		return ErrContainerStillRunning
 	}
 
-	if instance.UseDocker {
+	if instance.IsDockerized() {
 		err = s.dockerRunnerRepo.Delete(instance)
 	} else {
 		err = s.fsRunnerRepo.Delete(instance)
@@ -99,7 +99,7 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		return ErrInstanceAlreadyRunning
 	}
 
-	if instance.UseDocker {
+	if instance.IsDockerized() {
 		err = s.dockerRunnerRepo.Start(instance)
 	} else {
 		err = s.fsRunnerRepo.Start(instance)
@@ -206,7 +206,7 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 
 	s.stopUptimeRoutine(instance)
 
-	if instance.UseDocker {
+	if instance.IsDockerized() {
 		err = s.dockerRunnerRepo.Stop(instance)
 	} else {
 		err = s.fsRunnerRepo.Stop(instance)
@@ -281,12 +281,8 @@ func (s *InstanceService) Install(repo string, useDocker *bool, useReleases *boo
 		return nil, err
 	}
 
-	if useDocker != nil {
-		i.InstanceMetadata.UseDocker = *useDocker
-	}
-	if useReleases != nil {
-		i.InstanceMetadata.UseReleases = *useReleases
-	}
+	i.InstanceMetadata.UseDocker = useDocker
+	i.InstanceMetadata.UseReleases = useReleases
 
 	err = s.instanceRepo.SaveMetadata(i)
 	if err != nil {
@@ -317,7 +313,7 @@ func (s *InstanceService) GetDockerContainerInfo(uuid uuid.UUID) (map[string]any
 		return nil, err
 	}
 
-	if !instance.UseDocker {
+	if !instance.IsDockerized() {
 		return nil, errors.New("instance is not using docker")
 	}
 

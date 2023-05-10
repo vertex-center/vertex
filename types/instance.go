@@ -24,11 +24,16 @@ const (
 )
 
 type InstanceMetadata struct {
-	UseDocker   bool `json:"use_docker"`
-	UseReleases bool `json:"use_releases"`
+	// UseDocker indicates if the instance should be launched with Docker.
+	// The default value is false.
+	UseDocker *bool `json:"use_docker,omitempty"`
 
-	// LaunchOnStartup indicates if the instance needs to start automatically when Vertex
-	// starts. The default value is true.
+	// UseReleases indicates if the instance should use precompiled releases when possible.
+	// The default value is false.
+	UseReleases *bool `json:"use_releases,omitempty"`
+
+	// LaunchOnStartup indicates if the instance needs to start automatically when Vertex starts.
+	// The default value is true.
 	LaunchOnStartup *bool `json:"launch_on_startup,omitempty"`
 }
 
@@ -53,12 +58,6 @@ type Instance struct {
 }
 
 func NewInstance(id uuid.UUID, service Service, instancePath string) (Instance, error) {
-	// TODO: Make UseDocker and UseReleases optional
-	meta := InstanceMetadata{
-		UseDocker:   false,
-		UseReleases: false,
-	}
-
 	uptimeStorage, err := tstorage.NewStorage(
 		tstorage.WithDataPath(path.Join(instancePath, ".vertex", "timestorage")),
 		tstorage.WithTimestampPrecision(tstorage.Seconds),
@@ -69,14 +68,13 @@ func NewInstance(id uuid.UUID, service Service, instancePath string) (Instance, 
 	}
 
 	return Instance{
-		Service:          service,
-		InstanceMetadata: meta,
-		Status:           InstanceStatusOff,
-		Logger:           NewInstanceLogger(instancePath),
-		EnvVariables:     *NewEnvVariables(),
-		UUID:             id,
-		UptimeStorage:    uptimeStorage,
-		Listeners:        map[uuid.UUID]chan InstanceEvent{},
+		Service:       service,
+		Status:        InstanceStatusOff,
+		Logger:        NewInstanceLogger(instancePath),
+		EnvVariables:  *NewEnvVariables(),
+		UUID:          id,
+		UptimeStorage: uptimeStorage,
+		Listeners:     map[uuid.UUID]chan InstanceEvent{},
 	}, nil
 }
 
@@ -199,4 +197,8 @@ func (i *Instance) PushStatus(name string, status float64) error {
 	})
 
 	return err
+}
+
+func (i *Instance) IsDockerized() bool {
+	return i.InstanceMetadata.UseDocker != nil && *i.InstanceMetadata.UseDocker
 }
