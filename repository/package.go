@@ -52,7 +52,7 @@ func (r *PackageRepository) Get(id string) (types.Package, error) {
 	return pkg, nil
 }
 
-func (r *PackageRepository) GetPkgPath(id string) string {
+func (r *PackageRepository) GetPath(id string) string {
 	return path.Join(r.dependenciesPath, "packages", id)
 }
 
@@ -88,7 +88,7 @@ func (r *PackageRepository) reload() error {
 }
 
 func (r *PackageRepository) readPkgFromDisk(id string) (*types.Package, error) {
-	p := path.Join(r.GetPkgPath(id), fmt.Sprintf("%s.json", id))
+	p := path.Join(r.GetPath(id), fmt.Sprintf("%s.json", id))
 
 	file, err := os.ReadFile(p)
 	if err != nil {

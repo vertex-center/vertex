@@ -1,7 +1,10 @@
 package types
 
 import (
+	"encoding/json"
+	"errors"
 	"os/exec"
+	"path"
 	"time"
 
 	"github.com/google/uuid"
@@ -17,6 +20,8 @@ const (
 	InstanceStatusError    = "error"
 
 	InstanceEventStatusChange = "status_change"
+	InstanceEventStdout       = "stdout"
+	InstanceEventStderr       = "stderr"
 )
 
 type InstanceMetadata struct {
@@ -49,15 +54,56 @@ type Instance struct {
 	Listeners map[uuid.UUID]chan InstanceEvent `json:"-"`
 }
 
+func NewInstance(id uuid.UUID, service Service, instancePath string) (Instance, error) {
+	// TODO: Make UseDocker and UseReleases optional
+	meta := InstanceMetadata{
+		UseDocker:   false,
+		UseReleases: false,
+	}
+
+	uptimeStorage, err := tstorage.NewStorage(
+		tstorage.WithDataPath(path.Join(instancePath, ".vertex", "timestorage")),
+		tstorage.WithTimestampPrecision(tstorage.Seconds),
+		tstorage.WithWALBufferedSize(0),
+	)
+	if err != nil {
+		return Instance{}, errors.New("failed to initialize time-storage")
+	}
+
+	return Instance{
+		Service:          service,
+		InstanceMetadata: meta,
+		Status:           InstanceStatusOff,
+		Logger:           NewInstanceLogger(instancePath),
+		EnvVariables:     *NewEnvVariables(),
+		UUID:             id,
+		UptimeStorage:    uptimeStorage,
+		Listeners:        map[uuid.UUID]chan InstanceEvent{},
+	}, nil
+}
+
 type InstanceRepository interface {
 	Get(uuid uuid.UUID) (*Instance, error)
 	GetAll() map[uuid.UUID]*Instance
+	GetPath(uuid uuid.UUID) string
 	Delete(uuid uuid.UUID) error
 	Exists(uuid uuid.UUID) bool
-	Create(uuid uuid.UUID, i *Instance)
+	Set(uuid uuid.UUID, instance Instance) error
 
 	AddListener(channel chan InstanceEvent) uuid.UUID
 	RemoveListener(uuid uuid.UUID)
+
+	SaveMetadata(i *Instance) error
+	LoadMetadata(i *Instance) error
+
+	SaveEnv(i *Instance, variables map[string]string) error
+	LoadEnv(i *Instance) error
+
+	ReadService(instancePath string) (Service, error)
+
+	Load(uuid uuid.UUID) (*Instance, error)
+
+	Close()
 }
 
 func (i *Instance) DockerImageName() string {
@@ -108,6 +154,28 @@ func (i *Instance) NotifyListeners(event InstanceEvent) {
 	for _, listener := range i.Listeners {
 		listener <- event
 	}
+}
+
+func (i *Instance) PushLogLine(line *LogLine) {
+	i.Logger.Write(line)
+
+	data, err := json.Marshal(line)
+	if err != nil {
+		logger.Error(err).Print()
+	}
+
+	var name string
+	switch line.Kind {
+	case InstanceEventStderr:
+		name = InstanceEventStderr
+	default:
+		name = InstanceEventStdout
+	}
+
+	i.NotifyListeners(InstanceEvent{
+		Name: name,
+		Data: string(data),
+	})
 }
 
 func (i *Instance) PushStatus(name string, status float64) error {

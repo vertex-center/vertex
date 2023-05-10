@@ -37,7 +37,7 @@ func NewServiceRepository(params *ServiceRepositoryParams) ServiceRepository {
 	return repo
 }
 
-func (r *ServiceRepository) GetAvailable() []types.Service {
+func (r *ServiceRepository) GetAll() []types.Service {
 	return r.services
 }
 

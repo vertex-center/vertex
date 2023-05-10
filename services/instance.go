@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/docker/go-connections/nat"
+	"github.com/go-git/go-git/v5"
 	"github.com/google/uuid"
 	"github.com/nakabonne/tstorage"
 	"github.com/vertex-center/vertex/logger"
@@ -28,31 +29,27 @@ var (
 )
 
 type InstanceService struct {
-	repo       repository.InstanceRepository
-	dockerRepo repository.DockerRepository
+	instanceRepo types.InstanceRepository
+	dockerRepo   types.DockerRepository
 }
 
-func NewInstanceService() InstanceService {
+func NewInstanceService(instanceRepo types.InstanceRepository, dockerRepo types.DockerRepository) InstanceService {
 	return InstanceService{
-		repo:       repository.NewInstanceRepository(),
-		dockerRepo: repository.NewDockerRepository(),
+		instanceRepo: instanceRepo,
+		dockerRepo:   dockerRepo,
 	}
 }
 
-func (s *InstanceService) Unload() {
-	s.repo.Unload()
-}
-
 func (s *InstanceService) Get(uuid uuid.UUID) (*types.Instance, error) {
-	return s.repo.Get(uuid)
+	return s.instanceRepo.Get(uuid)
 }
 
 func (s *InstanceService) GetAll() map[uuid.UUID]*types.Instance {
-	return s.repo.GetAll()
+	return s.instanceRepo.GetAll()
 }
 
 func (s *InstanceService) Delete(uuid uuid.UUID) error {
-	i, err := s.repo.Get(uuid)
+	i, err := s.instanceRepo.Get(uuid)
 	if err != nil {
 		return err
 	}
@@ -75,24 +72,24 @@ func (s *InstanceService) Delete(uuid uuid.UUID) error {
 		}
 	}
 
-	return s.repo.Delete(uuid)
+	return s.instanceRepo.Delete(uuid)
 }
 
 func (s *InstanceService) AddListener(channel chan types.InstanceEvent) uuid.UUID {
-	return s.repo.AddListener(channel)
+	return s.instanceRepo.AddListener(channel)
 }
 
 func (s *InstanceService) RemoveListener(uuid uuid.UUID) {
-	s.repo.RemoveListener(uuid)
+	s.instanceRepo.RemoveListener(uuid)
 }
 
 func (s *InstanceService) Start(uuid uuid.UUID) error {
-	i, err := s.repo.Get(uuid)
+	i, err := s.instanceRepo.Get(uuid)
 	if err != nil {
 		return err
 	}
 
-	s.repo.WriteLogLine(i, &types.LogLine{
+	i.PushLogLine(&types.LogLine{
 		Kind:    types.LogKindVertexOut,
 		Message: "Starting instance...",
 	})
@@ -102,7 +99,7 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		Print()
 
 	if i.IsRunning() {
-		s.repo.WriteLogLine(i, &types.LogLine{
+		i.PushLogLine(&types.LogLine{
 			Kind:    types.LogKindVertexErr,
 			Message: ErrInstanceAlreadyRunning.Error(),
 		})
@@ -118,7 +115,7 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 	if err != nil {
 		i.SetStatus(types.InstanceStatusError)
 	} else {
-		s.repo.WriteLogLine(i, &types.LogLine{
+		i.PushLogLine(&types.LogLine{
 			Kind:    types.LogKindVertexOut,
 			Message: "Instance started.",
 		})
@@ -179,7 +176,7 @@ func (s *InstanceService) startUptimeRoutine(i *types.Instance) {
 }
 
 func (s *InstanceService) StartAll() {
-	for _, i := range s.repo.GetAll() {
+	for _, i := range s.instanceRepo.GetAll() {
 		launchOnStartup := i.InstanceMetadata.LaunchOnStartup
 		if launchOnStartup != nil && !*launchOnStartup {
 			continue
@@ -192,12 +189,12 @@ func (s *InstanceService) StartAll() {
 }
 
 func (s *InstanceService) Stop(uuid uuid.UUID) error {
-	i, err := s.repo.Get(uuid)
+	i, err := s.instanceRepo.Get(uuid)
 	if err != nil {
 		return err
 	}
 
-	s.repo.WriteLogLine(i, &types.LogLine{
+	i.PushLogLine(&types.LogLine{
 		Kind:    types.LogKindVertexOut,
 		Message: "Stopping instance...",
 	})
@@ -207,7 +204,7 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 		Print()
 
 	if !i.IsRunning() {
-		s.repo.WriteLogLine(i, &types.LogLine{
+		i.PushLogLine(&types.LogLine{
 			Kind:    types.LogKindVertexErr,
 			Message: ErrInstanceNotRunning.Error(),
 		})
@@ -223,7 +220,7 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 	}
 
 	if err == nil {
-		s.repo.WriteLogLine(i, &types.LogLine{
+		i.PushLogLine(&types.LogLine{
 			Kind:    types.LogKindVertexOut,
 			Message: "Instance stopped.",
 		})
@@ -245,7 +242,7 @@ func (s *InstanceService) stopUptimeRoutine(i *types.Instance) {
 }
 
 func (s *InstanceService) StopAll() {
-	for _, i := range s.repo.GetAll() {
+	for _, i := range s.instanceRepo.GetAll() {
 		if !i.IsRunning() {
 			continue
 		}
@@ -262,10 +259,10 @@ func (s *InstanceService) startWithDocker(i *types.Instance) error {
 
 	i.SetStatus(types.InstanceStatusBuilding)
 
-	instancePath := s.repo.GetPath(i)
+	instancePath := s.instanceRepo.GetPath(i.UUID)
 
 	onMsg := func(msg string) {
-		s.repo.WriteLogLine(i, &types.LogLine{
+		i.PushLogLine(&types.LogLine{
 			Kind:    types.LogKindOut,
 			Message: msg,
 		})
@@ -282,7 +279,7 @@ func (s *InstanceService) startWithDocker(i *types.Instance) error {
 	}
 
 	if err != nil {
-		s.repo.WriteLogLine(i, &types.LogLine{
+		i.PushLogLine(&types.LogLine{
 			Kind:    types.LogKindErr,
 			Message: err.Error(),
 		})
@@ -361,7 +358,7 @@ func (s *InstanceService) startManually(i *types.Instance) error {
 			Print()
 	}
 
-	dir := s.repo.GetPath(i)
+	dir := s.instanceRepo.GetPath(i.UUID)
 	executable := i.ID
 	command := "./" + i.ID
 
@@ -400,7 +397,7 @@ func (s *InstanceService) startManually(i *types.Instance) error {
 	stdoutScanner := bufio.NewScanner(stdoutReader)
 	go func() {
 		for stdoutScanner.Scan() {
-			s.repo.WriteLogLine(i, &types.LogLine{
+			i.PushLogLine(&types.LogLine{
 				Kind:    types.LogKindOut,
 				Message: stdoutScanner.Text(),
 			})
@@ -410,7 +407,7 @@ func (s *InstanceService) startManually(i *types.Instance) error {
 	stderrScanner := bufio.NewScanner(stderrReader)
 	go func() {
 		for stderrScanner.Scan() {
-			s.repo.WriteLogLine(i, &types.LogLine{
+			i.PushLogLine(&types.LogLine{
 				Kind:    types.LogKindErr,
 				Message: stderrScanner.Text(),
 			})
@@ -465,7 +462,7 @@ func (s *InstanceService) WriteEnv(uuid uuid.UUID, environment map[string]string
 		return err
 	}
 
-	return s.repo.WriteEnv(i, environment)
+	return s.instanceRepo.SaveEnv(i, environment)
 }
 
 func (s *InstanceService) Install(repo string, useDocker *bool, useReleases *bool) (*types.Instance, error) {
@@ -476,11 +473,11 @@ func (s *InstanceService) Install(repo string, useDocker *bool, useReleases *boo
 
 	var err error
 	if strings.HasPrefix(repo, "marketplace:") {
-		err = s.repo.Download(basePath, repo, forceClone)
+		err = s.Download(basePath, repo, forceClone)
 	} else if strings.HasPrefix(repo, "localstorage:") {
-		err = s.repo.Symlink(basePath, repo)
+		err = s.Symlink(basePath, repo)
 	} else if strings.HasPrefix(repo, "git:") {
-		err = s.repo.Download(basePath, repo, forceClone)
+		err = s.Download(basePath, repo, forceClone)
 	} else {
 		return nil, fmt.Errorf("this protocol is not supported")
 	}
@@ -489,7 +486,7 @@ func (s *InstanceService) Install(repo string, useDocker *bool, useReleases *boo
 		return nil, err
 	}
 
-	i, err := s.repo.Instantiate(serviceUUID)
+	i, err := s.instanceRepo.Load(serviceUUID)
 	if err != nil {
 		return nil, err
 	}
@@ -501,7 +498,7 @@ func (s *InstanceService) Install(repo string, useDocker *bool, useReleases *boo
 		i.InstanceMetadata.UseReleases = *useReleases
 	}
 
-	err = s.repo.SaveMetadata(i)
+	err = s.instanceRepo.SaveMetadata(i)
 	if err != nil {
 		return nil, err
 	}
@@ -516,7 +513,7 @@ func (s *InstanceService) SetLaunchOnStartup(uuid uuid.UUID, value bool) error {
 	}
 
 	i.InstanceMetadata.LaunchOnStartup = &value
-	err = s.repo.SaveMetadata(i)
+	err = s.instanceRepo.SaveMetadata(i)
 	if err != nil {
 		return err
 	}
@@ -629,4 +626,78 @@ func (s *InstanceService) GetAllStatus(uuid uuid.UUID, since StatusSince) ([]typ
 	}
 
 	return uptimes, nil
+}
+
+func (s *InstanceService) Download(dest string, repo string, forceClone bool) error {
+	var err error
+
+	if forceClone {
+		logger.Log("force-clone enabled.").Print()
+	} else {
+		logger.Log("force-clone disabled. try to download the releases first").Print()
+		err = downloadFromReleases(dest, repo)
+	}
+
+	if forceClone || errors.Is(err, storage.ErrNoReleasesPublished) {
+		split := strings.Split(repo, ":")
+		repo = "git:https://" + split[1]
+
+		err = downloadFromGit(dest, repo)
+		if err != nil {
+			return err
+		}
+	}
+
+	return err
+}
+
+func (s *InstanceService) Symlink(path string, repo string) error {
+	p := strings.Split(repo, ":")[1]
+
+	_, err := s.instanceRepo.ReadService(p)
+	if err != nil {
+		return fmt.Errorf("%s is not a compatible Vertex service", repo)
+	}
+
+	return os.Symlink(p, path)
+}
+
+func (s *InstanceService) load(instanceUUID uuid.UUID) (*types.Instance, error) {
+	instancePath := path.Join(storage.PathInstances, instanceUUID.String())
+
+	service, err := s.instanceRepo.ReadService(instancePath)
+	if err != nil {
+		return nil, err
+	}
+
+	i, err := types.NewInstance(instanceUUID, service, instancePath)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.instanceRepo.LoadMetadata(&i)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.instanceRepo.LoadEnv(&i)
+	return &i, err
+}
+
+func downloadFromReleases(dest string, repo string) error {
+	split := strings.Split(repo, "/")
+
+	owner := split[1]
+	repository := split[2]
+
+	return storage.DownloadLatestGithubRelease(owner, repository, dest)
+}
+
+func downloadFromGit(path string, repo string) error {
+	url := strings.SplitN(repo, ":", 2)[1]
+	_, err := git.PlainClone(path, false, &git.CloneOptions{
+		URL:      url,
+		Progress: os.Stdout,
+	})
+	return err
 }

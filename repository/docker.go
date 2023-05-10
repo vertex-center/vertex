@@ -100,7 +100,7 @@ func (r DockerRepository) BuildImageFromDockerfile(instancePath string, imageNam
 	return nil
 }
 
-func (r DockerRepository) CreateContainer(imageName string, containerName string, exposedPorts nat.PortSet, portBindinds nat.PortMap, binds []string) (string, error) {
+func (r DockerRepository) CreateContainer(imageName string, containerName string, exposedPorts nat.PortSet, portBindings nat.PortMap, binds []string) (string, error) {
 	config := container.Config{
 		Image:        imageName,
 		ExposedPorts: exposedPorts,
@@ -108,7 +108,7 @@ func (r DockerRepository) CreateContainer(imageName string, containerName string
 
 	hostConfig := container.HostConfig{
 		Binds:        binds,
-		PortBindings: portBindinds,
+		PortBindings: portBindings,
 	}
 
 	res, err := r.cli.ContainerCreate(context.Background(), &config, &hostConfig, nil, nil, containerName)

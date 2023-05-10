@@ -1,20 +1,19 @@
 package services
 
 import (
-	"github.com/vertex-center/vertex/repository"
 	"github.com/vertex-center/vertex/types"
 )
 
 type ServiceService struct {
-	repo repository.ServiceRepository
+	serviceRepo types.ServiceRepository
 }
 
-func NewServiceService() ServiceService {
+func NewServiceService(serviceRepo types.ServiceRepository) ServiceService {
 	return ServiceService{
-		repo: repository.NewServiceRepository(nil),
+		serviceRepo: serviceRepo,
 	}
 }
 
 func (s *ServiceService) ListAvailable() []types.Service {
-	return s.repo.GetAvailable()
+	return s.serviceRepo.GetAll()
 }

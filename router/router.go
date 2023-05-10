@@ -13,11 +13,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex-core-golang/router"
 	"github.com/vertex-center/vertex/logger"
+	"github.com/vertex-center/vertex/repository"
 	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/storage"
 )
 
 var (
+	dockerRepo   repository.DockerRepository
+	instanceRepo repository.InstanceFSRepository
+	packageRepo  repository.PackageRepository
+	serviceRepo  repository.ServiceRepository
+
 	packageService  services.PackageService
 	serviceService  services.ServiceService
 	instanceService services.InstanceService
@@ -55,9 +61,14 @@ func Create(about About) *gin.Engine {
 	)
 	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.PathClient, "dist"), true)))
 
-	packageService = services.NewPackageService()
-	serviceService = services.NewServiceService()
-	instanceService = services.NewInstanceService()
+	dockerRepo = repository.NewDockerRepository()
+	instanceRepo = repository.NewInstanceFSRepository()
+	packageRepo = repository.NewPackageRepo(nil)
+	serviceRepo = repository.NewServiceRepository(nil)
+
+	instanceService = services.NewInstanceService(&instanceRepo, &dockerRepo)
+	packageService = services.NewPackageService(&packageRepo)
+	serviceService = services.NewServiceService(&serviceRepo)
 	updateService = services.NewUpdateDependenciesService(about.Version)
 
 	go func() {
@@ -85,13 +96,14 @@ func handleSignals() {
 	go func() {
 		<-c
 		logger.Log("shutdown signal sent").Print()
-		instanceService.StopAll()
+		Unload()
 		os.Exit(0)
 	}()
 }
 
 func Unload() {
-	instanceService.Unload()
+	instanceService.StopAll()
+	instanceRepo.Close()
 }
 
 func headersSSE(c *gin.Context) {

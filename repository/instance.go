@@ -10,9 +10,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/go-git/go-git/v5"
 	"github.com/google/uuid"
-	"github.com/nakabonne/tstorage"
 	"github.com/vertex-center/vertex/logger"
 	"github.com/vertex-center/vertex/storage"
 	"github.com/vertex-center/vertex/types"
@@ -23,19 +21,17 @@ var (
 )
 
 const (
-	EventStdout = "stdout"
-	EventStderr = "stderr"
 	EventChange = "change"
 )
 
-type InstanceRepository struct {
+type InstanceFSRepository struct {
 	instances map[uuid.UUID]*types.Instance
 	listeners map[uuid.UUID]chan types.InstanceEvent
 	observer  chan types.InstanceEvent
 }
 
-func NewInstanceRepository() InstanceRepository {
-	r := InstanceRepository{
+func NewInstanceFSRepository() InstanceFSRepository {
+	r := InstanceFSRepository{
 		instances: map[uuid.UUID]*types.Instance{},
 		listeners: map[uuid.UUID]chan types.InstanceEvent{},
 		observer:  make(chan types.InstanceEvent),
@@ -57,11 +53,7 @@ func NewInstanceRepository() InstanceRepository {
 	return r
 }
 
-func (r *InstanceRepository) GetPath(i *types.Instance) string {
-	return path.Join(storage.PathInstances, i.UUID.String())
-}
-
-func (r *InstanceRepository) Get(uuid uuid.UUID) (*types.Instance, error) {
+func (r *InstanceFSRepository) Get(uuid uuid.UUID) (*types.Instance, error) {
 	i := r.instances[uuid]
 	if i == nil {
 		return nil, fmt.Errorf("the service '%s' is not instances", uuid)
@@ -69,16 +61,18 @@ func (r *InstanceRepository) Get(uuid uuid.UUID) (*types.Instance, error) {
 	return i, nil
 }
 
-func (r *InstanceRepository) GetAll() map[uuid.UUID]*types.Instance {
+func (r *InstanceFSRepository) GetAll() map[uuid.UUID]*types.Instance {
 	return r.instances
 }
 
-func (r *InstanceRepository) Delete(uuid uuid.UUID) error {
-	i := r.instances[uuid]
+func (r *InstanceFSRepository) GetPath(uuid uuid.UUID) string {
+	return path.Join(storage.PathInstances, uuid.String())
+}
 
-	err := os.RemoveAll(r.GetPath(i))
+func (r *InstanceFSRepository) Delete(uuid uuid.UUID) error {
+	err := os.RemoveAll(r.GetPath(uuid))
 	if err != nil {
-		return fmt.Errorf("failed to delete server uuid=%s: %v", i.UUID, err)
+		return fmt.Errorf("failed to delete server uuid=%s: %v", uuid, err)
 	}
 
 	delete(r.instances, uuid)
@@ -90,18 +84,26 @@ func (r *InstanceRepository) Delete(uuid uuid.UUID) error {
 	return nil
 }
 
-func (r *InstanceRepository) Exists(uuid uuid.UUID) bool {
+func (r *InstanceFSRepository) Exists(uuid uuid.UUID) bool {
 	return r.instances[uuid] != nil
 }
 
-func (r *InstanceRepository) Create(uuid uuid.UUID, i *types.Instance) {
-	r.instances[uuid] = i
+func (r *InstanceFSRepository) Set(uuid uuid.UUID, instance types.Instance) error {
+	if r.Exists(uuid) {
+		return fmt.Errorf("the instance '%s' already exists", uuid)
+	}
+
+	r.instances[uuid] = &instance
 	r.notifyListeners(types.InstanceEvent{
 		Name: EventChange,
 	})
+
+	instance.Register(r.observer)
+
+	return nil
 }
 
-func (r *InstanceRepository) AddListener(channel chan types.InstanceEvent) uuid.UUID {
+func (r *InstanceFSRepository) AddListener(channel chan types.InstanceEvent) uuid.UUID {
 	id := uuid.New()
 	r.listeners[id] = channel
 
@@ -112,7 +114,7 @@ func (r *InstanceRepository) AddListener(channel chan types.InstanceEvent) uuid.
 	return id
 }
 
-func (r *InstanceRepository) RemoveListener(uuid uuid.UUID) {
+func (r *InstanceFSRepository) RemoveListener(uuid uuid.UUID) {
 	delete(r.listeners, uuid)
 
 	logger.Log("unregistered from instance").
@@ -120,8 +122,8 @@ func (r *InstanceRepository) RemoveListener(uuid uuid.UUID) {
 		Print()
 }
 
-func (r *InstanceRepository) SaveMetadata(i *types.Instance) error {
-	metaPath := path.Join(r.GetPath(i), ".vertex", "instance_metadata.json")
+func (r *InstanceFSRepository) SaveMetadata(i *types.Instance) error {
+	metaPath := path.Join(r.GetPath(i.UUID), ".vertex", "instance_metadata.json")
 
 	metaBytes, err := json.MarshalIndent(i.InstanceMetadata, "", "\t")
 	if err != nil {
@@ -136,145 +138,59 @@ func (r *InstanceRepository) SaveMetadata(i *types.Instance) error {
 	return nil
 }
 
-func (r *InstanceRepository) notifyListeners(event types.InstanceEvent) {
-	for _, listener := range r.listeners {
-		listener <- event
-	}
-}
-
-func (r *InstanceRepository) Instantiate(uuid uuid.UUID) (*types.Instance, error) {
-	if r.Exists(uuid) {
-		return nil, fmt.Errorf("the service '%s' is already running", uuid)
-	}
-
-	i, err := r.load(uuid)
-	if err != nil {
-		return nil, err
-	}
-
-	r.Create(uuid, i)
-
-	i.Register(r.observer)
-
-	return i, nil
-}
-
-func (r *InstanceRepository) reload() {
-	r.unloadAll()
-
-	entries, err := os.ReadDir(storage.PathInstances)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, entry := range entries {
-		info, err := entry.Info()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		isInstance := entry.IsDir() || info.Mode()&os.ModeSymlink != 0
-
-		if isInstance {
-			logger.Log("found service").
-				AddKeyValue("uuid", entry.Name()).
-				Print()
-
-			serviceUUID, err := uuid.Parse(entry.Name())
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			if !r.Exists(serviceUUID) {
-				_, err = r.Instantiate(serviceUUID)
-				if err != nil {
-					log.Fatal(err)
-				}
-			}
-		}
-	}
-}
-
-func (r *InstanceRepository) load(instanceUUID uuid.UUID) (*types.Instance, error) {
-	instancePath := path.Join(storage.PathInstances, instanceUUID.String())
-
-	service, err := r.readService(instancePath)
-	if err != nil {
-		return nil, err
-	}
-
-	meta := types.InstanceMetadata{
-		UseDocker:   false,
-		UseReleases: false,
-	}
-
-	metaPath := path.Join(instancePath, ".vertex", "instance_metadata.json")
+func (r *InstanceFSRepository) LoadMetadata(i *types.Instance) error {
+	metaPath := path.Join(r.GetPath(i.UUID), ".vertex", "instance_metadata.json")
 	metaBytes, err := os.ReadFile(metaPath)
 
 	if errors.Is(err, os.ErrNotExist) {
 		logger.Log("instance_metadata.json not found. using default.").Print()
 	} else if err != nil {
-		return nil, err
+		return err
 	} else {
-		err = json.Unmarshal(metaBytes, &meta)
+		err = json.Unmarshal(metaBytes, &i.InstanceMetadata)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
 
-	uptimeStorage, err := tstorage.NewStorage(
-		tstorage.WithDataPath(path.Join(instancePath, ".vertex", "timestorage")),
-		tstorage.WithTimestampPrecision(tstorage.Seconds),
-		tstorage.WithWALBufferedSize(0),
-	)
-	if err != nil {
-		return nil, errors.New("failed to initialize time-storage")
-	}
-
-	i := &types.Instance{
-		Service:          *service,
-		InstanceMetadata: meta,
-		Status:           types.InstanceStatusOff,
-		Logger:           types.NewInstanceLogger(instancePath),
-		EnvVariables:     *types.NewEnvVariables(),
-		UUID:             instanceUUID,
-		UptimeStorage:    uptimeStorage,
-		Listeners:        map[uuid.UUID]chan types.InstanceEvent{},
-	}
-
-	err = r.readEnv(i)
-	return i, err
+	return nil
 }
 
-func (r *InstanceRepository) unloadAll() {
-	for _, i := range r.instances {
-		i.Logger.CloseLogFile()
-		err := i.UptimeStorage.Close()
-		if err != nil {
-			logger.Error(err).Print()
-		}
-	}
-}
-
-func (r *InstanceRepository) Unload() {
-	r.unloadAll()
-}
-
-func (r *InstanceRepository) readService(servicePath string) (*types.Service, error) {
-	data, err := os.ReadFile(path.Join(servicePath, ".vertex", "service.json"))
+func (r *InstanceFSRepository) ReadService(instancePath string) (types.Service, error) {
+	data, err := os.ReadFile(path.Join(instancePath, ".vertex", "service.json"))
 	if err != nil {
 		logger.Warn("service has no '.vertex/service.json' file").
-			AddKeyValue("path", path.Dir(servicePath)).
+			AddKeyValue("path", path.Dir(instancePath)).
 			Print()
 	}
 
 	var service types.Service
 	err = json.Unmarshal(data, &service)
-	return &service, err
+	return service, err
 }
 
-func (r *InstanceRepository) readEnv(i *types.Instance) error {
-	filepath := path.Join(r.GetPath(i), ".env")
+func (r *InstanceFSRepository) SaveEnv(i *types.Instance, variables map[string]string) error {
+	filepath := path.Join(r.GetPath(i.UUID), ".env")
+
+	file, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	for key, value := range variables {
+		_, err := file.WriteString(strings.Join([]string{key, value}, "=") + "\n")
+		if err != nil {
+			return err
+		}
+	}
+
+	i.EnvVariables.Entries = variables
+
+	return nil
+}
+
+func (r *InstanceFSRepository) LoadEnv(i *types.Instance) error {
+	filepath := path.Join(r.GetPath(i.UUID), ".env")
 
 	file, err := os.Open(filepath)
 	if os.IsNotExist(err) {
@@ -298,96 +214,78 @@ func (r *InstanceRepository) readEnv(i *types.Instance) error {
 	return nil
 }
 
-func (r *InstanceRepository) WriteEnv(i *types.Instance, variables map[string]string) error {
-	filepath := path.Join(r.GetPath(i), ".env")
-
-	file, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE, os.ModePerm)
-	if err != nil {
-		return err
+func (r *InstanceFSRepository) notifyListeners(event types.InstanceEvent) {
+	for _, listener := range r.listeners {
+		listener <- event
 	}
+}
 
-	for key, value := range variables {
-		_, err := file.WriteString(strings.Join([]string{key, value}, "=") + "\n")
+func (r *InstanceFSRepository) Close() {
+	for _, instance := range r.instances {
+		instance.Logger.CloseLogFile()
+		err := instance.UptimeStorage.Close()
 		if err != nil {
-			return err
+			logger.Error(err).Print()
 		}
 	}
-
-	i.EnvVariables.Entries = variables
-
-	return nil
 }
 
-func (r *InstanceRepository) Symlink(path string, repo string) error {
-	p := strings.Split(repo, ":")[1]
+func (r *InstanceFSRepository) reload() {
+	r.Close()
 
-	_, err := r.readService(p)
+	entries, err := os.ReadDir(storage.PathInstances)
 	if err != nil {
-		return fmt.Errorf("%s is not a compatible Vertex service", repo)
+		log.Fatal(err)
 	}
 
-	return os.Symlink(p, path)
-}
-
-func (r *InstanceRepository) Download(dest string, repo string, forceClone bool) error {
-	var err error
-
-	if forceClone {
-		logger.Log("force-clone enabled.").Print()
-	} else {
-		logger.Log("force-clone disabled. try to download the releases first").Print()
-		err = downloadFromReleases(dest, repo)
-	}
-
-	if forceClone || errors.Is(err, storage.ErrNoReleasesPublished) {
-		split := strings.Split(repo, ":")
-		repo = "git:https://" + split[1]
-
-		err = downloadFromGit(dest, repo)
+	for _, entry := range entries {
+		info, err := entry.Info()
 		if err != nil {
-			return err
+			log.Fatal(err)
+		}
+
+		isInstance := entry.IsDir() || info.Mode()&os.ModeSymlink != 0
+
+		if isInstance {
+			logger.Log("found service").
+				AddKeyValue("uuid", entry.Name()).
+				Print()
+
+			id, err := uuid.Parse(entry.Name())
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			_, err = r.Load(id)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 	}
-
-	return err
 }
 
-func (r *InstanceRepository) WriteLogLine(i *types.Instance, line *types.LogLine) {
-	i.Logger.Write(line)
+func (r *InstanceFSRepository) Load(uuid uuid.UUID) (*types.Instance, error) {
+	instancePath := path.Join(storage.PathInstances, uuid.String())
 
-	data, err := json.Marshal(line)
+	service, err := r.ReadService(instancePath)
 	if err != nil {
-		logger.Error(err).Print()
+		return nil, err
 	}
 
-	var name string
-	switch line.Kind {
-	case EventStderr:
-		name = EventStderr
-	default:
-		name = EventStdout
+	instance, err := types.NewInstance(uuid, service, instancePath)
+	if err != nil {
+		return nil, err
 	}
 
-	i.NotifyListeners(types.InstanceEvent{
-		Name: name,
-		Data: string(data),
-	})
-}
+	err = r.LoadMetadata(&instance)
+	if err != nil {
+		return nil, err
+	}
 
-func downloadFromReleases(dest string, repo string) error {
-	split := strings.Split(repo, "/")
+	err = r.Set(uuid, instance)
+	if err != nil {
+		return nil, err
+	}
 
-	owner := split[1]
-	repository := split[2]
-
-	return storage.DownloadLatestGithubRelease(owner, repository, dest)
-}
-
-func downloadFromGit(path string, repo string) error {
-	url := strings.SplitN(repo, ":", 2)[1]
-	_, err := git.PlainClone(path, false, &git.CloneOptions{
-		URL:      url,
-		Progress: os.Stdout,
-	})
-	return err
+	return &instance, nil
 }

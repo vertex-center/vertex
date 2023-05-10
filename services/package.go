@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	errors2 "github.com/pkg/errors"
-	"github.com/vertex-center/vertex/repository"
 	"github.com/vertex-center/vertex/types"
 )
 
@@ -16,12 +15,12 @@ var (
 )
 
 type PackageService struct {
-	repo repository.PackageRepository
+	packageRepo types.PackageRepository
 }
 
-func NewPackageService() PackageService {
+func NewPackageService(packageRepo types.PackageRepository) PackageService {
 	return PackageService{
-		repo: repository.NewPackageRepo(nil),
+		packageRepo: packageRepo,
 	}
 }
 
@@ -78,12 +77,12 @@ func (s *PackageService) InstallationCommand(p *types.Package, pm string) (Insta
 }
 
 func (s *PackageService) Get(id string) (types.Package, error) {
-	p, err := s.repo.Get(id)
+	p, err := s.packageRepo.Get(id)
 	if err != nil {
 		return types.Package{}, err
 	}
 
-	pkgPath := s.repo.GetPkgPath(id)
+	pkgPath := s.packageRepo.GetPath(id)
 
 	isScript := strings.HasPrefix(p.Check, "script:")
 	installed := false

@@ -52,5 +52,5 @@ type Service struct {
 }
 
 type ServiceRepository interface {
-	GetAvailable() []Service
+	GetAll() []Service
 }

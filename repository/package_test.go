@@ -44,7 +44,7 @@ func (suite *PackageRepositoryTestSuite) TearDownSuite() {
 }
 
 func (suite *PackageRepositoryTestSuite) TestGetPath() {
-	p := suite.repo.GetPkgPath("redis")
+	p := suite.repo.GetPath("redis")
 	assert.Equal(suite.T(), "package_test_live/packages/redis", p)
 }
 

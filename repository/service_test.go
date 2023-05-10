@@ -42,5 +42,5 @@ func (suite *AvailableTestSuite) TearDownSuite() {
 }
 
 func (suite *AvailableTestSuite) TestGetAvailable() {
-	assert.NotZero(suite.T(), suite.repo.GetAvailable())
+	assert.NotZero(suite.T(), suite.repo.GetAll())
 }
