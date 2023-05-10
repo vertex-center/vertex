@@ -662,28 +662,6 @@ func (s *InstanceService) Symlink(path string, repo string) error {
 	return os.Symlink(p, path)
 }
 
-func (s *InstanceService) load(instanceUUID uuid.UUID) (*types.Instance, error) {
-	instancePath := path.Join(storage.PathInstances, instanceUUID.String())
-
-	service, err := s.instanceRepo.ReadService(instancePath)
-	if err != nil {
-		return nil, err
-	}
-
-	i, err := types.NewInstance(instanceUUID, service, instancePath)
-	if err != nil {
-		return nil, err
-	}
-
-	err = s.instanceRepo.LoadMetadata(&i)
-	if err != nil {
-		return nil, err
-	}
-
-	err = s.instanceRepo.LoadEnv(&i)
-	return &i, err
-}
-
 func downloadFromReleases(dest string, repo string) error {
 	split := strings.Split(repo, "/")
 

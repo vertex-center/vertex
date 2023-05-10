@@ -282,6 +282,11 @@ func (r *InstanceFSRepository) Load(uuid uuid.UUID) (*types.Instance, error) {
 		return nil, err
 	}
 
+	err = r.LoadEnv(&instance)
+	if err != nil {
+		return nil, err
+	}
+
 	err = r.Set(uuid, instance)
 	if err != nil {
 		return nil, err
