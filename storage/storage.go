@@ -15,7 +15,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/google/go-github/v50/github"
-	"github.com/vertex-center/vertex/logger"
+	"github.com/vertex-center/vertex/pkg/logger"
 )
 
 const (

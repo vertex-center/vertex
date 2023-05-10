@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/logger"
+	"github.com/vertex-center/vertex/pkg/logger"
 )
 
 func addPackagesRoutes(r *gin.RouterGroup) {

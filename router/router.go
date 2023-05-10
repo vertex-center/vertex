@@ -12,7 +12,7 @@ import (
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex-core-golang/router"
-	"github.com/vertex-center/vertex/logger"
+	"github.com/vertex-center/vertex/pkg/logger"
 	"github.com/vertex-center/vertex/repository"
 	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/storage"

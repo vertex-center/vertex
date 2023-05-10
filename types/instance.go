@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/nakabonne/tstorage"
-	"github.com/vertex-center/vertex/logger"
+	"github.com/vertex-center/vertex/pkg/logger"
 )
 
 const (

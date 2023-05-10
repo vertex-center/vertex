@@ -12,7 +12,7 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/google/uuid"
 	"github.com/nakabonne/tstorage"
-	"github.com/vertex-center/vertex/logger"
+	"github.com/vertex-center/vertex/pkg/logger"
 	"github.com/vertex-center/vertex/storage"
 	"github.com/vertex-center/vertex/types"
 )

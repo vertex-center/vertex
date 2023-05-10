@@ -3,7 +3,7 @@ package types
 import (
 	"errors"
 
-	"github.com/vertex-center/vertex/logger"
+	"github.com/vertex-center/vertex/pkg/logger"
 )
 
 const (

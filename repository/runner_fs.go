@@ -9,7 +9,7 @@ import (
 	"path"
 
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/logger"
+	"github.com/vertex-center/vertex/pkg/logger"
 	"github.com/vertex-center/vertex/storage"
 	"github.com/vertex-center/vertex/types"
 )
