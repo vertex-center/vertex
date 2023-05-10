@@ -72,7 +72,7 @@ func (r *InstanceFSRepository) GetPath(uuid uuid.UUID) string {
 func (r *InstanceFSRepository) Delete(uuid uuid.UUID) error {
 	err := os.RemoveAll(r.GetPath(uuid))
 	if err != nil {
-		return fmt.Errorf("failed to delete server uuid=%s: %v", uuid, err)
+		return errors.New("failed to delete server")
 	}
 
 	delete(r.instances, uuid)

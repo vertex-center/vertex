@@ -1,23 +1,18 @@
 package services
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"net/http"
 	"os"
-	"os/exec"
 	"path"
-	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/docker/go-connections/nat"
 	"github.com/go-git/go-git/v5"
 	"github.com/google/uuid"
 	"github.com/nakabonne/tstorage"
 	"github.com/vertex-center/vertex/logger"
-	"github.com/vertex-center/vertex/repository"
 	"github.com/vertex-center/vertex/storage"
 	"github.com/vertex-center/vertex/types"
 )
@@ -30,13 +25,16 @@ var (
 
 type InstanceService struct {
 	instanceRepo types.InstanceRepository
-	dockerRepo   types.DockerRepository
+
+	dockerRunnerRepo types.RunnerRepository
+	fsRunnerRepo     types.RunnerRepository
 }
 
-func NewInstanceService(instanceRepo types.InstanceRepository, dockerRepo types.DockerRepository) InstanceService {
+func NewInstanceService(instanceRepo types.InstanceRepository, dockerRunnerRepo types.RunnerRepository, fsRunnerRepo types.RunnerRepository) InstanceService {
 	return InstanceService{
-		instanceRepo: instanceRepo,
-		dockerRepo:   dockerRepo,
+		instanceRepo:     instanceRepo,
+		dockerRunnerRepo: dockerRunnerRepo,
+		fsRunnerRepo:     fsRunnerRepo,
 	}
 }
 
@@ -49,27 +47,22 @@ func (s *InstanceService) GetAll() map[uuid.UUID]*types.Instance {
 }
 
 func (s *InstanceService) Delete(uuid uuid.UUID) error {
-	i, err := s.instanceRepo.Get(uuid)
+	instance, err := s.instanceRepo.Get(uuid)
 	if err != nil {
 		return err
 	}
 
-	if i.IsRunning() {
+	if instance.IsRunning() {
 		return ErrContainerStillRunning
 	}
 
-	if i.UseDocker {
-		containerID, err := s.dockerRepo.GetContainerID(i.DockerContainerName())
-		if err == repository.ErrContainerNotFound {
-			logger.Warn(err.Error()).Print()
-		} else if err != nil {
-			return err
-		} else {
-			err = s.dockerRepo.RemoveContainer(containerID)
-			if err != nil {
-				return err
-			}
-		}
+	if instance.UseDocker {
+		err = s.dockerRunnerRepo.Delete(instance)
+	} else {
+		err = s.fsRunnerRepo.Delete(instance)
+	}
+	if err != nil {
+		return err
 	}
 
 	return s.instanceRepo.Delete(uuid)
@@ -84,12 +77,12 @@ func (s *InstanceService) RemoveListener(uuid uuid.UUID) {
 }
 
 func (s *InstanceService) Start(uuid uuid.UUID) error {
-	i, err := s.instanceRepo.Get(uuid)
+	instance, err := s.instanceRepo.Get(uuid)
 	if err != nil {
 		return err
 	}
 
-	i.PushLogLine(&types.LogLine{
+	instance.PushLogLine(&types.LogLine{
 		Kind:    types.LogKindVertexOut,
 		Message: "Starting instance...",
 	})
@@ -98,24 +91,24 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		AddKeyValue("uuid", uuid).
 		Print()
 
-	if i.IsRunning() {
-		i.PushLogLine(&types.LogLine{
+	if instance.IsRunning() {
+		instance.PushLogLine(&types.LogLine{
 			Kind:    types.LogKindVertexErr,
 			Message: ErrInstanceAlreadyRunning.Error(),
 		})
 		return ErrInstanceAlreadyRunning
 	}
 
-	if i.UseDocker {
-		err = s.startWithDocker(i)
+	if instance.UseDocker {
+		err = s.dockerRunnerRepo.Start(instance)
 	} else {
-		err = s.startManually(i)
+		err = s.fsRunnerRepo.Start(instance)
 	}
 
 	if err != nil {
-		i.SetStatus(types.InstanceStatusError)
+		instance.SetStatus(types.InstanceStatusError)
 	} else {
-		i.PushLogLine(&types.LogLine{
+		instance.PushLogLine(&types.LogLine{
 			Kind:    types.LogKindVertexOut,
 			Message: "Instance started.",
 		})
@@ -124,7 +117,7 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 			AddKeyValue("uuid", uuid).
 			Print()
 
-		s.startUptimeRoutine(i)
+		s.startUptimeRoutine(instance)
 	}
 
 	return err
@@ -189,12 +182,12 @@ func (s *InstanceService) StartAll() {
 }
 
 func (s *InstanceService) Stop(uuid uuid.UUID) error {
-	i, err := s.instanceRepo.Get(uuid)
+	instance, err := s.instanceRepo.Get(uuid)
 	if err != nil {
 		return err
 	}
 
-	i.PushLogLine(&types.LogLine{
+	instance.PushLogLine(&types.LogLine{
 		Kind:    types.LogKindVertexOut,
 		Message: "Stopping instance...",
 	})
@@ -203,24 +196,24 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 		AddKeyValue("uuid", uuid).
 		Print()
 
-	if !i.IsRunning() {
-		i.PushLogLine(&types.LogLine{
+	if !instance.IsRunning() {
+		instance.PushLogLine(&types.LogLine{
 			Kind:    types.LogKindVertexErr,
 			Message: ErrInstanceNotRunning.Error(),
 		})
 		return ErrInstanceNotRunning
 	}
 
-	s.stopUptimeRoutine(i)
+	s.stopUptimeRoutine(instance)
 
-	if i.UseDocker {
-		err = s.stopWithDocker(i)
+	if instance.UseDocker {
+		err = s.dockerRunnerRepo.Stop(instance)
 	} else {
-		err = s.stopManually(i)
+		err = s.fsRunnerRepo.Stop(instance)
 	}
 
 	if err == nil {
-		i.PushLogLine(&types.LogLine{
+		instance.PushLogLine(&types.LogLine{
 			Kind:    types.LogKindVertexOut,
 			Message: "Instance stopped.",
 		})
@@ -229,7 +222,7 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 			AddKeyValue("uuid", uuid).
 			Print()
 
-		i.SetStatus(types.InstanceStatusOff)
+		instance.SetStatus(types.InstanceStatusOff)
 	}
 
 	return err
@@ -251,209 +244,6 @@ func (s *InstanceService) StopAll() {
 			logger.Error(err).Print()
 		}
 	}
-}
-
-func (s *InstanceService) startWithDocker(i *types.Instance) error {
-	imageName := i.DockerImageName()
-	containerName := i.DockerContainerName()
-
-	i.SetStatus(types.InstanceStatusBuilding)
-
-	instancePath := s.instanceRepo.GetPath(i.UUID)
-
-	onMsg := func(msg string) {
-		i.PushLogLine(&types.LogLine{
-			Kind:    types.LogKindOut,
-			Message: msg,
-		})
-	}
-
-	// Build
-	var err error
-	if i.Methods.Docker.Dockerfile != nil {
-		err = s.dockerRepo.BuildImageFromDockerfile(instancePath, imageName, onMsg)
-	} else if i.Methods.Docker.Image != nil {
-		err = s.dockerRepo.BuildImageFromName(*i.Methods.Docker.Image, onMsg)
-	} else {
-		return errors.New("no Docker methods found")
-	}
-
-	if err != nil {
-		i.PushLogLine(&types.LogLine{
-			Kind:    types.LogKindErr,
-			Message: err.Error(),
-		})
-		return err
-	}
-
-	// Create
-	id, err := s.dockerRepo.GetContainerID(containerName)
-	if err == repository.ErrContainerNotFound {
-		logger.Log("container doesn't exists, create it.").
-			AddKeyValue("container_name", containerName).
-			Print()
-
-		exposedPorts := nat.PortSet{}
-		portBindings := nat.PortMap{}
-		if i.Methods.Docker.Ports != nil {
-			var all []string
-
-			for _, out := range *i.Methods.Docker.Ports {
-				in := ""
-				for _, e := range i.EnvDefinitions {
-					if e.Type == "port" && e.Default == out {
-						in = i.EnvVariables.Entries[e.Name]
-						all = append(all, in+":"+out)
-						break
-					}
-				}
-			}
-
-			var err error
-			exposedPorts, portBindings, err = nat.ParsePortSpecs(all)
-			if err != nil {
-				return err
-			}
-		}
-
-		var binds []string
-		if i.Methods.Docker.Volumes != nil {
-			for source, target := range *i.Methods.Docker.Volumes {
-				source, err = filepath.Abs(path.Join(instancePath, "volumes", source))
-				if err != nil {
-					return err
-				}
-				binds = append(binds, source+":"+target)
-			}
-		}
-
-		if i.Methods.Docker.Dockerfile != nil {
-			id, err = s.dockerRepo.CreateContainer(imageName, containerName, exposedPorts, portBindings, binds)
-		} else if i.Methods.Docker.Image != nil {
-			id, err = s.dockerRepo.CreateContainer(*i.Methods.Docker.Image, containerName, exposedPorts, portBindings, binds)
-		}
-		if err != nil {
-			return err
-		}
-	} else if err != nil {
-		return err
-	}
-
-	i.SetStatus(types.InstanceStatusStarting)
-
-	// Start
-	err = s.dockerRepo.StartContainer(id)
-	if err != nil {
-		return err
-	}
-
-	i.SetStatus(types.InstanceStatusRunning)
-	return nil
-}
-
-func (s *InstanceService) startManually(i *types.Instance) error {
-	if i.Cmd != nil {
-		logger.Error(errors.New("runner already started")).
-			AddKeyValue("name", i.Name).
-			Print()
-	}
-
-	dir := s.instanceRepo.GetPath(i.UUID)
-	executable := i.ID
-	command := "./" + i.ID
-
-	// Try to find the executable
-	// For a service of ID=vertex-id, the executable can be:
-	// - vertex-id
-	// - script-filename.sh
-	_, err := os.Stat(path.Join(dir, executable))
-	if errors.Is(err, os.ErrNotExist) {
-		_, err = os.Stat(path.Join(dir, i.Methods.Script.Filename))
-		if errors.Is(err, os.ErrNotExist) {
-			return fmt.Errorf("executables %s and %s were not found", i.ID, i.Methods.Script.Filename)
-		} else if err != nil {
-			return err
-		}
-		command = fmt.Sprintf("./%s", i.Methods.Script.Filename)
-	} else if err != nil {
-		return err
-	}
-
-	i.Cmd = exec.Command(command)
-	i.Cmd.Dir = dir
-
-	i.Cmd.Stdin = os.Stdin
-
-	stdoutReader, err := i.Cmd.StdoutPipe()
-	if err != nil {
-		return err
-	}
-
-	stderrReader, err := i.Cmd.StderrPipe()
-	if err != nil {
-		return err
-	}
-
-	stdoutScanner := bufio.NewScanner(stdoutReader)
-	go func() {
-		for stdoutScanner.Scan() {
-			i.PushLogLine(&types.LogLine{
-				Kind:    types.LogKindOut,
-				Message: stdoutScanner.Text(),
-			})
-		}
-	}()
-
-	stderrScanner := bufio.NewScanner(stderrReader)
-	go func() {
-		for stderrScanner.Scan() {
-			i.PushLogLine(&types.LogLine{
-				Kind:    types.LogKindErr,
-				Message: stderrScanner.Text(),
-			})
-		}
-	}()
-
-	i.SetStatus(types.InstanceStatusRunning)
-
-	err = i.Cmd.Start()
-	if err != nil {
-		return err
-	}
-
-	go func() {
-		err := i.Cmd.Wait()
-		if err != nil {
-			logger.Error(err).
-				AddKeyValue("name", i.Service.Name).
-				Print()
-		}
-		i.SetStatus(types.InstanceStatusOff)
-	}()
-
-	return nil
-}
-
-func (s *InstanceService) stopWithDocker(i *types.Instance) error {
-	id, err := s.dockerRepo.GetContainerID(i.DockerContainerName())
-	if err != nil {
-		return err
-	}
-
-	return s.dockerRepo.StopContainer(id)
-}
-
-func (s *InstanceService) stopManually(i *types.Instance) error {
-	err := i.Cmd.Process.Signal(os.Interrupt)
-	if err != nil {
-		return err
-	}
-
-	// TODO: Force kill if the process continues
-
-	i.Cmd = nil
-
-	return nil
 }
 
 func (s *InstanceService) WriteEnv(uuid uuid.UUID, environment map[string]string) error {
@@ -521,17 +311,17 @@ func (s *InstanceService) SetLaunchOnStartup(uuid uuid.UUID, value bool) error {
 	return err
 }
 
-func (s *InstanceService) GetDockerContainerInfo(uuid uuid.UUID) (*types.DockerContainerInfo, error) {
-	i, err := s.Get(uuid)
+func (s *InstanceService) GetDockerContainerInfo(uuid uuid.UUID) (map[string]any, error) {
+	instance, err := s.Get(uuid)
 	if err != nil {
 		return nil, err
 	}
 
-	if !i.UseDocker {
+	if !instance.UseDocker {
 		return nil, errors.New("instance is not using docker")
 	}
 
-	info, err := s.dockerRepo.GetContainerInfo(i.DockerContainerName())
+	info, err := s.dockerRunnerRepo.Info(*instance)
 	if err != nil {
 		return nil, err
 	}
