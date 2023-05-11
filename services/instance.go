@@ -569,7 +569,10 @@ func (s *InstanceService) load(uuid uuid.UUID) error {
 		return err
 	}
 
-	s.logsRepo.Open(uuid)
+	err = s.logsRepo.Open(uuid)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
