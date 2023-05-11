@@ -26,29 +26,12 @@ const (
 
 type InstanceFSRepository struct {
 	instances map[uuid.UUID]*types.Instance
-	listeners map[uuid.UUID]chan types.InstanceEvent
-	observer  chan types.InstanceEvent
 }
 
 func NewInstanceFSRepository() InstanceFSRepository {
 	r := InstanceFSRepository{
 		instances: map[uuid.UUID]*types.Instance{},
-		listeners: map[uuid.UUID]chan types.InstanceEvent{},
-		observer:  make(chan types.InstanceEvent),
 	}
-
-	r.reload()
-
-	go func() {
-		defer close(r.observer)
-
-		for {
-			<-r.observer
-			r.notifyListeners(types.InstanceEvent{
-				Name: EventChange,
-			})
-		}
-	}()
 
 	return r
 }
@@ -77,10 +60,6 @@ func (r *InstanceFSRepository) Delete(uuid uuid.UUID) error {
 
 	delete(r.instances, uuid)
 
-	r.notifyListeners(types.InstanceEvent{
-		Name: EventChange,
-	})
-
 	return nil
 }
 
@@ -94,32 +73,8 @@ func (r *InstanceFSRepository) Set(uuid uuid.UUID, instance types.Instance) erro
 	}
 
 	r.instances[uuid] = &instance
-	r.notifyListeners(types.InstanceEvent{
-		Name: EventChange,
-	})
-
-	instance.Register(r.observer)
 
 	return nil
-}
-
-func (r *InstanceFSRepository) AddListener(channel chan types.InstanceEvent) uuid.UUID {
-	id := uuid.New()
-	r.listeners[id] = channel
-
-	logger.Log("registered to instance").
-		AddKeyValue("channel", id).
-		Print()
-
-	return id
-}
-
-func (r *InstanceFSRepository) RemoveListener(uuid uuid.UUID) {
-	delete(r.listeners, uuid)
-
-	logger.Log("unregistered from instance").
-		AddKeyValue("channel", uuid).
-		Print()
 }
 
 func (r *InstanceFSRepository) SaveMetadata(i *types.Instance) error {
@@ -214,15 +169,8 @@ func (r *InstanceFSRepository) LoadEnv(i *types.Instance) error {
 	return nil
 }
 
-func (r *InstanceFSRepository) notifyListeners(event types.InstanceEvent) {
-	for _, listener := range r.listeners {
-		listener <- event
-	}
-}
-
 func (r *InstanceFSRepository) Close() {
 	for _, instance := range r.instances {
-		instance.Logger.CloseLogFile()
 		err := instance.UptimeStorage.Close()
 		if err != nil {
 			logger.Error(err).Print()
@@ -230,7 +178,7 @@ func (r *InstanceFSRepository) Close() {
 	}
 }
 
-func (r *InstanceFSRepository) reload() {
+func (r *InstanceFSRepository) Reload(load func(uuid uuid.UUID)) {
 	r.Close()
 
 	entries, err := os.ReadDir(storage.PathInstances)
@@ -256,41 +204,7 @@ func (r *InstanceFSRepository) reload() {
 				log.Fatal(err)
 			}
 
-			_, err = r.Load(id)
-			if err != nil {
-				log.Fatal(err)
-			}
+			load(id)
 		}
 	}
-}
-
-func (r *InstanceFSRepository) Load(uuid uuid.UUID) (*types.Instance, error) {
-	instancePath := path.Join(storage.PathInstances, uuid.String())
-
-	service, err := r.ReadService(instancePath)
-	if err != nil {
-		return nil, err
-	}
-
-	instance, err := types.NewInstance(uuid, service, instancePath)
-	if err != nil {
-		return nil, err
-	}
-
-	err = r.LoadMetadata(&instance)
-	if err != nil {
-		return nil, err
-	}
-
-	err = r.LoadEnv(&instance)
-	if err != nil {
-		return nil, err
-	}
-
-	err = r.Set(uuid, instance)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.instances[uuid], nil
 }

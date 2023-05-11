@@ -1,5 +1,7 @@
 package types
 
+import "github.com/google/uuid"
+
 const (
 	LogKindOut       = "out"
 	LogKindErr       = "err"
@@ -22,4 +24,12 @@ type Logs struct {
 func (l *Logs) Add(line *LogLine) {
 	line.Id = len(l.Lines) + 1
 	l.Lines = append(l.Lines, *line)
+}
+
+type InstanceLogsRepository interface {
+	Open(uuid uuid.UUID) error
+	Close(uuid uuid.UUID) error
+	Push(uuid uuid.UUID, line LogLine)
+
+	CloseAll() error
 }

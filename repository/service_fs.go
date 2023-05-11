@@ -2,10 +2,11 @@ package repository
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"os"
 	"path"
 
+	"github.com/vertex-center/vertex/pkg/logger"
 	"github.com/vertex-center/vertex/storage"
 	"github.com/vertex-center/vertex/types"
 )
@@ -32,7 +33,7 @@ func NewServiceFSRepository(params *ServiceRepositoryParams) ServiceFSRepository
 	}
 	err := repo.reload()
 	if err != nil {
-		log.Fatalf("failed to reload services repository: %v", err)
+		logger.Error(fmt.Errorf("failed to reload services repository: %v", err)).Print()
 	}
 	return repo
 }

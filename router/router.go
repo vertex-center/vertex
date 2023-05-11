@@ -19,11 +19,13 @@ import (
 )
 
 var (
-	runnerDockerRepo repository.RunnerDockerRepository
-	runnerFSRepo     repository.RunnerFSRepository
-	instanceRepo     repository.InstanceFSRepository
-	packageRepo      repository.PackageFSRepository
-	serviceRepo      repository.ServiceFSRepository
+	runnerDockerRepo  repository.RunnerDockerRepository
+	runnerFSRepo      repository.RunnerFSRepository
+	instanceRepo      repository.InstanceFSRepository
+	instanceLogsRepo  repository.InstanceLogsFSRepository
+	eventInMemoryRepo repository.EventInMemoryRepository
+	packageRepo       repository.PackageFSRepository
+	serviceRepo       repository.ServiceFSRepository
 
 	packageService  services.PackageService
 	serviceService  services.ServiceService
@@ -65,10 +67,12 @@ func Create(about About) *gin.Engine {
 	runnerDockerRepo = repository.NewRunnerDockerRepository()
 	runnerFSRepo = repository.NewRunnerFSRepository()
 	instanceRepo = repository.NewInstanceFSRepository()
+	instanceLogsRepo = repository.NewInstanceLogsFSRepository()
+	eventInMemoryRepo = repository.NewEventInMemoryRepository()
 	packageRepo = repository.NewPackageFSRepository(nil)
 	serviceRepo = repository.NewServiceFSRepository(nil)
 
-	instanceService = services.NewInstanceService(&instanceRepo, &runnerDockerRepo, &runnerFSRepo)
+	instanceService = services.NewInstanceService(&instanceRepo, &runnerDockerRepo, &runnerFSRepo, &instanceLogsRepo, &eventInMemoryRepo)
 	packageService = services.NewPackageService(&packageRepo)
 	serviceService = services.NewServiceService(&serviceRepo)
 	updateService = services.NewUpdateDependenciesService(about.Version)

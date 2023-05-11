@@ -28,7 +28,7 @@ func (r RunnerFSRepository) Delete(instance *types.Instance) error {
 	return nil
 }
 
-func (r RunnerFSRepository) Start(instance *types.Instance) error {
+func (r RunnerFSRepository) Start(instance *types.Instance, onLog func(msg string), onErr func(msg string), setStatus func(status string)) error {
 	if r.commands[instance.UUID] != nil {
 		logger.Error(errors.New("runner already started")).
 			AddKeyValue("name", instance.Name).
@@ -76,24 +76,18 @@ func (r RunnerFSRepository) Start(instance *types.Instance) error {
 	stdoutScanner := bufio.NewScanner(stdoutReader)
 	go func() {
 		for stdoutScanner.Scan() {
-			instance.PushLogLine(&types.LogLine{
-				Kind:    types.LogKindOut,
-				Message: stdoutScanner.Text(),
-			})
+			onLog(stdoutScanner.Text())
 		}
 	}()
 
 	stderrScanner := bufio.NewScanner(stderrReader)
 	go func() {
 		for stderrScanner.Scan() {
-			instance.PushLogLine(&types.LogLine{
-				Kind:    types.LogKindErr,
-				Message: stderrScanner.Text(),
-			})
+			onErr(stderrScanner.Text())
 		}
 	}()
 
-	instance.SetStatus(types.InstanceStatusRunning)
+	setStatus(types.InstanceStatusRunning)
 
 	err = cmd.Start()
 	if err != nil {
@@ -107,7 +101,7 @@ func (r RunnerFSRepository) Start(instance *types.Instance) error {
 				AddKeyValue("name", instance.Service.Name).
 				Print()
 		}
-		instance.SetStatus(types.InstanceStatusOff)
+		setStatus(types.InstanceStatusOff)
 	}()
 
 	return nil

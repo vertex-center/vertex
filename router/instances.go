@@ -21,15 +21,22 @@ func handleGetInstances(c *gin.Context) {
 }
 
 func handleInstancesEvents(c *gin.Context) {
-	instancesChan := make(chan types.InstanceEvent)
-	id := instanceService.AddListener(instancesChan)
+	eventsChan := make(chan sse.Event)
+	defer close(eventsChan)
 
 	done := c.Request.Context().Done()
 
-	defer func() {
-		instanceService.RemoveListener(id)
-		close(instancesChan)
-	}()
+	listener := types.NewTempListener(func(e interface{}) {
+		switch e.(type) {
+		case types.EventInstancesChange:
+			eventsChan <- sse.Event{
+				Event: "change",
+			}
+		}
+	})
+
+	eventInMemoryRepo.AddListener(listener)
+	defer eventInMemoryRepo.RemoveListener(listener)
 
 	first := true
 
@@ -48,11 +55,8 @@ func handleInstancesEvents(c *gin.Context) {
 		}
 
 		select {
-		case e := <-instancesChan:
-			err := sse.Encode(w, sse.Event{
-				Event: e.Name,
-				Data:  e.Name,
-			})
+		case e := <-eventsChan:
+			err := sse.Encode(w, e)
 			if err != nil {
 				logger.Error(err).Print()
 			}

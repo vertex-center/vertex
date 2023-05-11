@@ -3,11 +3,11 @@ package repository
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"path"
 
 	errors2 "github.com/pkg/errors"
+	"github.com/vertex-center/vertex/pkg/logger"
 	"github.com/vertex-center/vertex/storage"
 	"github.com/vertex-center/vertex/types"
 )
@@ -39,7 +39,7 @@ func NewPackageFSRepository(params *PackageRepositoryParams) PackageFSRepository
 	}
 	err := repo.reload()
 	if err != nil {
-		log.Fatalf("failed to reload package repository: %v", err)
+		logger.Error(fmt.Errorf("failed to reload services repository: %v", err)).Print()
 	}
 	return repo
 }

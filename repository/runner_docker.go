@@ -50,36 +50,26 @@ func (r RunnerDockerRepository) Delete(instance *types.Instance) error {
 	return r.cli.ContainerRemove(context.Background(), id, dockertypes.ContainerRemoveOptions{})
 }
 
-func (r RunnerDockerRepository) Start(instance *types.Instance) error {
+func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg string), onErr func(msg string), setStatus func(status string)) error {
 	imageName := instance.DockerImageName()
 	containerName := instance.DockerContainerName()
 
-	instance.SetStatus(types.InstanceStatusBuilding)
+	setStatus(types.InstanceStatusBuilding)
 
 	instancePath := path.Join(storage.PathInstances, instance.UUID.String())
-
-	onMsg := func(msg string) {
-		instance.PushLogLine(&types.LogLine{
-			Kind:    types.LogKindOut,
-			Message: msg,
-		})
-	}
 
 	// Build
 	var err error
 	if instance.Methods.Docker.Dockerfile != nil {
-		err = r.buildImageFromDockerfile(instancePath, imageName, onMsg)
+		err = r.buildImageFromDockerfile(instancePath, imageName, onLog)
 	} else if instance.Methods.Docker.Image != nil {
-		err = r.buildImageFromName(*instance.Methods.Docker.Image, onMsg)
+		err = r.buildImageFromName(*instance.Methods.Docker.Image, onLog)
 	} else {
 		err = errors.New("no Docker methods found")
 	}
 
 	if err != nil {
-		instance.PushLogLine(&types.LogLine{
-			Kind:    types.LogKindErr,
-			Message: err.Error(),
-		})
+		onErr(err.Error())
 		return err
 	}
 
@@ -139,11 +129,11 @@ func (r RunnerDockerRepository) Start(instance *types.Instance) error {
 	// Start
 	err = r.cli.ContainerStart(context.Background(), id, dockertypes.ContainerStartOptions{})
 	if err != nil {
-		instance.SetStatus(types.InstanceStatusError)
+		setStatus(types.InstanceStatusError)
 		return err
 	}
 
-	instance.SetStatus(types.InstanceStatusRunning)
+	setStatus(types.InstanceStatusRunning)
 	return nil
 }
 

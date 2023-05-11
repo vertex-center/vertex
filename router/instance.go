@@ -141,17 +141,46 @@ func handlePatchEnvironment(c *gin.Context) {
 }
 
 func handleInstanceEvents(c *gin.Context) {
-	i := getInstance(c)
+	instance := getInstance(c)
 
-	instanceChan := make(chan types.InstanceEvent)
-	id := i.Register(instanceChan)
-
-	defer func() {
-		i.Unregister(id)
-		close(instanceChan)
-	}()
+	eventsChan := make(chan sse.Event)
+	defer close(eventsChan)
 
 	done := c.Request.Context().Done()
+
+	listener := types.NewTempListener(func(e interface{}) {
+		switch e := e.(type) {
+		case types.EventInstanceLog:
+			if instance.UUID != e.InstanceUUID {
+				break
+			}
+
+			if e.Kind == types.LogKindOut || e.Kind == types.LogKindVertexOut {
+				eventsChan <- sse.Event{
+					Event: "stdout",
+					Data:  e.Message,
+				}
+			} else {
+				eventsChan <- sse.Event{
+					Event: "stderr",
+					Data:  e.Message,
+				}
+			}
+
+		case types.EventInstanceStatusChange:
+			if instance.UUID != e.InstanceUUID {
+				break
+			}
+
+			eventsChan <- sse.Event{
+				Event: "status_change",
+				Data:  e.Status,
+			}
+		}
+	})
+
+	eventInMemoryRepo.AddListener(listener)
+	defer eventInMemoryRepo.RemoveListener(listener)
 
 	first := true
 
@@ -170,11 +199,8 @@ func handleInstanceEvents(c *gin.Context) {
 		}
 
 		select {
-		case e := <-instanceChan:
-			err := sse.Encode(w, sse.Event{
-				Event: e.Name,
-				Data:  e.Data,
-			})
+		case e := <-eventsChan:
+			err := sse.Encode(w, e)
 			if err != nil {
 				logger.Error(err).Print()
 			}

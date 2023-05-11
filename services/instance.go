@@ -24,18 +24,32 @@ var (
 )
 
 type InstanceService struct {
+	uuid uuid.UUID
+
 	instanceRepo types.InstanceRepository
+	logsRepo     types.InstanceLogsRepository
+	eventsRepo   types.EventRepository
 
 	dockerRunnerRepo types.RunnerRepository
 	fsRunnerRepo     types.RunnerRepository
 }
 
-func NewInstanceService(instanceRepo types.InstanceRepository, dockerRunnerRepo types.RunnerRepository, fsRunnerRepo types.RunnerRepository) InstanceService {
-	return InstanceService{
+func NewInstanceService(instanceRepo types.InstanceRepository, dockerRunnerRepo types.RunnerRepository, fsRunnerRepo types.RunnerRepository, instanceLogsRepo types.InstanceLogsRepository, eventRepo types.EventRepository) InstanceService {
+	s := InstanceService{
+		uuid: uuid.New(),
+
 		instanceRepo:     instanceRepo,
+		logsRepo:         instanceLogsRepo,
+		eventsRepo:       eventRepo,
 		dockerRunnerRepo: dockerRunnerRepo,
 		fsRunnerRepo:     fsRunnerRepo,
 	}
+
+	s.reload()
+
+	eventRepo.AddListener(&s)
+
+	return s
 }
 
 func (s *InstanceService) Get(uuid uuid.UUID) (*types.Instance, error) {
@@ -65,15 +79,13 @@ func (s *InstanceService) Delete(uuid uuid.UUID) error {
 		return err
 	}
 
-	return s.instanceRepo.Delete(uuid)
-}
+	err = s.instanceRepo.Delete(uuid)
+	if err != nil {
+		return err
+	}
 
-func (s *InstanceService) AddListener(channel chan types.InstanceEvent) uuid.UUID {
-	return s.instanceRepo.AddListener(channel)
-}
-
-func (s *InstanceService) RemoveListener(uuid uuid.UUID) {
-	s.instanceRepo.RemoveListener(uuid)
+	s.eventsRepo.Send(types.EventInstancesChange{})
+	return nil
 }
 
 func (s *InstanceService) Start(uuid uuid.UUID) error {
@@ -82,9 +94,10 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		return err
 	}
 
-	instance.PushLogLine(&types.LogLine{
-		Kind:    types.LogKindVertexOut,
-		Message: "Starting instance...",
+	s.eventsRepo.Send(types.EventInstanceLog{
+		InstanceUUID: uuid,
+		Kind:         types.LogKindOut,
+		Message:      "Starting instance...",
 	})
 
 	logger.Log("starting instance").
@@ -92,25 +105,47 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		Print()
 
 	if instance.IsRunning() {
-		instance.PushLogLine(&types.LogLine{
-			Kind:    types.LogKindVertexErr,
-			Message: ErrInstanceAlreadyRunning.Error(),
+		s.eventsRepo.Send(types.EventInstanceLog{
+			InstanceUUID: uuid,
+			Kind:         types.LogKindVertexErr,
+			Message:      ErrInstanceAlreadyRunning.Error(),
 		})
 		return ErrInstanceAlreadyRunning
 	}
 
+	onLog := func(msg string) {
+		s.eventsRepo.Send(types.EventInstanceLog{
+			InstanceUUID: uuid,
+			Kind:         types.LogKindOut,
+			Message:      msg,
+		})
+	}
+
+	onErr := func(msg string) {
+		s.eventsRepo.Send(types.EventInstanceLog{
+			InstanceUUID: uuid,
+			Kind:         types.LogKindErr,
+			Message:      msg,
+		})
+	}
+
+	setStatus := func(status string) {
+		s.setStatus(instance, status)
+	}
+
 	if instance.IsDockerized() {
-		err = s.dockerRunnerRepo.Start(instance)
+		err = s.dockerRunnerRepo.Start(instance, onLog, onErr, setStatus)
 	} else {
-		err = s.fsRunnerRepo.Start(instance)
+		err = s.fsRunnerRepo.Start(instance, onLog, onErr, setStatus)
 	}
 
 	if err != nil {
-		instance.SetStatus(types.InstanceStatusError)
+		s.setStatus(instance, types.InstanceStatusError)
 	} else {
-		instance.PushLogLine(&types.LogLine{
-			Kind:    types.LogKindVertexOut,
-			Message: "Instance started.",
+		s.eventsRepo.Send(types.EventInstanceLog{
+			InstanceUUID: uuid,
+			Kind:         types.LogKindVertexOut,
+			Message:      "Instance started.",
 		})
 
 		logger.Log("instance started").
@@ -187,9 +222,10 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 		return err
 	}
 
-	instance.PushLogLine(&types.LogLine{
-		Kind:    types.LogKindVertexOut,
-		Message: "Stopping instance...",
+	s.eventsRepo.Send(types.EventInstanceLog{
+		InstanceUUID: uuid,
+		Kind:         types.LogKindVertexOut,
+		Message:      "Stopping instance...",
 	})
 
 	logger.Log("stopping instance").
@@ -197,9 +233,10 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 		Print()
 
 	if !instance.IsRunning() {
-		instance.PushLogLine(&types.LogLine{
-			Kind:    types.LogKindVertexErr,
-			Message: ErrInstanceNotRunning.Error(),
+		s.eventsRepo.Send(types.EventInstanceLog{
+			InstanceUUID: uuid,
+			Kind:         types.LogKindVertexErr,
+			Message:      ErrInstanceNotRunning.Error(),
 		})
 		return ErrInstanceNotRunning
 	}
@@ -213,16 +250,17 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 	}
 
 	if err == nil {
-		instance.PushLogLine(&types.LogLine{
-			Kind:    types.LogKindVertexOut,
-			Message: "Instance stopped.",
+		s.eventsRepo.Send(types.EventInstanceLog{
+			InstanceUUID: uuid,
+			Kind:         types.LogKindVertexOut,
+			Message:      "Instance stopped.",
 		})
 
 		logger.Log("instance stopped").
 			AddKeyValue("uuid", uuid).
 			Print()
 
-		instance.SetStatus(types.InstanceStatusOff)
+		s.setStatus(instance, types.InstanceStatusOff)
 	}
 
 	return err
@@ -256,8 +294,8 @@ func (s *InstanceService) WriteEnv(uuid uuid.UUID, environment map[string]string
 }
 
 func (s *InstanceService) Install(repo string, useDocker *bool, useReleases *bool) (*types.Instance, error) {
-	serviceUUID := uuid.New()
-	basePath := path.Join(storage.PathInstances, serviceUUID.String())
+	id := uuid.New()
+	basePath := path.Join(storage.PathInstances, id.String())
 
 	forceClone := (useDocker != nil && *useDocker) || (useReleases == nil || !*useReleases)
 
@@ -276,20 +314,25 @@ func (s *InstanceService) Install(repo string, useDocker *bool, useReleases *boo
 		return nil, err
 	}
 
-	i, err := s.instanceRepo.Load(serviceUUID)
+	err = s.load(id)
 	if err != nil {
 		return nil, err
 	}
 
-	i.InstanceMetadata.UseDocker = useDocker
-	i.InstanceMetadata.UseReleases = useReleases
-
-	err = s.instanceRepo.SaveMetadata(i)
+	instance, err := s.instanceRepo.Get(id)
 	if err != nil {
 		return nil, err
 	}
 
-	return i, nil
+	instance.InstanceMetadata.UseDocker = useDocker
+	instance.InstanceMetadata.UseReleases = useReleases
+
+	err = s.instanceRepo.SaveMetadata(instance)
+	if err != nil {
+		return nil, err
+	}
+
+	return instance, nil
 }
 
 func (s *InstanceService) SetLaunchOnStartup(uuid uuid.UUID, value bool) error {
@@ -448,6 +491,29 @@ func (s *InstanceService) Symlink(path string, repo string) error {
 	return os.Symlink(p, path)
 }
 
+func (s *InstanceService) OnEvent(e interface{}) {
+	switch e := e.(type) {
+	case types.EventInstanceLog:
+		s.logsRepo.Push(e.InstanceUUID, types.LogLine{
+			Kind:    e.Kind,
+			Message: e.Message,
+		})
+	}
+}
+
+func (s *InstanceService) GetUUID() uuid.UUID {
+	return s.uuid
+}
+
+func (s *InstanceService) setStatus(instance *types.Instance, status string) {
+	instance.Status = status
+	s.eventsRepo.Send(types.EventInstancesChange{})
+	s.eventsRepo.Send(types.EventInstanceStatusChange{
+		InstanceUUID: instance.UUID,
+		Status:       status,
+	})
+}
+
 func downloadFromReleases(dest string, repo string) error {
 	split := strings.Split(repo, "/")
 
@@ -464,4 +530,46 @@ func downloadFromGit(path string, repo string) error {
 		Progress: os.Stdout,
 	})
 	return err
+}
+
+func (s *InstanceService) reload() {
+	s.instanceRepo.Reload(func(uuid uuid.UUID) {
+		err := s.load(uuid)
+		if err != nil {
+			return
+		}
+	})
+}
+
+func (s *InstanceService) load(uuid uuid.UUID) error {
+	instancePath := path.Join(storage.PathInstances, uuid.String())
+
+	service, err := s.instanceRepo.ReadService(instancePath)
+	if err != nil {
+		return err
+	}
+
+	instance, err := types.NewInstance(uuid, service, instancePath)
+	if err != nil {
+		return err
+	}
+
+	err = s.instanceRepo.LoadMetadata(&instance)
+	if err != nil {
+		return err
+	}
+
+	err = s.instanceRepo.LoadEnv(&instance)
+	if err != nil {
+		return err
+	}
+
+	err = s.instanceRepo.Set(uuid, instance)
+	if err != nil {
+		return err
+	}
+
+	s.logsRepo.Open(uuid)
+
+	return nil
 }
