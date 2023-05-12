@@ -6,9 +6,9 @@ import (
 	"os"
 
 	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/router"
 	"github.com/vertex-center/vertex/services"
-	"github.com/vertex-center/vertex/storage"
 )
 
 // version, commit and date will be overridden by goreleaser

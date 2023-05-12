@@ -14,7 +14,7 @@ import (
 
 	"github.com/google/go-github/v50/github"
 	"github.com/vertex-center/vertex/pkg/logger"
-	"github.com/vertex-center/vertex/storage"
+	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
 	"golang.org/x/exp/slices"
 )

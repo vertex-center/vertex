@@ -14,7 +14,7 @@ import (
 	"github.com/docker/docker/pkg/archive"
 	"github.com/docker/go-connections/nat"
 	"github.com/vertex-center/vertex/pkg/logger"
-	"github.com/vertex-center/vertex/storage"
+	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
 )
 

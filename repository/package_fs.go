@@ -8,7 +8,7 @@ import (
 
 	errors2 "github.com/pkg/errors"
 	"github.com/vertex-center/vertex/pkg/logger"
-	"github.com/vertex-center/vertex/storage"
+	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
 )
 
