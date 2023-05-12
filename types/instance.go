@@ -40,6 +40,8 @@ type InstanceEvent struct {
 	Data string
 }
 
+type EnvVariables map[string]string
+
 type Instance struct {
 	Service
 	InstanceMetadata
@@ -65,7 +67,7 @@ func NewInstance(id uuid.UUID, service Service, instancePath string) (Instance, 
 	return Instance{
 		Service:       service,
 		Status:        InstanceStatusOff,
-		EnvVariables:  *NewEnvVariables(),
+		EnvVariables:  map[string]string{},
 		UUID:          id,
 		UptimeStorage: uptimeStorage,
 	}, nil

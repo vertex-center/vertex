@@ -139,7 +139,7 @@ func (r *InstanceFSRepository) SaveEnv(i *types.Instance, variables map[string]s
 		}
 	}
 
-	i.EnvVariables.Entries = variables
+	i.EnvVariables = variables
 
 	return nil
 }
@@ -163,7 +163,7 @@ func (r *InstanceFSRepository) LoadEnv(i *types.Instance) error {
 			return errors.New("failed to read .env")
 		}
 
-		i.EnvVariables.Entries[line[0]] = line[1]
+		i.EnvVariables[line[0]] = line[1]
 	}
 
 	return nil

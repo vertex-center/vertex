@@ -89,7 +89,7 @@ func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg s
 				in := ""
 				for _, e := range instance.EnvDefinitions {
 					if e.Type == "port" && e.Default == out {
-						in = instance.EnvVariables.Entries[e.Name]
+						in = instance.EnvVariables[e.Name]
 						all = append(all, in+":"+out)
 						break
 					}
