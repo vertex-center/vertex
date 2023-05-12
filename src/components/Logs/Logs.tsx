@@ -3,15 +3,15 @@ import { HTMLProps, useEffect, useRef, useState } from "react";
 import styles from "./Logs.module.sass";
 import classNames from "classnames";
 import useScrollPercentage from "react-scroll-percentage-hook";
-import { LogLine } from "../../backend/backend";
 import { Text } from "../Text/Text";
 
-type LineProps = {
-    line: LogLine;
+export type LogLine = {
+    kind: "out" | "err";
+    message: string;
 };
 
-function Line(props: LineProps) {
-    const { id, kind, message } = props.line;
+function Line(props: LogLine) {
+    const { kind, message } = props;
 
     return (
         <div
@@ -20,7 +20,6 @@ function Line(props: LineProps) {
                 [styles.lineError]: kind === "err",
             })}
         >
-            <div className={styles.number}>{id}</div>
             <div>{message}</div>
         </div>
     );
@@ -56,7 +55,7 @@ export default function Logs(props: Props) {
     return (
         <div className={styles.logs} ref={ref}>
             {lines.map((line, i) => (
-                <Line key={i} line={line} />
+                <Line key={i} kind={line.kind} message={line.message} />
             ))}
             <div ref={scroll} />
         </div>

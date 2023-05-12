@@ -1,4 +1,4 @@
-import Logs from "../../components/Logs/Logs";
+import Logs, { LogLine } from "../../components/Logs/Logs";
 import { Fragment, useEffect, useState } from "react";
 import {
     registerSSE,
@@ -7,7 +7,7 @@ import {
     unregisterSSEEvent,
 } from "../../backend/sse";
 import { useParams } from "react-router-dom";
-import { LogLine, route } from "../../backend/backend";
+import { route } from "../../backend/backend";
 import { Title } from "../../components/Text/Text";
 
 export default function BayDetailsLogs() {
@@ -21,13 +21,23 @@ export default function BayDetailsLogs() {
         const sse = registerSSE(route(`/instance/${uuid}/events`));
 
         const onStdout = (e) => {
-            const logLine = JSON.parse(e.data);
-            setLogs((logs) => [...logs, logLine]);
+            setLogs((logs) => [
+                ...logs,
+                {
+                    kind: "out",
+                    message: e.data,
+                },
+            ]);
         };
 
         const onStderr = (e) => {
-            const logLine = JSON.parse(e.data);
-            setLogs((logs) => [...logs, logLine]);
+            setLogs((logs) => [
+                ...logs,
+                {
+                    kind: "err",
+                    message: e.data,
+                },
+            ]);
         };
 
         registerSSEEvent(sse, "stdout", onStdout);

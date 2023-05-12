@@ -1,11 +1,5 @@
 import axios from "axios";
 
-export type LogLine = {
-    id: number;
-    kind: string;
-    message: string;
-};
-
 export type Env = { [key: string]: string };
 
 export type EnvVariable = {
