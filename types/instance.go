@@ -15,10 +15,6 @@ const (
 	InstanceStatusStarting = "starting"
 	InstanceStatusRunning  = "running"
 	InstanceStatusError    = "error"
-
-	InstanceEventStatusChange = "status_change"
-	InstanceEventStdout       = "stdout"
-	InstanceEventStderr       = "stderr"
 )
 
 type InstanceMetadata struct {
@@ -33,11 +29,6 @@ type InstanceMetadata struct {
 	// LaunchOnStartup indicates if the instance needs to start automatically when Vertex starts.
 	// The default value is true.
 	LaunchOnStartup *bool `json:"launch_on_startup,omitempty"`
-}
-
-type InstanceEvent struct {
-	Name string
-	Data string
 }
 
 type EnvVariables map[string]string

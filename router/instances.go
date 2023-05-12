@@ -30,7 +30,7 @@ func handleInstancesEvents(c *gin.Context) {
 		switch e.(type) {
 		case types.EventInstancesChange:
 			eventsChan <- sse.Event{
-				Event: "change",
+				Event: types.EventNameInstancesChange,
 			}
 		}
 	})

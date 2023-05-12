@@ -4,6 +4,14 @@ import (
 	"github.com/google/uuid"
 )
 
+const (
+	EventNameInstancesChange = "change"
+
+	EventNameInstanceStatusChange = "status_change"
+	EventNameInstanceStdout       = "stdout"
+	EventNameInstanceStderr       = "stderr"
+)
+
 type Listener interface {
 	OnEvent(e interface{})
 	GetUUID() uuid.UUID

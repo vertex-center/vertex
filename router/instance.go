@@ -157,12 +157,12 @@ func handleInstanceEvents(c *gin.Context) {
 
 			if e.Kind == types.LogKindOut || e.Kind == types.LogKindVertexOut {
 				eventsChan <- sse.Event{
-					Event: "stdout",
+					Event: types.EventNameInstanceStdout,
 					Data:  e.Message,
 				}
 			} else {
 				eventsChan <- sse.Event{
-					Event: "stderr",
+					Event: types.EventNameInstanceStderr,
 					Data:  e.Message,
 				}
 			}
@@ -173,7 +173,7 @@ func handleInstanceEvents(c *gin.Context) {
 			}
 
 			eventsChan <- sse.Event{
-				Event: "status_change",
+				Event: types.EventNameInstanceStatusChange,
 				Data:  e.Status,
 			}
 		}
