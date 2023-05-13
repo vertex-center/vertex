@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/logger"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/router"
@@ -25,6 +26,8 @@ func main() {
 	logger.Log("Vertex starting...").Print()
 
 	parseArgs()
+
+	cfg := config.New()
 
 	err := os.MkdirAll(storage.PathInstances, os.ModePerm)
 	if err != nil && !os.IsExist(err) {
@@ -51,7 +54,7 @@ func main() {
 
 	logger.Log("Vertex started.").Print()
 
-	err = r.Run(":6130")
+	err = r.Run(fmt.Sprintf(":%s", cfg.Port))
 	if err != nil {
 		logger.Error(fmt.Errorf("error while starting server: %v", err)).Print()
 	}
