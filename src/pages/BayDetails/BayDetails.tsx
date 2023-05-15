@@ -102,11 +102,12 @@ export default function BayDetails() {
                         symbol="terminal"
                         name="Logs"
                     />
-                    <SidebarItem
-                        to={`/bay/${uuid}/status`}
-                        symbol="vital_signs"
-                        name="Status"
-                    />
+                    {/* Uptime status is disabled for now */}
+                    {/*<SidebarItem*/}
+                    {/*    to={`/bay/${uuid}/status`}*/}
+                    {/*    symbol="vital_signs"*/}
+                    {/*    name="Status"*/}
+                    {/*/>*/}
                     <SidebarItem
                         to={`/bay/${uuid}/environment`}
                         symbol="tune"
