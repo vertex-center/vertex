@@ -20,10 +20,6 @@ var (
 	ErrContainerNotFound = errors.New("container not found")
 )
 
-const (
-	EventChange = "change"
-)
-
 type InstanceFSRepository struct {
 	instances map[uuid.UUID]*types.Instance
 }
@@ -169,18 +165,7 @@ func (r *InstanceFSRepository) LoadEnv(i *types.Instance) error {
 	return nil
 }
 
-func (r *InstanceFSRepository) Close() {
-	for _, instance := range r.instances {
-		err := instance.UptimeStorage.Close()
-		if err != nil {
-			logger.Error(err).Print()
-		}
-	}
-}
-
 func (r *InstanceFSRepository) Reload(load func(uuid uuid.UUID)) {
-	r.Close()
-
 	entries, err := os.ReadDir(storage.PathInstances)
 	if err != nil {
 		log.Fatal(err)

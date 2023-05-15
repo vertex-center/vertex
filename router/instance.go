@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/pkg/logger"
-	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/types"
 )
 
@@ -24,7 +23,6 @@ func addInstanceRoutes(r *gin.RouterGroup) {
 	r.GET("/events", headersSSE, handleInstanceEvents)
 	r.GET("/dependencies", handleGetDependencies)
 	r.GET("/docker", handleGetDocker)
-	r.GET("/status", handleGetStatus)
 }
 
 func getParamInstanceUUID(c *gin.Context) *uuid.UUID {
@@ -243,15 +241,4 @@ func handleGetDocker(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, info)
-}
-
-func handleGetStatus(c *gin.Context) {
-	uid := getParamInstanceUUID(c)
-
-	status, err := instanceService.GetAllStatus(*uid, services.StatusSinceOneHour)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-	}
-
-	c.JSON(http.StatusOK, status)
 }

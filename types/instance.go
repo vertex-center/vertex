@@ -1,12 +1,7 @@
 package types
 
 import (
-	"errors"
-	"path"
-	"time"
-
 	"github.com/google/uuid"
-	"github.com/nakabonne/tstorage"
 )
 
 const (
@@ -37,31 +32,18 @@ type Instance struct {
 	Service
 	InstanceMetadata
 
+	UUID         uuid.UUID    `json:"uuid"`
 	Status       string       `json:"status"`
 	EnvVariables EnvVariables `json:"env"`
-
-	UUID               uuid.UUID        `json:"uuid"`
-	UptimeStorage      tstorage.Storage `json:"-"`
-	UptimeStopChannels []*chan bool     `json:"-"`
 }
 
-func NewInstance(id uuid.UUID, service Service, instancePath string) (Instance, error) {
-	uptimeStorage, err := tstorage.NewStorage(
-		tstorage.WithDataPath(path.Join(instancePath, ".vertex", "timestorage")),
-		tstorage.WithTimestampPrecision(tstorage.Seconds),
-		tstorage.WithWALBufferedSize(0),
-	)
-	if err != nil {
-		return Instance{}, errors.New("failed to initialize time-storage")
-	}
-
+func NewInstance(id uuid.UUID, service Service) Instance {
 	return Instance{
-		Service:       service,
-		Status:        InstanceStatusOff,
-		EnvVariables:  map[string]string{},
-		UUID:          id,
-		UptimeStorage: uptimeStorage,
-	}, nil
+		Service:      service,
+		UUID:         id,
+		Status:       InstanceStatusOff,
+		EnvVariables: map[string]string{},
+	}
 }
 
 type InstanceRepository interface {
@@ -81,8 +63,6 @@ type InstanceRepository interface {
 	ReadService(instancePath string) (Service, error)
 
 	Reload(func(uuid uuid.UUID))
-
-	Close()
 }
 
 func (i *Instance) DockerImageName() string {
@@ -95,31 +75,6 @@ func (i *Instance) DockerContainerName() string {
 
 func (i *Instance) IsRunning() bool {
 	return i.Status != InstanceStatusOff && i.Status != InstanceStatusError
-}
-
-func (i *Instance) PushStatus(name string, status float64) error {
-	err := i.UptimeStorage.InsertRows([]tstorage.Row{
-		{
-			Metric: "status_change",
-			Labels: []tstorage.Label{
-				{
-					Name:  "name",
-					Value: name,
-				},
-			},
-			DataPoint: tstorage.DataPoint{
-				Timestamp: time.Now().Unix(),
-				Value:     status,
-			},
-		},
-	})
-
-	//i.NotifyListeners(InstanceEvent{
-	//	Name: "uptime_status_change",
-	//	Data: UptimeStatus(status),
-	//})
-
-	return err
 }
 
 func (i *Instance) IsDockerized() bool {

@@ -3,15 +3,12 @@ package services
 import (
 	"errors"
 	"fmt"
-	"net/http"
 	"os"
 	"path"
 	"strings"
-	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/google/uuid"
-	"github.com/nakabonne/tstorage"
 	"github.com/vertex-center/vertex/pkg/logger"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
@@ -151,56 +148,9 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		logger.Log("instance started").
 			AddKeyValue("uuid", uuid).
 			Print()
-
-		s.startUptimeRoutine(instance)
 	}
 
 	return err
-}
-
-func (s *InstanceService) startUptimeRoutine(i *types.Instance) {
-	i.UptimeStopChannels = []*chan bool{}
-	for _, url := range i.URLs {
-		go func(name string, url string) {
-			ch := make(chan bool, 1)
-			i.UptimeStopChannels = append(i.UptimeStopChannels, &ch)
-			ticker := time.NewTicker(time.Second * 5)
-
-			defer func() {
-				_ = i.PushStatus(name, types.UptimeStatusFloatOff)
-				ticker.Stop()
-				close(ch)
-				logger.Log("uptime ticker stopped").
-					AddKeyValue("instance_uuid", i.UUID).
-					Print()
-			}()
-
-			for {
-				select {
-				case <-ch:
-					return
-				case <-ticker.C:
-					client := http.Client{
-						Timeout: time.Second * 2,
-					}
-					res, err := client.Get(url)
-					if err != nil {
-						logger.Error(err).Print()
-						break
-					}
-					if res.StatusCode >= 400 {
-						err = i.PushStatus(name, types.UptimeStatusFloatOff)
-					} else {
-						err = i.PushStatus(name, types.UptimeStatusFloatOn)
-					}
-					if err != nil {
-						logger.Error(err).Print()
-					}
-					res.Body.Close()
-				}
-			}
-		}(url.Name, "http://localhost:"+url.Port+*url.PingRoute)
-	}
 }
 
 func (s *InstanceService) StartAll() {
@@ -241,8 +191,6 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 		return ErrInstanceNotRunning
 	}
 
-	s.stopUptimeRoutine(instance)
-
 	if instance.IsDockerized() {
 		err = s.dockerRunnerRepo.Stop(instance)
 	} else {
@@ -264,12 +212,6 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 	}
 
 	return err
-}
-
-func (s *InstanceService) stopUptimeRoutine(i *types.Instance) {
-	for _, ch := range i.UptimeStopChannels {
-		*ch <- true
-	}
 }
 
 func (s *InstanceService) StopAll() {
@@ -368,95 +310,6 @@ func (s *InstanceService) GetDockerContainerInfo(uuid uuid.UUID) (map[string]any
 	return info, nil
 }
 
-type StatusSince int
-
-const (
-	StatusSinceOneHour = iota
-	StatusSinceTwoDay
-)
-
-func (s *InstanceService) GetAllStatus(uuid uuid.UUID, since StatusSince) ([]types.Uptime, error) {
-	i, err := s.Get(uuid)
-	if err != nil {
-		return nil, err
-	}
-
-	var (
-		uptimes   []types.Uptime
-		from      time.Time
-		count     int
-		interval  time.Duration
-		remaining int
-	)
-
-	switch since {
-	case StatusSinceTwoDay:
-		from = time.Now().Add(-time.Hour * 48).Truncate(time.Hour)
-		count = 48
-		interval = time.Hour
-		remaining = 3600 - time.Now().Hour()
-	case StatusSinceOneHour:
-		from = time.Now().Add(-time.Hour).Truncate(time.Minute)
-		count = 60
-		interval = time.Minute
-		remaining = 60 - time.Now().Second()
-	}
-
-	for _, url := range i.URLs {
-		if url.PingRoute == nil {
-			continue
-		}
-
-		var (
-			history                 []types.UptimePoint
-			currentStatusFloat      float64 = -1
-			currentRangeStatusFloat float64
-		)
-
-		t := from
-		for j := 0; j < count; j += 1 {
-			currentRangeStatusFloat = currentStatusFloat
-
-			start := t
-			end := start.Add(interval)
-
-			points, err := i.UptimeStorage.Select(
-				"status_change",
-				[]tstorage.Label{{Name: "name", Value: url.Name}},
-				start.Unix(),
-				end.Unix(),
-			)
-			if err != nil && err != tstorage.ErrNoDataPoints {
-				return nil, err
-			}
-
-			for _, p := range points {
-				currentStatusFloat = p.Value
-				if currentRangeStatusFloat > p.Value {
-					currentRangeStatusFloat = p.Value
-				}
-			}
-
-			history = append(history, types.UptimePoint{
-				Status: types.UptimeStatus(currentRangeStatusFloat),
-			})
-
-			t = end
-		}
-
-		uptimes = append(uptimes, types.Uptime{
-			Name:             url.Name,
-			PingURL:          url.PingRoute,
-			Current:          types.UptimeStatus(currentStatusFloat),
-			IntervalSeconds:  int(interval.Seconds()),
-			RemainingSeconds: remaining,
-			History:          history,
-		})
-	}
-
-	return uptimes, nil
-}
-
 func (s *InstanceService) Download(dest string, repo string, forceClone bool) error {
 	var err error
 
@@ -549,10 +402,7 @@ func (s *InstanceService) load(uuid uuid.UUID) error {
 		return err
 	}
 
-	instance, err := types.NewInstance(uuid, service, instancePath)
-	if err != nil {
-		return err
-	}
+	instance := types.NewInstance(uuid, service)
 
 	err = s.instanceRepo.LoadMetadata(&instance)
 	if err != nil {

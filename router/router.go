@@ -109,7 +109,6 @@ func handleSignals() {
 
 func Unload() {
 	instanceService.StopAll()
-	instanceRepo.Close()
 }
 
 func headersSSE(c *gin.Context) {
