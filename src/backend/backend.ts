@@ -167,6 +167,15 @@ export async function stopInstance(uuid: string) {
     });
 }
 
+export async function getLatestLogs(uuid: string) {
+    return new Promise((resolve, reject) => {
+        axios
+            .get(route(`/instance/${uuid}/logs`))
+            .then((res) => resolve(res.data))
+            .catch((err) => reject(err));
+    });
+}
+
 export async function saveInstanceEnv(uuid: string, env: Env) {
     return new Promise((resolve, reject) => {
         axios
