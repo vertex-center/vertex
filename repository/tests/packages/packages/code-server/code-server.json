@@ -1,0 +1,13 @@
+{
+    "name": "Code Server",
+    "description": "VS Code in the browser.",
+    "homepage": "https://coder.com/",
+    "license": "MIT",
+    "check": "code-server",
+    "install": {
+        "brew": "code-server",
+        "npm": "code-server",
+        "yay": "code-server",
+        "sources": "script:install.sh"
+    }
+}

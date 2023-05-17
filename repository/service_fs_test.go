@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -9,7 +8,7 @@ import (
 )
 
 const (
-	PathServices = "services_test_live"
+	PathServices = "tests/services"
 )
 
 type AvailableTestSuite struct {
@@ -27,20 +26,12 @@ func (suite *AvailableTestSuite) SetupSuite() {
 		servicesPath: PathServices,
 	})
 
-	err := os.MkdirAll(PathServices, os.ModePerm)
-	assert.NoError(suite.T(), err)
-
-	err = suite.repo.reload()
+	err := suite.repo.reload()
 	assert.NoError(suite.T(), err)
 
 	assert.NotZero(suite.T(), len(suite.repo.services))
 }
 
-func (suite *AvailableTestSuite) TearDownSuite() {
-	err := os.RemoveAll(PathServices)
-	assert.NoError(suite.T(), err)
-}
-
 func (suite *AvailableTestSuite) TestGetAvailable() {
-	assert.NotZero(suite.T(), suite.repo.GetAll())
+	assert.Equal(suite.T(), 3, len(suite.repo.GetAll()))
 }

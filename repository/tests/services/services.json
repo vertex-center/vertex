@@ -1,0 +1,17 @@
+{
+    "vertex-code-server": {
+        "name": "Vertex Code Server",
+        "description": "A wrapper for code-server.",
+        "repository": "github.com/vertex-center/vertex-code-server"
+    },
+    "vertex-redis": {
+        "name": "Vertex Redis",
+        "description": "A Redis wrapper for Vertex.",
+        "repository": "github.com/vertex-center/vertex-redis"
+    },
+    "vertex-spotify": {
+        "name": "Vertex Spotify",
+        "description": "This Spotify service collects all your spotify listening and can publish player events on Redis.",
+        "repository": "github.com/vertex-center/vertex-spotify"
+    }
+}
