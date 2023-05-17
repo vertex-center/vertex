@@ -10,6 +10,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/router"
 	"github.com/vertex-center/vertex/services"
+	"github.com/vertex-center/vertex/types"
 )
 
 // version, commit and date will be overridden by goreleaser
@@ -39,9 +40,9 @@ func main() {
 		return
 	}
 
-	err = setupClient()
+	err = setupDependencies()
 	if err != nil {
-		logger.Error(fmt.Errorf("failed to setup the web client: %v", err)).Print()
+		logger.Error(fmt.Errorf("failed to setup dependencies: %v", err)).Print()
 		return
 	}
 
@@ -83,22 +84,40 @@ func parseArgs() {
 	}
 }
 
-func setupClient() error {
-	err := os.Mkdir(storage.PathClient, os.ModePerm)
+func setupDependencies() error {
+	dependencies := []struct {
+		dir string
+		dep types.Dependency
+	}{
+		{storage.PathClient, services.DependencyClient},
+		{storage.PathServices, services.DependencyServices},
+		{storage.PathPackages, services.DependencyPackages},
+	}
+
+	for _, d := range dependencies {
+		err := setupDependency(d.dir, d.dep)
+		if err != nil {
+			logger.Error(err).Print()
+			os.Exit(1)
+		}
+	}
+	return nil
+}
+
+func setupDependency(dir string, dependency types.Dependency) error {
+	err := os.Mkdir(dir, os.ModePerm)
 	if os.IsExist(err) {
-		// The client is already setup.
+		// The dependency already exists.
 		return nil
 	}
 	if err != nil {
 		return err
 	}
 
-	// download client
-	d := services.VertexClientDependency{}
-	_, err = d.CheckForUpdate()
-	if err != nil {
+	// download
+	_, err = dependency.CheckForUpdate()
+	if err != nil && err != services.ErrDependencyNotInstalled {
 		return err
 	}
-
-	return d.InstallUpdate()
+	return dependency.InstallUpdate()
 }

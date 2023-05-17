@@ -43,13 +43,6 @@ func (r *ServiceFSRepository) GetAll() []types.Service {
 }
 
 func (r *ServiceFSRepository) reload() error {
-	url := "https://github.com/vertex-center/vertex-services"
-
-	err := storage.CloneOrPullRepository(url, r.servicesPath)
-	if err != nil {
-		return err
-	}
-
 	file, err := os.ReadFile(path.Join(r.servicesPath, "services.json"))
 	if err != nil {
 		return err

@@ -12,11 +12,22 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-git/go-git/v5"
 	"github.com/google/go-github/v50/github"
 	"github.com/vertex-center/vertex/pkg/logger"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
 	"golang.org/x/exp/slices"
+)
+
+var (
+	DependencyClient   types.Dependency = &VertexClientDependency{}
+	DependencyServices types.Dependency = newVertexGitHubDependency(storage.PathServices, "Vertex Services", "vertex-services")
+	DependencyPackages types.Dependency = newVertexGitHubDependency(storage.PathPackages, "Vertex Dependencies", "vertex-dependencies")
+)
+
+var (
+	ErrDependencyNotInstalled = errors.New("dependency is not installed")
 )
 
 type UpdateDependenciesService struct {
@@ -28,8 +39,11 @@ type UpdateDependenciesService struct {
 func NewUpdateDependenciesService(currentVertexVersion string) UpdateDependenciesService {
 	return UpdateDependenciesService{
 		dependencies: []types.Dependency{
-			&vertexDependency{currentVersion: currentVertexVersion},
-			&VertexClientDependency{},
+			&vertexDependency{currentVersion: currentVertexVersion}, // vertex-center/vertex
+
+			DependencyClient,   // vertex-center/vertex-webui
+			DependencyServices, // vertex-center/vertex-services
+			DependencyPackages, // vertex-center/vertex-dependencies
 		},
 	}
 }
@@ -39,17 +53,29 @@ func (s *UpdateDependenciesService) GetCachedUpdates() types.Updates {
 }
 
 func (s *UpdateDependenciesService) CheckForUpdates() (types.Updates, error) {
-	logger.Log("fetching all updates").Print()
+	logger.Log("fetching all updates...").Print()
 
 	s.updates.Items = []types.Update{}
 
 	for _, dependency := range s.dependencies {
+		logger.Log("fetching dependency").
+			AddKeyValue("id", dependency.GetID()).
+			Print()
+
 		update, err := dependency.CheckForUpdate()
 		if err != nil {
 			return types.Updates{}, err
 		}
 		if update != nil {
+			logger.Log("dependency needs update").
+				AddKeyValue("id", dependency.GetID()).
+				Print()
+
 			s.updates.Items = append(s.updates.Items, *update)
+		} else {
+			logger.Log("dependency already up-to-date").
+				AddKeyValue("id", dependency.GetID()).
+				Print()
 		}
 	}
 
@@ -309,4 +335,68 @@ func unarchive() error {
 	}
 
 	return nil
+}
+
+type vertexGitHubDependency struct {
+	dir  string
+	name string
+	repo string
+}
+
+func newVertexGitHubDependency(dir string, name string, repo string) *vertexGitHubDependency {
+	return &vertexGitHubDependency{
+		dir:  dir,
+		name: name,
+		repo: repo,
+	}
+}
+
+func (d *vertexGitHubDependency) CheckForUpdate() (*types.Update, error) {
+	client := github.NewClient(nil)
+
+	// Local
+	repo, err := git.PlainOpen(d.dir)
+	if err == git.ErrRepositoryNotExists {
+		return nil, ErrDependencyNotInstalled
+	}
+	if err != nil {
+		return nil, err
+	}
+	ref, err := repo.Head()
+	if err != nil {
+		return nil, err
+	}
+	localSHA := ref.Hash().String()
+
+	// Remote
+	branch, _, err := client.Repositories.GetBranch(context.Background(), "vertex-center", d.repo, "main", false)
+	if err != nil {
+		return nil, err
+	}
+	remoteSHA := branch.Commit.GetSHA()
+	if remoteSHA == "" {
+		return nil, errors.New("commit sha not found")
+	}
+
+	// Comparison
+	if localSHA != remoteSHA {
+		return &types.Update{
+			ID:             d.GetID(),
+			Name:           d.name,
+			CurrentVersion: localSHA,
+			LatestVersion:  remoteSHA,
+			NeedsRestart:   true,
+		}, nil
+	}
+
+	return nil, nil
+}
+
+func (d *vertexGitHubDependency) InstallUpdate() error {
+	url := "https://github.com/vertex-center/" + d.repo
+	return storage.CloneOrPullRepository(url, d.dir)
+}
+
+func (d *vertexGitHubDependency) GetID() string {
+	return d.repo
 }

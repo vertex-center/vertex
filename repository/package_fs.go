@@ -57,13 +57,6 @@ func (r *PackageFSRepository) GetPath(id string) string {
 }
 
 func (r *PackageFSRepository) reload() error {
-	url := "https://github.com/vertex-center/vertex-dependencies"
-
-	err := storage.CloneOrPullRepository(url, r.dependenciesPath)
-	if err != nil {
-		return err
-	}
-
 	dir, err := os.ReadDir(path.Join(r.dependenciesPath, "packages"))
 	if err != nil {
 		return err
