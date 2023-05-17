@@ -15,17 +15,6 @@ type LogLine struct {
 	Message string `json:"message"`
 }
 
-// TODO: Use a better structure than array
-
-type Logs struct {
-	Lines []LogLine `json:"lines"`
-}
-
-func (l *Logs) Add(line *LogLine) {
-	line.Id = len(l.Lines) + 1
-	l.Lines = append(l.Lines, *line)
-}
-
 type InstanceLogsRepository interface {
 	Open(uuid uuid.UUID) error
 	Close(uuid uuid.UUID) error
