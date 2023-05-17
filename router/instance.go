@@ -23,6 +23,7 @@ func addInstanceRoutes(r *gin.RouterGroup) {
 	r.GET("/events", headersSSE, handleInstanceEvents)
 	r.GET("/dependencies", handleGetDependencies)
 	r.GET("/docker", handleGetDocker)
+	r.GET("/logs", handleGetLogs)
 }
 
 func getParamInstanceUUID(c *gin.Context) *uuid.UUID {
@@ -238,7 +239,20 @@ func handleGetDocker(c *gin.Context) {
 	info, err := instanceService.GetDockerContainerInfo(*uid)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 
 	c.JSON(http.StatusOK, info)
+}
+
+func handleGetLogs(c *gin.Context) {
+	uid := getParamInstanceUUID(c)
+
+	logs, err := instanceService.GetLatestLogs(*uid)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, logs)
 }

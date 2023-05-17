@@ -310,6 +310,10 @@ func (s *InstanceService) GetDockerContainerInfo(uuid uuid.UUID) (map[string]any
 	return info, nil
 }
 
+func (s *InstanceService) GetLatestLogs(uuid uuid.UUID) ([]types.LogLine, error) {
+	return s.logsRepo.LoadBuffer(uuid)
+}
+
 func (s *InstanceService) Download(dest string, repo string, forceClone bool) error {
 	var err error
 

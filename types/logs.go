@@ -20,5 +20,8 @@ type InstanceLogsRepository interface {
 	Close(uuid uuid.UUID) error
 	Push(uuid uuid.UUID, line LogLine)
 
+	// LoadBuffer will load the latest logs kept in memory.
+	LoadBuffer(uuid uuid.UUID) ([]LogLine, error)
+
 	CloseAll() error
 }
