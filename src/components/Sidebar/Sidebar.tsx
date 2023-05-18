@@ -3,7 +3,16 @@ import { Horizontal } from "../Layouts/Layouts";
 import Symbol from "../Symbol/Symbol";
 import classNames from "classnames";
 import { NavLink } from "react-router-dom";
-import { HTMLProps } from "react";
+import { HTMLProps, PropsWithChildren } from "react";
+import { Text } from "../Text/Text";
+
+export function SidebarTitle({ children }: PropsWithChildren) {
+    return <Text className={styles.title}>{children}</Text>;
+}
+
+export function SidebarSeparator() {
+    return <div className={styles.separator} />;
+}
 
 type ItemProps = {
     to?: string;

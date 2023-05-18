@@ -18,7 +18,11 @@ import {
 } from "../../backend/sse";
 import Spacer from "../../components/Spacer/Spacer";
 import Header from "../../components/Header/Header";
-import Sidebar, { SidebarItem } from "../../components/Sidebar/Sidebar";
+import Sidebar, {
+    SidebarItem,
+    SidebarSeparator,
+    SidebarTitle,
+} from "../../components/Sidebar/Sidebar";
 import Popup from "../../components/Popup/Popup";
 import { Text, Title } from "../../components/Text/Text";
 import Button from "../../components/Button/Button";
@@ -104,22 +108,12 @@ export default function BayDetails() {
                         symbol="home"
                         name="Home"
                     />
-                    <div className={styles.separator} />
+                    <SidebarSeparator />
+                    <SidebarTitle>Analyze</SidebarTitle>
                     <SidebarItem
                         to={`/bay/${uuid}/logs`}
                         symbol="terminal"
                         name="Logs"
-                    />
-                    {/* Uptime status is disabled for now */}
-                    {/*<SidebarItem*/}
-                    {/*    to={`/bay/${uuid}/status`}*/}
-                    {/*    symbol="vital_signs"*/}
-                    {/*    name="Status"*/}
-                    {/*/>*/}
-                    <SidebarItem
-                        to={`/bay/${uuid}/environment`}
-                        symbol="tune"
-                        name="Environment"
                     />
                     {instance?.use_docker && (
                         <SidebarItem
@@ -128,6 +122,19 @@ export default function BayDetails() {
                             name="Docker"
                         />
                     )}
+                    {/* Uptime status is disabled for now */}
+                    {/*<SidebarItem*/}
+                    {/*    to={`/bay/${uuid}/status`}*/}
+                    {/*    symbol="vital_signs"*/}
+                    {/*    name="Status"*/}
+                    {/*/>*/}
+                    <SidebarSeparator />
+                    <SidebarTitle>Manage</SidebarTitle>
+                    <SidebarItem
+                        to={`/bay/${uuid}/environment`}
+                        symbol="tune"
+                        name="Environment"
+                    />
                     {!instance?.use_docker && (
                         <SidebarItem
                             to={`/bay/${uuid}/dependencies`}
