@@ -25,6 +25,7 @@ import Button from "../../components/Button/Button";
 import Progress from "../../components/Progress";
 import { SiDocker } from "@icons-pack/react-simple-icons";
 import useInstance from "../../hooks/useInstance";
+import { Error } from "../../components/Error/Error";
 
 export default function BayDetails() {
     const { uuid } = useParams();
@@ -34,6 +35,7 @@ export default function BayDetails() {
 
     const [showDeletePopup, setShowDeletePopup] = useState<boolean>();
     const [deleting, setDeleting] = useState<boolean>(false);
+    const [error, setError] = useState<string>();
 
     useEffect(() => {
         if (uuid === undefined) return;
@@ -63,9 +65,15 @@ export default function BayDetails() {
 
     const onDeleteInstance = () => {
         setDeleting(true);
-        deleteInstance(uuid).then(() => {
-            navigate("/");
-        });
+        setError(undefined);
+        deleteInstance(uuid)
+            .then(() => {
+                navigate("/");
+            })
+            .catch((err) => {
+                setError(err?.response?.data?.message ?? err?.message);
+                setDeleting(false);
+            });
     };
 
     const dismissDeletePopup = () => {
@@ -150,6 +158,7 @@ export default function BayDetails() {
                         data will be permanently deleted.
                     </Text>
                     {deleting && <Progress infinite />}
+                    {error && <Error error={error} />}
                     <Horizontal gap={12}>
                         <Spacer />
                         <Button onClick={onDeleteInstance} disabled={deleting}>
