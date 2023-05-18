@@ -161,7 +161,10 @@ export default function BayDetails() {
                     {error && <Error error={error} />}
                     <Horizontal gap={12}>
                         <Spacer />
-                        <Button onClick={onDeleteInstance} disabled={deleting}>
+                        <Button
+                            onClick={dismissDeletePopup}
+                            disabled={deleting}
+                        >
                             Cancel
                         </Button>
                         <Button
