@@ -1,6 +1,6 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { Caption, Text, Title } from "../../components/Text/Text";
-import { Horizontal } from "../../components/Layouts/Layouts";
+import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import Button from "../../components/Button/Button";
 import Spacer from "../../components/Spacer/Spacer";
 import Symbol from "../../components/Symbol/Symbol";
@@ -50,7 +50,8 @@ function Update(props: Props) {
                 </Horizontal>
             )}
             <code>
-                {current_version} {"->"} {latest_version}
+                {current_version.substring(0, 10)} {"->"}{" "}
+                {latest_version.substring(0, 10)}
             </code>
             {!isLoading && (
                 <Button onClick={onUpdate} rightSymbol="download">
@@ -122,16 +123,18 @@ export default function SettingsUpdates() {
                     <Text>Everything is up-to-date.</Text>
                 </Horizontal>
             )}
-            {updates?.items?.map((update) => (
-                <Update
-                    key={update.name}
-                    name={update.name}
-                    latest_version={update.latest_version}
-                    current_version={update.current_version}
-                    needs_restart={update.needs_restart}
-                    update={() => updateService(update.id)}
-                />
-            ))}
+            <Vertical gap={6}>
+                {updates?.items?.map((update) => (
+                    <Update
+                        key={update.name}
+                        name={update.name}
+                        latest_version={update.latest_version}
+                        current_version={update.current_version}
+                        needs_restart={update.needs_restart}
+                        update={() => updateService(update.id)}
+                    />
+                ))}
+            </Vertical>
             {error && <Error error={error} />}
             <Popup show={showMessage} onDismiss={dismissPopup}>
                 <Text>
