@@ -18,8 +18,10 @@ import {
     unregisterSSEEvent,
 } from "../../backend/sse";
 import { HeaderHome } from "../../components/Header/Header";
+import Progress from "../../components/Progress";
 
 export default function Infrastructure() {
+    const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState("Waiting server response...");
     const [installed, setInstalled] = useState<Instances>({});
 
@@ -39,6 +41,7 @@ export default function Infrastructure() {
     }, [installed]);
 
     const fetchServices = () => {
+        setLoading(true);
         getInstances()
             .then((installed) => {
                 console.log(installed);
@@ -48,6 +51,9 @@ export default function Infrastructure() {
             .catch(() => {
                 setInstalled({});
                 setStatus("off");
+            })
+            .finally(() => {
+                setLoading(false);
             });
     };
 
@@ -89,26 +95,29 @@ export default function Infrastructure() {
     return (
         <div className={styles.server}>
             <HeaderHome />
-            <div className={styles.bays}>
-                <Bay showCables instances={[{ name: "Vertex", status }]} />
-                {installedGrouped?.map((instances, i) => (
-                    <Bay
-                        key={i}
-                        showCables
-                        instances={instances.map((instance, i) => ({
-                            name: instance.name,
-                            status: instance.status,
-                            count: instances.length > 1 ? i + 1 : undefined,
-                            to: `/bay/${instance.uuid}/`,
-                            onPower: () => toggleInstance(instance.uuid),
-                            use_docker: instance.use_docker,
-                        }))}
-                    />
-                ))}
-                <Link to="/marketplace" className={styles.addBay}>
-                    <Symbol name="add" />
-                </Link>
-            </div>
+            {loading && <Progress infinite small />}
+            {!loading && (
+                <div className={styles.bays}>
+                    <Bay showCables instances={[{ name: "Vertex", status }]} />
+                    {installedGrouped?.map((instances, i) => (
+                        <Bay
+                            key={i}
+                            showCables
+                            instances={instances.map((instance, i) => ({
+                                name: instance.name,
+                                status: instance.status,
+                                count: instances.length > 1 ? i + 1 : undefined,
+                                to: `/bay/${instance.uuid}/`,
+                                onPower: () => toggleInstance(instance.uuid),
+                                use_docker: instance.use_docker,
+                            }))}
+                        />
+                    ))}
+                    <Link to="/marketplace" className={styles.addBay}>
+                        <Symbol name="add" />
+                    </Link>
+                </div>
+            )}
         </div>
     );
 }

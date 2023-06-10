@@ -3,17 +3,24 @@ import classNames from "classnames";
 
 type Props = {
     infinite?: boolean;
+    small?: boolean;
 };
 
 export default function Progress(props: Props) {
-    const { infinite } = props;
+    const { infinite, small } = props;
 
     return (
-        <div className={styles.progress}>
+        <div
+            className={classNames({
+                [styles.progress]: true,
+                [styles.progressSmall]: small,
+            })}
+        >
             <div
                 className={classNames({
                     [styles.bar]: true,
                     [styles.barInfinite]: infinite,
+                    [styles.barSmall]: small,
                 })}
             />
         </div>
