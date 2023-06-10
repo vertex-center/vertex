@@ -4,13 +4,14 @@ import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import Button from "../../components/Button/Button";
 import Spacer from "../../components/Spacer/Spacer";
 import Symbol from "../../components/Symbol/Symbol";
-import { executeUpdates, getUpdates, Updates } from "../../backend/backend";
+import { executeUpdates, getUpdates } from "../../backend/backend";
 import { Error } from "../../components/Error/Error";
 import Progress from "../../components/Progress";
 import Popup from "../../components/Popup/Popup";
 import Loading from "../../components/Loading/Loading";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
+import { Updates } from "../../models/update";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -73,8 +74,8 @@ export default function SettingsUpdates() {
         setIsLoading(true);
         setUpdates(undefined);
         getUpdates(refresh)
-            .then((updates) => {
-                setUpdates(updates);
+            .then((res) => {
+                setUpdates(res.data);
             })
             .catch((err) => {
                 setError(err?.response?.data?.message ?? err?.message);

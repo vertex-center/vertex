@@ -7,7 +7,7 @@ import {
     unregisterSSEEvent,
 } from "../../backend/sse";
 import { useParams } from "react-router-dom";
-import { getLatestLogs, route } from "../../backend/backend";
+import { getLatestLogs } from "../../backend/backend";
 import { Title } from "../../components/Text/Text";
 
 export default function BayDetailsLogs() {
@@ -17,14 +17,14 @@ export default function BayDetailsLogs() {
 
     useEffect(() => {
         getLatestLogs(uuid)
-            .then((logs: any) => setLogs(logs))
+            .then((res) => setLogs(res.data))
             .catch(console.error);
     }, []);
 
     useEffect(() => {
         if (uuid === undefined) return;
 
-        const sse = registerSSE(route(`/instance/${uuid}/events`));
+        const sse = registerSSE(`/instance/${uuid}/events`);
 
         const onStdout = (e) => {
             setLogs((logs) => [

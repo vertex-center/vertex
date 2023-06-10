@@ -5,12 +5,10 @@ import styles from "./BayDetailsDocker.module.sass";
 import { useParams } from "react-router-dom";
 import Loading from "../../components/Loading/Loading";
 import useInstance from "../../hooks/useInstance";
-import {
-    DockerContainerInfo,
-    getInstanceDockerContainerInfo,
-} from "../../backend/backend";
+import { getInstanceDockerContainerInfo } from "../../backend/backend";
 import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import Spacer from "../../components/Spacer/Spacer";
+import { DockerContainerInfo } from "../../models/docker";
 
 export default function BayDetailsDocker() {
     const { uuid } = useParams();
@@ -22,12 +20,10 @@ export default function BayDetailsDocker() {
     let label;
 
     useEffect(() => {
-        getInstanceDockerContainerInfo(uuid)
-            .then((info) => {
-                console.log(info);
-                setContainerInfo(info);
-            })
-            .catch();
+        getInstanceDockerContainerInfo(uuid).then((res) => {
+            console.log(res.data);
+            setContainerInfo(res.data);
+        });
     }, [uuid]);
 
     if (instance?.use_docker) {

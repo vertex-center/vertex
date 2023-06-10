@@ -1,253 +1,49 @@
 import axios from "axios";
+import { Instance, Instances } from "../models/instance";
+import { Env, Service } from "../models/service";
+import { Dependencies } from "../models/dependency";
+import { DockerContainerInfo } from "../models/docker";
+import { Uptime } from "../models/uptime";
+import { About } from "../models/about";
+import { Updates } from "../models/update";
 
-export type Env = { [key: string]: string };
+const api = axios.create({
+    baseURL: "http://localhost:6130/api",
+});
 
-export type EnvVariable = {
-    type: string;
-    name: string;
-    display_name: string;
-    secret: boolean;
-    default: string;
-    description: string;
-};
+export const getAbout = async () => api.get<About>("/about");
+export const getInstances = async () => api.get<Instances>("/instances");
+export const getAvailableServices = async () =>
+    api.get<Service[]>("/services/available");
+export const getInstance = async (uuid: string) =>
+    api.get<Instance>(`/instance/${uuid}`);
+export const deleteInstance = async (uuid: string) =>
+    api.delete(`/instance/${uuid}`);
+export const patchInstance = async (uuid: string, params: any) =>
+    api.patch(`/instance/${uuid}`, params);
+export const startInstance = async (uuid: string) =>
+    api.post(`/instance/${uuid}/start`);
+export const stopInstance = async (uuid: string) =>
+    api.post(`/instance/${uuid}/stop`);
+export const getLatestLogs = async (uuid: string) =>
+    api.get(`/instance/${uuid}/logs`);
+export const saveInstanceEnv = async (uuid: string, env: Env) =>
+    api.patch(`/instance/${uuid}/environment`, env);
+export const getInstanceDependencies = async (uuid: string) =>
+    api.get<Dependencies>(`/instance/${uuid}/dependencies`);
+export const getInstanceDockerContainerInfo = async (uuid: string) =>
+    api.get<DockerContainerInfo>(`/instance/${uuid}/docker`);
+export const getInstanceStatus = async (uuid: string) =>
+    api.get<Uptime[]>(`/instance/${uuid}/status`);
+export const installPackages = async (packages) =>
+    api.post(`/packages/install`, { packages });
+export const getUpdates = async (reload?: boolean) =>
+    api.get<Updates>(`/updates${reload ? "?reload=true" : ""}`);
+export const executeUpdates = async (updates: { name: string }[]) =>
+    api.post("/updates", { updates });
 
-export type Service = {
-    id: string;
-    name: string;
-    repository: string;
-    description: string;
-    environment: EnvVariable[];
-    dependencies?: { [name: string]: boolean };
-};
-
-export type Instance = Service & {
-    uuid: string;
-    status: string;
-    env: { [key: string]: string };
-    use_docker?: boolean;
-    use_releases?: boolean;
-    launch_on_startup?: boolean;
-};
-
-export type DockerContainerInfo = {
-    id: string;
-    name: string;
-    image: string;
-    platform: string;
-};
-
-export type Uptime = {
-    name: string;
-    ping_url?: string;
-    current: string;
-    interval_seconds: number;
-    remaining_seconds: number;
-    history: {
-        status: string;
-    }[];
-};
-
-export type Package = {
-    name: string;
-    description?: string;
-    homepage?: string;
-    license?: string;
-    check?: string;
-    install?: { [pm: string]: string };
-};
-
-export type Dependency = Package & {
-    installed: boolean;
-};
-
-export type About = {
-    version: string;
-    commit: string;
-    date: string;
-};
-
-export type Updates = {
-    last_checked: string;
-    items: Update[];
-};
-
-export type Update = {
-    id: string;
-    name: string;
-    current_version: string;
-    latest_version: string;
-    needs_restart?: boolean;
-};
-
-export type Dependencies = { [id: string]: Dependency };
-
-export type Instances = { [uuid: string]: Instance };
-
-export function route(path: string) {
-    return `http://localhost:6130/api${path}`;
-}
-
-export async function getInstances(): Promise<Instances> {
-    return new Promise((resolve, reject) => {
-        axios
-            .get(route("/instances"))
-            .then((res) => resolve(res.data))
-            .catch((err) => reject(err));
-    });
-}
-
-export async function getAvailableServices(): Promise<Service[]> {
-    return new Promise((resolve, reject) => {
-        axios
-            .get(route("/services/available"))
-            .then((res) => resolve(res.data))
-            .catch((err) => reject(err));
-    });
-}
-
-export async function downloadService(
+export const downloadService = async (
     repository: string,
     use_docker?: boolean,
     use_releases?: boolean
-) {
-    return new Promise((resolve, reject) => {
-        axios
-            .post(route("/services/download"), {
-                repository,
-                use_docker,
-                use_releases,
-            })
-            .then((res) => resolve(res.data))
-            .catch((err) => reject(err));
-    });
-}
-
-export async function getInstance(uuid: string): Promise<Instance> {
-    return new Promise((resolve, reject) => {
-        axios
-            .get(route(`/instance/${uuid}`))
-            .then((res) => resolve(res.data))
-            .catch((err) => reject(err));
-    });
-}
-
-export async function deleteInstance(uuid: string) {
-    return new Promise((resolve, reject) => {
-        axios
-            .delete(route(`/instance/${uuid}`))
-            .then((res) => resolve(res.data))
-            .catch((err) => reject(err));
-    });
-}
-
-export async function patchInstance(uuid: string, params: any) {
-    return new Promise((resolve, reject) => {
-        axios
-            .patch(route(`/instance/${uuid}`), params)
-            .then((res) => resolve(res.data))
-            .catch((err) => reject(err));
-    });
-}
-
-export async function startInstance(uuid: string) {
-    return new Promise((resolve, reject) => {
-        axios
-            .post(route(`/instance/${uuid}/start`))
-            .then((res) => resolve(res.data))
-            .catch((err) => reject(err));
-    });
-}
-
-export async function stopInstance(uuid: string) {
-    return new Promise((resolve, reject) => {
-        axios
-            .post(route(`/instance/${uuid}/stop`))
-            .then((res) => resolve(res.data))
-            .catch((err) => reject(err));
-    });
-}
-
-export async function getLatestLogs(uuid: string) {
-    return new Promise((resolve, reject) => {
-        axios
-            .get(route(`/instance/${uuid}/logs`))
-            .then((res) => resolve(res.data))
-            .catch((err) => reject(err));
-    });
-}
-
-export async function saveInstanceEnv(uuid: string, env: Env) {
-    return new Promise((resolve, reject) => {
-        axios
-            .patch(route(`/instance/${uuid}/environment`), env)
-            .then((res) => resolve(res.data))
-            .catch((err) => reject(err));
-    });
-}
-
-export async function getInstanceDependencies(
-    uuid: string
-): Promise<Dependencies> {
-    return new Promise((resolve, reject) => {
-        axios
-            .get(route(`/instance/${uuid}/dependencies`))
-            .then((res) => resolve(res.data))
-            .catch((err) => reject(err));
-    });
-}
-
-export async function getInstanceDockerContainerInfo(
-    uuid: string
-): Promise<DockerContainerInfo> {
-    return new Promise((resolve, reject) => {
-        axios
-            .get(route(`/instance/${uuid}/docker`))
-            .then((res) => resolve(res.data))
-            .catch((err) => reject(err));
-    });
-}
-
-export async function getInstanceStatus(uuid: string): Promise<Uptime[]> {
-    return new Promise((resolve, reject) => {
-        axios
-            .get(route(`/instance/${uuid}/status`))
-            .then((res) => resolve(res.data))
-            .catch((err) => reject(err));
-    });
-}
-
-export async function installPackages(packages) {
-    return new Promise((resolve, reject) => {
-        axios
-            .post(route(`/packages/install`), { packages })
-            .then((res) => resolve(res.data))
-            .catch((err) => reject(err));
-    });
-}
-
-export async function getAbout(): Promise<About> {
-    return new Promise((resolve, reject) => {
-        axios
-            .get(route("/about"))
-            .then((res) => resolve(res.data))
-            .catch((err) => reject(err));
-    });
-}
-
-export async function getUpdates(reload?: boolean): Promise<Updates> {
-    return new Promise((resolve, reject) => {
-        axios
-            .get(route(`/updates${reload ? "?reload=true" : ""}`))
-            .then((res) => resolve(res.data))
-            .catch((err) => reject(err));
-    });
-}
-
-export async function executeUpdates(updates: { name: string }[]) {
-    return new Promise((resolve, reject) => {
-        axios
-            .post(route("/updates"), { updates })
-            .then((res) => resolve(res.data))
-            .catch((err) => reject(err));
-    });
-}
+) => api.post("/services/download", { repository, use_docker, use_releases });

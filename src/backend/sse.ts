@@ -20,7 +20,7 @@ export function registerSSE(url: string): UUID {
     }
 
     uuid = uuidv4();
-    const eventSource = new EventSource(url);
+    const eventSource = new EventSource("http://localhost:6130/api" + url);
     allSSE[uuid] = { url, eventSource, watchers: 1 };
     console.log("SSE", uuid, "opened.");
     console.log(allSSE[uuid].watchers, "registered on", uuid);

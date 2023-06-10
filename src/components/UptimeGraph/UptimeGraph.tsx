@@ -3,7 +3,6 @@ import { Horizontal, Vertical } from "../Layouts/Layouts";
 import styles from "./UptimeGraph.module.sass";
 import classNames from "classnames";
 import { Text } from "../Text/Text";
-import { route, Uptime } from "../../backend/backend";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -12,6 +11,7 @@ import {
     unregisterSSE,
     unregisterSSEEvent,
 } from "../../backend/sse";
+import { Uptime } from "../../models/uptime";
 
 function UptimeGraph({ uptime }: { uptime: Uptime }) {
     const [tick, setTick] = useState<boolean>();
@@ -21,7 +21,7 @@ function UptimeGraph({ uptime }: { uptime: Uptime }) {
     useEffect(() => {
         if (uuid === undefined) return;
 
-        const sse = registerSSE(route(`/instance/${uuid}/events`));
+        const sse = registerSSE(`/instance/${uuid}/events`);
 
         const onStatusChange = (e) => {
             if (e.data == "on") {

@@ -1,4 +1,4 @@
-import { getAvailableServices, Service } from "../../backend/backend";
+import { getAvailableServices } from "../../backend/backend";
 import { Fragment, useEffect, useState } from "react";
 import styles from "./Marketplace.module.sass";
 import { Text, Title } from "../../components/Text/Text";
@@ -11,6 +11,7 @@ import Input from "../../components/Input/Input";
 import { SegmentedButtons } from "../../components/SegmentedButton";
 import { Horizontal } from "../../components/Layouts/Layouts";
 import Spacer from "../../components/Spacer/Spacer";
+import { Service } from "../../models/service";
 
 type StepDownloadMarketplaceProps = {
     onNextStep: () => void;
@@ -43,7 +44,9 @@ function StepDownloadMarketplace(props: StepDownloadMarketplaceProps) {
         setIsLoadingMarketplace(true);
         setError(undefined);
         getAvailableServices()
-            .then(setAvailable)
+            .then((res) => {
+                setAvailable(res.data);
+            })
             .catch((err) => {
                 setError(
                     `An error occurred while fetching services from the Marketplace: ${err.message}`

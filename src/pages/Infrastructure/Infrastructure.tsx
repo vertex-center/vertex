@@ -3,9 +3,6 @@ import Bay from "../../components/Bay/Bay";
 import { useEffect, useState } from "react";
 import {
     getInstances,
-    Instance,
-    Instances,
-    route,
     startInstance,
     stopInstance,
 } from "../../backend/backend";
@@ -19,6 +16,7 @@ import {
 } from "../../backend/sse";
 import { HeaderHome } from "../../components/Header/Header";
 import Progress from "../../components/Progress";
+import { Instance, Instances } from "../../models/instance";
 
 export default function Infrastructure() {
     const [loading, setLoading] = useState(true);
@@ -43,9 +41,9 @@ export default function Infrastructure() {
     const fetchServices = () => {
         setLoading(true);
         getInstances()
-            .then((installed) => {
-                console.log(installed);
-                setInstalled(installed);
+            .then((res) => {
+                console.log(res.data);
+                setInstalled(res.data);
                 setStatus("running");
             })
             .catch(() => {
@@ -58,7 +56,7 @@ export default function Infrastructure() {
     };
 
     useEffect(() => {
-        const sse = registerSSE(route("/instances/events"));
+        const sse = registerSSE("/instances/events");
 
         const onOpen = (e) => {
             console.log(e);

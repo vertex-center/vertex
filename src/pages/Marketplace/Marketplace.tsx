@@ -1,4 +1,4 @@
-import { downloadService, Instance } from "../../backend/backend";
+import { downloadService } from "../../backend/backend";
 import { Fragment, useState } from "react";
 
 import styles from "./Marketplace.module.sass";
@@ -11,6 +11,7 @@ import StepConfigure from "./StepConfigure";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import { SiGithub } from "@icons-pack/react-simple-icons";
+import { Instance } from "../../models/instance";
 
 export type DownloadMethod = "marketplace" | "git" | "localstorage";
 
@@ -37,10 +38,10 @@ export default function Installed() {
     ) => {
         setStep("downloading");
         downloadService(repository, useDocker, useReleases)
-            .then((data: any) => {
-                console.log(data.instance);
+            .then((res) => {
+                console.log(res.data.instance);
                 setStep("configure");
-                setInstance(data.instance);
+                setInstance(res.data.instance);
             })
             .catch((error) => {
                 console.log(error);

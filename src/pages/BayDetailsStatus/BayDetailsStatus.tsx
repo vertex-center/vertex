@@ -2,13 +2,14 @@ import { Fragment, useEffect, useState } from "react";
 import UptimeGraphs from "../../components/UptimeGraph/UptimeGraph";
 import { Title } from "../../components/Text/Text";
 import { useParams } from "react-router-dom";
-import { getInstanceStatus, route, Uptime } from "../../backend/backend";
+import { getInstanceStatus } from "../../backend/backend";
 import {
     registerSSE,
     registerSSEEvent,
     unregisterSSE,
     unregisterSSEEvent,
 } from "../../backend/sse";
+import { Uptime } from "../../models/uptime";
 
 type Props = {};
 
@@ -18,9 +19,9 @@ export default function BayDetailsStatus(props: Props) {
     const [uptimes, setUptimes] = useState<Uptime[]>();
 
     const reload = () => {
-        getInstanceStatus(uuid).then((uptime) => {
-            console.log(uptime);
-            setUptimes(uptime);
+        getInstanceStatus(uuid).then((res) => {
+            console.log(res.data);
+            setUptimes(res.data);
         });
     };
 
@@ -29,11 +30,9 @@ export default function BayDetailsStatus(props: Props) {
 
         reload();
 
-        const sse = registerSSE(route(`/instance/${uuid}/events`));
+        const sse = registerSSE(`/instance/${uuid}/events`);
 
-        const onStatusChange = (e) => {
-            reload();
-        };
+        const onStatusChange = () => reload;
 
         registerSSEEvent(sse, "uptime_status_change", onStatusChange);
 

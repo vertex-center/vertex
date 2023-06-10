@@ -2,7 +2,6 @@ import Bay from "../../components/Bay/Bay";
 import { useEffect, useState } from "react";
 import {
     deleteInstance,
-    route,
     startInstance,
     stopInstance,
 } from "../../backend/backend";
@@ -44,7 +43,7 @@ export default function BayDetails() {
     useEffect(() => {
         if (uuid === undefined) return;
 
-        const sse = registerSSE(route(`/instance/${uuid}/events`));
+        const sse = registerSSE(`/instance/${uuid}/events`);
 
         const onStatusChange = (e) => {
             setInstance((instance) => ({ ...instance, status: e.data }));

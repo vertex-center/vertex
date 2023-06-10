@@ -6,7 +6,6 @@ import styles from "./BayDetailsHome.module.sass";
 import { useParams } from "react-router-dom";
 import { Horizontal } from "../../components/Layouts/Layouts";
 import Spacer from "../../components/Spacer/Spacer";
-import { route } from "../../backend/backend";
 import classNames from "classnames";
 import {
     registerSSE,
@@ -24,7 +23,7 @@ export default function BayDetailsHome() {
     useEffect(() => {
         if (uuid === undefined) return;
 
-        const sse = registerSSE(route(`/instance/${uuid}/events`));
+        const sse = registerSSE(`/instance/${uuid}/events`);
 
         const onStatusChange = (e) => {
             setInstance((instance) => ({ ...instance, status: e.data }));

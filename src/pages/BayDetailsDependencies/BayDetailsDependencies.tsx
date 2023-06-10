@@ -6,11 +6,13 @@ import Symbol from "../../components/Symbol/Symbol";
 
 import styles from "./BayDetailsDependencies.module.sass";
 import {
-    Dependencies,
-    Dependency as DependencyModel,
     getInstanceDependencies,
     installPackages,
 } from "../../backend/backend";
+import {
+    Dependencies,
+    Dependency as DependencyModel,
+} from "../../models/dependency";
 import { useParams } from "react-router-dom";
 import classNames from "classnames";
 import Button from "../../components/Button/Button";
@@ -103,7 +105,7 @@ export default function BayDetailsDependencies() {
     const reload = useCallback(() => {
         setIsLoading(true);
         getInstanceDependencies(uuid)
-            .then((deps) => setDependencies(deps))
+            .then((res) => setDependencies(res.data))
             .finally(() => setIsLoading(false));
     }, [uuid]);
 
