@@ -1,0 +1,21 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+
+$border: 1px solid colors.$bg-secondary
+
+.service
+    padding: 12px 0
+    border-radius: dimensions.$border-radius
+    border-bottom: $border
+
+    &:first-child
+        border-top: $border
+
+.logo
+    height: 48px
+    width: 48px
+    background-color: colors.$bg-secondary
+    display: flex
+    align-items: center
+    justify-content: center
+    border-radius: dimensions.$border-radius

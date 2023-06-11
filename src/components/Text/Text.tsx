@@ -1,13 +1,19 @@
-import { HTMLProps, PropsWithChildren } from "react";
+import { HTMLProps } from "react";
 
 import styles from "./Text.module.sass";
 import classNames from "classnames";
 
-export function Title({ children }: PropsWithChildren) {
-    return <h2 className={styles.title}>{children}</h2>;
+export function Title(props: HTMLProps<HTMLHeadingElement>) {
+    const { children, className, ...others } = props;
+
+    return (
+        <h2 className={classNames(styles.title, className)} {...others}>
+            {children}
+        </h2>
+    );
 }
 
-export function Caption(props: HTMLProps<HTMLHeadingElement>) {
+export function Caption(props: HTMLProps<HTMLParagraphElement>) {
     const { children, className, ...others } = props;
 
     return (

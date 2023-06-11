@@ -1,5 +1,4 @@
 import { HashRouter, Route, Routes } from "react-router-dom";
-import Marketplace from "./pages/Marketplace/Marketplace";
 import Infrastructure from "./pages/Infrastructure/Infrastructure";
 import BayDetails from "./pages/BayDetails/BayDetails";
 import BayDetailsLogs from "./pages/BayDetailsLogs/BayDetailsLogs";
@@ -16,6 +15,7 @@ import SettingsUpdates from "./pages/SettingsUpdates/SettingsUpdates";
 import BayDetailsDocker from "./pages/BayDetailsDocker/BayDetailsDocker";
 import BayDetailsSettings from "./pages/BayDetailsSettings/BayDetailsSettings";
 import BayDetailsStatus from "./pages/BayDetailsStatus/BayDetailsStatus";
+import Store from "./pages/Store/Store";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -39,7 +39,7 @@ function App() {
                             element={<SettingsAbout />}
                         />
                     </Route>
-                    <Route path="/marketplace" element={<Marketplace />} />
+                    <Route path="/marketplace" element={<Store />} />
                     <Route path="/bay/:uuid/" element={<BayDetails />}>
                         <Route
                             path="/bay/:uuid/"

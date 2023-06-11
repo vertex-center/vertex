@@ -37,6 +37,7 @@ export function SegmentedButtons(props: Props) {
             {items.map((item) => {
                 return (
                     <SegmentedButton
+                        key={item.value}
                         value={item.value}
                         onClick={() => onChange(item.value)}
                         selected={value === item.value}
