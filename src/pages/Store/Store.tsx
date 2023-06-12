@@ -3,6 +3,7 @@ import {
     downloadService,
     getAvailableServices,
     getInstances,
+    getService,
 } from "../../backend/backend";
 import { Text, Title } from "../../components/Text/Text";
 import { Service as ServiceModel } from "../../models/service";
@@ -40,17 +41,41 @@ export default function Store() {
 
     const [repository, setRepository] = useState();
     const [importMethod, setImportMethod] = useState<ImportMethod>("git");
+    const [loading, setLoading] = useState<boolean>(false);
     const [importing, setImporting] = useState(false);
 
     const [selectedService, setSelectedService] = useState<ServiceModel>();
 
-    const [error, setError] = useState();
+    const [error, setError] = useState<string>();
+    const [popupError, setPopupError] = useState<string>();
 
     const [downloading, setDownloading] = useState<Downloading[]>([]);
 
     const openInstallPopup = (service: ServiceModel) => {
         setSelectedService(service);
         setShowInstallPopup(true);
+        setUseDocker(false);
+        setUseReleases(true);
+        setLoading(true);
+        setPopupError(undefined);
+        getService(service.repository)
+            .then((res) => {
+                setSelectedService(res.data);
+
+                const { docker, script } = res.data.methods;
+
+                if (docker && !script) {
+                    setUseDocker(true);
+                } else if (!docker && script) {
+                    setUseDocker(false);
+                } else if (!docker && !script) {
+                    setPopupError(
+                        "This service doesn't have installation method."
+                    );
+                }
+            })
+            .catch((err) => setPopupError(err.message))
+            .finally(() => setLoading(false));
     };
 
     const closeInstallPopup = () => {
@@ -97,61 +122,77 @@ export default function Store() {
         setRepository(e.target.value);
     };
 
+    const enableDockerChoice =
+        selectedService?.methods?.docker && selectedService?.methods?.script;
+
     const installPopup = (
         <Popup
             show={showInstallPopup}
             onDismiss={() => setShowInstallPopup(false)}
         >
             <Title>Download {selectedService?.name}</Title>
-            <Vertical gap={12}>
-                <Horizontal alignItems="center" gap={12}>
-                    <Text>Use Docker?</Text>
-                    <Spacer />
-                    <SegmentedButtons
-                        value={useDocker}
-                        onChange={(v) => setUseDocker(v)}
-                        items={[
-                            {
-                                label: "Yes",
-                                value: true,
-                                rightSymbol: "check",
-                            },
-                            {
-                                label: "No",
-                                value: false,
-                                rightSymbol: "close",
-                            },
-                        ]}
-                    />
-                </Horizontal>
-                <Horizontal alignItems="center" gap={12}>
-                    <Text style={useDocker !== false ? { opacity: 0.4 } : {}}>
-                        Download the precompiled release?
-                    </Text>
-                    <Spacer />
-                    <SegmentedButtons
-                        value={useReleases}
-                        disabled={useDocker !== false}
-                        onChange={(v) => setUseReleases(v)}
-                        items={[
-                            {
-                                label: "Yes",
-                                value: true,
-                                rightSymbol: "check",
-                            },
-                            {
-                                label: "No",
-                                value: false,
-                                rightSymbol: "close",
-                            },
-                        ]}
-                    />
-                </Horizontal>
-            </Vertical>
+            {loading && <Progress infinite />}
+            <Error error={popupError} />
+            {!loading && !popupError && (
+                <Vertical gap={12}>
+                    {enableDockerChoice && (
+                        <Horizontal alignItems="center" gap={12}>
+                            <Text>Use Docker?</Text>
+                            <Spacer />
+                            <SegmentedButtons
+                                value={useDocker}
+                                onChange={(v) => setUseDocker(v)}
+                                items={[
+                                    {
+                                        label: "Yes",
+                                        value: true,
+                                        rightSymbol: "check",
+                                    },
+                                    {
+                                        label: "No",
+                                        value: false,
+                                        rightSymbol: "close",
+                                    },
+                                ]}
+                            />
+                        </Horizontal>
+                    )}
+                    <Horizontal alignItems="center" gap={12}>
+                        <Text
+                            style={useDocker !== false ? { opacity: 0.4 } : {}}
+                        >
+                            Download the precompiled release?
+                        </Text>
+                        <Spacer />
+                        <SegmentedButtons
+                            value={useReleases}
+                            disabled={useDocker !== false}
+                            onChange={(v) => setUseReleases(v)}
+                            items={[
+                                {
+                                    label: "Yes",
+                                    value: true,
+                                    rightSymbol: "check",
+                                },
+                                {
+                                    label: "No",
+                                    value: false,
+                                    rightSymbol: "close",
+                                },
+                            ]}
+                        />
+                    </Horizontal>
+                </Vertical>
+            )}
             <Horizontal gap={8}>
                 <Spacer />
                 <Button onClick={closeInstallPopup}>Cancel</Button>
-                <Button onClick={install} primary rightSymbol="download">
+                <Button
+                    onClick={install}
+                    primary
+                    rightSymbol="download"
+                    disabled={loading || popupError !== undefined}
+                >
                     Download
                 </Button>
             </Horizontal>

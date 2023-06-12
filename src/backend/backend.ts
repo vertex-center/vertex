@@ -13,6 +13,8 @@ const api = axios.create({
 
 export const getAbout = async () => api.get<About>("/about");
 export const getInstances = async () => api.get<Instances>("/instances");
+export const getService = async (repository: string) =>
+    api.get<Service>(`/services/`, { params: { repository } });
 export const getAvailableServices = async () =>
     api.get<Service[]>("/services/available");
 export const getInstance = async (uuid: string) =>

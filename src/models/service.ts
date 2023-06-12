@@ -9,11 +9,36 @@ export type EnvVariable = {
     description: string;
 };
 
+export type URL = {
+    name: string;
+    port: string;
+    ping?: string;
+    kind: string;
+};
+
+export type ServiceMethodScript = {
+    file: string;
+    dependencies?: { [name: string]: boolean };
+};
+
+export type ServiceMethodDocker = {
+    image?: string;
+    dockerfile?: string;
+    ports?: string[];
+    volumes?: { [key: string]: string };
+};
+
+export type ServiceMethods = {
+    script?: ServiceMethodScript;
+    docker?: ServiceMethodDocker;
+};
+
 export type Service = {
     id: string;
     name: string;
     repository: string;
     description: string;
     environment: EnvVariable[];
-    dependencies?: { [name: string]: boolean };
+    urls?: URL[];
+    methods?: ServiceMethods;
 };
