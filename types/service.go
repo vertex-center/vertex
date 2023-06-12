@@ -52,5 +52,6 @@ type Service struct {
 }
 
 type ServiceRepository interface {
+	Get(repo string) (Service, error)
 	GetAll() []Service
 }

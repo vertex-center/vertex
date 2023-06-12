@@ -8,8 +8,21 @@ import (
 )
 
 func addServicesRoutes(r *gin.RouterGroup) {
+	r.GET("/", handleGetService)
 	r.GET("/available", handleServicesAvailable)
 	r.POST("/download", handleServiceDownload)
+}
+
+func handleGetService(c *gin.Context) {
+	repo := c.Query("repository")
+
+	service, err := serviceService.Get(repo)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, service)
 }
 
 func handleServicesAvailable(c *gin.Context) {

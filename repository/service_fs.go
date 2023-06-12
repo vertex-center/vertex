@@ -2,9 +2,13 @@ package repository
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/vertex-center/vertex/pkg/logger"
 	"github.com/vertex-center/vertex/pkg/storage"
@@ -36,6 +40,35 @@ func NewServiceFSRepository(params *ServiceRepositoryParams) ServiceFSRepository
 		logger.Error(fmt.Errorf("failed to reload services repository: %v", err)).Print()
 	}
 	return repo
+}
+
+func (r *ServiceFSRepository) Get(repo string) (types.Service, error) {
+	if strings.HasPrefix(repo, "github.com") {
+		repo = strings.TrimPrefix(repo, "github.com/")
+	} else {
+		return types.Service{}, errors.New("this repo is not supported")
+	}
+
+	println(repo)
+
+	res, err := http.Get(fmt.Sprintf("https://raw.githubusercontent.com/%s/main/.vertex/service.json", repo))
+	if err != nil {
+		return types.Service{}, err
+	}
+	defer res.Body.Close()
+
+	content, err := io.ReadAll(res.Body)
+	if err != nil {
+		return types.Service{}, err
+	}
+
+	var service types.Service
+	err = json.Unmarshal(content, &service)
+	if err != nil {
+		return types.Service{}, err
+	}
+
+	return service, nil
 }
 
 func (r *ServiceFSRepository) GetAll() []types.Service {
