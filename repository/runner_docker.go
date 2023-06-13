@@ -85,12 +85,11 @@ func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg s
 		if instance.Methods.Docker.Ports != nil {
 			var all []string
 
-			for _, out := range *instance.Methods.Docker.Ports {
-				in := ""
+			for in, out := range *instance.Methods.Docker.Ports {
 				for _, e := range instance.EnvDefinitions {
 					if e.Type == "port" && e.Default == out {
-						in = instance.EnvVariables[e.Name]
-						all = append(all, in+":"+out)
+						out = instance.EnvVariables[e.Name]
+						all = append(all, out+":"+in)
 						break
 					}
 				}

@@ -19,10 +19,13 @@ type ServiceMethodScript struct {
 }
 
 type ServiceMethodDocker struct {
-	Image      *string            `json:"image,omitempty"`
-	Dockerfile *string            `json:"dockerfile,omitempty"`
-	Ports      *[]string          `json:"ports,omitempty"`
-	Volumes    *map[string]string `json:"volumes,omitempty"`
+	Image      *string `json:"image,omitempty"`
+	Dockerfile *string `json:"dockerfile,omitempty"`
+
+	// Ports is a map containing docker port as a key, and output port as a value.
+	// The output port is automatically adjusted with PORT environment variables.
+	Ports   *map[string]string `json:"ports,omitempty"`
+	Volumes *map[string]string `json:"volumes,omitempty"`
 }
 
 type ServiceMethods struct {
