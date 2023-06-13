@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Instance, Instances } from "../models/instance";
+import { InstallMethod, Instance, Instances } from "../models/instance";
 import { Env, Service } from "../models/service";
 import { Dependencies } from "../models/dependency";
 import { DockerContainerInfo } from "../models/docker";
@@ -46,6 +46,5 @@ export const executeUpdates = async (updates: { name: string }[]) =>
 
 export const downloadService = async (
     repository: string,
-    use_docker?: boolean,
-    use_releases?: boolean
-) => api.post("/services/download", { repository, use_docker, use_releases });
+    method?: InstallMethod
+) => api.post("/services/download", { repository, method });

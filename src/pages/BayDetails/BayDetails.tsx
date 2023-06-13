@@ -94,7 +94,7 @@ export default function BayDetails() {
                             name: instance?.name,
                             status: instance?.status,
                             onPower: () => toggleInstance(uuid),
-                            use_docker: instance?.use_docker,
+                            method: instance?.install_method,
                         },
                     ]}
                 />
@@ -114,7 +114,7 @@ export default function BayDetails() {
                         symbol="terminal"
                         name="Logs"
                     />
-                    {instance?.use_docker && (
+                    {instance?.install_method === "docker" && (
                         <SidebarItem
                             to={`/bay/${uuid}/docker`}
                             symbol={<SiDocker size={20} />}
@@ -134,7 +134,7 @@ export default function BayDetails() {
                         symbol="tune"
                         name="Environment"
                     />
-                    {!instance?.use_docker && (
+                    {instance?.install_method !== "docker" && (
                         <SidebarItem
                             to={`/bay/${uuid}/dependencies`}
                             symbol="widgets"

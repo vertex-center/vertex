@@ -18,7 +18,7 @@ import Spacer from "../../components/Spacer/Spacer";
 import { SegmentedButtons } from "../../components/SegmentedButton";
 import Button from "../../components/Button/Button";
 import Popup from "../../components/Popup/Popup";
-import { Instances } from "../../models/instance";
+import { InstallMethod, Instances } from "../../models/instance";
 import Input from "../../components/Input/Input";
 import Progress from "../../components/Progress";
 
@@ -33,8 +33,7 @@ export default function Store() {
     const { data: instances, reload: reloadInstances } =
         useFetch<Instances>(getInstances);
 
-    const [useDocker, setUseDocker] = useState<boolean>(false);
-    const [useReleases, setUseReleases] = useState<boolean>(false);
+    const [installMethod, setInstallMethod] = useState<InstallMethod>();
 
     const [showInstallPopup, setShowInstallPopup] = useState<boolean>(false);
     const [showImportPopup, setShowImportPopup] = useState<boolean>(false);
@@ -54,21 +53,22 @@ export default function Store() {
     const openInstallPopup = (service: ServiceModel) => {
         setSelectedService(service);
         setShowInstallPopup(true);
-        setUseDocker(false);
-        setUseReleases(true);
+        setInstallMethod("script");
         setLoading(true);
         setPopupError(undefined);
         getService(service.repository)
             .then((res) => {
                 setSelectedService(res.data);
 
-                const { docker, script } = res.data.methods;
+                const { script, release, docker } = res.data.methods;
 
-                if (docker && !script) {
-                    setUseDocker(true);
-                } else if (!docker && script) {
-                    setUseDocker(false);
-                } else if (!docker && !script) {
+                if (script) {
+                    setInstallMethod("script");
+                } else if (release) {
+                    setInstallMethod("release");
+                } else if (docker) {
+                    setInstallMethod("docker");
+                } else {
                     setPopupError(
                         "This service doesn't have installation method."
                     );
@@ -90,11 +90,7 @@ export default function Store() {
         setDownloading((prev) => [...prev, { service }]);
         setShowInstallPopup(false);
 
-        downloadService(
-            `marketplace:${service.repository}`,
-            useDocker,
-            useReleases
-        )
+        downloadService(`marketplace:${service.repository}`, installMethod)
             .catch((error) => {
                 setError(error.message);
             })
@@ -122,9 +118,6 @@ export default function Store() {
         setRepository(e.target.value);
     };
 
-    const enableDockerChoice =
-        selectedService?.methods?.docker && selectedService?.methods?.script;
-
     const installPopup = (
         <Popup
             show={showInstallPopup}
@@ -134,59 +127,34 @@ export default function Store() {
             {loading && <Progress infinite />}
             <Error error={popupError} />
             {!loading && !popupError && (
-                <Vertical gap={12}>
-                    {enableDockerChoice && (
-                        <Horizontal alignItems="center" gap={12}>
-                            <Text>Use Docker?</Text>
-                            <Spacer />
-                            <SegmentedButtons
-                                value={useDocker}
-                                onChange={(v) => setUseDocker(v)}
-                                items={[
-                                    {
-                                        label: "Yes",
-                                        value: true,
-                                        rightSymbol: "check",
-                                    },
-                                    {
-                                        label: "No",
-                                        value: false,
-                                        rightSymbol: "close",
-                                    },
-                                ]}
-                            />
-                        </Horizontal>
-                    )}
-                    {(enableDockerChoice || useDocker === false) && (
-                        <Horizontal alignItems="center" gap={12}>
-                            <Text
-                                style={
-                                    useDocker !== false ? { opacity: 0.4 } : {}
-                                }
-                            >
-                                Download the precompiled release?
-                            </Text>
-                            <Spacer />
-                            <SegmentedButtons
-                                value={useReleases}
-                                disabled={useDocker !== false}
-                                onChange={(v) => setUseReleases(v)}
-                                items={[
-                                    {
-                                        label: "Yes",
-                                        value: true,
-                                        rightSymbol: "check",
-                                    },
-                                    {
-                                        label: "No",
-                                        value: false,
-                                        rightSymbol: "close",
-                                    },
-                                ]}
-                            />
-                        </Horizontal>
-                    )}
-                </Vertical>
+                <Horizontal alignItems="center" gap={12}>
+                    <Text>Installation method</Text>
+                    <Spacer />
+                    <SegmentedButtons
+                        value={installMethod}
+                        onChange={(v) => setInstallMethod(v)}
+                        items={[
+                            {
+                                label: "Script",
+                                value: "script",
+                                rightSymbol: "description",
+                                disabled: !selectedService?.methods?.script,
+                            },
+                            {
+                                label: "Release",
+                                value: "release",
+                                rightSymbol: "package",
+                                disabled: !selectedService?.methods?.release,
+                            },
+                            {
+                                label: "Docker",
+                                value: "docker",
+                                rightSymbol: "deployed_code",
+                                disabled: !selectedService?.methods?.docker,
+                            },
+                        ]}
+                    />
+                </Horizontal>
             )}
             <Horizontal gap={8}>
                 <Spacer />

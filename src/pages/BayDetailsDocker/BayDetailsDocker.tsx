@@ -26,7 +26,7 @@ export default function BayDetailsDocker() {
         });
     }, [uuid]);
 
-    if (instance?.use_docker) {
+    if (instance?.install_method === "docker") {
         label = <span className={styles.enabled}>enabled</span>;
     } else {
         label = <span className={styles.disabled}>disabled</span>;

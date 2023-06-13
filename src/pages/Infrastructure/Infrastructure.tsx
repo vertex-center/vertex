@@ -107,7 +107,7 @@ export default function Infrastructure() {
                                 count: instances.length > 1 ? i + 1 : undefined,
                                 to: `/bay/${instance.uuid}/`,
                                 onPower: () => toggleInstance(instance.uuid),
-                                use_docker: instance.use_docker,
+                                method: instance.install_method,
                             }))}
                         />
                     ))}

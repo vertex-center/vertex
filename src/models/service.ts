@@ -21,6 +21,10 @@ export type ServiceMethodScript = {
     dependencies?: { [name: string]: boolean };
 };
 
+export type ServiceMethodRelease = {
+    dependencies?: { [name: string]: boolean };
+};
+
 export type ServiceMethodDocker = {
     image?: string;
     dockerfile?: string;
@@ -30,6 +34,7 @@ export type ServiceMethodDocker = {
 
 export type ServiceMethods = {
     script?: ServiceMethodScript;
+    release?: ServiceMethodRelease;
     docker?: ServiceMethodDocker;
 };
 

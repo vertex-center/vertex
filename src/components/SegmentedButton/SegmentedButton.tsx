@@ -26,6 +26,7 @@ type Props = {
         label?: string;
         value: any;
         rightSymbol?: string;
+        disabled?: boolean;
     }[];
 };
 
@@ -41,7 +42,7 @@ export function SegmentedButtons(props: Props) {
                         value={item.value}
                         onClick={() => onChange(item.value)}
                         selected={value === item.value}
-                        disabled={disabled}
+                        disabled={disabled || item.disabled}
                         rightSymbol={item.rightSymbol}
                     >
                         {item.label ?? item.value}

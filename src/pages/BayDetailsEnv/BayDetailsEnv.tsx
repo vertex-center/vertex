@@ -1,12 +1,13 @@
 import { Fragment, useEffect, useState } from "react";
 import { Title } from "../../components/Text/Text";
-import { Env, EnvVariable, saveInstanceEnv } from "../../backend/backend";
+import { saveInstanceEnv } from "../../backend/backend";
 import { useParams } from "react-router-dom";
 import EnvVariableInput from "../../components/EnvVariableInput/EnvVariableInput";
 import Button from "../../components/Button/Button";
 import Symbol from "../../components/Symbol/Symbol";
 import { Horizontal } from "../../components/Layouts/Layouts";
 import useInstance from "../../hooks/useInstance";
+import { Env, EnvVariable } from "../../models/service";
 
 type Props = {};
 

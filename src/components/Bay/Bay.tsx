@@ -5,6 +5,7 @@ import { Horizontal, Vertical } from "../Layouts/Layouts";
 import { Link } from "react-router-dom";
 import Spacer from "../Spacer/Spacer";
 import { SiDocker } from "@icons-pack/react-simple-icons";
+import { InstallMethod } from "../../models/instance";
 
 type ButtonProps = {
     symbol: string;
@@ -124,7 +125,7 @@ type Props = {
         name: string;
         status: Status | string;
         count?: number;
-        use_docker?: boolean;
+        method?: InstallMethod;
 
         to?: string;
 
@@ -152,7 +153,7 @@ export default function Bay(props: Props) {
                         count={instance.count}
                         status={instance.status}
                         to={instance.to}
-                        dockerized={instance.use_docker}
+                        dockerized={instance.method === "docker"}
                     />
                     {instance?.onPower && (
                         <Button
