@@ -274,6 +274,16 @@ func (s *InstanceService) Install(repo string, useDocker *bool, useReleases *boo
 		return nil, err
 	}
 
+	env := map[string]string{}
+	for _, v := range instance.EnvDefinitions {
+		env[v.Name] = v.Default
+	}
+
+	err = s.instanceRepo.SaveEnv(instance, env)
+	if err != nil {
+		return nil, err
+	}
+
 	return instance, nil
 }
 
