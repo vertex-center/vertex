@@ -157,31 +157,35 @@ export default function Store() {
                             />
                         </Horizontal>
                     )}
-                    <Horizontal alignItems="center" gap={12}>
-                        <Text
-                            style={useDocker !== false ? { opacity: 0.4 } : {}}
-                        >
-                            Download the precompiled release?
-                        </Text>
-                        <Spacer />
-                        <SegmentedButtons
-                            value={useReleases}
-                            disabled={useDocker !== false}
-                            onChange={(v) => setUseReleases(v)}
-                            items={[
-                                {
-                                    label: "Yes",
-                                    value: true,
-                                    rightSymbol: "check",
-                                },
-                                {
-                                    label: "No",
-                                    value: false,
-                                    rightSymbol: "close",
-                                },
-                            ]}
-                        />
-                    </Horizontal>
+                    {(enableDockerChoice || useDocker === false) && (
+                        <Horizontal alignItems="center" gap={12}>
+                            <Text
+                                style={
+                                    useDocker !== false ? { opacity: 0.4 } : {}
+                                }
+                            >
+                                Download the precompiled release?
+                            </Text>
+                            <Spacer />
+                            <SegmentedButtons
+                                value={useReleases}
+                                disabled={useDocker !== false}
+                                onChange={(v) => setUseReleases(v)}
+                                items={[
+                                    {
+                                        label: "Yes",
+                                        value: true,
+                                        rightSymbol: "check",
+                                    },
+                                    {
+                                        label: "No",
+                                        value: false,
+                                        rightSymbol: "close",
+                                    },
+                                ]}
+                            />
+                        </Horizontal>
+                    )}
                 </Vertical>
             )}
             <Horizontal gap={8}>
