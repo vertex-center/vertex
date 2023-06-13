@@ -30,9 +30,8 @@ func handleServicesAvailable(c *gin.Context) {
 }
 
 type downloadBody struct {
-	Repository  string `json:"repository"`
-	UseDocker   *bool  `json:"use_docker,omitempty"`
-	UseReleases *bool  `json:"use_releases,omitempty"`
+	Repository string  `json:"repository"`
+	Method     *string `json:"method,omitempty"`
 }
 
 func handleServiceDownload(c *gin.Context) {
@@ -43,7 +42,7 @@ func handleServiceDownload(c *gin.Context) {
 		return
 	}
 
-	i, err := instanceService.Install(body.Repository, body.UseDocker, body.UseReleases)
+	i, err := instanceService.Install(body.Repository, body.Method)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

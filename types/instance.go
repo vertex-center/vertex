@@ -12,14 +12,16 @@ const (
 	InstanceStatusError    = "error"
 )
 
-type InstanceMetadata struct {
-	// UseDocker indicates if the instance should be launched with Docker.
-	// The default value is false.
-	UseDocker *bool `json:"use_docker,omitempty"`
+const (
+	InstanceInstallMethodScript  = "script"
+	InstanceInstallMethodRelease = "release"
+	InstanceInstallMethodDocker  = "docker"
+)
 
-	// UseReleases indicates if the instance should use precompiled releases when possible.
-	// The default value is false.
-	UseReleases *bool `json:"use_releases,omitempty"`
+type InstanceMetadata struct {
+	// Method indicates how the instance is installed.
+	// It can be by script, release or docker.
+	InstallMethod *string `json:"install_method,omitempty"`
 
 	// LaunchOnStartup indicates if the instance needs to start automatically when Vertex starts.
 	// The default value is true.
@@ -78,5 +80,5 @@ func (i *Instance) IsRunning() bool {
 }
 
 func (i *Instance) IsDockerized() bool {
-	return i.InstanceMetadata.UseDocker != nil && *i.InstanceMetadata.UseDocker
+	return i.InstanceMetadata.InstallMethod != nil && *i.InstanceMetadata.InstallMethod == InstanceInstallMethodDocker
 }

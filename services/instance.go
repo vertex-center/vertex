@@ -235,11 +235,11 @@ func (s *InstanceService) WriteEnv(uuid uuid.UUID, environment map[string]string
 	return s.instanceRepo.SaveEnv(i, environment)
 }
 
-func (s *InstanceService) Install(repo string, useDocker *bool, useReleases *bool) (*types.Instance, error) {
+func (s *InstanceService) Install(repo string, method *string) (*types.Instance, error) {
 	id := uuid.New()
 	basePath := path.Join(storage.PathInstances, id.String())
 
-	forceClone := (useDocker != nil && *useDocker) || (useReleases == nil || !*useReleases)
+	forceClone := method != nil && (*method == types.InstanceInstallMethodDocker || *method == types.InstanceInstallMethodScript)
 
 	var err error
 	if strings.HasPrefix(repo, "marketplace:") {
@@ -249,7 +249,7 @@ func (s *InstanceService) Install(repo string, useDocker *bool, useReleases *boo
 	} else if strings.HasPrefix(repo, "git:") {
 		err = s.Download(basePath, repo, forceClone)
 	} else {
-		return nil, fmt.Errorf("this protocol is not supported")
+		err = fmt.Errorf("this protocol is not supported")
 	}
 
 	if err != nil {
@@ -266,8 +266,7 @@ func (s *InstanceService) Install(repo string, useDocker *bool, useReleases *boo
 		return nil, err
 	}
 
-	instance.InstanceMetadata.UseDocker = useDocker
-	instance.InstanceMetadata.UseReleases = useReleases
+	instance.InstanceMetadata.InstallMethod = method
 
 	err = s.instanceRepo.SaveMetadata(instance)
 	if err != nil {

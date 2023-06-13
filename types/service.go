@@ -18,6 +18,10 @@ type ServiceMethodScript struct {
 	Dependencies *map[string]bool `json:"dependencies,omitempty"`
 }
 
+type ServiceMethodRelease struct {
+	Dependencies *map[string]bool `json:"dependencies,omitempty"`
+}
+
 type ServiceMethodDocker struct {
 	Image      *string `json:"image,omitempty"`
 	Dockerfile *string `json:"dockerfile,omitempty"`
@@ -29,8 +33,9 @@ type ServiceMethodDocker struct {
 }
 
 type ServiceMethods struct {
-	Script *ServiceMethodScript `json:"script,omitempty"`
-	Docker *ServiceMethodDocker `json:"docker,omitempty"`
+	Script  *ServiceMethodScript  `json:"script,omitempty"`
+	Release *ServiceMethodRelease `json:"release,omitempty"`
+	Docker  *ServiceMethodDocker  `json:"docker,omitempty"`
 }
 
 type URL struct {
