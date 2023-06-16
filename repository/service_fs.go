@@ -49,8 +49,6 @@ func (r *ServiceFSRepository) Get(repo string) (types.Service, error) {
 		return types.Service{}, errors.New("this repo is not supported")
 	}
 
-	println(repo)
-
 	res, err := http.Get(fmt.Sprintf("https://raw.githubusercontent.com/%s/main/.vertex/service.json", repo))
 	if err != nil {
 		return types.Service{}, err
