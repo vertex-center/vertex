@@ -40,9 +40,9 @@ export function Dependency(props: Props) {
     const install = () => {
         setInstalling(true);
         installPackages([{ name, package_manager: packageManager }])
-            .then((data: any) => {
-                if (data?.command) {
-                    onNeedsSudo(data?.command, packageManager);
+            .then((res) => {
+                if (res.data?.command) {
+                    onNeedsSudo(res.data?.command, packageManager);
                 } else {
                     onChange();
                 }
