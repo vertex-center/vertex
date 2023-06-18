@@ -14,10 +14,6 @@ func NewServiceService(serviceRepo types.ServiceRepository) ServiceService {
 	}
 }
 
-func (s *ServiceService) Get(repo string) (types.Service, error) {
-	return s.serviceRepo.Get(repo)
-}
-
 func (s *ServiceService) ListAvailable() []types.Service {
 	return s.serviceRepo.GetAll()
 }

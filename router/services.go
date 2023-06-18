@@ -8,21 +8,8 @@ import (
 )
 
 func addServicesRoutes(r *gin.RouterGroup) {
-	r.GET("/", handleGetService)
 	r.GET("/available", handleServicesAvailable)
-	r.POST("/download", handleServiceDownload)
-}
-
-func handleGetService(c *gin.Context) {
-	repo := c.Query("repository")
-
-	service, err := serviceService.Get(repo)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, service)
+	r.POST("/install", handleServiceInstall)
 }
 
 func handleServicesAvailable(c *gin.Context) {
@@ -30,11 +17,11 @@ func handleServicesAvailable(c *gin.Context) {
 }
 
 type downloadBody struct {
-	Repository string  `json:"repository"`
-	Method     *string `json:"method,omitempty"`
+	Method    string `json:"method"`
+	ServiceID string `json:"service_id"`
 }
 
-func handleServiceDownload(c *gin.Context) {
+func handleServiceInstall(c *gin.Context) {
 	var body downloadBody
 	err := c.BindJSON(&body)
 	if err != nil {
@@ -42,7 +29,7 @@ func handleServiceDownload(c *gin.Context) {
 		return
 	}
 
-	i, err := instanceService.Install(body.Repository, body.Method)
+	i, err := instanceService.Install(body.ServiceID, body.Method)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return

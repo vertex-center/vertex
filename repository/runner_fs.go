@@ -36,8 +36,8 @@ func (r RunnerFSRepository) Start(instance *types.Instance, onLog func(msg strin
 	}
 
 	dir := r.getPath(*instance)
-	executable := instance.ID
-	command := "./" + instance.ID
+	executable := instance.Methods.Script.Filename
+	command := "./" + executable
 
 	// Try to find the executable
 	// For a service of ID=vertex-id, the executable can be:
@@ -45,13 +45,7 @@ func (r RunnerFSRepository) Start(instance *types.Instance, onLog func(msg strin
 	// - script-filename.sh
 	_, err := os.Stat(path.Join(dir, executable))
 	if errors.Is(err, os.ErrNotExist) {
-		_, err = os.Stat(path.Join(dir, instance.Methods.Script.Filename))
-		if errors.Is(err, os.ErrNotExist) {
-			return fmt.Errorf("executables %s and %s were not found", instance.ID, instance.Methods.Script.Filename)
-		} else if err != nil {
-			return err
-		}
-		command = fmt.Sprintf("./%s", instance.Methods.Script.Filename)
+		return fmt.Errorf("executable %s were not found", command)
 	} else if err != nil {
 		return err
 	}
@@ -60,6 +54,20 @@ func (r RunnerFSRepository) Start(instance *types.Instance, onLog func(msg strin
 
 	cmd := r.commands[instance.UUID]
 	cmd.Dir = dir
+	cmd.Env = os.Environ()
+
+	envFile, err := os.Open(path.Join(storage.PathInstances, instance.UUID.String(), ".env"))
+	if err != nil {
+		return err
+	}
+
+	envScanner := bufio.NewScanner(envFile)
+	for envScanner.Scan() {
+		if envScanner.Text() == "" {
+			continue
+		}
+		cmd.Env = append(cmd.Env, envScanner.Text())
+	}
 
 	cmd.Stdin = os.Stdin
 

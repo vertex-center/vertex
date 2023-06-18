@@ -72,7 +72,7 @@ func Create(about About) *gin.Engine {
 	packageRepo = repository.NewPackageFSRepository(nil)
 	serviceRepo = repository.NewServiceFSRepository(nil)
 
-	instanceService = services.NewInstanceService(&instanceRepo, &runnerDockerRepo, &runnerFSRepo, &instanceLogsRepo, &eventInMemoryRepo)
+	instanceService = services.NewInstanceService(&serviceRepo, &instanceRepo, &runnerDockerRepo, &runnerFSRepo, &instanceLogsRepo, &eventInMemoryRepo)
 	packageService = services.NewPackageService(&packageRepo)
 	serviceService = services.NewServiceService(&serviceRepo)
 	updateService = services.NewUpdateDependenciesService(about.Version)

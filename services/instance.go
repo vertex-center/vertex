@@ -12,17 +12,20 @@ import (
 	"github.com/vertex-center/vertex/pkg/logger"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
+	"gopkg.in/yaml.v2"
 )
 
 var (
-	ErrContainerStillRunning  = errors.New("the container is still running")
-	ErrInstanceAlreadyRunning = errors.New("the instance is already running")
-	ErrInstanceNotRunning     = errors.New("the instance is not running")
+	ErrContainerStillRunning      = errors.New("the container is still running")
+	ErrInstanceAlreadyRunning     = errors.New("the instance is already running")
+	ErrInstanceNotRunning         = errors.New("the instance is not running")
+	ErrInstallMethodDoesNotExists = errors.New("this install method doesn't exist for this service")
 )
 
 type InstanceService struct {
 	uuid uuid.UUID
 
+	serviceRepo  types.ServiceRepository
 	instanceRepo types.InstanceRepository
 	logsRepo     types.InstanceLogsRepository
 	eventsRepo   types.EventRepository
@@ -31,10 +34,11 @@ type InstanceService struct {
 	fsRunnerRepo     types.RunnerRepository
 }
 
-func NewInstanceService(instanceRepo types.InstanceRepository, dockerRunnerRepo types.RunnerRepository, fsRunnerRepo types.RunnerRepository, instanceLogsRepo types.InstanceLogsRepository, eventRepo types.EventRepository) InstanceService {
+func NewInstanceService(serviceRepo types.ServiceRepository, instanceRepo types.InstanceRepository, dockerRunnerRepo types.RunnerRepository, fsRunnerRepo types.RunnerRepository, instanceLogsRepo types.InstanceLogsRepository, eventRepo types.EventRepository) InstanceService {
 	s := InstanceService{
 		uuid: uuid.New(),
 
+		serviceRepo:      serviceRepo,
 		instanceRepo:     instanceRepo,
 		logsRepo:         instanceLogsRepo,
 		eventsRepo:       eventRepo,
@@ -235,23 +239,43 @@ func (s *InstanceService) WriteEnv(uuid uuid.UUID, environment map[string]string
 	return s.instanceRepo.SaveEnv(i, environment)
 }
 
-func (s *InstanceService) Install(repo string, method *string) (*types.Instance, error) {
+func (s *InstanceService) Install(serviceID string, method string) (*types.Instance, error) {
 	id := uuid.New()
-	basePath := path.Join(storage.PathInstances, id.String())
+	dir := path.Join(storage.PathInstances, id.String())
 
-	forceClone := method != nil && (*method == types.InstanceInstallMethodDocker || *method == types.InstanceInstallMethodScript)
-
-	var err error
-	if strings.HasPrefix(repo, "marketplace:") {
-		err = s.Download(basePath, repo, forceClone)
-	} else if strings.HasPrefix(repo, "localstorage:") {
-		err = s.Symlink(basePath, repo)
-	} else if strings.HasPrefix(repo, "git:") {
-		err = s.Download(basePath, repo, forceClone)
-	} else {
-		err = fmt.Errorf("this protocol is not supported")
+	service, err := s.serviceRepo.Get(serviceID)
+	if err != nil {
+		return nil, err
 	}
 
+	err = os.Mkdir(dir, os.ModePerm)
+	if err != nil {
+		return nil, err
+	}
+
+	if method == types.InstanceInstallMethodScript {
+		err = s.PreInstallForScript(service, dir)
+	} else if method == types.InstanceInstallMethodRelease {
+		err = s.PreInstallForRelease(service, dir)
+	} else if method == types.InstanceInstallMethodDocker {
+		err = s.PreInstallForDocker(service, dir)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	err = os.Mkdir(path.Join(dir, ".vertex"), os.ModePerm)
+	if err != nil {
+		return nil, err
+	}
+
+	serviceYaml, err := yaml.Marshal(service)
+	if err != nil {
+
+		return nil, err
+	}
+
+	err = os.WriteFile(path.Join(dir, ".vertex", "service.yml"), serviceYaml, os.ModePerm)
 	if err != nil {
 		return nil, err
 	}
@@ -266,7 +290,7 @@ func (s *InstanceService) Install(repo string, method *string) (*types.Instance,
 		return nil, err
 	}
 
-	instance.InstanceMetadata.InstallMethod = method
+	instance.InstanceMetadata.InstallMethod = &method
 
 	err = s.instanceRepo.SaveMetadata(instance)
 	if err != nil {
@@ -323,27 +347,21 @@ func (s *InstanceService) GetLatestLogs(uuid uuid.UUID) ([]types.LogLine, error)
 	return s.logsRepo.LoadBuffer(uuid)
 }
 
-func (s *InstanceService) Download(dest string, repo string, forceClone bool) error {
-	var err error
-
-	if forceClone {
-		logger.Log("force-clone enabled.").Print()
-	} else {
-		logger.Log("force-clone disabled. try to download the releases first").Print()
-		err = downloadFromReleases(dest, repo)
-	}
-
-	if forceClone || errors.Is(err, storage.ErrNoReleasesPublished) {
-		split := strings.Split(repo, ":")
-		repo = "git:https://" + split[1]
-
-		err = downloadFromGit(dest, repo)
-		if err != nil {
-			return err
-		}
-	}
-
+func (s *InstanceService) CloneRepository(dir string, url string) error {
+	_, err := git.PlainClone(dir, false, &git.CloneOptions{
+		URL:      url,
+		Progress: os.Stdout,
+	})
 	return err
+}
+
+func (s *InstanceService) DownloadRelease(dir string, repo string) error {
+	split := strings.Split(repo, "/")
+
+	owner := split[1]
+	repository := split[2]
+
+	return storage.DownloadLatestGithubRelease(owner, repository, dir)
 }
 
 func (s *InstanceService) Symlink(path string, repo string) error {
@@ -378,24 +396,6 @@ func (s *InstanceService) setStatus(instance *types.Instance, status string) {
 		InstanceUUID: instance.UUID,
 		Status:       status,
 	})
-}
-
-func downloadFromReleases(dest string, repo string) error {
-	split := strings.Split(repo, "/")
-
-	owner := split[1]
-	repository := split[2]
-
-	return storage.DownloadLatestGithubRelease(owner, repository, dest)
-}
-
-func downloadFromGit(path string, repo string) error {
-	url := strings.SplitN(repo, ":", 2)[1]
-	_, err := git.PlainClone(path, false, &git.CloneOptions{
-		URL:      url,
-		Progress: os.Stdout,
-	})
-	return err
 }
 
 func (s *InstanceService) reload() {
@@ -437,5 +437,45 @@ func (s *InstanceService) load(uuid uuid.UUID) error {
 		return err
 	}
 
+	return nil
+}
+
+func (s *InstanceService) PreInstallForScript(service types.Service, dir string) error {
+	if service.Methods.Script == nil {
+		return ErrInstallMethodDoesNotExists
+	}
+
+	if service.Methods.Script.Clone != nil {
+		err := s.CloneRepository(dir, service.Methods.Script.Clone.Repository)
+		if err != nil {
+			return err
+		}
+	}
+
+	script, err := s.serviceRepo.GetScript(service.ID)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(path.Join(dir, service.Methods.Script.Filename), script, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *InstanceService) PreInstallForRelease(service types.Service, dir string) error {
+	if service.Methods.Release == nil {
+		return ErrInstallMethodDoesNotExists
+	}
+
+	return nil
+}
+
+func (s *InstanceService) PreInstallForDocker(service types.Service, dir string) error {
+	if service.Methods.Docker == nil {
+		return ErrInstallMethodDoesNotExists
+	}
 	return nil
 }

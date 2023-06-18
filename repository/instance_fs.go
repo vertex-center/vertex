@@ -14,6 +14,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/logger"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
+	"gopkg.in/yaml.v2"
 )
 
 var (
@@ -108,15 +109,15 @@ func (r *InstanceFSRepository) LoadMetadata(i *types.Instance) error {
 }
 
 func (r *InstanceFSRepository) ReadService(instancePath string) (types.Service, error) {
-	data, err := os.ReadFile(path.Join(instancePath, ".vertex", "service.json"))
+	data, err := os.ReadFile(path.Join(instancePath, ".vertex", "service.yml"))
 	if err != nil {
-		logger.Warn("service has no '.vertex/service.json' file").
+		logger.Warn("'.vertex/service.yml' file not found").
 			AddKeyValue("path", path.Dir(instancePath)).
 			Print()
 	}
 
 	var service types.Service
-	err = json.Unmarshal(data, &service)
+	err = yaml.Unmarshal(data, &service)
 	return service, err
 }
 

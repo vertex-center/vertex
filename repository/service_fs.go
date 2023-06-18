@@ -1,18 +1,15 @@
 package repository
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/vertex-center/vertex/pkg/logger"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
+	"gopkg.in/yaml.v2"
 )
 
 type ServiceFSRepository struct {
@@ -42,31 +39,27 @@ func NewServiceFSRepository(params *ServiceRepositoryParams) ServiceFSRepository
 	return repo
 }
 
-func (r *ServiceFSRepository) Get(repo string) (types.Service, error) {
-	if strings.HasPrefix(repo, "github.com") {
-		repo = strings.TrimPrefix(repo, "github.com/")
-	} else {
-		return types.Service{}, errors.New("this repo is not supported")
+func (r *ServiceFSRepository) Get(id string) (types.Service, error) {
+	for _, service := range r.services {
+		if service.ID == id {
+			return service, nil
+		}
 	}
 
-	res, err := http.Get(fmt.Sprintf("https://raw.githubusercontent.com/%s/main/.vertex/service.json", repo))
+	return types.Service{}, types.ErrServiceNotFound
+}
+
+func (r *ServiceFSRepository) GetScript(id string) ([]byte, error) {
+	service, err := r.Get(id)
 	if err != nil {
-		return types.Service{}, err
-	}
-	defer res.Body.Close()
-
-	content, err := io.ReadAll(res.Body)
-	if err != nil {
-		return types.Service{}, err
+		return nil, err
 	}
 
-	var service types.Service
-	err = json.Unmarshal(content, &service)
-	if err != nil {
-		return types.Service{}, err
+	if service.Methods.Script == nil {
+		return nil, errors.New("the service doesn't have a script method")
 	}
 
-	return service, nil
+	return os.ReadFile(path.Join(r.servicesPath, "services", id, service.Methods.Script.Filename))
 }
 
 func (r *ServiceFSRepository) GetAll() []types.Service {
@@ -74,20 +67,33 @@ func (r *ServiceFSRepository) GetAll() []types.Service {
 }
 
 func (r *ServiceFSRepository) reload() error {
-	file, err := os.ReadFile(path.Join(r.servicesPath, "services.json"))
-	if err != nil {
-		return err
-	}
-
-	var availableMap map[string]types.Service
-	err = json.Unmarshal(file, &availableMap)
-	if err != nil {
-		return err
-	}
+	servicesPath := path.Join(r.servicesPath, "services")
 
 	r.services = []types.Service{}
-	for key, service := range availableMap {
-		service.ID = key
+
+	entries, err := os.ReadDir(servicesPath)
+	if err != nil {
+		return err
+	}
+
+	for _, dir := range entries {
+		if !dir.IsDir() {
+			continue
+		}
+
+		servicePath := path.Join(servicesPath, dir.Name(), "service.yml")
+
+		file, err := os.ReadFile(servicePath)
+		if err != nil {
+			return err
+		}
+
+		var service types.Service
+		err = yaml.Unmarshal(file, &service)
+		if err != nil {
+			return err
+		}
+
 		r.services = append(r.services, service)
 	}
 
