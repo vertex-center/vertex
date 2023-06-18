@@ -5,20 +5,17 @@ import Loading from "../../components/Loading/Loading";
 import Symbol from "../../components/Symbol/Symbol";
 
 import styles from "./SettingsAbout.module.sass";
-import { Error } from "../../components/Error/Error";
 import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import { useFetch } from "../../hooks/useFetch";
 import { About } from "../../models/about";
 
-type Props = {};
-
-export default function SettingsAbout(props: Props) {
+export default function SettingsAbout() {
     const { data: about, loading, error } = useFetch<About>(getAbout);
 
     return (
         <Fragment>
             <Title>About</Title>
-            {error && <Error error={error} />}
+            {/*{error && <Error error={error} />}*/}
             {loading && !error && <Loading />}
             {!loading && (
                 <Vertical gap={4}>

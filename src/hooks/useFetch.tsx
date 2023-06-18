@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { AxiosError } from "axios";
 
 export function useFetch<T>(call: any) {
-    const [data, setData] = useState<T>();
-    const [error, setError] = useState();
+    const [data, setData] = useState<T>(undefined);
+    const [error, setError] = useState<AxiosError>(undefined);
     const [loading, setLoading] = useState<boolean>(true);
 
     const reload = async () => {
