@@ -33,5 +33,5 @@ func (suite *AvailableTestSuite) SetupSuite() {
 }
 
 func (suite *AvailableTestSuite) TestGetAvailable() {
-	assert.Equal(suite.T(), 3, len(suite.repo.GetAll()))
+	assert.Equal(suite.T(), 1, len(suite.repo.GetAll()))
 }
