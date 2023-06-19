@@ -13,7 +13,8 @@ type InstallServiceParams = {
 };
 
 const api = axios.create({
-    baseURL: "http://localhost:6130/api",
+    // @ts-ignore
+    baseURL: `${window.apiURL}/api`,
 });
 
 export const getAbout = async () => api.get<About>("/about");
