@@ -62,6 +62,7 @@ func Create(about About) *gin.Engine {
 			return l.String()
 		}),
 	)
+
 	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.PathClient, "dist"), true)))
 
 	runnerDockerRepo = repository.NewRunnerDockerRepository()

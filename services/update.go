@@ -14,6 +14,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/google/go-github/v50/github"
+	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/logger"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
@@ -248,6 +249,13 @@ func (d *VertexClientDependency) InstallUpdate() error {
 			}
 
 			err = os.Remove(path.Join(storage.PathClient, "temp.zip"))
+			if err != nil {
+				return err
+			}
+
+			configJsContent := fmt.Sprintf("window.apiURL = \"http://%s\";", config.Current.Host)
+
+			err = os.WriteFile(path.Join(storage.PathClient, "dist", "config.js"), []byte(configJsContent), os.ModePerm)
 			if err != nil {
 				return err
 			}

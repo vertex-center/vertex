@@ -1,11 +1,13 @@
 package config
 
+var Current = New()
+
 type Config struct {
-	Port string `json:"port"`
+	Host string `json:"host"`
 }
 
 func New() Config {
 	return Config{
-		Port: "6130",
+		Host: "127.0.0.1:6130",
 	}
 }

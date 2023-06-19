@@ -28,8 +28,6 @@ func main() {
 
 	parseArgs()
 
-	cfg := config.New()
-
 	err := os.MkdirAll(storage.PathInstances, os.ModePerm)
 	if err != nil && !os.IsExist(err) {
 		logger.Error(fmt.Errorf("failed to create directory: %v", err)).
@@ -55,7 +53,7 @@ func main() {
 
 	logger.Log("Vertex started.").Print()
 
-	err = r.Run(fmt.Sprintf(":%s", cfg.Port))
+	err = r.Run(config.Current.Host)
 	if err != nil {
 		logger.Error(fmt.Errorf("error while starting server: %v", err)).Print()
 	}
