@@ -51,14 +51,22 @@ func main() {
 	})
 	defer router.Unload()
 
-	logger.Log("Vertex started.").Print()
+	url := fmt.Sprintf("http://%s", config.Current.Host)
+
+	println()
+	println("-- Vertex Client :: ", url)
+	println()
+
+	logger.Log("Vertex started").
+		AddKeyValue("url", url).
+		Print()
 
 	err = r.Run(config.Current.Host)
 	if err != nil {
 		logger.Error(fmt.Errorf("error while starting server: %v", err)).Print()
 	}
 
-	logger.Log("Vertex stopped.").Print()
+	logger.Log("Vertex stopped").Print()
 }
 
 func parseArgs() {
