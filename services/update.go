@@ -253,9 +253,7 @@ func (d *VertexClientDependency) InstallUpdate() error {
 				return err
 			}
 
-			configJsContent := fmt.Sprintf("window.apiURL = \"http://%s\";", config.Current.Host)
-
-			err = os.WriteFile(path.Join(storage.PathClient, "dist", "config.js"), []byte(configJsContent), os.ModePerm)
+			err = config.Current.Apply()
 			if err != nil {
 				return err
 			}

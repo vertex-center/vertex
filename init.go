@@ -44,6 +44,12 @@ func main() {
 		return
 	}
 
+	err = config.Current.Apply()
+	if err != nil {
+		logger.Error(fmt.Errorf("failed to apply the current configuration: %v", err)).Print()
+		return
+	}
+
 	r := router.Create(router.About{
 		Version: version,
 		Commit:  commit,
@@ -53,15 +59,13 @@ func main() {
 
 	url := fmt.Sprintf("http://%s", config.Current.Host)
 
-	println()
-	println("-- Vertex Client :: ", url)
-	println()
+	fmt.Printf("\n-- Vertex Client :: %s\n\n", url)
 
 	logger.Log("Vertex started").
 		AddKeyValue("url", url).
 		Print()
 
-	err = r.Run(config.Current.Host)
+	err = r.Run(fmt.Sprintf(":%s", config.Current.Port))
 	if err != nil {
 		logger.Error(fmt.Errorf("error while starting server: %v", err)).Print()
 	}
@@ -75,7 +79,11 @@ func parseArgs() {
 	flagDate := flag.Bool("date", false, "Print the release date")
 	flagCommit := flag.Bool("commit", false, "Print the commit hash")
 
+	flagPort := flag.String("port", config.Current.Port, "The Vertex port")
+	flagHost := flag.String("host", config.Current.Host, "The Vertex access url")
+
 	flag.Parse()
+
 	if *flagVersion || *flagV {
 		fmt.Println(version)
 		os.Exit(0)
@@ -88,6 +96,8 @@ func parseArgs() {
 		fmt.Println(commit)
 		os.Exit(0)
 	}
+	config.Current.Host = *flagHost
+	config.Current.Port = *flagPort
 }
 
 func setupDependencies() error {
