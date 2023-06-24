@@ -10,6 +10,7 @@ import useInstance from "../../hooks/useInstance";
 import Progress from "../../components/Progress";
 import Symbol from "../../components/Symbol/Symbol";
 import ToggleButton from "../../components/ToggleButton/ToggleButton";
+import Input from "../../components/Input/Input";
 
 type Props = {};
 
@@ -18,7 +19,8 @@ export default function BayDetailsSettings(props: Props) {
 
     const { instance } = useInstance(uuid);
 
-    const [autostart, setAutostart] = useState<boolean>();
+    const [displayName, setDisplayName] = useState<string>();
+    const [launchOnStartup, setLaunchOnStartup] = useState<boolean>();
 
     // undefined = not saved AND never modified
     const [saved, setSaved] = useState<boolean>(undefined);
@@ -26,13 +28,17 @@ export default function BayDetailsSettings(props: Props) {
     const [error, setError] = useState<string>();
 
     useEffect(() => {
-        console.log(instance);
-        setAutostart(instance?.launch_on_startup ?? true);
+        if (!instance) return;
+        setLaunchOnStartup(instance?.launch_on_startup ?? true);
+        setDisplayName(instance?.display_name ?? instance?.name);
     }, [instance]);
 
     const save = () => {
         setUploading(true);
-        patchInstance(uuid, { launch_on_startup: autostart })
+        patchInstance(uuid, {
+            launch_on_startup: launchOnStartup,
+            display_name: displayName,
+        })
             .then(() => {
                 setSaved(true);
             })
@@ -47,13 +53,23 @@ export default function BayDetailsSettings(props: Props) {
     return (
         <Fragment>
             <Title>Settings</Title>
+            <Input
+                label="Instance name"
+                description="The custom name of your choice for this service"
+                value={displayName}
+                onChange={(e: any) => {
+                    setDisplayName(e.target.value);
+                    setSaved(false);
+                }}
+                disabled={displayName === undefined}
+            />
             <Horizontal alignItems="center">
                 <Text>Launch on Startup</Text>
                 <Spacer />
                 <ToggleButton
-                    value={autostart}
+                    value={launchOnStartup}
                     onChange={(v) => {
-                        setAutostart(v);
+                        setLaunchOnStartup(v);
                         setSaved(false);
                     }}
                 />

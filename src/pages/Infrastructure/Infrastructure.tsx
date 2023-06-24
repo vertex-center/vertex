@@ -102,7 +102,7 @@ export default function Infrastructure() {
                             key={i}
                             showCables
                             instances={instances.map((instance, i) => ({
-                                name: instance.name,
+                                name: instance?.display_name ?? instance.name,
                                 status: instance.status,
                                 count: instances.length > 1 ? i + 1 : undefined,
                                 to: `/bay/${instance.uuid}/`,

@@ -91,7 +91,7 @@ export default function BayDetails() {
                     showCables
                     instances={[
                         {
-                            name: instance?.name,
+                            name: instance?.display_name ?? instance?.name,
                             status: instance?.status,
                             onPower: () => toggleInstance(uuid),
                             method: instance?.install_method,
@@ -158,10 +158,13 @@ export default function BayDetails() {
                     <Outlet />
                 </div>
                 <Popup show={showDeletePopup} onDismiss={dismissDeletePopup}>
-                    <Title>Delete {instance?.name}?</Title>
+                    <Title>
+                        Delete {instance?.display_name ?? instance?.name}?
+                    </Title>
                     <Text>
-                        Are you sure you want to delete {instance?.name}? All
-                        data will be permanently deleted.
+                        Are you sure you want to delete{" "}
+                        {instance?.display_name ?? instance?.name}? All data
+                        will be permanently deleted.
                     </Text>
                     {deleting && <Progress infinite />}
                     {error && <Error error={error} />}

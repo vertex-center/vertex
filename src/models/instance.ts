@@ -7,8 +7,8 @@ export type Instance = Service & {
     status: string;
     env: { [key: string]: string };
     install_method?: InstallMethod;
-    use_releases?: boolean;
     launch_on_startup?: boolean;
+    display_name?: string;
 };
 
 export type Instances = { [uuid: string]: Instance };
