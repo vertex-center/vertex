@@ -26,6 +26,9 @@ type InstanceMetadata struct {
 	// LaunchOnStartup indicates if the instance needs to start automatically when Vertex starts.
 	// The default value is true.
 	LaunchOnStartup *bool `json:"launch_on_startup,omitempty"`
+
+	// DisplayName is a custom name for the instance.
+	DisplayName *string `json:"display_name,omitempty"`
 }
 
 type EnvVariables map[string]string

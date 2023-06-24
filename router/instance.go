@@ -72,7 +72,8 @@ func handleDeleteInstance(c *gin.Context) {
 }
 
 type handlePatchInstanceBody struct {
-	LaunchOnStartup *bool `json:"launch_on_startup"`
+	LaunchOnStartup *bool   `json:"launch_on_startup,omitempty"`
+	DisplayName     *string `json:"display_name,omitempty"`
 }
 
 func handlePatchInstance(c *gin.Context) {
@@ -87,6 +88,14 @@ func handlePatchInstance(c *gin.Context) {
 
 	if body.LaunchOnStartup != nil {
 		err = instanceService.SetLaunchOnStartup(*uid, *body.LaunchOnStartup)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+	}
+
+	if body.DisplayName != nil {
+		err = instanceService.SetDisplayName(*uid, *body.DisplayName)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return

@@ -317,12 +317,17 @@ func (s *InstanceService) SetLaunchOnStartup(uuid uuid.UUID, value bool) error {
 	}
 
 	i.InstanceMetadata.LaunchOnStartup = &value
-	err = s.instanceRepo.SaveMetadata(i)
+	return s.instanceRepo.SaveMetadata(i)
+}
+
+func (s *InstanceService) SetDisplayName(uuid uuid.UUID, value string) error {
+	i, err := s.Get(uuid)
 	if err != nil {
 		return err
 	}
 
-	return err
+	i.InstanceMetadata.DisplayName = &value
+	return s.instanceRepo.SaveMetadata(i)
 }
 
 func (s *InstanceService) GetDockerContainerInfo(uuid uuid.UUID) (map[string]any, error) {
