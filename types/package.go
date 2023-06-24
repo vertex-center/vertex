@@ -4,6 +4,7 @@ const (
 	PmNone   = "sources"
 	PmAptGet = "apt-get"
 	PmBrew   = "brew"
+	PmNpm    = "npm"
 	PmPacman = "pacman"
 	PmSnap   = "snap"
 )

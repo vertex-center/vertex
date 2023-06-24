@@ -61,6 +61,11 @@ func (s *PackageService) InstallationCommand(p *types.Package, pm string) (Insta
 			Cmd:  "brew install " + packageName,
 			Sudo: false,
 		}, nil
+	case types.PmNpm:
+		return InstallCmd{
+			Cmd:  "npm install -g " + packageName,
+			Sudo: false,
+		}, nil
 	case types.PmPacman:
 		return InstallCmd{
 			Cmd:  "sudo pacman -S --noconfirm " + packageName,
