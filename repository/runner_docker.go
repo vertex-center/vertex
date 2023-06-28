@@ -131,9 +131,9 @@ func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg s
 		setStatus(types.InstanceStatusError)
 		return err
 	}
-
 	setStatus(types.InstanceStatusRunning)
 
+	r.watchForLogs(id, instance, onLog)
 	r.watchForStatusChange(id, instance, setStatus)
 
 	return nil
@@ -255,6 +255,9 @@ func (r RunnerDockerRepository) createContainer(imageName string, containerName 
 	config := container.Config{
 		Image:        imageName,
 		ExposedPorts: exposedPorts,
+		Tty:          true,
+		AttachStdout: true,
+		AttachStderr: true,
 	}
 
 	hostConfig := container.HostConfig{
@@ -290,5 +293,29 @@ func (r RunnerDockerRepository) watchForStatusChange(containerID string, instanc
 
 			setStatus(types.InstanceStatusOff)
 		}
+	}()
+}
+
+func (r RunnerDockerRepository) watchForLogs(containerID string, instance *types.Instance, onLog func(msg string)) {
+	go func() {
+		logs, err := r.cli.ContainerLogs(context.Background(), containerID, dockertypes.ContainerLogsOptions{
+			ShowStdout: true,
+			ShowStderr: true,
+			Timestamps: false,
+			Follow:     true,
+			Tail:       "0",
+		})
+		if err != nil {
+			logger.Error(err).
+				AddKeyValue("uuid", instance.UUID).
+				Print()
+		}
+
+		scanner := bufio.NewScanner(logs)
+		for scanner.Scan() {
+			onLog(scanner.Text())
+		}
+		_ = logs.Close()
+		logger.Warn("CLOSED").Print()
 	}()
 }
