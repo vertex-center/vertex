@@ -133,6 +133,9 @@ func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg s
 	}
 
 	setStatus(types.InstanceStatusRunning)
+
+	r.watchForStatusChange(id, instance, setStatus)
+
 	return nil
 }
 
@@ -266,4 +269,26 @@ func (r RunnerDockerRepository) createContainer(imageName string, containerName 
 			Print()
 	}
 	return res.ID, err
+}
+
+func (r RunnerDockerRepository) watchForStatusChange(containerID string, instance *types.Instance, setStatus func(status string)) {
+	go func() {
+		resChan, errChan := r.cli.ContainerWait(context.Background(), containerID, container.WaitConditionNotRunning)
+
+		select {
+		case err := <-errChan:
+			if err != nil {
+				logger.Error(err).
+					AddKeyValue("uuid", instance.UUID).
+					Print()
+			}
+		case status := <-resChan:
+			logger.Log("docker container exited with status").
+				AddKeyValue("uuid", instance.UUID).
+				AddKeyValue("status", status.StatusCode).
+				Print()
+
+			setStatus(types.InstanceStatusOff)
+		}
+	}()
 }
