@@ -38,6 +38,7 @@ type Status =
     | "building"
     | "starting"
     | "running"
+    | "stopping"
     | "error"
     | "downloading";
 
@@ -65,6 +66,9 @@ function LCD(props: LCDProps) {
             break;
         case "running":
             message = "Running";
+            break;
+        case "stopping":
+            message = "Stopping...";
             break;
         case "error":
             message = "Fatal error";
@@ -94,7 +98,8 @@ function LCD(props: LCDProps) {
                     [styles.lcdGray]: true,
                     [styles.lcdGreen]: status === "running",
                     [styles.lcdYellow]: status === "building",
-                    [styles.lcdOrange]: status === "starting",
+                    [styles.lcdOrange]:
+                        status === "starting" || status === "stopping",
                     [styles.lcdRed]: status === "error",
                     [styles.lcdDownloading]: status === "downloading",
                 })}
