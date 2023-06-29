@@ -316,6 +316,8 @@ func (r RunnerDockerRepository) watchForLogs(containerID string, instance *types
 			onLog(scanner.Text())
 		}
 		_ = logs.Close()
-		logger.Warn("CLOSED").Print()
+		logger.Log("logs pipe closed").
+			AddKeyValue("uuid", instance.UUID).
+			Print()
 	}()
 }
