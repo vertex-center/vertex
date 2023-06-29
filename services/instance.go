@@ -194,6 +194,8 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 		return ErrInstanceNotRunning
 	}
 
+	s.setStatus(instance, types.InstanceStatusStopping)
+
 	if instance.IsDockerized() {
 		err = s.dockerRunnerRepo.Stop(instance)
 	} else {
@@ -212,6 +214,8 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 			Print()
 
 		s.setStatus(instance, types.InstanceStatusOff)
+	} else {
+		s.setStatus(instance, types.InstanceStatusRunning)
 	}
 
 	return err

@@ -39,10 +39,6 @@ func (r RunnerFSRepository) Start(instance *types.Instance, onLog func(msg strin
 	executable := instance.Methods.Script.Filename
 	command := "./" + executable
 
-	// Try to find the executable
-	// For a service of ID=vertex-id, the executable can be:
-	// - vertex-id
-	// - script-filename.sh
 	_, err := os.Stat(path.Join(dir, executable))
 	if errors.Is(err, os.ErrNotExist) {
 		return fmt.Errorf("executable %s were not found", command)

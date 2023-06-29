@@ -9,6 +9,7 @@ const (
 	InstanceStatusBuilding = "building"
 	InstanceStatusStarting = "starting"
 	InstanceStatusRunning  = "running"
+	InstanceStatusStopping = "stopping"
 	InstanceStatusError    = "error"
 )
 
