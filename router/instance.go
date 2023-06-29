@@ -64,7 +64,7 @@ func handleDeleteInstance(c *gin.Context) {
 
 	err := instanceService.Delete(*uid)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to delete instance %s: %v", uid, err))
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 

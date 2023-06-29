@@ -16,7 +16,6 @@ import (
 )
 
 var (
-	ErrInstanceStillRunning       = errors.New("the instance is still running")
 	ErrInstanceAlreadyRunning     = errors.New("the instance is already running")
 	ErrInstanceNotRunning         = errors.New("the instance is not running")
 	ErrInstallMethodDoesNotExists = errors.New("this install method doesn't exist for this service")
@@ -68,7 +67,7 @@ func (s *InstanceService) Delete(uuid uuid.UUID) error {
 	}
 
 	if instance.IsRunning() {
-		return ErrInstanceStillRunning
+		return errors.New("failed to delete this instance because the instance is still running")
 	}
 
 	if instance.IsDockerized() {
