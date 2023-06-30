@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/logger"
@@ -54,6 +55,9 @@ func main() {
 		Version: version,
 		Commit:  commit,
 		Date:    date,
+
+		OS:   runtime.GOOS,
+		Arch: runtime.GOARCH,
 	})
 	defer router.Unload()
 
