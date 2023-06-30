@@ -86,6 +86,10 @@ type ServiceMethodDocker struct {
 	// Volumes is a map containing output folder as a key, and input folder from Docker
 	// as a string value.
 	Volumes *map[string]string `yaml:"volumes,omitempty" json:"volumes,omitempty"`
+
+	// Environment is a map containing docker environment variable as a key, and
+	// its corresponding service environment name as a value.
+	Environment *map[string]string `yaml:"environment,omitempty" json:"environment,omitempty"`
 }
 
 type ServiceMethods struct {

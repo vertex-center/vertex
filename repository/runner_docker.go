@@ -113,10 +113,20 @@ func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg s
 			}
 		}
 
+		var env []string
+		if instance.Methods.Docker.Environment != nil {
+			for in, out := range *instance.Methods.Docker.Environment {
+				value := instance.EnvVariables[out]
+				env = append(env, in+"="+value)
+			}
+		}
+
+		println(env)
+
 		if instance.Methods.Docker.Dockerfile != nil {
-			id, err = r.createContainer(imageName, containerName, exposedPorts, portBindings, binds)
+			id, err = r.createContainer(imageName, containerName, exposedPorts, portBindings, binds, env)
 		} else if instance.Methods.Docker.Image != nil {
-			id, err = r.createContainer(*instance.Methods.Docker.Image, instance.DockerContainerName(), exposedPorts, portBindings, binds)
+			id, err = r.createContainer(*instance.Methods.Docker.Image, instance.DockerContainerName(), exposedPorts, portBindings, binds, env)
 		}
 		if err != nil {
 			return err
@@ -251,10 +261,11 @@ func (r RunnerDockerRepository) buildImageFromDockerfile(instancePath string, im
 	return nil
 }
 
-func (r RunnerDockerRepository) createContainer(imageName string, containerName string, exposedPorts nat.PortSet, portBindings nat.PortMap, binds []string) (string, error) {
+func (r RunnerDockerRepository) createContainer(imageName string, containerName string, exposedPorts nat.PortSet, portBindings nat.PortMap, binds []string, env []string) (string, error) {
 	config := container.Config{
 		Image:        imageName,
 		ExposedPorts: exposedPorts,
+		Env:          env,
 		Tty:          true,
 		AttachStdout: true,
 		AttachStderr: true,
