@@ -90,6 +90,9 @@ type ServiceMethodDocker struct {
 	// Environment is a map containing docker environment variable as a key, and
 	// its corresponding service environment name as a value.
 	Environment *map[string]string `yaml:"environment,omitempty" json:"environment,omitempty"`
+
+	// Capabilities is an array containing all additional Docker capabilities.
+	Capabilities *[]string `yaml:"capabilities" json:"capabilities"`
 }
 
 type ServiceMethods struct {

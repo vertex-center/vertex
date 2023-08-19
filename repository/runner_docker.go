@@ -121,12 +121,15 @@ func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg s
 			}
 		}
 
-		println(env)
+		var capAdd []string
+		if *instance.Methods.Docker.Capabilities != nil {
+			capAdd = *instance.Methods.Docker.Capabilities
+		}
 
 		if instance.Methods.Docker.Dockerfile != nil {
-			id, err = r.createContainer(imageName, containerName, exposedPorts, portBindings, binds, env)
+			id, err = r.createContainer(imageName, containerName, exposedPorts, portBindings, binds, env, capAdd)
 		} else if instance.Methods.Docker.Image != nil {
-			id, err = r.createContainer(*instance.Methods.Docker.Image, instance.DockerContainerName(), exposedPorts, portBindings, binds, env)
+			id, err = r.createContainer(*instance.Methods.Docker.Image, instance.DockerContainerName(), exposedPorts, portBindings, binds, env, capAdd)
 		}
 		if err != nil {
 			return err
@@ -261,7 +264,7 @@ func (r RunnerDockerRepository) buildImageFromDockerfile(instancePath string, im
 	return nil
 }
 
-func (r RunnerDockerRepository) createContainer(imageName string, containerName string, exposedPorts nat.PortSet, portBindings nat.PortMap, binds []string, env []string) (string, error) {
+func (r RunnerDockerRepository) createContainer(imageName string, containerName string, exposedPorts nat.PortSet, portBindings nat.PortMap, binds []string, env []string, capAdd []string) (string, error) {
 	config := container.Config{
 		Image:        imageName,
 		ExposedPorts: exposedPorts,
@@ -274,6 +277,7 @@ func (r RunnerDockerRepository) createContainer(imageName string, containerName 
 	hostConfig := container.HostConfig{
 		Binds:        binds,
 		PortBindings: portBindings,
+		CapAdd:       capAdd,
 	}
 
 	res, err := r.cli.ContainerCreate(context.Background(), &config, &hostConfig, nil, nil, containerName)
