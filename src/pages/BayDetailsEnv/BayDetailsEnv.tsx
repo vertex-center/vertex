@@ -25,7 +25,7 @@ export default function BayDetailsEnv(props: Props) {
 
     useEffect(() => {
         setEnv(
-            instance?.environment.map((e) => ({
+            instance?.environment?.map((e) => ({
                 env: e,
                 value: instance?.env[e.name] ?? e.default ?? "",
             }))

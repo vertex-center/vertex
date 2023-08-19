@@ -42,36 +42,37 @@ export default function BayDetailsHome() {
         <Fragment>
             <Title>Home</Title>
             <nav className={styles.nav}>
-                {instance?.environment
-                    .filter((e) => e.type === "port")
-                    .map((e) => {
-                        console.log(instance.env);
-                        const port = instance.env[e.name] ?? e.default;
-                        const disabled = instance.status !== "running";
-                        const href = `http://localhost:${port}`;
+                {instance?.environment &&
+                    instance?.environment
+                        .filter((e) => e.type === "port")
+                        .map((e) => {
+                            console.log(instance.env);
+                            const port = instance.env[e.name] ?? e.default;
+                            const disabled = instance.status !== "running";
+                            const href = `http://localhost:${port}`;
 
-                        return (
-                            <a
-                                href={href}
-                                target="_blank"
-                                rel="noreferrer"
-                                className={classNames({
-                                    [styles.navItem]: true,
-                                    [styles.navItemDisabled]: disabled,
-                                })}
-                            >
-                                <Horizontal>
-                                    <Symbol
-                                        className={styles.navItemSymbol}
-                                        name="public"
-                                    />
-                                    <Spacer />
-                                    <Symbol name="open_in_new" />
-                                </Horizontal>
-                                <div>http://localhost:{port}</div>
-                            </a>
-                        );
-                    })}
+                            return (
+                                <a
+                                    href={href}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className={classNames({
+                                        [styles.navItem]: true,
+                                        [styles.navItemDisabled]: disabled,
+                                    })}
+                                >
+                                    <Horizontal>
+                                        <Symbol
+                                            className={styles.navItemSymbol}
+                                            name="public"
+                                        />
+                                        <Spacer />
+                                        <Symbol name="open_in_new" />
+                                    </Horizontal>
+                                    <div>http://localhost:{port}</div>
+                                </a>
+                            );
+                        })}
             </nav>
         </Fragment>
     );
