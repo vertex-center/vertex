@@ -122,7 +122,7 @@ func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg s
 		}
 
 		var capAdd []string
-		if *instance.Methods.Docker.Capabilities != nil {
+		if instance.Methods.Docker.Capabilities != nil {
 			capAdd = *instance.Methods.Docker.Capabilities
 		}
 
