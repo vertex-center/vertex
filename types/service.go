@@ -19,6 +19,9 @@ type Service struct {
 	// Description describes the service in a few words.
 	Description string `yaml:"description" json:"description"`
 
+	// Features describes some features of the service to help Vertex.
+	Features *Features `yaml:"features" json:"features"`
+
 	// EnvDefinitions defines all parameterizable environment variables.
 	EnvDefinitions []EnvDefinition `yaml:"environment,omitempty" json:"environment,omitempty"`
 
@@ -27,6 +30,29 @@ type Service struct {
 
 	// Methods defines different methods to install the service.
 	Methods ServiceMethods `yaml:"methods" json:"methods"`
+}
+
+type DatabaseFeature struct {
+	// The database Type. Can be redis, postgres...
+	Type string `yaml:"type" json:"type"`
+
+	// The database Port. Must be the name
+	// of an environment variable.
+	Port string `yaml:"port" json:"port"`
+
+	// The Username to connect to the database. Must be the name
+	// of an environment variable.
+	Username *string `yaml:"username" json:"username"`
+
+	// The Password to connect to the database. Must be the name
+	// of an environment variable.
+	Password *string `yaml:"password" json:"password"`
+}
+
+type Features struct {
+	// The database feature describes the database made available
+	// by this service.
+	Databases *[]DatabaseFeature `yaml:"databases" json:"databases"`
 }
 
 type EnvDefinition struct {
