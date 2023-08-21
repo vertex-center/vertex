@@ -2,6 +2,7 @@ import styles from "./Infrastructure.module.sass";
 import Bay from "../../components/Bay/Bay";
 import { useEffect, useState } from "react";
 import {
+    checkForInstanceUpdates,
     getInstances,
     startInstance,
     stopInstance,
@@ -17,6 +18,7 @@ import {
 import { HeaderHome } from "../../components/Header/Header";
 import Progress from "../../components/Progress";
 import { Instance, Instances } from "../../models/instance";
+import Button from "../../components/Button/Button";
 
 export default function Infrastructure() {
     const [loading, setLoading] = useState(true);
@@ -90,6 +92,12 @@ export default function Infrastructure() {
         }
     };
 
+    const checkForUpdates = async () => {
+        checkForInstanceUpdates().then((res) => {
+            setInstalled(res.data);
+        });
+    };
+
     return (
         <div className={styles.server}>
             <HeaderHome />
@@ -108,9 +116,11 @@ export default function Infrastructure() {
                                 to: `/bay/${instance.uuid}/`,
                                 onPower: () => toggleInstance(instance.uuid),
                                 method: instance.install_method,
+                                update: instance.update,
                             }))}
                         />
                     ))}
+                    <Button onClick={checkForUpdates}>Check for updates</Button>
                     <Link to="/marketplace" className={styles.addBay}>
                         <Symbol name="add" />
                     </Link>

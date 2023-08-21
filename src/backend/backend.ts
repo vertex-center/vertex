@@ -19,6 +19,8 @@ const api = axios.create({
 
 export const getAbout = async () => api.get<About>("/about");
 export const getInstances = async () => api.get<Instances>("/instances");
+export const checkForInstanceUpdates = async () =>
+    api.get<Instances>("/instances/checkupdates");
 export const getAvailableServices = async () =>
     api.get<Service[]>("/services/available");
 export const installService = async (params: InstallServiceParams) =>
