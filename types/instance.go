@@ -41,6 +41,13 @@ type Instance struct {
 	UUID         uuid.UUID    `json:"uuid"`
 	Status       string       `json:"status"`
 	EnvVariables EnvVariables `json:"env"`
+
+	Update *InstanceUpdate `json:"update,omitempty"`
+}
+
+type InstanceUpdate struct {
+	CurrentVersion string `json:"current_version"`
+	LatestVersion  string `json:"latest_version"`
 }
 
 func NewInstance(id uuid.UUID, service Service) Instance {

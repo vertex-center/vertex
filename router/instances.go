@@ -12,12 +12,23 @@ import (
 
 func addInstancesRoutes(r *gin.RouterGroup) {
 	r.GET("", handleGetInstances)
+	r.GET("/checkupdates", handleCheckForUpdates)
 	r.GET("/events", headersSSE, handleInstancesEvents)
 }
 
 func handleGetInstances(c *gin.Context) {
 	installed := instanceService.GetAll()
 	c.JSON(http.StatusOK, installed)
+}
+
+func handleCheckForUpdates(c *gin.Context) {
+	instances, err := instanceService.CheckForUpdates()
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, instances)
 }
 
 func handleInstancesEvents(c *gin.Context) {

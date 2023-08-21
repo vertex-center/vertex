@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
 	"path"
 	"path/filepath"
 
@@ -42,7 +43,7 @@ func NewRunnerDockerRepository() RunnerDockerRepository {
 }
 
 func (r RunnerDockerRepository) Delete(instance *types.Instance) error {
-	id, err := r.getID(*instance)
+	id, err := r.getContainerID(*instance)
 	if err != nil {
 		return err
 	}
@@ -74,7 +75,7 @@ func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg s
 	}
 
 	// Create
-	id, err := r.getID(*instance)
+	id, err := r.getContainerID(*instance)
 	if err == ErrContainerNotFound {
 		logger.Log("container doesn't exists, create it.").
 			AddKeyValue("container_name", instance.DockerContainerName()).
@@ -153,7 +154,7 @@ func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg s
 }
 
 func (r RunnerDockerRepository) Stop(instance *types.Instance) error {
-	id, err := r.getID(*instance)
+	id, err := r.getContainerID(*instance)
 	if err != nil {
 		return err
 	}
@@ -162,7 +163,7 @@ func (r RunnerDockerRepository) Stop(instance *types.Instance) error {
 }
 
 func (r RunnerDockerRepository) Info(instance types.Instance) (map[string]any, error) {
-	id, err := r.getID(instance)
+	id, err := r.getContainerID(instance)
 	if err != nil {
 		return nil, err
 	}
@@ -180,33 +181,102 @@ func (r RunnerDockerRepository) Info(instance types.Instance) (map[string]any, e
 	}, nil
 }
 
-func (r RunnerDockerRepository) getID(instance types.Instance) (string, error) {
+func (r RunnerDockerRepository) CheckForUpdates(instance *types.Instance) error {
+	if instance.Methods.Docker.Image == nil {
+		// TODO: Support Dockerfile updates
+		return nil
+	}
+
+	imageName := *instance.Methods.Docker.Image
+
+	res, err := r.pullImage(imageName)
+	if err != nil {
+		return err
+	}
+	defer res.Close()
+
+	imageInfo, _, err := r.cli.ImageInspectWithRaw(context.Background(), imageName)
+	if err != nil {
+		return err
+	}
+
+	latestImageID := imageInfo.ID
+
+	currentImageID, err := r.getImageID(*instance)
+	if err != nil {
+		return err
+	}
+
+	if latestImageID == currentImageID {
+		logger.Log("already up-to-date").AddKeyValue("uuid", instance.UUID).Print()
+		instance.Update = nil
+	} else {
+		logger.Log("a new update is available").AddKeyValue("uuid", instance.UUID).Print()
+		instance.Update = &types.InstanceUpdate{
+			CurrentVersion: currentImageID,
+			LatestVersion:  latestImageID,
+		}
+	}
+
+	return nil
+}
+
+func (r RunnerDockerRepository) HasUpdateAvailable(instance types.Instance) (bool, error) {
+	//TODO implement me
+	return false, nil
+}
+
+func (r RunnerDockerRepository) getContainer(instance types.Instance) (dockertypes.Container, error) {
 	containers, err := r.cli.ContainerList(context.Background(), dockertypes.ContainerListOptions{
 		All: true,
 	})
 	if err != nil {
-		return "", err
+		return dockertypes.Container{}, err
 	}
 
-	var containerID string
+	var dockerContainer *dockertypes.Container
 
 	for _, c := range containers {
 		name := c.Names[0]
 		if name == "/"+instance.DockerContainerName() {
-			containerID = c.ID
+			dockerContainer = &c
 			break
 		}
 	}
 
-	if containerID == "" {
-		return "", ErrContainerNotFound
+	if dockerContainer == nil {
+		return dockertypes.Container{}, ErrContainerNotFound
 	}
 
-	return containerID, nil
+	return *dockerContainer, nil
+}
+
+func (r RunnerDockerRepository) getContainerID(instance types.Instance) (string, error) {
+	c, err := r.getContainer(instance)
+	if err != nil {
+		return "", err
+	}
+	return c.ID, nil
+}
+
+func (r RunnerDockerRepository) getImageID(instance types.Instance) (string, error) {
+	c, err := r.getContainer(instance)
+	if err != nil {
+		return "", err
+	}
+	return c.ImageID, nil
+}
+
+func (r RunnerDockerRepository) pullImage(imageName string) (io.ReadCloser, error) {
+	res, err := r.cli.ImagePull(context.Background(), imageName, dockertypes.ImagePullOptions{})
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
 
 func (r RunnerDockerRepository) buildImageFromName(imageName string, onMsg func(msg string)) error {
-	res, err := r.cli.ImagePull(context.Background(), imageName, dockertypes.ImagePullOptions{})
+	res, err := r.pullImage(imageName)
 	if err != nil {
 		return err
 	}

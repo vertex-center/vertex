@@ -313,6 +313,24 @@ func (s *InstanceService) Install(serviceID string, method string) (*types.Insta
 	return instance, nil
 }
 
+func (s *InstanceService) CheckForUpdates() (map[uuid.UUID]*types.Instance, error) {
+	for _, instance := range s.GetAll() {
+		var err error
+
+		if instance.IsDockerized() {
+			err = s.dockerRunnerRepo.CheckForUpdates(instance)
+		} else {
+			err = s.fsRunnerRepo.CheckForUpdates(instance)
+		}
+
+		if err != nil {
+			return s.GetAll(), err
+		}
+	}
+
+	return s.GetAll(), nil
+}
+
 func (s *InstanceService) SetLaunchOnStartup(uuid uuid.UUID, value bool) error {
 	i, err := s.Get(uuid)
 	if err != nil {

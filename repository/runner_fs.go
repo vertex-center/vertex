@@ -130,6 +130,16 @@ func (r RunnerFSRepository) Info(instance types.Instance) (map[string]any, error
 	return map[string]any{}, nil
 }
 
+func (r RunnerFSRepository) CheckForUpdates(instance *types.Instance) error {
+	//TODO implement me
+	return nil
+}
+
+func (r RunnerFSRepository) HasUpdateAvailable(instance types.Instance) (bool, error) {
+	//TODO implement me
+	return false, nil
+}
+
 func (r RunnerFSRepository) getPath(instance types.Instance) string {
 	return path.Join(storage.PathInstances, instance.UUID.String())
 }
