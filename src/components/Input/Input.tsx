@@ -9,6 +9,10 @@ export type InputProps = HTMLProps<HTMLInputElement> & {
     description?: string;
 };
 
+export type SelectProps = HTMLProps<HTMLSelectElement> & {
+    description?: string;
+};
+
 export default function Input(props: InputProps) {
     const { className, label, description, ...others } = props;
 

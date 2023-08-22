@@ -1,7 +1,8 @@
 import PortInput from "../Input/PortInput";
 import Input from "../Input/Input";
 import { Vertical } from "../Layouts/Layouts";
-import { EnvVariable } from "../../backend/backend";
+import TimezoneInput from "../Input/TimezoneInput";
+import { EnvVariable } from "../../models/service";
 
 type Props = {
     env: EnvVariable;
@@ -25,6 +26,8 @@ export default function EnvVariableInput(props: Props) {
     let input;
     if (env.type === "port") {
         input = <PortInput {...inputProps} />;
+    } else if (env.type === "timezone") {
+        input = <TimezoneInput {...inputProps} />;
     } else {
         input = <Input {...inputProps} />;
     }
