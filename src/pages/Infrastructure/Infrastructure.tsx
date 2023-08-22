@@ -126,9 +126,9 @@ export default function Infrastructure() {
                         <Button primary to="/marketplace" leftSymbol="add">
                             Add services
                         </Button>
-                        <Button onClick={checkForUpdates} leftSymbol="update">
-                            Check for updates
-                        </Button>
+                        {/*<Button onClick={checkForUpdates} leftSymbol="update">*/}
+                        {/*    Check for updates*/}
+                        {/*</Button>*/}
                     </Horizontal>
                 </div>
             )}
