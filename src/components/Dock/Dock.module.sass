@@ -1,0 +1,37 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+
+.dock
+    display: inline-flex
+    flex-direction: row
+    border-radius: calc(dimensions.$border-radius-lg + 4px)
+    gap: 10px
+    border: 1px solid colors.$bg-tertiary
+    padding: 10px
+
+    &Container
+        position: fixed
+        display: flex
+        align-items: center
+        justify-content: center
+        left: 50%
+        transform: translateX(-50%)
+        bottom: 20px
+
+.app
+    display: inline-flex
+    align-items: center
+    justify-content: center
+    height: 60px
+    width: 60px
+    border-radius: dimensions.$border-radius-lg
+    background-color: colors.$bg-tertiary
+
+    &:hover
+        background-color: colors.$bg-tertiary-hover
+
+    &Active
+        background-color: colors.$bg-accent
+
+        &:hover
+            background-color: colors.$bg-accent-hover

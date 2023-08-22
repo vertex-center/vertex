@@ -1,4 +1,4 @@
-import { HashRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import Infrastructure from "./pages/Infrastructure/Infrastructure";
 import BayDetails from "./pages/BayDetails/BayDetails";
 import BayDetailsLogs from "./pages/BayDetailsLogs/BayDetailsLogs";
@@ -16,6 +16,7 @@ import BayDetailsDocker from "./pages/BayDetailsDocker/BayDetailsDocker";
 import BayDetailsSettings from "./pages/BayDetailsSettings/BayDetailsSettings";
 import BayDetailsStatus from "./pages/BayDetailsStatus/BayDetailsStatus";
 import Store from "./pages/Store/Store";
+import Dock from "./components/Dock/Dock";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -24,7 +25,48 @@ function App() {
         <div className={classNames("app", theme)}>
             <HashRouter>
                 <Routes>
-                    <Route path="/" element={<Infrastructure />} index />
+                    <Route
+                        path="/"
+                        element={<Navigate to="/infrastructure" />}
+                        index
+                    />
+                    <Route
+                        path="/infrastructure"
+                        element={<Infrastructure />}
+                    />
+                    <Route
+                        path="/infrastructure/:uuid/"
+                        element={<BayDetails />}
+                    >
+                        <Route
+                            path="/infrastructure/:uuid/"
+                            element={<BayDetailsHome />}
+                        />
+                        <Route
+                            path="/infrastructure/:uuid/docker"
+                            element={<BayDetailsDocker />}
+                        />
+                        <Route
+                            path="/infrastructure/:uuid/logs"
+                            element={<BayDetailsLogs />}
+                        />
+                        <Route
+                            path="/infrastructure/:uuid/status"
+                            element={<BayDetailsStatus />}
+                        />
+                        <Route
+                            path="/infrastructure/:uuid/environment"
+                            element={<BayDetailsEnv />}
+                        />
+                        <Route
+                            path="/infrastructure/:uuid/dependencies"
+                            element={<BayDetailsDependencies />}
+                        />
+                        <Route
+                            path="/infrastructure/:uuid/settings"
+                            element={<BayDetailsSettings />}
+                        />
+                    </Route>
                     <Route path="/settings" element={<Settings />}>
                         <Route
                             path="/settings/theme"
@@ -40,37 +82,8 @@ function App() {
                         />
                     </Route>
                     <Route path="/marketplace" element={<Store />} />
-                    <Route path="/bay/:uuid/" element={<BayDetails />}>
-                        <Route
-                            path="/bay/:uuid/"
-                            element={<BayDetailsHome />}
-                        />
-                        <Route
-                            path="/bay/:uuid/docker"
-                            element={<BayDetailsDocker />}
-                        />
-                        <Route
-                            path="/bay/:uuid/logs"
-                            element={<BayDetailsLogs />}
-                        />
-                        <Route
-                            path="/bay/:uuid/status"
-                            element={<BayDetailsStatus />}
-                        />
-                        <Route
-                            path="/bay/:uuid/environment"
-                            element={<BayDetailsEnv />}
-                        />
-                        <Route
-                            path="/bay/:uuid/dependencies"
-                            element={<BayDetailsDependencies />}
-                        />
-                        <Route
-                            path="/bay/:uuid/settings"
-                            element={<BayDetailsSettings />}
-                        />
-                    </Route>
                 </Routes>
+                <Dock />
             </HashRouter>
         </div>
     );

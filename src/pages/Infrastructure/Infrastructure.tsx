@@ -7,8 +7,6 @@ import {
     startInstance,
     stopInstance,
 } from "../../backend/backend";
-import Symbol from "../../components/Symbol/Symbol";
-import { Link } from "react-router-dom";
 import {
     registerSSE,
     registerSSEEvent,
@@ -18,7 +16,9 @@ import {
 import { HeaderHome } from "../../components/Header/Header";
 import Progress from "../../components/Progress";
 import { Instance, Instances } from "../../models/instance";
+import { BigTitle } from "../../components/Text/Text";
 import Button from "../../components/Button/Button";
+import { Horizontal } from "../../components/Layouts/Layouts";
 
 export default function Infrastructure() {
     const [loading, setLoading] = useState(true);
@@ -102,28 +102,34 @@ export default function Infrastructure() {
         <div className={styles.server}>
             <HeaderHome />
             {loading && <Progress infinite small />}
+            <div className={styles.title}>
+                <BigTitle>Infrastructure</BigTitle>
+            </div>
             {!loading && (
                 <div className={styles.bays}>
-                    <Bay showCables instances={[{ name: "Vertex", status }]} />
+                    <Bay instances={[{ name: "Vertex", status }]} />
                     {installedGrouped?.map((instances, i) => (
                         <Bay
                             key={i}
-                            showCables
                             instances={instances.map((instance, i) => ({
                                 name: instance?.display_name ?? instance.name,
                                 status: instance.status,
                                 count: instances.length > 1 ? i + 1 : undefined,
-                                to: `/bay/${instance.uuid}/`,
+                                to: `/infrastructure/${instance.uuid}/`,
                                 onPower: () => toggleInstance(instance.uuid),
                                 method: instance.install_method,
                                 update: instance.update,
                             }))}
                         />
                     ))}
-                    <Button onClick={checkForUpdates}>Check for updates</Button>
-                    <Link to="/marketplace" className={styles.addBay}>
-                        <Symbol name="add" />
-                    </Link>
+                    <Horizontal className={styles.addBay} gap={10}>
+                        <Button primary to="/marketplace" leftSymbol="add">
+                            Add services
+                        </Button>
+                        <Button onClick={checkForUpdates} leftSymbol="update">
+                            Check for updates
+                        </Button>
+                    </Horizontal>
                 </div>
             )}
         </div>

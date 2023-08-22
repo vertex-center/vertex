@@ -2,14 +2,14 @@ import styles from "./Bay.module.sass";
 import Symbol from "../Symbol/Symbol";
 import classNames from "classnames";
 import { Horizontal, Vertical } from "../Layouts/Layouts";
-import { Link } from "react-router-dom";
-import Spacer from "../Spacer/Spacer";
 import { SiDocker } from "@icons-pack/react-simple-icons";
 import { InstallMethod, InstanceUpdate } from "../../models/instance";
+import { Link } from "react-router-dom";
+import { Fragment, MouseEventHandler } from "react";
 
 type ButtonProps = {
     symbol: string;
-    onClick: () => void;
+    onClick: MouseEventHandler<HTMLSpanElement>;
 };
 
 function Button({ symbol, onClick }: ButtonProps) {
@@ -45,13 +45,12 @@ type Status =
 type LCDProps = {
     name: string;
     status: Status | string;
-    to?: string;
     count?: number;
     dockerized?: boolean;
 };
 
 function LCD(props: LCDProps) {
-    const { name, status, to, count, dockerized } = props;
+    const { name, status, count, dockerized } = props;
 
     let message;
     switch (status) {
@@ -83,15 +82,16 @@ function LCD(props: LCDProps) {
     let content = (
         <Vertical gap={10}>
             <Horizontal gap={8}>
-                <div>{name}</div>
+                <Horizontal gap={8}>
+                    {name}
+                    {count && <div className={styles.lcdCount}>{count}</div>}
+                </Horizontal>
                 {dockerized && (
                     <SiDocker
                         size={15}
                         style={{ marginTop: -1, opacity: 0.5 }}
                     />
                 )}
-                <Spacer />
-                <div className={styles.lcdCount}>{count}</div>
             </Horizontal>
             <div
                 className={classNames({
@@ -109,19 +109,6 @@ function LCD(props: LCDProps) {
         </Vertical>
     );
 
-    if (to)
-        return (
-            <Link
-                to={to}
-                className={classNames({
-                    [styles.lcd]: true,
-                    [styles.lcdClickable]: to,
-                })}
-            >
-                {content}
-            </Link>
-        );
-
     return <div className={styles.lcd}>{content}</div>;
 }
 
@@ -137,44 +124,58 @@ type Props = {
 
         onPower?: () => void;
     }[];
-    showCables?: boolean;
 };
 
 export default function Bay(props: Props) {
-    const { instances, showCables } = props;
+    const { instances } = props;
+
+    const onPower = (e: any, instance: any) => {
+        instance?.onPower();
+        e.preventDefault();
+    };
 
     return (
         <div className={styles.group}>
-            {instances.map((instance) => (
-                <div
-                    className={classNames({
-                        [styles.bay]: true,
-                        [styles.bayWithCable]:
-                            showCables && instance.status !== "off",
-                    })}
-                >
-                    <LED status={instance.status} />
-                    <LCD
-                        name={instance.name}
-                        count={instance.count}
-                        status={instance.status}
-                        to={instance.to}
-                        dockerized={instance.method === "docker"}
-                    />
-                    {instance?.update && (
-                        <div>
-                            Update available: {instance.update.current_version}{" "}
-                            {"->"} {instance.update.latest_version}
-                        </div>
-                    )}
-                    {instance?.onPower && (
-                        <Button
-                            symbol="power_rounded"
-                            onClick={instance.onPower}
+            {instances.map((instance) => {
+                const content = (
+                    <Fragment>
+                        <LED status={instance.status} />
+                        <LCD
+                            name={instance.name}
+                            count={instance.count}
+                            status={instance.status}
+                            dockerized={instance.method === "docker"}
                         />
-                    )}
-                </div>
-            ))}
+                        {instance?.update && (
+                            <div>
+                                Update available:{" "}
+                                {instance.update.current_version} {"->"}{" "}
+                                {instance.update.latest_version}
+                            </div>
+                        )}
+                        {instance?.onPower && (
+                            <Button
+                                symbol="power_rounded"
+                                onClick={(e: any) => onPower(e, instance)}
+                            />
+                        )}
+                    </Fragment>
+                );
+
+                const classnames = classNames({
+                    [styles.bay]: true,
+                    [styles.bayClickable]: instance.to,
+                });
+
+                if (instance.to)
+                    return (
+                        <Link to={instance.to} className={classnames}>
+                            {content}
+                        </Link>
+                    );
+
+                return <div className={classnames}>{content}</div>;
+            })}
         </div>
     );
 }

@@ -5,9 +5,8 @@
     display: flex
     flex-direction: column
     align-items: flex-start
-    padding: 0 32px 8px
+    padding: 0 38px 0
     gap: 4px
-    border-bottom: 1px solid colors.$bg-secondary
 
 .logo
     margin: 16px 0 8px
@@ -16,11 +15,10 @@
 .items
     display: flex
     flex-direction: row
-    gap: 4px
 
 .item
     border-radius: dimensions.$border-radius
-    padding: 10px 14px
+    padding: 15px 20px
     -webkit-user-select: none
     -ms-user-select: none
     user-select: none
@@ -40,15 +38,6 @@
         background-color: colors.$bg-secondary-hover
 
     &Active
-        position: relative
-
-        &::after
-            position: absolute
-            content: ''
-            left: 10px
-            right: 10px
-            bottom: -8px
-            height: 2px
-            border-top-right-radius: 2px
-            border-top-left-radius: 2px
-            background-color: colors.$fg-secondary
+        border-bottom: 1px solid colors.$fg-accent
+        background-color: colors.$bg-secondary
+        color: colors.$fg-accent

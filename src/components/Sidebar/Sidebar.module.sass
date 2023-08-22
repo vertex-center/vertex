@@ -8,18 +8,19 @@
     min-width: 350px
     height: 100%
     border-right: 1px solid colors.$bg-secondary
-    padding: 12px 12px 12px 40px
+    padding: 10px 20px 10px 40px
     box-sizing: border-box
 
     &Item
-        padding: 10px 14px
+        padding: 15px 20px
         cursor: pointer
-        border-radius: dimensions.$border-radius
+        border-radius: dimensions.$border-radius-lg
         border: 1px solid transparent
         transition: all 0.1s ease
         -webkit-user-select: none
         -ms-user-select: none
         user-select: none
+        position: relative
 
         &:hover
             background-color: colors.$bg-secondary-hover
@@ -32,7 +33,7 @@
             content: ''
             top: 50%
             bottom: 50%
-            left: -3px
+            left: 0
             width: 3px
             border-radius: 2px
             background-color: colors.$fg-secondary
@@ -40,10 +41,12 @@
 
         &Active
             position: relative
+            color: colors.$fg-accent
+            background-color: colors.$bg-secondary
 
             &::after
-                top: 10px
-                bottom: 10px
+                top: 15px
+                bottom: 15px
 
 .symbol
     margin-top: -1px
@@ -53,7 +56,6 @@
 
 .title
     margin: 8px 12px
-    font-size: 14px
     color: colors.$fg-secondary
 
 .separator

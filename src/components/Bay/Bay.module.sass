@@ -2,26 +2,37 @@
 @use "../../styles/dimensions"
 @use "../../styles/fonts"
 
+.group
+    display: flex
+    flex-direction: column
+    gap: 2px
+
 .bay
-    background-color: colors.$bg-primary
-    border: 1px solid colors.$bg-tertiary
-    padding: 0 20px 0 24px
+    background-color: colors.$bg-secondary
     display: flex
     flex-direction: row
     align-items: center
-    gap: 20px
+    gap: 30px
     position: relative
+    border: 1px solid transparent
+    padding: 20px 40px
+
+    &Clickable
+        cursor: pointer
+
+        &:hover
+            background-color: colors.$bg-secondary-hover
 
     &:first-of-type
-        border-top-left-radius: dimensions.$border-radius
-        border-top-right-radius: dimensions.$border-radius
+        border-top-left-radius: dimensions.$border-radius-lg
+        border-top-right-radius: dimensions.$border-radius-lg
 
     &:not(&:last-of-type)
         border-bottom: none
 
     &:last-of-type
-        border-bottom-left-radius: dimensions.$border-radius
-        border-bottom-right-radius: dimensions.$border-radius
+        border-bottom-left-radius: dimensions.$border-radius-lg
+        border-bottom-right-radius: dimensions.$border-radius-lg
 
     &::before
         position: absolute
@@ -33,22 +44,12 @@
         right: 100%
         transition: max-width 0.3s ease
 
-    &WithCable::before
-        width: 100px
-        max-width: 100px
-
 .lcd
-    background-color: colors.$bg-no-color
-    border: 1px solid transparent
-    padding: 16px 20px
     display: flex
     flex-direction: column
     align-items: stretch
     flex-grow: 1
     gap: 10px
-    font-family: fonts.$font-family-code
-    font-size: 15px
-    letter-spacing: 1px
     color: colors.$fg-primary
     transition: all 0.1s ease
 
@@ -76,13 +77,6 @@
         color: colors.$orange
         opacity: 1
 
-    &Clickable
-        cursor: pointer
-        border: 1px solid transparent
-
-        &:hover
-            border-color: colors.$bg-accent
-
     &Count
         color: colors.$fg-tertiary
 
@@ -90,8 +84,20 @@
     width: 14px
     height: 14px
     border-radius: 50%
-    background-color: transparent
     border: 1px solid colors.$bg-tertiary
+    background-color: colors.$red
+    position: relative
+
+    &::after
+        content: ''
+        position: absolute
+        top: -4px
+        bottom: -4px
+        left: -4px
+        right: -4px
+        border-radius: 50%
+        opacity: 0.2
+        background-color: colors.$red
 
     &Error
         background-color: colors.$red
@@ -103,6 +109,9 @@
     &Running
         background-color: colors.$green
 
+        &::after
+            background-color: colors.$green
+
 @keyframes pulse-blue
     from
         background-color: transparent
@@ -110,15 +119,20 @@
         background-color: colors.$blue
 
 .button
+    position: absolute
+    display: flex
+    align-items: center
+    justify-content: center
+    right: 4px
+    top: 4px
+    bottom: 4px
+    aspect-ratio: 1
     cursor: pointer
-    padding: 8px
-    border: 1px solid transparent
-    border-radius: 50%
+    border-radius: calc(dimensions.$border-radius-lg - 4px)
     -webkit-user-select: none
     -ms-user-select: none
     user-select: none
 
     &:hover
-        background-color: colors.$bg-secondary-hover
+        background-color: colors.$bg-tertiary-hover
         //border-color: colors.$bg-tertiary
-        border-color: colors.$bg-accent

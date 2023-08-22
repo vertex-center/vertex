@@ -8,6 +8,7 @@ import Symbol from "../../components/Symbol/Symbol";
 import { Horizontal } from "../../components/Layouts/Layouts";
 import useInstance from "../../hooks/useInstance";
 import { Env, EnvVariable } from "../../models/service";
+import styles from "./BayDetailsEnv.module.sass";
 
 type Props = {};
 
@@ -59,7 +60,7 @@ export default function BayDetailsEnv(props: Props) {
 
     return (
         <Fragment>
-            <Title>Environment</Title>
+            <Title className={styles.title}>Environment</Title>
             {env?.map((env, i) => (
                 <EnvVariableInput
                     env={env.env}
@@ -79,7 +80,11 @@ export default function BayDetailsEnv(props: Props) {
                 Save
             </Button>
             {saved && (
-                <Horizontal alignItems="center" gap={4}>
+                <Horizontal
+                    className={styles.saved}
+                    alignItems="center"
+                    gap={4}
+                >
                     <Symbol name="check" />
                     Saved!
                 </Horizontal>

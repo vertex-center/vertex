@@ -35,14 +35,18 @@ export default function BayDetailsDocker() {
     return (
         <Vertical gap={40}>
             <Vertical gap={20}>
-                <Title>Docker</Title>
+                <Title className={styles.title}>Docker</Title>
                 {!instance && <Loading />}
-                {instance && <Text>Docker is {label} for this instance.</Text>}
+                {instance && (
+                    <Text className={styles.content}>
+                        Docker is {label} for this instance.
+                    </Text>
+                )}
             </Vertical>
 
             <Vertical gap={20}>
-                <Title>Details</Title>
-                <Vertical gap={8}>
+                <Title className={styles.title}>Details</Title>
+                <Vertical className={styles.content} gap={8}>
                     <Horizontal gap={12} alignItems="center">
                         <Text>Container ID</Text>
                         <Spacer />

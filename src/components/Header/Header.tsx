@@ -33,7 +33,7 @@ function Item({ children, to, symbol }: ItemProps) {
 export default function Header({ children }: HTMLProps<HTMLHeadingElement>) {
     return (
         <header className={styles.header}>
-            <Link to="/" className={styles.logo}>
+            <Link to="/infrastructure" className={styles.logo}>
                 <Logo />
             </Link>
             {children}
@@ -44,16 +44,16 @@ export default function Header({ children }: HTMLProps<HTMLHeadingElement>) {
 export function HeaderHome() {
     return (
         <Header>
-            <nav>
-                <ul className={styles.items}>
-                    <Item to="/" symbol="storage">
-                        Servers
-                    </Item>
-                    <Item to="/settings" symbol="settings">
-                        Settings
-                    </Item>
-                </ul>
-            </nav>
+            {/*<nav>*/}
+            {/*    <ul className={styles.items}>*/}
+            {/*        <Item to="/" symbol="storage">*/}
+            {/*            Servers*/}
+            {/*        </Item>*/}
+            {/*        <Item to="/settings" symbol="settings">*/}
+            {/*            Settings*/}
+            {/*        </Item>*/}
+            {/*    </ul>*/}
+            {/*</nav>*/}
         </Header>
     );
 }

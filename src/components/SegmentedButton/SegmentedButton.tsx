@@ -9,10 +9,17 @@ type SegmentedButtonProps = ButtonProps & {
 };
 
 export function SegmentedButton(props: SegmentedButtonProps) {
-    const { children, className, ...others } = props;
+    const { children, className, selected, ...others } = props;
 
     return (
-        <Button {...others} className={classNames(styles.button, className)}>
+        <Button
+            {...others}
+            className={classNames({
+                [styles.button]: true,
+                [styles.buttonSelected]: selected,
+                [className]: true,
+            })}
+        >
             {children}
         </Button>
     );

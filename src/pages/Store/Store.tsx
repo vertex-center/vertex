@@ -4,7 +4,7 @@ import {
     getInstances,
     installService,
 } from "../../backend/backend";
-import { Text, Title } from "../../components/Text/Text";
+import { BigTitle, Text, Title } from "../../components/Text/Text";
 import { Service as ServiceModel } from "../../models/service";
 import Header from "../../components/Header/Header";
 import { Fragment, useState } from "react";
@@ -227,16 +227,8 @@ export default function Store() {
         <Fragment>
             <Header />
             <div className={styles.page}>
-                <Horizontal gap={12} alignItems="center">
-                    <Title>Marketplace</Title>
-                    {/*<Spacer />*/}
-                    {/*or*/}
-                    {/*<Button*/}
-                    {/*    onClick={() => setShowImportPopup(true)}*/}
-                    {/*    rightSymbol="download"*/}
-                    {/*>*/}
-                    {/*    Import from elsewhere*/}
-                    {/*</Button>*/}
+                <Horizontal gap={10} alignItems="center">
+                    <BigTitle>Marketplace</BigTitle>
                 </Horizontal>
                 {<Error error={error} />}
                 <Vertical>

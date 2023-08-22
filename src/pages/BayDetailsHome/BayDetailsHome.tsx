@@ -40,7 +40,7 @@ export default function BayDetailsHome() {
 
     return (
         <Fragment>
-            <Title>Home</Title>
+            <Title className={styles.title}>Home</Title>
             <nav className={styles.nav}>
                 {instance?.environment &&
                     instance?.environment

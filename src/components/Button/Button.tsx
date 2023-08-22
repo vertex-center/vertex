@@ -4,6 +4,7 @@ import styles from "./Button.module.sass";
 import Symbol from "../Symbol/Symbol";
 import classNames from "classnames";
 import Spacer from "../Spacer/Spacer";
+import { Link } from "react-router-dom";
 
 export type ButtonProps = HTMLProps<HTMLButtonElement> & {
     leftSymbol?: string | any;
@@ -15,7 +16,8 @@ export type ButtonProps = HTMLProps<HTMLButtonElement> & {
     loading?: boolean;
     disabled?: boolean;
 
-    onClick: () => void;
+    onClick?: () => void;
+    to?: string;
 
     color?: "default" | "red";
 
@@ -36,28 +38,15 @@ export default function Button(props: ButtonProps) {
         selected,
         selectable,
         onClick,
+        to,
         className,
         type,
         color,
         ...others
     } = props;
 
-    return (
-        <button
-            className={classNames({
-                [styles.button]: true,
-                [styles.primary]: primary,
-                [styles.large]: large,
-                [styles.selected]: selected,
-                [styles.disabled]: disabled,
-                [styles.loading]: loading,
-                [styles.colorRed]: color === "red",
-                [className]: true,
-            })}
-            type="button"
-            onClick={disabled || loading ? () => {} : onClick}
-            {...others}
-        >
+    const content = (
+        <Fragment>
             {leftSymbol && (
                 <Symbol className={styles.symbol} name={leftSymbol} />
             )}
@@ -81,6 +70,38 @@ export default function Button(props: ButtonProps) {
                     />
                 </Fragment>
             )}
+        </Fragment>
+    );
+
+    const properties: any = {
+        className: classNames({
+            [styles.button]: true,
+            [styles.primary]: primary,
+            [styles.large]: large,
+            [styles.selected]: selected,
+            [styles.disabled]: disabled,
+            [styles.loading]: loading,
+            [styles.colorRed]: color === "red",
+            [className]: true,
+        }),
+    };
+
+    if (to) {
+        return (
+            <Link to={to} {...properties} {...others}>
+                {content}
+            </Link>
+        );
+    }
+
+    return (
+        <button
+            {...properties}
+            type="button"
+            onClick={disabled || loading ? () => {} : onClick}
+            {...others}
+        >
+            {content}
         </button>
     );
 }

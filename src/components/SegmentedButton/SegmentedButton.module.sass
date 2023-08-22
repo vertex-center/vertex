@@ -1,11 +1,16 @@
+@use "../../styles/colors"
 @use "../../styles/dimensions"
 
 .button
     margin: 0
     border-radius: 0
+    border: 1px solid transparent
+
+    &Selected
+        border-color: colors.$bg-accent
 
     &:first-of-type
-        border-radius: dimensions.$border-radius 0 0 dimensions.$border-radius
+        border-radius: dimensions.$border-radius-lg 0 0 dimensions.$border-radius-lg
 
     &:last-of-type
-        border-radius: 0 dimensions.$border-radius dimensions.$border-radius 0
+        border-radius: 0 dimensions.$border-radius-lg dimensions.$border-radius-lg 0

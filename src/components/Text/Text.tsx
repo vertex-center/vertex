@@ -3,6 +3,16 @@ import { HTMLProps } from "react";
 import styles from "./Text.module.sass";
 import classNames from "classnames";
 
+export function BigTitle(props: HTMLProps<HTMLHeadingElement>) {
+    const { children, className, ...others } = props;
+
+    return (
+        <h1 className={classNames(styles.bigtitle, className)} {...others}>
+            {children}
+        </h1>
+    );
+}
+
 export function Title(props: HTMLProps<HTMLHeadingElement>) {
     const { children, className, ...others } = props;
 

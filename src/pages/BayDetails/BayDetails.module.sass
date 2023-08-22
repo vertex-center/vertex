@@ -2,18 +2,20 @@
 @use "../../styles/dimensions"
 @use "../../styles/fonts"
 
+.title
+    margin: 20px 50px
+
 .details
     position: relative
     width: 100vw
     height: 100vh
 
 .bay
-    padding: 20px 40px
-    border-bottom: 1px solid colors.$bg-secondary
+    padding: 0 20px 10px
 
 .content
     width: 100vw
-    height: calc(100vh - 117px - 79px)
+    height: calc(100vh - 240px)
 
 .side
     display: flex
@@ -21,8 +23,7 @@
     overflow: auto
     gap: 20px
     width: 100%
-
-    padding: 32px 0
+    padding: 20px 0
 
     & > *
-        margin: 0 24px
+        margin: 0 20px

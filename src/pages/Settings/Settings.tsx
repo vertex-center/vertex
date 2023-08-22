@@ -8,6 +8,7 @@ import { Horizontal } from "../../components/Layouts/Layouts";
 
 import styles from "./Settings.module.sass";
 import { Outlet } from "react-router-dom";
+import { BigTitle } from "../../components/Text/Text";
 
 type Props = {};
 
@@ -15,6 +16,9 @@ export default function Settings(props: Props) {
     return (
         <div>
             <HeaderHome />
+            <div className={styles.title}>
+                <BigTitle>Settings</BigTitle>
+            </div>
             <Horizontal className={styles.content}>
                 <Sidebar>
                     <SidebarTitle>Settings</SidebarTitle>

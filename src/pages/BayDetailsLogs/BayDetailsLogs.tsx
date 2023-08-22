@@ -9,6 +9,7 @@ import {
 import { useParams } from "react-router-dom";
 import { getLatestLogs } from "../../backend/backend";
 import { Title } from "../../components/Text/Text";
+import styles from "./BayDetailsLogs.module.sass";
 
 export default function BayDetailsLogs() {
     const { uuid } = useParams();
@@ -61,7 +62,7 @@ export default function BayDetailsLogs() {
 
     return (
         <Fragment>
-            <Title>Logs</Title>
+            <Title className={styles.title}>Logs</Title>
             <Logs lines={logs} />
         </Fragment>
     );

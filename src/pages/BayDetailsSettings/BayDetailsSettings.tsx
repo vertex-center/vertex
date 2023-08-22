@@ -12,6 +12,8 @@ import Symbol from "../../components/Symbol/Symbol";
 import ToggleButton from "../../components/ToggleButton/ToggleButton";
 import Input from "../../components/Input/Input";
 
+import styles from "./BayDetailsSettings.module.sass";
+
 type Props = {};
 
 export default function BayDetailsSettings(props: Props) {
@@ -52,7 +54,7 @@ export default function BayDetailsSettings(props: Props) {
 
     return (
         <Fragment>
-            <Title>Settings</Title>
+            <Title className={styles.title}>Settings</Title>
             <Input
                 label="Instance name"
                 description="The custom name of your choice for this service"
@@ -63,7 +65,7 @@ export default function BayDetailsSettings(props: Props) {
                 }}
                 disabled={displayName === undefined}
             />
-            <Horizontal alignItems="center">
+            <Horizontal className={styles.toggle} alignItems="center">
                 <Text>Launch on Startup</Text>
                 <Spacer />
                 <ToggleButton
@@ -86,7 +88,11 @@ export default function BayDetailsSettings(props: Props) {
             </Button>
             {uploading && <Progress infinite />}
             {!uploading && saved && (
-                <Horizontal alignItems="center" gap={4}>
+                <Horizontal
+                    className={styles.saved}
+                    alignItems="center"
+                    gap={4}
+                >
                     <Symbol name="check" />
                     Saved!
                 </Horizontal>

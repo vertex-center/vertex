@@ -2,18 +2,21 @@
 @use "../../styles/dimensions"
 @use "../../styles/fonts"
 
+.title
+    margin: 0 40px
+
 .nav
     display: grid
     grid-template-columns: repeat(3, 1fr)
-    gap: 20px
+    gap: 10px
 
     &Item
         display: flex
         flex-direction: column
         gap: 16px
         background-color: colors.$bg-secondary
-        border-radius: dimensions.$border-radius
-        padding: 12px 16px 16px
+        border-radius: dimensions.$border-radius-lg
+        padding: 15px 30px
         border: 1px solid colors.$bg-secondary
         transition: all 0.1s ease
         cursor: pointer

@@ -125,7 +125,9 @@ export default function BayDetailsDependencies() {
 
     return (
         <Fragment>
-            <Title>Dependencies ({Object.keys(dependencies).length})</Title>
+            <Title className={styles.title}>
+                Dependencies ({Object.keys(dependencies).length})
+            </Title>
             <Horizontal alignItems="center">
                 <Button
                     rightSymbol="refresh"
@@ -136,7 +138,7 @@ export default function BayDetailsDependencies() {
                     Reload
                 </Button>
             </Horizontal>
-            <Vertical gap={12}>
+            <Vertical className={styles.dependencies} gap={12}>
                 {Object.entries(dependencies).map(([name, dep]) => (
                     <Dependency
                         key={name}

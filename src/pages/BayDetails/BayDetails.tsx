@@ -23,7 +23,7 @@ import Sidebar, {
     SidebarTitle,
 } from "../../components/Sidebar/Sidebar";
 import Popup from "../../components/Popup/Popup";
-import { Text, Title } from "../../components/Text/Text";
+import { BigTitle, Text, Title } from "../../components/Text/Text";
 import Button from "../../components/Button/Button";
 import Progress from "../../components/Progress";
 import { SiDocker } from "@icons-pack/react-simple-icons";
@@ -71,7 +71,7 @@ export default function BayDetails() {
         setError(undefined);
         deleteInstance(uuid)
             .then(() => {
-                navigate("/");
+                navigate("/infrastructure");
             })
             .catch((err) => {
                 setError(err?.response?.data?.message ?? err?.message);
@@ -86,9 +86,11 @@ export default function BayDetails() {
     return (
         <div className={styles.details}>
             <Header />
+            <div className={styles.title}>
+                <BigTitle>{instance?.name}</BigTitle>
+            </div>
             <div className={styles.bay}>
                 <Bay
-                    showCables
                     instances={[
                         {
                             name: instance?.display_name ?? instance?.name,
@@ -103,20 +105,20 @@ export default function BayDetails() {
                 <Sidebar>
                     <SidebarItem to="/" symbol="arrow_back" name="Back" />
                     <SidebarItem
-                        to={`/bay/${uuid}/`}
+                        to={`/infrastructure/${uuid}/`}
                         symbol="home"
                         name="Home"
                     />
                     <SidebarSeparator />
                     <SidebarTitle>Analyze</SidebarTitle>
                     <SidebarItem
-                        to={`/bay/${uuid}/logs`}
+                        to={`/infrastructure/${uuid}/logs`}
                         symbol="terminal"
                         name="Logs"
                     />
                     {instance?.install_method === "docker" && (
                         <SidebarItem
-                            to={`/bay/${uuid}/docker`}
+                            to={`/infrastructure/${uuid}/docker`}
                             symbol={<SiDocker size={20} />}
                             name="Docker"
                         />
@@ -130,19 +132,19 @@ export default function BayDetails() {
                     <SidebarSeparator />
                     <SidebarTitle>Manage</SidebarTitle>
                     <SidebarItem
-                        to={`/bay/${uuid}/environment`}
+                        to={`/infrastructure/${uuid}/environment`}
                         symbol="tune"
                         name="Environment"
                     />
                     {instance?.install_method !== "docker" && (
                         <SidebarItem
-                            to={`/bay/${uuid}/dependencies`}
+                            to={`/infrastructure/${uuid}/dependencies`}
                             symbol="widgets"
                             name="Dependencies"
                         />
                     )}
                     <SidebarItem
-                        to={`/bay/${uuid}/settings`}
+                        to={`/infrastructure/${uuid}/settings`}
                         symbol="settings"
                         name="Settings"
                     />
@@ -168,7 +170,7 @@ export default function BayDetails() {
                     </Text>
                     {deleting && <Progress infinite />}
                     {error && <Error error={error} />}
-                    <Horizontal gap={12}>
+                    <Horizontal gap={10}>
                         <Spacer />
                         <Button
                             onClick={dismissDeletePopup}
