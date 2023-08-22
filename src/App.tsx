@@ -17,6 +17,7 @@ import BayDetailsSettings from "./pages/BayDetailsSettings/BayDetailsSettings";
 import BayDetailsStatus from "./pages/BayDetailsStatus/BayDetailsStatus";
 import Store from "./pages/Store/Store";
 import Dock from "./components/Dock/Dock";
+import BayDetailsUpdate from "./pages/BayDetailsUpdate/BayDetailsUpdate";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -61,6 +62,10 @@ function App() {
                         <Route
                             path="/infrastructure/:uuid/dependencies"
                             element={<BayDetailsDependencies />}
+                        />
+                        <Route
+                            path="/infrastructure/:uuid/update"
+                            element={<BayDetailsUpdate />}
                         />
                         <Route
                             path="/infrastructure/:uuid/settings"

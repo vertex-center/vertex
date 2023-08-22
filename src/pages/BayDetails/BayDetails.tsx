@@ -144,6 +144,11 @@ export default function BayDetails() {
                         />
                     )}
                     <SidebarItem
+                        to={`/infrastructure/${uuid}/update`}
+                        symbol="update"
+                        name="Update"
+                    />
+                    <SidebarItem
                         to={`/infrastructure/${uuid}/settings`}
                         symbol="settings"
                         name="Settings"
