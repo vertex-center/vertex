@@ -1,0 +1,25 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+
+.button
+    position: relative
+    display: flex
+    align-items: center
+    justify-content: center
+
+    & > *
+        position: relative
+        z-index: 20
+
+    &::before
+        z-index: 10
+        content: ''
+        position: absolute
+        top: -10px
+        left: -10px
+        right: -10px
+        bottom: -10px
+        border-radius: dimensions.$border-radius-lg
+
+    &:hover::before
+        background-color: colors.$bg-secondary-hover

@@ -29,6 +29,7 @@ import Progress from "../../components/Progress";
 import { SiDocker } from "@icons-pack/react-simple-icons";
 import useInstance from "../../hooks/useInstance";
 import { Error } from "../../components/Error/Error";
+import BackButton from "../../components/BackButton/BackButton";
 
 export default function BayDetails() {
     const { uuid } = useParams();
@@ -87,6 +88,7 @@ export default function BayDetails() {
         <div className={styles.details}>
             <Header />
             <div className={styles.title}>
+                <BackButton to="/infrastructure" />
                 <BigTitle>{instance?.name}</BigTitle>
             </div>
             <div className={styles.bay}>
@@ -103,7 +105,6 @@ export default function BayDetails() {
             </div>
             <Horizontal className={styles.content}>
                 <Sidebar>
-                    <SidebarItem to="/" symbol="arrow_back" name="Back" />
                     <SidebarItem
                         to={`/infrastructure/${uuid}/`}
                         symbol="home"
