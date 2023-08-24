@@ -118,7 +118,7 @@ type ServiceMethodDocker struct {
 	Environment *map[string]string `yaml:"environment,omitempty" json:"environment,omitempty"`
 
 	// Capabilities is an array containing all additional Docker capabilities.
-	Capabilities *[]string `yaml:"capabilities" json:"capabilities"`
+	Capabilities *[]string `yaml:"capabilities,omitempty" json:"capabilities,omitempty"`
 }
 
 type ServiceMethods struct {
