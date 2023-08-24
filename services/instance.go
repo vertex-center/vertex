@@ -191,10 +191,12 @@ func (s *InstanceService) StartAll() {
 
 	// Start them
 	for _, id := range ids {
-		err := s.Start(id)
-		if err != nil {
-			logger.Error(err).Print()
-		}
+		go func(id uuid.UUID) {
+			err := s.Start(id)
+			if err != nil {
+				logger.Error(err).Print()
+			}
+		}(id)
 	}
 }
 
