@@ -8,6 +8,7 @@ import (
 	"io"
 	"path"
 	"path/filepath"
+	"strings"
 
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -106,7 +107,9 @@ func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg s
 		var binds []string
 		if instance.Methods.Docker.Volumes != nil {
 			for source, target := range *instance.Methods.Docker.Volumes {
-				source, err = filepath.Abs(path.Join(instancePath, "volumes", source))
+				if !strings.HasPrefix(source, "/") {
+					source, err = filepath.Abs(path.Join(instancePath, "volumes", source))
+				}
 				if err != nil {
 					return err
 				}
