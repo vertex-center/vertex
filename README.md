@@ -15,9 +15,11 @@
 
 Vertex is a program that allows you to create your self-hosted server easily. Install, configure and start new services in less than a minute.
 
-<img width="1515" alt="image" src="https://user-images.githubusercontent.com/12123721/229261331-b2c8de51-f88a-458d-9eff-0ea73c83a0ad.png">
-
 Vertex is designed to be installed on low-powered computers like Raspberry Pi, so avoiding systems like Docker and prioritizing compiled languages like Go, Rust or C++.
+
+<img width="1884" alt="image" src="https://github.com/vertex-center/vertex/assets/12123721/a2b59a98-3b0d-4323-9db3-2078683eaf90">
+
+<img width="1884" alt="image" src="https://github.com/vertex-center/vertex/assets/12123721/1b801d93-3ea0-4547-a6e6-4ccb3caf2c4c">
 
 ## Installation
 
@@ -42,15 +44,9 @@ Decompress and execute the binary. Then, go to http://localhost:6130/. Enjoy!
 
 ## Available services
 
-<img width="822" alt="image" src="https://user-images.githubusercontent.com/12123721/229261568-399c5970-600b-4023-96b1-bddd7feba81e.png">
+All services are fetched from [Vertex Services](https://github.com/vertex-center/vertex-services). Installation can be done in one click, using Docker or package manager. Everything is handled automatically.
 
-There are 3 methods to install new services:
-
-1. **From Marketplace.** These are services officially [released](https://github.com/vertex-center/vertex-services) by the Vertex team. Simply select the service you want from the UI, and install.
-2. **From Git.** For unofficial services, you can easily provide a link to the repository. Vertex will clone and start the project automatically.
-3. **From Local storage.** This method is useful while contributing to Vertex. You can select the path of a service on your computer, and Vertex will handle it automatically.
-
-With all these methods, Vertex aims to be a flexible way to manage all your services.
+<img width="1884" alt="image" src="https://github.com/vertex-center/vertex/assets/12123721/30fef18d-ec3a-46e5-b73c-9c26d8a19a9f">
 
 ## License
 
