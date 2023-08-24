@@ -3,6 +3,7 @@ module github.com/vertex-center/vertex
 go 1.20
 
 require (
+	github.com/antelman107/net-wait-go v0.0.0-20220211074630-12d8a944b87d
 	github.com/docker/docker v23.0.3+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/fatih/color v1.14.1

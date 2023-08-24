@@ -6,7 +6,9 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 
+	"github.com/antelman107/net-wait-go/wait"
 	"github.com/go-git/go-git/v5"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/pkg/logger"
@@ -157,12 +159,39 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 }
 
 func (s *InstanceService) StartAll() {
+	var ids []uuid.UUID
+
+	// Select instances that should launch on startup
 	for _, i := range s.instanceRepo.GetAll() {
 		launchOnStartup := i.InstanceMetadata.LaunchOnStartup
+
 		if launchOnStartup != nil && !*launchOnStartup {
 			continue
 		}
-		err := s.Start(i.UUID)
+
+		ids = append(ids, i.UUID)
+	}
+
+	if len(ids) == 0 {
+		return
+	}
+
+	logger.Log("trying to ping Google...").Print()
+
+	// Wait for internet connection
+	if !wait.New(
+		wait.WithWait(time.Second),
+		wait.WithBreak(500*time.Millisecond),
+	).Do([]string{"google.com:80"}) {
+		logger.Error(errors.New("internet connection: Failed to ping google.com")).Print()
+		return
+	} else {
+		logger.Log("internet connection: OK").Print()
+	}
+
+	// Start them
+	for _, id := range ids {
+		err := s.Start(id)
 		if err != nil {
 			logger.Error(err).Print()
 		}
