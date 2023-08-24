@@ -19,11 +19,12 @@ export default function EnvVariableInput(props: Props) {
         label: env.display_name,
         name: env.name,
         description: env.description,
-        onChange: (e) => onChange(e.target.value),
+        onChange: (e: any) => onChange(e.target.value),
+        type: env.secret ? "password" : undefined,
         disabled,
     };
 
-    let input;
+    let input: any;
     if (env.type === "port") {
         input = <PortInput {...inputProps} />;
     } else if (env.type === "timezone") {
