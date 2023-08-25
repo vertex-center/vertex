@@ -20,7 +20,7 @@ type Service struct {
 	Description string `yaml:"description" json:"description"`
 
 	// Features describes some features of the service to help Vertex.
-	Features *Features `yaml:"features" json:"features"`
+	Features *Features `yaml:"features,omitempty" json:"features,omitempty"`
 
 	// EnvDefinitions defines all parameterizable environment variables.
 	EnvDefinitions []EnvDefinition `yaml:"environment,omitempty" json:"environment,omitempty"`
