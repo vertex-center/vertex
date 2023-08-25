@@ -43,6 +43,8 @@ export const getInstanceDependencies = async (uuid: string) =>
     api.get<Dependencies>(`/instance/${uuid}/dependencies`);
 export const getInstanceDockerContainerInfo = async (uuid: string) =>
     api.get<DockerContainerInfo>(`/instance/${uuid}/docker`);
+export const recreateDockerContainer = async (uuid: string) =>
+    api.post(`/instance/${uuid}/docker/recreate`);
 export const getInstanceStatus = async (uuid: string) =>
     api.get<Uptime[]>(`/instance/${uuid}/status`);
 export const installPackages = async (packages) =>

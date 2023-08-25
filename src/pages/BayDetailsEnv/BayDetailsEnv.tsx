@@ -9,6 +9,7 @@ import { Horizontal } from "../../components/Layouts/Layouts";
 import useInstance from "../../hooks/useInstance";
 import { Env, EnvVariable } from "../../models/service";
 import styles from "./BayDetailsEnv.module.sass";
+import Loading from "../../components/Loading/Loading";
 
 type Props = {};
 
@@ -77,8 +78,11 @@ export default function BayDetailsEnv(props: Props) {
                 loading={uploading}
                 disabled={saved || saved === undefined}
             >
-                Save
+                Save{" "}
+                {instance?.install_method === "docker" &&
+                    "+ Recreate container"}
             </Button>
+            {uploading && <Loading />}
             {saved && (
                 <Horizontal
                     className={styles.saved}
