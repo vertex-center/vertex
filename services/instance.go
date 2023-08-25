@@ -536,3 +536,22 @@ func (s *InstanceService) PreInstallForDocker(service types.Service, dir string)
 	}
 	return nil
 }
+
+func (s *InstanceService) RecreateContainer(instance *types.Instance) error {
+	if !instance.IsDockerized() {
+		return nil
+	}
+
+	if instance.IsRunning() {
+		err := s.dockerRunnerRepo.Stop(instance)
+		if err != nil {
+			return err
+		}
+	}
+
+	err := s.dockerRunnerRepo.Delete(instance)
+	if err != nil {
+		return err
+	}
+	return s.Start(instance.UUID)
+}

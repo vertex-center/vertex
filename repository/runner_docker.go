@@ -77,7 +77,7 @@ func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg s
 
 	// Create
 	id, err := r.getContainerID(*instance)
-	if err == ErrContainerNotFound {
+	if errors.Is(err, ErrContainerNotFound) {
 		logger.Log("container doesn't exists, create it.").
 			AddKeyValue("container_name", instance.DockerContainerName()).
 			Print()

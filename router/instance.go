@@ -23,6 +23,7 @@ func addInstanceRoutes(r *gin.RouterGroup) {
 	r.GET("/events", headersSSE, handleInstanceEvents)
 	r.GET("/dependencies", handleGetDependencies)
 	r.GET("/docker", handleGetDocker)
+	r.POST("/docker/recreate", handleRecreateDockerContainer)
 	r.GET("/logs", handleGetLogs)
 }
 
@@ -138,10 +139,17 @@ func handlePatchEnvironment(c *gin.Context) {
 	}
 
 	uid := getParamInstanceUUID(c)
+	i := getInstance(c)
 
 	err = instanceService.WriteEnv(*uid, environment)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to save environment: %v", err))
+		return
+	}
+
+	err = instanceService.RecreateContainer(i)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -252,6 +260,18 @@ func handleGetDocker(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, info)
+}
+
+func handleRecreateDockerContainer(c *gin.Context) {
+	i := getInstance(c)
+
+	err := instanceService.RecreateContainer(i)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.Status(http.StatusOK)
 }
 
 func handleGetLogs(c *gin.Context) {
