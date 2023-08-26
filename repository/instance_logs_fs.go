@@ -114,8 +114,8 @@ func (l *InstanceLogger) Close() error {
 }
 
 func (r *InstanceLogsFSRepository) getLogger(uuid uuid.UUID) (*InstanceLogger, error) {
-	l := r.loggers[uuid]
-	if l == nil {
+	l, ok := r.loggers[uuid]
+	if !ok {
 		return nil, ErrInstanceNotFound
 	}
 	return l, nil

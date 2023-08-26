@@ -34,11 +34,11 @@ func NewInstanceFSRepository() InstanceFSRepository {
 }
 
 func (r *InstanceFSRepository) Get(uuid uuid.UUID) (*types.Instance, error) {
-	i := r.instances[uuid]
-	if i == nil {
-		return nil, fmt.Errorf("the service '%s' is not instances", uuid)
+	instance, ok := r.instances[uuid]
+	if !ok {
+		return nil, fmt.Errorf("the service '%s' doesn't exist", uuid)
 	}
-	return i, nil
+	return instance, nil
 }
 
 func (r *InstanceFSRepository) GetAll() map[uuid.UUID]*types.Instance {
