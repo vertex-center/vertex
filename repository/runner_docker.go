@@ -54,7 +54,6 @@ func (r RunnerDockerRepository) Delete(instance *types.Instance) error {
 
 func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg string), onErr func(msg string), setStatus func(status string)) error {
 	imageName := instance.DockerImageName()
-	containerName := instance.DockerContainerName()
 
 	setStatus(types.InstanceStatusBuilding)
 
@@ -78,12 +77,23 @@ func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg s
 	// Create
 	id, err := r.getContainerID(*instance)
 	if errors.Is(err, ErrContainerNotFound) {
+		containerName := instance.DockerContainerName()
+
 		logger.Log("container doesn't exists, create it.").
-			AddKeyValue("container_name", instance.DockerContainerName()).
+			AddKeyValue("container_name", containerName).
 			Print()
 
-		exposedPorts := nat.PortSet{}
-		portBindings := nat.PortMap{}
+		options := createContainerOptions{
+			imageName:     imageName,
+			containerName: containerName,
+			exposedPorts:  nat.PortSet{},
+			portBindings:  nat.PortMap{},
+			binds:         []string{},
+			env:           []string{},
+			capAdd:        []string{},
+		}
+
+		// exposedPorts and portBindings
 		if instance.Methods.Docker.Ports != nil {
 			var all []string
 
@@ -98,13 +108,13 @@ func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg s
 			}
 
 			var err error
-			exposedPorts, portBindings, err = nat.ParsePortSpecs(all)
+			options.exposedPorts, options.portBindings, err = nat.ParsePortSpecs(all)
 			if err != nil {
 				return err
 			}
 		}
 
-		var binds []string
+		// binds
 		if instance.Methods.Docker.Volumes != nil {
 			for source, target := range *instance.Methods.Docker.Volumes {
 				if !strings.HasPrefix(source, "/") {
@@ -113,27 +123,28 @@ func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg s
 				if err != nil {
 					return err
 				}
-				binds = append(binds, source+":"+target)
+				options.binds = append(options.binds, source+":"+target)
 			}
 		}
 
-		var env []string
+		// env
 		if instance.Methods.Docker.Environment != nil {
 			for in, out := range *instance.Methods.Docker.Environment {
 				value := instance.EnvVariables[out]
-				env = append(env, in+"="+value)
+				options.env = append(options.env, in+"="+value)
 			}
 		}
 
-		var capAdd []string
+		// capAdd
 		if instance.Methods.Docker.Capabilities != nil {
-			capAdd = *instance.Methods.Docker.Capabilities
+			options.capAdd = *instance.Methods.Docker.Capabilities
 		}
 
 		if instance.Methods.Docker.Dockerfile != nil {
-			id, err = r.createContainer(imageName, containerName, exposedPorts, portBindings, binds, env, capAdd)
+			id, err = r.createContainer(options)
 		} else if instance.Methods.Docker.Image != nil {
-			id, err = r.createContainer(*instance.Methods.Docker.Image, instance.DockerContainerName(), exposedPorts, portBindings, binds, env, capAdd)
+			options.imageName = *instance.Methods.Docker.Image
+			id, err = r.createContainer(options)
 		}
 		if err != nil {
 			return err
@@ -337,23 +348,33 @@ func (r RunnerDockerRepository) buildImageFromDockerfile(instancePath string, im
 	return nil
 }
 
-func (r RunnerDockerRepository) createContainer(imageName string, containerName string, exposedPorts nat.PortSet, portBindings nat.PortMap, binds []string, env []string, capAdd []string) (string, error) {
+type createContainerOptions struct {
+	imageName     string
+	containerName string
+	exposedPorts  nat.PortSet
+	portBindings  nat.PortMap
+	binds         []string
+	env           []string
+	capAdd        []string
+}
+
+func (r RunnerDockerRepository) createContainer(options createContainerOptions) (string, error) {
 	config := container.Config{
-		Image:        imageName,
-		ExposedPorts: exposedPorts,
-		Env:          env,
+		Image:        options.imageName,
+		ExposedPorts: options.exposedPorts,
+		Env:          options.env,
 		Tty:          true,
 		AttachStdout: true,
 		AttachStderr: true,
 	}
 
 	hostConfig := container.HostConfig{
-		Binds:        binds,
-		PortBindings: portBindings,
-		CapAdd:       capAdd,
+		Binds:        options.binds,
+		PortBindings: options.portBindings,
+		CapAdd:       options.capAdd,
 	}
 
-	res, err := r.cli.ContainerCreate(context.Background(), &config, &hostConfig, nil, nil, containerName)
+	res, err := r.cli.ContainerCreate(context.Background(), &config, &hostConfig, nil, nil, options.containerName)
 	for _, warn := range res.Warnings {
 		logger.Warn("warning while creating container").
 			AddKeyValue("warning", warn).
