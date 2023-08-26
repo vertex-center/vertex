@@ -76,15 +76,15 @@ func (r *InstanceFSRepository) Set(uuid uuid.UUID, instance types.Instance) erro
 	return nil
 }
 
-func (r *InstanceFSRepository) SaveMetadata(i *types.Instance) error {
-	metaPath := path.Join(r.GetPath(i.UUID), ".vertex", "instance_metadata.json")
+func (r *InstanceFSRepository) SaveSettings(i *types.Instance) error {
+	settingsPath := path.Join(r.GetPath(i.UUID), ".vertex", "instance_settings.json")
 
-	metaBytes, err := json.MarshalIndent(i.InstanceMetadata, "", "\t")
+	settingsBytes, err := json.MarshalIndent(i.InstanceSettings, "", "\t")
 	if err != nil {
 		return err
 	}
 
-	err = os.WriteFile(metaPath, metaBytes, os.ModePerm)
+	err = os.WriteFile(settingsPath, settingsBytes, os.ModePerm)
 	if err != nil {
 		return err
 	}
@@ -92,16 +92,16 @@ func (r *InstanceFSRepository) SaveMetadata(i *types.Instance) error {
 	return nil
 }
 
-func (r *InstanceFSRepository) LoadMetadata(i *types.Instance) error {
-	metaPath := path.Join(r.GetPath(i.UUID), ".vertex", "instance_metadata.json")
-	metaBytes, err := os.ReadFile(metaPath)
+func (r *InstanceFSRepository) LoadSettings(i *types.Instance) error {
+	settingsPath := path.Join(r.GetPath(i.UUID), ".vertex", "instance_settings.json")
+	settingsBytes, err := os.ReadFile(settingsPath)
 
 	if errors.Is(err, os.ErrNotExist) {
-		logger.Log("instance_metadata.json not found. using default.").Print()
+		logger.Log("instance_settings.json not found. using default.").Print()
 	} else if err != nil {
 		return err
 	} else {
-		err = json.Unmarshal(metaBytes, &i.InstanceMetadata)
+		err = json.Unmarshal(settingsBytes, &i.InstanceSettings)
 		if err != nil {
 			return err
 		}

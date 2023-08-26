@@ -163,7 +163,7 @@ func (s *InstanceService) StartAll() {
 
 	// Select instances that should launch on startup
 	for _, i := range s.instanceRepo.GetAll() {
-		launchOnStartup := i.InstanceMetadata.LaunchOnStartup
+		launchOnStartup := i.InstanceSettings.LaunchOnStartup
 
 		if launchOnStartup != nil && !*launchOnStartup {
 			continue
@@ -324,9 +324,9 @@ func (s *InstanceService) Install(serviceID string, method string) (*types.Insta
 		return nil, err
 	}
 
-	instance.InstanceMetadata.InstallMethod = &method
+	instance.InstanceSettings.InstallMethod = &method
 
-	err = s.instanceRepo.SaveMetadata(instance)
+	err = s.instanceRepo.SaveSettings(instance)
 	if err != nil {
 		return nil, err
 	}
@@ -368,8 +368,8 @@ func (s *InstanceService) SetLaunchOnStartup(uuid uuid.UUID, value bool) error {
 		return err
 	}
 
-	i.InstanceMetadata.LaunchOnStartup = &value
-	return s.instanceRepo.SaveMetadata(i)
+	i.InstanceSettings.LaunchOnStartup = &value
+	return s.instanceRepo.SaveSettings(i)
 }
 
 func (s *InstanceService) SetDisplayName(uuid uuid.UUID, value string) error {
@@ -378,8 +378,8 @@ func (s *InstanceService) SetDisplayName(uuid uuid.UUID, value string) error {
 		return err
 	}
 
-	i.InstanceMetadata.DisplayName = &value
-	return s.instanceRepo.SaveMetadata(i)
+	i.InstanceSettings.DisplayName = &value
+	return s.instanceRepo.SaveSettings(i)
 }
 
 func (s *InstanceService) GetDockerContainerInfo(uuid uuid.UUID) (map[string]any, error) {
@@ -474,7 +474,7 @@ func (s *InstanceService) load(uuid uuid.UUID) error {
 
 	instance := types.NewInstance(uuid, service)
 
-	err = s.instanceRepo.LoadMetadata(&instance)
+	err = s.instanceRepo.LoadSettings(&instance)
 	if err != nil {
 		return err
 	}

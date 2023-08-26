@@ -19,7 +19,7 @@ const (
 	InstanceInstallMethodDocker  = "docker"
 )
 
-type InstanceMetadata struct {
+type InstanceSettings struct {
 	// Method indicates how the instance is installed.
 	// It can be by script, release or docker.
 	InstallMethod *string `json:"install_method,omitempty"`
@@ -36,7 +36,7 @@ type EnvVariables map[string]string
 
 type Instance struct {
 	Service
-	InstanceMetadata
+	InstanceSettings
 
 	UUID         uuid.UUID    `json:"uuid"`
 	Status       string       `json:"status"`
@@ -67,8 +67,8 @@ type InstanceRepository interface {
 	Exists(uuid uuid.UUID) bool
 	Set(uuid uuid.UUID, instance Instance) error
 
-	SaveMetadata(i *Instance) error
-	LoadMetadata(i *Instance) error
+	SaveSettings(i *Instance) error
+	LoadSettings(i *Instance) error
 
 	SaveEnv(i *Instance, variables map[string]string) error
 	LoadEnv(i *Instance) error
@@ -91,5 +91,5 @@ func (i *Instance) IsRunning() bool {
 }
 
 func (i *Instance) IsDockerized() bool {
-	return i.InstanceMetadata.InstallMethod != nil && *i.InstanceMetadata.InstallMethod == InstanceInstallMethodDocker
+	return i.InstanceSettings.InstallMethod != nil && *i.InstanceSettings.InstallMethod == InstanceInstallMethodDocker
 }
