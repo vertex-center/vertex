@@ -17,7 +17,7 @@ import (
 const bufferSize = 50
 
 var (
-	ErrInstanceNotFound = errors.New("logs for this uuid are not found")
+	ErrLoggerNotFound = errors.New("instance logger not found")
 )
 
 type InstanceLogger struct {
@@ -116,7 +116,7 @@ func (l *InstanceLogger) Close() error {
 func (r *InstanceLogsFSRepository) getLogger(uuid uuid.UUID) (*InstanceLogger, error) {
 	l, ok := r.loggers[uuid]
 	if !ok {
-		return nil, ErrInstanceNotFound
+		return nil, ErrLoggerNotFound
 	}
 	return l, nil
 }

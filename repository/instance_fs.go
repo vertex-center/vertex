@@ -18,7 +18,9 @@ import (
 )
 
 var (
-	ErrContainerNotFound = errors.New("container not found")
+	ErrInstanceNotFound      = errors.New("instance not found")
+	ErrInstanceAlreadyExists = errors.New("instance already exists")
+	ErrContainerNotFound     = errors.New("container not found")
 )
 
 type InstanceFSRepository struct {
@@ -36,7 +38,7 @@ func NewInstanceFSRepository() InstanceFSRepository {
 func (r *InstanceFSRepository) Get(uuid uuid.UUID) (*types.Instance, error) {
 	instance, ok := r.instances[uuid]
 	if !ok {
-		return nil, fmt.Errorf("the service '%s' doesn't exist", uuid)
+		return nil, ErrInstanceNotFound
 	}
 	return instance, nil
 }
@@ -52,7 +54,7 @@ func (r *InstanceFSRepository) GetPath(uuid uuid.UUID) string {
 func (r *InstanceFSRepository) Delete(uuid uuid.UUID) error {
 	err := os.RemoveAll(r.GetPath(uuid))
 	if err != nil {
-		return errors.New("failed to delete server")
+		return fmt.Errorf("failed to delete server: %v", err)
 	}
 
 	delete(r.instances, uuid)
@@ -66,7 +68,7 @@ func (r *InstanceFSRepository) Exists(uuid uuid.UUID) bool {
 
 func (r *InstanceFSRepository) Set(uuid uuid.UUID, instance types.Instance) error {
 	if r.Exists(uuid) {
-		return fmt.Errorf("the instance '%s' already exists", uuid)
+		return ErrInstanceAlreadyExists
 	}
 
 	r.instances[uuid] = &instance
