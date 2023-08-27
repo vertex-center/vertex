@@ -18,6 +18,7 @@ import BayDetailsStatus from "./pages/BayDetailsStatus/BayDetailsStatus";
 import Store from "./pages/Store/Store";
 import Dock from "./components/Dock/Dock";
 import BayDetailsUpdate from "./pages/BayDetailsUpdate/BayDetailsUpdate";
+import ReverseProxy from "./pages/ReverseProxy/ReverseProxy";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -35,6 +36,7 @@ function App() {
                         path="/infrastructure"
                         element={<Infrastructure />}
                     />
+                    <Route path="/proxy" element={<ReverseProxy />} />
                     <Route
                         path="/infrastructure/:uuid/"
                         element={<BayDetails />}

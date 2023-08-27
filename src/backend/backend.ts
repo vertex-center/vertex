@@ -53,3 +53,10 @@ export const getUpdates = async (reload?: boolean) =>
     api.get<Updates>(`/updates${reload ? "?reload=true" : ""}`);
 export const executeUpdates = async (updates: { name: string }[]) =>
     api.post("/updates", { updates });
+
+export const getProxyRedirects = async () =>
+    api.get<ProxyRedirects>("/proxy/redirects");
+export const addProxyRedirect = async (source: string, target: string) =>
+    api.post("/proxy/redirect", { source, target });
+export const removeProxyRedirect = async (id: string) =>
+    api.delete(`/proxy/redirect/${id}`);

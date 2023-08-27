@@ -1,0 +1,48 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+
+.redirect
+    display: flex
+    flex-direction: row
+    align-items: center
+    gap: 10px
+
+.url
+    background-color: colors.$bg-secondary
+    border-radius: dimensions.$border-radius-lg
+    display: flex
+    align-items: center
+    padding: 20px 40px
+    box-sizing: border-box
+    flex: 1 1 0
+    width: 0
+    height: 60px
+
+.line
+    height: 1px
+    width: 100px
+    background-color: colors.$bg-tertiary
+    margin: 0 10px
+
+.arrow
+    color: colors.$bg-tertiary
+
+.enabled
+    & > .line
+        background-color: colors.$green
+
+    & > .arrow
+        color: colors.$green
+
+.delete
+    display: flex
+    align-items: center
+    justify-content: center
+    height: 60px
+    aspect-ratio: 1
+    background-color: colors.$bg-secondary
+    border-radius: dimensions.$border-radius-lg
+    cursor: pointer
+
+    &:hover
+        background-color: colors.$bg-secondary-hover

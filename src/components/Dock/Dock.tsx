@@ -33,6 +33,7 @@ export default function Dock(props: Props) {
         <div className={styles.dockContainer}>
             <div className={styles.dock}>
                 <DockApp to="/infrastructure" symbol="storage" />
+                <DockApp to="/proxy" symbol="router" />
                 <DockApp to="/settings" symbol="settings" />
             </div>
         </div>
