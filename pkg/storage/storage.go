@@ -21,6 +21,7 @@ import (
 const (
 	PathClient    = "live/client"
 	PathPackages  = "live/packages"
+	PathProxy     = "live/proxy"
 	PathInstances = "live/instances"
 	PathServices  = "live/services"
 	PathUpdates   = "live/updates"

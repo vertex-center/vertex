@@ -39,6 +39,16 @@ func main() {
 		return
 	}
 
+	err = os.MkdirAll(storage.PathProxy, os.ModePerm)
+	if err != nil && !os.IsExist(err) {
+		logger.Error(fmt.Errorf("failed to create directory: %v", err)).
+			AddKeyValue("message", "failed to create directory").
+			AddKeyValue("path", storage.PathProxy).
+			Print()
+
+		return
+	}
+
 	err = setupDependencies()
 	if err != nil {
 		logger.Error(fmt.Errorf("failed to setup dependencies: %v", err)).Print()
@@ -51,7 +61,7 @@ func main() {
 		return
 	}
 
-	r := router.Create(router.About{
+	router := router.NewRouter(types.About{
 		Version: version,
 		Commit:  commit,
 		Date:    date,
@@ -59,22 +69,16 @@ func main() {
 		OS:   runtime.GOOS,
 		Arch: runtime.GOARCH,
 	})
-	defer router.Unload()
+	defer router.Stop()
 
+	// Logs
 	url := fmt.Sprintf("http://%s", config.Current.Host)
-
 	fmt.Printf("\n-- Vertex Client :: %s\n\n", url)
-
 	logger.Log("Vertex started").
 		AddKeyValue("url", url).
 		Print()
 
-	err = r.Run(fmt.Sprintf(":%s", config.Current.Port))
-	if err != nil {
-		logger.Error(fmt.Errorf("error while starting server: %v", err)).Print()
-	}
-
-	logger.Log("Vertex stopped").Print()
+	router.Start(fmt.Sprintf(":%s", config.Current.Port))
 }
 
 func parseArgs() {
