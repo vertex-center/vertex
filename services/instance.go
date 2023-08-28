@@ -459,6 +459,7 @@ func (s *InstanceService) reload() {
 	s.instanceRepo.Reload(func(uuid uuid.UUID) {
 		err := s.load(uuid)
 		if err != nil {
+			logger.Error(err).Print()
 			return
 		}
 	})
