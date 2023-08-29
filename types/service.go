@@ -102,6 +102,9 @@ type ServiceMethodDocker struct {
 	// Image is the Docker image to run.
 	Image *string `yaml:"image,omitempty" json:"image,omitempty"`
 
+	// Clone describes the repository to clone if some files are needed to run the script.
+	Clone *ServiceClone `yaml:"clone,omitempty" json:"clone,omitempty"`
+
 	// Dockerfile is the name of the Dockerfile if the repository is cloned.
 	Dockerfile *string `yaml:"dockerfile,omitempty" json:"dockerfile,omitempty"`
 

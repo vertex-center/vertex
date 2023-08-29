@@ -535,6 +535,14 @@ func (s *InstanceService) PreInstallForDocker(service types.Service, dir string)
 	if service.Methods.Docker == nil {
 		return ErrInstallMethodDoesNotExists
 	}
+
+	if service.Methods.Docker.Clone != nil {
+		err := s.CloneRepository(dir, service.Methods.Docker.Clone.Repository)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
