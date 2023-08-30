@@ -49,6 +49,16 @@ func main() {
 		return
 	}
 
+	err = os.MkdirAll(storage.PathSettings, os.ModePerm)
+	if err != nil && !os.IsExist(err) {
+		logger.Error(fmt.Errorf("failed to create directory: %v", err)).
+			AddKeyValue("message", "failed to create directory").
+			AddKeyValue("path", storage.PathProxy).
+			Print()
+
+		return
+	}
+
 	err = setupDependencies()
 	if err != nil {
 		logger.Error(fmt.Errorf("failed to setup dependencies: %v", err)).Print()

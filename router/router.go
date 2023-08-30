@@ -30,12 +30,14 @@ var (
 	packageRepo       repository.PackageFSRepository
 	serviceRepo       repository.ServiceFSRepository
 	proxyRepo         repository.ProxyFSRepository
+	settingsRepo      repository.SettingsFSRepository
 
 	packageService  services.PackageService
 	serviceService  services.ServiceService
 	proxyService    services.ProxyService
 	instanceService services.InstanceService
 	updateService   services.UpdateDependenciesService
+	settingsService services.SettingsService
 )
 
 type Router struct {
@@ -64,12 +66,14 @@ func NewRouter(about types.About) Router {
 	packageRepo = repository.NewPackageFSRepository(nil)
 	serviceRepo = repository.NewServiceFSRepository(nil)
 	proxyRepo = repository.NewProxyFSRepository(nil)
+	settingsRepo = repository.NewSettingsFSRepository(nil)
 
 	proxyService = services.NewProxyService(&proxyRepo)
 	instanceService = services.NewInstanceService(&serviceRepo, &instanceRepo, &runnerDockerRepo, &runnerFSRepo, &instanceLogsRepo, &eventInMemoryRepo)
 	packageService = services.NewPackageService(&packageRepo)
 	serviceService = services.NewServiceService(&serviceRepo)
 	updateService = services.NewUpdateDependenciesService(about.Version)
+	settingsService = services.NewSettingsService(&settingsRepo)
 
 	api := r.Group("/api")
 	api.GET("/ping", handlePing)
@@ -83,6 +87,7 @@ func NewRouter(about types.About) Router {
 	addPackagesRoutes(api.Group("/packages"))
 	addProxyRoutes(api.Group("/proxy"))
 	addUpdatesRoutes(api.Group("/updates"))
+	addSettingsRoutes(api.Group("/settings"))
 
 	router.engine = r
 

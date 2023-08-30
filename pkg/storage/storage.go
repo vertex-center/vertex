@@ -24,6 +24,7 @@ const (
 	PathProxy     = "live/proxy"
 	PathInstances = "live/instances"
 	PathServices  = "live/services"
+	PathSettings  = "live/settings"
 	PathUpdates   = "live/updates"
 )
 
