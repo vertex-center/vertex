@@ -447,6 +447,10 @@ func (s *InstanceService) GetUUID() uuid.UUID {
 }
 
 func (s *InstanceService) setStatus(instance *types.Instance, status string) {
+	if instance.Status == status {
+		return
+	}
+
 	instance.Status = status
 	s.eventsRepo.Send(types.EventInstancesChange{})
 	s.eventsRepo.Send(types.EventInstanceStatusChange{

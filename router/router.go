@@ -22,22 +22,23 @@ import (
 )
 
 var (
-	runnerDockerRepo  repository.RunnerDockerRepository
-	runnerFSRepo      repository.RunnerFSRepository
-	instanceRepo      repository.InstanceFSRepository
-	instanceLogsRepo  repository.InstanceLogsFSRepository
-	eventInMemoryRepo repository.EventInMemoryRepository
-	packageRepo       repository.PackageFSRepository
-	serviceRepo       repository.ServiceFSRepository
-	proxyRepo         repository.ProxyFSRepository
-	settingsRepo      repository.SettingsFSRepository
+	runnerDockerRepo repository.RunnerDockerRepository
+	runnerFSRepo     repository.RunnerFSRepository
+	instanceRepo     repository.InstanceFSRepository
+	instanceLogsRepo repository.InstanceLogsFSRepository
+	eventRepo        repository.EventInMemoryRepository
+	packageRepo      repository.PackageFSRepository
+	serviceRepo      repository.ServiceFSRepository
+	proxyRepo        repository.ProxyFSRepository
+	settingsRepo     repository.SettingsFSRepository
 
-	packageService  services.PackageService
-	serviceService  services.ServiceService
-	proxyService    services.ProxyService
-	instanceService services.InstanceService
-	updateService   services.UpdateDependenciesService
-	settingsService services.SettingsService
+	packageService       services.PackageService
+	notificationsService services.NotificationsService
+	serviceService       services.ServiceService
+	proxyService         services.ProxyService
+	instanceService      services.InstanceService
+	updateService        services.UpdateDependenciesService
+	settingsService      services.SettingsService
 )
 
 type Router struct {
@@ -62,14 +63,15 @@ func NewRouter(about types.About) Router {
 	runnerFSRepo = repository.NewRunnerFSRepository()
 	instanceRepo = repository.NewInstanceFSRepository()
 	instanceLogsRepo = repository.NewInstanceLogsFSRepository()
-	eventInMemoryRepo = repository.NewEventInMemoryRepository()
+	eventRepo = repository.NewEventInMemoryRepository()
 	packageRepo = repository.NewPackageFSRepository(nil)
 	serviceRepo = repository.NewServiceFSRepository(nil)
 	proxyRepo = repository.NewProxyFSRepository(nil)
 	settingsRepo = repository.NewSettingsFSRepository(nil)
 
 	proxyService = services.NewProxyService(&proxyRepo)
-	instanceService = services.NewInstanceService(&serviceRepo, &instanceRepo, &runnerDockerRepo, &runnerFSRepo, &instanceLogsRepo, &eventInMemoryRepo)
+	notificationsService = services.NewNotificationsService(&settingsRepo, &eventRepo, &instanceRepo)
+	instanceService = services.NewInstanceService(&serviceRepo, &instanceRepo, &runnerDockerRepo, &runnerFSRepo, &instanceLogsRepo, &eventRepo)
 	packageService = services.NewPackageService(&packageRepo)
 	serviceService = services.NewServiceService(&serviceRepo)
 	updateService = services.NewUpdateDependenciesService(about.Version)
@@ -112,7 +114,12 @@ func (r *Router) Start(addr string) {
 		Handler: r.engine,
 	}
 
-	err := r.server.ListenAndServe()
+	err := notificationsService.StartWebhook()
+	if err != nil {
+		logger.Error(err).Print()
+	}
+
+	err = r.server.ListenAndServe()
 	if errors.Is(err, http.ErrServerClosed) {
 		logger.Log("Vertex closed").Print()
 	} else if err != nil {
