@@ -54,6 +54,10 @@ export const getUpdates = async (reload?: boolean) =>
 export const executeUpdates = async (updates: { name: string }[]) =>
     api.post("/updates", { updates });
 
+export const getSettings = async () => api.get<Settings>("/settings");
+export const patchSettings = async (settings: Partial<Settings>) =>
+    api.patch("/settings", settings);
+
 export const getProxyRedirects = async () =>
     api.get<ProxyRedirects>("/proxy/redirects");
 export const addProxyRedirect = async (source: string, target: string) =>

@@ -19,6 +19,7 @@ import Store from "./pages/Store/Store";
 import Dock from "./components/Dock/Dock";
 import BayDetailsUpdate from "./pages/BayDetailsUpdate/BayDetailsUpdate";
 import ReverseProxy from "./pages/ReverseProxy/ReverseProxy";
+import SettingsNotifications from "./pages/SettingsNotifications/SettingsNotifications";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -78,6 +79,10 @@ function App() {
                         <Route
                             path="/settings/theme"
                             element={<SettingsTheme />}
+                        />
+                        <Route
+                            path="/settings/notifications"
+                            element={<SettingsNotifications />}
                         />
                         <Route
                             path="/settings/updates"

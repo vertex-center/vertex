@@ -30,6 +30,11 @@ export default function Settings(props: Props) {
                     <SidebarSeparator />
                     <SidebarTitle>Administration</SidebarTitle>
                     <SidebarItem
+                        to="/settings/notifications"
+                        symbol="notifications"
+                        name="Notifications"
+                    />
+                    <SidebarItem
                         to="/settings/updates"
                         symbol="update"
                         name="Updates"
