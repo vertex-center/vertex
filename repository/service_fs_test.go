@@ -26,7 +26,7 @@ func (suite *AvailableTestSuite) SetupSuite() {
 		servicesPath: PathServices,
 	})
 
-	err := suite.repo.reload()
+	err := suite.repo.Reload()
 	assert.NoError(suite.T(), err)
 
 	assert.NotZero(suite.T(), len(suite.repo.services))

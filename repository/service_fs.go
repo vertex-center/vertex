@@ -32,7 +32,7 @@ func NewServiceFSRepository(params *ServiceRepositoryParams) ServiceFSRepository
 	repo := ServiceFSRepository{
 		servicesPath: params.servicesPath,
 	}
-	err := repo.reload()
+	err := repo.Reload()
 	if err != nil {
 		logger.Error(fmt.Errorf("failed to reload services repository: %v", err)).Print()
 	}
@@ -66,7 +66,7 @@ func (r *ServiceFSRepository) GetAll() []types.Service {
 	return r.services
 }
 
-func (r *ServiceFSRepository) reload() error {
+func (r *ServiceFSRepository) Reload() error {
 	servicesPath := path.Join(r.servicesPath, "services")
 
 	r.services = []types.Service{}

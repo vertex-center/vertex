@@ -114,3 +114,7 @@ func (s *PackageService) Get(id string) (types.Package, error) {
 	p.Installed = &installed
 	return p, nil
 }
+
+func (s *PackageService) Reload() error {
+	return s.packageRepo.Reload()
+}

@@ -362,7 +362,7 @@ func (d *vertexGitHubDependency) CheckForUpdate() (*types.Update, error) {
 
 	// Local
 	repo, err := git.PlainOpen(d.dir)
-	if err == git.ErrRepositoryNotExists {
+	if errors.Is(err, git.ErrRepositoryNotExists) {
 		return nil, ErrDependencyNotInstalled
 	}
 	if err != nil {
@@ -391,7 +391,7 @@ func (d *vertexGitHubDependency) CheckForUpdate() (*types.Update, error) {
 			Name:           d.name,
 			CurrentVersion: localSHA,
 			LatestVersion:  remoteSHA,
-			NeedsRestart:   true,
+			NeedsRestart:   false,
 		}, nil
 	}
 

@@ -166,4 +166,7 @@ type ServiceRepository interface {
 
 	// GetAll gets all available services.
 	GetAll() []Service
+
+	// Reload the repository
+	Reload() error
 }

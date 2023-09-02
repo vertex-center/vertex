@@ -55,5 +55,17 @@ func handleExecuteUpdates(c *gin.Context) {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 	}
 
+	err = serviceService.Reload()
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	err = packageService.Reload()
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
 	c.Status(http.StatusOK)
 }

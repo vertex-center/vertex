@@ -37,7 +37,7 @@ func NewPackageFSRepository(params *PackageRepositoryParams) PackageFSRepository
 		dependenciesPath: params.dependenciesPath,
 		pkgs:             map[string]types.Package{},
 	}
-	err := repo.reload()
+	err := repo.Reload()
 	if err != nil {
 		logger.Error(fmt.Errorf("failed to reload services repository: %v", err)).Print()
 	}
@@ -56,7 +56,7 @@ func (r *PackageFSRepository) GetPath(id string) string {
 	return path.Join(r.dependenciesPath, "packages", id)
 }
 
-func (r *PackageFSRepository) reload() error {
+func (r *PackageFSRepository) Reload() error {
 	dir, err := os.ReadDir(path.Join(r.dependenciesPath, "packages"))
 	if err != nil {
 		return err

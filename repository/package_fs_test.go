@@ -26,7 +26,7 @@ func (suite *PackageRepositoryTestSuite) SetupSuite() {
 		dependenciesPath: PathPackages,
 	})
 
-	err := suite.repo.reload()
+	err := suite.repo.Reload()
 	assert.NoError(suite.T(), err)
 	assert.NoError(suite.T(), err)
 	assert.NotEqual(suite.T(), 0, len(suite.repo.pkgs))
@@ -40,7 +40,7 @@ func (suite *PackageRepositoryTestSuite) TestGetPath() {
 }
 
 func (suite *PackageRepositoryTestSuite) TestReload() {
-	err := suite.repo.reload()
+	err := suite.repo.Reload()
 	assert.NoError(suite.T(), err)
 }
 

@@ -17,3 +17,7 @@ func NewServiceService(serviceRepo types.ServiceRepository) ServiceService {
 func (s *ServiceService) ListAvailable() []types.Service {
 	return s.serviceRepo.GetAll()
 }
+
+func (s *ServiceService) Reload() error {
+	return s.serviceRepo.Reload()
+}
