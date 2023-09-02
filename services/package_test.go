@@ -70,3 +70,8 @@ func (m *MockPackageRepository) GetPath(id string) string {
 	m.Called(id)
 	return ""
 }
+
+func (m *MockPackageRepository) Reload() error {
+	m.Called()
+	return nil
+}
