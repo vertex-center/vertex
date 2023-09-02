@@ -140,6 +140,11 @@ func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg s
 			options.capAdd = *instance.Methods.Docker.Capabilities
 		}
 
+		// sysctls
+		if instance.Methods.Docker.Sysctls != nil {
+			options.sysctls = *instance.Methods.Docker.Sysctls
+		}
+
 		if instance.Methods.Docker.Dockerfile != nil {
 			id, err = r.createContainer(options)
 		} else if instance.Methods.Docker.Image != nil {
@@ -356,6 +361,7 @@ type createContainerOptions struct {
 	binds         []string
 	env           []string
 	capAdd        []string
+	sysctls       map[string]string
 }
 
 func (r RunnerDockerRepository) createContainer(options createContainerOptions) (string, error) {
@@ -372,6 +378,7 @@ func (r RunnerDockerRepository) createContainer(options createContainerOptions) 
 		Binds:        options.binds,
 		PortBindings: options.portBindings,
 		CapAdd:       options.capAdd,
+		Sysctls:      options.sysctls,
 	}
 
 	res, err := r.cli.ContainerCreate(context.Background(), &config, &hostConfig, nil, nil, options.containerName)

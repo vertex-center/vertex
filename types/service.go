@@ -122,6 +122,9 @@ type ServiceMethodDocker struct {
 
 	// Capabilities is an array containing all additional Docker capabilities.
 	Capabilities *[]string `yaml:"capabilities,omitempty" json:"capabilities,omitempty"`
+
+	// Sysctls allows to modify kernel parameters.
+	Sysctls *map[string]string `yaml:"sysctls,omitempty" json:"sysctls,omitempty"`
 }
 
 type ServiceMethods struct {
