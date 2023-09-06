@@ -31,7 +31,11 @@ func NewSettingsFSRepository(params *SettingsRepositoryParams) SettingsFSReposit
 	repo := SettingsFSRepository{
 		settingsPath: params.settingsPath,
 	}
-	repo.read()
+
+	err := repo.read()
+	if err != nil {
+		logger.Error(err).Print()
+	}
 
 	return repo
 }
@@ -55,23 +59,23 @@ func (r *SettingsFSRepository) SetNotificationsWebhook(webhook *string) error {
 	return r.write()
 }
 
-func (r *SettingsFSRepository) read() {
+func (r *SettingsFSRepository) read() error {
 	p := path.Join(r.settingsPath, "settings.json")
 	file, err := os.ReadFile(p)
 
 	if errors.Is(err, os.ErrNotExist) {
 		logger.Log("settings.json doesn't exists or could not be found").Print()
-		return
+		return nil
 	} else if err != nil {
-		logger.Error(err).Print()
-		return
+		return err
 	}
 
 	err = json.Unmarshal(file, &r.settings)
 	if err != nil {
-		logger.Error(err).Print()
-		return
+		return err
 	}
+
+	return nil
 }
 
 func (r *SettingsFSRepository) write() error {
