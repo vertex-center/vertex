@@ -26,7 +26,16 @@ func NewProxyFSRepository(params *ProxyRepositoryParams) ProxyFSRepository {
 		params = &ProxyRepositoryParams{}
 	}
 	if params.proxyPath == "" {
-		params.proxyPath = storage.PathProxy
+		params.proxyPath = path.Join(storage.Path, "proxy")
+	}
+
+	err := os.MkdirAll(params.proxyPath, os.ModePerm)
+	if err != nil && !os.IsExist(err) {
+		logger.Error(err).
+			AddKeyValue("message", "failed to create directory").
+			AddKeyValue("path", params.proxyPath).
+			Print()
+		os.Exit(1)
 	}
 
 	repo := ProxyFSRepository{

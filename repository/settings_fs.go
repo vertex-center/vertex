@@ -25,14 +25,23 @@ func NewSettingsFSRepository(params *SettingsRepositoryParams) SettingsFSReposit
 		params = &SettingsRepositoryParams{}
 	}
 	if params.settingsPath == "" {
-		params.settingsPath = storage.PathSettings
+		params.settingsPath = path.Join(storage.Path, "settings")
+	}
+
+	err := os.MkdirAll(params.settingsPath, os.ModePerm)
+	if err != nil && !os.IsExist(err) {
+		logger.Error(err).
+			AddKeyValue("message", "failed to create directory").
+			AddKeyValue("path", params.settingsPath).
+			Print()
+		os.Exit(1)
 	}
 
 	repo := SettingsFSRepository{
 		settingsPath: params.settingsPath,
 	}
 
-	err := repo.read()
+	err = repo.read()
 	if err != nil {
 		logger.Error(err).Print()
 	}

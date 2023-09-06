@@ -18,15 +18,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/logger"
 )
 
-const (
-	PathClient    = "live/client"
-	PathPackages  = "live/packages"
-	PathProxy     = "live/proxy"
-	PathInstances = "live/instances"
-	PathServices  = "live/services"
-	PathSettings  = "live/settings"
-	PathUpdates   = "live/updates"
-)
+const Path = "live"
 
 var (
 	ErrNoReleasesPublished = errors.New("this repository has no existing releases")

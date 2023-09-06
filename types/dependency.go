@@ -13,4 +13,7 @@ type Dependency interface {
 	// GetID returns the ID of the dependency that can be used to
 	// identify it from the client.
 	GetID() string
+
+	// GetPath returns the path of the dependency.
+	GetPath() string
 }

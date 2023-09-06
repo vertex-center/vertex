@@ -24,5 +24,5 @@ func New() Config {
 
 func (c Config) Apply() error {
 	configJsContent := fmt.Sprintf("window.apiURL = \"http://%s\";", c.Host)
-	return os.WriteFile(path.Join(storage.PathClient, "dist", "config.js"), []byte(configJsContent), os.ModePerm)
+	return os.WriteFile(path.Join(storage.Path, "client", "dist", "config.js"), []byte(configJsContent), os.ModePerm)
 }

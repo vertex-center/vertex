@@ -52,7 +52,7 @@ func (r RunnerFSRepository) Start(instance *types.Instance, onLog func(msg strin
 	cmd.Dir = dir
 	cmd.Env = os.Environ()
 
-	envFile, err := os.Open(path.Join(storage.PathInstances, instance.UUID.String(), ".env"))
+	envFile, err := os.Open(path.Join(r.getPath(*instance), ".env"))
 	if err != nil {
 		return err
 	}
@@ -141,5 +141,5 @@ func (r RunnerFSRepository) HasUpdateAvailable(instance types.Instance) (bool, e
 }
 
 func (r RunnerFSRepository) getPath(instance types.Instance) string {
-	return path.Join(storage.PathInstances, instance.UUID.String())
+	return path.Join(storage.Path, "instances", instance.UUID.String())
 }

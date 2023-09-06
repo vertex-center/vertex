@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -8,7 +9,6 @@ import (
 
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/logger"
-	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/router"
 	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/types"
@@ -29,37 +29,7 @@ func main() {
 
 	parseArgs()
 
-	err := os.MkdirAll(storage.PathInstances, os.ModePerm)
-	if err != nil && !os.IsExist(err) {
-		logger.Error(fmt.Errorf("failed to create directory: %v", err)).
-			AddKeyValue("message", "failed to create directory").
-			AddKeyValue("path", storage.PathInstances).
-			Print()
-
-		return
-	}
-
-	err = os.MkdirAll(storage.PathProxy, os.ModePerm)
-	if err != nil && !os.IsExist(err) {
-		logger.Error(fmt.Errorf("failed to create directory: %v", err)).
-			AddKeyValue("message", "failed to create directory").
-			AddKeyValue("path", storage.PathProxy).
-			Print()
-
-		return
-	}
-
-	err = os.MkdirAll(storage.PathSettings, os.ModePerm)
-	if err != nil && !os.IsExist(err) {
-		logger.Error(fmt.Errorf("failed to create directory: %v", err)).
-			AddKeyValue("message", "failed to create directory").
-			AddKeyValue("path", storage.PathProxy).
-			Print()
-
-		return
-	}
-
-	err = setupDependencies()
+	err := setupDependencies()
 	if err != nil {
 		logger.Error(fmt.Errorf("failed to setup dependencies: %v", err)).Print()
 		return
@@ -119,17 +89,14 @@ func parseArgs() {
 }
 
 func setupDependencies() error {
-	dependencies := []struct {
-		dir string
-		dep types.Dependency
-	}{
-		{storage.PathClient, services.DependencyClient},
-		{storage.PathServices, services.DependencyServices},
-		{storage.PathPackages, services.DependencyPackages},
+	dependencies := []types.Dependency{
+		services.DependencyClient,
+		services.DependencyServices,
+		services.DependencyPackages,
 	}
 
-	for _, d := range dependencies {
-		err := setupDependency(d.dir, d.dep)
+	for _, dep := range dependencies {
+		err := setupDependency(dep)
 		if err != nil {
 			logger.Error(err).Print()
 			os.Exit(1)
@@ -138,8 +105,8 @@ func setupDependencies() error {
 	return nil
 }
 
-func setupDependency(dir string, dependency types.Dependency) error {
-	err := os.Mkdir(dir, os.ModePerm)
+func setupDependency(dep types.Dependency) error {
+	err := os.Mkdir(dep.GetPath(), os.ModePerm)
 	if os.IsExist(err) {
 		// The dependency already exists.
 		return nil
@@ -149,9 +116,9 @@ func setupDependency(dir string, dependency types.Dependency) error {
 	}
 
 	// download
-	_, err = dependency.CheckForUpdate()
-	if err != nil && err != services.ErrDependencyNotInstalled {
+	_, err = dep.CheckForUpdate()
+	if err != nil && !errors.Is(err, services.ErrDependencyNotInstalled) {
 		return err
 	}
-	return dependency.InstallUpdate()
+	return dep.InstallUpdate()
 }

@@ -24,12 +24,23 @@ var (
 )
 
 type InstanceFSRepository struct {
-	instances map[uuid.UUID]*types.Instance
+	instancesPath string
+	instances     map[uuid.UUID]*types.Instance
 }
 
 func NewInstanceFSRepository() InstanceFSRepository {
 	r := InstanceFSRepository{
-		instances: map[uuid.UUID]*types.Instance{},
+		instancesPath: path.Join(storage.Path, "instances"),
+		instances:     map[uuid.UUID]*types.Instance{},
+	}
+
+	err := os.MkdirAll(r.instancesPath, os.ModePerm)
+	if err != nil && !os.IsExist(err) {
+		logger.Error(err).
+			AddKeyValue("message", "failed to create directory").
+			AddKeyValue("path", r.instancesPath).
+			Print()
+		os.Exit(1)
 	}
 
 	return r
@@ -48,7 +59,7 @@ func (r *InstanceFSRepository) GetAll() map[uuid.UUID]*types.Instance {
 }
 
 func (r *InstanceFSRepository) GetPath(uuid uuid.UUID) string {
-	return path.Join(storage.PathInstances, uuid.String())
+	return path.Join(r.instancesPath, uuid.String())
 }
 
 func (r *InstanceFSRepository) Delete(uuid uuid.UUID) error {
@@ -169,7 +180,7 @@ func (r *InstanceFSRepository) LoadEnv(i *types.Instance) error {
 }
 
 func (r *InstanceFSRepository) Reload(load func(uuid uuid.UUID)) {
-	entries, err := os.ReadDir(storage.PathInstances)
+	entries, err := os.ReadDir(r.instancesPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -177,7 +188,8 @@ func (r *InstanceFSRepository) Reload(load func(uuid uuid.UUID)) {
 	for _, entry := range entries {
 		info, err := entry.Info()
 		if err != nil {
-			log.Fatal(err)
+			logger.Error(err).Print()
+			continue
 		}
 
 		isInstance := entry.IsDir() || info.Mode()&os.ModeSymlink != 0
@@ -189,7 +201,8 @@ func (r *InstanceFSRepository) Reload(load func(uuid uuid.UUID)) {
 
 			id, err := uuid.Parse(entry.Name())
 			if err != nil {
-				log.Fatal(err)
+				logger.Error(err).Print()
+				continue
 			}
 
 			load(id)

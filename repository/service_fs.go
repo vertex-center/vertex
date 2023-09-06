@@ -26,7 +26,7 @@ func NewServiceFSRepository(params *ServiceRepositoryParams) ServiceFSRepository
 		params = &ServiceRepositoryParams{}
 	}
 	if params.servicesPath == "" {
-		params.servicesPath = storage.PathServices
+		params.servicesPath = path.Join(storage.Path, "services")
 	}
 
 	repo := ServiceFSRepository{

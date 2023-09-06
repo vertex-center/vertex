@@ -30,7 +30,7 @@ func NewPackageFSRepository(params *PackageRepositoryParams) PackageFSRepository
 		params = &PackageRepositoryParams{}
 	}
 	if params.dependenciesPath == "" {
-		params.dependenciesPath = storage.PathPackages
+		params.dependenciesPath = path.Join(storage.Path, "packages")
 	}
 
 	repo := PackageFSRepository{

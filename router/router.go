@@ -56,7 +56,7 @@ func NewRouter(about types.About) Router {
 	r.Use(ginutils.Logger("MAIN"))
 	r.Use(gin.Recovery())
 	r.Use(middleware.ErrorMiddleware())
-	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.PathClient, "dist"), true)))
+	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
 	r.GET("/ping", handlePing)
 
 	runnerDockerRepo = repository.NewRunnerDockerRepository()

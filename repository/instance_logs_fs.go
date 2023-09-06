@@ -41,14 +41,14 @@ func NewInstanceLogsFSRepository() InstanceLogsFSRepository {
 }
 
 func (r *InstanceLogsFSRepository) Open(uuid uuid.UUID) error {
-	dir := path.Join(storage.PathInstances, uuid.String(), ".vertex", "logs")
+	dir := path.Join(storage.Path, "instances", uuid.String(), ".vertex", "logs")
 	err := os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
 		return err
 	}
 
 	filename := fmt.Sprintf("logs_%s.txt", time.Now().Format(time.DateOnly))
-	filepath := path.Join(storage.PathInstances, uuid.String(), ".vertex", "logs", filename)
+	filepath := path.Join(dir, filename)
 
 	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
 	if err != nil {

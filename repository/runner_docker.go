@@ -57,7 +57,7 @@ func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg s
 
 	setStatus(types.InstanceStatusBuilding)
 
-	instancePath := path.Join(storage.PathInstances, instance.UUID.String())
+	instancePath := r.getPath(*instance)
 
 	// Build
 	var err error
@@ -436,4 +436,8 @@ func (r RunnerDockerRepository) watchForLogs(containerID string, instance *types
 			AddKeyValue("uuid", instance.UUID).
 			Print()
 	}()
+}
+
+func (r RunnerDockerRepository) getPath(instance types.Instance) string {
+	return path.Join(storage.Path, "instances", instance.UUID.String())
 }

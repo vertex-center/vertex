@@ -275,7 +275,7 @@ func (s *InstanceService) WriteEnv(uuid uuid.UUID, environment map[string]string
 
 func (s *InstanceService) Install(serviceID string, method string) (*types.Instance, error) {
 	id := uuid.New()
-	dir := path.Join(storage.PathInstances, id.String())
+	dir := s.instanceRepo.GetPath(id)
 
 	service, err := s.serviceRepo.Get(serviceID)
 	if err != nil {
@@ -470,7 +470,7 @@ func (s *InstanceService) reload() {
 }
 
 func (s *InstanceService) load(uuid uuid.UUID) error {
-	instancePath := path.Join(storage.PathInstances, uuid.String())
+	instancePath := s.instanceRepo.GetPath(uuid)
 
 	service, err := s.instanceRepo.ReadService(instancePath)
 	if err != nil {

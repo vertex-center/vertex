@@ -23,8 +23,8 @@ import (
 
 var (
 	DependencyClient   types.Dependency = &VertexClientDependency{}
-	DependencyServices types.Dependency = newVertexGitHubDependency(storage.PathServices, "Vertex Services", "vertex-services")
-	DependencyPackages types.Dependency = newVertexGitHubDependency(storage.PathPackages, "Vertex Dependencies", "vertex-dependencies")
+	DependencyServices types.Dependency = newVertexGitHubDependency("services", "Vertex Services", "vertex-services")
+	DependencyPackages types.Dependency = newVertexGitHubDependency("packages", "Vertex Dependencies", "vertex-dependencies")
 )
 
 var (
@@ -159,7 +159,9 @@ func (d *vertexDependency) InstallUpdate() error {
 		return errors.New("the release has not been fetched before installing the update")
 	}
 
-	err := storage.DownloadGithubRelease(d.release, storage.PathUpdates)
+	dir := path.Join(storage.Path, "updates")
+
+	err := storage.DownloadGithubRelease(d.release, dir)
 	if err != nil {
 		return err
 	}
@@ -169,7 +171,7 @@ func (d *vertexDependency) InstallUpdate() error {
 		return fmt.Errorf("failed to rename old executable: %v", err)
 	}
 
-	err = os.Rename(path.Join(storage.PathUpdates, "vertex"), "vertex")
+	err = os.Rename(path.Join(dir, "vertex"), "vertex")
 	if err != nil {
 		return err
 	}
@@ -187,10 +189,15 @@ func (d *vertexDependency) GetID() string {
 	return "vertex"
 }
 
+func (d *vertexDependency) GetPath() string {
+	return "."
+}
+
 type VertexClientDependency struct {
 	currentVersion string
 	release        *github.RepositoryRelease
 	update         *types.Update
+	dir            string
 }
 
 func (d *VertexClientDependency) CheckForUpdate() (*types.Update, error) {
@@ -228,27 +235,29 @@ func (d *VertexClientDependency) InstallUpdate() error {
 
 	for _, asset := range d.release.Assets {
 		if strings.Contains(*asset.Name, "vertex-webui") {
-			err := os.RemoveAll(storage.PathClient)
+			dir := d.GetPath()
+
+			err := os.RemoveAll(dir)
 			if err != nil {
 				return err
 			}
 
-			err = os.MkdirAll(storage.PathClient, os.ModePerm)
+			err = os.MkdirAll(dir, os.ModePerm)
 			if err != nil {
 				return err
 			}
 
-			err = download(*asset.BrowserDownloadURL)
+			err = download(dir, *asset.BrowserDownloadURL)
 			if err != nil {
 				return err
 			}
 
-			err = unarchive()
+			err = unarchive(dir)
 			if err != nil {
 				return err
 			}
 
-			err = os.Remove(path.Join(storage.PathClient, "temp.zip"))
+			err = os.Remove(path.Join(dir, "temp.zip"))
 			if err != nil {
 				return err
 			}
@@ -271,22 +280,26 @@ func (d *VertexClientDependency) GetID() string {
 	return "vertex-webui"
 }
 
+func (d *VertexClientDependency) GetPath() string {
+	return path.Join(storage.Path, "client")
+}
+
 func (d *VertexClientDependency) FetchCurrentVersion() {
-	version, err := os.ReadFile(path.Join(storage.PathClient, "dist", "version.txt"))
+	version, err := os.ReadFile(path.Join(d.GetPath(), "dist", "version.txt"))
 	if err != nil {
 		return
 	}
 	d.currentVersion = strings.TrimSpace(string(version))
 }
 
-func download(url string) error {
+func download(dir string, url string) error {
 	res, err := http.Get(url)
 	if err != nil {
 		return err
 	}
 	defer res.Body.Close()
 
-	file, err := os.Create(path.Join(storage.PathClient, "temp.zip"))
+	file, err := os.Create(path.Join(dir, "temp.zip"))
 	if err != nil {
 		return err
 	}
@@ -296,14 +309,14 @@ func download(url string) error {
 	return err
 }
 
-func unarchive() error {
-	reader, err := zip.OpenReader(path.Join(storage.PathClient, "temp.zip"))
+func unarchive(dir string) error {
+	reader, err := zip.OpenReader(path.Join(dir, "temp.zip"))
 	if err != nil {
 		return err
 	}
 
 	for _, header := range reader.File {
-		filepath := path.Join(storage.PathClient, header.Name)
+		filepath := path.Join(dir, header.Name)
 
 		if header.FileInfo().IsDir() {
 			err = os.MkdirAll(filepath, os.ModePerm)
@@ -351,7 +364,7 @@ type vertexGitHubDependency struct {
 
 func newVertexGitHubDependency(dir string, name string, repo string) *vertexGitHubDependency {
 	return &vertexGitHubDependency{
-		dir:  dir,
+		dir:  path.Join(storage.Path, dir),
 		name: name,
 		repo: repo,
 	}
@@ -405,4 +418,8 @@ func (d *vertexGitHubDependency) InstallUpdate() error {
 
 func (d *vertexGitHubDependency) GetID() string {
 	return d.repo
+}
+
+func (d *vertexGitHubDependency) GetPath() string {
+	return d.dir
 }
