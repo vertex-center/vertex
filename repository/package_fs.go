@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"sync"
 
 	errors2 "github.com/pkg/errors"
 	"github.com/vertex-center/vertex/pkg/logger"
@@ -17,7 +18,9 @@ var (
 )
 
 type PackageFSRepository struct {
-	pkgs             map[string]types.Package
+	pkgs      map[string]types.Package
+	pkgsMutex *sync.RWMutex
+
 	dependenciesPath string
 }
 
@@ -34,9 +37,12 @@ func NewPackageFSRepository(params *PackageRepositoryParams) PackageFSRepository
 	}
 
 	repo := PackageFSRepository{
+		pkgs:      map[string]types.Package{},
+		pkgsMutex: &sync.RWMutex{},
+
 		dependenciesPath: params.dependenciesPath,
-		pkgs:             map[string]types.Package{},
 	}
+
 	err := repo.Reload()
 	if err != nil {
 		logger.Error(fmt.Errorf("failed to reload services repository: %v", err)).Print()
@@ -45,11 +51,21 @@ func NewPackageFSRepository(params *PackageRepositoryParams) PackageFSRepository
 }
 
 func (r *PackageFSRepository) Get(id string) (types.Package, error) {
+	r.pkgsMutex.RLock()
+	defer r.pkgsMutex.RUnlock()
+
 	pkg, ok := r.pkgs[id]
 	if !ok {
 		return types.Package{}, ErrPkgNotFound
 	}
 	return pkg, nil
+}
+
+func (r *PackageFSRepository) set(id string, pkg types.Package) {
+	r.pkgsMutex.Lock()
+	defer r.pkgsMutex.Unlock()
+
+	r.pkgs[id] = pkg
 }
 
 func (r *PackageFSRepository) GetPath(id string) string {
@@ -69,18 +85,18 @@ func (r *PackageFSRepository) Reload() error {
 
 		name := entry.Name()
 
-		pkg, err := r.readPkgFromDisk(name)
+		pkg, err := r.readFromDisk(name)
 		if err != nil {
 			return err
 		}
 
-		r.pkgs[name] = *pkg
+		r.set(name, *pkg)
 	}
 
 	return nil
 }
 
-func (r *PackageFSRepository) readPkgFromDisk(id string) (*types.Package, error) {
+func (r *PackageFSRepository) readFromDisk(id string) (*types.Package, error) {
 	p := path.Join(r.GetPath(id), fmt.Sprintf("%s.json", id))
 
 	file, err := os.ReadFile(p)
