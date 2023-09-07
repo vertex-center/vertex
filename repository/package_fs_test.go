@@ -45,10 +45,10 @@ func (suite *PackageRepositoryTestSuite) TestReload() {
 }
 
 func (suite *PackageRepositoryTestSuite) TestGet() {
-	pkg, err := suite.repo.Get("redis")
+	pkg, err := suite.repo.GetByID("redis")
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), pkg.Name, "Redis")
 
-	_, err = suite.repo.Get("undefined_package_name")
+	_, err = suite.repo.GetByID("undefined_package_name")
 	assert.ErrorIs(suite.T(), err, ErrPkgNotFound)
 }

@@ -29,7 +29,7 @@ func handleInstallPackages(c *gin.Context) {
 	}
 
 	for _, d := range body.Packages {
-		pkg, err := packageService.Get(d.Name)
+		pkg, err := packageService.GetByID(d.Name)
 		if err != nil {
 			logger.Warn("dependency not found").
 				AddKeyValue("name", d.Name).

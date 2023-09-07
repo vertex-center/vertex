@@ -20,7 +20,7 @@ type Package struct {
 }
 
 type PackageRepository interface {
-	Get(id string) (Package, error)
+	GetByID(id string) (Package, error)
 	GetPath(id string) string
 
 	// Reload the repository

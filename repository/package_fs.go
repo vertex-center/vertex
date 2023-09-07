@@ -50,7 +50,7 @@ func NewPackageFSRepository(params *PackageRepositoryParams) PackageFSRepository
 	return repo
 }
 
-func (r *PackageFSRepository) Get(id string) (types.Package, error) {
+func (r *PackageFSRepository) GetByID(id string) (types.Package, error) {
 	r.pkgsMutex.RLock()
 	defer r.pkgsMutex.RUnlock()
 

@@ -61,7 +61,7 @@ type MockPackageRepository struct {
 	mock.Mock
 }
 
-func (m *MockPackageRepository) Get(id string) (types.Package, error) {
+func (m *MockPackageRepository) GetByID(id string) (types.Package, error) {
 	m.Called(id)
 	return types.Package{}, nil
 }

@@ -81,38 +81,44 @@ func (s *PackageService) InstallationCommand(p *types.Package, pm string) (Insta
 	return InstallCmd{}, ErrPkgManagerNotFound
 }
 
-func (s *PackageService) Get(id string) (types.Package, error) {
-	p, err := s.packageRepo.Get(id)
+func (s *PackageService) GetByID(id string) (types.Package, error) {
+	pkg, err := s.packageRepo.GetByID(id)
 	if err != nil {
 		return types.Package{}, err
 	}
 
-	pkgPath := s.packageRepo.GetPath(id)
+	installed, err := s.checkIsInstalled(id, pkg)
+	pkg.Installed = &installed
+	return pkg, err
+}
 
-	isScript := strings.HasPrefix(p.Check, "script:")
-	installed := false
+func (s *PackageService) checkIsInstalled(id string, pkg types.Package) (bool, error) {
+	pkgPath := s.packageRepo.GetPath(id)
+	isScript := strings.HasPrefix(pkg.Check, "script:")
 
 	if isScript {
-		script := strings.Split(p.Check, ":")[1]
-
-		cmd := exec.Command(path.Join(pkgPath, script))
-
-		err = cmd.Run()
-		if cmd.ProcessState.ExitCode() == 0 {
-			installed = true
-		}
-		if err != nil {
-			return types.Package{}, err
-		}
-	} else {
-		_, err := exec.LookPath(p.Check)
-		if err == nil {
-			installed = true
-		}
+		return s.checkIsInstalledWithScript(pkgPath, pkg.Check)
 	}
+	return s.checkIsInstalledWithCommand(pkg.Check)
+}
 
-	p.Installed = &installed
-	return p, nil
+func (s *PackageService) checkIsInstalledWithScript(pkgPath, check string) (bool, error) {
+	script := strings.Split(check, ":")[1]
+	cmd := exec.Command(path.Join(pkgPath, script))
+
+	err := cmd.Run()
+	if err != nil || cmd.ProcessState.ExitCode() != 0 {
+		return false, err
+	}
+	return true, nil
+}
+
+func (s *PackageService) checkIsInstalledWithCommand(cmd string) (bool, error) {
+	_, err := exec.LookPath(cmd)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (s *PackageService) Reload() error {

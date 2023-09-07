@@ -238,7 +238,7 @@ func handleGetDependencies(c *gin.Context) {
 
 	if i.Methods.Script.Dependencies != nil {
 		for name := range *i.Methods.Script.Dependencies {
-			dep, err := packageService.Get(name)
+			dep, err := packageService.GetByID(name)
 			if err != nil {
 				logger.Error(err).Print()
 				continue
