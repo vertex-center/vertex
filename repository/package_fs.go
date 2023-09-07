@@ -7,14 +7,14 @@ import (
 	"path"
 	"sync"
 
-	errors2 "github.com/pkg/errors"
+	"github.com/pkg/errors"
 	"github.com/vertex-center/vertex/pkg/logger"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
 )
 
 var (
-	ErrPkgNotFound = errors2.New("package not found")
+	ErrPkgNotFound = errors.New("package not found")
 )
 
 type PackageFSRepository struct {

@@ -6,12 +6,12 @@ import (
 	"path"
 	"strings"
 
-	errors2 "github.com/pkg/errors"
+	"github.com/pkg/errors"
 	"github.com/vertex-center/vertex/types"
 )
 
 var (
-	ErrPkgManagerNotFound = errors2.New("package manager not found")
+	ErrPkgManagerNotFound = errors.New("package manager not found")
 )
 
 type PackageService struct {
