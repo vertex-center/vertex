@@ -7,9 +7,10 @@ import (
 	"path"
 
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vlog"
 )
 
 type ProxyFSRepository struct {
@@ -31,10 +32,10 @@ func NewProxyFSRepository(params *ProxyRepositoryParams) ProxyFSRepository {
 
 	err := os.MkdirAll(params.proxyPath, os.ModePerm)
 	if err != nil && !os.IsExist(err) {
-		logger.Error(err).
-			AddKeyValue("message", "failed to create directory").
-			AddKeyValue("path", params.proxyPath).
-			Print()
+		log.Default.Error(err,
+			vlog.String("message", "failed to create directory"),
+			vlog.String("path", params.proxyPath),
+		)
 		os.Exit(1)
 	}
 
@@ -66,15 +67,15 @@ func (r *ProxyFSRepository) read() {
 	file, err := os.ReadFile(p)
 
 	if errors.Is(err, os.ErrNotExist) {
-		logger.Log("redirects.json doesn't exists or could not be found").Print()
+		log.Default.Info("redirects.json doesn't exists or could not be found")
 	} else if err != nil {
-		logger.Error(err).Print()
+		log.Default.Error(err)
 		return
 	}
 
 	err = json.Unmarshal(file, &r.redirects)
 	if err != nil {
-		logger.Error(err).Print()
+		log.Default.Error(err)
 		return
 	}
 }

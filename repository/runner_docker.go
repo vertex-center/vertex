@@ -15,9 +15,10 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
 	"github.com/docker/go-connections/nat"
-	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vlog"
 )
 
 type RunnerDockerRepository struct {
@@ -31,9 +32,9 @@ type dockerMessage struct {
 func NewRunnerDockerRepository() RunnerDockerRepository {
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
-		logger.Warn("couldn't connect with the Docker cli.").
-			AddKeyValue("error", err.Error()).
-			Print()
+		log.Default.Warn("couldn't connect with the Docker cli.",
+			vlog.String("error", err.Error()),
+		)
 
 		return RunnerDockerRepository{}
 	}
@@ -79,9 +80,9 @@ func (r RunnerDockerRepository) Start(instance *types.Instance, onLog func(msg s
 	if errors.Is(err, ErrContainerNotFound) {
 		containerName := instance.DockerContainerName()
 
-		logger.Log("container doesn't exists, create it.").
-			AddKeyValue("container_name", containerName).
-			Print()
+		log.Default.Info("container doesn't exists, create it.",
+			vlog.String("container_name", containerName),
+		)
 
 		options := createContainerOptions{
 			imageName:     imageName,
@@ -227,10 +228,14 @@ func (r RunnerDockerRepository) CheckForUpdates(instance *types.Instance) error 
 	}
 
 	if latestImageID == currentImageID {
-		logger.Log("already up-to-date").AddKeyValue("uuid", instance.UUID).Print()
+		log.Default.Info("already up-to-date",
+			vlog.String("uuid", instance.UUID.String()),
+		)
 		instance.Update = nil
 	} else {
-		logger.Log("a new update is available").AddKeyValue("uuid", instance.UUID).Print()
+		log.Default.Info("a new update is available",
+			vlog.String("uuid", instance.UUID.String()),
+		)
 		instance.Update = &types.InstanceUpdate{
 			CurrentVersion: currentImageID,
 			LatestVersion:  latestImageID,
@@ -339,9 +344,9 @@ func (r RunnerDockerRepository) buildImageFromDockerfile(instancePath string, im
 		msg := dockerMessage{}
 		err := json.Unmarshal(scanner.Bytes(), &msg)
 		if err != nil {
-			logger.Warn("Failed to parse message:").
-				AddKeyValue("msg", scanner.Text()).
-				Print()
+			log.Default.Warn("Failed to parse message",
+				vlog.String("message", scanner.Text()),
+			)
 		} else {
 			if msg.Stream != "" {
 				onMsg(msg.Stream)
@@ -349,7 +354,7 @@ func (r RunnerDockerRepository) buildImageFromDockerfile(instancePath string, im
 		}
 	}
 
-	logger.Log("Docker build: success.").Print()
+	log.Default.Info("Docker build: success.")
 	return nil
 }
 
@@ -383,9 +388,9 @@ func (r RunnerDockerRepository) createContainer(options createContainerOptions) 
 
 	res, err := r.cli.ContainerCreate(context.Background(), &config, &hostConfig, nil, nil, options.containerName)
 	for _, warn := range res.Warnings {
-		logger.Warn("warning while creating container").
-			AddKeyValue("warning", warn).
-			Print()
+		log.Default.Warn("warning while creating container",
+			vlog.String("warning", warn),
+		)
 	}
 	return res.ID, err
 }
@@ -397,16 +402,15 @@ func (r RunnerDockerRepository) watchForStatusChange(containerID string, instanc
 		select {
 		case err := <-errChan:
 			if err != nil {
-				logger.Error(err).
-					AddKeyValue("uuid", instance.UUID).
-					Print()
+				log.Default.Error(err,
+					vlog.String("uuid", instance.UUID.String()),
+				)
 			}
 		case status := <-resChan:
-			logger.Log("docker container exited with status").
-				AddKeyValue("uuid", instance.UUID).
-				AddKeyValue("status", status.StatusCode).
-				Print()
-
+			log.Default.Info("container exited",
+				vlog.String("uuid", instance.UUID.String()),
+				vlog.Int64("status", status.StatusCode),
+			)
 			setStatus(types.InstanceStatusOff)
 		}
 	}()
@@ -422,9 +426,9 @@ func (r RunnerDockerRepository) watchForLogs(containerID string, instance *types
 			Tail:       "0",
 		})
 		if err != nil {
-			logger.Error(err).
-				AddKeyValue("uuid", instance.UUID).
-				Print()
+			log.Default.Error(err,
+				vlog.String("uuid", instance.UUID.String()),
+			)
 		}
 
 		scanner := bufio.NewScanner(logs)
@@ -432,9 +436,9 @@ func (r RunnerDockerRepository) watchForLogs(containerID string, instance *types
 			onLog(scanner.Text())
 		}
 		_ = logs.Close()
-		logger.Log("logs pipe closed").
-			AddKeyValue("uuid", instance.UUID).
-			Print()
+		log.Default.Info("logs pipe closed",
+			vlog.String("uuid", instance.UUID.String()),
+		)
 	}()
 }
 

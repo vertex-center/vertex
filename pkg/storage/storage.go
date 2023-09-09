@@ -15,7 +15,8 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/google/go-github/v50/github"
-	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vlog"
 )
 
 const Path = "live"
@@ -26,9 +27,9 @@ var (
 )
 
 func CloneOrPullRepository(url string, dest string) error {
-	logger.Log("downloading repository").
-		AddKeyValue("url", url).
-		Print()
+	log.Default.Info("downloading repository",
+		vlog.String("url", url),
+	)
 
 	_, err := git.PlainClone(dest, false, &git.CloneOptions{
 		URL:      url,
@@ -58,10 +59,10 @@ func CloneOrPullRepository(url string, dest string) error {
 }
 
 func DownloadLatestGithubRelease(owner string, repo string, dest string) error {
-	logger.Log("downloading repository").
-		AddKeyValue("owner", owner).
-		AddKeyValue("repo", repo).
-		Print()
+	log.Default.Info("downloading repository",
+		vlog.String("owner", owner),
+		vlog.String("repo", repo),
+	)
 
 	client := github.NewClient(nil)
 
@@ -74,9 +75,9 @@ func DownloadLatestGithubRelease(owner string, repo string, dest string) error {
 }
 
 func DownloadGithubRelease(release *github.RepositoryRelease, dest string) error {
-	logger.Log("downloading GitHub release").
-		AddKeyValue("release", *release.Name).
-		Print()
+	log.Default.Info("downloading repository",
+		vlog.String("release", *release.Name),
+	)
 
 	platform := fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH)
 
@@ -107,9 +108,9 @@ func DownloadGithubRelease(release *github.RepositoryRelease, dest string) error
 }
 
 func Download(url string, dest string, filename string) error {
-	logger.Log("downloading repository").
-		AddKeyValue("url", url).
-		Print()
+	log.Default.Info("downloading repository",
+		vlog.String("url", url),
+	)
 
 	err := os.MkdirAll(dest, os.ModePerm)
 	if err != nil {

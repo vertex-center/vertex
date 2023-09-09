@@ -4,7 +4,7 @@ import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/webhook"
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/types"
 )
 
@@ -71,7 +71,7 @@ func (s *NotificationsService) sendStatus(instanceUUID uuid.UUID, status string)
 
 	instance, err := s.instanceRepo.Get(instanceUUID)
 	if err != nil {
-		logger.Error(err).Print()
+		log.Default.Error(err)
 		return
 	}
 

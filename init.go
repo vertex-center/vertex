@@ -8,10 +8,11 @@ import (
 	"runtime"
 
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/router"
 	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vlog"
 )
 
 // version, commit and date will be overridden by goreleaser
@@ -22,22 +23,21 @@ var (
 )
 
 func main() {
-	logger.CreateDefaultLogger()
-	defer logger.DefaultLogger.CloseLogFiles()
+	defer log.Default.Close()
 
-	logger.Log("Vertex starting...").Print()
+	log.Default.Info("Vertex starting...")
 
 	parseArgs()
 
 	err := setupDependencies()
 	if err != nil {
-		logger.Error(fmt.Errorf("failed to setup dependencies: %v", err)).Print()
+		log.Default.Error(fmt.Errorf("failed to setup dependencies: %v", err))
 		return
 	}
 
 	err = config.Current.Apply()
 	if err != nil {
-		logger.Error(fmt.Errorf("failed to apply the current configuration: %v", err)).Print()
+		log.Default.Error(fmt.Errorf("failed to apply the current configuration: %v", err))
 		return
 	}
 
@@ -54,9 +54,9 @@ func main() {
 	// Logs
 	url := fmt.Sprintf("http://%s", config.Current.Host)
 	fmt.Printf("\n-- Vertex Client :: %s\n\n", url)
-	logger.Log("Vertex started").
-		AddKeyValue("url", url).
-		Print()
+	log.Default.Info("Vertex started",
+		vlog.String("url", url),
+	)
 
 	router.Start(fmt.Sprintf(":%s", config.Current.Port))
 }
@@ -98,7 +98,7 @@ func setupDependencies() error {
 	for _, dep := range dependencies {
 		err := setupDependency(dep)
 		if err != nil {
-			logger.Error(err).Print()
+			log.Default.Error(err)
 			os.Exit(1)
 		}
 	}

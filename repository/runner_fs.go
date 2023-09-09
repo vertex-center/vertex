@@ -9,9 +9,10 @@ import (
 	"path"
 
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vlog"
 )
 
 type RunnerFSRepository struct {
@@ -30,9 +31,9 @@ func (r RunnerFSRepository) Delete(instance *types.Instance) error {
 
 func (r RunnerFSRepository) Start(instance *types.Instance, onLog func(msg string), onErr func(msg string), setStatus func(status string)) error {
 	if r.commands[instance.UUID] != nil {
-		logger.Error(errors.New("runner already started")).
-			AddKeyValue("name", instance.Name).
-			Print()
+		log.Default.Error(errors.New("runner already started"),
+			vlog.String("name", instance.Name),
+		)
 	}
 
 	dir := r.getPath(*instance)
@@ -101,9 +102,9 @@ func (r RunnerFSRepository) Start(instance *types.Instance, onLog func(msg strin
 	go func() {
 		err := cmd.Wait()
 		if err != nil {
-			logger.Error(err).
-				AddKeyValue("name", instance.Service.Name).
-				Print()
+			log.Default.Error(err,
+				vlog.String("name", instance.Service.Name),
+			)
 		}
 		setStatus(types.InstanceStatusOff)
 	}()

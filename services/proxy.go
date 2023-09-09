@@ -12,8 +12,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex-core-golang/router/middleware"
 	"github.com/vertex-center/vertex/pkg/ginutils"
-	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vlog"
 )
 
 var (
@@ -52,7 +53,7 @@ func (s *ProxyService) Start() error {
 	go func() {
 		err := s.server.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			logger.Error(err).Print()
+			log.Default.Error(err)
 			return
 		}
 	}()
@@ -95,22 +96,22 @@ func (s *ProxyService) handleProxy(c *gin.Context) {
 	}
 
 	if redirect == nil {
-		logger.Warn("this host is not registered in the reverse proxy").
-			AddKeyValue("host", host).
-			Print()
+		log.Default.Warn("this host is not registered in the reverse proxy",
+			vlog.String("host", host),
+		)
 		return
 	}
 
 	target, err := url.Parse(redirect.Target)
 	if err != nil {
-		logger.Error(err).Print()
+		log.Default.Error(err)
 		return
 	}
 
 	proxy := httputil.NewSingleHostReverseProxy(target)
 	proxy.ErrorHandler = func(w http.ResponseWriter, request *http.Request, err error) {
 		if err != nil && !errors.Is(err, context.Canceled) {
-			logger.Error(err).Print()
+			log.Default.Error(err)
 		}
 	}
 	proxy.Director = func(request *http.Request) {

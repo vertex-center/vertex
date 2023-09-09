@@ -15,9 +15,10 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/google/go-github/v50/github"
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vlog"
 	"golang.org/x/exp/slices"
 )
 
@@ -54,29 +55,28 @@ func (s *UpdateDependenciesService) GetCachedUpdates() types.Updates {
 }
 
 func (s *UpdateDependenciesService) CheckForUpdates() (types.Updates, error) {
-	logger.Log("fetching all updates...").Print()
+	log.Default.Info("fetching all updates...")
 
 	s.updates.Items = []types.Update{}
 
 	for _, dependency := range s.dependencies {
-		logger.Log("fetching dependency").
-			AddKeyValue("id", dependency.GetID()).
-			Print()
+		log.Default.Info("fetching dependency",
+			vlog.String("id", dependency.GetID()),
+		)
 
 		update, err := dependency.CheckForUpdate()
 		if err != nil {
 			return types.Updates{}, err
 		}
 		if update != nil {
-			logger.Log("dependency needs update").
-				AddKeyValue("id", dependency.GetID()).
-				Print()
-
+			log.Default.Info("dependency needs update",
+				vlog.String("id", dependency.GetID()),
+			)
 			s.updates.Items = append(s.updates.Items, *update)
 		} else {
-			logger.Log("dependency already up-to-date").
-				AddKeyValue("id", dependency.GetID()).
-				Print()
+			log.Default.Info("dependency already up-to-date",
+				vlog.String("id", dependency.GetID()),
+			)
 		}
 	}
 
@@ -111,7 +111,7 @@ type vertexDependency struct {
 
 func (d *vertexDependency) CheckForUpdate() (*types.Update, error) {
 	if d.currentVersion == "dev" {
-		logger.Log("skipping vertex update in 'dev' version").Print()
+		log.Default.Info("skipping vertex update in 'dev' version")
 		return nil, nil
 	}
 
@@ -146,10 +146,10 @@ func (d *vertexDependency) CheckForUpdate() (*types.Update, error) {
 		NeedsRestart:   true,
 	}
 
-	logger.Log("a new release for Vertex is available").
-		AddKeyValue("current", d.currentVersion).
-		AddKeyValue("release", latestVersion).
-		Print()
+	log.Default.Info("a new release for Vertex is available",
+		vlog.String("current", d.currentVersion),
+		vlog.String("release", latestVersion),
+	)
 
 	return d.update, nil
 }
@@ -180,7 +180,7 @@ func (d *vertexDependency) InstallUpdate() error {
 	d.release = nil
 	d.update = nil
 
-	logger.Warn("a new Vertex update has been installed. please restart Vertex to apply changes.").Print()
+	log.Default.Warn("a new Vertex update has been installed. please restart Vertex to apply changes.")
 
 	return nil
 }
@@ -231,7 +231,7 @@ func (d *VertexClientDependency) CheckForUpdate() (*types.Update, error) {
 }
 
 func (d *VertexClientDependency) InstallUpdate() error {
-	logger.Log("downloading vertex-webui client...").Print()
+	log.Default.Info("downloading vertex-webui client...")
 
 	for _, asset := range d.release.Assets {
 		if strings.Contains(*asset.Name, "vertex-webui") {

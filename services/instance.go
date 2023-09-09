@@ -11,9 +11,10 @@ import (
 	"github.com/antelman107/net-wait-go/wait"
 	"github.com/go-git/go-git/v5"
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vlog"
 	"gopkg.in/yaml.v2"
 )
 
@@ -102,9 +103,9 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		Message:      "Starting instance...",
 	})
 
-	logger.Log("starting instance").
-		AddKeyValue("uuid", uuid).
-		Print()
+	log.Default.Info("starting instance",
+		vlog.String("uuid", uuid.String()),
+	)
 
 	if instance.IsRunning() {
 		s.eventsRepo.Send(types.EventInstanceLog{
@@ -150,9 +151,9 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 			Message:      "Instance started.",
 		})
 
-		logger.Log("instance started").
-			AddKeyValue("uuid", uuid).
-			Print()
+		log.Default.Info("instance started",
+			vlog.String("uuid", uuid.String()),
+		)
 	}
 
 	return err
@@ -176,17 +177,17 @@ func (s *InstanceService) StartAll() {
 		return
 	}
 
-	logger.Log("trying to ping Google...").Print()
+	log.Default.Info("trying to ping Google...")
 
 	// Wait for internet connection
 	if !wait.New(
 		wait.WithWait(time.Second),
 		wait.WithBreak(500*time.Millisecond),
 	).Do([]string{"google.com:80"}) {
-		logger.Error(errors.New("internet connection: Failed to ping google.com")).Print()
+		log.Default.Error(errors.New("internet connection: Failed to ping google.com"))
 		return
 	} else {
-		logger.Log("internet connection: OK").Print()
+		log.Default.Info("internet connection: OK")
 	}
 
 	// Start them
@@ -194,7 +195,7 @@ func (s *InstanceService) StartAll() {
 		go func(id uuid.UUID) {
 			err := s.Start(id)
 			if err != nil {
-				logger.Error(err).Print()
+				log.Default.Error(err)
 			}
 		}(id)
 	}
@@ -212,9 +213,9 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 		Message:      "Stopping instance...",
 	})
 
-	logger.Log("stopping instance").
-		AddKeyValue("uuid", uuid).
-		Print()
+	log.Default.Info("stopping instance",
+		vlog.String("uuid", uuid.String()),
+	)
 
 	if !instance.IsRunning() {
 		s.eventsRepo.Send(types.EventInstanceLog{
@@ -240,9 +241,9 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 			Message:      "Instance stopped.",
 		})
 
-		logger.Log("instance stopped").
-			AddKeyValue("uuid", uuid).
-			Print()
+		log.Default.Info("instance stopped",
+			vlog.String("uuid", uuid.String()),
+		)
 
 		s.setStatus(instance, types.InstanceStatusOff)
 	} else {
@@ -259,7 +260,7 @@ func (s *InstanceService) StopAll() {
 		}
 		err := s.Stop(i.UUID)
 		if err != nil {
-			logger.Error(err).Print()
+			log.Default.Error(err)
 		}
 	}
 }
@@ -463,7 +464,7 @@ func (s *InstanceService) reload() {
 	s.instanceRepo.Reload(func(uuid uuid.UUID) {
 		err := s.load(uuid)
 		if err != nil {
-			logger.Error(err).Print()
+			log.Default.Error(err)
 			return
 		}
 	})

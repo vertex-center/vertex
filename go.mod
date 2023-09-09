@@ -7,18 +7,18 @@ require (
 	github.com/disgoorg/disgo v0.16.9
 	github.com/docker/docker v23.0.3+incompatible
 	github.com/docker/go-connections v0.4.0
-	github.com/fatih/color v1.14.1
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/sse v0.1.0
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.9.0
-	github.com/go-co-op/gocron v1.23.0
+	github.com/go-co-op/gocron v1.33.1
 	github.com/go-git/go-git/v5 v5.6.1
 	github.com/google/go-github/v50 v50.0.0
-	github.com/google/uuid v1.3.0
+	github.com/google/uuid v1.3.1
 	github.com/pkg/errors v0.9.1
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.4
 	github.com/vertex-center/vertex-core-golang v0.0.0-20230423023245-a01db2466031
+	github.com/vertex-center/vlog v1.0.1
 	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -38,6 +38,7 @@ require (
 	github.com/docker/distribution v2.8.2+incompatible // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
+	github.com/fatih/color v1.15.0 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
 	github.com/go-git/go-billy/v5 v5.4.1 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -77,6 +78,7 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.9 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
+	go.uber.org/atomic v1.9.0 // indirect
 	golang.org/x/arch v0.1.0 // indirect
 	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/mod v0.11.0 // indirect

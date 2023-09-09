@@ -5,15 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"path"
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vlog"
 	"gopkg.in/yaml.v2"
 )
 
@@ -36,10 +36,10 @@ func NewInstanceFSRepository() InstanceFSRepository {
 
 	err := os.MkdirAll(r.instancesPath, os.ModePerm)
 	if err != nil && !os.IsExist(err) {
-		logger.Error(err).
-			AddKeyValue("message", "failed to create directory").
-			AddKeyValue("path", r.instancesPath).
-			Print()
+		log.Default.Error(err,
+			vlog.String("message", "failed to create directory"),
+			vlog.String("path", r.instancesPath),
+		)
 		os.Exit(1)
 	}
 
@@ -108,7 +108,7 @@ func (r *InstanceFSRepository) LoadSettings(i *types.Instance) error {
 	settingsBytes, err := os.ReadFile(settingsPath)
 
 	if errors.Is(err, os.ErrNotExist) {
-		logger.Log("instance_settings.json not found. using default.").Print()
+		log.Default.Warn("instance_settings.json not found. using default.")
 	} else if err != nil {
 		return err
 	} else {
@@ -124,9 +124,9 @@ func (r *InstanceFSRepository) LoadSettings(i *types.Instance) error {
 func (r *InstanceFSRepository) ReadService(instancePath string) (types.Service, error) {
 	data, err := os.ReadFile(path.Join(instancePath, ".vertex", "service.yml"))
 	if err != nil {
-		logger.Warn("'.vertex/service.yml' file not found").
-			AddKeyValue("path", path.Dir(instancePath)).
-			Print()
+		log.Default.Warn("'.vertex/service.yml' file not found",
+			vlog.String("path", path.Dir(instancePath)),
+		)
 	}
 
 	var service types.Service
@@ -182,26 +182,27 @@ func (r *InstanceFSRepository) LoadEnv(i *types.Instance) error {
 func (r *InstanceFSRepository) Reload(load func(uuid uuid.UUID)) {
 	entries, err := os.ReadDir(r.instancesPath)
 	if err != nil {
-		log.Fatal(err)
+		log.Default.Error(err)
+		os.Exit(1)
 	}
 
 	for _, entry := range entries {
 		info, err := entry.Info()
 		if err != nil {
-			logger.Error(err).Print()
+			log.Default.Error(err)
 			continue
 		}
 
 		isInstance := entry.IsDir() || info.Mode()&os.ModeSymlink != 0
 
 		if isInstance {
-			logger.Log("found service").
-				AddKeyValue("uuid", entry.Name()).
-				Print()
+			log.Default.Info("found instance",
+				vlog.String("uuid", entry.Name()),
+			)
 
 			id, err := uuid.Parse(entry.Name())
 			if err != nil {
-				logger.Error(err).Print()
+				log.Default.Error(err)
 				continue
 			}
 

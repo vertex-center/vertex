@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
-	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
 )
@@ -45,7 +45,7 @@ func NewPackageFSRepository(params *PackageRepositoryParams) PackageFSRepository
 
 	err := repo.Reload()
 	if err != nil {
-		logger.Error(fmt.Errorf("failed to reload services repository: %v", err)).Print()
+		log.Default.Error(fmt.Errorf("failed to reload services repository: %v", err))
 	}
 	return repo
 }

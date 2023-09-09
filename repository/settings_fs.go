@@ -6,9 +6,10 @@ import (
 	"os"
 	"path"
 
-	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vlog"
 )
 
 type SettingsFSRepository struct {
@@ -30,10 +31,10 @@ func NewSettingsFSRepository(params *SettingsRepositoryParams) SettingsFSReposit
 
 	err := os.MkdirAll(params.settingsPath, os.ModePerm)
 	if err != nil && !os.IsExist(err) {
-		logger.Error(err).
-			AddKeyValue("message", "failed to create directory").
-			AddKeyValue("path", params.settingsPath).
-			Print()
+		log.Default.Error(err,
+			vlog.String("message", "failed to create directory"),
+			vlog.String("path", params.settingsPath),
+		)
 		os.Exit(1)
 	}
 
@@ -43,7 +44,7 @@ func NewSettingsFSRepository(params *SettingsRepositoryParams) SettingsFSReposit
 
 	err = repo.read()
 	if err != nil {
-		logger.Error(err).Print()
+		log.Default.Error(err)
 	}
 
 	return repo
@@ -73,7 +74,7 @@ func (r *SettingsFSRepository) read() error {
 	file, err := os.ReadFile(p)
 
 	if errors.Is(err, os.ErrNotExist) {
-		logger.Log("settings.json doesn't exists or could not be found").Print()
+		log.Default.Info("settings.json doesn't exists or could not be found")
 		return nil
 	} else if err != nil {
 		return err

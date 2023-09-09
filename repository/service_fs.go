@@ -6,7 +6,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
 	"gopkg.in/yaml.v2"
@@ -34,7 +34,7 @@ func NewServiceFSRepository(params *ServiceRepositoryParams) ServiceFSRepository
 	}
 	err := repo.Reload()
 	if err != nil {
-		logger.Error(fmt.Errorf("failed to reload services repository: %v", err)).Print()
+		log.Default.Error(fmt.Errorf("failed to reload services repository: %v", err))
 	}
 	return repo
 }

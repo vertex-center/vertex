@@ -1,30 +1,36 @@
 package ginutils
 
 import (
-	"strings"
-
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vlog"
 )
 
 func Logger(router string) gin.HandlerFunc {
 	return gin.LoggerWithFormatter(func(params gin.LogFormatterParams) string {
-		l := logger.Request().
-			AddKeyValue("router", router).
-			AddKeyValue("method", params.Method).
-			AddKeyValue("status", params.StatusCode).
-			AddKeyValue("path", params.Path).
-			AddKeyValue("latency", params.Latency).
-			AddKeyValue("ip", params.ClientIP).
-			AddKeyValue("size", params.BodySize)
-
 		if params.ErrorMessage != "" {
-			err, _ := strings.CutSuffix(params.ErrorMessage, "\n")
-			l.AddKeyValue("error", err)
+			log.Default.Request("request",
+				vlog.String("router", router),
+				vlog.String("method", params.Method),
+				vlog.Int("status", params.StatusCode),
+				vlog.String("path", params.Path),
+				vlog.String("latency", params.Latency.String()),
+				vlog.String("ip", params.ClientIP),
+				vlog.Int("size", params.BodySize),
+				vlog.String("error", params.ErrorMessage),
+			)
+		} else {
+			log.Default.Request("request",
+				vlog.String("router", router),
+				vlog.String("method", params.Method),
+				vlog.Int("status", params.StatusCode),
+				vlog.String("path", params.Path),
+				vlog.String("latency", params.Latency.String()),
+				vlog.String("ip", params.ClientIP),
+				vlog.Int("size", params.BodySize),
+			)
 		}
 
-		l.PrintInExternalFiles()
-
-		return l.String()
+		return ""
 	})
 }

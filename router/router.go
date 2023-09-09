@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex-core-golang/router/middleware"
 	"github.com/vertex-center/vertex/pkg/ginutils"
-	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/repository"
 	"github.com/vertex-center/vertex/services"
@@ -100,7 +100,7 @@ func (r *Router) Start(addr string) {
 	go func() {
 		err := proxyService.Start()
 		if err != nil {
-			logger.Error(err).Print()
+			log.Default.Error(err)
 			return
 		}
 
@@ -116,14 +116,14 @@ func (r *Router) Start(addr string) {
 
 	err := notificationsService.StartWebhook()
 	if err != nil {
-		logger.Error(err).Print()
+		log.Default.Error(err)
 	}
 
 	err = r.server.ListenAndServe()
 	if errors.Is(err, http.ErrServerClosed) {
-		logger.Log("Vertex closed").Print()
+		log.Default.Info("Vertex closed")
 	} else if err != nil {
-		logger.Error(err).Print()
+		log.Default.Error(err)
 	}
 }
 
@@ -134,7 +134,7 @@ func (r *Router) Stop() {
 
 	err := r.server.Shutdown(context.Background())
 	if err != nil {
-		logger.Error(err).Print()
+		log.Default.Error(err)
 		return
 	}
 
@@ -152,7 +152,7 @@ func (r *Router) handleSignals() {
 	signal.Notify(c, os.Interrupt)
 	go func() {
 		<-c
-		logger.Log("shutdown signal sent").Print()
+		log.Default.Info("shutdown signal sent")
 		r.Stop()
 		os.Exit(0)
 	}()

@@ -6,7 +6,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vlog"
 )
 
 func addPackagesRoutes(r *gin.RouterGroup) {
@@ -31,19 +32,22 @@ func handleInstallPackages(c *gin.Context) {
 	for _, d := range body.Packages {
 		pkg, err := packageService.GetByID(d.Name)
 		if err != nil {
-			logger.Warn("dependency not found").
-				AddKeyValue("name", d.Name).
-				AddKeyValue("package_manager", d.PackageManager).
-				Print()
+			log.Default.Warn("dependency not found",
+				vlog.String("name", d.Name),
+				vlog.String("package_manager", d.PackageManager),
+			)
 
 			continue
 		}
 
-		logger.Log(fmt.Sprintf("installing package name='%s' with package_manager=%s", d.Name, d.PackageManager)).Print()
+		log.Default.Info("installing package",
+			vlog.String("name", d.Name),
+			vlog.String("package_manager", d.PackageManager),
+		)
 
 		cmd, err := packageService.InstallationCommand(&pkg, d.PackageManager)
 		if err != nil {
-			logger.Error(err).Print()
+			log.Default.Error(err)
 			continue
 		}
 
@@ -55,15 +59,15 @@ func handleInstallPackages(c *gin.Context) {
 		} else {
 			err = packageService.Install(cmd)
 			if err != nil {
-				logger.Error(err).Print()
+				log.Default.Error(err)
 				continue
 			}
 		}
 
-		logger.Log("package installed successfully").
-			AddKeyValue("name", d.Name).
-			AddKeyValue("package_manager", d.PackageManager).
-			Print()
+		log.Default.Info("package installed successfully",
+			vlog.String("name", d.Name),
+			vlog.String("package_manager", d.PackageManager),
+		)
 
 		c.Status(http.StatusOK)
 		return

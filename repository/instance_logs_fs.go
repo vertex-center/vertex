@@ -9,7 +9,7 @@ import (
 
 	"github.com/go-co-op/gocron"
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
 )
@@ -75,7 +75,7 @@ func (r *InstanceLogsFSRepository) Close(uuid uuid.UUID) error {
 func (r *InstanceLogsFSRepository) Push(uuid uuid.UUID, line types.LogLine) {
 	l, err := r.getLogger(uuid)
 	if err != nil {
-		logger.Error(err).Print()
+		log.Default.Error(err)
 		return
 	}
 	l.currentLine += 1
@@ -86,7 +86,7 @@ func (r *InstanceLogsFSRepository) Push(uuid uuid.UUID, line types.LogLine) {
 
 	_, err = fmt.Fprintf(l.file, "%s\n", line.Message)
 	if err != nil {
-		logger.Error(err).Print()
+		log.Default.Error(err)
 	}
 }
 
@@ -127,17 +127,17 @@ func (r *InstanceLogsFSRepository) startCron() {
 		for id := range r.loggers {
 			err := r.Close(id)
 			if err != nil {
-				logger.Error(err).Print()
+				log.Default.Error(err)
 				continue
 			}
 			err = r.Open(id)
 			if err != nil {
-				logger.Error(err).Print()
+				log.Default.Error(err)
 			}
 		}
 	})
 	if err != nil {
-		logger.Error(err).Print()
+		log.Default.Error(err)
 		return
 	}
 	s.StartAsync()

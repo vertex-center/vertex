@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-contrib/sse"
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/pkg/logger"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/types"
 )
 
@@ -58,7 +58,7 @@ func handleInstancesEvents(c *gin.Context) {
 			})
 
 			if err != nil {
-				logger.Error(err).Print()
+				log.Default.Error(err)
 				return false
 			}
 			first = false
@@ -69,7 +69,7 @@ func handleInstancesEvents(c *gin.Context) {
 		case e := <-eventsChan:
 			err := sse.Encode(w, e)
 			if err != nil {
-				logger.Error(err).Print()
+				log.Default.Error(err)
 			}
 			return true
 		case <-done:
