@@ -71,7 +71,7 @@ func (s *NotificationsService) sendStatus(instanceUUID uuid.UUID, status string)
 
 	instance, err := s.instanceAdapter.Get(instanceUUID)
 	if err != nil {
-		log.Default.Error(err)
+		log.Error(err)
 		return
 	}
 

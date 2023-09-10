@@ -25,19 +25,19 @@ var (
 func main() {
 	defer log.Default.Close()
 
-	log.Default.Info("Vertex starting...")
+	log.Info("Vertex starting...")
 
 	parseArgs()
 
 	err := setupDependencies()
 	if err != nil {
-		log.Default.Error(fmt.Errorf("failed to setup dependencies: %v", err))
+		log.Error(fmt.Errorf("failed to setup dependencies: %v", err))
 		return
 	}
 
 	err = config.Current.Apply()
 	if err != nil {
-		log.Default.Error(fmt.Errorf("failed to apply the current configuration: %v", err))
+		log.Error(fmt.Errorf("failed to apply the current configuration: %v", err))
 		return
 	}
 
@@ -54,7 +54,7 @@ func main() {
 	// Logs
 	url := fmt.Sprintf("http://%s", config.Current.Host)
 	fmt.Printf("\n-- Vertex Client :: %s\n\n", url)
-	log.Default.Info("Vertex started",
+	log.Info("Vertex started",
 		vlog.String("url", url),
 	)
 
@@ -98,7 +98,7 @@ func setupDependencies() error {
 	for _, dep := range dependencies {
 		err := setupDependency(dep)
 		if err != nil {
-			log.Default.Error(err)
+			log.Error(err)
 			os.Exit(1)
 		}
 	}

@@ -75,7 +75,7 @@ func (a *InstanceLogsFSAdapter) Close(uuid uuid.UUID) error {
 func (a *InstanceLogsFSAdapter) Push(uuid uuid.UUID, line types.LogLine) {
 	l, err := a.getLogger(uuid)
 	if err != nil {
-		log.Default.Error(err)
+		log.Error(err)
 		return
 	}
 	l.currentLine += 1
@@ -86,7 +86,7 @@ func (a *InstanceLogsFSAdapter) Push(uuid uuid.UUID, line types.LogLine) {
 
 	_, err = fmt.Fprintf(l.file, "%s\n", line.Message)
 	if err != nil {
-		log.Default.Error(err)
+		log.Error(err)
 	}
 }
 
@@ -127,17 +127,17 @@ func (a *InstanceLogsFSAdapter) startCron() {
 		for id := range a.loggers {
 			err := a.Close(id)
 			if err != nil {
-				log.Default.Error(err)
+				log.Error(err)
 				continue
 			}
 			err = a.Open(id)
 			if err != nil {
-				log.Default.Error(err)
+				log.Error(err)
 			}
 		}
 	})
 	if err != nil {
-		log.Default.Error(err)
+		log.Error(err)
 		return
 	}
 	s.StartAsync()

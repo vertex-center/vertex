@@ -9,7 +9,7 @@ import (
 func Logger(router string) gin.HandlerFunc {
 	return gin.LoggerWithFormatter(func(params gin.LogFormatterParams) string {
 		if params.ErrorMessage != "" {
-			log.Default.Request("request",
+			log.Request("request",
 				vlog.String("router", router),
 				vlog.String("method", params.Method),
 				vlog.Int("status", params.StatusCode),
@@ -20,7 +20,7 @@ func Logger(router string) gin.HandlerFunc {
 				vlog.String("error", params.ErrorMessage),
 			)
 		} else {
-			log.Default.Request("request",
+			log.Request("request",
 				vlog.String("router", router),
 				vlog.String("method", params.Method),
 				vlog.Int("status", params.StatusCode),

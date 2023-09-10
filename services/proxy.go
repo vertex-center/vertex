@@ -53,7 +53,7 @@ func (s *ProxyService) Start() error {
 	go func() {
 		err := s.server.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Default.Error(err)
+			log.Error(err)
 			return
 		}
 	}()
@@ -96,7 +96,7 @@ func (s *ProxyService) handleProxy(c *gin.Context) {
 	}
 
 	if redirect == nil {
-		log.Default.Warn("this host is not registered in the reverse proxy",
+		log.Warn("this host is not registered in the reverse proxy",
 			vlog.String("host", host),
 		)
 		return
@@ -104,14 +104,14 @@ func (s *ProxyService) handleProxy(c *gin.Context) {
 
 	target, err := url.Parse(redirect.Target)
 	if err != nil {
-		log.Default.Error(err)
+		log.Error(err)
 		return
 	}
 
 	proxy := httputil.NewSingleHostReverseProxy(target)
 	proxy.ErrorHandler = func(w http.ResponseWriter, request *http.Request, err error) {
 		if err != nil && !errors.Is(err, context.Canceled) {
-			log.Default.Error(err)
+			log.Error(err)
 		}
 	}
 	proxy.Director = func(request *http.Request) {

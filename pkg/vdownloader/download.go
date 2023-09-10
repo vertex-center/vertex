@@ -13,7 +13,7 @@ import (
 // Download downloads a file from a URL. It creates the
 // directory if it doesn't exist.
 func Download(url string, dir string, filename string) error {
-	log.Default.Info("downloading",
+	log.Info("downloading",
 		vlog.String("url", url),
 	)
 

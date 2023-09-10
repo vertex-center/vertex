@@ -31,7 +31,7 @@ func (a RunnerFSAdapter) Delete(instance *types.Instance) error {
 
 func (a RunnerFSAdapter) Start(instance *types.Instance, onLog func(msg string), onErr func(msg string), setStatus func(status string)) error {
 	if a.commands[instance.UUID] != nil {
-		log.Default.Error(errors.New("runner already started"),
+		log.Error(errors.New("runner already started"),
 			vlog.String("name", instance.Name),
 		)
 	}
@@ -102,7 +102,7 @@ func (a RunnerFSAdapter) Start(instance *types.Instance, onLog func(msg string),
 	go func() {
 		err := cmd.Wait()
 		if err != nil {
-			log.Default.Error(err,
+			log.Error(err,
 				vlog.String("name", instance.Service.Name),
 			)
 		}

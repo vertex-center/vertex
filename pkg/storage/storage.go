@@ -25,7 +25,7 @@ var (
 )
 
 func CloneOrPullRepository(url string, dest string) error {
-	log.Default.Info("downloading repository",
+	log.Info("downloading repository",
 		vlog.String("url", url),
 	)
 
@@ -57,7 +57,7 @@ func CloneOrPullRepository(url string, dest string) error {
 }
 
 func DownloadLatestGithubRelease(owner string, repo string, dest string) error {
-	log.Default.Info("downloading repository",
+	log.Info("downloading repository",
 		vlog.String("owner", owner),
 		vlog.String("repo", repo),
 	)
@@ -73,7 +73,7 @@ func DownloadLatestGithubRelease(owner string, repo string, dest string) error {
 }
 
 func DownloadGithubRelease(release *github.RepositoryRelease, dest string) error {
-	log.Default.Info("downloading release",
+	log.Info("downloading release",
 		vlog.String("release", *release.Name),
 	)
 

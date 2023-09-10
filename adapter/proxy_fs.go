@@ -32,7 +32,7 @@ func NewProxyFSAdapter(params *ProxyFSAdapterParams) types.ProxyAdapterPort {
 
 	err := os.MkdirAll(params.proxyPath, os.ModePerm)
 	if err != nil && !os.IsExist(err) {
-		log.Default.Error(err,
+		log.Error(err,
 			vlog.String("message", "failed to create directory"),
 			vlog.String("path", params.proxyPath),
 		)
@@ -67,15 +67,15 @@ func (a *ProxyFSRepository) read() {
 	file, err := os.ReadFile(p)
 
 	if errors.Is(err, os.ErrNotExist) {
-		log.Default.Info("redirects.json doesn't exists or could not be found")
+		log.Info("redirects.json doesn't exists or could not be found")
 	} else if err != nil {
-		log.Default.Error(err)
+		log.Error(err)
 		return
 	}
 
 	err = json.Unmarshal(file, &a.redirects)
 	if err != nil {
-		log.Default.Error(err)
+		log.Error(err)
 		return
 	}
 }

@@ -207,7 +207,7 @@ func handleInstanceEvents(c *gin.Context) {
 			})
 
 			if err != nil {
-				log.Default.Error(err)
+				log.Error(err)
 				return false
 			}
 			first = false
@@ -218,7 +218,7 @@ func handleInstanceEvents(c *gin.Context) {
 		case e := <-eventsChan:
 			err := sse.Encode(w, e)
 			if err != nil {
-				log.Default.Error(err)
+				log.Error(err)
 			}
 			return true
 		case <-done:
@@ -240,7 +240,7 @@ func handleGetDependencies(c *gin.Context) {
 		for name := range *i.Methods.Script.Dependencies {
 			dep, err := packageService.GetByID(name)
 			if err != nil {
-				log.Default.Error(err)
+				log.Error(err)
 				continue
 			}
 			deps[name] = dep

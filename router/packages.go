@@ -32,7 +32,7 @@ func handleInstallPackages(c *gin.Context) {
 	for _, d := range body.Packages {
 		pkg, err := packageService.GetByID(d.Name)
 		if err != nil {
-			log.Default.Warn("dependency not found",
+			log.Warn("dependency not found",
 				vlog.String("name", d.Name),
 				vlog.String("package_manager", d.PackageManager),
 			)
@@ -40,14 +40,14 @@ func handleInstallPackages(c *gin.Context) {
 			continue
 		}
 
-		log.Default.Info("installing package",
+		log.Info("installing package",
 			vlog.String("name", d.Name),
 			vlog.String("package_manager", d.PackageManager),
 		)
 
 		cmd, err := packageService.InstallationCommand(&pkg, d.PackageManager)
 		if err != nil {
-			log.Default.Error(err)
+			log.Error(err)
 			continue
 		}
 
@@ -59,12 +59,12 @@ func handleInstallPackages(c *gin.Context) {
 		} else {
 			err = packageService.Install(cmd)
 			if err != nil {
-				log.Default.Error(err)
+				log.Error(err)
 				continue
 			}
 		}
 
-		log.Default.Info("package installed successfully",
+		log.Info("package installed successfully",
 			vlog.String("name", d.Name),
 			vlog.String("package_manager", d.PackageManager),
 		)

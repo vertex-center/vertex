@@ -103,7 +103,7 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		Message:      "Starting instance...",
 	})
 
-	log.Default.Info("starting instance",
+	log.Info("starting instance",
 		vlog.String("uuid", uuid.String()),
 	)
 
@@ -151,7 +151,7 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 			Message:      "Instance started.",
 		})
 
-		log.Default.Info("instance started",
+		log.Info("instance started",
 			vlog.String("uuid", uuid.String()),
 		)
 	}
@@ -177,17 +177,17 @@ func (s *InstanceService) StartAll() {
 		return
 	}
 
-	log.Default.Info("trying to ping Google...")
+	log.Info("trying to ping Google...")
 
 	// Wait for internet connection
 	if !wait.New(
 		wait.WithWait(time.Second),
 		wait.WithBreak(500*time.Millisecond),
 	).Do([]string{"google.com:80"}) {
-		log.Default.Error(errors.New("internet connection: Failed to ping google.com"))
+		log.Error(errors.New("internet connection: Failed to ping google.com"))
 		return
 	} else {
-		log.Default.Info("internet connection: OK")
+		log.Info("internet connection: OK")
 	}
 
 	// Start them
@@ -195,7 +195,7 @@ func (s *InstanceService) StartAll() {
 		go func(id uuid.UUID) {
 			err := s.Start(id)
 			if err != nil {
-				log.Default.Error(err)
+				log.Error(err)
 			}
 		}(id)
 	}
@@ -213,7 +213,7 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 		Message:      "Stopping instance...",
 	})
 
-	log.Default.Info("stopping instance",
+	log.Info("stopping instance",
 		vlog.String("uuid", uuid.String()),
 	)
 
@@ -241,7 +241,7 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 			Message:      "Instance stopped.",
 		})
 
-		log.Default.Info("instance stopped",
+		log.Info("instance stopped",
 			vlog.String("uuid", uuid.String()),
 		)
 
@@ -260,7 +260,7 @@ func (s *InstanceService) StopAll() {
 		}
 		err := s.Stop(i.UUID)
 		if err != nil {
-			log.Default.Error(err)
+			log.Error(err)
 		}
 	}
 }
@@ -464,7 +464,7 @@ func (s *InstanceService) reload() {
 	s.instanceAdapter.Reload(func(uuid uuid.UUID) {
 		err := s.load(uuid)
 		if err != nil {
-			log.Default.Error(err)
+			log.Error(err)
 			return
 		}
 	})

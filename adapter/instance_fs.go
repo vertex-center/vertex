@@ -36,7 +36,7 @@ func NewInstanceFSAdapter() types.InstanceAdapterPort {
 
 	err := os.MkdirAll(adapter.instancesPath, os.ModePerm)
 	if err != nil && !os.IsExist(err) {
-		log.Default.Error(err,
+		log.Error(err,
 			vlog.String("message", "failed to create directory"),
 			vlog.String("path", adapter.instancesPath),
 		)
@@ -108,7 +108,7 @@ func (a *InstanceFSAdapter) LoadSettings(i *types.Instance) error {
 	settingsBytes, err := os.ReadFile(settingsPath)
 
 	if errors.Is(err, os.ErrNotExist) {
-		log.Default.Warn("instance_settings.json not found. using default.")
+		log.Warn("instance_settings.json not found. using default.")
 	} else if err != nil {
 		return err
 	} else {
@@ -124,7 +124,7 @@ func (a *InstanceFSAdapter) LoadSettings(i *types.Instance) error {
 func (a *InstanceFSAdapter) ReadService(instancePath string) (types.Service, error) {
 	data, err := os.ReadFile(path.Join(instancePath, ".vertex", "service.yml"))
 	if err != nil {
-		log.Default.Warn("'.vertex/service.yml' file not found",
+		log.Warn("'.vertex/service.yml' file not found",
 			vlog.String("path", path.Dir(instancePath)),
 		)
 	}
@@ -182,27 +182,27 @@ func (a *InstanceFSAdapter) LoadEnv(i *types.Instance) error {
 func (a *InstanceFSAdapter) Reload(load func(uuid uuid.UUID)) {
 	entries, err := os.ReadDir(a.instancesPath)
 	if err != nil {
-		log.Default.Error(err)
+		log.Error(err)
 		os.Exit(1)
 	}
 
 	for _, entry := range entries {
 		info, err := entry.Info()
 		if err != nil {
-			log.Default.Error(err)
+			log.Error(err)
 			continue
 		}
 
 		isInstance := entry.IsDir() || info.Mode()&os.ModeSymlink != 0
 
 		if isInstance {
-			log.Default.Info("found instance",
+			log.Info("found instance",
 				vlog.String("uuid", entry.Name()),
 			)
 
 			id, err := uuid.Parse(entry.Name())
 			if err != nil {
-				log.Default.Error(err)
+				log.Error(err)
 				continue
 			}
 

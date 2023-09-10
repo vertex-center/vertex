@@ -31,7 +31,7 @@ func NewSettingsFSAdapter(params *SettingsFSAdapterParams) types.SettingsAdapter
 
 	err := os.MkdirAll(params.settingsPath, os.ModePerm)
 	if err != nil && !os.IsExist(err) {
-		log.Default.Error(err,
+		log.Error(err,
 			vlog.String("message", "failed to create directory"),
 			vlog.String("path", params.settingsPath),
 		)
@@ -44,7 +44,7 @@ func NewSettingsFSAdapter(params *SettingsFSAdapterParams) types.SettingsAdapter
 
 	err = adapter.read()
 	if err != nil {
-		log.Default.Error(err)
+		log.Error(err)
 	}
 
 	return adapter
@@ -74,7 +74,7 @@ func (a *SettingsFSAdapter) read() error {
 	file, err := os.ReadFile(p)
 
 	if errors.Is(err, os.ErrNotExist) {
-		log.Default.Info("settings.json doesn't exists or could not be found")
+		log.Info("settings.json doesn't exists or could not be found")
 		return nil
 	} else if err != nil {
 		return err

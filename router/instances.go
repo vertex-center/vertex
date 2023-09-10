@@ -58,7 +58,7 @@ func handleInstancesEvents(c *gin.Context) {
 			})
 
 			if err != nil {
-				log.Default.Error(err)
+				log.Error(err)
 				return false
 			}
 			first = false
@@ -69,7 +69,7 @@ func handleInstancesEvents(c *gin.Context) {
 		case e := <-eventsChan:
 			err := sse.Encode(w, e)
 			if err != nil {
-				log.Default.Error(err)
+				log.Error(err)
 			}
 			return true
 		case <-done:

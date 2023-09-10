@@ -71,7 +71,7 @@ func (r *Router) Start(addr string) {
 	go func() {
 		err := proxyService.Start()
 		if err != nil {
-			log.Default.Error(err)
+			log.Error(err)
 			return
 		}
 
@@ -87,14 +87,14 @@ func (r *Router) Start(addr string) {
 
 	err := notificationsService.StartWebhook()
 	if err != nil {
-		log.Default.Error(err)
+		log.Error(err)
 	}
 
 	err = r.server.ListenAndServe()
 	if errors.Is(err, http.ErrServerClosed) {
-		log.Default.Info("Vertex closed")
+		log.Info("Vertex closed")
 	} else if err != nil {
-		log.Default.Error(err)
+		log.Error(err)
 	}
 }
 
@@ -105,7 +105,7 @@ func (r *Router) Stop() {
 
 	err := r.server.Shutdown(context.Background())
 	if err != nil {
-		log.Default.Error(err)
+		log.Error(err)
 		return
 	}
 
@@ -123,7 +123,7 @@ func (r *Router) handleSignals() {
 	signal.Notify(c, os.Interrupt)
 	go func() {
 		<-c
-		log.Default.Info("shutdown signal sent")
+		log.Info("shutdown signal sent")
 		r.Stop()
 		os.Exit(0)
 	}()

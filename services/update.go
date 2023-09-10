@@ -55,12 +55,12 @@ func (s *UpdateDependenciesService) GetCachedUpdates() types.Updates {
 }
 
 func (s *UpdateDependenciesService) CheckForUpdates() (types.Updates, error) {
-	log.Default.Info("fetching all updates...")
+	log.Info("fetching all updates...")
 
 	s.updates.Items = []types.Update{}
 
 	for _, dependency := range s.dependencies {
-		log.Default.Info("fetching dependency",
+		log.Info("fetching dependency",
 			vlog.String("id", dependency.GetID()),
 		)
 
@@ -69,12 +69,12 @@ func (s *UpdateDependenciesService) CheckForUpdates() (types.Updates, error) {
 			return types.Updates{}, err
 		}
 		if update != nil {
-			log.Default.Info("dependency needs update",
+			log.Info("dependency needs update",
 				vlog.String("id", dependency.GetID()),
 			)
 			s.updates.Items = append(s.updates.Items, *update)
 		} else {
-			log.Default.Info("dependency already up-to-date",
+			log.Info("dependency already up-to-date",
 				vlog.String("id", dependency.GetID()),
 			)
 		}
@@ -111,7 +111,7 @@ type vertexDependency struct {
 
 func (d *vertexDependency) CheckForUpdate() (*types.Update, error) {
 	if d.currentVersion == "dev" {
-		log.Default.Info("skipping vertex update in 'dev' version")
+		log.Info("skipping vertex update in 'dev' version")
 		return nil, nil
 	}
 
@@ -146,7 +146,7 @@ func (d *vertexDependency) CheckForUpdate() (*types.Update, error) {
 		NeedsRestart:   true,
 	}
 
-	log.Default.Info("a new release for Vertex is available",
+	log.Info("a new release for Vertex is available",
 		vlog.String("current", d.currentVersion),
 		vlog.String("release", latestVersion),
 	)
@@ -180,7 +180,7 @@ func (d *vertexDependency) InstallUpdate() error {
 	d.release = nil
 	d.update = nil
 
-	log.Default.Warn("a new Vertex update has been installed. please restart Vertex to apply changes.")
+	log.Warn("a new Vertex update has been installed. please restart Vertex to apply changes.")
 
 	return nil
 }
@@ -230,7 +230,7 @@ func (d *VertexClientDependency) CheckForUpdate() (*types.Update, error) {
 }
 
 func (d *VertexClientDependency) InstallUpdate() error {
-	log.Default.Info("downloading vertex-webui client...")
+	log.Info("downloading vertex-webui client...")
 
 	for _, asset := range d.release.Assets {
 		if strings.Contains(*asset.Name, "vertex-webui") {

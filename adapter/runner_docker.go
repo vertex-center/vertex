@@ -32,7 +32,7 @@ type dockerMessage struct {
 func NewRunnerDockerAdapter() RunnerDockerAdapter {
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
-		log.Default.Warn("couldn't connect with the Docker cli.",
+		log.Warn("couldn't connect with the Docker cli.",
 			vlog.String("error", err.Error()),
 		)
 
@@ -80,7 +80,7 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, onLog func(msg stri
 	if errors.Is(err, ErrContainerNotFound) {
 		containerName := instance.DockerContainerName()
 
-		log.Default.Info("container doesn't exists, create it.",
+		log.Info("container doesn't exists, create it.",
 			vlog.String("container_name", containerName),
 		)
 
@@ -228,12 +228,12 @@ func (a RunnerDockerAdapter) CheckForUpdates(instance *types.Instance) error {
 	}
 
 	if latestImageID == currentImageID {
-		log.Default.Info("already up-to-date",
+		log.Info("already up-to-date",
 			vlog.String("uuid", instance.UUID.String()),
 		)
 		instance.Update = nil
 	} else {
-		log.Default.Info("a new update is available",
+		log.Info("a new update is available",
 			vlog.String("uuid", instance.UUID.String()),
 		)
 		instance.Update = &types.InstanceUpdate{
@@ -344,7 +344,7 @@ func (a RunnerDockerAdapter) buildImageFromDockerfile(instancePath string, image
 		msg := dockerMessage{}
 		err := json.Unmarshal(scanner.Bytes(), &msg)
 		if err != nil {
-			log.Default.Warn("Failed to parse message",
+			log.Warn("Failed to parse message",
 				vlog.String("message", scanner.Text()),
 			)
 		} else {
@@ -354,7 +354,7 @@ func (a RunnerDockerAdapter) buildImageFromDockerfile(instancePath string, image
 		}
 	}
 
-	log.Default.Info("Docker build: success.")
+	log.Info("Docker build: success.")
 	return nil
 }
 
@@ -388,7 +388,7 @@ func (a RunnerDockerAdapter) createContainer(options createContainerOptions) (st
 
 	res, err := a.cli.ContainerCreate(context.Background(), &config, &hostConfig, nil, nil, options.containerName)
 	for _, warn := range res.Warnings {
-		log.Default.Warn("warning while creating container",
+		log.Warn("warning while creating container",
 			vlog.String("warning", warn),
 		)
 	}
@@ -402,12 +402,12 @@ func (a RunnerDockerAdapter) watchForStatusChange(containerID string, instance *
 		select {
 		case err := <-errChan:
 			if err != nil {
-				log.Default.Error(err,
+				log.Error(err,
 					vlog.String("uuid", instance.UUID.String()),
 				)
 			}
 		case status := <-resChan:
-			log.Default.Info("container exited",
+			log.Info("container exited",
 				vlog.String("uuid", instance.UUID.String()),
 				vlog.Int64("status", status.StatusCode),
 			)
@@ -426,7 +426,7 @@ func (a RunnerDockerAdapter) watchForLogs(containerID string, instance *types.In
 			Tail:       "0",
 		})
 		if err != nil {
-			log.Default.Error(err,
+			log.Error(err,
 				vlog.String("uuid", instance.UUID.String()),
 			)
 		}
@@ -436,7 +436,7 @@ func (a RunnerDockerAdapter) watchForLogs(containerID string, instance *types.In
 			onLog(scanner.Text())
 		}
 		_ = logs.Close()
-		log.Default.Info("logs pipe closed",
+		log.Info("logs pipe closed",
 			vlog.String("uuid", instance.UUID.String()),
 		)
 	}()
