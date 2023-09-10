@@ -1,13 +1,9 @@
 package storage
 
 import (
-	"archive/tar"
-	"compress/gzip"
 	"context"
 	"errors"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"path"
 	"runtime"
@@ -16,6 +12,8 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/google/go-github/v50/github"
 	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/pkg/varchiver"
+	"github.com/vertex-center/vertex/pkg/vdownloader"
 	"github.com/vertex-center/vlog"
 )
 
@@ -75,7 +73,7 @@ func DownloadLatestGithubRelease(owner string, repo string, dest string) error {
 }
 
 func DownloadGithubRelease(release *github.RepositoryRelease, dest string) error {
-	log.Default.Info("downloading repository",
+	log.Default.Info("downloading release",
 		vlog.String("release", *release.Name),
 	)
 
@@ -84,13 +82,14 @@ func DownloadGithubRelease(release *github.RepositoryRelease, dest string) error
 	for _, asset := range release.Assets {
 		if strings.Contains(*asset.Name, platform) {
 			archivePath := path.Join(dest, "temp.tar.gz")
+			url := *asset.BrowserDownloadURL
 
-			err := Download(*asset.BrowserDownloadURL, dest, "temp.tar.gz")
+			err := vdownloader.Download(url, dest, "temp.tar.gz")
 			if err != nil {
 				return err
 			}
 
-			err = UntarFile(dest, archivePath)
+			err = varchiver.Untar(archivePath, dest)
 			if err != nil {
 				return err
 			}
@@ -105,93 +104,4 @@ func DownloadGithubRelease(release *github.RepositoryRelease, dest string) error
 	}
 
 	return ErrNoReleasesForThisOS
-}
-
-func Download(url string, dest string, filename string) error {
-	log.Default.Info("downloading repository",
-		vlog.String("url", url),
-	)
-
-	err := os.MkdirAll(dest, os.ModePerm)
-	if err != nil {
-		return err
-	}
-
-	res, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-
-	file, err := os.Create(path.Join(dest, filename))
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	_, err = io.Copy(file, res.Body)
-	return err
-}
-
-func UntarFile(basePath string, archivePath string) error {
-	archive, err := os.Open(archivePath)
-	if err != nil {
-		return err
-	}
-	defer archive.Close()
-
-	stream, err := gzip.NewReader(archive)
-	if err != nil {
-		return err
-	}
-	defer stream.Close()
-
-	reader := tar.NewReader(stream)
-
-	for {
-		header, err := reader.Next()
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			return err
-		}
-
-		filepath := path.Join(basePath, header.Name)
-
-		switch header.Typeflag {
-		case tar.TypeDir:
-			err = os.MkdirAll(filepath, os.ModePerm)
-			if err != nil {
-				return err
-			}
-		case tar.TypeReg:
-			err := os.MkdirAll(path.Dir(filepath), os.ModePerm)
-			if err != nil {
-				return err
-			}
-
-			file, err := os.Create(filepath)
-			if err != nil {
-				return err
-			}
-
-			_, err = io.Copy(file, reader)
-			if err != nil {
-				return err
-			}
-
-			err = os.Chmod(filepath, 0755)
-			if err != nil {
-				return err
-			}
-
-			file.Close()
-		default:
-			return fmt.Errorf("unknown flag type (%b) for file '%s'", header.Typeflag, header.Name)
-		}
-	}
-
-	return nil
 }
