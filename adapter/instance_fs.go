@@ -18,7 +18,6 @@ import (
 )
 
 var (
-	ErrInstanceNotFound      = errors.New("instance not found")
 	ErrInstanceAlreadyExists = errors.New("instance already exists")
 	ErrContainerNotFound     = errors.New("container not found")
 )
@@ -46,10 +45,12 @@ func NewInstanceFSAdapter() types.InstanceAdapterPort {
 	return adapter
 }
 
+// Get returns an instance by its UUID. If the instance does not exist,
+// it returns ErrInstanceNotFound.
 func (a *InstanceFSAdapter) Get(uuid uuid.UUID) (*types.Instance, error) {
 	instance, ok := a.instances[uuid]
 	if !ok {
-		return nil, ErrInstanceNotFound
+		return nil, types.ErrInstanceNotFound
 	}
 	return instance, nil
 }

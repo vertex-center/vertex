@@ -1,12 +1,12 @@
 package router
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 )
 
@@ -21,11 +21,17 @@ type InstallPackagesBody struct {
 	} `json:"packages"`
 }
 
+// handleInstallPackages handles the installation of packages.
+// Errors can be:
+//   - failed_to_parse_body: failed to parse the request body.
 func handleInstallPackages(c *gin.Context) {
 	var body InstallPackagesBody
 	err := c.BindJSON(&body)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, fmt.Errorf("failed to parse body: %v", err))
+		c.AbortWithStatusJSON(http.StatusBadRequest, types.APIError{
+			Code:    "failed_to_parse_body",
+			Message: fmt.Sprintf("failed to parse request body: %v", err),
+		})
 		return
 	}
 
@@ -36,7 +42,6 @@ func handleInstallPackages(c *gin.Context) {
 				vlog.String("name", d.Name),
 				vlog.String("package_manager", d.PackageManager),
 			)
-
 			continue
 		}
 
@@ -69,9 +74,9 @@ func handleInstallPackages(c *gin.Context) {
 			vlog.String("package_manager", d.PackageManager),
 		)
 
-		c.Status(http.StatusOK)
+		c.Status(http.StatusNoContent)
 		return
 	}
 
-	_ = c.AbortWithError(http.StatusNotFound, errors.New("failed to find this package manager"))
+	c.Status(http.StatusNoContent)
 }

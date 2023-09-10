@@ -16,21 +16,29 @@ func addInstancesRoutes(r *gin.RouterGroup) {
 	r.GET("/events", headersSSE, handleInstancesEvents)
 }
 
+// handleGetInstances returns all installed instances.
 func handleGetInstances(c *gin.Context) {
 	installed := instanceService.GetAll()
 	c.JSON(http.StatusOK, installed)
 }
 
+// handleCheckForUpdates checks for updates for all installed instances.
+// Errors can be:
+//   - check_for_updates_failed
 func handleCheckForUpdates(c *gin.Context) {
 	instances, err := instanceService.CheckForUpdates()
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+			Code:    "check_for_updates_failed",
+			Message: err.Error(),
+		})
 		return
 	}
 
 	c.JSON(http.StatusOK, instances)
 }
 
+// handleInstancesEvents returns a stream of events related to instances.
 func handleInstancesEvents(c *gin.Context) {
 	eventsChan := make(chan sse.Event)
 	defer close(eventsChan)

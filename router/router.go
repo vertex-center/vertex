@@ -12,7 +12,6 @@ import (
 	"github.com/gin-contrib/sse"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex-core-golang/router/middleware"
 	"github.com/vertex-center/vertex/adapter"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
@@ -56,7 +55,6 @@ func NewRouter(about types.About) Router {
 	r.engine.Use(cors.Default())
 	r.engine.Use(ginutils.Logger("MAIN"))
 	r.engine.Use(gin.Recovery())
-	r.engine.Use(middleware.ErrorMiddleware())
 	r.engine.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
 	r.engine.GET("/ping", handlePing)
 

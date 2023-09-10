@@ -1,6 +1,8 @@
 package types
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
 )
 
@@ -17,6 +19,11 @@ const (
 	InstanceInstallMethodScript  = "script"
 	InstanceInstallMethodRelease = "release"
 	InstanceInstallMethodDocker  = "docker"
+)
+
+var (
+	ErrInstanceNotFound     = errors.New("instance not found")
+	ErrInstanceStillRunning = errors.New("instance still running")
 )
 
 type InstanceSettings struct {

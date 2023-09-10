@@ -55,6 +55,8 @@ func NewInstanceService(serviceAdapter types.ServiceAdapterPort, instanceAdapter
 	return s
 }
 
+// Get returns an instance by its UUID. If the instance does not exist,
+// it returns ErrInstanceNotFound.
 func (s *InstanceService) Get(uuid uuid.UUID) (*types.Instance, error) {
 	return s.instanceAdapter.Get(uuid)
 }
@@ -63,6 +65,9 @@ func (s *InstanceService) GetAll() map[uuid.UUID]*types.Instance {
 	return s.instanceAdapter.GetAll()
 }
 
+// Delete deletes an instance by its UUID.
+// If the instance does not exist, it returns ErrInstanceNotFound.
+// If the instance is still running, it returns ErrInstanceStillRunning.
 func (s *InstanceService) Delete(uuid uuid.UUID) error {
 	instance, err := s.instanceAdapter.Get(uuid)
 	if err != nil {
@@ -70,7 +75,7 @@ func (s *InstanceService) Delete(uuid uuid.UUID) error {
 	}
 
 	if instance.IsRunning() {
-		return errors.New("failed to delete this instance because the instance is still running")
+		return types.ErrInstanceStillRunning
 	}
 
 	if instance.IsDockerized() {
@@ -91,6 +96,9 @@ func (s *InstanceService) Delete(uuid uuid.UUID) error {
 	return nil
 }
 
+// Start starts an instance by its UUID.
+// If the instance does not exist, it returns ErrInstanceNotFound.
+// If the instance is already running, it returns ErrInstanceAlreadyRunning.
 func (s *InstanceService) Start(uuid uuid.UUID) error {
 	instance, err := s.instanceAdapter.Get(uuid)
 	if err != nil {
@@ -201,6 +209,9 @@ func (s *InstanceService) StartAll() {
 	}
 }
 
+// Stop stops an instance by its UUID.
+// If the instance does not exist, it returns ErrInstanceNotFound.
+// If the instance is not running, it returns ErrInstanceNotRunning.
 func (s *InstanceService) Stop(uuid uuid.UUID) error {
 	instance, err := s.instanceAdapter.Get(uuid)
 	if err != nil {
@@ -265,6 +276,8 @@ func (s *InstanceService) StopAll() {
 	}
 }
 
+// WriteEnv writes environment variables to an instance by its UUID.
+// If the instance does not exist, it returns ErrInstanceNotFound.
 func (s *InstanceService) WriteEnv(uuid uuid.UUID, environment map[string]string) error {
 	i, err := s.Get(uuid)
 	if err != nil {
@@ -551,6 +564,7 @@ func (s *InstanceService) PreInstallForDocker(service types.Service, dir string)
 	return nil
 }
 
+// RecreateContainer recreates a container by its UUID.
 func (s *InstanceService) RecreateContainer(instance *types.Instance) error {
 	if !instance.IsDockerized() {
 		return nil
