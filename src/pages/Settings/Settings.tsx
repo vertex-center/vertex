@@ -3,21 +3,19 @@ import Sidebar, {
     SidebarSeparator,
     SidebarTitle,
 } from "../../components/Sidebar/Sidebar";
-import { Horizontal } from "../../components/Layouts/Layouts";
 
 import styles from "./Settings.module.sass";
 import { Outlet } from "react-router-dom";
 import { BigTitle } from "../../components/Text/Text";
+import { Fragment } from "react";
 
-type Props = {};
-
-export default function Settings(props: Props) {
+export default function Settings() {
     return (
-        <div>
+        <Fragment>
             <div className={styles.title}>
                 <BigTitle>Settings</BigTitle>
             </div>
-            <Horizontal className={styles.content}>
+            <div className={styles.content}>
                 <Sidebar>
                     <SidebarTitle>Settings</SidebarTitle>
                     <SidebarItem
@@ -46,7 +44,7 @@ export default function Settings(props: Props) {
                 <div className={styles.side}>
                     <Outlet />
                 </div>
-            </Horizontal>
-        </div>
+            </div>
+        </Fragment>
     );
 }

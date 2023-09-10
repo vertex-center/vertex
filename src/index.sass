@@ -6,12 +6,22 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Rubik:wght@400;500;600&family=Silkscreen:wght@400;700&display=swap')
 
 .app
+    display: flex
+    flex-direction: column
     min-height: 100vh
+    max-height: 100vh
+    overflow: hidden
     background-color: colors.$bg-primary
-    overflow: scroll
     color: colors.$fg-primary
     font-family: fonts.$font-family
     font-size: fonts.$font-size-normal
+
+    &Content
+        display: flex
+        flex-direction: column
+        flex-grow: 1
+        overflow: scroll
+        padding-bottom: 100px
 
 code
     font-family: fonts.$font-family-code

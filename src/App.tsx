@@ -29,74 +29,76 @@ function App() {
         <div className={classNames("app", theme)}>
             <HashRouter>
                 <Header />
-                <Routes>
-                    <Route
-                        path="/"
-                        element={<Navigate to="/infrastructure" />}
-                        index
-                    />
-                    <Route
-                        path="/infrastructure"
-                        element={<Infrastructure />}
-                    />
-                    <Route path="/proxy" element={<ReverseProxy />} />
-                    <Route
-                        path="/infrastructure/:uuid/"
-                        element={<BayDetails />}
-                    >
+                <div className="appContent">
+                    <Routes>
+                        <Route
+                            path="/"
+                            element={<Navigate to="/infrastructure" />}
+                            index
+                        />
+                        <Route
+                            path="/infrastructure"
+                            element={<Infrastructure />}
+                        />
+                        <Route path="/proxy" element={<ReverseProxy />} />
                         <Route
                             path="/infrastructure/:uuid/"
-                            element={<BayDetailsHome />}
-                        />
-                        <Route
-                            path="/infrastructure/:uuid/docker"
-                            element={<BayDetailsDocker />}
-                        />
-                        <Route
-                            path="/infrastructure/:uuid/logs"
-                            element={<BayDetailsLogs />}
-                        />
-                        <Route
-                            path="/infrastructure/:uuid/status"
-                            element={<BayDetailsStatus />}
-                        />
-                        <Route
-                            path="/infrastructure/:uuid/environment"
-                            element={<BayDetailsEnv />}
-                        />
-                        <Route
-                            path="/infrastructure/:uuid/dependencies"
-                            element={<BayDetailsDependencies />}
-                        />
-                        <Route
-                            path="/infrastructure/:uuid/update"
-                            element={<BayDetailsUpdate />}
-                        />
-                        <Route
-                            path="/infrastructure/:uuid/settings"
-                            element={<BayDetailsSettings />}
-                        />
-                    </Route>
-                    <Route path="/settings" element={<Settings />}>
-                        <Route
-                            path="/settings/theme"
-                            element={<SettingsTheme />}
-                        />
-                        <Route
-                            path="/settings/notifications"
-                            element={<SettingsNotifications />}
-                        />
-                        <Route
-                            path="/settings/updates"
-                            element={<SettingsUpdates />}
-                        />
-                        <Route
-                            path="/settings/about"
-                            element={<SettingsAbout />}
-                        />
-                    </Route>
-                    <Route path="/marketplace" element={<Store />} />
-                </Routes>
+                            element={<BayDetails />}
+                        >
+                            <Route
+                                path="/infrastructure/:uuid/"
+                                element={<BayDetailsHome />}
+                            />
+                            <Route
+                                path="/infrastructure/:uuid/docker"
+                                element={<BayDetailsDocker />}
+                            />
+                            <Route
+                                path="/infrastructure/:uuid/logs"
+                                element={<BayDetailsLogs />}
+                            />
+                            <Route
+                                path="/infrastructure/:uuid/status"
+                                element={<BayDetailsStatus />}
+                            />
+                            <Route
+                                path="/infrastructure/:uuid/environment"
+                                element={<BayDetailsEnv />}
+                            />
+                            <Route
+                                path="/infrastructure/:uuid/dependencies"
+                                element={<BayDetailsDependencies />}
+                            />
+                            <Route
+                                path="/infrastructure/:uuid/update"
+                                element={<BayDetailsUpdate />}
+                            />
+                            <Route
+                                path="/infrastructure/:uuid/settings"
+                                element={<BayDetailsSettings />}
+                            />
+                        </Route>
+                        <Route path="/settings" element={<Settings />}>
+                            <Route
+                                path="/settings/theme"
+                                element={<SettingsTheme />}
+                            />
+                            <Route
+                                path="/settings/notifications"
+                                element={<SettingsNotifications />}
+                            />
+                            <Route
+                                path="/settings/updates"
+                                element={<SettingsUpdates />}
+                            />
+                            <Route
+                                path="/settings/about"
+                                element={<SettingsAbout />}
+                            />
+                        </Route>
+                        <Route path="/marketplace" element={<Store />} />
+                    </Routes>
+                </div>
                 <Dock />
             </HashRouter>
         </div>

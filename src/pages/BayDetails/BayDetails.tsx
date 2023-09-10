@@ -152,7 +152,6 @@ export default function BayDetails() {
                         symbol="settings"
                         name="Settings"
                     />
-                    <Spacer />
                     <SidebarItem
                         onClick={() => setShowDeletePopup(true)}
                         symbol="delete"
