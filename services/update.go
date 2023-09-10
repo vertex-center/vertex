@@ -197,7 +197,6 @@ type VertexClientDependency struct {
 	currentVersion string
 	release        *github.RepositoryRelease
 	update         *types.Update
-	dir            string
 }
 
 func (d *VertexClientDependency) CheckForUpdate() (*types.Update, error) {
