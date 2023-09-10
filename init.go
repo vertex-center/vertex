@@ -41,7 +41,7 @@ func main() {
 		return
 	}
 
-	router := router.NewRouter(types.About{
+	r := router.NewRouter(types.About{
 		Version: version,
 		Commit:  commit,
 		Date:    date,
@@ -49,7 +49,7 @@ func main() {
 		OS:   runtime.GOOS,
 		Arch: runtime.GOARCH,
 	})
-	defer router.Stop()
+	defer r.Stop()
 
 	// Logs
 	url := fmt.Sprintf("http://%s", config.Current.Host)
@@ -58,7 +58,7 @@ func main() {
 		vlog.String("url", url),
 	)
 
-	router.Start(fmt.Sprintf(":%s", config.Current.Port))
+	r.Start(fmt.Sprintf(":%s", config.Current.Port))
 }
 
 func parseArgs() {
