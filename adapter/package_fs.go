@@ -1,4 +1,4 @@
-package repository
+package adapter
 
 import (
 	"encoding/json"
@@ -17,63 +17,63 @@ var (
 	ErrPkgNotFound = errors.New("package not found")
 )
 
-type PackageFSRepository struct {
+type PackageFSAdapter struct {
 	pkgs      map[string]types.Package
 	pkgsMutex *sync.RWMutex
 
 	dependenciesPath string
 }
 
-type PackageRepositoryParams struct {
+type PackageFSAdapterParams struct {
 	dependenciesPath string
 }
 
-func NewPackageFSRepository(params *PackageRepositoryParams) PackageFSRepository {
+func NewPackageFSAdapter(params *PackageFSAdapterParams) types.PackageAdapterPort {
 	if params == nil {
-		params = &PackageRepositoryParams{}
+		params = &PackageFSAdapterParams{}
 	}
 	if params.dependenciesPath == "" {
 		params.dependenciesPath = path.Join(storage.Path, "packages")
 	}
 
-	repo := PackageFSRepository{
+	adapter := &PackageFSAdapter{
 		pkgs:      map[string]types.Package{},
 		pkgsMutex: &sync.RWMutex{},
 
 		dependenciesPath: params.dependenciesPath,
 	}
 
-	err := repo.Reload()
+	err := adapter.Reload()
 	if err != nil {
-		log.Default.Error(fmt.Errorf("failed to reload services repository: %v", err))
+		log.Default.Error(fmt.Errorf("failed to reload services: %v", err))
 	}
-	return repo
+	return adapter
 }
 
-func (r *PackageFSRepository) GetByID(id string) (types.Package, error) {
-	r.pkgsMutex.RLock()
-	defer r.pkgsMutex.RUnlock()
+func (a *PackageFSAdapter) GetByID(id string) (types.Package, error) {
+	a.pkgsMutex.RLock()
+	defer a.pkgsMutex.RUnlock()
 
-	pkg, ok := r.pkgs[id]
+	pkg, ok := a.pkgs[id]
 	if !ok {
 		return types.Package{}, ErrPkgNotFound
 	}
 	return pkg, nil
 }
 
-func (r *PackageFSRepository) set(id string, pkg types.Package) {
-	r.pkgsMutex.Lock()
-	defer r.pkgsMutex.Unlock()
+func (a *PackageFSAdapter) set(id string, pkg types.Package) {
+	a.pkgsMutex.Lock()
+	defer a.pkgsMutex.Unlock()
 
-	r.pkgs[id] = pkg
+	a.pkgs[id] = pkg
 }
 
-func (r *PackageFSRepository) GetPath(id string) string {
-	return path.Join(r.dependenciesPath, "packages", id)
+func (a *PackageFSAdapter) GetPath(id string) string {
+	return path.Join(a.dependenciesPath, "packages", id)
 }
 
-func (r *PackageFSRepository) Reload() error {
-	dir, err := os.ReadDir(path.Join(r.dependenciesPath, "packages"))
+func (a *PackageFSAdapter) Reload() error {
+	dir, err := os.ReadDir(path.Join(a.dependenciesPath, "packages"))
 	if err != nil {
 		return err
 	}
@@ -85,19 +85,19 @@ func (r *PackageFSRepository) Reload() error {
 
 		name := entry.Name()
 
-		pkg, err := r.readFromDisk(name)
+		pkg, err := a.readFromDisk(name)
 		if err != nil {
 			return err
 		}
 
-		r.set(name, *pkg)
+		a.set(name, *pkg)
 	}
 
 	return nil
 }
 
-func (r *PackageFSRepository) readFromDisk(id string) (*types.Package, error) {
-	p := path.Join(r.GetPath(id), fmt.Sprintf("%s.json", id))
+func (a *PackageFSAdapter) readFromDisk(id string) (*types.Package, error) {
+	p := path.Join(a.GetPath(id), fmt.Sprintf("%s.json", id))
 
 	file, err := os.ReadFile(p)
 	if err != nil {

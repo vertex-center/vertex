@@ -1,4 +1,4 @@
-package repository
+package adapter
 
 import (
 	"testing"
@@ -9,37 +9,37 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type EventInMemoryRepositoryTestSuite struct {
+type EventInMemoryAdapterTestSuite struct {
 	suite.Suite
 
-	repo EventInMemoryRepository
+	adapter EventInMemoryAdapter
 }
 
 func TestEventInMemoryRepositoryTestSuite(t *testing.T) {
-	suite.Run(t, new(EventInMemoryRepositoryTestSuite))
+	suite.Run(t, new(EventInMemoryAdapterTestSuite))
 }
 
-func (suite *EventInMemoryRepositoryTestSuite) SetupSuite() {
-	suite.repo = NewEventInMemoryRepository()
+func (suite *EventInMemoryAdapterTestSuite) SetupSuite() {
+	suite.adapter = *NewEventInMemoryAdapter().(*EventInMemoryAdapter)
 }
 
-func (suite *EventInMemoryRepositoryTestSuite) TestEvents() {
+func (suite *EventInMemoryAdapterTestSuite) TestEvents() {
 	listener := MockListener{
 		uuid: uuid.New(),
 	}
 
 	// Add a listener
-	suite.repo.AddListener(&listener)
-	assert.Equal(suite.T(), 1, len(*suite.repo.listeners))
+	suite.adapter.AddListener(&listener)
+	assert.Equal(suite.T(), 1, len(*suite.adapter.listeners))
 
 	// Fire event
 	listener.On("OnEvent").Return(nil)
-	suite.repo.Send(MockEvent{})
+	suite.adapter.Send(MockEvent{})
 	listener.AssertCalled(suite.T(), "OnEvent")
 
 	// Remove listener
-	suite.repo.RemoveListener(&listener)
-	assert.Equal(suite.T(), 0, len(*suite.repo.listeners))
+	suite.adapter.RemoveListener(&listener)
+	assert.Equal(suite.T(), 0, len(*suite.adapter.listeners))
 }
 
 type MockEvent struct{}

@@ -14,7 +14,7 @@ func addSettingsRoutes(r *gin.RouterGroup) {
 }
 
 func handleGetSettings(c *gin.Context) {
-	c.JSON(http.StatusOK, settingsRepo.GetSettings())
+	c.JSON(http.StatusOK, settingsFSAdapter.GetSettings())
 }
 
 func handlePatchSettings(c *gin.Context) {

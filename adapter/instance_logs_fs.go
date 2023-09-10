@@ -1,4 +1,4 @@
-package repository
+package adapter
 
 import (
 	"errors"
@@ -28,19 +28,19 @@ type InstanceLogger struct {
 	currentLine int
 }
 
-type InstanceLogsFSRepository struct {
+type InstanceLogsFSAdapter struct {
 	loggers map[uuid.UUID]*InstanceLogger
 }
 
-func NewInstanceLogsFSRepository() InstanceLogsFSRepository {
-	r := InstanceLogsFSRepository{
+func NewInstanceLogsFSAdapter() types.InstanceLogsAdapterPort {
+	r := &InstanceLogsFSAdapter{
 		loggers: map[uuid.UUID]*InstanceLogger{},
 	}
 	r.startCron()
 	return r
 }
 
-func (r *InstanceLogsFSRepository) Open(uuid uuid.UUID) error {
+func (a *InstanceLogsFSAdapter) Open(uuid uuid.UUID) error {
 	dir := path.Join(storage.Path, "instances", uuid.String(), ".vertex", "logs")
 	err := os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
@@ -60,20 +60,20 @@ func (r *InstanceLogsFSRepository) Open(uuid uuid.UUID) error {
 	}
 	l.file = file
 
-	r.loggers[uuid] = &l
+	a.loggers[uuid] = &l
 	return nil
 }
 
-func (r *InstanceLogsFSRepository) Close(uuid uuid.UUID) error {
-	l, err := r.getLogger(uuid)
+func (a *InstanceLogsFSAdapter) Close(uuid uuid.UUID) error {
+	l, err := a.getLogger(uuid)
 	if err != nil {
 		return err
 	}
 	return l.Close()
 }
 
-func (r *InstanceLogsFSRepository) Push(uuid uuid.UUID, line types.LogLine) {
-	l, err := r.getLogger(uuid)
+func (a *InstanceLogsFSAdapter) Push(uuid uuid.UUID, line types.LogLine) {
+	l, err := a.getLogger(uuid)
 	if err != nil {
 		log.Default.Error(err)
 		return
@@ -90,10 +90,10 @@ func (r *InstanceLogsFSRepository) Push(uuid uuid.UUID, line types.LogLine) {
 	}
 }
 
-func (r *InstanceLogsFSRepository) CloseAll() error {
+func (a *InstanceLogsFSAdapter) CloseAll() error {
 	var errs []error
-	for id := range r.loggers {
-		err := r.Close(id)
+	for id := range a.loggers {
+		err := a.Close(id)
 		if err != nil {
 			errs = append(errs, err)
 		}
@@ -101,8 +101,8 @@ func (r *InstanceLogsFSRepository) CloseAll() error {
 	return errors.Join(errs...)
 }
 
-func (r *InstanceLogsFSRepository) LoadBuffer(uuid uuid.UUID) ([]types.LogLine, error) {
-	l, err := r.getLogger(uuid)
+func (a *InstanceLogsFSAdapter) LoadBuffer(uuid uuid.UUID) ([]types.LogLine, error) {
+	l, err := a.getLogger(uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -113,24 +113,24 @@ func (l *InstanceLogger) Close() error {
 	return l.file.Close()
 }
 
-func (r *InstanceLogsFSRepository) getLogger(uuid uuid.UUID) (*InstanceLogger, error) {
-	l, ok := r.loggers[uuid]
+func (a *InstanceLogsFSAdapter) getLogger(uuid uuid.UUID) (*InstanceLogger, error) {
+	l, ok := a.loggers[uuid]
 	if !ok {
 		return nil, ErrLoggerNotFound
 	}
 	return l, nil
 }
 
-func (r *InstanceLogsFSRepository) startCron() {
+func (a *InstanceLogsFSAdapter) startCron() {
 	s := gocron.NewScheduler(time.Local)
 	_, err := s.Every(1).Day().At("00:00").Do(func() {
-		for id := range r.loggers {
-			err := r.Close(id)
+		for id := range a.loggers {
+			err := a.Close(id)
 			if err != nil {
 				log.Default.Error(err)
 				continue
 			}
-			err = r.Open(id)
+			err = a.Open(id)
 			if err != nil {
 				log.Default.Error(err)
 			}

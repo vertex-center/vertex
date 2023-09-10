@@ -5,12 +5,12 @@ import (
 )
 
 type SettingsService struct {
-	settingsRepo types.SettingsRepository
+	settingsAdapter types.SettingsAdapterPort
 }
 
-func NewSettingsService(settingsRepo types.SettingsRepository) SettingsService {
+func NewSettingsService(settingsAdapter types.SettingsAdapterPort) SettingsService {
 	return SettingsService{
-		settingsRepo: settingsRepo,
+		settingsAdapter: settingsAdapter,
 	}
 }
 
@@ -18,7 +18,7 @@ func (s *SettingsService) Update(settings types.Settings) error {
 	if settings.Notifications != nil {
 		notifs := settings.Notifications
 		if notifs.Webhook != nil {
-			err := s.settingsRepo.SetNotificationsWebhook(notifs.Webhook)
+			err := s.settingsAdapter.SetNotificationsWebhook(notifs.Webhook)
 			if err != nil {
 				return err
 			}
@@ -29,9 +29,9 @@ func (s *SettingsService) Update(settings types.Settings) error {
 }
 
 func (s *SettingsService) GetNotificationsWebhook() *string {
-	return s.settingsRepo.GetNotificationsWebhook()
+	return s.settingsAdapter.GetNotificationsWebhook()
 }
 
 func (s *SettingsService) SetNotificationsWebhook(webhook *string) error {
-	return s.settingsRepo.SetNotificationsWebhook(webhook)
+	return s.settingsAdapter.SetNotificationsWebhook(webhook)
 }

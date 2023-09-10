@@ -13,7 +13,7 @@ type PackageTestSuite struct {
 	suite.Suite
 
 	service PackageService
-	repo    MockPackageRepository
+	adapter MockPackageAdapter
 }
 
 func TestEventInMemoryRepositoryTestSuite(t *testing.T) {
@@ -21,8 +21,8 @@ func TestEventInMemoryRepositoryTestSuite(t *testing.T) {
 }
 
 func (suite *PackageTestSuite) SetupSuite() {
-	suite.repo = MockPackageRepository{}
-	suite.service = NewPackageService(&suite.repo)
+	suite.adapter = MockPackageAdapter{}
+	suite.service = NewPackageService(&suite.adapter)
 }
 
 func (suite *PackageTestSuite) TestInstallationCommand() {
@@ -57,21 +57,21 @@ func (suite *PackageTestSuite) TestInstallationCommand() {
 	}
 }
 
-type MockPackageRepository struct {
+type MockPackageAdapter struct {
 	mock.Mock
 }
 
-func (m *MockPackageRepository) GetByID(id string) (types.Package, error) {
+func (m *MockPackageAdapter) GetByID(id string) (types.Package, error) {
 	m.Called(id)
 	return types.Package{}, nil
 }
 
-func (m *MockPackageRepository) GetPath(id string) string {
+func (m *MockPackageAdapter) GetPath(id string) string {
 	m.Called(id)
 	return ""
 }
 
-func (m *MockPackageRepository) Reload() error {
+func (m *MockPackageAdapter) Reload() error {
 	m.Called()
 	return nil
 }

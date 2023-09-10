@@ -17,7 +17,7 @@ type Listener interface {
 	GetUUID() uuid.UUID
 }
 
-type EventRepository interface {
+type EventAdapterPort interface {
 	AddListener(l Listener)
 	RemoveListener(l Listener)
 	Send(e interface{})

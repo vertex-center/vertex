@@ -46,8 +46,8 @@ func handleInstancesEvents(c *gin.Context) {
 		}
 	})
 
-	eventRepo.AddListener(listener)
-	defer eventRepo.RemoveListener(listener)
+	eventInMemoryAdapter.AddListener(listener)
+	defer eventInMemoryAdapter.RemoveListener(listener)
 
 	first := true
 

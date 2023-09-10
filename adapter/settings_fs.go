@@ -1,4 +1,4 @@
-package repository
+package adapter
 
 import (
 	"encoding/json"
@@ -12,18 +12,18 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-type SettingsFSRepository struct {
+type SettingsFSAdapter struct {
 	settingsPath string
 	settings     types.Settings
 }
 
-type SettingsRepositoryParams struct {
+type SettingsFSAdapterParams struct {
 	settingsPath string
 }
 
-func NewSettingsFSRepository(params *SettingsRepositoryParams) SettingsFSRepository {
+func NewSettingsFSAdapter(params *SettingsFSAdapterParams) types.SettingsAdapterPort {
 	if params == nil {
-		params = &SettingsRepositoryParams{}
+		params = &SettingsFSAdapterParams{}
 	}
 	if params.settingsPath == "" {
 		params.settingsPath = path.Join(storage.Path, "settings")
@@ -38,39 +38,39 @@ func NewSettingsFSRepository(params *SettingsRepositoryParams) SettingsFSReposit
 		os.Exit(1)
 	}
 
-	repo := SettingsFSRepository{
+	adapter := &SettingsFSAdapter{
 		settingsPath: params.settingsPath,
 	}
 
-	err = repo.read()
+	err = adapter.read()
 	if err != nil {
 		log.Default.Error(err)
 	}
 
-	return repo
+	return adapter
 }
 
-func (r *SettingsFSRepository) GetSettings() types.Settings {
-	return r.settings
+func (a *SettingsFSAdapter) GetSettings() types.Settings {
+	return a.settings
 }
 
-func (r *SettingsFSRepository) GetNotificationsWebhook() *string {
-	if r.settings.Notifications == nil {
+func (a *SettingsFSAdapter) GetNotificationsWebhook() *string {
+	if a.settings.Notifications == nil {
 		return nil
 	}
-	return r.settings.Notifications.Webhook
+	return a.settings.Notifications.Webhook
 }
 
-func (r *SettingsFSRepository) SetNotificationsWebhook(webhook *string) error {
-	if r.settings.Notifications == nil {
-		r.settings.Notifications = &types.SettingsNotifications{}
+func (a *SettingsFSAdapter) SetNotificationsWebhook(webhook *string) error {
+	if a.settings.Notifications == nil {
+		a.settings.Notifications = &types.SettingsNotifications{}
 	}
-	r.settings.Notifications.Webhook = webhook
-	return r.write()
+	a.settings.Notifications.Webhook = webhook
+	return a.write()
 }
 
-func (r *SettingsFSRepository) read() error {
-	p := path.Join(r.settingsPath, "settings.json")
+func (a *SettingsFSAdapter) read() error {
+	p := path.Join(a.settingsPath, "settings.json")
 	file, err := os.ReadFile(p)
 
 	if errors.Is(err, os.ErrNotExist) {
@@ -80,7 +80,7 @@ func (r *SettingsFSRepository) read() error {
 		return err
 	}
 
-	err = json.Unmarshal(file, &r.settings)
+	err = json.Unmarshal(file, &a.settings)
 	if err != nil {
 		return err
 	}
@@ -88,10 +88,10 @@ func (r *SettingsFSRepository) read() error {
 	return nil
 }
 
-func (r *SettingsFSRepository) write() error {
-	p := path.Join(r.settingsPath, "settings.json")
+func (a *SettingsFSAdapter) write() error {
+	p := path.Join(a.settingsPath, "settings.json")
 
-	bytes, err := json.MarshalIndent(r.settings, "", "\t")
+	bytes, err := json.MarshalIndent(a.settings, "", "\t")
 	if err != nil {
 		return err
 	}

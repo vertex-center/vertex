@@ -1,6 +1,6 @@
 package types
 
-type RunnerRepository interface {
+type RunnerAdapterPort interface {
 	Delete(instance *Instance) error
 	Start(instance *Instance, onLog func(msg string), onErr func(msg string), setStatus func(status string)) error
 	Stop(instance *Instance) error

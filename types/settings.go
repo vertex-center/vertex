@@ -8,7 +8,7 @@ type Settings struct {
 	Notifications *SettingsNotifications `json:"notifications,omitempty"`
 }
 
-type SettingsRepository interface {
+type SettingsAdapterPort interface {
 	GetSettings() Settings
 
 	GetNotificationsWebhook() *string

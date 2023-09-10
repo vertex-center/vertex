@@ -19,10 +19,10 @@ type Package struct {
 	Installed      *bool             `json:"installed,omitempty"`
 }
 
-type PackageRepository interface {
+type PackageAdapterPort interface {
 	GetByID(id string) (Package, error)
 	GetPath(id string) string
 
-	// Reload the repository
+	// Reload the adapter
 	Reload() error
 }

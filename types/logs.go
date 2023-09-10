@@ -15,7 +15,7 @@ type LogLine struct {
 	Message string `json:"message"`
 }
 
-type InstanceLogsRepository interface {
+type InstanceLogsAdapterPort interface {
 	Open(uuid uuid.UUID) error
 	Close(uuid uuid.UUID) error
 	Push(uuid uuid.UUID, line LogLine)

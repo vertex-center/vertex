@@ -13,24 +13,24 @@ import (
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex-core-golang/router/middleware"
+	"github.com/vertex-center/vertex/adapter"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
-	"github.com/vertex-center/vertex/repository"
 	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/types"
 )
 
 var (
-	runnerDockerRepo repository.RunnerDockerRepository
-	runnerFSRepo     repository.RunnerFSRepository
-	instanceRepo     repository.InstanceFSRepository
-	instanceLogsRepo repository.InstanceLogsFSRepository
-	eventRepo        repository.EventInMemoryRepository
-	packageRepo      repository.PackageFSRepository
-	serviceRepo      repository.ServiceFSRepository
-	proxyRepo        repository.ProxyFSRepository
-	settingsRepo     repository.SettingsFSRepository
+	runnerDockerAdapter   types.RunnerAdapterPort
+	runnerFSAdapter       types.RunnerAdapterPort
+	instanceFSAdapter     types.InstanceAdapterPort
+	instanceLogsFSAdapter types.InstanceLogsAdapterPort
+	eventInMemoryAdapter  types.EventAdapterPort
+	packageFSAdapter      types.PackageAdapterPort
+	serviceFSAdapter      types.ServiceAdapterPort
+	proxyFSAdapter        types.ProxyAdapterPort
+	settingsFSAdapter     types.SettingsAdapterPort
 
 	packageService       services.PackageService
 	notificationsService services.NotificationsService
@@ -59,23 +59,23 @@ func NewRouter(about types.About) Router {
 	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
 	r.GET("/ping", handlePing)
 
-	runnerDockerRepo = repository.NewRunnerDockerRepository()
-	runnerFSRepo = repository.NewRunnerFSRepository()
-	instanceRepo = repository.NewInstanceFSRepository()
-	instanceLogsRepo = repository.NewInstanceLogsFSRepository()
-	eventRepo = repository.NewEventInMemoryRepository()
-	packageRepo = repository.NewPackageFSRepository(nil)
-	serviceRepo = repository.NewServiceFSRepository(nil)
-	proxyRepo = repository.NewProxyFSRepository(nil)
-	settingsRepo = repository.NewSettingsFSRepository(nil)
+	runnerDockerAdapter = adapter.NewRunnerDockerAdapter()
+	runnerFSAdapter = adapter.NewRunnerFSAdapter()
+	instanceFSAdapter = adapter.NewInstanceFSAdapter()
+	instanceLogsFSAdapter = adapter.NewInstanceLogsFSAdapter()
+	eventInMemoryAdapter = adapter.NewEventInMemoryAdapter()
+	packageFSAdapter = adapter.NewPackageFSAdapter(nil)
+	serviceFSAdapter = adapter.NewServiceFSAdapter(nil)
+	proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
+	settingsFSAdapter = adapter.NewSettingsFSAdapter(nil)
 
-	proxyService = services.NewProxyService(&proxyRepo)
-	notificationsService = services.NewNotificationsService(&settingsRepo, &eventRepo, &instanceRepo)
-	instanceService = services.NewInstanceService(&serviceRepo, &instanceRepo, &runnerDockerRepo, &runnerFSRepo, &instanceLogsRepo, &eventRepo)
-	packageService = services.NewPackageService(&packageRepo)
-	serviceService = services.NewServiceService(&serviceRepo)
+	proxyService = services.NewProxyService(proxyFSAdapter)
+	notificationsService = services.NewNotificationsService(settingsFSAdapter, eventInMemoryAdapter, instanceFSAdapter)
+	instanceService = services.NewInstanceService(serviceFSAdapter, instanceFSAdapter, runnerDockerAdapter, runnerFSAdapter, instanceLogsFSAdapter, eventInMemoryAdapter)
+	packageService = services.NewPackageService(packageFSAdapter)
+	serviceService = services.NewServiceService(serviceFSAdapter)
 	updateService = services.NewUpdateDependenciesService(about.Version)
-	settingsService = services.NewSettingsService(&settingsRepo)
+	settingsService = services.NewSettingsService(settingsFSAdapter)
 
 	api := r.Group("/api")
 	api.GET("/ping", handlePing)

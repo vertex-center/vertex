@@ -15,12 +15,12 @@ var (
 )
 
 type PackageService struct {
-	packageRepo types.PackageRepository
+	packageAdapter types.PackageAdapterPort
 }
 
-func NewPackageService(packageRepo types.PackageRepository) PackageService {
+func NewPackageService(packageAdapter types.PackageAdapterPort) PackageService {
 	return PackageService{
-		packageRepo: packageRepo,
+		packageAdapter: packageAdapter,
 	}
 }
 
@@ -82,7 +82,7 @@ func (s *PackageService) InstallationCommand(p *types.Package, pm string) (Insta
 }
 
 func (s *PackageService) GetByID(id string) (types.Package, error) {
-	pkg, err := s.packageRepo.GetByID(id)
+	pkg, err := s.packageAdapter.GetByID(id)
 	if err != nil {
 		return types.Package{}, err
 	}
@@ -93,7 +93,7 @@ func (s *PackageService) GetByID(id string) (types.Package, error) {
 }
 
 func (s *PackageService) checkIsInstalled(id string, pkg types.Package) (bool, error) {
-	pkgPath := s.packageRepo.GetPath(id)
+	pkgPath := s.packageAdapter.GetPath(id)
 	isScript := strings.HasPrefix(pkg.Check, "script:")
 
 	if isScript {
@@ -122,5 +122,5 @@ func (s *PackageService) checkIsInstalledWithCommand(cmd string) (bool, error) {
 }
 
 func (s *PackageService) Reload() error {
-	return s.packageRepo.Reload()
+	return s.packageAdapter.Reload()
 }

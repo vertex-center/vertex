@@ -1,4 +1,4 @@
-package repository
+package adapter
 
 import (
 	"encoding/json"
@@ -18,13 +18,13 @@ type ProxyFSRepository struct {
 	proxyPath string
 }
 
-type ProxyRepositoryParams struct {
+type ProxyFSAdapterParams struct {
 	proxyPath string
 }
 
-func NewProxyFSRepository(params *ProxyRepositoryParams) ProxyFSRepository {
+func NewProxyFSAdapter(params *ProxyFSAdapterParams) types.ProxyAdapterPort {
 	if params == nil {
-		params = &ProxyRepositoryParams{}
+		params = &ProxyFSAdapterParams{}
 	}
 	if params.proxyPath == "" {
 		params.proxyPath = path.Join(storage.Path, "proxy")
@@ -39,31 +39,31 @@ func NewProxyFSRepository(params *ProxyRepositoryParams) ProxyFSRepository {
 		os.Exit(1)
 	}
 
-	repo := ProxyFSRepository{
+	adapter := &ProxyFSRepository{
 		redirects: types.ProxyRedirects{},
 		proxyPath: params.proxyPath,
 	}
-	repo.read()
+	adapter.read()
 
-	return repo
+	return adapter
 }
 
-func (r *ProxyFSRepository) GetRedirects() types.ProxyRedirects {
-	return r.redirects
+func (a *ProxyFSRepository) GetRedirects() types.ProxyRedirects {
+	return a.redirects
 }
 
-func (r *ProxyFSRepository) AddRedirect(id uuid.UUID, redirect types.ProxyRedirect) error {
-	r.redirects[id] = redirect
-	return r.write()
+func (a *ProxyFSRepository) AddRedirect(id uuid.UUID, redirect types.ProxyRedirect) error {
+	a.redirects[id] = redirect
+	return a.write()
 }
 
-func (r *ProxyFSRepository) RemoveRedirect(id uuid.UUID) error {
-	delete(r.redirects, id)
-	return r.write()
+func (a *ProxyFSRepository) RemoveRedirect(id uuid.UUID) error {
+	delete(a.redirects, id)
+	return a.write()
 }
 
-func (r *ProxyFSRepository) read() {
-	p := path.Join(r.proxyPath, "redirects.json")
+func (a *ProxyFSRepository) read() {
+	p := path.Join(a.proxyPath, "redirects.json")
 	file, err := os.ReadFile(p)
 
 	if errors.Is(err, os.ErrNotExist) {
@@ -73,17 +73,17 @@ func (r *ProxyFSRepository) read() {
 		return
 	}
 
-	err = json.Unmarshal(file, &r.redirects)
+	err = json.Unmarshal(file, &a.redirects)
 	if err != nil {
 		log.Default.Error(err)
 		return
 	}
 }
 
-func (r *ProxyFSRepository) write() error {
-	p := path.Join(r.proxyPath, "redirects.json")
+func (a *ProxyFSRepository) write() error {
+	p := path.Join(a.proxyPath, "redirects.json")
 
-	bytes, err := json.MarshalIndent(r.redirects, "", "\t")
+	bytes, err := json.MarshalIndent(a.redirects, "", "\t")
 	if err != nil {
 		return err
 	}

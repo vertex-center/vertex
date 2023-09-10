@@ -1,4 +1,4 @@
-package repository
+package adapter
 
 import (
 	"bufio"
@@ -15,28 +15,28 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-type RunnerFSRepository struct {
+type RunnerFSAdapter struct {
 	commands map[uuid.UUID]*exec.Cmd
 }
 
-func NewRunnerFSRepository() RunnerFSRepository {
-	return RunnerFSRepository{
+func NewRunnerFSAdapter() RunnerFSAdapter {
+	return RunnerFSAdapter{
 		commands: map[uuid.UUID]*exec.Cmd{},
 	}
 }
 
-func (r RunnerFSRepository) Delete(instance *types.Instance) error {
+func (a RunnerFSAdapter) Delete(instance *types.Instance) error {
 	return nil
 }
 
-func (r RunnerFSRepository) Start(instance *types.Instance, onLog func(msg string), onErr func(msg string), setStatus func(status string)) error {
-	if r.commands[instance.UUID] != nil {
+func (a RunnerFSAdapter) Start(instance *types.Instance, onLog func(msg string), onErr func(msg string), setStatus func(status string)) error {
+	if a.commands[instance.UUID] != nil {
 		log.Default.Error(errors.New("runner already started"),
 			vlog.String("name", instance.Name),
 		)
 	}
 
-	dir := r.getPath(*instance)
+	dir := a.getPath(*instance)
 	executable := instance.Methods.Script.Filename
 	command := "./" + executable
 
@@ -47,13 +47,13 @@ func (r RunnerFSRepository) Start(instance *types.Instance, onLog func(msg strin
 		return err
 	}
 
-	r.commands[instance.UUID] = exec.Command(command)
+	a.commands[instance.UUID] = exec.Command(command)
 
-	cmd := r.commands[instance.UUID]
+	cmd := a.commands[instance.UUID]
 	cmd.Dir = dir
 	cmd.Env = os.Environ()
 
-	envFile, err := os.Open(path.Join(r.getPath(*instance), ".env"))
+	envFile, err := os.Open(path.Join(a.getPath(*instance), ".env"))
 	if err != nil {
 		return err
 	}
@@ -112,8 +112,8 @@ func (r RunnerFSRepository) Start(instance *types.Instance, onLog func(msg strin
 	return nil
 }
 
-func (r RunnerFSRepository) Stop(instance *types.Instance) error {
-	cmd := r.commands[instance.UUID]
+func (a RunnerFSAdapter) Stop(instance *types.Instance) error {
+	cmd := a.commands[instance.UUID]
 
 	err := cmd.Process.Signal(os.Interrupt)
 	if err != nil {
@@ -122,25 +122,25 @@ func (r RunnerFSRepository) Stop(instance *types.Instance) error {
 
 	// TODO: Force kill if the process continues
 
-	delete(r.commands, instance.UUID)
+	delete(a.commands, instance.UUID)
 
 	return nil
 }
 
-func (r RunnerFSRepository) Info(instance types.Instance) (map[string]any, error) {
+func (a RunnerFSAdapter) Info(instance types.Instance) (map[string]any, error) {
 	return map[string]any{}, nil
 }
 
-func (r RunnerFSRepository) CheckForUpdates(instance *types.Instance) error {
+func (a RunnerFSAdapter) CheckForUpdates(instance *types.Instance) error {
 	//TODO implement me
 	return nil
 }
 
-func (r RunnerFSRepository) HasUpdateAvailable(instance types.Instance) (bool, error) {
+func (a RunnerFSAdapter) HasUpdateAvailable(instance types.Instance) (bool, error) {
 	//TODO implement me
 	return false, nil
 }
 
-func (r RunnerFSRepository) getPath(instance types.Instance) string {
+func (a RunnerFSAdapter) getPath(instance types.Instance) string {
 	return path.Join(storage.Path, "instances", instance.UUID.String())
 }

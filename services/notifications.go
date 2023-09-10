@@ -8,27 +8,27 @@ import (
 	"github.com/vertex-center/vertex/types"
 )
 
-// TODO: Move webhooks use to a Discord repo
+// TODO: Move webhooks use to a Discord adapter
 
 type NotificationsService struct {
-	settingsRepo types.SettingsRepository
-	eventsRepo   types.EventRepository
-	instanceRepo types.InstanceRepository
+	settingsAdapter types.SettingsAdapterPort
+	eventsAdapter   types.EventAdapterPort
+	instanceAdapter types.InstanceAdapterPort
 
 	client   webhook.Client
 	listener types.Listener
 }
 
-func NewNotificationsService(settingsRepo types.SettingsRepository, eventsRepo types.EventRepository, instanceRepo types.InstanceRepository) NotificationsService {
+func NewNotificationsService(settingsAdapter types.SettingsAdapterPort, eventsAdapter types.EventAdapterPort, instanceAdapter types.InstanceAdapterPort) NotificationsService {
 	return NotificationsService{
-		settingsRepo: settingsRepo,
-		eventsRepo:   eventsRepo,
-		instanceRepo: instanceRepo,
+		settingsAdapter: settingsAdapter,
+		eventsAdapter:   eventsAdapter,
+		instanceAdapter: instanceAdapter,
 	}
 }
 
 func (s *NotificationsService) StartWebhook() error {
-	webhookURL := s.settingsRepo.GetNotificationsWebhook()
+	webhookURL := s.settingsAdapter.GetNotificationsWebhook()
 	if webhookURL == nil {
 		return nil
 	}
@@ -48,13 +48,13 @@ func (s *NotificationsService) StartWebhook() error {
 		}
 	})
 
-	s.eventsRepo.AddListener(s.listener)
+	s.eventsAdapter.AddListener(s.listener)
 
 	return nil
 }
 
 func (s *NotificationsService) StopWebhook() {
-	s.eventsRepo.RemoveListener(s.listener)
+	s.eventsAdapter.RemoveListener(s.listener)
 }
 
 func (s *NotificationsService) sendStatus(instanceUUID uuid.UUID, status string) {
@@ -69,7 +69,7 @@ func (s *NotificationsService) sendStatus(instanceUUID uuid.UUID, status string)
 		color = 10038562
 	}
 
-	instance, err := s.instanceRepo.Get(instanceUUID)
+	instance, err := s.instanceAdapter.Get(instanceUUID)
 	if err != nil {
 		log.Default.Error(err)
 		return

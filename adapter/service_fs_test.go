@@ -1,4 +1,4 @@
-package repository
+package adapter
 
 import (
 	"testing"
@@ -14,7 +14,7 @@ const (
 type AvailableTestSuite struct {
 	suite.Suite
 
-	repo ServiceFSRepository
+	adapter ServiceFSAdapter
 }
 
 func TestAvailableTestSuite(t *testing.T) {
@@ -22,16 +22,16 @@ func TestAvailableTestSuite(t *testing.T) {
 }
 
 func (suite *AvailableTestSuite) SetupSuite() {
-	suite.repo = NewServiceFSRepository(&ServiceRepositoryParams{
+	suite.adapter = *NewServiceFSAdapter(&ServiceFSAdapterParams{
 		servicesPath: PathServices,
-	})
+	}).(*ServiceFSAdapter)
 
-	err := suite.repo.Reload()
+	err := suite.adapter.Reload()
 	assert.NoError(suite.T(), err)
 
-	assert.NotZero(suite.T(), len(suite.repo.services))
+	assert.NotZero(suite.T(), len(suite.adapter.services))
 }
 
 func (suite *AvailableTestSuite) TestGetAvailable() {
-	assert.Equal(suite.T(), 1, len(suite.repo.GetAll()))
+	assert.Equal(suite.T(), 1, len(suite.adapter.GetAll()))
 }

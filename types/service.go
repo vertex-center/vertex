@@ -160,7 +160,7 @@ var (
 	ErrServiceNotFound = errors.New("the service was not found")
 )
 
-type ServiceRepository interface {
+type ServiceAdapterPort interface {
 	// Get a service with its id. Returns ErrServiceNotFound if
 	// the service was not found.
 	Get(id string) (Service, error)
@@ -170,6 +170,6 @@ type ServiceRepository interface {
 	// GetAll gets all available services.
 	GetAll() []Service
 
-	// Reload the repository
+	// Reload the adapter
 	Reload() error
 }

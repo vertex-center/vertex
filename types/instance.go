@@ -59,7 +59,7 @@ func NewInstance(id uuid.UUID, service Service) Instance {
 	}
 }
 
-type InstanceRepository interface {
+type InstanceAdapterPort interface {
 	Get(uuid uuid.UUID) (*Instance, error)
 	GetAll() map[uuid.UUID]*Instance
 	GetPath(uuid uuid.UUID) string

@@ -1,4 +1,4 @@
-package repository
+package adapter
 
 import (
 	"bufio"
@@ -23,72 +23,72 @@ var (
 	ErrContainerNotFound     = errors.New("container not found")
 )
 
-type InstanceFSRepository struct {
+type InstanceFSAdapter struct {
 	instancesPath string
 	instances     map[uuid.UUID]*types.Instance
 }
 
-func NewInstanceFSRepository() InstanceFSRepository {
-	r := InstanceFSRepository{
+func NewInstanceFSAdapter() types.InstanceAdapterPort {
+	adapter := &InstanceFSAdapter{
 		instancesPath: path.Join(storage.Path, "instances"),
 		instances:     map[uuid.UUID]*types.Instance{},
 	}
 
-	err := os.MkdirAll(r.instancesPath, os.ModePerm)
+	err := os.MkdirAll(adapter.instancesPath, os.ModePerm)
 	if err != nil && !os.IsExist(err) {
 		log.Default.Error(err,
 			vlog.String("message", "failed to create directory"),
-			vlog.String("path", r.instancesPath),
+			vlog.String("path", adapter.instancesPath),
 		)
 		os.Exit(1)
 	}
 
-	return r
+	return adapter
 }
 
-func (r *InstanceFSRepository) Get(uuid uuid.UUID) (*types.Instance, error) {
-	instance, ok := r.instances[uuid]
+func (a *InstanceFSAdapter) Get(uuid uuid.UUID) (*types.Instance, error) {
+	instance, ok := a.instances[uuid]
 	if !ok {
 		return nil, ErrInstanceNotFound
 	}
 	return instance, nil
 }
 
-func (r *InstanceFSRepository) GetAll() map[uuid.UUID]*types.Instance {
-	return r.instances
+func (a *InstanceFSAdapter) GetAll() map[uuid.UUID]*types.Instance {
+	return a.instances
 }
 
-func (r *InstanceFSRepository) GetPath(uuid uuid.UUID) string {
-	return path.Join(r.instancesPath, uuid.String())
+func (a *InstanceFSAdapter) GetPath(uuid uuid.UUID) string {
+	return path.Join(a.instancesPath, uuid.String())
 }
 
-func (r *InstanceFSRepository) Delete(uuid uuid.UUID) error {
-	err := os.RemoveAll(r.GetPath(uuid))
+func (a *InstanceFSAdapter) Delete(uuid uuid.UUID) error {
+	err := os.RemoveAll(a.GetPath(uuid))
 	if err != nil {
 		return fmt.Errorf("failed to delete server: %v", err)
 	}
 
-	delete(r.instances, uuid)
+	delete(a.instances, uuid)
 
 	return nil
 }
 
-func (r *InstanceFSRepository) Exists(uuid uuid.UUID) bool {
-	return r.instances[uuid] != nil
+func (a *InstanceFSAdapter) Exists(uuid uuid.UUID) bool {
+	return a.instances[uuid] != nil
 }
 
-func (r *InstanceFSRepository) Set(uuid uuid.UUID, instance types.Instance) error {
-	if r.Exists(uuid) {
+func (a *InstanceFSAdapter) Set(uuid uuid.UUID, instance types.Instance) error {
+	if a.Exists(uuid) {
 		return ErrInstanceAlreadyExists
 	}
 
-	r.instances[uuid] = &instance
+	a.instances[uuid] = &instance
 
 	return nil
 }
 
-func (r *InstanceFSRepository) SaveSettings(i *types.Instance) error {
-	settingsPath := path.Join(r.GetPath(i.UUID), ".vertex", "instance_settings.json")
+func (a *InstanceFSAdapter) SaveSettings(i *types.Instance) error {
+	settingsPath := path.Join(a.GetPath(i.UUID), ".vertex", "instance_settings.json")
 
 	settingsBytes, err := json.MarshalIndent(i.InstanceSettings, "", "\t")
 	if err != nil {
@@ -103,8 +103,8 @@ func (r *InstanceFSRepository) SaveSettings(i *types.Instance) error {
 	return nil
 }
 
-func (r *InstanceFSRepository) LoadSettings(i *types.Instance) error {
-	settingsPath := path.Join(r.GetPath(i.UUID), ".vertex", "instance_settings.json")
+func (a *InstanceFSAdapter) LoadSettings(i *types.Instance) error {
+	settingsPath := path.Join(a.GetPath(i.UUID), ".vertex", "instance_settings.json")
 	settingsBytes, err := os.ReadFile(settingsPath)
 
 	if errors.Is(err, os.ErrNotExist) {
@@ -121,7 +121,7 @@ func (r *InstanceFSRepository) LoadSettings(i *types.Instance) error {
 	return nil
 }
 
-func (r *InstanceFSRepository) ReadService(instancePath string) (types.Service, error) {
+func (a *InstanceFSAdapter) ReadService(instancePath string) (types.Service, error) {
 	data, err := os.ReadFile(path.Join(instancePath, ".vertex", "service.yml"))
 	if err != nil {
 		log.Default.Warn("'.vertex/service.yml' file not found",
@@ -134,8 +134,8 @@ func (r *InstanceFSRepository) ReadService(instancePath string) (types.Service, 
 	return service, err
 }
 
-func (r *InstanceFSRepository) SaveEnv(i *types.Instance, variables map[string]string) error {
-	filepath := path.Join(r.GetPath(i.UUID), ".env")
+func (a *InstanceFSAdapter) SaveEnv(i *types.Instance, variables map[string]string) error {
+	filepath := path.Join(a.GetPath(i.UUID), ".env")
 
 	file, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE, os.ModePerm)
 	if err != nil {
@@ -154,8 +154,8 @@ func (r *InstanceFSRepository) SaveEnv(i *types.Instance, variables map[string]s
 	return nil
 }
 
-func (r *InstanceFSRepository) LoadEnv(i *types.Instance) error {
-	filepath := path.Join(r.GetPath(i.UUID), ".env")
+func (a *InstanceFSAdapter) LoadEnv(i *types.Instance) error {
+	filepath := path.Join(a.GetPath(i.UUID), ".env")
 
 	file, err := os.Open(filepath)
 	if os.IsNotExist(err) {
@@ -179,8 +179,8 @@ func (r *InstanceFSRepository) LoadEnv(i *types.Instance) error {
 	return nil
 }
 
-func (r *InstanceFSRepository) Reload(load func(uuid uuid.UUID)) {
-	entries, err := os.ReadDir(r.instancesPath)
+func (a *InstanceFSAdapter) Reload(load func(uuid uuid.UUID)) {
+	entries, err := os.ReadDir(a.instancesPath)
 	if err != nil {
 		log.Default.Error(err)
 		os.Exit(1)

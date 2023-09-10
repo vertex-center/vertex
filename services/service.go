@@ -5,19 +5,19 @@ import (
 )
 
 type ServiceService struct {
-	serviceRepo types.ServiceRepository
+	serviceAdapter types.ServiceAdapterPort
 }
 
-func NewServiceService(serviceRepo types.ServiceRepository) ServiceService {
+func NewServiceService(serviceAdapter types.ServiceAdapterPort) ServiceService {
 	return ServiceService{
-		serviceRepo: serviceRepo,
+		serviceAdapter: serviceAdapter,
 	}
 }
 
 func (s *ServiceService) ListAvailable() []types.Service {
-	return s.serviceRepo.GetAll()
+	return s.serviceAdapter.GetAll()
 }
 
 func (s *ServiceService) Reload() error {
-	return s.serviceRepo.Reload()
+	return s.serviceAdapter.Reload()
 }

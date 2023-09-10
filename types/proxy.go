@@ -9,7 +9,7 @@ type ProxyRedirect struct {
 	Target string `json:"target"`
 }
 
-type ProxyRepository interface {
+type ProxyAdapterPort interface {
 	GetRedirects() ProxyRedirects
 	AddRedirect(id uuid.UUID, redirect ProxyRedirect) error
 	RemoveRedirect(id uuid.UUID) error

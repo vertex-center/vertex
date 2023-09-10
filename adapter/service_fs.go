@@ -1,4 +1,4 @@
-package repository
+package adapter
 
 import (
 	"errors"
@@ -12,35 +12,35 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type ServiceFSRepository struct {
+type ServiceFSAdapter struct {
 	servicesPath string
 	services     []types.Service
 }
 
-type ServiceRepositoryParams struct {
+type ServiceFSAdapterParams struct {
 	servicesPath string
 }
 
-func NewServiceFSRepository(params *ServiceRepositoryParams) ServiceFSRepository {
+func NewServiceFSAdapter(params *ServiceFSAdapterParams) types.ServiceAdapterPort {
 	if params == nil {
-		params = &ServiceRepositoryParams{}
+		params = &ServiceFSAdapterParams{}
 	}
 	if params.servicesPath == "" {
 		params.servicesPath = path.Join(storage.Path, "services")
 	}
 
-	repo := ServiceFSRepository{
+	adapter := &ServiceFSAdapter{
 		servicesPath: params.servicesPath,
 	}
-	err := repo.Reload()
+	err := adapter.Reload()
 	if err != nil {
-		log.Default.Error(fmt.Errorf("failed to reload services repository: %v", err))
+		log.Default.Error(fmt.Errorf("failed to reload services: %v", err))
 	}
-	return repo
+	return adapter
 }
 
-func (r *ServiceFSRepository) Get(id string) (types.Service, error) {
-	for _, service := range r.services {
+func (a *ServiceFSAdapter) Get(id string) (types.Service, error) {
+	for _, service := range a.services {
 		if service.ID == id {
 			return service, nil
 		}
@@ -49,8 +49,8 @@ func (r *ServiceFSRepository) Get(id string) (types.Service, error) {
 	return types.Service{}, types.ErrServiceNotFound
 }
 
-func (r *ServiceFSRepository) GetScript(id string) ([]byte, error) {
-	service, err := r.Get(id)
+func (a *ServiceFSAdapter) GetScript(id string) ([]byte, error) {
+	service, err := a.Get(id)
 	if err != nil {
 		return nil, err
 	}
@@ -59,17 +59,17 @@ func (r *ServiceFSRepository) GetScript(id string) ([]byte, error) {
 		return nil, errors.New("the service doesn't have a script method")
 	}
 
-	return os.ReadFile(path.Join(r.servicesPath, "services", id, service.Methods.Script.Filename))
+	return os.ReadFile(path.Join(a.servicesPath, "services", id, service.Methods.Script.Filename))
 }
 
-func (r *ServiceFSRepository) GetAll() []types.Service {
-	return r.services
+func (a *ServiceFSAdapter) GetAll() []types.Service {
+	return a.services
 }
 
-func (r *ServiceFSRepository) Reload() error {
-	servicesPath := path.Join(r.servicesPath, "services")
+func (a *ServiceFSAdapter) Reload() error {
+	servicesPath := path.Join(a.servicesPath, "services")
 
-	r.services = []types.Service{}
+	a.services = []types.Service{}
 
 	entries, err := os.ReadDir(servicesPath)
 	if err != nil {
@@ -94,7 +94,7 @@ func (r *ServiceFSRepository) Reload() error {
 			return err
 		}
 
-		r.services = append(r.services, service)
+		a.services = append(a.services, service)
 	}
 
 	return nil

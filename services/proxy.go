@@ -22,13 +22,13 @@ var (
 )
 
 type ProxyService struct {
-	server    *http.Server
-	proxyRepo types.ProxyRepository
+	server       *http.Server
+	proxyAdapter types.ProxyAdapterPort
 }
 
-func NewProxyService(proxyRepo types.ProxyRepository) ProxyService {
+func NewProxyService(proxyAdapter types.ProxyAdapterPort) ProxyService {
 	s := ProxyService{
-		proxyRepo: proxyRepo,
+		proxyAdapter: proxyAdapter,
 	}
 	return s
 }
@@ -72,23 +72,23 @@ func (s *ProxyService) Stop() error {
 }
 
 func (s *ProxyService) GetRedirects() types.ProxyRedirects {
-	return s.proxyRepo.GetRedirects()
+	return s.proxyAdapter.GetRedirects()
 }
 
 func (s *ProxyService) AddRedirect(redirect types.ProxyRedirect) error {
 	id := uuid.New()
-	return s.proxyRepo.AddRedirect(id, redirect)
+	return s.proxyAdapter.AddRedirect(id, redirect)
 }
 
 func (s *ProxyService) RemoveRedirect(id uuid.UUID) error {
-	return s.proxyRepo.RemoveRedirect(id)
+	return s.proxyAdapter.RemoveRedirect(id)
 }
 
 func (s *ProxyService) handleProxy(c *gin.Context) {
 	host := c.Request.Host
 
 	var redirect *types.ProxyRedirect
-	for _, r := range s.proxyRepo.GetRedirects() {
+	for _, r := range s.proxyAdapter.GetRedirects() {
 		if host == r.Source {
 			redirect = &r
 			break
