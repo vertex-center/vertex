@@ -34,6 +34,7 @@ export default function Dock(props: Props) {
             <div className={styles.dock}>
                 <DockApp to="/infrastructure" symbol="storage" />
                 <DockApp to="/proxy" symbol="router" />
+                <div className={styles.separator} />
                 <DockApp to="/settings" symbol="settings" />
             </div>
         </div>
