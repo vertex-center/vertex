@@ -40,7 +40,6 @@ export default function Infrastructure() {
     }, [installed]);
 
     const fetchServices = () => {
-        setLoading(true);
         getInstances()
             .then((res) => {
                 console.log(res.data);
