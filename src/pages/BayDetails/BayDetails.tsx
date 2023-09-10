@@ -16,7 +16,6 @@ import {
     unregisterSSEEvent,
 } from "../../backend/sse";
 import Spacer from "../../components/Spacer/Spacer";
-import Header from "../../components/Header/Header";
 import Sidebar, {
     SidebarItem,
     SidebarSeparator,
@@ -86,7 +85,6 @@ export default function BayDetails() {
 
     return (
         <div className={styles.details}>
-            <Header />
             <div className={styles.title}>
                 <BackButton to="/infrastructure" />
                 <BigTitle>{instance?.name}</BigTitle>

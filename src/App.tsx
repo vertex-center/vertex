@@ -20,6 +20,7 @@ import Dock from "./components/Dock/Dock";
 import BayDetailsUpdate from "./pages/BayDetailsUpdate/BayDetailsUpdate";
 import ReverseProxy from "./pages/ReverseProxy/ReverseProxy";
 import SettingsNotifications from "./pages/SettingsNotifications/SettingsNotifications";
+import Header from "./components/Header/Header";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -27,6 +28,7 @@ function App() {
     return (
         <div className={classNames("app", theme)}>
             <HashRouter>
+                <Header />
                 <Routes>
                     <Route
                         path="/"

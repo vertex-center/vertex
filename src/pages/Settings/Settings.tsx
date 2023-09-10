@@ -1,4 +1,3 @@
-import { HeaderHome } from "../../components/Header/Header";
 import Sidebar, {
     SidebarItem,
     SidebarSeparator,
@@ -15,7 +14,6 @@ type Props = {};
 export default function Settings(props: Props) {
     return (
         <div>
-            <HeaderHome />
             <div className={styles.title}>
                 <BigTitle>Settings</BigTitle>
             </div>

@@ -6,7 +6,6 @@ import {
 } from "../../backend/backend";
 import { BigTitle, Text, Title } from "../../components/Text/Text";
 import { Service as ServiceModel } from "../../models/service";
-import Header from "../../components/Header/Header";
 import { Fragment, useState } from "react";
 
 import styles from "./Store.module.sass";
@@ -225,7 +224,6 @@ export default function Store() {
 
     return (
         <Fragment>
-            <Header />
             <div className={styles.page}>
                 <Horizontal gap={10} alignItems="center">
                     <BigTitle>Marketplace</BigTitle>

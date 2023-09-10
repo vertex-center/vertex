@@ -13,7 +13,6 @@ import {
     unregisterSSE,
     unregisterSSEEvent,
 } from "../../backend/sse";
-import { HeaderHome } from "../../components/Header/Header";
 import Progress from "../../components/Progress";
 import { Instance, Instances } from "../../models/instance";
 import { BigTitle } from "../../components/Text/Text";
@@ -100,7 +99,6 @@ export default function Infrastructure() {
 
     return (
         <div className={styles.server}>
-            <HeaderHome />
             {loading && <Progress infinite small />}
             <div className={styles.title}>
                 <BigTitle>Infrastructure</BigTitle>

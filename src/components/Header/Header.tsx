@@ -40,20 +40,3 @@ export default function Header({ children }: HTMLProps<HTMLHeadingElement>) {
         </header>
     );
 }
-
-export function HeaderHome() {
-    return (
-        <Header>
-            {/*<nav>*/}
-            {/*    <ul className={styles.items}>*/}
-            {/*        <Item to="/" symbol="storage">*/}
-            {/*            Servers*/}
-            {/*        </Item>*/}
-            {/*        <Item to="/settings" symbol="settings">*/}
-            {/*            Settings*/}
-            {/*        </Item>*/}
-            {/*    </ul>*/}
-            {/*</nav>*/}
-        </Header>
-    );
-}

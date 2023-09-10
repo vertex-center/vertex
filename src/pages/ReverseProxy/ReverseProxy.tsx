@@ -1,5 +1,4 @@
 import { BigTitle, Title } from "../../components/Text/Text";
-import Header from "../../components/Header/Header";
 import styles from "../ReverseProxy/ReverseProxy.module.sass";
 import ProxyRedirect from "../../components/ProxyRedirect/ProxyRedirect";
 import { Horizontal } from "../../components/Layouts/Layouts";
@@ -45,7 +44,6 @@ export default function ReverseProxy(props: Props) {
 
     return (
         <div>
-            <Header />
             <div className={styles.title}>
                 <BigTitle>Reverse Proxy</BigTitle>
             </div>
