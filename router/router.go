@@ -49,51 +49,22 @@ type Router struct {
 func NewRouter(about types.About) Router {
 	gin.SetMode(gin.ReleaseMode)
 
-	router := Router{}
+	r := Router{
+		engine: gin.New(),
+	}
 
-	r := gin.New()
-	r.Use(cors.Default())
-	r.Use(ginutils.Logger("MAIN"))
-	r.Use(gin.Recovery())
-	r.Use(middleware.ErrorMiddleware())
-	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
-	r.GET("/ping", handlePing)
+	r.engine.Use(cors.Default())
+	r.engine.Use(ginutils.Logger("MAIN"))
+	r.engine.Use(gin.Recovery())
+	r.engine.Use(middleware.ErrorMiddleware())
+	r.engine.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
+	r.engine.GET("/ping", handlePing)
 
-	runnerDockerAdapter = adapter.NewRunnerDockerAdapter()
-	runnerFSAdapter = adapter.NewRunnerFSAdapter()
-	instanceFSAdapter = adapter.NewInstanceFSAdapter()
-	instanceLogsFSAdapter = adapter.NewInstanceLogsFSAdapter()
-	eventInMemoryAdapter = adapter.NewEventInMemoryAdapter()
-	packageFSAdapter = adapter.NewPackageFSAdapter(nil)
-	serviceFSAdapter = adapter.NewServiceFSAdapter(nil)
-	proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
-	settingsFSAdapter = adapter.NewSettingsFSAdapter(nil)
+	r.initAdapters()
+	r.initServices(about)
+	r.initAPIRoutes(about)
 
-	proxyService = services.NewProxyService(proxyFSAdapter)
-	notificationsService = services.NewNotificationsService(settingsFSAdapter, eventInMemoryAdapter, instanceFSAdapter)
-	instanceService = services.NewInstanceService(serviceFSAdapter, instanceFSAdapter, runnerDockerAdapter, runnerFSAdapter, instanceLogsFSAdapter, eventInMemoryAdapter)
-	packageService = services.NewPackageService(packageFSAdapter)
-	serviceService = services.NewServiceService(serviceFSAdapter)
-	updateService = services.NewUpdateDependenciesService(about.Version)
-	settingsService = services.NewSettingsService(settingsFSAdapter)
-
-	api := r.Group("/api")
-	api.GET("/ping", handlePing)
-	api.GET("/about", func(c *gin.Context) {
-		c.JSON(http.StatusOK, about)
-	})
-
-	addServicesRoutes(api.Group("/services"))
-	addInstancesRoutes(api.Group("/instances"))
-	addInstanceRoutes(api.Group("/instance/:instance_uuid"))
-	addPackagesRoutes(api.Group("/packages"))
-	addProxyRoutes(api.Group("/proxy"))
-	addUpdatesRoutes(api.Group("/updates"))
-	addSettingsRoutes(api.Group("/settings"))
-
-	router.engine = r
-
-	return router
+	return r
 }
 
 func (r *Router) Start(addr string) {
@@ -156,6 +127,44 @@ func (r *Router) handleSignals() {
 		r.Stop()
 		os.Exit(0)
 	}()
+}
+
+func (r *Router) initAdapters() {
+	runnerDockerAdapter = adapter.NewRunnerDockerAdapter()
+	runnerFSAdapter = adapter.NewRunnerFSAdapter()
+	instanceFSAdapter = adapter.NewInstanceFSAdapter()
+	instanceLogsFSAdapter = adapter.NewInstanceLogsFSAdapter()
+	eventInMemoryAdapter = adapter.NewEventInMemoryAdapter()
+	packageFSAdapter = adapter.NewPackageFSAdapter(nil)
+	serviceFSAdapter = adapter.NewServiceFSAdapter(nil)
+	proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
+	settingsFSAdapter = adapter.NewSettingsFSAdapter(nil)
+}
+
+func (r *Router) initServices(about types.About) {
+	proxyService = services.NewProxyService(proxyFSAdapter)
+	notificationsService = services.NewNotificationsService(settingsFSAdapter, eventInMemoryAdapter, instanceFSAdapter)
+	instanceService = services.NewInstanceService(serviceFSAdapter, instanceFSAdapter, runnerDockerAdapter, runnerFSAdapter, instanceLogsFSAdapter, eventInMemoryAdapter)
+	packageService = services.NewPackageService(packageFSAdapter)
+	serviceService = services.NewServiceService(serviceFSAdapter)
+	updateService = services.NewUpdateDependenciesService(about.Version)
+	settingsService = services.NewSettingsService(settingsFSAdapter)
+}
+
+func (r *Router) initAPIRoutes(about types.About) {
+	api := r.engine.Group("/api")
+	api.GET("/ping", handlePing)
+	api.GET("/about", func(c *gin.Context) {
+		c.JSON(http.StatusOK, about)
+	})
+
+	addServicesRoutes(api.Group("/services"))
+	addInstancesRoutes(api.Group("/instances"))
+	addInstanceRoutes(api.Group("/instance/:instance_uuid"))
+	addPackagesRoutes(api.Group("/packages"))
+	addProxyRoutes(api.Group("/proxy"))
+	addUpdatesRoutes(api.Group("/updates"))
+	addSettingsRoutes(api.Group("/settings"))
 }
 
 func headersSSE(c *gin.Context) {
