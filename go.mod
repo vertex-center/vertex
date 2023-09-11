@@ -17,7 +17,6 @@ require (
 	github.com/google/uuid v1.3.1
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.4
-	github.com/vertex-center/vertex-core-golang v0.0.0-20230423023245-a01db2466031
 	github.com/vertex-center/vlog v1.0.1
 	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b
 	gopkg.in/yaml.v2 v2.4.0

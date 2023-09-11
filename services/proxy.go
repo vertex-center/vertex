@@ -10,7 +10,6 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex-core-golang/router/middleware"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/types"
@@ -42,7 +41,6 @@ func (s *ProxyService) Start() error {
 	r.Use(cors.Default())
 	r.Use(ginutils.Logger("PROX"))
 	r.Use(gin.Recovery())
-	r.Use(middleware.ErrorMiddleware())
 	r.Any("/*path", s.handleProxy)
 
 	s.server = &http.Server{

@@ -213,8 +213,6 @@ github.com/ugorji/go/codec v1.1.7/go.mod h1:Ax+UKWsSmolVDwsd+7N3ZtXu+yMGCf907BLY
 github.com/ugorji/go/codec v1.2.7/go.mod h1:WGN1fab3R1fzQlVQTkfxVtIBhWDRqOviHU95kRgeqEY=
 github.com/ugorji/go/codec v1.2.9 h1:rmenucSohSTiyL09Y+l2OCk+FrMxGMzho2+tjr5ticU=
 github.com/ugorji/go/codec v1.2.9/go.mod h1:UNopzCgEMSXjBc6AOMqYvWC1ktqTAfzJZUZgYf6w6lg=
-github.com/vertex-center/vertex-core-golang v0.0.0-20230423023245-a01db2466031 h1:og0cF2u0K3n9628dEwi6QM5u5AcPwO4XKgp9ndHlfb0=
-github.com/vertex-center/vertex-core-golang v0.0.0-20230423023245-a01db2466031/go.mod h1:LW8yo6JkIKZxVJKhgbLsf1CAocMWnDYz1luF04juh/g=
 github.com/vertex-center/vlog v1.0.1 h1:fa2bBD1h4T3+KNQ5jphuQ/Fb9eRj1uC28n/xYBFubRw=
 github.com/vertex-center/vlog v1.0.1/go.mod h1:M52swDkdWWu3VWY2Cj+mqc64Nzx33sDukAgrQ3HA95c=
 github.com/xanzy/ssh-agent v0.3.3 h1:+/15pJfg/RsTxqYcX6fHqOXZwwMP+2VyYWJeWM2qQFM=
