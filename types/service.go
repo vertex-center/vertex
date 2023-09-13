@@ -148,6 +148,9 @@ type URL struct {
 	// but the port here doesn't change with the environment.
 	Port string `yaml:"port" json:"port"`
 
+	// HomeRoute allows to specify a route to change the home path.
+	HomeRoute *string `yaml:"home,omitempty" json:"home,omitempty"`
+
 	// PingRoute allows to specify a route to change the ping path.
 	PingRoute *string `yaml:"ping,omitempty" json:"ping,omitempty"`
 
