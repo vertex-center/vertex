@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -60,7 +61,10 @@ func (s *ProxyService) Start() error {
 }
 
 func (s *ProxyService) Stop() error {
-	err := s.server.Shutdown(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	err := s.server.Shutdown(ctx)
 	if err != nil {
 		return err
 	}

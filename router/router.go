@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sse"
@@ -101,7 +102,10 @@ func (r *Router) Stop() {
 
 	instanceService.StopAll()
 
-	err := r.server.Shutdown(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	err := r.server.Shutdown(ctx)
 	if err != nil {
 		log.Error(err)
 		return
@@ -123,6 +127,10 @@ func (r *Router) handleSignals() {
 		<-c
 		log.Info("shutdown signal sent")
 		r.Stop()
+		err := proxyService.Stop()
+		if err != nil {
+			log.Error(err)
+		}
 		os.Exit(0)
 	}()
 }
