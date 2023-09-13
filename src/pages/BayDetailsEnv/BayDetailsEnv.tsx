@@ -1,6 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
 import { Title } from "../../components/Text/Text";
-import { saveInstanceEnv } from "../../backend/backend";
 import { useParams } from "react-router-dom";
 import EnvVariableInput from "../../components/EnvVariableInput/EnvVariableInput";
 import Button from "../../components/Button/Button";
@@ -10,6 +9,7 @@ import useInstance from "../../hooks/useInstance";
 import { Env, EnvVariable } from "../../models/service";
 import styles from "./BayDetailsEnv.module.sass";
 import Loading from "../../components/Loading/Loading";
+import { api } from "../../backend/backend";
 
 type Props = {};
 
@@ -50,7 +50,8 @@ export default function BayDetailsEnv(props: Props) {
             _env[e.env.name] = e.value;
         });
         setUploading(true);
-        saveInstanceEnv(uuid, _env)
+        api.instance.env
+            .save(uuid, _env)
             .then(console.log)
             .catch(console.error)
             .finally(() => {

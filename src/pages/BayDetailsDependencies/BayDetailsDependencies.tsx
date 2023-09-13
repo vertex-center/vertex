@@ -6,10 +6,6 @@ import Symbol from "../../components/Symbol/Symbol";
 
 import styles from "./BayDetailsDependencies.module.sass";
 import {
-    getInstanceDependencies,
-    installPackages,
-} from "../../backend/backend";
-import {
     Dependencies,
     Dependency as DependencyModel,
 } from "../../models/dependency";
@@ -20,6 +16,7 @@ import { SegmentedButtons } from "../../components/SegmentedButton";
 import Progress from "../../components/Progress";
 import Popup from "../../components/Popup/Popup";
 import Code from "../../components/Code/Code";
+import { api } from "../../backend/backend";
 
 type Props = {
     name: string;
@@ -39,7 +36,8 @@ export function Dependency(props: Props) {
 
     const install = () => {
         setInstalling(true);
-        installPackages([{ name, package_manager: packageManager }])
+        api.packages
+            .install([{ name, package_manager: packageManager }])
             .then((res) => {
                 if (res.data?.command) {
                     onNeedsSudo(res.data?.command, packageManager);
@@ -104,7 +102,8 @@ export default function BayDetailsDependencies() {
 
     const reload = useCallback(() => {
         setIsLoading(true);
-        getInstanceDependencies(uuid)
+        api.instance.dependencies
+            .get(uuid)
             .then((res) => setDependencies(res.data))
             .finally(() => setIsLoading(false));
     }, [uuid]);

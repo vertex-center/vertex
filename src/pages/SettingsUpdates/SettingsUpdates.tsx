@@ -4,7 +4,6 @@ import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import Button from "../../components/Button/Button";
 import Spacer from "../../components/Spacer/Spacer";
 import Symbol from "../../components/Symbol/Symbol";
-import { executeUpdates, getUpdates } from "../../backend/backend";
 import { Error } from "../../components/Error/Error";
 import Progress from "../../components/Progress";
 import Popup from "../../components/Popup/Popup";
@@ -12,6 +11,7 @@ import Loading from "../../components/Loading/Loading";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import { Updates } from "../../models/update";
+import { api } from "../../backend/backend";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -73,7 +73,8 @@ export default function SettingsUpdates() {
     const reload = useCallback((refresh?: boolean) => {
         setIsLoading(true);
         setUpdates(undefined);
-        getUpdates(refresh)
+        api.updates
+            .get(refresh)
             .then((res) => {
                 setUpdates(res.data);
             })
@@ -84,7 +85,8 @@ export default function SettingsUpdates() {
     }, []);
 
     const updateService = (name: string) => {
-        executeUpdates([{ name }])
+        api.updates
+            .install([{ name }])
             .then(() => setShowMessage(true))
             .catch((err) => {
                 setError(err?.response?.data?.message ?? err?.message);

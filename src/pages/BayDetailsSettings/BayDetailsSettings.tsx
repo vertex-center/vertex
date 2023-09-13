@@ -4,7 +4,6 @@ import { Horizontal } from "../../components/Layouts/Layouts";
 import Spacer from "../../components/Spacer/Spacer";
 import Button from "../../components/Button/Button";
 import { Error } from "../../components/Error/Error";
-import { patchInstance } from "../../backend/backend";
 import { useParams } from "react-router-dom";
 import useInstance from "../../hooks/useInstance";
 import Progress from "../../components/Progress";
@@ -13,6 +12,7 @@ import ToggleButton from "../../components/ToggleButton/ToggleButton";
 import Input from "../../components/Input/Input";
 
 import styles from "./BayDetailsSettings.module.sass";
+import { api } from "../../backend/backend";
 
 type Props = {};
 
@@ -37,10 +37,11 @@ export default function BayDetailsSettings(props: Props) {
 
     const save = () => {
         setUploading(true);
-        patchInstance(uuid, {
-            launch_on_startup: launchOnStartup,
-            display_name: displayName,
-        })
+        api.instance
+            .patch(uuid, {
+                launch_on_startup: launchOnStartup,
+                display_name: displayName,
+            })
             .then(() => {
                 setSaved(true);
             })

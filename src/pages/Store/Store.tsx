@@ -1,9 +1,4 @@
 import { useFetch } from "../../hooks/useFetch";
-import {
-    getAvailableServices,
-    getInstances,
-    installService,
-} from "../../backend/backend";
 import { BigTitle, Text, Title } from "../../components/Text/Text";
 import { Service as ServiceModel } from "../../models/service";
 import { Fragment, useState } from "react";
@@ -17,6 +12,7 @@ import { SegmentedButtons } from "../../components/SegmentedButton";
 import Button from "../../components/Button/Button";
 import Popup from "../../components/Popup/Popup";
 import { InstallMethod, Instances } from "../../models/instance";
+import { api } from "../../backend/backend";
 
 type Downloading = {
     service: ServiceModel;
@@ -25,9 +21,12 @@ type Downloading = {
 // type ImportMethod = "git" | "localstorage";
 
 export default function Store() {
-    const { data: services } = useFetch<ServiceModel[]>(getAvailableServices);
-    const { data: instances, reload: reloadInstances } =
-        useFetch<Instances>(getInstances);
+    const { data: services } = useFetch<ServiceModel[]>(
+        api.services.available.get
+    );
+    const { data: instances, reload: reloadInstances } = useFetch<Instances>(
+        api.instances.get
+    );
 
     const [installMethod, setInstallMethod] = useState<InstallMethod>();
 
@@ -76,10 +75,11 @@ export default function Store() {
         setDownloading((prev) => [...prev, { service }]);
         setShowInstallPopup(false);
 
-        installService({
-            method: installMethod,
-            service_id: service.id,
-        })
+        api.services
+            .install({
+                method: installMethod,
+                service_id: service.id,
+            })
             .catch((error) => {
                 setError(error.message);
             })

@@ -2,12 +2,6 @@ import styles from "./Infrastructure.module.sass";
 import Bay from "../../components/Bay/Bay";
 import { useEffect, useState } from "react";
 import {
-    checkForInstanceUpdates,
-    getInstances,
-    startInstance,
-    stopInstance,
-} from "../../backend/backend";
-import {
     registerSSE,
     registerSSEEvent,
     unregisterSSE,
@@ -18,6 +12,7 @@ import { Instance, Instances } from "../../models/instance";
 import { BigTitle } from "../../components/Text/Text";
 import Button from "../../components/Button/Button";
 import { Horizontal } from "../../components/Layouts/Layouts";
+import { api } from "../../backend/backend";
 
 export default function Infrastructure() {
     const [loading, setLoading] = useState(true);
@@ -40,7 +35,8 @@ export default function Infrastructure() {
     }, [installed]);
 
     const fetchServices = () => {
-        getInstances()
+        api.instances
+            .get()
             .then((res) => {
                 console.log(res.data);
                 setInstalled(res.data);
@@ -84,14 +80,14 @@ export default function Infrastructure() {
             installed[uuid].status === "off" ||
             installed[uuid].status === "error"
         ) {
-            await startInstance(uuid);
+            await api.instance.start(uuid);
         } else {
-            await stopInstance(uuid);
+            await api.instance.stop(uuid);
         }
     };
 
     const checkForUpdates = async () => {
-        checkForInstanceUpdates().then((res) => {
+        api.instances.checkForUpdates().then((res) => {
             setInstalled(res.data);
         });
     };

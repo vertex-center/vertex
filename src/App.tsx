@@ -14,7 +14,6 @@ import SettingsAbout from "./pages/SettingsAbout/SettingsAbout";
 import SettingsUpdates from "./pages/SettingsUpdates/SettingsUpdates";
 import BayDetailsDocker from "./pages/BayDetailsDocker/BayDetailsDocker";
 import BayDetailsSettings from "./pages/BayDetailsSettings/BayDetailsSettings";
-import BayDetailsStatus from "./pages/BayDetailsStatus/BayDetailsStatus";
 import Store from "./pages/Store/Store";
 import Dock from "./components/Dock/Dock";
 import BayDetailsUpdate from "./pages/BayDetailsUpdate/BayDetailsUpdate";
@@ -56,10 +55,6 @@ function App() {
                             <Route
                                 path="/infrastructure/:uuid/logs"
                                 element={<BayDetailsLogs />}
-                            />
-                            <Route
-                                path="/infrastructure/:uuid/status"
-                                element={<BayDetailsStatus />}
                             />
                             <Route
                                 path="/infrastructure/:uuid/environment"

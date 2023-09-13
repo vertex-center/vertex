@@ -1,6 +1,5 @@
 import { Fragment } from "react";
 import { Title } from "../../components/Text/Text";
-import { getAbout } from "../../backend/backend";
 import Loading from "../../components/Loading/Loading";
 import Symbol from "../../components/Symbol/Symbol";
 
@@ -8,6 +7,7 @@ import styles from "./SettingsAbout.module.sass";
 import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import { useFetch } from "../../hooks/useFetch";
 import { About } from "../../models/about";
+import { api } from "../../backend/backend";
 
 type ItemProps = {
     symbol: string;
@@ -33,7 +33,7 @@ function Item(props: ItemProps) {
 }
 
 export default function SettingsAbout() {
-    const { data: about, loading, error } = useFetch<About>(getAbout);
+    const { data: about, loading, error } = useFetch<About>(api.about.get);
 
     return (
         <Fragment>

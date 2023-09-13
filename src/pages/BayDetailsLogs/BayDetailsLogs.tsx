@@ -7,7 +7,7 @@ import {
     unregisterSSEEvent,
 } from "../../backend/sse";
 import { useParams } from "react-router-dom";
-import { getLatestLogs } from "../../backend/backend";
+import { api } from "../../backend/backend";
 import { Title } from "../../components/Text/Text";
 import styles from "./BayDetailsLogs.module.sass";
 
@@ -17,7 +17,8 @@ export default function BayDetailsLogs() {
     const [logs, setLogs] = useState<LogLine[]>([]);
 
     useEffect(() => {
-        getLatestLogs(uuid)
+        api.instance.logs
+            .get(uuid)
             .then((res) => setLogs(res.data))
             .catch(console.error);
     }, []);

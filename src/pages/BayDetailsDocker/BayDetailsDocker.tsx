@@ -5,16 +5,13 @@ import styles from "./BayDetailsDocker.module.sass";
 import { useParams } from "react-router-dom";
 import Loading from "../../components/Loading/Loading";
 import useInstance from "../../hooks/useInstance";
-import {
-    getInstanceDockerContainerInfo,
-    recreateDockerContainer,
-} from "../../backend/backend";
 import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import Spacer from "../../components/Spacer/Spacer";
 import Button from "../../components/Button/Button";
 import { Error } from "../../components/Error/Error";
 import { useFetch } from "../../hooks/useFetch";
 import { DockerContainerInfo } from "../../models/docker";
+import { api } from "../../backend/backend";
 
 export default function BayDetailsDocker() {
     const { uuid } = useParams();
@@ -22,9 +19,7 @@ export default function BayDetailsDocker() {
     const { instance } = useInstance(uuid);
 
     const { data: containerInfo, reload: reloadContainerInfo } =
-        useFetch<DockerContainerInfo>(() =>
-            getInstanceDockerContainerInfo(uuid)
-        );
+        useFetch<DockerContainerInfo>(() => api.instance.docker.get(uuid));
 
     const [recreatingContainer, setRecreatingContainer] = useState(false);
     const [recreatingContainerError, setRecreatingContainerError] = useState();
@@ -40,7 +35,8 @@ export default function BayDetailsDocker() {
         setRecreatingContainer(true);
         setRecreatingContainerError(undefined);
 
-        recreateDockerContainer(uuid)
+        api.instance.docker
+            .recreate(uuid)
             .then(() => {
                 reloadContainerInfo().then();
             })

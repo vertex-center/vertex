@@ -4,11 +4,7 @@ import ProxyRedirect from "../../components/ProxyRedirect/ProxyRedirect";
 import { Horizontal } from "../../components/Layouts/Layouts";
 import Button from "../../components/Button/Button";
 import { useFetch } from "../../hooks/useFetch";
-import {
-    addProxyRedirect,
-    getProxyRedirects,
-    removeProxyRedirect,
-} from "../../backend/backend";
+import { api } from "../../backend/backend";
 import Popup from "../../components/Popup/Popup";
 import React, { useState } from "react";
 import Input from "../../components/Input/Input";
@@ -17,8 +13,9 @@ import Spacer from "../../components/Spacer/Spacer";
 type Props = {};
 
 export default function ReverseProxy(props: Props) {
-    const { data: redirects, reload } =
-        useFetch<ProxyRedirects>(getProxyRedirects);
+    const { data: redirects, reload } = useFetch<ProxyRedirects>(
+        api.proxy.redirects.get
+    );
 
     const [showNewRedirectPopup, setShowNewRedirectPopup] = useState(false);
 
@@ -32,14 +29,15 @@ export default function ReverseProxy(props: Props) {
     const closeNewRedirectPopup = () => setShowNewRedirectPopup(false);
 
     const addNewRedirection = () => {
-        addProxyRedirect(source, target)
+        api.proxy.redirects
+            .add(source, target)
             .then(reload)
             .catch(console.error)
             .finally(closeNewRedirectPopup);
     };
 
     const onDelete = (uuid: string) => {
-        removeProxyRedirect(uuid).then(reload).catch(console.error);
+        api.proxy.redirects.delete(uuid).then(reload).catch(console.error);
     };
 
     return (

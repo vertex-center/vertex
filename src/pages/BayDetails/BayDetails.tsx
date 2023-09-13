@@ -1,10 +1,6 @@
 import Bay from "../../components/Bay/Bay";
 import { useEffect, useState } from "react";
-import {
-    deleteInstance,
-    startInstance,
-    stopInstance,
-} from "../../backend/backend";
+import { api } from "../../backend/backend";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 
 import styles from "./BayDetails.module.sass";
@@ -60,16 +56,17 @@ export default function BayDetails() {
 
     const toggleInstance = async (uuid: string) => {
         if (instance.status === "off" || instance.status === "error") {
-            await startInstance(uuid);
+            await api.instance.start(uuid);
         } else {
-            await stopInstance(uuid);
+            await api.instance.stop(uuid);
         }
     };
 
     const onDeleteInstance = () => {
         setDeleting(true);
         setError(undefined);
-        deleteInstance(uuid)
+        api.instance
+            .delete(uuid)
             .then(() => {
                 navigate("/infrastructure");
             })
