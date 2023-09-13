@@ -56,6 +56,7 @@ export default function BayDetailsHome() {
                             // @ts-ignore
                             let url = new URL(window.apiURL);
                             url.port = port;
+                            url.pathname = u.home ?? "";
 
                             return (
                                 <a
