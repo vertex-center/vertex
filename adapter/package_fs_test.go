@@ -17,7 +17,7 @@ type PackageAdapterTestSuite struct {
 	adapter PackageFSAdapter
 }
 
-func TestPackageRepositoryTestSuite(t *testing.T) {
+func TestPackageAdapterTestSuite(t *testing.T) {
 	suite.Run(t, new(PackageAdapterTestSuite))
 }
 

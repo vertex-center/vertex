@@ -16,7 +16,7 @@ type PackageTestSuite struct {
 	adapter MockPackageAdapter
 }
 
-func TestEventInMemoryRepositoryTestSuite(t *testing.T) {
+func TestEventInMemoryAdapterTestSuite(t *testing.T) {
 	suite.Run(t, new(PackageTestSuite))
 }
 

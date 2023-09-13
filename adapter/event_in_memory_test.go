@@ -15,7 +15,7 @@ type EventInMemoryAdapterTestSuite struct {
 	adapter EventInMemoryAdapter
 }
 
-func TestEventInMemoryRepositoryTestSuite(t *testing.T) {
+func TestEventInMemoryAdapterTestSuite(t *testing.T) {
 	suite.Run(t, new(EventInMemoryAdapterTestSuite))
 }
 
