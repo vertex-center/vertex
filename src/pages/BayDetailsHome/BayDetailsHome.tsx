@@ -42,18 +42,24 @@ export default function BayDetailsHome() {
         <Fragment>
             <Title className={styles.title}>Home</Title>
             <nav className={styles.nav}>
-                {instance?.environment &&
-                    instance?.environment
-                        .filter((e) => e.type === "port")
-                        .map((e) => {
-                            console.log(instance.env);
-                            const port = instance.env[e.name] ?? e.default;
+                {instance?.urls &&
+                    instance?.urls
+                        .filter((u) => u.kind === "client")
+                        .map((u) => {
+                            const portEnvName = instance?.environment
+                                ?.filter((e) => e.type === "port")
+                                ?.find((e) => e.default === u.port).name;
+
+                            const port = instance?.env[portEnvName] ?? u.port;
                             const disabled = instance.status !== "running";
-                            const href = `http://localhost:${port}`;
+
+                            // @ts-ignore
+                            let url = new URL(window.apiURL);
+                            url.port = port;
 
                             return (
                                 <a
-                                    href={href}
+                                    href={url.href}
                                     target="_blank"
                                     rel="noreferrer"
                                     className={classNames({
@@ -69,7 +75,7 @@ export default function BayDetailsHome() {
                                         <Spacer />
                                         <Symbol name="open_in_new" />
                                     </Horizontal>
-                                    <div>http://localhost:{port}</div>
+                                    <div>{url.href}</div>
                                 </a>
                             );
                         })}

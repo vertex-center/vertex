@@ -12,6 +12,7 @@ export type EnvVariable = {
 export type URL = {
     name: string;
     port: string;
+    home?: string;
     ping?: string;
     kind: string;
 };
