@@ -21,7 +21,7 @@ export default function SettingsTheme(props: Props) {
     return (
         <Fragment>
             <Title>Theme</Title>
-            <Vertical gap={8}>
+            <Vertical gap={6}>
                 {themes.map((t) => (
                     <Button
                         onClick={() => setTheme(t.key)}
