@@ -6,12 +6,8 @@ import { NavLink } from "react-router-dom";
 import { HTMLProps, PropsWithChildren } from "react";
 import { Text } from "../Text/Text";
 
-export function SidebarTitle({ children }: PropsWithChildren) {
+function SidebarTitle({ children }: PropsWithChildren) {
     return <Text className={styles.title}>{children}</Text>;
-}
-
-export function SidebarSeparator() {
-    return <div className={styles.separator} />;
 }
 
 type ItemProps = {
@@ -58,6 +54,21 @@ export function SidebarItem(props: ItemProps) {
         >
             {content}
         </NavLink>
+    );
+}
+
+type GroupProps = PropsWithChildren<{
+    title?: string;
+}>;
+
+export function SidebarGroup(props: GroupProps) {
+    const { title, children } = props;
+
+    return (
+        <div className={styles.group}>
+            {title && <SidebarTitle>{title}</SidebarTitle>}
+            {children}
+        </div>
     );
 }
 

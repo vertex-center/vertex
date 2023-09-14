@@ -13,9 +13,8 @@ import {
 } from "../../backend/sse";
 import Spacer from "../../components/Spacer/Spacer";
 import Sidebar, {
+    SidebarGroup,
     SidebarItem,
-    SidebarSeparator,
-    SidebarTitle,
 } from "../../components/Sidebar/Sidebar";
 import Popup from "../../components/Popup/Popup";
 import { BigTitle, Text, Title } from "../../components/Text/Text";
@@ -100,61 +99,57 @@ export default function BayDetails() {
             </div>
             <Horizontal className={styles.content}>
                 <Sidebar>
-                    <SidebarItem
-                        to={`/infrastructure/${uuid}/`}
-                        symbol="home"
-                        name="Home"
-                    />
-                    <SidebarSeparator />
-                    <SidebarTitle>Analyze</SidebarTitle>
-                    <SidebarItem
-                        to={`/infrastructure/${uuid}/logs`}
-                        symbol="terminal"
-                        name="Logs"
-                    />
-                    {instance?.install_method === "docker" && (
+                    <SidebarGroup>
                         <SidebarItem
-                            to={`/infrastructure/${uuid}/docker`}
-                            symbol={<SiDocker size={20} />}
-                            name="Docker"
+                            to={`/infrastructure/${uuid}/`}
+                            symbol="home"
+                            name="Home"
                         />
-                    )}
-                    {/* Uptime status is disabled for now */}
-                    {/*<SidebarItem*/}
-                    {/*    to={`/bay/${uuid}/status`}*/}
-                    {/*    symbol="vital_signs"*/}
-                    {/*    name="Status"*/}
-                    {/*/>*/}
-                    <SidebarSeparator />
-                    <SidebarTitle>Manage</SidebarTitle>
-                    <SidebarItem
-                        to={`/infrastructure/${uuid}/environment`}
-                        symbol="tune"
-                        name="Environment"
-                    />
-                    {instance?.install_method !== "docker" && (
+                    </SidebarGroup>
+                    <SidebarGroup title="Analyze">
                         <SidebarItem
-                            to={`/infrastructure/${uuid}/dependencies`}
-                            symbol="widgets"
-                            name="Dependencies"
+                            to={`/infrastructure/${uuid}/logs`}
+                            symbol="terminal"
+                            name="Logs"
                         />
-                    )}
-                    <SidebarItem
-                        to={`/infrastructure/${uuid}/update`}
-                        symbol="update"
-                        name="Update"
-                    />
-                    <SidebarItem
-                        to={`/infrastructure/${uuid}/settings`}
-                        symbol="settings"
-                        name="Settings"
-                    />
-                    <SidebarItem
-                        onClick={() => setShowDeletePopup(true)}
-                        symbol="delete"
-                        name="Delete"
-                        red
-                    />
+                        {instance?.install_method === "docker" && (
+                            <SidebarItem
+                                to={`/infrastructure/${uuid}/docker`}
+                                symbol={<SiDocker size={20} />}
+                                name="Docker"
+                            />
+                        )}
+                    </SidebarGroup>
+                    <SidebarGroup title="Manage">
+                        <SidebarItem
+                            to={`/infrastructure/${uuid}/environment`}
+                            symbol="tune"
+                            name="Environment"
+                        />
+                        {instance?.install_method !== "docker" && (
+                            <SidebarItem
+                                to={`/infrastructure/${uuid}/dependencies`}
+                                symbol="widgets"
+                                name="Dependencies"
+                            />
+                        )}
+                        <SidebarItem
+                            to={`/infrastructure/${uuid}/update`}
+                            symbol="update"
+                            name="Update"
+                        />
+                        <SidebarItem
+                            to={`/infrastructure/${uuid}/settings`}
+                            symbol="settings"
+                            name="Settings"
+                        />
+                        <SidebarItem
+                            onClick={() => setShowDeletePopup(true)}
+                            symbol="delete"
+                            name="Delete"
+                            red
+                        />
+                    </SidebarGroup>
                 </Sidebar>
                 <div className={styles.side}>
                     <Outlet />

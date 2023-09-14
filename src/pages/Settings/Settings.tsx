@@ -1,7 +1,6 @@
 import Sidebar, {
+    SidebarGroup,
     SidebarItem,
-    SidebarSeparator,
-    SidebarTitle,
 } from "../../components/Sidebar/Sidebar";
 
 import styles from "./Settings.module.sass";
@@ -17,29 +16,30 @@ export default function Settings() {
             </div>
             <div className={styles.content}>
                 <Sidebar>
-                    <SidebarTitle>Settings</SidebarTitle>
-                    <SidebarItem
-                        to="/settings/theme"
-                        symbol="palette"
-                        name="Theme"
-                    />
-                    <SidebarSeparator />
-                    <SidebarTitle>Administration</SidebarTitle>
-                    <SidebarItem
-                        to="/settings/notifications"
-                        symbol="notifications"
-                        name="Notifications"
-                    />
-                    <SidebarItem
-                        to="/settings/updates"
-                        symbol="update"
-                        name="Updates"
-                    />
-                    <SidebarItem
-                        to="/settings/about"
-                        symbol="info"
-                        name="About"
-                    />
+                    <SidebarGroup title="Settings">
+                        <SidebarItem
+                            to="/settings/theme"
+                            symbol="palette"
+                            name="Theme"
+                        />
+                    </SidebarGroup>
+                    <SidebarGroup title="Administration">
+                        <SidebarItem
+                            to="/settings/notifications"
+                            symbol="notifications"
+                            name="Notifications"
+                        />
+                        <SidebarItem
+                            to="/settings/updates"
+                            symbol="update"
+                            name="Updates"
+                        />
+                        <SidebarItem
+                            to="/settings/about"
+                            symbol="info"
+                            name="About"
+                        />
+                    </SidebarGroup>
                 </Sidebar>
                 <div className={styles.side}>
                     <Outlet />
