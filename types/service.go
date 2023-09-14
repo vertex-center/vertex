@@ -19,6 +19,12 @@ type Service struct {
 	// Description describes the service in a few words.
 	Description string `yaml:"description" json:"description"`
 
+	// Color is the main color of the service.
+	Color *string `yaml:"color,omitempty" json:"color,omitempty"`
+
+	// Icon is the icon link of the service, located in ./live/services/icons/.
+	Icon *string `yaml:"icon,omitempty" json:"icon,omitempty"`
+
 	// Features describes some features of the service to help Vertex.
 	Features *Features `yaml:"features,omitempty" json:"features,omitempty"`
 

@@ -12,6 +12,7 @@ import (
 func addServicesRoutes(r *gin.RouterGroup) {
 	r.GET("/available", handleServicesAvailable)
 	r.POST("/install", handleServiceInstall)
+	r.Static("/icons", "./live/services/icons")
 }
 
 // handleServicesAvailable handles the retrieval of all available services.
