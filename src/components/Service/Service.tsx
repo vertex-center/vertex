@@ -25,10 +25,25 @@ export default function Service(props: Props) {
         installedCountText = `Installed in ${installedCount} instances`;
     }
 
+    // @ts-ignore
+    const iconURL = new URL(window.apiURL);
+    iconURL.pathname = `/api/services/icons/${service?.icon}`;
+
     return (
         <Horizontal className={styles.service} gap={16} alignItems="center">
             <div className={styles.logo}>
-                <Symbol name="extension" />
+                {service?.icon ? (
+                    <span
+                        style={{
+                            maskImage: `url(${iconURL.href})`,
+                            backgroundColor: service?.color,
+                            width: 24,
+                            height: 24,
+                        }}
+                    />
+                ) : (
+                    <Symbol name="extension" style={{ opacity: 0.8 }} />
+                )}
             </div>
             <Vertical gap={6}>
                 <div>{service?.name}</div>

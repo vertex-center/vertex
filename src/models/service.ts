@@ -44,6 +44,8 @@ export type Service = {
     name: string;
     repository: string;
     description: string;
+    color?: string;
+    icon?: string;
     environment: EnvVariable[];
     urls?: URL[];
     methods?: ServiceMethods;
