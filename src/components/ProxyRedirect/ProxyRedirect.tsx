@@ -19,11 +19,19 @@ export default function ProxyRedirect(props: Props) {
                 [styles.enabled]: enabled,
             })}
         >
-            <div className={styles.url}>{source}</div>
-            <div className={styles.line} />
-            <Symbol className={styles.arrow} name="double_arrow" />
-            <div className={styles.line} />
-            <div className={styles.url}>{target}</div>
+            <div className={styles.wrapper}>
+                <div className={styles.url}>
+                    <Symbol name="link" />
+                    {source}
+                </div>
+                <div className={styles.line} />
+                <Symbol className={styles.arrow} name="double_arrow" />
+                <div className={styles.line} />
+                <div className={styles.url}>
+                    <Symbol name="subdirectory_arrow_right" />
+                    {target}
+                </div>
+            </div>
             <div className={styles.delete} onClick={onDelete}>
                 <Symbol name="close" />
             </div>
