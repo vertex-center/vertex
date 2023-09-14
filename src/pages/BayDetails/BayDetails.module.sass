@@ -15,8 +15,14 @@
     gap: 20px
     margin: 20px 50px
 
+    @include dimensions.extra-small-or-less
+        margin: 20px 40px
+
 .bay
     padding: 0 20px 10px
+
+    @include dimensions.extra-small-or-less
+        padding: 0 10px 10px
 
 .content
     display: flex

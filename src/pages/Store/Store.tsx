@@ -225,11 +225,15 @@ export default function Store() {
     return (
         <Fragment>
             <div className={styles.page}>
-                <Horizontal gap={10} alignItems="center">
+                <Horizontal
+                    className={styles.title}
+                    gap={10}
+                    alignItems="center"
+                >
                     <BigTitle>Marketplace</BigTitle>
                 </Horizontal>
                 {<Error error={error} />}
-                <Vertical>
+                <Vertical className={styles.content}>
                     {services?.map((service) => (
                         <Service
                             key={service.id}

@@ -1,5 +1,15 @@
-.page
+@use '../../styles/dimensions'
+
+.title
+    margin: 20px 50px
+
+    @include dimensions.extra-small-or-less
+        margin: 20px 40px
+
+.content
     display: flex
     flex-direction: column
-    margin: 20px 50px
-    gap: 20px
+    margin: 0 50px
+
+    @include dimensions.extra-small-or-less
+        margin: 0 40px
