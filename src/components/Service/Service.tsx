@@ -2,9 +2,7 @@ import { Service as ServiceModel } from "../../models/service";
 
 import styles from "./Service.module.sass";
 import { Caption } from "../Text/Text";
-import { Horizontal, Vertical } from "../Layouts/Layouts";
 import Symbol from "../Symbol/Symbol";
-import Spacer from "../Spacer/Spacer";
 import Button from "../Button/Button";
 import Progress from "../Progress";
 
@@ -30,7 +28,7 @@ export default function Service(props: Props) {
     iconURL.pathname = `/api/services/icons/${service?.icon}`;
 
     return (
-        <Horizontal className={styles.service} gap={16} alignItems="center">
+        <div className={styles.service}>
             <div className={styles.logo}>
                 {service?.icon ? (
                     <span
@@ -45,18 +43,23 @@ export default function Service(props: Props) {
                     <Symbol name="extension" style={{ opacity: 0.8 }} />
                 )}
             </div>
-            <Vertical gap={6}>
+            <div className={styles.info}>
                 <div>{service?.name}</div>
                 <Caption>{service?.description}</Caption>
-            </Vertical>
-            <Spacer />
-            {installedCountText && <Caption>{installedCountText}</Caption>}
+            </div>
+            {installedCountText && (
+                <Caption className={styles.count}>{installedCountText}</Caption>
+            )}
             {downloading && <Progress infinite />}
             {!downloading && (
-                <Button rightSymbol="add" onClick={onInstall}>
+                <Button
+                    className={styles.add}
+                    rightSymbol="add"
+                    onClick={onInstall}
+                >
                     New instance
                 </Button>
             )}
-        </Horizontal>
+        </div>
     );
 }

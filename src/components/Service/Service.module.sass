@@ -3,18 +3,44 @@
 
 $border: 1px solid colors.$bg-secondary
 
+
 .service
+    display: flex
+    flex-direction: row
+    align-items: center
+    gap: 15px
     padding: 15px 0
     border-bottom: $border
+    position: relative
 
     &:first-child
         border-top: $border
 
+    @media (max-width: 1000px)
+        flex-direction: column
+        align-items: flex-start
+
 .logo
-    height: 48px
-    width: 48px
+    min-height: 48px
+    min-width: 48px
+    max-height: 48px
+    max-width: 48px
     background-color: colors.$bg-secondary
     display: flex
     align-items: center
     justify-content: center
     border-radius: dimensions.$border-radius-lg
+
+.info
+    display: flex
+    flex-direction: column
+    gap: 8px
+    flex-grow: 1
+
+.count
+    white-space: nowrap
+
+.add
+    @media (max-width: 1000px)
+        position: absolute
+        right: 0
