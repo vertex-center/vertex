@@ -2,7 +2,7 @@ import styles from "./Sidebar.module.sass";
 import { Horizontal } from "../Layouts/Layouts";
 import Symbol from "../Symbol/Symbol";
 import classNames from "classnames";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { HTMLProps, PropsWithChildren } from "react";
 import { Text } from "../Text/Text";
 
@@ -72,8 +72,25 @@ export function SidebarGroup(props: GroupProps) {
     );
 }
 
-type Props = HTMLProps<HTMLDivElement>;
+type Props = HTMLProps<HTMLDivElement> & {
+    root: string;
+};
 
-export default function Sidebar({ children }: Props) {
-    return <nav className={styles.navbar}>{children}</nav>;
+export default function Sidebar(props: Props) {
+    const { children, root } = props;
+
+    const location = useLocation();
+
+    return (
+        <nav
+            className={classNames({
+                [styles.navbar]: true,
+                [styles.navbarWithItemSelected]:
+                    !location.pathname.endsWith(root) &&
+                    !location.pathname.endsWith(root + "/"),
+            })}
+        >
+            {children}
+        </nav>
+    );
 }

@@ -8,21 +8,11 @@
     flex-grow: 1
     align-items: stretch
 
-.title
-    display: flex
-    flex-direction: row
-    align-items: center
-    gap: 20px
-    margin: 20px 50px
-
-    @include dimensions.extra-small-or-less
-        margin: 20px 40px
-
 .bay
-    padding: 0 20px 10px
+    padding: 10px 20px 10px
 
     @include dimensions.extra-small-or-less
-        padding: 0 10px 10px
+        padding: 10px 10px 10px
 
 .content
     display: flex
@@ -38,7 +28,10 @@
     gap: 20px
     width: 100%
     padding: 20px 0
-    max-height: calc(100vh - 380px)
+    max-height: calc(100vh - 320px)
 
     & > *
         margin: 0 20px
+
+        @include dimensions.extra-small-or-less
+            margin: 0 10px

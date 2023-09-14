@@ -17,13 +17,12 @@ import Sidebar, {
     SidebarItem,
 } from "../../components/Sidebar/Sidebar";
 import Popup from "../../components/Popup/Popup";
-import { BigTitle, Text, Title } from "../../components/Text/Text";
+import { Text, Title } from "../../components/Text/Text";
 import Button from "../../components/Button/Button";
 import Progress from "../../components/Progress";
 import { SiDocker } from "@icons-pack/react-simple-icons";
 import useInstance from "../../hooks/useInstance";
 import { Error } from "../../components/Error/Error";
-import BackButton from "../../components/BackButton/BackButton";
 
 export default function BayDetails() {
     const { uuid } = useParams();
@@ -81,10 +80,6 @@ export default function BayDetails() {
 
     return (
         <div className={styles.details}>
-            <div className={styles.title}>
-                <BackButton to="/infrastructure" />
-                <BigTitle>{instance?.name}</BigTitle>
-            </div>
             <div className={styles.bay}>
                 <Bay
                     instances={[
@@ -98,10 +93,10 @@ export default function BayDetails() {
                 />
             </div>
             <Horizontal className={styles.content}>
-                <Sidebar>
+                <Sidebar root={`/infrastructure/${uuid}`}>
                     <SidebarGroup>
                         <SidebarItem
-                            to={`/infrastructure/${uuid}/`}
+                            to={`/infrastructure/${uuid}/home`}
                             symbol="home"
                             name="Home"
                         />

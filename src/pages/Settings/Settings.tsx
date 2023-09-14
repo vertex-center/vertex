@@ -15,7 +15,7 @@ export default function Settings() {
                 <BigTitle>Settings</BigTitle>
             </div>
             <div className={styles.content}>
-                <Sidebar>
+                <Sidebar root="/settings">
                     <SidebarGroup title="Settings">
                         <SidebarItem
                             to="/settings/theme"

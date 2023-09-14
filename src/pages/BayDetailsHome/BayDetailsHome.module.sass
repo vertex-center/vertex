@@ -5,10 +5,19 @@
 .title
     margin: 0 40px
 
+    @include dimensions.extra-small-or-less
+        margin: 0 30px
+
 .nav
     display: grid
     grid-template-columns: repeat(3, 1fr)
     gap: 10px
+
+    @include dimensions.large-or-less
+        grid-template-columns: repeat(2, 1fr)
+
+    @include dimensions.medium-or-less
+        grid-template-columns: 1fr
 
     &Item
         display: flex

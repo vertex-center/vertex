@@ -40,7 +40,7 @@ export default function BayDetailsHome() {
 
     return (
         <Fragment>
-            <Title className={styles.title}>Home</Title>
+            <Title className={styles.title}>URLs</Title>
             <nav className={styles.nav}>
                 {instance?.urls &&
                     instance?.urls

@@ -45,7 +45,7 @@ function App() {
                             element={<BayDetails />}
                         >
                             <Route
-                                path="/infrastructure/:uuid/"
+                                path="/infrastructure/:uuid/home"
                                 element={<BayDetailsHome />}
                             />
                             <Route

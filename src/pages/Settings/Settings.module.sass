@@ -4,17 +4,17 @@
     margin: 20px 50px
 
     @include dimensions.extra-small-or-less
-        margin: 20px 40px
+        margin: 20px 30px
 
 .content
     display: flex
     flex-direction: row
     flex-grow: 1
     align-items: stretch
-    margin-left: 20px
+    margin-left: 10px
 
     @include dimensions.extra-small-or-less
-        margin-left: 10px
+        margin-left: 0
 
 .side
     display: flex
@@ -25,4 +25,7 @@
     padding: 32px 0
 
     & > *
-        margin: 0 24px
+        margin: 0 40px
+
+        @include dimensions.extra-small-or-less
+            margin: 0 30px

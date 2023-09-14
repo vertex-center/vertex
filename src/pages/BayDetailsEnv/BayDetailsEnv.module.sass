@@ -1,2 +1,7 @@
+@use '../../styles/dimensions'
+
 .title, .saved
     margin: 0 40px
+
+    @include dimensions.extra-small-or-less
+        margin: 0 30px
