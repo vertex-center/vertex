@@ -1,15 +1,13 @@
 @use "../../styles/colors"
 @use "../../styles/dimensions"
 
-$threshold-vertical: 900px
-
 .redirect
     display: flex
     flex-direction: row
     align-items: center
     gap: 6px
 
-    @media (max-width: $threshold-vertical)
+    @include dimensions.medium-or-less
         align-items: stretch
 
 .wrapper
@@ -19,7 +17,7 @@ $threshold-vertical: 900px
     gap: 6px
     flex-grow: 1
 
-    @media (max-width: $threshold-vertical)
+    @include dimensions.medium-or-less
         flex-direction: column
         align-items: center
         gap: 2px
@@ -41,7 +39,7 @@ $threshold-vertical: 900px
     & > *:first-child
         display: none
 
-    @media (max-width: $threshold-vertical)
+    @include dimensions.medium-or-less
         width: 100%
         padding: 25px
         gap: 15px
@@ -65,16 +63,16 @@ $threshold-vertical: 900px
     background-color: colors.$bg-tertiary
     margin: 0 10px
 
-    @media (max-width: 1300px)
+    @include dimensions.large-or-less
         width: 50px
 
-    @media (max-width: $threshold-vertical)
+    @include dimensions.medium-or-less
         display: none
 
 .arrow
     color: colors.$bg-tertiary
 
-    @media (max-width: $threshold-vertical)
+    @include dimensions.medium-or-less
         display: none
 
 .enabled
@@ -97,6 +95,6 @@ $threshold-vertical: 900px
     &:hover
         background-color: colors.$bg-secondary-hover
 
-    @media (max-width: $threshold-vertical)
+    @include dimensions.medium-or-less
         height: auto
         width: 60px

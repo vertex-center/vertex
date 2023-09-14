@@ -16,7 +16,7 @@ $border: 1px solid colors.$bg-secondary
     &:first-child
         border-top: $border
 
-    @media (max-width: 1000px)
+    @include dimensions.medium-or-less
         flex-direction: column
         align-items: flex-start
 
@@ -41,6 +41,6 @@ $border: 1px solid colors.$bg-secondary
     white-space: nowrap
 
 .add
-    @media (max-width: 1000px)
+    @include dimensions.medium-or-less
         position: absolute
         right: 0
