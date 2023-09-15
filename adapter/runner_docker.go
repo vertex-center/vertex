@@ -6,11 +6,9 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"os"
 	"os/user"
 	"path"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	dockertypes "github.com/docker/docker/api/types"
@@ -129,52 +127,13 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, onLog func(msg stri
 
 		// binds
 		if instance.Methods.Docker.Volumes != nil {
-			currentUser, err := user.Current()
-			if err != nil {
-				return err
-			}
-			uidString := currentUser.Uid
-			gidString := currentUser.Gid
-
-			uid, err := strconv.Atoi(uidString)
-			if err != nil {
-				return err
-			}
-			gid, err := strconv.Atoi(gidString)
-			if err != nil {
-				return err
-			}
-
-			volumesPath := path.Join(instancePath, "volumes")
-
-			err = os.MkdirAll(volumesPath, os.ModePerm)
-			if err != nil {
-				return err
-			}
-
-			err = os.Chown(volumesPath, uid, gid)
-			if err != nil {
-				return err
-			}
-
 			for source, target := range *instance.Methods.Docker.Volumes {
 				if !strings.HasPrefix(source, "/") {
 					source, err = filepath.Abs(path.Join(instancePath, "volumes", source))
-					if err != nil {
-						return err
-					}
 				}
-
-				err = os.MkdirAll(source, os.ModePerm)
 				if err != nil {
 					return err
 				}
-
-				err = os.Chown(source, uid, gid)
-				if err != nil {
-					return err
-				}
-
 				options.binds = append(options.binds, source+":"+target)
 			}
 		}
@@ -198,10 +157,10 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, onLog func(msg stri
 		}
 
 		if instance.Methods.Docker.Dockerfile != nil {
-			id, err = a.createContainer(instancePath, options)
+			id, err = a.createContainer(options)
 		} else if instance.Methods.Docker.Image != nil {
 			options.imageName = *instance.Methods.Docker.Image
-			id, err = a.createContainer(instancePath, options)
+			id, err = a.createContainer(options)
 		}
 		if err != nil {
 			return err
@@ -421,7 +380,7 @@ type createContainerOptions struct {
 	sysctls       map[string]string
 }
 
-func (a RunnerDockerAdapter) createContainer(instancePath string, options createContainerOptions) (string, error) {
+func (a RunnerDockerAdapter) createContainer(options createContainerOptions) (string, error) {
 	config := container.Config{
 		Image:        options.imageName,
 		ExposedPorts: options.exposedPorts,
