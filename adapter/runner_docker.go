@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"os/user"
 	"path"
 	"path/filepath"
 	"strings"
@@ -84,6 +85,14 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, onLog func(msg stri
 			vlog.String("container_name", containerName),
 		)
 
+		userOption := ""
+		currentUser, err := user.Current()
+		if err != nil {
+			log.Error(err)
+		} else {
+			userOption = currentUser.Uid + ":" + currentUser.Gid
+		}
+
 		options := createContainerOptions{
 			imageName:     imageName,
 			containerName: containerName,
@@ -91,6 +100,7 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, onLog func(msg stri
 			portBindings:  nat.PortMap{},
 			binds:         []string{},
 			env:           []string{},
+			user:          userOption,
 			capAdd:        []string{},
 		}
 
@@ -365,6 +375,7 @@ type createContainerOptions struct {
 	portBindings  nat.PortMap
 	binds         []string
 	env           []string
+	user          string
 	capAdd        []string
 	sysctls       map[string]string
 }
@@ -377,6 +388,7 @@ func (a RunnerDockerAdapter) createContainer(options createContainerOptions) (st
 		Tty:          true,
 		AttachStdout: true,
 		AttachStderr: true,
+		User:         options.user,
 	}
 
 	hostConfig := container.HostConfig{
