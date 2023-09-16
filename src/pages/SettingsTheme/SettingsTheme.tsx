@@ -1,10 +1,10 @@
-import { Fragment, useContext } from "react";
+import { useContext } from "react";
 import Button from "../../components/Button/Button";
 import { Vertical } from "../../components/Layouts/Layouts";
 import { Title } from "../../components/Text/Text";
 import { ThemeContext } from "../../main";
 
-type Props = {};
+import styles from "./SettingsTheme.module.sass";
 
 const themes = [
     { key: "vertex-dark", label: "Vertex Dark" },
@@ -15,12 +15,12 @@ const themes = [
     { key: "catppuccin-latte", label: "Catppuccin Latte" },
 ];
 
-export default function SettingsTheme(props: Props) {
+export default function SettingsTheme() {
     const { theme, setTheme } = useContext(ThemeContext);
 
     return (
-        <Fragment>
-            <Title>Theme</Title>
+        <Vertical gap={20}>
+            <Title className={styles.title}>Theme</Title>
             <Vertical gap={6}>
                 {themes.map((t) => (
                     <Button
@@ -32,6 +32,6 @@ export default function SettingsTheme(props: Props) {
                     </Button>
                 ))}
             </Vertical>
-        </Fragment>
+        </Vertical>
     );
 }

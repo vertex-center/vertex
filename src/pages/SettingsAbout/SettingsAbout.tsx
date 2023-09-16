@@ -1,43 +1,22 @@
 import { Fragment } from "react";
 import { Title } from "../../components/Text/Text";
 import Loading from "../../components/Loading/Loading";
-import Symbol from "../../components/Symbol/Symbol";
-
-import styles from "./SettingsAbout.module.sass";
-import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import { useFetch } from "../../hooks/useFetch";
 import { About } from "../../models/about";
 import { api } from "../../backend/backend";
+import {
+    KeyValueGroup,
+    KeyValueInfo,
+} from "../../components/KeyValueInfo/KeyValueInfo";
 
-type ItemProps = {
-    symbol: string;
-    label: string;
-    value?: string;
-};
-
-function Item(props: ItemProps) {
-    const { symbol, label } = props;
-    let { value } = props;
-
-    if (!value) value = "N/A";
-
-    return (
-        <Horizontal gap={12} alignItems="center">
-            <div className={styles.item}>
-                <Symbol name={symbol} />
-            </div>
-            <div className={styles.item}>{label}:</div>
-            <div className={styles.item}>{value}</div>
-        </Horizontal>
-    );
-}
+import styles from "./SettingsAbout.module.sass";
+import { Vertical } from "../../components/Layouts/Layouts";
 
 export default function SettingsAbout() {
     const { data: about, loading, error } = useFetch<About>(api.about.get);
 
     return (
         <Fragment>
-            {/*{error && <Error error={error} />}*/}
             {loading && !error && (
                 <Fragment>
                     <Title>Vertex</Title>
@@ -45,35 +24,54 @@ export default function SettingsAbout() {
                 </Fragment>
             )}
             {!loading && (
-                <Fragment>
-                    <Title>Vertex</Title>
-                    <Vertical gap={4} style={{ marginBottom: 16 }}>
-                        <Item
-                            symbol="tag"
-                            label="Version"
-                            value={about?.version}
-                        />
-                        <Item
-                            symbol="commit"
-                            label="Commit"
-                            value={about?.commit}
-                        />
-                        <Item
-                            symbol="calendar_month"
-                            label="Release date"
-                            value={about?.date}
-                        />
+                <Vertical gap={30}>
+                    <Vertical gap={20}>
+                        <Title className={styles.title}>Vertex</Title>
+                        <KeyValueGroup>
+                            <KeyValueInfo
+                                name="Version"
+                                type="code"
+                                symbol="tag"
+                            >
+                                {about?.version}
+                            </KeyValueInfo>
+                            <KeyValueInfo
+                                name="Commit"
+                                type="code"
+                                symbol="commit"
+                            >
+                                {about?.commit}
+                            </KeyValueInfo>
+                            <KeyValueInfo
+                                name="Release date"
+                                type="code"
+                                symbol="calendar_month"
+                            >
+                                {about?.date}
+                            </KeyValueInfo>
+                        </KeyValueGroup>
                     </Vertical>
-                    <Title>Platform</Title>
-                    <Vertical gap={4}>
-                        <Item symbol="computer" label="OS" value={about?.os} />
-                        <Item
-                            symbol="memory"
-                            label="Arch"
-                            value={about?.arch}
-                        />
+
+                    <Vertical gap={20}>
+                        <Title className={styles.title}>Platform</Title>
+                        <KeyValueGroup>
+                            <KeyValueInfo
+                                name="OS"
+                                type="code"
+                                symbol="computer"
+                            >
+                                {about?.os}
+                            </KeyValueInfo>
+                            <KeyValueInfo
+                                name="Architecture"
+                                type="code"
+                                symbol="memory"
+                            >
+                                {about?.arch}
+                            </KeyValueInfo>
+                        </KeyValueGroup>
                     </Vertical>
-                </Fragment>
+                </Vertical>
             )}
         </Fragment>
     );

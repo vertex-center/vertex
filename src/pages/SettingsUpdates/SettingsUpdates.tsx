@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Caption, Text, Title } from "../../components/Text/Text";
 import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import Button from "../../components/Button/Button";
@@ -12,6 +12,8 @@ import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import { Updates } from "../../models/update";
 import { api } from "../../backend/backend";
+
+import styles from "./SettingsUpdates.module.sass";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -101,8 +103,8 @@ export default function SettingsUpdates() {
     };
 
     return (
-        <Fragment>
-            <Title>Updates</Title>
+        <Vertical gap={20}>
+            <Title className={styles.title}>Updates</Title>
             {!isLoading && (
                 <Horizontal alignItems="center" gap={20}>
                     <Button onClick={() => reload(true)} rightSymbol="refresh">
@@ -151,6 +153,6 @@ export default function SettingsUpdates() {
                     </Button>
                 </Horizontal>
             </Popup>
-        </Fragment>
+        </Vertical>
     );
 }
