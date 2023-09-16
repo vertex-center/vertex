@@ -6,12 +6,15 @@ import { useParams } from "react-router-dom";
 import Loading from "../../components/Loading/Loading";
 import useInstance from "../../hooks/useInstance";
 import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
-import Spacer from "../../components/Spacer/Spacer";
 import Button from "../../components/Button/Button";
 import { Error } from "../../components/Error/Error";
 import { useFetch } from "../../hooks/useFetch";
 import { DockerContainerInfo } from "../../models/docker";
 import { api } from "../../backend/backend";
+import {
+    KeyValueGroup,
+    KeyValueInfo,
+} from "../../components/KeyValueInfo/KeyValueInfo";
 
 export default function BayDetailsDocker() {
     const { uuid } = useParams();
@@ -65,33 +68,25 @@ export default function BayDetailsDocker() {
 
             <Vertical gap={20}>
                 <Title className={styles.title}>Details</Title>
-                <Vertical className={styles.content} gap={8}>
-                    <Horizontal gap={12} alignItems="center">
-                        <Text>Container ID</Text>
-                        <Spacer />
-                        <code>{containerInfo?.id}</code>
-                    </Horizontal>
-                    <Horizontal gap={12} alignItems="center">
-                        <Text>Container Name</Text>
-                        <Spacer />
-                        <code>{containerInfo?.name}</code>
-                    </Horizontal>
-                    <Horizontal gap={12} alignItems="center">
-                        <Text>Image</Text>
-                        <Spacer />
-                        <code>{containerInfo?.image}</code>
-                    </Horizontal>
-                    <Horizontal gap={12} alignItems="center">
-                        <Text>Platform</Text>
-                        <Spacer />
-                        <code>{containerInfo?.platform}</code>
-                    </Horizontal>
-                </Vertical>
+                <KeyValueGroup>
+                    <KeyValueInfo name="Container ID" type="code">
+                        {containerInfo?.id}
+                    </KeyValueInfo>
+                    <KeyValueInfo name="Container Name" type="code">
+                        {containerInfo?.name}
+                    </KeyValueInfo>
+                    <KeyValueInfo name="Image" type="code">
+                        {containerInfo?.image}
+                    </KeyValueInfo>
+                    <KeyValueInfo name="Platform" type="code">
+                        {containerInfo?.platform}
+                    </KeyValueInfo>
+                </KeyValueGroup>
             </Vertical>
 
             <Vertical gap={20}>
                 <Title className={styles.title}>Actions</Title>
-                <Vertical className={styles.content} gap={8}>
+                <Vertical gap={8}>
                     <Horizontal alignItems="center" gap={20}>
                         <Button
                             leftSymbol="restart_alt"
