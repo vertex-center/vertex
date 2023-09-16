@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { Text, Title } from "../../components/Text/Text";
+import { Title } from "../../components/Text/Text";
 
 import styles from "./BayDetailsDocker.module.sass";
 import { useParams } from "react-router-dom";
-import Loading from "../../components/Loading/Loading";
-import useInstance from "../../hooks/useInstance";
 import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import Button from "../../components/Button/Button";
 import { Error } from "../../components/Error/Error";
@@ -20,20 +18,11 @@ import byteSize from "byte-size";
 export default function BayDetailsDocker() {
     const { uuid } = useParams();
 
-    const { instance } = useInstance(uuid);
-
-    const { data: containerInfo, reload: reloadContainerInfo } =
+    const { data: info, reload: reloadContainerInfo } =
         useFetch<DockerContainerInfo>(() => api.instance.docker.get(uuid));
 
     const [recreatingContainer, setRecreatingContainer] = useState(false);
     const [recreatingContainerError, setRecreatingContainerError] = useState();
-
-    let label;
-    if (instance?.install_method === "docker") {
-        label = <span className={styles.enabled}>enabled</span>;
-    } else {
-        label = <span className={styles.disabled}>disabled</span>;
-    }
 
     const recreateContainer = () => {
         setRecreatingContainer(true);
@@ -56,28 +45,18 @@ export default function BayDetailsDocker() {
     };
 
     return (
-        <Vertical gap={40}>
-            <Vertical gap={20}>
-                <Title className={styles.title}>Docker</Title>
-                {!instance && <Loading />}
-                {instance && (
-                    <Text className={styles.content}>
-                        Docker is {label} for this instance.
-                    </Text>
-                )}
-            </Vertical>
-
+        <Vertical gap={30}>
             <Vertical gap={20}>
                 <Title className={styles.title}>Container</Title>
                 <KeyValueGroup>
                     <KeyValueInfo name="ID" type="code">
-                        {containerInfo?.container?.id}
+                        {info?.container?.id}
                     </KeyValueInfo>
                     <KeyValueInfo name="Container Name" type="code">
-                        {containerInfo?.container?.name}
+                        {info?.container?.name}
                     </KeyValueInfo>
                     <KeyValueInfo name="Platform" type="code">
-                        {containerInfo?.container?.platform}
+                        {info?.container?.platform}
                     </KeyValueInfo>
                 </KeyValueGroup>
             </Vertical>
@@ -86,24 +65,22 @@ export default function BayDetailsDocker() {
                 <Title className={styles.title}>Image</Title>
                 <KeyValueGroup>
                     <KeyValueInfo name="ID" type="code">
-                        {containerInfo?.image?.id}
+                        {info?.image?.id}
                     </KeyValueInfo>
                     <KeyValueInfo name="Architecture" type="code">
-                        {containerInfo?.image?.architecture}
+                        {info?.image?.architecture}
                     </KeyValueInfo>
                     <KeyValueInfo name="OS" type="code">
-                        {containerInfo?.image?.os}
+                        {info?.image?.os}
                     </KeyValueInfo>
                     <KeyValueInfo name="Size" type="code">
-                        {byteSize(containerInfo?.image?.size).toString()}
+                        {byteSize(info?.image?.size).toString()}
                     </KeyValueInfo>
                     <KeyValueInfo name="Virtual size" type="code">
-                        {byteSize(
-                            containerInfo?.image?.virtual_size
-                        ).toString()}
+                        {byteSize(info?.image?.virtual_size).toString()}
                     </KeyValueInfo>
                     <KeyValueInfo name="Tags" type="code">
-                        {containerInfo?.image?.tags?.join(", ")}
+                        {info?.image?.tags?.join(", ")}
                     </KeyValueInfo>
                 </KeyValueGroup>
             </Vertical>
