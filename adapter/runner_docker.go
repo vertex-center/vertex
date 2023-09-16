@@ -193,11 +193,25 @@ func (a RunnerDockerAdapter) Info(instance types.Instance) (map[string]any, erro
 		return nil, err
 	}
 
+	imageInfo, _, err := a.cli.ImageInspectWithRaw(context.Background(), info.Image)
+	if err != nil {
+		return nil, err
+	}
+
 	return map[string]any{
-		"id":       info.ID,
-		"name":     info.Name,
-		"image":    info.Image,
-		"platform": info.Platform,
+		"container": map[string]any{
+			"id":       info.ID,
+			"name":     info.Name,
+			"platform": info.Platform,
+		},
+		"image": map[string]any{
+			"id":           imageInfo.ID,
+			"architecture": imageInfo.Architecture,
+			"os":           imageInfo.Os,
+			"size":         imageInfo.Size,
+			"virtual_size": imageInfo.VirtualSize,
+			"tags":         imageInfo.RepoTags,
+		},
 	}, nil
 }
 
