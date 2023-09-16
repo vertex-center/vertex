@@ -1,6 +1,15 @@
 export type DockerContainerInfo = {
-    id: string;
-    name: string;
-    image: string;
-    platform: string;
+    container?: {
+        id?: string;
+        name?: string;
+        platform?: string;
+    };
+    image?: {
+        id?: string;
+        architecture?: string;
+        os?: string;
+        size?: number;
+        virtual_size?: number;
+        tags?: string[];
+    };
 };

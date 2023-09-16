@@ -15,6 +15,7 @@ import {
     KeyValueGroup,
     KeyValueInfo,
 } from "../../components/KeyValueInfo/KeyValueInfo";
+import byteSize from "byte-size";
 
 export default function BayDetailsDocker() {
     const { uuid } = useParams();
@@ -67,19 +68,42 @@ export default function BayDetailsDocker() {
             </Vertical>
 
             <Vertical gap={20}>
-                <Title className={styles.title}>Details</Title>
+                <Title className={styles.title}>Container</Title>
                 <KeyValueGroup>
-                    <KeyValueInfo name="Container ID" type="code">
-                        {containerInfo?.id}
+                    <KeyValueInfo name="ID" type="code">
+                        {containerInfo?.container?.id}
                     </KeyValueInfo>
                     <KeyValueInfo name="Container Name" type="code">
-                        {containerInfo?.name}
-                    </KeyValueInfo>
-                    <KeyValueInfo name="Image" type="code">
-                        {containerInfo?.image}
+                        {containerInfo?.container?.name}
                     </KeyValueInfo>
                     <KeyValueInfo name="Platform" type="code">
-                        {containerInfo?.platform}
+                        {containerInfo?.container?.platform}
+                    </KeyValueInfo>
+                </KeyValueGroup>
+            </Vertical>
+
+            <Vertical gap={20}>
+                <Title className={styles.title}>Image</Title>
+                <KeyValueGroup>
+                    <KeyValueInfo name="ID" type="code">
+                        {containerInfo?.image?.id}
+                    </KeyValueInfo>
+                    <KeyValueInfo name="Architecture" type="code">
+                        {containerInfo?.image?.architecture}
+                    </KeyValueInfo>
+                    <KeyValueInfo name="OS" type="code">
+                        {containerInfo?.image?.os}
+                    </KeyValueInfo>
+                    <KeyValueInfo name="Size" type="code">
+                        {byteSize(containerInfo?.image?.size).toString()}
+                    </KeyValueInfo>
+                    <KeyValueInfo name="Virtual size" type="code">
+                        {byteSize(
+                            containerInfo?.image?.virtual_size
+                        ).toString()}
+                    </KeyValueInfo>
+                    <KeyValueInfo name="Tags" type="code">
+                        {containerInfo?.image?.tags?.join(", ")}
                     </KeyValueInfo>
                 </KeyValueGroup>
             </Vertical>
