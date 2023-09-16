@@ -49,13 +49,17 @@ export default function BayDetailsDocker() {
             <Vertical gap={20}>
                 <Title className={styles.title}>Container</Title>
                 <KeyValueGroup>
-                    <KeyValueInfo name="ID" type="code">
+                    <KeyValueInfo name="ID" type="code" symbol="tag">
                         {info?.container?.id}
                     </KeyValueInfo>
-                    <KeyValueInfo name="Container Name" type="code">
+                    <KeyValueInfo
+                        name="Container Name"
+                        type="code"
+                        symbol="badge"
+                    >
                         {info?.container?.name}
                     </KeyValueInfo>
-                    <KeyValueInfo name="Platform" type="code">
+                    <KeyValueInfo name="Platform" type="code" symbol="computer">
                         {info?.container?.platform}
                     </KeyValueInfo>
                 </KeyValueGroup>
@@ -64,22 +68,30 @@ export default function BayDetailsDocker() {
             <Vertical gap={20}>
                 <Title className={styles.title}>Image</Title>
                 <KeyValueGroup>
-                    <KeyValueInfo name="ID" type="code">
+                    <KeyValueInfo name="ID" type="code" symbol="tag">
                         {info?.image?.id}
                     </KeyValueInfo>
-                    <KeyValueInfo name="Architecture" type="code">
+                    <KeyValueInfo
+                        name="Architecture"
+                        type="code"
+                        symbol="memory"
+                    >
                         {info?.image?.architecture}
                     </KeyValueInfo>
-                    <KeyValueInfo name="OS" type="code">
+                    <KeyValueInfo name="OS" type="code" symbol="computer">
                         {info?.image?.os}
                     </KeyValueInfo>
-                    <KeyValueInfo name="Size" type="code">
+                    <KeyValueInfo name="Size" type="code" symbol="straighten">
                         {byteSize(info?.image?.size).toString()}
                     </KeyValueInfo>
-                    <KeyValueInfo name="Virtual size" type="code">
+                    <KeyValueInfo
+                        name="Virtual size"
+                        type="code"
+                        symbol="straighten"
+                    >
                         {byteSize(info?.image?.virtual_size).toString()}
                     </KeyValueInfo>
-                    <KeyValueInfo name="Tags" type="code">
+                    <KeyValueInfo name="Tags" type="code" symbol="sell">
                         {info?.image?.tags?.join(", ")}
                     </KeyValueInfo>
                 </KeyValueGroup>

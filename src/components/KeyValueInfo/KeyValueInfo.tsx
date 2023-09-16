@@ -2,6 +2,7 @@ import { PropsWithChildren } from "react";
 
 import styles from "./KeyValueInfo.module.sass";
 import Spacer from "../Spacer/Spacer";
+import Symbol from "../Symbol/Symbol";
 
 export function KeyValueGroup(props: PropsWithChildren) {
     const { children } = props;
@@ -13,10 +14,11 @@ type Type = "code";
 type Props = PropsWithChildren<{
     name: string;
     type?: Type;
+    symbol?: string;
 }>;
 
 export function KeyValueInfo(props: Props) {
-    const { name, type, children } = props;
+    const { name, type, symbol, children } = props;
 
     let content = children;
     if (type === "code") {
@@ -25,7 +27,10 @@ export function KeyValueInfo(props: Props) {
 
     return (
         <div className={styles.info}>
-            <div className={styles.name}>{name}</div>
+            <div className={styles.key}>
+                {symbol && <Symbol className={styles.symbol} name={symbol} />}
+                <div className={styles.name}>{name}</div>
+            </div>
             <Spacer />
             {content}
         </div>

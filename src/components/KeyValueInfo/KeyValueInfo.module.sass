@@ -1,5 +1,6 @@
 @use "../../styles/colors"
 @use "../../styles/dimensions"
+@use "../../styles/fonts"
 
 .group
     display: flex
@@ -27,9 +28,19 @@
         word-wrap: anywhere
         white-space: normal
 
-.name
+.key
+    display: flex
+    flex-direction: row
+    align-items: center
+    gap: 5px
     font-weight: bold
     color: colors.$fg-secondary
+
+.symbol
+    font-size: fonts.$font-size-normal
+
+.name
+    font-weight: bold
 
 .code
     font-size: 0.9em
