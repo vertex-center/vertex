@@ -1,5 +1,10 @@
 import axios from "axios";
-import { InstallMethod, Instance, Instances } from "../models/instance";
+import {
+    InstallMethod,
+    Instance,
+    InstanceQuery,
+    Instances,
+} from "../models/instance";
 import { Env, Service } from "../models/service";
 import { Dependencies } from "../models/dependency";
 import { DockerContainerInfo } from "../models/docker";
@@ -23,6 +28,8 @@ export const api = {
 
     instances: {
         get: () => server.get<Instances>("/instances"),
+        search: (query: InstanceQuery) =>
+            server.get<Instances>("/instances/search", { params: query }),
         checkForUpdates: () => server.get<Instances>("/instances/checkupdates"),
     },
 

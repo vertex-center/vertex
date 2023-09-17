@@ -2,9 +2,9 @@ import { Service as ServiceModel } from "../../models/service";
 
 import styles from "./Service.module.sass";
 import { Caption } from "../Text/Text";
-import Symbol from "../Symbol/Symbol";
 import Button from "../Button/Button";
 import Progress from "../Progress";
+import ServiceLogo from "../ServiceLogo/ServiceLogo";
 
 type Props = {
     service: ServiceModel;
@@ -23,25 +23,10 @@ export default function Service(props: Props) {
         installedCountText = `Installed in ${installedCount} instances`;
     }
 
-    // @ts-ignore
-    const iconURL = new URL(window.apiURL);
-    iconURL.pathname = `/api/services/icons/${service?.icon}`;
-
     return (
         <div className={styles.service}>
             <div className={styles.logo}>
-                {service?.icon ? (
-                    <span
-                        style={{
-                            maskImage: `url(${iconURL.href})`,
-                            backgroundColor: service?.color,
-                            width: 24,
-                            height: 24,
-                        }}
-                    />
-                ) : (
-                    <Symbol name="extension" style={{ opacity: 0.8 }} />
-                )}
+                <ServiceLogo service={service} />
             </div>
             <div className={styles.info}>
                 <div>{service?.name}</div>

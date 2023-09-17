@@ -20,6 +20,7 @@ import BayDetailsUpdate from "./pages/BayDetailsUpdate/BayDetailsUpdate";
 import ReverseProxy from "./pages/ReverseProxy/ReverseProxy";
 import SettingsNotifications from "./pages/SettingsNotifications/SettingsNotifications";
 import Header from "./components/Header/Header";
+import BayDetailsDatabase from "./pages/BayDetailsDatabase/BayDetailsDatabase";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -59,6 +60,10 @@ function App() {
                             <Route
                                 path="/infrastructure/:uuid/environment"
                                 element={<BayDetailsEnv />}
+                            />
+                            <Route
+                                path="/infrastructure/:uuid/database"
+                                element={<BayDetailsDatabase />}
                             />
                             <Route
                                 path="/infrastructure/:uuid/dependencies"
