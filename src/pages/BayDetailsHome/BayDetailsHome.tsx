@@ -42,15 +42,16 @@ export default function BayDetailsHome() {
         <Fragment>
             <Title className={styles.title}>URLs</Title>
             <nav className={styles.nav}>
-                {instance?.urls &&
-                    instance?.urls
+                {instance?.service?.urls &&
+                    instance?.service?.urls
                         .filter((u) => u.kind === "client")
                         .map((u) => {
-                            const portEnvName = instance?.environment
+                            const portEnvName = instance?.service?.environment
                                 ?.filter((e) => e.type === "port")
                                 ?.find((e) => e.default === u.port).name;
 
-                            const port = instance?.env[portEnvName] ?? u.port;
+                            const port =
+                                instance?.environment[portEnvName] ?? u.port;
                             const disabled = instance.status !== "running";
 
                             // @ts-ignore

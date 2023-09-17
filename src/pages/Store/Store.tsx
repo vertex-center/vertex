@@ -246,7 +246,8 @@ export default function Store() {
                                 instances === undefined
                                     ? undefined
                                     : Object.values(instances)?.filter(
-                                          ({ id }) => id === service.id
+                                          ({ service: s }) =>
+                                              s.id === service.id
                                       )?.length
                             }
                         />

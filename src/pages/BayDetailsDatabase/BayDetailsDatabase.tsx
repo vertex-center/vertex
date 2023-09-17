@@ -13,15 +13,13 @@ import { useState } from "react";
 import { Instance } from "../../models/instance";
 import Progress from "../../components/Progress";
 
-type Props = {};
-
-export default function BayDetailsDatabase(props: Props) {
+export default function BayDetailsDatabase() {
     const { uuid } = useParams();
     const { instance } = useInstance(uuid);
 
     const [database, setDatabase] = useState<Instance>();
 
-    const db = database?.features?.databases?.[0];
+    const db = database?.service?.features?.databases?.[0];
 
     return (
         <Vertical gap={20}>
@@ -33,7 +31,7 @@ export default function BayDetailsDatabase(props: Props) {
                         onChange={setDatabase}
                         instance={database}
                         query={{
-                            features: instance?.databases?.[0]?.types,
+                            features: instance?.service?.databases?.[0]?.types,
                         }}
                     />
                 )}

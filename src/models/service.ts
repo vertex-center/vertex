@@ -39,6 +39,22 @@ export type ServiceMethods = {
     docker?: ServiceMethodDocker;
 };
 
+export type Features = {
+    databases: DatabaseFeature[];
+};
+
+export type DatabaseFeature = {
+    type?: string;
+    port?: string;
+    username?: string;
+    password?: string;
+};
+
+export type DatabaseEnvironment = {
+    types: string[];
+    names: string[];
+};
+
 export type Service = {
     id: string;
     name: string;
@@ -46,7 +62,9 @@ export type Service = {
     description: string;
     color?: string;
     icon?: string;
+    features: Features;
     environment: EnvVariable[];
+    databases: DatabaseEnvironment[];
     urls?: URL[];
     methods?: ServiceMethods;
 };

@@ -84,7 +84,9 @@ export default function BayDetails() {
                 <Bay
                     instances={[
                         {
-                            name: instance?.display_name ?? instance?.name,
+                            name:
+                                instance?.display_name ??
+                                instance?.service?.name,
                             status: instance?.status,
                             onPower: () => toggleInstance(uuid),
                             method: instance?.install_method,
@@ -156,12 +158,13 @@ export default function BayDetails() {
                 </div>
                 <Popup show={showDeletePopup} onDismiss={dismissDeletePopup}>
                     <Title>
-                        Delete {instance?.display_name ?? instance?.name}?
+                        Delete{" "}
+                        {instance?.display_name ?? instance?.service?.name}?
                     </Title>
                     <Text>
                         Are you sure you want to delete{" "}
-                        {instance?.display_name ?? instance?.name}? All data
-                        will be permanently deleted.
+                        {instance?.display_name ?? instance?.service?.name}? All
+                        data will be permanently deleted.
                     </Text>
                     {deleting && <Progress infinite />}
                     {error && <Error error={error} />}

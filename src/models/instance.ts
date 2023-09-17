@@ -11,28 +11,11 @@ export type InstanceUpdate = {
     latest_version: string;
 };
 
-export type Features = {
-    databases: DatabaseFeature[];
-};
-
-export type DatabaseFeature = {
-    type?: string;
-    port?: string;
-    username?: string;
-    password?: string;
-};
-
-export type DatabaseEnvironment = {
-    types: string[];
-    names: string[];
-};
-
-export type Instance = Service & {
+export type Instance = {
+    service: Service;
     uuid: string;
     status: string;
-    features: Features;
-    env: { [key: string]: string };
-    databases: DatabaseEnvironment[];
+    environment: { [key: string]: string };
     install_method?: InstallMethod;
     launch_on_startup?: boolean;
     display_name?: string;

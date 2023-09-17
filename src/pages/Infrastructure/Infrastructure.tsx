@@ -22,12 +22,14 @@ export default function Infrastructure() {
     const [installedGrouped, setInstalledGrouped] = useState<Instance[][]>([]);
 
     useEffect(() => {
-        const ids = new Set<string>(Object.values(installed).map((i) => i.id));
+        const ids = new Set<string>(
+            Object.values(installed).map((i) => i.service?.id)
+        );
         const final = [];
         ids.forEach((id) => {
             final.push(
                 Object.entries(installed)
-                    .filter(([_, i]) => i.id === id)
+                    .filter(([_, i]) => i.service?.id === id)
                     .map(([_, i]) => i)
             );
         });
@@ -105,7 +107,9 @@ export default function Infrastructure() {
                         <Bay
                             key={i}
                             instances={instances.map((instance, i) => ({
-                                name: instance?.display_name ?? instance.name,
+                                name:
+                                    instance?.display_name ??
+                                    instance?.service?.name,
                                 status: instance.status,
                                 count: instances.length > 1 ? i + 1 : undefined,
                                 to: `/infrastructure/${instance.uuid}/`,

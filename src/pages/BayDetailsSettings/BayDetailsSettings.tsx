@@ -32,7 +32,7 @@ export default function BayDetailsSettings(props: Props) {
     useEffect(() => {
         if (!instance) return;
         setLaunchOnStartup(instance?.launch_on_startup ?? true);
-        setDisplayName(instance?.display_name ?? instance?.name);
+        setDisplayName(instance?.display_name ?? instance?.service?.name);
     }, [instance]);
 
     const save = () => {
