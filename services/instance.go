@@ -17,7 +17,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
-	"gopkg.in/yaml.v2"
 )
 
 var (
@@ -177,15 +176,10 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 func (s *InstanceService) StartAll() {
 	var ids []uuid.UUID
 
-	// Select instances that should launch on startup
 	for _, i := range s.instanceAdapter.GetAll() {
-		launchOnStartup := i.InstanceSettings.LaunchOnStartup
-
-		if launchOnStartup != nil && !*launchOnStartup {
-			continue
+		if i.LaunchOnStartup() {
+			ids = append(ids, i.UUID)
 		}
-
-		ids = append(ids, i.UUID)
 	}
 
 	if len(ids) == 0 {
@@ -291,7 +285,8 @@ func (s *InstanceService) WriteEnv(uuid uuid.UUID, environment map[string]string
 		return err
 	}
 
-	return s.instanceAdapter.SaveEnv(i, environment)
+	i.Env = environment
+	return s.instanceAdapter.SaveEnv(i)
 }
 
 func (s *InstanceService) Install(serviceID string, method string) (*types.Instance, error) {
@@ -319,18 +314,12 @@ func (s *InstanceService) Install(serviceID string, method string) (*types.Insta
 		return nil, err
 	}
 
-	err = os.Mkdir(path.Join(dir, ".vertex"), os.ModePerm)
-	if err != nil {
-		return nil, err
+	tempInstance := &types.Instance{
+		UUID:    id,
+		Service: service,
 	}
 
-	serviceYaml, err := yaml.Marshal(service)
-	if err != nil {
-
-		return nil, err
-	}
-
-	err = os.WriteFile(path.Join(dir, ".vertex", "service.yml"), serviceYaml, os.ModePerm)
+	err = s.instanceAdapter.SaveService(tempInstance)
 	if err != nil {
 		return nil, err
 	}
@@ -352,17 +341,10 @@ func (s *InstanceService) Install(serviceID string, method string) (*types.Insta
 		return nil, err
 	}
 
-	env := map[string]string{}
-	for _, v := range instance.Service.Env {
-		env[v.Name] = v.Default
-	}
+	instance.ResetDefaultEnv()
 
-	err = s.instanceAdapter.SaveEnv(instance, env)
-	if err != nil {
-		return nil, err
-	}
-
-	return instance, nil
+	err = s.instanceAdapter.SaveEnv(instance)
+	return instance, err
 }
 
 func (s *InstanceService) CheckForUpdates() (map[uuid.UUID]*types.Instance, error) {
@@ -421,12 +403,12 @@ func (s *InstanceService) SetDatabases(id uuid.UUID, databases map[string]uuid.U
 
 // remapDatabaseEnv remaps the environment variables of an instance.
 func (s *InstanceService) remapDatabaseEnv(uuid uuid.UUID) error {
-	i, err := s.Get(uuid)
+	instance, err := s.Get(uuid)
 	if err != nil {
 		return err
 	}
 
-	for databaseID, databaseInstanceUUID := range i.Databases {
+	for databaseID, databaseInstanceUUID := range instance.Databases {
 		db, err := s.Get(databaseInstanceUUID)
 		if err != nil {
 			return err
@@ -441,24 +423,24 @@ func (s *InstanceService) remapDatabaseEnv(uuid uuid.UUID) error {
 		}
 
 		dbEnvNames := (*db.Service.Features.Databases)[0]
-		iEnvNames := i.Service.Databases[databaseID].Names
+		iEnvNames := instance.Service.Databases[databaseID].Names
 
-		i.Env[iEnvNames.Host] = host
-		i.Env[iEnvNames.Port] = db.Env[dbEnvNames.Port]
+		instance.Env[iEnvNames.Host] = host
+		instance.Env[iEnvNames.Port] = db.Env[dbEnvNames.Port]
 		if dbEnvNames.Username != nil {
-			i.Env[iEnvNames.Username] = db.Env[*dbEnvNames.Username]
+			instance.Env[iEnvNames.Username] = db.Env[*dbEnvNames.Username]
 		}
 		if dbEnvNames.Password != nil {
-			i.Env[iEnvNames.Password] = db.Env[*dbEnvNames.Password]
+			instance.Env[iEnvNames.Password] = db.Env[*dbEnvNames.Password]
 		}
 	}
 
-	err = s.instanceAdapter.SaveEnv(i, i.Env)
+	err = s.instanceAdapter.SaveEnv(instance)
 	if err != nil {
 		return err
 	}
 
-	return s.instanceAdapter.SaveSettings(i)
+	return s.instanceAdapter.SaveSettings(instance)
 }
 
 func (s *InstanceService) GetDockerContainerInfo(uuid uuid.UUID) (map[string]any, error) {
@@ -503,7 +485,7 @@ func (s *InstanceService) DownloadRelease(dir string, repo string) error {
 func (s *InstanceService) Symlink(path string, repo string) error {
 	p := strings.Split(repo, ":")[1]
 
-	_, err := s.instanceAdapter.ReadService(p)
+	_, err := s.instanceAdapter.LoadService(p)
 	if err != nil {
 		return fmt.Errorf("%s is not a compatible Vertex service", repo)
 	}
@@ -551,7 +533,7 @@ func (s *InstanceService) reload() {
 func (s *InstanceService) load(uuid uuid.UUID) error {
 	instancePath := s.instanceAdapter.GetPath(uuid)
 
-	service, err := s.instanceAdapter.ReadService(instancePath)
+	service, err := s.instanceAdapter.LoadService(instancePath)
 	if err != nil {
 		return err
 	}

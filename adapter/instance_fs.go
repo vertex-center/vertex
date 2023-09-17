@@ -17,6 +17,15 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type InstanceFilePath string
+
+const (
+	InstanceVertexPath   InstanceFilePath = ".vertex"
+	InstanceSettingsPath InstanceFilePath = ".vertex/instance_settings.json"
+	InstanceServicePath  InstanceFilePath = ".vertex/service.yml"
+	InstanceEnvPath      InstanceFilePath = ".env"
+)
+
 var (
 	ErrInstanceAlreadyExists = errors.New("instance already exists")
 	ErrContainerNotFound     = errors.New("container not found")
@@ -88,6 +97,10 @@ func (a *InstanceFSAdapter) GetPath(uuid uuid.UUID) string {
 	return path.Join(a.instancesPath, uuid.String())
 }
 
+func (a *InstanceFSAdapter) GetFilePath(uuid uuid.UUID, filepath InstanceFilePath) string {
+	return path.Join(a.GetPath(uuid), string(filepath))
+}
+
 func (a *InstanceFSAdapter) Delete(uuid uuid.UUID) error {
 	err := os.RemoveAll(a.GetPath(uuid))
 	if err != nil {
@@ -114,7 +127,7 @@ func (a *InstanceFSAdapter) Set(uuid uuid.UUID, instance types.Instance) error {
 }
 
 func (a *InstanceFSAdapter) SaveSettings(i *types.Instance) error {
-	settingsPath := path.Join(a.GetPath(i.UUID), ".vertex", "instance_settings.json")
+	settingsPath := a.GetFilePath(i.UUID, InstanceSettingsPath)
 
 	settingsBytes, err := json.MarshalIndent(i.InstanceSettings, "", "\t")
 	if err != nil {
@@ -130,11 +143,11 @@ func (a *InstanceFSAdapter) SaveSettings(i *types.Instance) error {
 }
 
 func (a *InstanceFSAdapter) LoadSettings(i *types.Instance) error {
-	settingsPath := path.Join(a.GetPath(i.UUID), ".vertex", "instance_settings.json")
-	settingsBytes, err := os.ReadFile(settingsPath)
+	settingsPath := a.GetFilePath(i.UUID, InstanceSettingsPath)
 
+	settingsBytes, err := os.ReadFile(settingsPath)
 	if errors.Is(err, os.ErrNotExist) {
-		log.Warn("instance_settings.json not found. using default.")
+		log.Warn("settings file not found. using default.")
 	} else if err != nil {
 		return err
 	} else {
@@ -147,10 +160,32 @@ func (a *InstanceFSAdapter) LoadSettings(i *types.Instance) error {
 	return nil
 }
 
-func (a *InstanceFSAdapter) ReadService(instancePath string) (types.Service, error) {
-	data, err := os.ReadFile(path.Join(instancePath, ".vertex", "service.yml"))
+func (a *InstanceFSAdapter) SaveService(instance *types.Instance) error {
+	dir := a.GetFilePath(instance.UUID, InstanceVertexPath)
+	servicePath := a.GetFilePath(instance.UUID, InstanceServicePath)
+
+	err := os.MkdirAll(dir, os.ModePerm)
+	if err != nil && !os.IsExist(err) {
+		return err
+	}
+
+	serviceBytes, err := yaml.Marshal(instance.Service)
 	if err != nil {
-		log.Warn("'.vertex/service.yml' file not found",
+		return err
+	}
+
+	err = os.WriteFile(servicePath, serviceBytes, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *InstanceFSAdapter) LoadService(instancePath string) (types.Service, error) {
+	data, err := os.ReadFile(path.Join(instancePath, string(InstanceServicePath)))
+	if err != nil {
+		log.Warn("file not found",
 			vlog.String("path", path.Dir(instancePath)),
 		)
 	}
@@ -160,30 +195,28 @@ func (a *InstanceFSAdapter) ReadService(instancePath string) (types.Service, err
 	return service, err
 }
 
-func (a *InstanceFSAdapter) SaveEnv(i *types.Instance, variables map[string]string) error {
-	filepath := path.Join(a.GetPath(i.UUID), ".env")
+func (a *InstanceFSAdapter) SaveEnv(i *types.Instance) error {
+	envPath := a.GetFilePath(i.UUID, InstanceEnvPath)
 
-	file, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE, os.ModePerm)
+	file, err := os.OpenFile(envPath, os.O_WRONLY|os.O_CREATE, os.ModePerm)
 	if err != nil {
 		return err
 	}
 
-	for key, value := range variables {
+	for key, value := range i.Env {
 		_, err := file.WriteString(strings.Join([]string{key, value}, "=") + "\n")
 		if err != nil {
 			return err
 		}
 	}
 
-	i.Env = variables
-
 	return nil
 }
 
 func (a *InstanceFSAdapter) LoadEnv(i *types.Instance) error {
-	filepath := path.Join(a.GetPath(i.UUID), ".env")
+	envPath := a.GetFilePath(i.UUID, InstanceEnvPath)
 
-	file, err := os.Open(filepath)
+	file, err := os.Open(envPath)
 	if os.IsNotExist(err) {
 		return nil
 	}

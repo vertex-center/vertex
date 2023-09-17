@@ -86,10 +86,11 @@ type InstanceAdapterPort interface {
 	SaveSettings(i *Instance) error
 	LoadSettings(i *Instance) error
 
-	SaveEnv(i *Instance, variables map[string]string) error
+	SaveEnv(i *Instance) error
 	LoadEnv(i *Instance) error
 
-	ReadService(instancePath string) (Service, error)
+	SaveService(i *Instance) error
+	LoadService(instancePath string) (Service, error)
 
 	Reload(func(uuid uuid.UUID))
 }
@@ -108,6 +109,21 @@ func (i *Instance) IsRunning() bool {
 
 func (i *Instance) IsDockerized() bool {
 	return i.InstanceSettings.InstallMethod != nil && *i.InstanceSettings.InstallMethod == InstanceInstallMethodDocker
+}
+
+func (i *Instance) LaunchOnStartup() bool {
+	launchOnStartup := i.InstanceSettings.LaunchOnStartup
+	if launchOnStartup != nil && !*launchOnStartup {
+		return false
+	}
+	return true
+}
+
+func (i *Instance) ResetDefaultEnv() {
+	i.Env = EnvVariables{}
+	for _, env := range i.Service.Env {
+		i.Env[env.Name] = env.Default
+	}
 }
 
 func (i *Instance) HasFeature(featureType string) bool {
