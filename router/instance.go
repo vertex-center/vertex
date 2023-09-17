@@ -413,7 +413,7 @@ func handleGetDependencies(c *gin.Context) {
 		return
 	}
 
-	if i.Methods.Script == nil {
+	if i.Service.Methods.Script == nil {
 		c.AbortWithStatusJSON(http.StatusNotFound, types.APIError{
 			Code:    "instance_doesnt_use_scripts",
 			Message: "this service doesn't use scripts, so it doesn't have dependencies",
@@ -423,8 +423,8 @@ func handleGetDependencies(c *gin.Context) {
 
 	var deps = map[string]types.Package{}
 
-	if i.Methods.Script.Dependencies != nil {
-		for name := range *i.Methods.Script.Dependencies {
+	if i.Service.Methods.Script.Dependencies != nil {
+		for name := range *i.Service.Methods.Script.Dependencies {
 			dep, err := packageService.GetByID(name)
 			if err != nil {
 				log.Error(err)

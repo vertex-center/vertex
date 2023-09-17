@@ -59,13 +59,14 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, onLog func(msg stri
 	setStatus(types.InstanceStatusBuilding)
 
 	instancePath := a.getPath(*instance)
+	service := instance.Service
 
 	// Build
 	var err error
-	if instance.Methods.Docker.Dockerfile != nil {
+	if service.Methods.Docker.Dockerfile != nil {
 		err = a.buildImageFromDockerfile(instancePath, imageName, onLog)
-	} else if instance.Methods.Docker.Image != nil {
-		err = a.buildImageFromName(*instance.Methods.Docker.Image, onLog)
+	} else if service.Methods.Docker.Image != nil {
+		err = a.buildImageFromName(*service.Methods.Docker.Image, onLog)
 	} else {
 		err = errors.New("no Docker methods found")
 	}
@@ -95,13 +96,13 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, onLog func(msg stri
 		}
 
 		// exposedPorts and portBindings
-		if instance.Methods.Docker.Ports != nil {
+		if service.Methods.Docker.Ports != nil {
 			var all []string
 
-			for in, out := range *instance.Methods.Docker.Ports {
-				for _, e := range instance.EnvDefinitions {
+			for in, out := range *service.Methods.Docker.Ports {
+				for _, e := range service.Env {
 					if e.Type == "port" && e.Default == out {
-						out = instance.EnvVariables[e.Name]
+						out = instance.Env[e.Name]
 						all = append(all, out+":"+in)
 						break
 					}
@@ -116,8 +117,8 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, onLog func(msg stri
 		}
 
 		// binds
-		if instance.Methods.Docker.Volumes != nil {
-			for source, target := range *instance.Methods.Docker.Volumes {
+		if service.Methods.Docker.Volumes != nil {
+			for source, target := range *service.Methods.Docker.Volumes {
 				if !strings.HasPrefix(source, "/") {
 					source, err = filepath.Abs(path.Join(instancePath, "volumes", source))
 				}
@@ -129,27 +130,27 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, onLog func(msg stri
 		}
 
 		// env
-		if instance.Methods.Docker.Environment != nil {
-			for in, out := range *instance.Methods.Docker.Environment {
-				value := instance.EnvVariables[out]
+		if service.Methods.Docker.Environment != nil {
+			for in, out := range *service.Methods.Docker.Environment {
+				value := instance.Env[out]
 				options.env = append(options.env, in+"="+value)
 			}
 		}
 
 		// capAdd
-		if instance.Methods.Docker.Capabilities != nil {
-			options.capAdd = *instance.Methods.Docker.Capabilities
+		if service.Methods.Docker.Capabilities != nil {
+			options.capAdd = *service.Methods.Docker.Capabilities
 		}
 
 		// sysctls
-		if instance.Methods.Docker.Sysctls != nil {
-			options.sysctls = *instance.Methods.Docker.Sysctls
+		if service.Methods.Docker.Sysctls != nil {
+			options.sysctls = *service.Methods.Docker.Sysctls
 		}
 
-		if instance.Methods.Docker.Dockerfile != nil {
+		if service.Methods.Docker.Dockerfile != nil {
 			id, err = a.createContainer(options)
-		} else if instance.Methods.Docker.Image != nil {
-			options.imageName = *instance.Methods.Docker.Image
+		} else if service.Methods.Docker.Image != nil {
+			options.imageName = *service.Methods.Docker.Image
 			id, err = a.createContainer(options)
 		}
 		if err != nil {
@@ -216,12 +217,14 @@ func (a RunnerDockerAdapter) Info(instance types.Instance) (map[string]any, erro
 }
 
 func (a RunnerDockerAdapter) CheckForUpdates(instance *types.Instance) error {
-	if instance.Methods.Docker.Image == nil {
+	service := instance.Service
+
+	if service.Methods.Docker.Image == nil {
 		// TODO: Support Dockerfile updates
 		return nil
 	}
 
-	imageName := *instance.Methods.Docker.Image
+	imageName := *service.Methods.Docker.Image
 
 	res, err := a.pullImage(imageName)
 	if err != nil {

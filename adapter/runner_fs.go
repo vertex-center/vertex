@@ -30,14 +30,16 @@ func (a RunnerFSAdapter) Delete(instance *types.Instance) error {
 }
 
 func (a RunnerFSAdapter) Start(instance *types.Instance, onLog func(msg string), onErr func(msg string), setStatus func(status string)) error {
+	service := instance.Service
+
 	if a.commands[instance.UUID] != nil {
 		log.Error(errors.New("runner already started"),
-			vlog.String("name", instance.Name),
+			vlog.String("name", service.Name),
 		)
 	}
 
 	dir := a.getPath(*instance)
-	executable := instance.Methods.Script.Filename
+	executable := service.Methods.Script.Filename
 	command := "./" + executable
 
 	_, err := os.Stat(path.Join(dir, executable))
@@ -103,7 +105,7 @@ func (a RunnerFSAdapter) Start(instance *types.Instance, onLog func(msg string),
 		err := cmd.Wait()
 		if err != nil {
 			log.Error(err,
-				vlog.String("name", instance.Service.Name),
+				vlog.String("name", service.Name),
 			)
 		}
 		setStatus(types.InstanceStatusOff)

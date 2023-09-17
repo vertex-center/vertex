@@ -42,12 +42,12 @@ type InstanceSettings struct {
 type EnvVariables map[string]string
 
 type Instance struct {
-	Service
 	InstanceSettings
 
-	UUID         uuid.UUID    `json:"uuid"`
-	Status       string       `json:"status"`
-	EnvVariables EnvVariables `json:"env"`
+	Service Service      `json:"service"`
+	UUID    uuid.UUID    `json:"uuid"`
+	Status  string       `json:"status"`
+	Env     EnvVariables `json:"environment,omitempty"`
 
 	Update *InstanceUpdate `json:"update,omitempty"`
 }
@@ -63,10 +63,10 @@ type InstanceUpdate struct {
 
 func NewInstance(id uuid.UUID, service Service) Instance {
 	return Instance{
-		Service:      service,
-		UUID:         id,
-		Status:       InstanceStatusOff,
-		EnvVariables: map[string]string{},
+		Service: service,
+		UUID:    id,
+		Status:  InstanceStatusOff,
+		Env:     map[string]string{},
 	}
 }
 
@@ -107,12 +107,12 @@ func (i *Instance) IsDockerized() bool {
 }
 
 func (i *Instance) HasFeature(featureType string) bool {
-	if i.Features == nil {
+	if i.Service.Features == nil {
 		return false
 	}
 
-	if i.Features.Databases != nil {
-		for _, db := range *i.Features.Databases {
+	if i.Service.Features.Databases != nil {
+		for _, db := range *i.Service.Features.Databases {
 			if db.Type == featureType {
 				return true
 			}

@@ -351,7 +351,7 @@ func (s *InstanceService) Install(serviceID string, method string) (*types.Insta
 	}
 
 	env := map[string]string{}
-	for _, v := range instance.EnvDefinitions {
+	for _, v := range instance.Service.Env {
 		env[v.Name] = v.Default
 	}
 

@@ -75,7 +75,7 @@ func (s *NotificationsService) sendStatus(instanceUUID uuid.UUID, status string)
 		return
 	}
 
-	var name = instance.Name
+	var name = instance.Service.Name
 	if instance.DisplayName != nil {
 		name = *instance.DisplayName
 	}

@@ -175,7 +175,7 @@ func (a *InstanceFSAdapter) SaveEnv(i *types.Instance, variables map[string]stri
 		}
 	}
 
-	i.EnvVariables = variables
+	i.Env = variables
 
 	return nil
 }
@@ -199,7 +199,7 @@ func (a *InstanceFSAdapter) LoadEnv(i *types.Instance) error {
 			return errors.New("failed to read .env")
 		}
 
-		i.EnvVariables[line[0]] = line[1]
+		i.Env[line[0]] = line[1]
 	}
 
 	return nil

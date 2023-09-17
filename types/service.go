@@ -28,8 +28,8 @@ type Service struct {
 	// Features describes some features of the service to help Vertex.
 	Features *Features `yaml:"features,omitempty" json:"features,omitempty"`
 
-	// EnvDefinitions defines all parameterizable environment variables.
-	EnvDefinitions []EnvDefinition `yaml:"environment,omitempty" json:"environment,omitempty"`
+	// Env defines all parameterizable environment variables.
+	Env []ServiceEnv `yaml:"environment,omitempty" json:"environment,omitempty"`
 
 	// Databases defines all databases used by the service.
 	Databases []DatabaseEnvironment `yaml:"databases,omitempty" json:"databases,omitempty"`
@@ -80,7 +80,7 @@ type Features struct {
 	Databases *[]DatabaseFeature `yaml:"databases" json:"databases"`
 }
 
-type EnvDefinition struct {
+type ServiceEnv struct {
 	// Type is the environment variable type.
 	// It can be: port, string, url.
 	Type string `yaml:"type" json:"type"`
