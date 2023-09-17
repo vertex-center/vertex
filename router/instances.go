@@ -27,7 +27,7 @@ func handleGetInstances(c *gin.Context) {
 func handleSearchInstances(c *gin.Context) {
 	query := types.InstanceQuery{}
 
-	features := c.QueryArray("features")
+	features := c.QueryArray("features[]")
 	if len(features) > 0 {
 		query.Features = features
 	}
