@@ -37,6 +37,10 @@ type InstanceSettings struct {
 
 	// DisplayName is a custom name for the instance.
 	DisplayName *string `json:"display_name,omitempty"`
+
+	// Database describes the databases used by the instance.
+	// The key is the database ID, and the value is the database instance UUID.
+	Databases map[string]uuid.UUID `json:"databases,omitempty"`
 }
 
 type EnvVariables map[string]string

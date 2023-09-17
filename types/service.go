@@ -32,7 +32,7 @@ type Service struct {
 	Env []ServiceEnv `yaml:"environment,omitempty" json:"environment,omitempty"`
 
 	// Databases defines all databases used by the service.
-	Databases []DatabaseEnvironment `yaml:"databases,omitempty" json:"databases,omitempty"`
+	Databases map[string]DatabaseEnvironment `yaml:"databases,omitempty" json:"databases,omitempty"`
 
 	// URLs defines all service urls.
 	URLs []URL `yaml:"urls,omitempty" json:"urls,omitempty"`
@@ -42,6 +42,9 @@ type Service struct {
 }
 
 type DatabaseEnvironment struct {
+	// DisplayName is a readable name for the user.
+	DisplayName string `yaml:"display_name" json:"display_name"`
+
 	// The database Types. Can be redis, postgres...
 	Types []string `yaml:"types" json:"types"`
 

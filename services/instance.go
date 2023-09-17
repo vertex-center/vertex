@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"path"
 	"strings"
@@ -11,6 +12,7 @@ import (
 	"github.com/antelman107/net-wait-go/wait"
 	"github.com/go-git/go-git/v5"
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
@@ -398,6 +400,64 @@ func (s *InstanceService) SetDisplayName(uuid uuid.UUID, value string) error {
 	}
 
 	i.InstanceSettings.DisplayName = &value
+	return s.instanceAdapter.SaveSettings(i)
+}
+
+func (s *InstanceService) SetDatabases(id uuid.UUID, databases map[string]uuid.UUID) error {
+	i, err := s.Get(id)
+	if err != nil {
+		return err
+	}
+
+	i.Databases = databases
+
+	err = s.remapDatabaseEnv(id)
+	if err != nil {
+		return err
+	}
+
+	return s.instanceAdapter.SaveSettings(i)
+}
+
+// remapDatabaseEnv remaps the environment variables of an instance.
+func (s *InstanceService) remapDatabaseEnv(uuid uuid.UUID) error {
+	i, err := s.Get(uuid)
+	if err != nil {
+		return err
+	}
+
+	for databaseID, databaseInstanceUUID := range i.Databases {
+		db, err := s.Get(databaseInstanceUUID)
+		if err != nil {
+			return err
+		}
+
+		host := config.Current.Host
+		if strings.Contains(host, ":") {
+			host, _, err = net.SplitHostPort(host)
+			if err != nil {
+				return err
+			}
+		}
+
+		dbEnvNames := (*db.Service.Features.Databases)[0]
+		iEnvNames := i.Service.Databases[databaseID].Names
+
+		i.Env[iEnvNames.Host] = host
+		i.Env[iEnvNames.Port] = db.Env[dbEnvNames.Port]
+		if dbEnvNames.Username != nil {
+			i.Env[iEnvNames.Username] = db.Env[*dbEnvNames.Username]
+		}
+		if dbEnvNames.Password != nil {
+			i.Env[iEnvNames.Password] = db.Env[*dbEnvNames.Password]
+		}
+	}
+
+	err = s.instanceAdapter.SaveEnv(i, i.Env)
+	if err != nil {
+		return err
+	}
+
 	return s.instanceAdapter.SaveSettings(i)
 }
 

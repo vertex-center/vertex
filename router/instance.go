@@ -134,8 +134,9 @@ func handleDeleteInstance(c *gin.Context) {
 }
 
 type handlePatchInstanceBody struct {
-	LaunchOnStartup *bool   `json:"launch_on_startup,omitempty"`
-	DisplayName     *string `json:"display_name,omitempty"`
+	LaunchOnStartup *bool                `json:"launch_on_startup,omitempty"`
+	DisplayName     *string              `json:"display_name,omitempty"`
+	Databases       map[string]uuid.UUID `json:"databases,omitempty"`
 }
 
 // handlePatchInstance updates the instance with the UUID in the URL.
@@ -191,6 +192,23 @@ func handlePatchInstance(c *gin.Context) {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
 				Code:    "failed_to_set_display_name",
 				Message: fmt.Sprintf("failed to set display name: %v", err),
+			})
+			return
+		}
+	}
+
+	if body.Databases != nil {
+		err = instanceService.SetDatabases(*uid, body.Databases)
+		if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
+			c.AbortWithStatusJSON(http.StatusNotFound, types.APIError{
+				Code:    "instance_not_found",
+				Message: fmt.Sprintf("instance %s not found", uid),
+			})
+			return
+		} else if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+				Code:    "failed_to_set_databases",
+				Message: fmt.Sprintf("failed to set databases: %v", err),
 			})
 			return
 		}
