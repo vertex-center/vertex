@@ -51,8 +51,9 @@ export type DatabaseFeature = {
 };
 
 export type DatabaseEnvironment = {
-    types: string[];
-    names: string[];
+    display_name: string;
+    types?: string[];
+    names?: { [name: string]: string };
 };
 
 export type Service = {
@@ -64,7 +65,7 @@ export type Service = {
     icon?: string;
     features: Features;
     environment: EnvVariable[];
-    databases: DatabaseEnvironment[];
+    databases: { [name: string]: DatabaseEnvironment };
     urls?: URL[];
     methods?: ServiceMethods;
 };

@@ -9,42 +9,73 @@ import {
 import useInstance from "../../hooks/useInstance";
 import { useParams } from "react-router-dom";
 import InstanceSelect from "../../components/Input/InstanceSelect";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Instance } from "../../models/instance";
 import Progress from "../../components/Progress";
+import Button from "../../components/Button/Button";
+import { api } from "../../backend/backend";
+import { DatabaseEnvironment } from "../../models/service";
 
-export default function BayDetailsDatabase() {
-    const { uuid } = useParams();
-    const { instance } = useInstance(uuid);
+type DatabaseProps = {
+    instance?: Instance;
+
+    dbID?: string;
+    dbDefinition?: DatabaseEnvironment;
+
+    onChange?: (name: string, dbUUID: string) => void;
+};
+
+function Database(props: DatabaseProps) {
+    const { instance, dbID, dbDefinition, onChange } = props;
 
     const [database, setDatabase] = useState<Instance>();
 
-    const db = database?.service?.features?.databases?.[0];
+    const env = database?.environment;
+
+    useEffect(() => {
+        const uuid = instance?.databases?.[dbID];
+        if (uuid === undefined) return;
+        api.instance
+            .get(uuid)
+            .then((res) => {
+                setDatabase(res.data);
+            })
+            .catch(console.error);
+    }, [instance]);
+
+    const onDatabaseChange = (instance: Instance) => {
+        setDatabase(instance);
+        onChange?.(dbID, instance?.uuid);
+    };
+
+    const port = env?.[database?.service?.features?.databases?.[0]?.port];
+    const username =
+        env?.[database?.service?.features?.databases?.[0]?.username];
 
     return (
         <Vertical gap={20}>
-            <Title className={styles.title}>Database</Title>
+            <Title className={styles.title}>{dbDefinition?.display_name}</Title>
             <Vertical gap={10}>
                 {!instance && <Progress infinite />}
                 {instance && (
                     <InstanceSelect
-                        onChange={setDatabase}
+                        onChange={onDatabaseChange}
                         instance={database}
                         query={{
-                            features: instance?.service?.databases?.[0]?.types,
+                            features: dbDefinition?.types,
                         }}
                     />
                 )}
-                {db && (
+                {database && (
                     <KeyValueGroup>
                         <KeyValueInfo name="Type" type="code">
-                            {db?.type}
+                            {database?.service?.features?.databases?.[0]?.type}
                         </KeyValueInfo>
                         <KeyValueInfo name="Port" type="code">
-                            {db?.port}
+                            {port}
                         </KeyValueInfo>
                         <KeyValueInfo name="Username" type="code">
-                            {db?.username}
+                            {username}
                         </KeyValueInfo>
                         <KeyValueInfo name="Password" type="code">
                             ***
@@ -52,6 +83,60 @@ export default function BayDetailsDatabase() {
                     </KeyValueGroup>
                 )}
             </Vertical>
+        </Vertical>
+    );
+}
+
+export default function BayDetailsDatabase() {
+    const { uuid } = useParams();
+    const { instance } = useInstance(uuid);
+
+    const [saved, setSaved] = useState<boolean>(undefined);
+    const [uploading, setUploading] = useState<boolean>(false);
+
+    const [databases, setDatabases] = useState<{ [name: string]: string }>();
+
+    const save = () => {
+        setUploading(true);
+        api.instance
+            .patch(uuid, { databases })
+            .then(() => setSaved(true))
+            .catch(console.error)
+            .finally(() => setUploading(false));
+    };
+
+    const onChange = (name: string, dbUUID: string) => {
+        console.log({ ...databases, [name]: dbUUID });
+        setDatabases((prev) => ({ ...prev, [name]: dbUUID }));
+        setSaved(false);
+    };
+
+    return (
+        <Vertical gap={20}>
+            {instance &&
+                Object.entries(instance?.service?.databases ?? {}).map(
+                    ([dbID, db]) => (
+                        <Database
+                            key={dbID}
+                            dbID={dbID}
+                            dbDefinition={db}
+                            instance={instance}
+                            onChange={onChange}
+                        />
+                    )
+                )}
+            <Button
+                primary
+                large
+                onClick={save}
+                rightSymbol="save"
+                loading={uploading}
+                disabled={saved || saved === undefined}
+            >
+                Save{" "}
+                {instance?.install_method === "docker" &&
+                    "+ Recreate container"}
+            </Button>
         </Vertical>
     );
 }

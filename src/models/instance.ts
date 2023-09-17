@@ -19,6 +19,7 @@ export type Instance = {
     install_method?: InstallMethod;
     launch_on_startup?: boolean;
     display_name?: string;
+    databases?: { [key: string]: string };
     update?: InstanceUpdate;
 };
 

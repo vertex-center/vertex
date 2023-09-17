@@ -130,11 +130,13 @@ export default function BayDetails() {
                                 name="Dependencies"
                             />
                         )}
-                        <SidebarItem
-                            to={`/infrastructure/${uuid}/database`}
-                            symbol="database"
-                            name="Database"
-                        />
+                        {instance?.service?.databases && (
+                            <SidebarItem
+                                to={`/infrastructure/${uuid}/database`}
+                                symbol="database"
+                                name="Database"
+                            />
+                        )}
                         <SidebarItem
                             to={`/infrastructure/${uuid}/update`}
                             symbol="update"
