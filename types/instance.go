@@ -52,6 +52,10 @@ type Instance struct {
 	Update *InstanceUpdate `json:"update,omitempty"`
 }
 
+type InstanceQuery struct {
+	Features []string `json:"features,omitempty"`
+}
+
 type InstanceUpdate struct {
 	CurrentVersion string `json:"current_version"`
 	LatestVersion  string `json:"latest_version"`
@@ -69,6 +73,7 @@ func NewInstance(id uuid.UUID, service Service) Instance {
 type InstanceAdapterPort interface {
 	Get(uuid uuid.UUID) (*Instance, error)
 	GetAll() map[uuid.UUID]*Instance
+	Search(query InstanceQuery) map[uuid.UUID]*Instance
 	GetPath(uuid uuid.UUID) string
 	Delete(uuid uuid.UUID) error
 	Exists(uuid uuid.UUID) bool
@@ -99,4 +104,34 @@ func (i *Instance) IsRunning() bool {
 
 func (i *Instance) IsDockerized() bool {
 	return i.InstanceSettings.InstallMethod != nil && *i.InstanceSettings.InstallMethod == InstanceInstallMethodDocker
+}
+
+func (i *Instance) HasFeature(featureType string) bool {
+	if i.Features == nil {
+		return false
+	}
+
+	if i.Features.Databases != nil {
+		for _, db := range *i.Features.Databases {
+			if db.Type == featureType {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func (i *Instance) HasOneOfFeatures(featureTypes []string) bool {
+	if featureTypes == nil {
+		return true
+	}
+
+	for _, featureType := range featureTypes {
+		if i.HasFeature(featureType) {
+			return true
+		}
+	}
+
+	return false
 }

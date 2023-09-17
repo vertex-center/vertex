@@ -65,6 +65,11 @@ func (s *InstanceService) GetAll() map[uuid.UUID]*types.Instance {
 	return s.instanceAdapter.GetAll()
 }
 
+// Search returns all instances that match the query.
+func (s *InstanceService) Search(query types.InstanceQuery) map[uuid.UUID]*types.Instance {
+	return s.instanceAdapter.Search(query)
+}
+
 // Delete deletes an instance by its UUID.
 // If the instance does not exist, it returns ErrInstanceNotFound.
 // If the instance is still running, it returns ErrInstanceStillRunning.

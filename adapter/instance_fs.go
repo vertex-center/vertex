@@ -27,9 +27,20 @@ type InstanceFSAdapter struct {
 	instances     map[uuid.UUID]*types.Instance
 }
 
-func NewInstanceFSAdapter() types.InstanceAdapterPort {
+type InstanceFSAdapterParams struct {
+	instancesPath string
+}
+
+func NewInstanceFSAdapter(params *InstanceFSAdapterParams) types.InstanceAdapterPort {
+	if params == nil {
+		params = &InstanceFSAdapterParams{}
+	}
+	if params.instancesPath == "" {
+		params.instancesPath = path.Join(storage.Path, "instances")
+	}
+
 	adapter := &InstanceFSAdapter{
-		instancesPath: path.Join(storage.Path, "instances"),
+		instancesPath: params.instancesPath,
 		instances:     map[uuid.UUID]*types.Instance{},
 	}
 
@@ -57,6 +68,20 @@ func (a *InstanceFSAdapter) Get(uuid uuid.UUID) (*types.Instance, error) {
 
 func (a *InstanceFSAdapter) GetAll() map[uuid.UUID]*types.Instance {
 	return a.instances
+}
+
+func (a *InstanceFSAdapter) Search(query types.InstanceQuery) map[uuid.UUID]*types.Instance {
+	instances := map[uuid.UUID]*types.Instance{}
+
+	for _, instance := range a.instances {
+		if !instance.HasOneOfFeatures(query.Features) {
+			continue
+		}
+
+		instances[instance.UUID] = instance
+	}
+
+	return instances
 }
 
 func (a *InstanceFSAdapter) GetPath(uuid uuid.UUID) string {

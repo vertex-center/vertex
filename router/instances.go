@@ -12,6 +12,7 @@ import (
 
 func addInstancesRoutes(r *gin.RouterGroup) {
 	r.GET("", handleGetInstances)
+	r.GET("/search", handleSearchInstances)
 	r.GET("/checkupdates", handleCheckForUpdates)
 	r.GET("/events", headersSSE, handleInstancesEvents)
 }
@@ -19,6 +20,19 @@ func addInstancesRoutes(r *gin.RouterGroup) {
 // handleGetInstances returns all installed instances.
 func handleGetInstances(c *gin.Context) {
 	installed := instanceService.GetAll()
+	c.JSON(http.StatusOK, installed)
+}
+
+// handleSearchInstances returns all installed instances that match the query.
+func handleSearchInstances(c *gin.Context) {
+	query := types.InstanceQuery{}
+
+	features := c.QueryArray("features")
+	if len(features) > 0 {
+		query.Features = features
+	}
+
+	installed := instanceService.Search(query)
 	c.JSON(http.StatusOK, installed)
 }
 

@@ -138,7 +138,7 @@ func (r *Router) handleSignals() {
 func (r *Router) initAdapters() {
 	runnerDockerAdapter = adapter.NewRunnerDockerAdapter()
 	runnerFSAdapter = adapter.NewRunnerFSAdapter()
-	instanceFSAdapter = adapter.NewInstanceFSAdapter()
+	instanceFSAdapter = adapter.NewInstanceFSAdapter(nil)
 	instanceLogsFSAdapter = adapter.NewInstanceLogsFSAdapter()
 	eventInMemoryAdapter = adapter.NewEventInMemoryAdapter()
 	packageFSAdapter = adapter.NewPackageFSAdapter(nil)
