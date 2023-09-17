@@ -31,11 +31,30 @@ type Service struct {
 	// EnvDefinitions defines all parameterizable environment variables.
 	EnvDefinitions []EnvDefinition `yaml:"environment,omitempty" json:"environment,omitempty"`
 
+	// Databases defines all databases used by the service.
+	Databases []DatabaseEnvironment `yaml:"databases,omitempty" json:"databases,omitempty"`
+
 	// URLs defines all service urls.
 	URLs []URL `yaml:"urls,omitempty" json:"urls,omitempty"`
 
 	// Methods defines different methods to install the service.
 	Methods ServiceMethods `yaml:"methods" json:"methods"`
+}
+
+type DatabaseEnvironment struct {
+	// The database Types. Can be redis, postgres...
+	Types []string `yaml:"types" json:"types"`
+
+	// The database environment names.
+	Names DatabaseEnvironmentNames `yaml:"names" json:"names"`
+}
+
+type DatabaseEnvironmentNames struct {
+	Host     string `yaml:"host" json:"host"`
+	Port     string `yaml:"port" json:"port"`
+	Username string `yaml:"username" json:"username"`
+	Password string `yaml:"password" json:"password"`
+	Database string `yaml:"database" json:"database"`
 }
 
 type DatabaseFeature struct {
