@@ -26,6 +26,7 @@ func addInstanceRoutes(r *gin.RouterGroup) {
 	r.GET("/docker", handleGetDocker)
 	r.POST("/docker/recreate", handleRecreateDockerContainer)
 	r.GET("/logs", handleGetLogs)
+	r.POST("/update/service", handleUpdateService)
 }
 
 // getParamInstanceUUID returns the UUID of the instance in the URL.
@@ -522,4 +523,25 @@ func handleGetLogs(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, logs)
+}
+
+// handleUpdateService updates the service of the instance with the UUID in the URL.
+// Errors can be:
+//   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
+func handleUpdateService(c *gin.Context) {
+	uid := getParamInstanceUUID(c)
+	if uid == nil {
+		return
+	}
+
+	err := instanceService.UpdateService(*uid)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+			Code:    "failed_to_update_service",
+			Message: fmt.Sprintf("failed to update service: %v", err),
+		})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }

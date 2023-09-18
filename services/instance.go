@@ -408,7 +408,7 @@ func (s *InstanceService) CheckForServiceUpdate(uuid uuid.UUID) error {
 	return nil
 }
 
-func (s *InstanceService) UpgradeService(uuid uuid.UUID) error {
+func (s *InstanceService) UpdateService(uuid uuid.UUID) error {
 	instance, err := s.Get(uuid)
 	if err != nil {
 		return err
@@ -423,7 +423,7 @@ func (s *InstanceService) UpgradeService(uuid uuid.UUID) error {
 		log.Error(err)
 	}
 
-	if service.Version > instance.Service.Version && service.Version <= types.MaxSupportedVersion {
+	if service.Version <= types.MaxSupportedVersion {
 		log.Info("service version is outdated, upgrading.",
 			vlog.String("uuid", uuid.String()),
 			vlog.Int("old_version", int(instance.Service.Version)),
@@ -434,6 +434,16 @@ func (s *InstanceService) UpgradeService(uuid uuid.UUID) error {
 		if err != nil {
 			return err
 		}
+
+		err = s.CheckForServiceUpdate(uuid)
+		if err != nil {
+			return err
+		}
+	} else {
+		log.Info("service version is not supported, skipping.",
+			vlog.String("uuid", uuid.String()),
+			vlog.Int("version", int(service.Version)),
+		)
 	}
 
 	return nil
