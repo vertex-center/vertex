@@ -2,6 +2,9 @@
   <configuration default="false" name="Run Vertex" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="Vertex" />
     <working_directory value="$PROJECT_DIR$" />
+    <envs>
+      <env name="DEBUG" value="1" />
+    </envs>
     <kind value="PACKAGE" />
     <package value="github.com/vertex-center/vertex" />
     <directory value="$PROJECT_DIR$" />

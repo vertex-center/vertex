@@ -1,12 +1,30 @@
 package types
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vlog"
+)
 
 const (
 	URLKindClient = "client"
 )
 
+var (
+	ErrServiceNotFound = errors.New("the service was not found")
+)
+
+type Version int
+
+type ServiceVersioning struct {
+	// Version is the version of the service format used.
+	Version Version `yaml:"version" json:"version"`
+}
+
 type Service struct {
+	ServiceVersioning
+
 	// ID is the identifier of the service. It must be unique.
 	ID string `yaml:"id" json:"id"`
 
@@ -39,6 +57,33 @@ type Service struct {
 
 	// Methods defines different methods to install the service.
 	Methods ServiceMethods `yaml:"methods" json:"methods"`
+}
+
+type ServiceV1 Service
+
+func (s *Service) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var versioning ServiceVersioning
+	err := unmarshal(&versioning)
+	if err != nil {
+		return err
+	}
+	s.ServiceVersioning = versioning
+
+	log.Debug("reading service", vlog.Int("version", int(versioning.Version)))
+
+	switch versioning.Version {
+	case 0, 1:
+		var service ServiceV1
+		err := unmarshal(&service)
+		if err != nil {
+			return err
+		}
+		*s = Service(service)
+	default:
+		return errors.New("service version not supported")
+	}
+
+	return nil
 }
 
 type DatabaseEnvironment struct {
@@ -186,10 +231,6 @@ type URL struct {
 	// It can be: client, server.
 	Kind string `yaml:"kind" json:"kind"`
 }
-
-var (
-	ErrServiceNotFound = errors.New("the service was not found")
-)
 
 type ServiceAdapterPort interface {
 	// Get a service with its id. Returns ErrServiceNotFound if
