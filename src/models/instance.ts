@@ -11,6 +11,17 @@ export type InstanceUpdate = {
     latest_version: string;
 };
 
+export type Operation = {
+    op: string;
+    from?: string;
+    path: string;
+    value?: string;
+};
+
+export type ServiceUpdate = {
+    patch?: Operation[];
+};
+
 export type Instance = {
     service: Service;
     uuid: string;
@@ -21,6 +32,7 @@ export type Instance = {
     display_name?: string;
     databases?: { [key: string]: string };
     update?: InstanceUpdate;
+    service_update?: ServiceUpdate;
 };
 
 export type Instances = { [uuid: string]: Instance };

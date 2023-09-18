@@ -70,6 +70,11 @@ export const api = {
             recreate: (id: string) =>
                 server.post(`/instance/${id}/docker/recreate`),
         },
+
+        update: {
+            service: (id: string) =>
+                server.post(`/instance/${id}/update/service`),
+        },
     },
 
     packages: {

@@ -1,35 +1,71 @@
-import { Fragment } from "react";
-import { Text, Title } from "../../components/Text/Text";
+import { SubTitle, Title } from "../../components/Text/Text";
 import { useParams } from "react-router-dom";
 import useInstance from "../../hooks/useInstance";
 import styles from "./BayDetailsUpdate.module.sass";
+import Button from "../../components/Button/Button";
+import JsonPatch from "../../components/JsonPatch/JsonPatch";
 import { Vertical } from "../../components/Layouts/Layouts";
-import Loading from "../../components/Loading/Loading";
+import { Fragment, useState } from "react";
+import { api } from "../../backend/backend";
 
 export default function BayDetailsUpdate() {
     const { uuid } = useParams();
 
-    const { instance } = useInstance(uuid);
+    const { instance, reloadInstance } = useInstance(uuid);
 
-    let content: any;
-    if (instance?.update) {
-        content = (
-            <Vertical gap={10}>
-                <Text>An update is available.</Text>
-                <Text>Current: {instance?.update?.current_version}</Text>
-                <Text>Latest: {instance?.update?.latest_version}</Text>
-            </Vertical>
-        );
-    } else {
-        content = (
-            <Text className={styles.content}>Everything is up-to-date</Text>
-        );
-    }
+    const [updating, setUpdating] = useState(false);
+
+    // let content: any;
+    // if (instance?.update) {
+    //     content = (
+    //         <Vertical gap={10}>
+    //             <Text>An update is available.</Text>
+    //             <Text>Current: {instance?.update?.current_version}</Text>
+    //             <Text>Latest: {instance?.update?.latest_version}</Text>
+    //         </Vertical>
+    //     );
+    // } else {
+    //     content = (
+    //         <Text className={styles.content}>Everything is up-to-date</Text>
+    //     );
+    // }
+
+    const updateVertexIntegration = () => {
+        setUpdating(true);
+        api.instance.update
+            .service(uuid)
+            .then(reloadInstance)
+            .catch(console.error)
+            .finally(() => setUpdating(false));
+    };
 
     return (
-        <Fragment>
+        <Vertical gap={20}>
             <Title className={styles.title}>Update</Title>
-            {instance ? content : <Loading />}
-        </Fragment>
+            {instance?.service_update && (
+                <Fragment>
+                    <SubTitle className={styles.content}>
+                        Vertex integration
+                    </SubTitle>
+                    <div className={styles.content}>
+                        A new version of the Vertex integration is available for
+                        this instance.
+                    </div>
+                    <JsonPatch operations={instance?.service_update?.patch} />
+                    <div>
+                        <Button
+                            disabled={updating}
+                            rightSymbol="download"
+                            onClick={updateVertexIntegration}
+                        >
+                            Update
+                        </Button>
+                    </div>
+                </Fragment>
+            )}
+            {!instance?.service_update && (
+                <div className={styles.content}>Everything is up-to-date</div>
+            )}
+        </Vertical>
     );
 }

@@ -23,6 +23,16 @@ export function Title(props: HTMLProps<HTMLHeadingElement>) {
     );
 }
 
+export function SubTitle(props: HTMLProps<HTMLHeadingElement>) {
+    const { children, className, ...others } = props;
+
+    return (
+        <h3 className={classNames(styles.subtitle, className)} {...others}>
+            {children}
+        </h3>
+    );
+}
+
 export function Caption(props: HTMLProps<HTMLParagraphElement>) {
     const { children, className, ...others } = props;
 
