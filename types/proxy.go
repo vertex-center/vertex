@@ -11,6 +11,7 @@ type ProxyRedirect struct {
 
 type ProxyAdapterPort interface {
 	GetRedirects() ProxyRedirects
+	GetRedirectByHost(host string) *ProxyRedirect
 	AddRedirect(id uuid.UUID, redirect ProxyRedirect) error
 	RemoveRedirect(id uuid.UUID) error
 }

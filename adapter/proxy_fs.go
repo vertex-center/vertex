@@ -52,6 +52,15 @@ func (a *ProxyFSAdapter) GetRedirects() types.ProxyRedirects {
 	return a.redirects
 }
 
+func (a *ProxyFSAdapter) GetRedirectByHost(host string) *types.ProxyRedirect {
+	for _, redirect := range a.redirects {
+		if redirect.Source == host {
+			return &redirect
+		}
+	}
+	return nil
+}
+
 func (a *ProxyFSAdapter) AddRedirect(id uuid.UUID, redirect types.ProxyRedirect) error {
 	a.redirects[id] = redirect
 	return a.write()

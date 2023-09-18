@@ -89,14 +89,7 @@ func (s *ProxyService) RemoveRedirect(id uuid.UUID) error {
 func (s *ProxyService) handleProxy(c *gin.Context) {
 	host := c.Request.Host
 
-	var redirect *types.ProxyRedirect
-	for _, r := range s.proxyAdapter.GetRedirects() {
-		if host == r.Source {
-			redirect = &r
-			break
-		}
-	}
-
+	redirect := s.proxyAdapter.GetRedirectByHost(host)
 	if redirect == nil {
 		log.Warn("this host is not registered in the reverse proxy",
 			vlog.String("host", host),
