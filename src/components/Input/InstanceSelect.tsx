@@ -1,8 +1,9 @@
-import Select, { Option } from "./Select";
+import Select, { SelectOption, SelectValue } from "./Select";
 import { Instance, InstanceQuery, Instances } from "../../models/instance";
 import { useFetch } from "../../hooks/useFetch";
 import { api } from "../../backend/backend";
 import Progress from "../Progress";
+import ServiceLogo from "../ServiceLogo/ServiceLogo";
 
 type Props = {
     instance?: Instance;
@@ -21,20 +22,29 @@ export default function InstanceSelect(props: Props) {
         return <Progress infinite />;
     }
 
-    const onInstanceChange = (e: any) => {
-        const uuid = e.target.value;
+    const onInstanceChange = (uuid: any) => {
         const instance = instances?.[uuid];
-        console.log(instance);
         onChange?.(instance);
     };
 
+    const value = (
+        <SelectValue>
+            {instance && <ServiceLogo service={instance?.service} />}
+            {instance?.display_name ??
+                instance?.service?.name ??
+                "Select an instance"}
+        </SelectValue>
+    );
+
     return (
-        <Select onChange={onInstanceChange} value={instance?.uuid}>
-            <Option value=""></Option>
+        // @ts-ignore
+        <Select onChange={onInstanceChange} value={value}>
+            <SelectOption value="">None</SelectOption>
             {Object.entries(instances ?? [])?.map(([, instance]) => (
-                <Option key={instance.uuid} value={instance.uuid}>
-                    {instance?.service?.name}
-                </Option>
+                <SelectOption key={instance.uuid} value={instance.uuid}>
+                    <ServiceLogo service={instance?.service} />
+                    {instance?.display_name ?? instance?.service?.name}
+                </SelectOption>
             ))}
         </Select>
     );

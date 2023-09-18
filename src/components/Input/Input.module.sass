@@ -2,6 +2,8 @@
 @use "../../styles/dimensions"
 
 .input
+    display: flex
+    flex-direction: row
     padding: 15px 20px
     border-radius: dimensions.$border-radius-lg
     background-color: colors.$bg-secondary
@@ -28,3 +30,61 @@
     margin-left: 20px
     opacity: 0.5
     font-size: 14px
+
+.select
+    display: flex
+    flex-direction: column
+    gap: 6px
+    position: relative
+
+    & .input
+        &:hover
+            border: 1px solid colors.$bg-accent
+            cursor: pointer
+
+    &Value
+        display: flex
+        flex-direction: row
+        gap: 15px
+        align-items: center
+
+    &Items
+        background-color: colors.$bg-secondary
+        border-radius: dimensions.$border-radius-lg
+        border: 1px solid colors.$bg-tertiary
+        position: absolute
+        left: 0
+        right: 0
+        top: 100%
+        margin-top: 6px
+        overflow: hidden
+        padding: 6px
+        display: none
+        z-index: 2
+
+        &Opened
+            display: block
+
+    &Item
+        display: flex
+        flex-direction: row
+        gap: 15px
+        align-items: center
+        padding: 12px 14px
+        cursor: pointer
+        border-radius: calc(dimensions.$border-radius-lg - 6px)
+
+        &:hover
+            background-color: colors.$bg-tertiary
+
+    &Overlay
+        position: fixed
+        left: 0
+        right: 0
+        top: 0
+        bottom: 0
+        z-index: 1
+        display: none
+
+        &Opened
+            display: block

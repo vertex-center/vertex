@@ -1,5 +1,5 @@
 import { SelectProps } from "./Input";
-import Select, { Option } from "./Select";
+import Select, { SelectOption, SelectValue } from "./Select";
 import timezones, { Timezone } from "timezones.json";
 import { Vertical } from "../Layouts/Layouts";
 import { useEffect, useState } from "react";
@@ -23,11 +23,9 @@ export default function TimezoneInput(props: Props) {
         }
     }, [value]);
 
-    const onGroupChange = (e: any) => {
-        const value = e.target.value;
-
-        if (value === "none") {
-            setGroup("none");
+    const onGroupChange = (value: any) => {
+        if (value === "") {
+            setGroup("");
             setTimezoneGroup(undefined);
             return;
         }
@@ -37,25 +35,32 @@ export default function TimezoneInput(props: Props) {
         setTimezoneGroup(tz);
     };
 
+    const groupValue = <SelectValue>{group}</SelectValue>;
+    const timezoneValue = <SelectValue>{timezone}</SelectValue>;
+
     return (
         <Vertical gap={4}>
             <Select
                 className={className}
                 label={label}
                 {...others}
-                value={group}
+                // @ts-ignore
+                value={groupValue}
                 onChange={onGroupChange}
             >
-                <Option value="" />
+                <SelectOption value="">None</SelectOption>
                 {timezones.map((value) => (
-                    <Option value={value.value}>{value.text}</Option>
+                    <SelectOption value={value.value}>
+                        {value.text}
+                    </SelectOption>
                 ))}
             </Select>
 
             {timezoneGroup && (
-                <Select className={className} value={timezone} {...others}>
+                // @ts-ignore
+                <Select className={className} value={timezoneValue} {...others}>
                     {timezoneGroup.utc.map((value) => (
-                        <Option value={value}>{value}</Option>
+                        <SelectOption value={value}>{value}</SelectOption>
                     ))}
                 </Select>
             )}

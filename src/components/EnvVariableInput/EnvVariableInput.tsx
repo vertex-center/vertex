@@ -28,7 +28,12 @@ export default function EnvVariableInput(props: Props) {
     if (env.type === "port") {
         input = <PortInput {...inputProps} />;
     } else if (env.type === "timezone") {
-        input = <TimezoneInput {...inputProps} />;
+        input = (
+            <TimezoneInput
+                {...inputProps}
+                onChange={(value: any) => onChange(value)}
+            />
+        );
     } else {
         input = <Input {...inputProps} />;
     }
