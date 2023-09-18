@@ -560,11 +560,6 @@ func (s *InstanceService) load(uuid uuid.UUID) error {
 		return err
 	}
 
-	err = s.UpgradeService(uuid)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
