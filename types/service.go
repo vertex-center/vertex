@@ -5,6 +5,7 @@ import (
 
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
+	"github.com/wI2L/jsondiff"
 )
 
 const (
@@ -91,6 +92,10 @@ func (s *Service) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	}
 
 	return nil
+}
+
+type ServiceUpdate struct {
+	Patch *jsondiff.Patch `json:"patch"`
 }
 
 type DatabaseEnvironment struct {
@@ -245,6 +250,10 @@ type ServiceAdapterPort interface {
 	Get(id string) (Service, error)
 
 	GetScript(id string) ([]byte, error)
+
+	// GetRaw gets a service by id, without any processing.
+	// Returns ErrServiceNotFound if the service was not found.
+	GetRaw(id string) (interface{}, error)
 
 	// GetAll gets all available services.
 	GetAll() []Service

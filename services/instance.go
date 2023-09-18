@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"net"
@@ -12,11 +13,13 @@ import (
 	"github.com/antelman107/net-wait-go/wait"
 	"github.com/go-git/go-git/v5"
 	"github.com/google/uuid"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
+	"github.com/wI2L/jsondiff"
 )
 
 var (
@@ -365,6 +368,77 @@ func (s *InstanceService) CheckForUpdates() (map[uuid.UUID]*types.Instance, erro
 	return s.GetAll(), nil
 }
 
+// CheckForServiceUpdate checks if the service of an instance has an update.
+// If it has, it sets the instance's ServiceUpdate field.
+func (s *InstanceService) CheckForServiceUpdate(uuid uuid.UUID) error {
+	instance, err := s.Get(uuid)
+	if err != nil {
+		return err
+	}
+
+	instancePath := s.instanceAdapter.GetPath(uuid)
+
+	latest, err := s.serviceAdapter.GetRaw(instance.Service.ID)
+	if err != nil {
+		return err
+	}
+
+	current, err := s.instanceAdapter.LoadServiceRaw(instancePath)
+	if err != nil {
+		return err
+	}
+
+	patch, err := jsondiff.Compare(current, latest, jsondiff.UnmarshalFunc(func(b []byte, v any) error {
+		dec := jsoniter.NewDecoder(bytes.NewReader(b))
+		return dec.Decode(v)
+	}))
+	if err != nil {
+		return err
+	}
+
+	if len(patch) == 0 {
+		instance.ServiceUpdate = nil
+		return nil
+	}
+
+	instance.ServiceUpdate = &types.ServiceUpdate{
+		Patch: &patch,
+	}
+
+	return nil
+}
+
+func (s *InstanceService) UpgradeService(uuid uuid.UUID) error {
+	instance, err := s.Get(uuid)
+	if err != nil {
+		return err
+	}
+
+	service, err := s.serviceAdapter.Get(instance.Service.ID)
+	if err != nil && errors.Is(err, types.ErrServiceNotFound) {
+		log.Debug("service does not exist in the service repository, using the instance's service",
+			vlog.String("uuid", uuid.String()),
+		)
+	} else if err != nil {
+		log.Error(err)
+	}
+
+	if service.Version > instance.Service.Version && service.Version <= types.MaxSupportedVersion {
+		log.Info("service version is outdated, upgrading.",
+			vlog.String("uuid", uuid.String()),
+			vlog.Int("old_version", int(instance.Service.Version)),
+			vlog.Int("new_version", int(service.Version)),
+		)
+		instance.Service = service
+		err := s.instanceAdapter.SaveService(instance)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (s *InstanceService) SetLaunchOnStartup(uuid uuid.UUID, value bool) error {
 	i, err := s.Get(uuid)
 	if err != nil {
@@ -560,35 +634,9 @@ func (s *InstanceService) load(uuid uuid.UUID) error {
 		return err
 	}
 
-	return nil
-}
-
-func (s *InstanceService) UpgradeService(uuid uuid.UUID) error {
-	instance, err := s.Get(uuid)
+	err = s.CheckForServiceUpdate(uuid)
 	if err != nil {
 		return err
-	}
-
-	service, err := s.serviceAdapter.Get(instance.Service.ID)
-	if err != nil && errors.Is(err, types.ErrServiceNotFound) {
-		log.Debug("service does not exist in the service repository, using the instance's service",
-			vlog.String("uuid", uuid.String()),
-		)
-	} else if err != nil {
-		log.Error(err)
-	}
-
-	if service.Version > instance.Service.Version && service.Version <= types.MaxSupportedVersion {
-		log.Info("service version is outdated, upgrading.",
-			vlog.String("uuid", uuid.String()),
-			vlog.Int("old_version", int(instance.Service.Version)),
-			vlog.Int("new_version", int(service.Version)),
-		)
-		instance.Service = service
-		err := s.instanceAdapter.SaveService(instance)
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil

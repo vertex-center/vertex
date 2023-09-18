@@ -9,7 +9,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type ServiceFSAdapter struct {
@@ -47,6 +47,19 @@ func (a *ServiceFSAdapter) Get(id string) (types.Service, error) {
 	}
 
 	return types.Service{}, types.ErrServiceNotFound
+}
+
+func (a *ServiceFSAdapter) GetRaw(id string) (interface{}, error) {
+	servicePath := path.Join(a.servicesPath, "services", id, "service.yml")
+
+	data, err := os.ReadFile(servicePath)
+	if err != nil {
+		return nil, err
+	}
+
+	var service interface{}
+	err = yaml.Unmarshal(data, &service)
+	return service, err
 }
 
 func (a *ServiceFSAdapter) GetScript(id string) ([]byte, error) {

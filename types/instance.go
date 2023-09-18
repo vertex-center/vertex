@@ -53,7 +53,8 @@ type Instance struct {
 	Status  string       `json:"status"`
 	Env     EnvVariables `json:"environment,omitempty"`
 
-	Update *InstanceUpdate `json:"update,omitempty"`
+	Update        *InstanceUpdate `json:"update,omitempty"`
+	ServiceUpdate *ServiceUpdate  `json:"service_update,omitempty"`
 }
 
 type InstanceQuery struct {
@@ -91,6 +92,7 @@ type InstanceAdapterPort interface {
 
 	SaveService(i *Instance) error
 	LoadService(instancePath string) (Service, error)
+	LoadServiceRaw(instancePath string) (interface{}, error)
 
 	Reload(func(uuid uuid.UUID))
 }

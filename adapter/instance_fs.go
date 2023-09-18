@@ -14,7 +14,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type InstanceFilePath string
@@ -191,6 +191,19 @@ func (a *InstanceFSAdapter) LoadService(instancePath string) (types.Service, err
 	}
 
 	var service types.Service
+	err = yaml.Unmarshal(data, &service)
+	return service, err
+}
+
+func (a *InstanceFSAdapter) LoadServiceRaw(instancePath string) (interface{}, error) {
+	servicePath := path.Join(instancePath, string(InstanceServicePath))
+
+	data, err := os.ReadFile(servicePath)
+	if err != nil {
+		return nil, err
+	}
+
+	var service interface{}
 	err = yaml.Unmarshal(data, &service)
 	return service, err
 }
