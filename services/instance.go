@@ -560,6 +560,42 @@ func (s *InstanceService) load(uuid uuid.UUID) error {
 		return err
 	}
 
+	err = s.UpgradeService(uuid)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *InstanceService) UpgradeService(uuid uuid.UUID) error {
+	instance, err := s.Get(uuid)
+	if err != nil {
+		return err
+	}
+
+	service, err := s.serviceAdapter.Get(instance.Service.ID)
+	if err != nil && errors.Is(err, types.ErrServiceNotFound) {
+		log.Debug("service does not exist in the service repository, using the instance's service",
+			vlog.String("uuid", uuid.String()),
+		)
+	} else if err != nil {
+		log.Error(err)
+	}
+
+	if service.Version > instance.Service.Version && service.Version <= types.MaxSupportedVersion {
+		log.Info("service version is outdated, upgrading.",
+			vlog.String("uuid", uuid.String()),
+			vlog.Int("old_version", int(instance.Service.Version)),
+			vlog.Int("new_version", int(service.Version)),
+		)
+		instance.Service = service
+		err := s.instanceAdapter.SaveService(instance)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

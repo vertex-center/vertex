@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	URLKindClient = "client"
+	MaxSupportedVersion Version = 1
 )
 
 var (
@@ -18,12 +18,12 @@ var (
 type Version int
 
 type ServiceVersioning struct {
-	// Version is the version of the service format used.
+	// Version of the service format used.
 	Version Version `yaml:"version" json:"version"`
 }
 
 type Service struct {
-	ServiceVersioning
+	ServiceVersioning `yaml:",inline"`
 
 	// ID is the identifier of the service. It must be unique.
 	ID string `yaml:"id" json:"id"`
