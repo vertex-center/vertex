@@ -62,16 +62,23 @@ type Service struct {
 type ServiceV1 Service
 
 func (s *Service) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	var versioning ServiceVersioning
-	err := unmarshal(&versioning)
+	var service struct {
+		ServiceVersioning `yaml:",inline"`
+		ID                string `yaml:"id"`
+	}
+
+	err := unmarshal(&service)
 	if err != nil {
 		return err
 	}
-	s.ServiceVersioning = versioning
+	s.ServiceVersioning = service.ServiceVersioning
 
-	log.Debug("reading service", vlog.Int("version", int(versioning.Version)))
+	log.Debug("reading service",
+		vlog.Int("version", int(service.Version)),
+		vlog.String("id", service.ID),
+	)
 
-	switch versioning.Version {
+	switch service.Version {
 	case 0, 1:
 		var service ServiceV1
 		err := unmarshal(&service)
