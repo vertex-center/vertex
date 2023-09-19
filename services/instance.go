@@ -1,25 +1,23 @@
 package services
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"net"
 	"os"
 	"path"
+	"reflect"
 	"strings"
 	"time"
 
 	"github.com/antelman107/net-wait-go/wait"
 	"github.com/go-git/go-git/v5"
 	"github.com/google/uuid"
-	jsoniter "github.com/json-iterator/go"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
-	"github.com/wI2L/jsondiff"
 )
 
 var (
@@ -376,9 +374,8 @@ func (s *InstanceService) CheckForServiceUpdate(uuid uuid.UUID) error {
 		return err
 	}
 
-	instancePath := s.instanceAdapter.GetPath(uuid)
-
-	latest, err := s.serviceAdapter.GetRaw(instance.Service.ID)
+	current := instance.Service
+	latest, err := s.serviceAdapter.Get(current.ID)
 	if err != nil && errors.Is(err, types.ErrServiceNotFound) {
 		// If the service does not exist in the service repository, that means
 		// that the instance is using a custom service.
@@ -387,33 +384,9 @@ func (s *InstanceService) CheckForServiceUpdate(uuid uuid.UUID) error {
 		return err
 	}
 
-	current, err := s.instanceAdapter.LoadServiceRaw(instancePath)
-	if err != nil {
-		return err
-	}
-
-	patch, err := jsondiff.Compare(current, latest, jsondiff.UnmarshalFunc(func(b []byte, v any) error {
-		dec := jsoniter.NewDecoder(bytes.NewReader(b))
-		return dec.Decode(v)
-	}), jsondiff.MarshalFunc(func(v any) ([]byte, error) {
-		var buf bytes.Buffer
-		enc := jsoniter.NewEncoder(&buf)
-		err := enc.Encode(v)
-		return buf.Bytes(), err
-	}))
-	if err != nil {
-		return err
-	}
-
-	if len(patch) == 0 {
-		instance.ServiceUpdate = nil
-		return nil
-	}
-
-	instance.ServiceUpdate = &types.ServiceUpdate{
-		Patch: &patch,
-	}
-
+	upToDate := reflect.DeepEqual(latest, current)
+	log.Debug("service up-to-date", vlog.Bool("up_to_date", upToDate))
+	instance.ServiceUpdate.Available = !upToDate
 	return nil
 }
 

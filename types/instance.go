@@ -54,7 +54,7 @@ type Instance struct {
 	Env     EnvVariables `json:"environment,omitempty"`
 
 	Update        *InstanceUpdate `json:"update,omitempty"`
-	ServiceUpdate *ServiceUpdate  `json:"service_update,omitempty"`
+	ServiceUpdate ServiceUpdate   `json:"service_update,omitempty"`
 }
 
 type InstanceQuery struct {

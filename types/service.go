@@ -5,7 +5,6 @@ import (
 
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
-	"github.com/wI2L/jsondiff"
 )
 
 const (
@@ -95,7 +94,7 @@ func (s *Service) UnmarshalYAML(unmarshal func(interface{}) error) error {
 }
 
 type ServiceUpdate struct {
-	Patch *jsondiff.Patch `json:"patch"`
+	Available bool `json:"available"`
 }
 
 type DatabaseEnvironment struct {
