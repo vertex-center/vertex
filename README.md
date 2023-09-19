@@ -9,6 +9,13 @@
 <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/vertex-center/vertex?color=DE3C4B&labelColor=1E212B&style=for-the-badge">
 </p>
 
+---
+
+> **Warning**
+> Vertex is currently in development. While it is usable, and I am using it in production, there may be breaking changes before the v1.0 release. You can keep following the project on [Discord](https://discord.gg/tGZV6X6ZJh), or by starring the repository.
+
+---
+
 ## About
 
 ### Vertex
