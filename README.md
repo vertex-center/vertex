@@ -15,7 +15,7 @@
 
 Vertex is a program that allows you to create your self-hosted server easily. Install, configure and start new services in less than a minute.
 
-Vertex is designed to be installed on low-powered computers like Raspberry Pi, so avoiding systems like Docker and prioritizing compiled languages like Go, Rust or C++.
+Vertex is designed to be installed on low-powered computers like Raspberry Pi, so prioritizing compiled languages like Go, Rust or C++.
 
 <img width="1884" alt="image" src="https://github.com/vertex-center/vertex/assets/12123721/a2b59a98-3b0d-4323-9db3-2078683eaf90">
 
