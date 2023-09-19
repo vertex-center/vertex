@@ -141,6 +141,9 @@ export default function BayDetails() {
                             to={`/infrastructure/${uuid}/update`}
                             symbol="update"
                             name="Update"
+                            notifications={
+                                instance?.service_update ? 1 : undefined
+                            }
                         />
                         <SidebarItem
                             to={`/infrastructure/${uuid}/settings`}

@@ -5,6 +5,7 @@ import classNames from "classnames";
 import { NavLink, useLocation } from "react-router-dom";
 import { HTMLProps, PropsWithChildren } from "react";
 import { Text } from "../Text/Text";
+import Spacer from "../Spacer/Spacer";
 
 function SidebarTitle({ children }: PropsWithChildren) {
     return <Text className={styles.title}>{children}</Text>;
@@ -16,6 +17,7 @@ type ItemProps = {
 
     symbol: string | any;
     name: string;
+    notifications?: number;
 
     red?: boolean;
 };
@@ -27,6 +29,12 @@ export function SidebarItem(props: ItemProps) {
         <Horizontal alignItems="center" gap={12}>
             <Symbol className={styles.symbol} name={symbol} />
             {name}
+            <Spacer />
+            {props.notifications && (
+                <div className={styles.notifications}>
+                    {props.notifications}
+                </div>
+            )}
         </Horizontal>
     );
 
