@@ -48,7 +48,9 @@ function Line(props: LineProps) {
             {from && <div className={styles.path}>{from}</div>}
             <div className={styles.path}>{path}</div>
             {value && <Symbol className={styles.equal} name="equal" />}
-            {value && <div>{value}</div>}
+            {value && (
+                <div className={styles.value}>{JSON.stringify(value)}</div>
+            )}
         </div>
     );
 }
@@ -59,6 +61,7 @@ type Props = {
 
 export default function JsonPatch(props: Props) {
     const { operations } = props;
+    console.log(operations);
     return (
         <div className={styles.patch}>
             {operations?.map((operation: Operation, i: number) => (
