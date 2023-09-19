@@ -395,6 +395,11 @@ func (s *InstanceService) CheckForServiceUpdate(uuid uuid.UUID) error {
 	patch, err := jsondiff.Compare(current, latest, jsondiff.UnmarshalFunc(func(b []byte, v any) error {
 		dec := jsoniter.NewDecoder(bytes.NewReader(b))
 		return dec.Decode(v)
+	}), jsondiff.MarshalFunc(func(v any) ([]byte, error) {
+		var buf bytes.Buffer
+		enc := jsoniter.NewEncoder(&buf)
+		err := enc.Encode(v)
+		return buf.Bytes(), err
 	}))
 	if err != nil {
 		return err
