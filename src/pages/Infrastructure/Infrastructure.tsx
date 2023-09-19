@@ -121,7 +121,7 @@ export default function Infrastructure() {
                     ))}
                     <Horizontal className={styles.addBay} gap={10}>
                         <Button primary to="/marketplace" leftSymbol="add">
-                            Add services
+                            Create instance
                         </Button>
                         {/*<Button onClick={checkForUpdates} leftSymbol="update">*/}
                         {/*    Check for updates*/}
