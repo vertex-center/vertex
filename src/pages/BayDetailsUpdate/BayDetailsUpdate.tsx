@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import useInstance from "../../hooks/useInstance";
 import styles from "./BayDetailsUpdate.module.sass";
 import Button from "../../components/Button/Button";
-import JsonPatch from "../../components/JsonPatch/JsonPatch";
 import { Vertical } from "../../components/Layouts/Layouts";
 import { Fragment, useState } from "react";
 import { api } from "../../backend/backend";
@@ -42,7 +41,7 @@ export default function BayDetailsUpdate() {
     return (
         <Vertical gap={20}>
             <Title className={styles.title}>Update</Title>
-            {instance?.service_update && (
+            {instance?.service_update?.available && (
                 <Fragment>
                     <SubTitle className={styles.content}>
                         Vertex integration
@@ -51,7 +50,6 @@ export default function BayDetailsUpdate() {
                         A new version of the Vertex integration is available for
                         this instance.
                     </div>
-                    <JsonPatch operations={instance?.service_update?.patch} />
                     <div>
                         <Button
                             disabled={updating}
@@ -63,7 +61,7 @@ export default function BayDetailsUpdate() {
                     </div>
                 </Fragment>
             )}
-            {!instance?.service_update && (
+            {!instance?.service_update?.available && (
                 <div className={styles.content}>Everything is up-to-date</div>
             )}
         </Vertical>

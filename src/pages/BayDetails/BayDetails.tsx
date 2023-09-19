@@ -142,7 +142,9 @@ export default function BayDetails() {
                             symbol="update"
                             name="Update"
                             notifications={
-                                instance?.service_update ? 1 : undefined
+                                instance?.service_update?.available
+                                    ? 1
+                                    : undefined
                             }
                         />
                         <SidebarItem

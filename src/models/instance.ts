@@ -19,7 +19,7 @@ export type Operation = {
 };
 
 export type ServiceUpdate = {
-    patch?: Operation[];
+    available?: boolean;
 };
 
 export type Instance = {
