@@ -53,7 +53,9 @@ func (a *ServiceFSAdapter) GetRaw(id string) (interface{}, error) {
 	servicePath := path.Join(a.servicesPath, "services", id, "service.yml")
 
 	data, err := os.ReadFile(servicePath)
-	if err != nil {
+	if err != nil && os.IsNotExist(err) {
+		return nil, types.ErrServiceNotFound
+	} else if err != nil {
 		return nil, err
 	}
 

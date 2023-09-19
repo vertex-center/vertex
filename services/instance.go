@@ -379,7 +379,11 @@ func (s *InstanceService) CheckForServiceUpdate(uuid uuid.UUID) error {
 	instancePath := s.instanceAdapter.GetPath(uuid)
 
 	latest, err := s.serviceAdapter.GetRaw(instance.Service.ID)
-	if err != nil {
+	if err != nil && errors.Is(err, types.ErrServiceNotFound) {
+		// If the service does not exist in the service repository, that means
+		// that the instance is using a custom service.
+		return nil
+	} else if err != nil {
 		return err
 	}
 
