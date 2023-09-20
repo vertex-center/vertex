@@ -5,80 +5,79 @@ import Button from "../../components/Button/Button";
 import Spacer from "../../components/Spacer/Spacer";
 import Symbol from "../../components/Symbol/Symbol";
 import { Error } from "../../components/Error/Error";
-import Progress from "../../components/Progress";
 import Popup from "../../components/Popup/Popup";
 import Loading from "../../components/Loading/Loading";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
-import { Updates } from "../../models/update";
+import { Dependencies } from "../../models/update";
 import { api } from "../../backend/backend";
 
 import styles from "./SettingsUpdates.module.sass";
+import Update, { Updates } from "../../components/Update/Update";
 
 TimeAgo.addDefaultLocale(en);
 
 const timeAgo = new TimeAgo("en-US");
 
-type Props = {
-    name: string;
-    update: () => void;
-    current_version: string;
-    latest_version: string;
-    needs_restart?: boolean;
-};
+// type Props = {
+//     name: string;
+//     update: () => void;
+//     current_version: string;
+//     latest_version: string;
+//     needs_restart?: boolean;
+// };
 
-function Update(props: Props) {
-    const { name, update, current_version, latest_version, needs_restart } =
-        props;
-
-    const [isLoading, setIsLoading] = useState(false);
-
-    const onUpdate = () => {
-        setIsLoading(true);
-        update();
-    };
-
-    return (
-        <Horizontal gap={24} alignItems="center">
-            <Text>{name}</Text>
-            <Spacer />
-            {needs_restart && (
-                <Horizontal
-                    gap={6}
-                    alignItems="center"
-                    style={{ color: "var(--orange)" }}
-                >
-                    <Symbol name="warning" />
-                    You'll need to restart the server
-                </Horizontal>
-            )}
-            <code>
-                {current_version.substring(0, 10)} {"->"}{" "}
-                {latest_version.substring(0, 10)}
-            </code>
-            {!isLoading && (
-                <Button onClick={onUpdate} rightSymbol="download">
-                    Update
-                </Button>
-            )}
-            {isLoading && <Progress infinite />}
-        </Horizontal>
-    );
-}
+// function Update(props: Props) {
+//     const { name, update, current_version, latest_version, needs_restart } =
+//         props;
+//
+//     const [isLoading, setIsLoading] = useState(false);
+//
+//     const onUpdate = () => {
+//         setIsLoading(true);
+//         update();
+//     };
+//
+//     return (
+//         <Horizontal gap={24} alignItems="center">
+//             <Text>{name}</Text>
+//             <Spacer />
+//             {needs_restart && (
+//                 <Horizontal
+//                     gap={6}
+//                     alignItems="center"
+//                     style={{ color: "var(--orange)" }}
+//                 >
+//                     <Symbol name="warning" />
+//                     You'll need to restart the server
+//                 </Horizontal>
+//             )}
+//             <code>
+//                 {current_version.substring(0, 10)} {"->"}{" "}
+//                 {latest_version.substring(0, 10)}
+//             </code>
+//             {!isLoading && (
+//                 <Button onClick={onUpdate} rightSymbol="download">
+//                     Update
+//                 </Button>
+//             )}
+//             {isLoading && <Progress infinite />}
+//         </Horizontal>
+//     );
+// }
 
 export default function SettingsUpdates() {
-    const [updates, setUpdates] = useState<Updates>();
+    const [dependencies, setDependencies] = useState<Dependencies>();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState();
     const [showMessage, setShowMessage] = useState<boolean>(false);
 
     const reload = useCallback((refresh?: boolean) => {
         setIsLoading(true);
-        setUpdates(undefined);
-        api.updates
+        api.dependencies
             .get(refresh)
             .then((res) => {
-                setUpdates(res.data);
+                setDependencies(res.data);
             })
             .catch((err) => {
                 setError(err?.response?.data?.message ?? err?.message);
@@ -87,9 +86,11 @@ export default function SettingsUpdates() {
     }, []);
 
     const updateService = (name: string) => {
-        api.updates
+        return api.dependencies
             .install([{ name }])
-            .then(() => setShowMessage(true))
+            .then(() => {
+                if (name === "vertex") setShowMessage(true);
+            })
             .catch((err) => {
                 setError(err?.response?.data?.message ?? err?.message);
             })
@@ -110,11 +111,11 @@ export default function SettingsUpdates() {
                     <Button onClick={() => reload(true)} rightSymbol="refresh">
                         Check for updates
                     </Button>
-                    {updates?.last_checked && (
+                    {dependencies?.last_updates_check && (
                         <Caption>
                             Last refresh:{" "}
                             {timeAgo.format(
-                                new Date(updates?.last_checked),
+                                new Date(dependencies?.last_updates_check),
                                 "round"
                             )}
                         </Caption>
@@ -122,24 +123,24 @@ export default function SettingsUpdates() {
                 </Horizontal>
             )}
             {isLoading && <Loading />}
-            {!error && !isLoading && updates?.items?.length === 0 && (
+            {!error && !isLoading && dependencies?.items?.length === 0 && (
                 <Horizontal alignItems="center">
                     <Symbol name="check" />
                     <Text>Everything is up-to-date.</Text>
                 </Horizontal>
             )}
-            <Vertical gap={6}>
-                {updates?.items?.map((update) => (
+            <Updates>
+                {dependencies?.items?.map((dep) => (
                     <Update
-                        key={update.name}
-                        name={update.name}
-                        latest_version={update.latest_version}
-                        current_version={update.current_version}
-                        needs_restart={update.needs_restart}
-                        update={() => updateService(update.id)}
+                        key={dep?.id}
+                        name={dep?.name}
+                        onUpdate={() => updateService(dep?.id)}
+                        current_version={dep?.update?.current_version}
+                        latest_version={dep?.update?.latest_version}
+                        available={dep?.update !== undefined}
                     />
                 ))}
-            </Vertical>
+            </Updates>
             {error && <Error error={error} />}
             <Popup show={showMessage} onDismiss={dismissPopup}>
                 <Text>

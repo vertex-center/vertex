@@ -7,9 +7,9 @@ import {
 } from "../models/instance";
 import { Env, Service } from "../models/service";
 import { Dependencies } from "../models/dependency";
+import { Dependencies as DependenciesUpdate } from "../models/update";
 import { DockerContainerInfo } from "../models/docker";
 import { About } from "../models/about";
-import { Updates } from "../models/update";
 
 type InstallServiceParams = {
     method: InstallMethod;
@@ -82,11 +82,13 @@ export const api = {
             server.post(`/packages/install`, { packages }),
     },
 
-    updates: {
+    dependencies: {
         get: (reload?: boolean) =>
-            server.get<Updates>(`/updates${reload ? "?reload=true" : ""}`),
+            server.get<DependenciesUpdate>(
+                `/dependencies${reload ? "?reload=true" : ""}`
+            ),
         install: (updates: { name: string }[]) =>
-            server.post(`/updates`, { updates }),
+            server.post(`/dependencies/update`, { updates }),
     },
 
     settings: {

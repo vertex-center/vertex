@@ -6,6 +6,7 @@ import Button from "../../components/Button/Button";
 import { Vertical } from "../../components/Layouts/Layouts";
 import { Fragment, useState } from "react";
 import { api } from "../../backend/backend";
+import Update, { Updates } from "../../components/Update/Update";
 
 export default function BayDetailsUpdate() {
     const { uuid } = useParams();
@@ -41,6 +42,13 @@ export default function BayDetailsUpdate() {
     return (
         <Vertical gap={20}>
             <Title className={styles.title}>Update</Title>
+            <Updates>
+                <Update
+                    name="Vertex integration"
+                    onUpdate={updateVertexIntegration}
+                    available={instance?.service_update?.available}
+                />
+            </Updates>
             {instance?.service_update?.available && (
                 <Fragment>
                     <SubTitle className={styles.content}>
@@ -60,9 +68,6 @@ export default function BayDetailsUpdate() {
                         </Button>
                     </div>
                 </Fragment>
-            )}
-            {!instance?.service_update?.available && (
-                <div className={styles.content}>Everything is up-to-date</div>
             )}
         </Vertical>
     );
