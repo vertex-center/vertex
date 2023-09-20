@@ -10,15 +10,16 @@ type Props = {
 
 export default function Hardware(props: Props) {
     if (!props.hardware) return null;
+    if (!props.hardware.host) return null;
 
-    const { os, arch, version, name } = props.hardware;
+    const { os, arch, platform, version, name } = props.hardware.host;
 
     let icon = undefined;
     switch (os) {
         case "linux":
             icon = <SiLinux />;
             break;
-        case "Darwin":
+        case "darwin":
             icon = <SiApple />;
             break;
         case "windows":
@@ -32,7 +33,7 @@ export default function Hardware(props: Props) {
             <Vertical gap={4}>
                 <div>{name}</div>
                 <div className={styles.version}>
-                    {version} - {arch}
+                    {platform} ({version}) - {arch}
                 </div>
             </Vertical>
         </div>
