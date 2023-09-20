@@ -22,7 +22,7 @@ type Props = {
 };
 
 export default function Update(props: Props) {
-    const { name, available, version, current_version, latest_version } = props;
+    const { name, available, version, latest_version } = props;
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -33,12 +33,16 @@ export default function Update(props: Props) {
 
     return (
         <div className={styles.update}>
-            <div className={styles.name}>{name}</div>
-            <Spacer />
-            <code className={styles.version}>
-                {version}
-                {latest_version && " -> " + latest_version}
-            </code>
+            <div className={styles.info}>
+                <div className={styles.name}>{name}</div>
+                <Spacer />
+                {version && (
+                    <code className={styles.version}>
+                        {version}
+                        {latest_version && " -> " + latest_version}
+                    </code>
+                )}
+            </div>
             {available ? (
                 isLoading ? (
                     <Progress infinite />
