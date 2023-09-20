@@ -39,6 +39,7 @@ var (
 	instanceService      services.InstanceService
 	dependenciesService  services.DependenciesService
 	settingsService      services.SettingsService
+	hardwareService      services.HardwareService
 )
 
 type Router struct {
@@ -155,6 +156,7 @@ func (r *Router) initServices(about types.About) {
 	serviceService = services.NewServiceService(serviceFSAdapter)
 	dependenciesService = services.NewDependenciesService(about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)
+	hardwareService = services.NewHardwareService()
 }
 
 func (r *Router) initAPIRoutes(about types.About) {
@@ -171,6 +173,7 @@ func (r *Router) initAPIRoutes(about types.About) {
 	addProxyRoutes(api.Group("/proxy"))
 	addDependenciesRoutes(api.Group("/dependencies"))
 	addSettingsRoutes(api.Group("/settings"))
+	addHardwareRoutes(api.Group("/hardware"))
 }
 
 func headersSSE(c *gin.Context) {
