@@ -24,53 +24,30 @@ export default function SettingsAbout() {
                 </Fragment>
             )}
             {!loading && (
-                <Vertical gap={30}>
-                    <Vertical gap={20}>
-                        <Title className={styles.title}>Vertex</Title>
-                        <KeyValueGroup>
-                            <KeyValueInfo
-                                name="Version"
-                                type="code"
-                                symbol="tag"
-                            >
-                                {about?.version}
-                            </KeyValueInfo>
-                            <KeyValueInfo
-                                name="Commit"
-                                type="code"
-                                symbol="commit"
-                            >
-                                {about?.commit}
-                            </KeyValueInfo>
-                            <KeyValueInfo
-                                name="Release date"
-                                type="code"
-                                symbol="calendar_month"
-                            >
-                                {about?.date}
-                            </KeyValueInfo>
-                        </KeyValueGroup>
-                    </Vertical>
-
-                    <Vertical gap={20}>
-                        <Title className={styles.title}>Platform</Title>
-                        <KeyValueGroup>
-                            <KeyValueInfo
-                                name="OS"
-                                type="code"
-                                symbol="computer"
-                            >
-                                {about?.os}
-                            </KeyValueInfo>
-                            <KeyValueInfo
-                                name="Architecture"
-                                type="code"
-                                symbol="memory"
-                            >
-                                {about?.arch}
-                            </KeyValueInfo>
-                        </KeyValueGroup>
-                    </Vertical>
+                <Vertical gap={20}>
+                    <Title className={styles.title}>Vertex</Title>
+                    <KeyValueGroup>
+                        <KeyValueInfo name="Version" type="code" symbol="tag">
+                            {about?.version}
+                        </KeyValueInfo>
+                        <KeyValueInfo name="Commit" type="code" symbol="commit">
+                            {about?.commit}
+                        </KeyValueInfo>
+                        <KeyValueInfo
+                            name="Release date"
+                            type="code"
+                            symbol="calendar_month"
+                        >
+                            {about?.date}
+                        </KeyValueInfo>
+                        <KeyValueInfo
+                            name="Compiled for"
+                            type="code"
+                            symbol="memory"
+                        >
+                            {about?.os}/{about?.arch}
+                        </KeyValueInfo>
+                    </KeyValueGroup>
                 </Vertical>
             )}
         </Fragment>
