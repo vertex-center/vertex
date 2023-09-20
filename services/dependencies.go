@@ -180,10 +180,6 @@ func (d *vertexUpdater) InstallUpdate() error {
 	return nil
 }
 
-func (d *vertexUpdater) GetID() string {
-	return "vertex"
-}
-
 func (d *vertexUpdater) GetPath() string {
 	return "."
 }
@@ -263,10 +259,6 @@ func (d *clientUpdater) InstallUpdate() error {
 	d.release = nil
 
 	return nil
-}
-
-func (d *clientUpdater) GetID() string {
-	return "vertex-webui"
 }
 
 func (d *clientUpdater) GetPath() string {
@@ -401,10 +393,6 @@ func (d *gitHubUpdater) CheckForUpdate() (*types.DependencyUpdate, error) {
 func (d *gitHubUpdater) InstallUpdate() error {
 	url := "https://github.com/vertex-center/" + d.repo
 	return storage.CloneOrPullRepository(url, d.dir)
-}
-
-func (d *gitHubUpdater) GetID() string {
-	return d.repo
 }
 
 func (d *gitHubUpdater) GetPath() string {

@@ -12,10 +12,6 @@ type DependencyUpdater interface {
 	// InstallUpdate will install the previously fetched update.
 	InstallUpdate() error
 
-	// GetID returns the ID of the dependency that can be used to
-	// identify it from the client.
-	GetID() string
-
 	// GetPath returns the path of the dependency.
 	GetPath() string
 }
