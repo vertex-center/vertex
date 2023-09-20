@@ -22,7 +22,7 @@ func addInstanceRoutes(r *gin.RouterGroup) {
 	r.POST("/stop", handleStopInstance)
 	r.PATCH("/environment", handlePatchEnvironment)
 	r.GET("/events", headersSSE, handleInstanceEvents)
-	r.GET("/dependencies", handleGetDependencies)
+	r.GET("/dependencies", handleGetPackages)
 	r.GET("/docker", handleGetDocker)
 	r.POST("/docker/recreate", handleRecreateDockerContainer)
 	r.GET("/logs", handleGetLogs)
@@ -421,12 +421,12 @@ func handleInstanceEvents(c *gin.Context) {
 	})
 }
 
-// handleGetDependencies returns the dependencies of the instance with the UUID in the URL.
+// handleGetPackages returns the dependencies of the instance with the UUID in the URL.
 // Errors can be:
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
 //   - instance_doesnt_use_scripts: the instance doesn't use scripts, so it doesn't have dependencies
-func handleGetDependencies(c *gin.Context) {
+func handleGetPackages(c *gin.Context) {
 	i := getInstance(c)
 	if i == nil {
 		return

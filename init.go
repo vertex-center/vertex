@@ -89,14 +89,8 @@ func parseArgs() {
 }
 
 func setupDependencies() error {
-	dependencies := []types.Dependency{
-		services.DependencyClient,
-		services.DependencyServices,
-		services.DependencyPackages,
-	}
-
-	for _, dep := range dependencies {
-		err := setupDependency(dep)
+	for _, dep := range services.Dependencies {
+		err := setupDependency(dep.Updater)
 		if err != nil {
 			log.Error(err)
 			os.Exit(1)
@@ -105,7 +99,7 @@ func setupDependencies() error {
 	return nil
 }
 
-func setupDependency(dep types.Dependency) error {
+func setupDependency(dep types.DependencyUpdater) error {
 	err := os.Mkdir(dep.GetPath(), os.ModePerm)
 	if os.IsExist(err) {
 		// The dependency already exists.

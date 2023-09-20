@@ -8,21 +8,21 @@ import (
 	"github.com/vertex-center/vertex/types"
 )
 
-func addUpdatesRoutes(r *gin.RouterGroup) {
-	r.GET("", handleGetUpdates)
-	r.POST("", handleExecuteUpdates)
+func addDependenciesRoutes(r *gin.RouterGroup) {
+	r.GET("", handleGetDependencies)
+	r.POST("/update", handleUpdateDependencies)
 }
 
-// handleGetUpdates handles the retrieval of all updates.
+// handleGetPackages handles the retrieval of all dependencies.
 // Errors can be:
-//   - failed_to_check_for_updates: failed to check for updates.
-func handleGetUpdates(c *gin.Context) {
+//   - failed_to_get_dependencies: failed to get dependencies.
+func handleGetDependencies(c *gin.Context) {
 	reload := c.Query("reload")
 
-	var updates types.Updates
+	var dependencies types.Dependencies
 	if reload == "true" {
 		var err error
-		updates, err = updateService.CheckForUpdates()
+		dependencies, err = dependenciesService.CheckForUpdates()
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
 				Code:    "failed_to_check_for_updates",
@@ -31,10 +31,10 @@ func handleGetUpdates(c *gin.Context) {
 			return
 		}
 	} else {
-		updates = updateService.GetCachedUpdates()
+		dependencies = dependenciesService.GetCachedUpdates()
 	}
 
-	c.JSON(http.StatusOK, updates)
+	c.JSON(http.StatusOK, dependencies)
 }
 
 type executeUpdatesBody struct {
@@ -49,7 +49,7 @@ type executeUpdatesBody struct {
 //   - failed_to_install_updates: failed to install the updates.
 //   - failed_to_reload_services: failed to reload the services.
 //   - failed_to_reload_packages: failed to reload the packages.
-func handleExecuteUpdates(c *gin.Context) {
+func handleUpdateDependencies(c *gin.Context) {
 	var body executeUpdatesBody
 	err := c.BindJSON(&body)
 	if err != nil {
@@ -60,12 +60,14 @@ func handleExecuteUpdates(c *gin.Context) {
 		return
 	}
 
+	fmt.Printf("body: %v\n", body)
+
 	var updates []string
 	for _, update := range body.Updates {
 		updates = append(updates, update.Name)
 	}
 
-	err = updateService.InstallUpdates(updates)
+	err = dependenciesService.InstallUpdates(updates)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_install_updates",

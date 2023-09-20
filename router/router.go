@@ -37,7 +37,7 @@ var (
 	serviceService       services.ServiceService
 	proxyService         services.ProxyService
 	instanceService      services.InstanceService
-	updateService        services.UpdateDependenciesService
+	dependenciesService  services.DependenciesService
 	settingsService      services.SettingsService
 )
 
@@ -153,7 +153,7 @@ func (r *Router) initServices(about types.About) {
 	instanceService = services.NewInstanceService(serviceFSAdapter, instanceFSAdapter, runnerDockerAdapter, runnerFSAdapter, instanceLogsFSAdapter, eventInMemoryAdapter)
 	packageService = services.NewPackageService(packageFSAdapter)
 	serviceService = services.NewServiceService(serviceFSAdapter)
-	updateService = services.NewUpdateDependenciesService(about.Version)
+	dependenciesService = services.NewDependenciesService(about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)
 }
 
@@ -169,7 +169,7 @@ func (r *Router) initAPIRoutes(about types.About) {
 	addInstanceRoutes(api.Group("/instance/:instance_uuid"))
 	addPackagesRoutes(api.Group("/packages"))
 	addProxyRoutes(api.Group("/proxy"))
-	addUpdatesRoutes(api.Group("/updates"))
+	addDependenciesRoutes(api.Group("/dependencies"))
 	addSettingsRoutes(api.Group("/settings"))
 }
 

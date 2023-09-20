@@ -23,93 +23,94 @@ import (
 )
 
 var (
-	DependencyClient   types.Dependency = &VertexClientDependency{}
-	DependencyServices types.Dependency = newVertexGitHubDependency("services", "Vertex Services", "vertex-services")
-	DependencyPackages types.Dependency = newVertexGitHubDependency("packages", "Vertex Dependencies", "vertex-dependencies")
+	Dependencies = []*types.Dependency{
+		{
+			ID:      "vertex-webui",
+			Name:    "Vertex Web UI",
+			Updater: &clientUpdater{},
+		},
+		{
+			ID:      "vertex-services",
+			Name:    "Vertex Services",
+			Updater: newGitHubUpdater("services", "Vertex Services", "vertex-services"),
+		},
+		{
+			ID:      "vertex-dependencies",
+			Name:    "Vertex Dependencies",
+			Updater: newGitHubUpdater("packages", "Vertex Dependencies", "vertex-dependencies"),
+		},
+	}
 )
 
 var (
 	ErrDependencyNotInstalled = errors.New("dependency is not installed")
 )
 
-type UpdateDependenciesService struct {
-	dependencies []types.Dependency
-
-	updates types.Updates
+type DependenciesService struct {
+	dependencies types.Dependencies
 }
 
-func NewUpdateDependenciesService(currentVertexVersion string) UpdateDependenciesService {
-	return UpdateDependenciesService{
-		dependencies: []types.Dependency{
-			&vertexDependency{currentVersion: currentVertexVersion}, // vertex-center/vertex
+func NewDependenciesService(currentVertexVersion string) DependenciesService {
+	dependencies := append(Dependencies, &types.Dependency{
+		ID:      "vertex",
+		Name:    "Vertex",
+		Updater: &vertexUpdater{currentVersion: currentVertexVersion},
+	})
 
-			DependencyClient,   // vertex-center/vertex-webui
-			DependencyServices, // vertex-center/vertex-services
-			DependencyPackages, // vertex-center/vertex-dependencies
+	return DependenciesService{
+		dependencies: types.Dependencies{
+			Items: dependencies,
 		},
 	}
 }
 
-func (s *UpdateDependenciesService) GetCachedUpdates() types.Updates {
-	return s.updates
+func (s *DependenciesService) GetCachedUpdates() types.Dependencies {
+	return s.dependencies
 }
 
-func (s *UpdateDependenciesService) CheckForUpdates() (types.Updates, error) {
+func (s *DependenciesService) CheckForUpdates() (types.Dependencies, error) {
 	log.Info("fetching all updates...")
 
-	s.updates.Items = []types.Update{}
-
-	for _, dependency := range s.dependencies {
+	for _, dependency := range s.dependencies.Items {
 		log.Info("fetching dependency",
-			vlog.String("id", dependency.GetID()),
+			vlog.String("id", dependency.ID),
 		)
 
-		update, err := dependency.CheckForUpdate()
+		update, err := dependency.Updater.CheckForUpdate()
 		if err != nil {
-			return types.Updates{}, err
+			log.Error(err)
 		}
-		if update != nil {
-			log.Info("dependency needs update",
-				vlog.String("id", dependency.GetID()),
-			)
-			s.updates.Items = append(s.updates.Items, *update)
-		} else {
-			log.Info("dependency already up-to-date",
-				vlog.String("id", dependency.GetID()),
-			)
-		}
+		dependency.Update = update
 	}
 
 	t := time.Now()
-	s.updates.LastChecked = &(t)
-	return s.updates, nil
+	s.dependencies.LastUpdatesCheck = &(t)
+	return s.dependencies, nil
 }
 
-func (s *UpdateDependenciesService) InstallUpdates(dependenciesID []string) error {
-	for _, dependency := range s.dependencies {
-		if slices.Contains(dependenciesID, dependency.GetID()) {
-			err := dependency.InstallUpdate()
+func (s *DependenciesService) InstallUpdates(dependenciesID []string) error {
+	for _, dependency := range s.dependencies.Items {
+		if slices.Contains(dependenciesID, dependency.ID) {
+			err := dependency.Updater.InstallUpdate()
 			if err != nil {
 				return err
 			}
+			dependency.Update = nil
 		}
 	}
-	s.updates.Items = []types.Update{}
 	return nil
 }
 
 // Vertex: https://github.com/vertex-center/vertex
-type vertexDependency struct {
+type vertexUpdater struct {
 	// The current version of Vertex.
 	currentVersion string
 
-	// The update found by the CheckForUpdate function.
-	update *types.Update
 	// The GitHub release associated with the update
 	release *github.RepositoryRelease
 }
 
-func (d *vertexDependency) CheckForUpdate() (*types.Update, error) {
+func (d *vertexUpdater) CheckForUpdate() (*types.DependencyUpdate, error) {
 	if d.currentVersion == "dev" {
 		log.Info("skipping vertex update in 'dev' version")
 		return nil, nil
@@ -138,23 +139,19 @@ func (d *vertexDependency) CheckForUpdate() (*types.Update, error) {
 		return nil, nil
 	}
 
-	d.update = &types.Update{
-		ID:             d.GetID(),
-		Name:           "Vertex",
-		CurrentVersion: d.currentVersion,
-		LatestVersion:  latestVersion,
-		NeedsRestart:   true,
-	}
-
 	log.Info("a new release for Vertex is available",
 		vlog.String("current", d.currentVersion),
 		vlog.String("release", latestVersion),
 	)
 
-	return d.update, nil
+	return &types.DependencyUpdate{
+		CurrentVersion: d.currentVersion,
+		LatestVersion:  latestVersion,
+		NeedsRestart:   true,
+	}, nil
 }
 
-func (d *vertexDependency) InstallUpdate() error {
+func (d *vertexUpdater) InstallUpdate() error {
 	if d.release == nil {
 		return errors.New("the release has not been fetched before installing the update")
 	}
@@ -176,30 +173,27 @@ func (d *vertexDependency) InstallUpdate() error {
 		return err
 	}
 
-	d.currentVersion = d.update.LatestVersion
 	d.release = nil
-	d.update = nil
 
 	log.Warn("a new Vertex update has been installed. please restart Vertex to apply changes.")
 
 	return nil
 }
 
-func (d *vertexDependency) GetID() string {
+func (d *vertexUpdater) GetID() string {
 	return "vertex"
 }
 
-func (d *vertexDependency) GetPath() string {
+func (d *vertexUpdater) GetPath() string {
 	return "."
 }
 
-type VertexClientDependency struct {
+type clientUpdater struct {
 	currentVersion string
 	release        *github.RepositoryRelease
-	update         *types.Update
 }
 
-func (d *VertexClientDependency) CheckForUpdate() (*types.Update, error) {
+func (d *clientUpdater) CheckForUpdate() (*types.DependencyUpdate, error) {
 	d.FetchCurrentVersion()
 
 	client := github.NewClient(nil)
@@ -219,17 +213,14 @@ func (d *VertexClientDependency) CheckForUpdate() (*types.Update, error) {
 	}
 
 	d.release = release
-	d.update = &types.Update{
-		ID:             d.GetID(),
-		Name:           "Vertex Client",
+	return &types.DependencyUpdate{
 		CurrentVersion: d.currentVersion,
 		LatestVersion:  latestVersion,
 		NeedsRestart:   false,
-	}
-	return d.update, nil
+	}, nil
 }
 
-func (d *VertexClientDependency) InstallUpdate() error {
+func (d *clientUpdater) InstallUpdate() error {
 	log.Info("downloading vertex-webui client...")
 
 	for _, asset := range d.release.Assets {
@@ -269,21 +260,20 @@ func (d *VertexClientDependency) InstallUpdate() error {
 	}
 
 	d.FetchCurrentVersion()
-	d.update = nil
 	d.release = nil
 
 	return nil
 }
 
-func (d *VertexClientDependency) GetID() string {
+func (d *clientUpdater) GetID() string {
 	return "vertex-webui"
 }
 
-func (d *VertexClientDependency) GetPath() string {
+func (d *clientUpdater) GetPath() string {
 	return path.Join(storage.Path, "client")
 }
 
-func (d *VertexClientDependency) FetchCurrentVersion() {
+func (d *clientUpdater) FetchCurrentVersion() {
 	version, err := os.ReadFile(path.Join(d.GetPath(), "dist", "version.txt"))
 	if err != nil {
 		return
@@ -355,21 +345,21 @@ func unarchive(dir string) error {
 	return nil
 }
 
-type vertexGitHubDependency struct {
+type gitHubUpdater struct {
 	dir  string
 	name string
 	repo string
 }
 
-func newVertexGitHubDependency(dir string, name string, repo string) *vertexGitHubDependency {
-	return &vertexGitHubDependency{
+func newGitHubUpdater(dir string, name string, repo string) *gitHubUpdater {
+	return &gitHubUpdater{
 		dir:  path.Join(storage.Path, dir),
 		name: name,
 		repo: repo,
 	}
 }
 
-func (d *vertexGitHubDependency) CheckForUpdate() (*types.Update, error) {
+func (d *gitHubUpdater) CheckForUpdate() (*types.DependencyUpdate, error) {
 	client := github.NewClient(nil)
 
 	// Local
@@ -398,9 +388,7 @@ func (d *vertexGitHubDependency) CheckForUpdate() (*types.Update, error) {
 
 	// Comparison
 	if localSHA != remoteSHA {
-		return &types.Update{
-			ID:             d.GetID(),
-			Name:           d.name,
+		return &types.DependencyUpdate{
 			CurrentVersion: localSHA,
 			LatestVersion:  remoteSHA,
 			NeedsRestart:   false,
@@ -410,15 +398,15 @@ func (d *vertexGitHubDependency) CheckForUpdate() (*types.Update, error) {
 	return nil, nil
 }
 
-func (d *vertexGitHubDependency) InstallUpdate() error {
+func (d *gitHubUpdater) InstallUpdate() error {
 	url := "https://github.com/vertex-center/" + d.repo
 	return storage.CloneOrPullRepository(url, d.dir)
 }
 
-func (d *vertexGitHubDependency) GetID() string {
+func (d *gitHubUpdater) GetID() string {
 	return d.repo
 }
 
-func (d *vertexGitHubDependency) GetPath() string {
+func (d *gitHubUpdater) GetPath() string {
 	return d.dir
 }
