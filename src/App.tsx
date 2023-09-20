@@ -21,6 +21,7 @@ import ReverseProxy from "./pages/ReverseProxy/ReverseProxy";
 import SettingsNotifications from "./pages/SettingsNotifications/SettingsNotifications";
 import Header from "./components/Header/Header";
 import BayDetailsDatabase from "./pages/BayDetailsDatabase/BayDetailsDatabase";
+import SettingsHardware from "./pages/SettingsHardware/SettingsHardware";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -86,6 +87,10 @@ function App() {
                             <Route
                                 path="/settings/notifications"
                                 element={<SettingsNotifications />}
+                            />
+                            <Route
+                                path="/settings/hardware"
+                                element={<SettingsHardware />}
                             />
                             <Route
                                 path="/settings/updates"

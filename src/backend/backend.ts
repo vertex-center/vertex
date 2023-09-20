@@ -10,6 +10,7 @@ import { Dependencies } from "../models/dependency";
 import { Dependencies as DependenciesUpdate } from "../models/update";
 import { DockerContainerInfo } from "../models/docker";
 import { About } from "../models/about";
+import { Hardware } from "../models/hardware";
 
 type InstallServiceParams = {
     method: InstallMethod;
@@ -24,6 +25,10 @@ const server = axios.create({
 export const api = {
     about: {
         get: () => server.get<About>("/about"),
+    },
+
+    hardware: {
+        get: () => server.get<Hardware>("/hardware"),
     },
 
     instances: {

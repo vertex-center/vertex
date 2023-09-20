@@ -30,6 +30,11 @@ export default function Settings() {
                             name="Notifications"
                         />
                         <SidebarItem
+                            to="/settings/hardware"
+                            symbol="hard_drive"
+                            name="Hardware"
+                        />
+                        <SidebarItem
                             to="/settings/updates"
                             symbol="update"
                             name="Updates"
