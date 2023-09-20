@@ -134,6 +134,7 @@ export default function SettingsUpdates() {
                     <Update
                         key={dep?.id}
                         name={dep?.name}
+                        version={dep?.version}
                         onUpdate={() => updateService(dep?.id)}
                         current_version={dep?.update?.current_version}
                         latest_version={dep?.update?.latest_version}

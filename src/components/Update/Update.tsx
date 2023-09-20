@@ -4,7 +4,6 @@ import styles from "./Update.module.sass";
 import Button from "../Button/Button";
 import Spacer from "../Spacer/Spacer";
 import Symbol from "../Symbol/Symbol";
-import { Horizontal } from "../Layouts/Layouts";
 import Progress from "../Progress";
 
 export function Updates(props: PropsWithChildren) {
@@ -13,15 +12,17 @@ export function Updates(props: PropsWithChildren) {
 
 type Props = {
     name: string;
-    onUpdate: () => Promise<void>;
+    version?: string;
     available?: boolean;
 
     current_version?: string;
     latest_version?: string;
+
+    onUpdate: () => Promise<void>;
 };
 
 export default function Update(props: Props) {
-    const { name, available, current_version, latest_version } = props;
+    const { name, available, version, current_version, latest_version } = props;
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -34,20 +35,18 @@ export default function Update(props: Props) {
         <div className={styles.update}>
             <div className={styles.name}>{name}</div>
             <Spacer />
+            <code className={styles.version}>
+                {version}
+                {latest_version && " -> " + latest_version}
+            </code>
             {available ? (
-                <Horizontal gap={20} alignItems="center">
-                    {current_version && latest_version && (
-                        <code>
-                            {current_version} {"->"} {latest_version}
-                        </code>
-                    )}
-                    {!isLoading && (
-                        <Button rightSymbol="download" onClick={onUpdate}>
-                            Install
-                        </Button>
-                    )}
-                    {isLoading && <Progress infinite />}
-                </Horizontal>
+                isLoading ? (
+                    <Progress infinite />
+                ) : (
+                    <Button rightSymbol="download" onClick={onUpdate}>
+                        Update
+                    </Button>
+                )
             ) : (
                 <div className={styles.status}>
                     <Symbol name="check" />
