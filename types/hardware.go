@@ -1,8 +1,27 @@
 package types
 
-type Hardware struct {
-	OS      string `json:"os"`
-	Arch    string `json:"arch"`
+type Host struct {
+	// OS is the operating system name.
+	// Example: "linux"
+	OS string `json:"os"`
+
+	// Arch is the hardware architecture.
+	// Example: "arm64"
+	Arch string `json:"arch"`
+
+	// Platform is the platform name.
+	// Example: "arch"
+	Platform string `json:"platform"`
+
+	// Version is the platform version.
+	// Example: "13.5.2"
 	Version string `json:"version"`
-	Name    string `json:"name"`
+
+	// Name is the hostname.
+	// Example: "my-host"
+	Name string `json:"name"`
+}
+
+type Hardware struct {
+	Host Host `json:"host"`
 }
