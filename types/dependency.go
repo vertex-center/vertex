@@ -12,6 +12,9 @@ type DependencyUpdater interface {
 	// InstallUpdate will install the previously fetched update.
 	InstallUpdate() error
 
+	// GetCurrentVersion returns the current version of the dependency.
+	GetCurrentVersion() string
+
 	// GetPath returns the path of the dependency.
 	GetPath() string
 }

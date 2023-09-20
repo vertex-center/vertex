@@ -51,11 +51,15 @@ type DependenciesService struct {
 }
 
 func NewDependenciesService(currentVertexVersion string) DependenciesService {
-	dependencies := append(Dependencies, &types.Dependency{
+	var dependencies = append([]*types.Dependency{{
 		ID:      "vertex",
 		Name:    "Vertex",
 		Updater: &vertexUpdater{currentVersion: currentVertexVersion},
-	})
+	}}, Dependencies...)
+
+	for _, dependency := range dependencies {
+		dependency.Version = dependency.Updater.GetCurrentVersion()
+	}
 
 	return DependenciesService{
 		dependencies: types.Dependencies{
@@ -95,6 +99,8 @@ func (s *DependenciesService) InstallUpdates(dependenciesID []string) error {
 			if err != nil {
 				return err
 			}
+
+			dependency.Version = dependency.Updater.GetCurrentVersion()
 			dependency.Update = nil
 		}
 	}
@@ -180,6 +186,10 @@ func (d *vertexUpdater) InstallUpdate() error {
 	return nil
 }
 
+func (d *vertexUpdater) GetCurrentVersion() string {
+	return d.currentVersion
+}
+
 func (d *vertexUpdater) GetPath() string {
 	return "."
 }
@@ -190,8 +200,6 @@ type clientUpdater struct {
 }
 
 func (d *clientUpdater) CheckForUpdate() (*types.DependencyUpdate, error) {
-	d.FetchCurrentVersion()
-
 	client := github.NewClient(nil)
 
 	owner := "vertex-center"
@@ -255,22 +263,23 @@ func (d *clientUpdater) InstallUpdate() error {
 		}
 	}
 
-	d.FetchCurrentVersion()
 	d.release = nil
 
 	return nil
 }
 
-func (d *clientUpdater) GetPath() string {
-	return path.Join(storage.Path, "client")
-}
-
-func (d *clientUpdater) FetchCurrentVersion() {
+func (d *clientUpdater) GetCurrentVersion() string {
 	version, err := os.ReadFile(path.Join(d.GetPath(), "dist", "version.txt"))
 	if err != nil {
-		return
+		log.Error(err)
 	}
-	d.currentVersion = strings.TrimSpace(string(version))
+	currentVersion := strings.TrimSpace(string(version))
+	d.currentVersion = currentVersion
+	return currentVersion
+}
+
+func (d *clientUpdater) GetPath() string {
+	return path.Join(storage.Path, "client")
 }
 
 func download(dir string, url string) error {
@@ -378,6 +387,13 @@ func (d *gitHubUpdater) CheckForUpdate() (*types.DependencyUpdate, error) {
 		return nil, errors.New("commit sha not found")
 	}
 
+	if len(localSHA) > 7 {
+		localSHA = localSHA[:7]
+	}
+	if len(remoteSHA) > 7 {
+		remoteSHA = remoteSHA[:7]
+	}
+
 	// Comparison
 	if localSHA != remoteSHA {
 		return &types.DependencyUpdate{
@@ -393,6 +409,24 @@ func (d *gitHubUpdater) CheckForUpdate() (*types.DependencyUpdate, error) {
 func (d *gitHubUpdater) InstallUpdate() error {
 	url := "https://github.com/vertex-center/" + d.repo
 	return storage.CloneOrPullRepository(url, d.dir)
+}
+
+func (d *gitHubUpdater) GetCurrentVersion() string {
+	repo, err := git.PlainOpen(d.dir)
+	if err != nil {
+		log.Error(err)
+		return ""
+	}
+	ref, err := repo.Head()
+	if err != nil {
+		log.Error(err)
+		return ""
+	}
+	hash := ref.Hash().String()
+	if len(hash) > 7 {
+		hash = hash[:7]
+	}
+	return hash
 }
 
 func (d *gitHubUpdater) GetPath() string {
