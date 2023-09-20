@@ -2,7 +2,6 @@ import { PropsWithChildren, useState } from "react";
 
 import styles from "./Update.module.sass";
 import Button from "../Button/Button";
-import Spacer from "../Spacer/Spacer";
 import Symbol from "../Symbol/Symbol";
 import Progress from "../Progress";
 
@@ -35,7 +34,6 @@ export default function Update(props: Props) {
         <div className={styles.update}>
             <div className={styles.info}>
                 <div className={styles.name}>{name}</div>
-                <Spacer />
                 {version && (
                     <code className={styles.version}>
                         {version}
