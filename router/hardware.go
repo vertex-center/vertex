@@ -1,6 +1,8 @@
 package router
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 func addHardwareRoutes(r *gin.RouterGroup) {
 	r.GET("", handleGetHardware)

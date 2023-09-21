@@ -34,7 +34,7 @@ func handleAddRedirect(c *gin.Context) {
 	var body handleAddRedirectBody
 	err := c.BindJSON(&body)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, types.APIError{
+		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
 			Code:    "failed_to_parse_body",
 			Message: fmt.Sprintf("failed to parse request body: %v", err),
 		})
@@ -48,7 +48,7 @@ func handleAddRedirect(c *gin.Context) {
 
 	err = proxyService.AddRedirect(redirect)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_add_redirect",
 			Message: fmt.Sprintf("failed to add redirect: %v", err),
 		})
@@ -66,7 +66,7 @@ func handleAddRedirect(c *gin.Context) {
 func handleRemoveRedirect(c *gin.Context) {
 	idString := c.Param("id")
 	if idString == "" {
-		c.AbortWithStatusJSON(http.StatusBadRequest, types.APIError{
+		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
 			Code:    "missing_redirect_uuid",
 			Message: "missing redirect uuid",
 		})
@@ -75,7 +75,7 @@ func handleRemoveRedirect(c *gin.Context) {
 
 	id, err := uuid.Parse(idString)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, types.APIError{
+		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
 			Code:    "invalid_redirect_uuid",
 			Message: "invalid redirect uuid",
 		})
@@ -84,7 +84,7 @@ func handleRemoveRedirect(c *gin.Context) {
 
 	err = proxyService.RemoveRedirect(id)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_remove_redirect",
 			Message: fmt.Sprintf("failed to remove redirect: %v", err),
 		})

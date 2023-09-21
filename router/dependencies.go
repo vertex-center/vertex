@@ -24,7 +24,7 @@ func handleGetDependencies(c *gin.Context) {
 		var err error
 		dependencies, err = dependenciesService.CheckForUpdates()
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+			_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 				Code:    "failed_to_check_for_updates",
 				Message: fmt.Sprintf("failed to check for updates: %v", err),
 			})
@@ -53,7 +53,7 @@ func handleUpdateDependencies(c *gin.Context) {
 	var body executeUpdatesBody
 	err := c.BindJSON(&body)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, types.APIError{
+		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
 			Code:    "failed_to_parse_body",
 			Message: fmt.Sprintf("failed to parse request body: %v", err),
 		})
@@ -69,7 +69,7 @@ func handleUpdateDependencies(c *gin.Context) {
 
 	err = dependenciesService.InstallUpdates(updates)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_install_updates",
 			Message: fmt.Sprintf("failed to install updates: %v", err),
 		})
@@ -78,7 +78,7 @@ func handleUpdateDependencies(c *gin.Context) {
 
 	err = serviceService.Reload()
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_reload_services",
 			Message: fmt.Sprintf("failed to reload services: %v", err),
 		})
@@ -87,8 +87,7 @@ func handleUpdateDependencies(c *gin.Context) {
 
 	err = packageService.Reload()
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_reload_packages",
 			Message: fmt.Sprintf("failed to reload packages: %v", err),
 		})

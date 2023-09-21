@@ -28,7 +28,7 @@ func handleInstallPackages(c *gin.Context) {
 	var body InstallPackagesBody
 	err := c.BindJSON(&body)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, types.APIError{
+		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
 			Code:    "failed_to_parse_body",
 			Message: fmt.Sprintf("failed to parse request body: %v", err),
 		})

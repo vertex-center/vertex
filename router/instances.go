@@ -42,7 +42,7 @@ func handleSearchInstances(c *gin.Context) {
 func handleCheckForUpdates(c *gin.Context) {
 	instances, err := instanceService.CheckForUpdates()
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "check_for_updates_failed",
 			Message: err.Error(),
 		})

@@ -26,7 +26,7 @@ func handlePatchSettings(c *gin.Context) {
 	var settings types.Settings
 	err := c.BindJSON(&settings)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, types.APIError{
+		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
 			Code:    "failed_to_parse_body",
 			Message: fmt.Sprintf("failed to parse request body: %v", err),
 		})
@@ -35,7 +35,7 @@ func handlePatchSettings(c *gin.Context) {
 
 	err = settingsService.Update(settings)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_update_settings",
 			Message: fmt.Sprintf("failed to update settings: %v", err),
 		})

@@ -1,6 +1,8 @@
 package ginutils
 
 import (
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
@@ -9,6 +11,9 @@ import (
 func Logger(router string) gin.HandlerFunc {
 	return gin.LoggerWithFormatter(func(params gin.LogFormatterParams) string {
 		if params.ErrorMessage != "" {
+			errorMessage := strings.TrimSuffix(params.ErrorMessage, "\n")
+			errorMessage = strings.ReplaceAll(errorMessage, "Error #01: ", "")
+
 			log.Request("request",
 				vlog.String("router", router),
 				vlog.String("method", params.Method),
@@ -17,7 +22,7 @@ func Logger(router string) gin.HandlerFunc {
 				vlog.String("latency", params.Latency.String()),
 				vlog.String("ip", params.ClientIP),
 				vlog.Int("size", params.BodySize),
-				vlog.String("error", params.ErrorMessage),
+				vlog.String("error", errorMessage),
 			)
 		} else {
 			log.Request("request",

@@ -55,6 +55,7 @@ func NewRouter(about types.About) Router {
 	}
 
 	r.engine.Use(cors.Default())
+	r.engine.Use(ginutils.ErrorHandler())
 	r.engine.Use(ginutils.Logger("MAIN"))
 	r.engine.Use(gin.Recovery())
 	r.engine.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))

@@ -34,7 +34,7 @@ func handleServiceInstall(c *gin.Context) {
 	var body downloadBody
 	err := c.BindJSON(&body)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, types.APIError{
+		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
 			Code:    "failed_to_parse_body",
 			Message: fmt.Sprintf("failed to parse request body: %v", err),
 		})
@@ -43,13 +43,13 @@ func handleServiceInstall(c *gin.Context) {
 
 	i, err := instanceService.Install(body.ServiceID, body.Method)
 	if err != nil && errors.Is(err, types.ErrServiceNotFound) {
-		c.AbortWithStatusJSON(http.StatusBadRequest, types.APIError{
+		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
 			Code:    "service_not_found",
 			Message: fmt.Sprintf("service not found: %v", err),
 		})
 		return
 	} else if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_install_service",
 			Message: fmt.Sprintf("failed to install service: %v", err),
 		})

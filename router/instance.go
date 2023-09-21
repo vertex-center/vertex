@@ -36,7 +36,7 @@ func addInstanceRoutes(r *gin.RouterGroup) {
 func getParamInstanceUUID(c *gin.Context) *uuid.UUID {
 	p := c.Param("instance_uuid")
 	if p == "" {
-		c.AbortWithStatusJSON(http.StatusBadRequest, types.APIError{
+		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
 			Code:    "missing_instance_uuid",
 			Message: "'instance_uuid' was missing in the URL",
 		})
@@ -45,7 +45,7 @@ func getParamInstanceUUID(c *gin.Context) *uuid.UUID {
 
 	uid, err := uuid.Parse(p)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, types.APIError{
+		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
 			Code:    "invalid_instance_uuid",
 			Message: fmt.Sprintf("'%s' is not a valid UUID", p),
 		})
@@ -69,13 +69,13 @@ func getInstance(c *gin.Context) *types.Instance {
 
 	instance, err := instanceService.Get(*instanceUUID)
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
-		c.AbortWithStatusJSON(http.StatusNotFound, types.APIError{
+		_ = c.AbortWithError(http.StatusNotFound, types.APIError{
 			Code:    "instance_not_found",
 			Message: fmt.Sprintf("instance %s not found", instanceUUID),
 		})
 		return nil
 	} else if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_retrieve_instance",
 			Message: fmt.Sprintf("failed to retrieve instance %s: %v", instanceUUID, err),
 		})
@@ -112,19 +112,19 @@ func handleDeleteInstance(c *gin.Context) {
 
 	err := instanceService.Delete(*uid)
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
-		c.AbortWithStatusJSON(http.StatusNotFound, types.APIError{
+		_ = c.AbortWithError(http.StatusNotFound, types.APIError{
 			Code:    "instance_not_found",
 			Message: fmt.Sprintf("instance %s not found", uid),
 		})
 		return
 	} else if err != nil && errors.Is(err, types.ErrInstanceStillRunning) {
-		c.AbortWithStatusJSON(http.StatusConflict, types.APIError{
+		_ = c.AbortWithError(http.StatusConflict, types.APIError{
 			Code:    "instance_still_running",
 			Message: fmt.Sprintf("instance %s is still running", uid),
 		})
 		return
 	} else if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_delete_instance",
 			Message: fmt.Sprintf("failed to delete instance %s, %v", uid, err),
 		})
@@ -157,7 +157,7 @@ func handlePatchInstance(c *gin.Context) {
 	var body handlePatchInstanceBody
 	err := c.BindJSON(&body)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, types.APIError{
+		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
 			Code:    "failed_to_parse_body",
 			Message: fmt.Sprintf("failed to parse request body: %v", err),
 		})
@@ -167,13 +167,13 @@ func handlePatchInstance(c *gin.Context) {
 	if body.LaunchOnStartup != nil {
 		err = instanceService.SetLaunchOnStartup(*uid, *body.LaunchOnStartup)
 		if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
-			c.AbortWithStatusJSON(http.StatusNotFound, types.APIError{
+			_ = c.AbortWithError(http.StatusNotFound, types.APIError{
 				Code:    "instance_not_found",
 				Message: fmt.Sprintf("instance %s not found", uid),
 			})
 			return
 		} else if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+			_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 				Code:    "failed_to_set_launch_on_startup",
 				Message: fmt.Sprintf("failed to set launch on startup: %v", err),
 			})
@@ -184,13 +184,13 @@ func handlePatchInstance(c *gin.Context) {
 	if body.DisplayName != nil {
 		err = instanceService.SetDisplayName(*uid, *body.DisplayName)
 		if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
-			c.AbortWithStatusJSON(http.StatusNotFound, types.APIError{
+			_ = c.AbortWithError(http.StatusNotFound, types.APIError{
 				Code:    "instance_not_found",
 				Message: fmt.Sprintf("instance %s not found", uid),
 			})
 			return
 		} else if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+			_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 				Code:    "failed_to_set_display_name",
 				Message: fmt.Sprintf("failed to set display name: %v", err),
 			})
@@ -201,13 +201,13 @@ func handlePatchInstance(c *gin.Context) {
 	if body.Databases != nil {
 		err = instanceService.SetDatabases(*uid, body.Databases)
 		if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
-			c.AbortWithStatusJSON(http.StatusNotFound, types.APIError{
+			_ = c.AbortWithError(http.StatusNotFound, types.APIError{
 				Code:    "instance_not_found",
 				Message: fmt.Sprintf("instance %s not found", uid),
 			})
 			return
 		} else if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+			_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 				Code:    "failed_to_set_databases",
 				Message: fmt.Sprintf("failed to set databases: %v", err),
 			})
@@ -233,19 +233,19 @@ func handleStartInstance(c *gin.Context) {
 
 	err := instanceService.Start(*uid)
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
-		c.AbortWithStatusJSON(http.StatusNotFound, types.APIError{
+		_ = c.AbortWithError(http.StatusNotFound, types.APIError{
 			Code:    "instance_not_found",
 			Message: fmt.Sprintf("instance %s not found", uid),
 		})
 		return
 	} else if err != nil && errors.Is(err, services.ErrInstanceAlreadyRunning) {
-		c.AbortWithStatusJSON(http.StatusConflict, types.APIError{
+		_ = c.AbortWithError(http.StatusConflict, types.APIError{
 			Code:    "instance_already_running",
 			Message: fmt.Sprintf("instance %s is already running", uid),
 		})
 		return
 	} else if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_start_instance",
 			Message: fmt.Sprintf("failed to start instance %s: %v", uid, err),
 		})
@@ -270,19 +270,19 @@ func handleStopInstance(c *gin.Context) {
 
 	err := instanceService.Stop(*uid)
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
-		c.AbortWithStatusJSON(http.StatusNotFound, types.APIError{
+		_ = c.AbortWithError(http.StatusNotFound, types.APIError{
 			Code:    "instance_not_found",
 			Message: fmt.Sprintf("instance %s not found", uid),
 		})
 		return
 	} else if err != nil && errors.Is(err, services.ErrInstanceNotRunning) {
-		c.AbortWithStatusJSON(http.StatusConflict, types.APIError{
+		_ = c.AbortWithError(http.StatusConflict, types.APIError{
 			Code:    "instance_not_running",
 			Message: fmt.Sprintf("instance %s is not running", uid),
 		})
 		return
 	} else if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_stop_instance",
 			Message: fmt.Sprintf("failed to stop instance %s: %v", uid, err),
 		})
@@ -304,7 +304,7 @@ func handlePatchEnvironment(c *gin.Context) {
 	var environment map[string]string
 	err := c.BindJSON(&environment)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, types.APIError{
+		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
 			Code:    "failed_to_parse_body",
 			Message: fmt.Sprintf("failed to parse request body: %v", err),
 		})
@@ -318,13 +318,13 @@ func handlePatchEnvironment(c *gin.Context) {
 
 	err = instanceService.WriteEnv(i.UUID, environment)
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
-		c.AbortWithStatusJSON(http.StatusNotFound, types.APIError{
+		_ = c.AbortWithError(http.StatusNotFound, types.APIError{
 			Code:    "instance_not_found",
 			Message: fmt.Sprintf("instance %s not found", i.UUID),
 		})
 		return
 	} else if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_save_environment",
 			Message: fmt.Sprintf("failed to save environment: %v", err),
 		})
@@ -333,7 +333,7 @@ func handlePatchEnvironment(c *gin.Context) {
 
 	err = instanceService.RecreateContainer(i)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_recreate_container",
 			Message: fmt.Sprintf("failed to recreate container: %v", err),
 		})
@@ -433,7 +433,7 @@ func handleGetPackages(c *gin.Context) {
 	}
 
 	if i.Service.Methods.Script == nil {
-		c.AbortWithStatusJSON(http.StatusNotFound, types.APIError{
+		_ = c.AbortWithError(http.StatusNotFound, types.APIError{
 			Code:    "instance_doesnt_use_scripts",
 			Message: "this service doesn't use scripts, so it doesn't have dependencies",
 		})
@@ -469,7 +469,7 @@ func handleGetDocker(c *gin.Context) {
 
 	info, err := instanceService.GetDockerContainerInfo(*uid)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_get_docker_container_info",
 			Message: fmt.Sprintf("failed to get docker container info: %v", err),
 		})
@@ -492,7 +492,7 @@ func handleRecreateDockerContainer(c *gin.Context) {
 
 	err := instanceService.RecreateContainer(i)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_recreate_container",
 			Message: fmt.Sprintf("failed to recreate container: %v", err),
 		})
@@ -515,7 +515,7 @@ func handleGetLogs(c *gin.Context) {
 
 	logs, err := instanceService.GetLatestLogs(*uid)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_get_logs",
 			Message: fmt.Sprintf("failed to get logs: %v", err),
 		})
@@ -536,7 +536,7 @@ func handleUpdateService(c *gin.Context) {
 
 	err := instanceService.UpdateService(*uid)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, types.APIError{
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_update_service",
 			Message: fmt.Sprintf("failed to update service: %v", err),
 		})
