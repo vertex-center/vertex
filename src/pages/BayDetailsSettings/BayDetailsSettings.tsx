@@ -3,7 +3,6 @@ import { Text, Title } from "../../components/Text/Text";
 import { Horizontal } from "../../components/Layouts/Layouts";
 import Spacer from "../../components/Spacer/Spacer";
 import Button from "../../components/Button/Button";
-import { ErrorMessage } from "../../components/ErrorMessage/ErrorMessage";
 import { useParams } from "react-router-dom";
 import useInstance from "../../hooks/useInstance";
 import Progress from "../../components/Progress";
@@ -13,6 +12,7 @@ import Input from "../../components/Input/Input";
 
 import styles from "./BayDetailsSettings.module.sass";
 import { api } from "../../backend/backend";
+import { APIError } from "../../components/Error/Error";
 
 type Props = {};
 
@@ -27,7 +27,7 @@ export default function BayDetailsSettings(props: Props) {
     // undefined = not saved AND never modified
     const [saved, setSaved] = useState<boolean>(undefined);
     const [uploading, setUploading] = useState<boolean>(false);
-    const [error, setError] = useState<string>();
+    const [error, setError] = useState();
 
     useEffect(() => {
         if (!instance) return;
@@ -45,9 +45,7 @@ export default function BayDetailsSettings(props: Props) {
             .then(() => {
                 setSaved(true);
             })
-            .catch((error) => {
-                setError(`${error.message}: ${error.response.data.message}`);
-            })
+            .catch(setError)
             .finally(() => {
                 setUploading(false);
             });
@@ -56,6 +54,7 @@ export default function BayDetailsSettings(props: Props) {
     return (
         <Fragment>
             <Title className={styles.title}>Settings</Title>
+            <APIError error={error} />
             <Input
                 label="Instance name"
                 description="The custom name of your choice for this service"
@@ -98,7 +97,6 @@ export default function BayDetailsSettings(props: Props) {
                     Saved!
                 </Horizontal>
             )}
-            <ErrorMessage error={error} />
         </Fragment>
     );
 }

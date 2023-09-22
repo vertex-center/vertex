@@ -11,19 +11,21 @@ import {
 
 import styles from "./SettingsAbout.module.sass";
 import { Vertical } from "../../components/Layouts/Layouts";
+import { APIError } from "../../components/Error/Error";
 
 export default function SettingsAbout() {
     const { data: about, loading, error } = useFetch<About>(api.about.get);
 
     return (
         <Fragment>
-            {loading && !error && (
-                <Fragment>
-                    <Title>Vertex</Title>
-                    <Loading />
-                </Fragment>
+            {(loading || error) && (
+                <Vertical>
+                    <Title className={styles.title}>Vertex</Title>
+                    {loading && <Loading />}
+                </Vertical>
             )}
-            {!loading && (
+            <APIError error={error} />
+            {!loading && !error && (
                 <Vertical gap={20}>
                     <Title className={styles.title}>Vertex</Title>
                     <KeyValueGroup>

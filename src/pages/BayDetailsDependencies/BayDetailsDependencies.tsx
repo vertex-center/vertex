@@ -17,6 +17,7 @@ import Progress from "../../components/Progress";
 import Popup from "../../components/Popup/Popup";
 import Code from "../../components/Code/Code";
 import { api } from "../../backend/backend";
+import { APIError } from "../../components/Error/Error";
 
 type Props = {
     name: string;
@@ -99,12 +100,14 @@ export default function BayDetailsDependencies() {
     const [isLoading, setIsLoading] = useState(false);
     const [command, setCommand] = useState<string>();
     const [packageManager, setPackageManager] = useState<string>();
+    const [error, setError] = useState();
 
     const reload = useCallback(() => {
         setIsLoading(true);
         api.instance.dependencies
             .get(uuid)
             .then((res) => setDependencies(res.data))
+            .catch(setError)
             .finally(() => setIsLoading(false));
     }, [uuid]);
 
@@ -127,6 +130,7 @@ export default function BayDetailsDependencies() {
             <Title className={styles.title}>
                 Dependencies ({Object.keys(dependencies).length})
             </Title>
+            <APIError error={error} />
             <Horizontal alignItems="center">
                 <Button
                     rightSymbol="refresh"

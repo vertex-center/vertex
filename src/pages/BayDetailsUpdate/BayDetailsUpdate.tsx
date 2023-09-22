@@ -5,29 +5,36 @@ import styles from "./BayDetailsUpdate.module.sass";
 import { Vertical } from "../../components/Layouts/Layouts";
 import { api } from "../../backend/backend";
 import Update, { Updates } from "../../components/Update/Update";
+import { useState } from "react";
+import { APIError } from "../../components/Error/Error";
 
 export default function BayDetailsUpdate() {
     const { uuid } = useParams();
 
     const { instance, reloadInstance } = useInstance(uuid);
 
+    const [error, setError] = useState();
+
     const updateVertexIntegration = () => {
         return api.instance.update
             .service(uuid)
             .then(reloadInstance)
-            .catch(console.error);
+            .catch(setError);
     };
 
     return (
         <Vertical gap={20}>
             <Title className={styles.title}>Update</Title>
-            <Updates>
-                <Update
-                    name="Vertex integration"
-                    onUpdate={updateVertexIntegration}
-                    available={instance?.service_update?.available}
-                />
-            </Updates>
+            <APIError error={error} />
+            {!error && (
+                <Updates>
+                    <Update
+                        name="Vertex integration"
+                        onUpdate={updateVertexIntegration}
+                        available={instance?.service_update?.available}
+                    />
+                </Updates>
+            )}
         </Vertical>
     );
 }

@@ -10,6 +10,7 @@ import { Env, EnvVariable } from "../../models/service";
 import styles from "./BayDetailsEnv.module.sass";
 import Loading from "../../components/Loading/Loading";
 import { api } from "../../backend/backend";
+import { APIError } from "../../components/Error/Error";
 
 type Props = {};
 
@@ -21,6 +22,7 @@ export default function BayDetailsEnv(props: Props) {
     const { instance } = useInstance(uuid);
 
     const [uploading, setUploading] = useState(false);
+    const [error, setError] = useState();
 
     // undefined = not saved AND never modified
     const [saved, setSaved] = useState<boolean>(undefined);
@@ -53,7 +55,7 @@ export default function BayDetailsEnv(props: Props) {
         api.instance.env
             .save(uuid, _env)
             .then(console.log)
-            .catch(console.error)
+            .catch(setError)
             .finally(() => {
                 setUploading(false);
                 setSaved(true);
@@ -94,6 +96,7 @@ export default function BayDetailsEnv(props: Props) {
                     Saved!
                 </Horizontal>
             )}
+            <APIError error={error} />
         </Fragment>
     );
 }

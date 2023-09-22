@@ -4,7 +4,6 @@ import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import Button from "../../components/Button/Button";
 import Spacer from "../../components/Spacer/Spacer";
 import Symbol from "../../components/Symbol/Symbol";
-import { ErrorMessage } from "../../components/ErrorMessage/ErrorMessage";
 import Popup from "../../components/Popup/Popup";
 import Loading from "../../components/Loading/Loading";
 import TimeAgo from "javascript-time-ago";
@@ -14,74 +13,29 @@ import { api } from "../../backend/backend";
 
 import styles from "./SettingsUpdates.module.sass";
 import Update, { Updates } from "../../components/Update/Update";
+import { APIError } from "../../components/Error/Error";
 
 TimeAgo.addDefaultLocale(en);
 
 const timeAgo = new TimeAgo("en-US");
 
-// type Props = {
-//     name: string;
-//     update: () => void;
-//     current_version: string;
-//     latest_version: string;
-//     needs_restart?: boolean;
-// };
-
-// function Update(props: Props) {
-//     const { name, update, current_version, latest_version, needs_restart } =
-//         props;
-//
-//     const [isLoading, setIsLoading] = useState(false);
-//
-//     const onUpdate = () => {
-//         setIsLoading(true);
-//         update();
-//     };
-//
-//     return (
-//         <Horizontal gap={24} alignItems="center">
-//             <Text>{name}</Text>
-//             <Spacer />
-//             {needs_restart && (
-//                 <Horizontal
-//                     gap={6}
-//                     alignItems="center"
-//                     style={{ color: "var(--orange)" }}
-//                 >
-//                     <Symbol name="warning" />
-//                     You'll need to restart the server
-//                 </Horizontal>
-//             )}
-//             <code>
-//                 {current_version.substring(0, 10)} {"->"}{" "}
-//                 {latest_version.substring(0, 10)}
-//             </code>
-//             {!isLoading && (
-//                 <Button onClick={onUpdate} rightSymbol="download">
-//                     Update
-//                 </Button>
-//             )}
-//             {isLoading && <Progress infinite />}
-//         </Horizontal>
-//     );
-// }
-
 export default function SettingsUpdates() {
     const [dependencies, setDependencies] = useState<Dependencies>();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState();
+    const [updateError, setUpdateError] = useState();
     const [showMessage, setShowMessage] = useState<boolean>(false);
 
     const reload = useCallback((refresh?: boolean) => {
         setIsLoading(true);
+        setError(undefined);
+
         api.dependencies
             .get(refresh)
             .then((res) => {
                 setDependencies(res.data);
             })
-            .catch((err) => {
-                setError(err?.response?.data?.message ?? err?.message);
-            })
+            .catch(setError)
             .finally(() => setIsLoading(false));
     }, []);
 
@@ -91,9 +45,7 @@ export default function SettingsUpdates() {
             .then(() => {
                 if (name === "vertex") setShowMessage(true);
             })
-            .catch((err) => {
-                setError(err?.response?.data?.message ?? err?.message);
-            })
+            .catch(setUpdateError)
             .finally(reload);
     };
 
@@ -106,7 +58,7 @@ export default function SettingsUpdates() {
     return (
         <Vertical gap={20}>
             <Title className={styles.title}>Updates</Title>
-            {!isLoading && (
+            {!isLoading && !error && (
                 <Horizontal alignItems="center" gap={20}>
                     <Button onClick={() => reload(true)} rightSymbol="refresh">
                         Check for updates
@@ -129,6 +81,7 @@ export default function SettingsUpdates() {
                     <Text>Everything is up-to-date.</Text>
                 </Horizontal>
             )}
+            <APIError error={updateError} />
             <Updates>
                 {dependencies?.items?.map((dep) => (
                     <Update
@@ -142,7 +95,7 @@ export default function SettingsUpdates() {
                     />
                 ))}
             </Updates>
-            {error && <ErrorMessage error={error} />}
+            <APIError error={error} />
             <Popup show={showMessage} onDismiss={dismissPopup}>
                 <Text>
                     Updates are installed. You can now restart your Vertex

@@ -13,9 +13,11 @@ import { BigTitle } from "../../components/Text/Text";
 import Button from "../../components/Button/Button";
 import { Horizontal } from "../../components/Layouts/Layouts";
 import { api } from "../../backend/backend";
+import { APIError } from "../../components/Error/Error";
 
 export default function Infrastructure() {
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState();
     const [status, setStatus] = useState("Waiting server response...");
     const [installed, setInstalled] = useState<Instances>({});
 
@@ -37,6 +39,8 @@ export default function Infrastructure() {
     }, [installed]);
 
     const fetchServices = () => {
+        // setError(undefined);
+
         api.instances
             .get()
             .then((res) => {
@@ -44,9 +48,10 @@ export default function Infrastructure() {
                 setInstalled(res.data);
                 setStatus("running");
             })
-            .catch(() => {
+            .catch((error) => {
                 setInstalled({});
                 setStatus("off");
+                setError(error);
             })
             .finally(() => {
                 setLoading(false);
@@ -100,7 +105,14 @@ export default function Infrastructure() {
             <div className={styles.title}>
                 <BigTitle>Infrastructure</BigTitle>
             </div>
-            {!loading && (
+
+            {error && (
+                <div className={styles.bays}>
+                    <APIError error={error} />
+                </div>
+            )}
+
+            {!loading && !error && (
                 <div className={styles.bays}>
                     <Bay instances={[{ name: "Vertex", status }]} />
                     {installedGrouped?.map((instances, i) => (

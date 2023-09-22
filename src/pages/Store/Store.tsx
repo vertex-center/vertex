@@ -5,7 +5,6 @@ import { Fragment, useState } from "react";
 
 import styles from "./Store.module.sass";
 import Service from "../../components/Service/Service";
-import { ErrorMessage } from "../../components/ErrorMessage/ErrorMessage";
 import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import Spacer from "../../components/Spacer/Spacer";
 import { SegmentedButtons } from "../../components/SegmentedButton";
@@ -13,6 +12,7 @@ import Button from "../../components/Button/Button";
 import Popup from "../../components/Popup/Popup";
 import { InstallMethod, Instances } from "../../models/instance";
 import { api } from "../../backend/backend";
+import { APIError, Errors } from "../../components/Error/Error";
 
 type Downloading = {
     service: ServiceModel;
@@ -21,12 +21,14 @@ type Downloading = {
 // type ImportMethod = "git" | "localstorage";
 
 export default function Store() {
-    const { data: services } = useFetch<ServiceModel[]>(
+    const { data: services, error: servicesError } = useFetch<ServiceModel[]>(
         api.services.available.get
     );
-    const { data: instances, reload: reloadInstances } = useFetch<Instances>(
-        api.instances.get
-    );
+    const {
+        data: instances,
+        error: instancesError,
+        reload: reloadInstances,
+    } = useFetch<Instances>(api.instances.get);
 
     const [installMethod, setInstallMethod] = useState<InstallMethod>();
 
@@ -39,8 +41,8 @@ export default function Store() {
 
     const [selectedService, setSelectedService] = useState<ServiceModel>();
 
-    const [error, setError] = useState<string>();
-    const [popupError, setPopupError] = useState<string>();
+    const [error, setError] = useState();
+    const [popupError, setPopupError] = useState();
 
     const [downloading, setDownloading] = useState<Downloading[]>([]);
 
@@ -59,6 +61,7 @@ export default function Store() {
         } else if (docker) {
             setInstallMethod("docker");
         } else {
+            // @ts-ignore
             setPopupError("This service doesn't have installation method.");
         }
     };
@@ -80,9 +83,7 @@ export default function Store() {
                 method: installMethod,
                 service_id: service.id,
             })
-            .catch((error) => {
-                setError(error.message);
-            })
+            .catch(setError)
             .finally(() => {
                 setDownloading(
                     downloading.filter(({ service: s }) => s.id !== service.id)
@@ -113,7 +114,6 @@ export default function Store() {
             onDismiss={() => setShowInstallPopup(false)}
         >
             <Title>Download {selectedService?.name}</Title>
-            <ErrorMessage error={popupError} />
             {!popupError && (
                 <Horizontal alignItems="center" gap={12}>
                     <Text>Installation method</Text>
@@ -144,6 +144,7 @@ export default function Store() {
                     />
                 </Horizontal>
             )}
+            <APIError style={{ margin: 0 }} error={popupError} />
             <Horizontal gap={8}>
                 <Spacer />
                 <Button onClick={closeInstallPopup}>Cancel</Button>
@@ -232,7 +233,11 @@ export default function Store() {
                 >
                     <BigTitle>Marketplace</BigTitle>
                 </Horizontal>
-                {<ErrorMessage error={error} />}
+                <Errors className={styles.errors}>
+                    <APIError error={error} />
+                    <APIError error={servicesError} />
+                    <APIError error={instancesError} />
+                </Errors>
                 <Vertical className={styles.content}>
                     {services?.map((service) => (
                         <Service

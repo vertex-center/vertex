@@ -5,7 +5,6 @@ import styles from "./BayDetailsDocker.module.sass";
 import { useParams } from "react-router-dom";
 import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import Button from "../../components/Button/Button";
-import { ErrorMessage } from "../../components/ErrorMessage/ErrorMessage";
 import { useFetch } from "../../hooks/useFetch";
 import { DockerContainerInfo } from "../../models/docker";
 import { api } from "../../backend/backend";
@@ -14,12 +13,16 @@ import {
     KeyValueInfo,
 } from "../../components/KeyValueInfo/KeyValueInfo";
 import byteSize from "byte-size";
+import { APIError } from "../../components/Error/Error";
 
 export default function BayDetailsDocker() {
     const { uuid } = useParams();
 
-    const { data: info, reload: reloadContainerInfo } =
-        useFetch<DockerContainerInfo>(() => api.instance.docker.get(uuid));
+    const {
+        data: info,
+        error,
+        reload: reloadContainerInfo,
+    } = useFetch<DockerContainerInfo>(() => api.instance.docker.get(uuid));
 
     const [recreatingContainer, setRecreatingContainer] = useState(false);
     const [recreatingContainerError, setRecreatingContainerError] = useState();
@@ -44,8 +47,12 @@ export default function BayDetailsDocker() {
             });
     };
 
+    if (error) return <APIError error={error} />;
+
     return (
         <Vertical gap={30}>
+            <APIError error={recreatingContainerError} />
+
             <Vertical gap={20}>
                 <Title className={styles.title}>Container</Title>
                 <KeyValueGroup>
@@ -108,7 +115,6 @@ export default function BayDetailsDocker() {
                         >
                             Recreate container
                         </Button>
-                        <ErrorMessage error={recreatingContainerError} />
                     </Horizontal>
                 </Vertical>
             </Vertical>

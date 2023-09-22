@@ -6,6 +6,7 @@ import Symbol from "../Symbol/Symbol";
 import Progress from "../Progress";
 
 export function Updates(props: PropsWithChildren) {
+    if (!props.children) return null;
     return <div {...props} />;
 }
 

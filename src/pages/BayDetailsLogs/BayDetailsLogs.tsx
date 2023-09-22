@@ -10,17 +10,19 @@ import { useParams } from "react-router-dom";
 import { api } from "../../backend/backend";
 import { Title } from "../../components/Text/Text";
 import styles from "./BayDetailsLogs.module.sass";
+import { APIError } from "../../components/Error/Error";
 
 export default function BayDetailsLogs() {
     const { uuid } = useParams();
 
     const [logs, setLogs] = useState<LogLine[]>([]);
+    const [error, setError] = useState();
 
     useEffect(() => {
         api.instance.logs
             .get(uuid)
             .then((res) => setLogs(res.data))
-            .catch(console.error);
+            .catch(setError);
     }, []);
 
     useEffect(() => {
@@ -64,6 +66,7 @@ export default function BayDetailsLogs() {
     return (
         <Fragment>
             <Title className={styles.title}>Logs</Title>
+            <APIError error={error} />
             <Logs lines={logs} />
         </Fragment>
     );

@@ -9,13 +9,16 @@ import Popup from "../../components/Popup/Popup";
 import React, { useState } from "react";
 import Input from "../../components/Input/Input";
 import Spacer from "../../components/Spacer/Spacer";
+import { APIError } from "../../components/Error/Error";
 
 type Props = {};
 
 export default function ReverseProxy(props: Props) {
-    const { data: redirects, reload } = useFetch<ProxyRedirects>(
-        api.proxy.redirects.get
-    );
+    const {
+        data: redirects,
+        error,
+        reload,
+    } = useFetch<ProxyRedirects>(api.proxy.redirects.get);
 
     const [showNewRedirectPopup, setShowNewRedirectPopup] = useState(false);
 
@@ -45,15 +48,18 @@ export default function ReverseProxy(props: Props) {
             <div className={styles.title}>
                 <BigTitle>Reverse Proxy</BigTitle>
             </div>
+
             <div className={styles.redirects}>
-                {Object.entries(redirects ?? {}).map(([uuid, redirect]) => (
-                    <ProxyRedirect
-                        enabled={true}
-                        source={redirect.source}
-                        target={redirect.target}
-                        onDelete={() => onDelete(uuid)}
-                    />
-                ))}
+                {error && <APIError error={error} />}
+                {!error &&
+                    Object.entries(redirects ?? {}).map(([uuid, redirect]) => (
+                        <ProxyRedirect
+                            enabled={true}
+                            source={redirect.source}
+                            target={redirect.target}
+                            onDelete={() => onDelete(uuid)}
+                        />
+                    ))}
             </div>
             <Horizontal className={styles.addRedirect} gap={10}>
                 <Button primary onClick={openNewRedirectPopup} leftSymbol="add">

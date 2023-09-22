@@ -15,6 +15,7 @@ import Progress from "../../components/Progress";
 import Button from "../../components/Button/Button";
 import { api } from "../../backend/backend";
 import { DatabaseEnvironment } from "../../models/service";
+import { APIError } from "../../components/Error/Error";
 
 type DatabaseProps = {
     instance?: Instance;
@@ -29,6 +30,7 @@ function Database(props: DatabaseProps) {
     const { instance, dbID, dbDefinition, onChange } = props;
 
     const [database, setDatabase] = useState<Instance>();
+    const [error, setError] = useState();
 
     const env = database?.environment;
 
@@ -40,7 +42,7 @@ function Database(props: DatabaseProps) {
             .then((res) => {
                 setDatabase(res.data);
             })
-            .catch(console.error);
+            .catch(setError);
     }, [instance]);
 
     const onDatabaseChange = (instance: Instance) => {
@@ -51,6 +53,8 @@ function Database(props: DatabaseProps) {
     const port = env?.[database?.service?.features?.databases?.[0]?.port];
     const username =
         env?.[database?.service?.features?.databases?.[0]?.username];
+
+    if (error) return <APIError error={error} />;
 
     return (
         <Vertical gap={20}>

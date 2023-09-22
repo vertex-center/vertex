@@ -22,7 +22,7 @@ import Button from "../../components/Button/Button";
 import Progress from "../../components/Progress";
 import { SiDocker } from "@icons-pack/react-simple-icons";
 import useInstance from "../../hooks/useInstance";
-import { ErrorMessage } from "../../components/ErrorMessage/ErrorMessage";
+import { APIError } from "../../components/Error/Error";
 
 export default function BayDetails() {
     const { uuid } = useParams();
@@ -32,7 +32,7 @@ export default function BayDetails() {
 
     const [showDeletePopup, setShowDeletePopup] = useState<boolean>();
     const [deleting, setDeleting] = useState<boolean>(false);
-    const [error, setError] = useState<string>();
+    const [error, setError] = useState();
 
     useEffect(() => {
         if (uuid === undefined) return;
@@ -68,14 +68,15 @@ export default function BayDetails() {
             .then(() => {
                 navigate("/infrastructure");
             })
-            .catch((err) => {
-                setError(err?.response?.data?.message ?? err?.message);
+            .catch((error) => {
+                setError(error);
                 setDeleting(false);
             });
     };
 
     const dismissDeletePopup = () => {
         setShowDeletePopup(false);
+        setError(undefined);
     };
 
     return (
@@ -174,7 +175,7 @@ export default function BayDetails() {
                         data will be permanently deleted.
                     </Text>
                     {deleting && <Progress infinite />}
-                    {error && <ErrorMessage error={error} />}
+                    <APIError style={{ margin: 0 }} error={error} />
                     <Horizontal gap={10}>
                         <Spacer />
                         <Button
