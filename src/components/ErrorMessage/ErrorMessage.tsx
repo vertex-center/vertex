@@ -1,13 +1,13 @@
 import { Horizontal } from "../Layouts/Layouts";
 import Symbol from "../Symbol/Symbol";
 
-import styles from "./Error.module.sass";
+import styles from "./ErrorMessage.module.sass";
 
 type Props = {
     error?: string;
 };
 
-export function Error(props: Props) {
+export function ErrorMessage(props: Props) {
     const { error } = props;
 
     if (!error) return null;

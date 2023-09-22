@@ -3,7 +3,7 @@ import { Text, Title } from "../../components/Text/Text";
 import { Horizontal } from "../../components/Layouts/Layouts";
 import Spacer from "../../components/Spacer/Spacer";
 import Button from "../../components/Button/Button";
-import { Error } from "../../components/Error/Error";
+import { ErrorMessage } from "../../components/ErrorMessage/ErrorMessage";
 import { useParams } from "react-router-dom";
 import useInstance from "../../hooks/useInstance";
 import Progress from "../../components/Progress";
@@ -98,7 +98,7 @@ export default function BayDetailsSettings(props: Props) {
                     Saved!
                 </Horizontal>
             )}
-            <Error error={error} />
+            <ErrorMessage error={error} />
         </Fragment>
     );
 }

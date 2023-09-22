@@ -5,7 +5,7 @@ import styles from "./BayDetailsDocker.module.sass";
 import { useParams } from "react-router-dom";
 import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import Button from "../../components/Button/Button";
-import { Error } from "../../components/Error/Error";
+import { ErrorMessage } from "../../components/ErrorMessage/ErrorMessage";
 import { useFetch } from "../../hooks/useFetch";
 import { DockerContainerInfo } from "../../models/docker";
 import { api } from "../../backend/backend";
@@ -108,7 +108,7 @@ export default function BayDetailsDocker() {
                         >
                             Recreate container
                         </Button>
-                        <Error error={recreatingContainerError} />
+                        <ErrorMessage error={recreatingContainerError} />
                     </Horizontal>
                 </Vertical>
             </Vertical>

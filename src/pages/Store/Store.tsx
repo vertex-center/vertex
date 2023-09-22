@@ -5,7 +5,7 @@ import { Fragment, useState } from "react";
 
 import styles from "./Store.module.sass";
 import Service from "../../components/Service/Service";
-import { Error } from "../../components/Error/Error";
+import { ErrorMessage } from "../../components/ErrorMessage/ErrorMessage";
 import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import Spacer from "../../components/Spacer/Spacer";
 import { SegmentedButtons } from "../../components/SegmentedButton";
@@ -113,7 +113,7 @@ export default function Store() {
             onDismiss={() => setShowInstallPopup(false)}
         >
             <Title>Download {selectedService?.name}</Title>
-            <Error error={popupError} />
+            <ErrorMessage error={popupError} />
             {!popupError && (
                 <Horizontal alignItems="center" gap={12}>
                     <Text>Installation method</Text>
@@ -232,7 +232,7 @@ export default function Store() {
                 >
                     <BigTitle>Marketplace</BigTitle>
                 </Horizontal>
-                {<Error error={error} />}
+                {<ErrorMessage error={error} />}
                 <Vertical className={styles.content}>
                     {services?.map((service) => (
                         <Service

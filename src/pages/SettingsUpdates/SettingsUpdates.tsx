@@ -4,7 +4,7 @@ import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import Button from "../../components/Button/Button";
 import Spacer from "../../components/Spacer/Spacer";
 import Symbol from "../../components/Symbol/Symbol";
-import { Error } from "../../components/Error/Error";
+import { ErrorMessage } from "../../components/ErrorMessage/ErrorMessage";
 import Popup from "../../components/Popup/Popup";
 import Loading from "../../components/Loading/Loading";
 import TimeAgo from "javascript-time-ago";
@@ -142,7 +142,7 @@ export default function SettingsUpdates() {
                     />
                 ))}
             </Updates>
-            {error && <Error error={error} />}
+            {error && <ErrorMessage error={error} />}
             <Popup show={showMessage} onDismiss={dismissPopup}>
                 <Text>
                     Updates are installed. You can now restart your Vertex

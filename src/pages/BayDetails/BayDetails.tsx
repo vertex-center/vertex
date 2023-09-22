@@ -22,7 +22,7 @@ import Button from "../../components/Button/Button";
 import Progress from "../../components/Progress";
 import { SiDocker } from "@icons-pack/react-simple-icons";
 import useInstance from "../../hooks/useInstance";
-import { Error } from "../../components/Error/Error";
+import { ErrorMessage } from "../../components/ErrorMessage/ErrorMessage";
 
 export default function BayDetails() {
     const { uuid } = useParams();
@@ -174,7 +174,7 @@ export default function BayDetails() {
                         data will be permanently deleted.
                     </Text>
                     {deleting && <Progress infinite />}
-                    {error && <Error error={error} />}
+                    {error && <ErrorMessage error={error} />}
                     <Horizontal gap={10}>
                         <Spacer />
                         <Button
