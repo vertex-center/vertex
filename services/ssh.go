@@ -49,10 +49,7 @@ func (s *SSHService) GetAll() ([]types.PublicKey, error) {
 
 	var publicKeys []ssh.PublicKey
 	for len(bytes) > 0 {
-		pubKey, _, _, rest, err := ssh.ParseAuthorizedKey(bytes)
-		if err != nil {
-			log.Error(err)
-		}
+		pubKey, _, _, rest, _ := ssh.ParseAuthorizedKey(bytes)
 		if pubKey != nil {
 			publicKeys = append(publicKeys, pubKey)
 		}
