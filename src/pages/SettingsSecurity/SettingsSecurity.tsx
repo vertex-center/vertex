@@ -16,7 +16,11 @@ import Input from "../../components/Input/Input";
 import Progress from "../../components/Progress";
 
 export default function SettingsSecurity() {
-    const { data: sshKeys, error } = useFetch<SSHKeys>(api.security.ssh.get);
+    const {
+        data: sshKeys,
+        error,
+        reload,
+    } = useFetch<SSHKeys>(api.security.ssh.get);
 
     const [showPopup, setShowPopup] = useState(false);
     const [authorizedKey, setAuthorizedKey] = useState("");
@@ -33,7 +37,10 @@ export default function SettingsSecurity() {
         setAdding(true);
         api.security.ssh
             .add(authorizedKey)
-            .then(dismissPopup)
+            .then(() => {
+                dismissPopup();
+                reload().then();
+            })
             .catch(setAddError)
             .finally(() => setAdding(false));
     };
