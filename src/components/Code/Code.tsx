@@ -1,19 +1,21 @@
 import SyntaxHighlighter from "react-syntax-highlighter";
-import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { atomOneDark as style } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 import styles from "./Code.module.sass";
+import { HTMLProps } from "react";
+import classNames from "classnames";
 
-type Props = {
+type Props = HTMLProps<HTMLDivElement> & {
     code: string;
     language: string;
 };
 
 export default function Code(props: Props) {
-    const { language, code } = props;
+    const { language, code, className, ...others } = props;
 
     return (
-        <div className={styles.code}>
-            <SyntaxHighlighter language={language} style={atomOneDark}>
+        <div className={classNames(styles.code, className)} {...others}>
+            <SyntaxHighlighter language={language} style={style}>
                 {code}
             </SyntaxHighlighter>
         </div>
