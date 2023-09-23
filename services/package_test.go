@@ -9,23 +9,23 @@ import (
 	"github.com/vertex-center/vertex/types"
 )
 
-type PackageTestSuite struct {
+type PackageServiceTestSuite struct {
 	suite.Suite
 
 	service PackageService
 	adapter MockPackageAdapter
 }
 
-func TestEventInMemoryAdapterTestSuite(t *testing.T) {
-	suite.Run(t, new(PackageTestSuite))
+func TestPackageServiceTestSuite(t *testing.T) {
+	suite.Run(t, new(PackageServiceTestSuite))
 }
 
-func (suite *PackageTestSuite) SetupSuite() {
+func (suite *PackageServiceTestSuite) SetupSuite() {
 	suite.adapter = MockPackageAdapter{}
 	suite.service = NewPackageService(&suite.adapter)
 }
 
-func (suite *PackageTestSuite) TestInstallationCommand() {
+func (suite *PackageServiceTestSuite) TestInstallationCommand() {
 	p := types.Package{
 		InstallPackage: map[string]string{
 			"brew":    "redis",
