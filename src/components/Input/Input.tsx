@@ -18,7 +18,7 @@ export default function Input(props: InputProps) {
 
     return (
         <Vertical gap={6}>
-            <label className={styles.label}>{label}</label>
+            {label && <label className={styles.label}>{label}</label>}
             <input
                 {...others}
                 className={classNames(styles.input, className)}
