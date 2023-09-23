@@ -14,19 +14,35 @@ var (
 	ErrInvalidPublicKey = errors.New("invalid key")
 )
 
-type SSHService struct{}
+type SSHService struct {
+	authorizedKeysPath string
+}
 
-func NewSSHService() SSHService {
-	return SSHService{}
+type SSHServiceParams struct {
+	AuthorizedKeysPath string
+}
+
+func NewSSHService(params *SSHServiceParams) SSHService {
+	s := SSHService{}
+
+	if params == nil {
+		params = &SSHServiceParams{}
+	}
+
+	s.authorizedKeysPath = params.AuthorizedKeysPath
+	if s.authorizedKeysPath == "" {
+		var err error
+		s.authorizedKeysPath, err = getAuthorizedKeysPath()
+		if err != nil {
+			log.Error(err)
+		}
+	}
+
+	return s
 }
 
 func (s *SSHService) GetAll() ([]types.PublicKey, error) {
-	authorizedKeysPath, err := s.getAuthorizedKeysPath()
-	if err != nil {
-		return nil, err
-	}
-
-	bytes, err := os.ReadFile(authorizedKeysPath)
+	bytes, err := os.ReadFile(s.authorizedKeysPath)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +53,9 @@ func (s *SSHService) GetAll() ([]types.PublicKey, error) {
 		if err != nil {
 			log.Error(err)
 		}
-		publicKeys = append(publicKeys, pubKey)
+		if pubKey != nil {
+			publicKeys = append(publicKeys, pubKey)
+		}
 		bytes = rest
 	}
 
@@ -56,17 +74,12 @@ func (s *SSHService) GetAll() ([]types.PublicKey, error) {
 // be a valid SSH public key, otherwise ErrInvalidPublicKey is returned.
 func (s *SSHService) Add(authorizedKey string) error {
 	// Check if the key is valid.
-	_, err := ssh.ParsePublicKey([]byte(authorizedKey))
+	_, _, _, _, err := ssh.ParseAuthorizedKey([]byte(authorizedKey))
 	if err != nil {
 		return ErrInvalidPublicKey
 	}
 
-	authorizedKeysPath, err := s.getAuthorizedKeysPath()
-	if err != nil {
-		return err
-	}
-
-	file, err := os.OpenFile(authorizedKeysPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	file, err := os.OpenFile(s.authorizedKeysPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
@@ -76,7 +89,7 @@ func (s *SSHService) Add(authorizedKey string) error {
 	return err
 }
 
-func (s *SSHService) getAuthorizedKeysPath() (string, error) {
+func getAuthorizedKeysPath() (string, error) {
 	dir, err := os.UserHomeDir()
 	if err != nil {
 		return "", err
