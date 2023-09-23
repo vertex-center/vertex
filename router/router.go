@@ -40,6 +40,7 @@ var (
 	dependenciesService  services.DependenciesService
 	settingsService      services.SettingsService
 	hardwareService      services.HardwareService
+	sshService           services.SSHService
 )
 
 type Router struct {
@@ -158,6 +159,7 @@ func (r *Router) initServices(about types.About) {
 	dependenciesService = services.NewDependenciesService(about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)
 	hardwareService = services.NewHardwareService()
+	sshService = services.NewSSHService()
 }
 
 func (r *Router) initAPIRoutes(about types.About) {
@@ -175,6 +177,7 @@ func (r *Router) initAPIRoutes(about types.About) {
 	addDependenciesRoutes(api.Group("/dependencies"))
 	addSettingsRoutes(api.Group("/settings"))
 	addHardwareRoutes(api.Group("/hardware"))
+	addSecurityRoutes(api.Group("/security"))
 }
 
 func headersSSE(c *gin.Context) {
