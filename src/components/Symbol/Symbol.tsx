@@ -3,12 +3,12 @@ import classNames from "classnames";
 import styles from "./Symbol.module.sass";
 import { HTMLProps } from "react";
 
-type Props = HTMLProps<HTMLSpanElement> & {
+export type SymbolProps = HTMLProps<HTMLSpanElement> & {
     name: string;
     rotating?: boolean;
 };
 
-export default function Symbol(props: Props) {
+export default function Symbol(props: SymbolProps) {
     const { name, rotating, className, ...others } = props;
     return (
         <span

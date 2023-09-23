@@ -1,39 +1,6 @@
 @use "../../styles/colors"
 @use "../../styles/dimensions"
 
-.update
-    display: flex
-    flex-direction: row
-    align-items: center
-    padding: 0 10px 0 20px
-    border: 1px solid colors.$bg-tertiary
-    border-bottom: none
-    height: 70px
-    gap: 20px
-
-    &:first-child
-        border-top-left-radius: dimensions.$border-radius-lg
-        border-top-right-radius: dimensions.$border-radius-lg
-
-    &:last-child
-        border-bottom-left-radius: dimensions.$border-radius-lg
-        border-bottom-right-radius: dimensions.$border-radius-lg
-        border-bottom: 1px solid colors.$bg-tertiary
-
-.info
-    display: flex
-    flex-direction: column
-    justify-content: center
-    flex-grow: 1
-    gap: 8px
-
-.name
-    font-weight: 500
-
-.version
-    font-size: 14px
-    color: colors.$fg-secondary
-
 .status
     display: flex
     flex-direction: row

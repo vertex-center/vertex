@@ -4,10 +4,15 @@ import styles from "./Update.module.sass";
 import Button from "../Button/Button";
 import Symbol from "../Symbol/Symbol";
 import Progress from "../Progress";
+import ListItem from "../List/ListItem";
+import List from "../List/List";
+import ListInfo from "../List/ListInfo";
+import ListTitle from "../List/ListTitle";
+import ListDescription from "../List/ListDescription";
 
 export function Updates(props: PropsWithChildren) {
     if (!props.children) return null;
-    return <div {...props} />;
+    return <List {...props} />;
 }
 
 type Props = {
@@ -32,16 +37,18 @@ export default function Update(props: Props) {
     };
 
     return (
-        <div className={styles.update}>
-            <div className={styles.info}>
-                <div className={styles.name}>{name}</div>
+        <ListItem>
+            <ListInfo>
+                <ListTitle className={styles.name}>{name}</ListTitle>
                 {version && (
-                    <code className={styles.version}>
-                        {version}
-                        {latest_version && " -> " + latest_version}
-                    </code>
+                    <ListDescription>
+                        <code className={styles.version}>
+                            {version}
+                            {latest_version && " -> " + latest_version}
+                        </code>
+                    </ListDescription>
                 )}
-            </div>
+            </ListInfo>
             {available ? (
                 isLoading ? (
                     <Progress infinite />
@@ -56,6 +63,6 @@ export default function Update(props: Props) {
                     Up-to-date
                 </div>
             )}
-        </div>
+        </ListItem>
     );
 }

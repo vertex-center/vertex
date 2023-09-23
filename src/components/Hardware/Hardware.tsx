@@ -1,8 +1,10 @@
 import { Hardware as HardwareModel } from "../../models/hardware";
 import { SiApple, SiLinux, SiWindows } from "@icons-pack/react-simple-icons";
-
-import styles from "./Hardware.module.sass";
-import { Vertical } from "../Layouts/Layouts";
+import ListItem from "../List/ListItem";
+import ListSymbol from "../List/ListSymbol";
+import ListInfo from "../List/ListInfo";
+import ListTitle from "../List/ListTitle";
+import ListDescription from "../List/ListDescription";
 
 type Props = {
     hardware?: HardwareModel;
@@ -27,15 +29,15 @@ export default function Hardware(props: Props) {
             break;
     }
 
+    const description = `${platform} (${version}) - ${arch}`;
+
     return (
-        <div className={styles.hardware}>
-            <div className={styles.icon}>{icon}</div>
-            <Vertical gap={4}>
-                <div>{name}</div>
-                <div className={styles.version}>
-                    {platform} ({version}) - {arch}
-                </div>
-            </Vertical>
-        </div>
+        <ListItem>
+            <ListSymbol>{icon}</ListSymbol>
+            <ListInfo>
+                <ListTitle>{name}</ListTitle>
+                <ListDescription>{description}</ListDescription>
+            </ListInfo>
+        </ListItem>
     );
 }
