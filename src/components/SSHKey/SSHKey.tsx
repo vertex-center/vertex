@@ -10,9 +10,14 @@ export function SSHKeys(props: ListProps) {
     return <List {...props} />;
 }
 
-type SSHKeyProps = {};
+type SSHKeyProps = {
+    type: string;
+    fingerprint: string;
+};
 
 export default function SSHKey(props: SSHKeyProps) {
+    const { type, fingerprint } = props;
+
     return (
         <ListItem>
             <ListSymbol>
@@ -20,7 +25,9 @@ export default function SSHKey(props: SSHKeyProps) {
             </ListSymbol>
             <ListInfo>
                 <ListTitle>SSH Key</ListTitle>
-                <ListDescription>SSH Key</ListDescription>
+                <ListDescription>
+                    {type} - {fingerprint}
+                </ListDescription>
             </ListInfo>
         </ListItem>
     );

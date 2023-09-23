@@ -38,6 +38,14 @@ export const api = {
         checkForUpdates: () => server.get<Instances>("/instances/checkupdates"),
     },
 
+    security: {
+        ssh: {
+            get: () => server.get<SSHKeys>("/security/ssh"),
+            add: (authorized_key: string) =>
+                server.post("/security/ssh", { authorized_key }),
+        },
+    },
+
     services: {
         install: (params: InstallServiceParams) =>
             server.post("/services/install", params),

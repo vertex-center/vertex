@@ -17,12 +17,12 @@ type Props = HTMLProps<HTMLDivElement> & {
 };
 
 export default function Error(props: Props) {
-    const { error, ...others } = props;
+    const { error, className, ...others } = props;
 
     let err = error?.message ?? error;
 
     return (
-        <div className={styles.box} {...others}>
+        <div className={classNames(styles.box, className)} {...others}>
             <div className={styles.error}>
                 <Symbol className={styles.symbol} name="error" />
                 <h1>Error</h1>
