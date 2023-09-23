@@ -35,6 +35,11 @@ export default function Settings() {
                             name="Hardware"
                         />
                         <SidebarItem
+                            to="/settings/security"
+                            symbol="key"
+                            name="Security"
+                        />
+                        <SidebarItem
                             to="/settings/updates"
                             symbol="update"
                             name="Updates"

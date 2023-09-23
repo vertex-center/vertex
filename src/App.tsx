@@ -22,6 +22,7 @@ import SettingsNotifications from "./pages/SettingsNotifications/SettingsNotific
 import Header from "./components/Header/Header";
 import BayDetailsDatabase from "./pages/BayDetailsDatabase/BayDetailsDatabase";
 import SettingsHardware from "./pages/SettingsHardware/SettingsHardware";
+import SettingsSecurity from "./pages/SettingsSecurity/SettingsSecurity";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -91,6 +92,10 @@ function App() {
                             <Route
                                 path="/settings/hardware"
                                 element={<SettingsHardware />}
+                            />
+                            <Route
+                                path="/settings/security"
+                                element={<SettingsSecurity />}
                             />
                             <Route
                                 path="/settings/updates"
