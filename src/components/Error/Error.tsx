@@ -5,11 +5,17 @@ import { HTMLProps } from "react";
 import classNames from "classnames";
 
 export function Errors(props: HTMLProps<HTMLDivElement>) {
-    const { children, className } = props;
+    const { children, className, ...others } = props;
 
     if (!children) return null;
 
-    return <div {...props} className={classNames(styles.errors, className)} />;
+    return (
+        <div
+            className={classNames(styles.errors, className)}
+            {...others}
+            children={children}
+        />
+    );
 }
 
 type Props = HTMLProps<HTMLDivElement> & {

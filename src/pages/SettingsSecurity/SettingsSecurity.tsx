@@ -3,10 +3,11 @@ import { SubTitle, Title } from "../../components/Text/Text";
 import styles from "./SettingsSecurity.module.sass";
 import { Horizontal, Vertical } from "../../components/Layouts/Layouts";
 import SSHKey, { SSHKeys } from "../../components/SSHKey/SSHKey";
-import { APIError } from "../../components/Error/Error";
+import { APIError, Errors } from "../../components/Error/Error";
 import ListItem from "../../components/List/ListItem";
 import { useFetch } from "../../hooks/useFetch";
 import { api } from "../../backend/backend";
+import { SSHKeys as SSHKeysModel } from "../../models/security";
 import Button from "../../components/Button/Button";
 import { ChangeEvent, Fragment, useState } from "react";
 import Popup from "../../components/Popup/Popup";
@@ -20,11 +21,12 @@ export default function SettingsSecurity() {
         data: sshKeys,
         error,
         reload,
-    } = useFetch<SSHKeys>(api.security.ssh.get);
+    } = useFetch<SSHKeysModel>(api.security.ssh.get);
 
     const [showPopup, setShowPopup] = useState(false);
     const [authorizedKey, setAuthorizedKey] = useState("");
     const [addError, setAddError] = useState();
+    const [deleteError, setDeleteError] = useState();
     const [adding, setAdding] = useState(false);
 
     const dismissPopup = () => {
@@ -45,6 +47,10 @@ export default function SettingsSecurity() {
             .finally(() => setAdding(false));
     };
 
+    const deleteSSHKey = (fingerprint: string) => {
+        api.security.ssh.delete(fingerprint).then(reload).catch(setDeleteError);
+    };
+
     const onAuthorizedKeyChange = (e: ChangeEvent<HTMLInputElement>) => {
         setAuthorizedKey(e.target.value);
     };
@@ -53,7 +59,12 @@ export default function SettingsSecurity() {
         <Fragment>
             <Vertical gap={20}>
                 <Title className={styles.title}>SSH keys</Title>
-                <APIError error={error} />
+                {(error || deleteError) && (
+                    <Errors>
+                        <APIError error={error} />
+                        <APIError error={deleteError} />
+                    </Errors>
+                )}
                 {!error && sshKeys && (
                     <SSHKeys>
                         {sshKeys?.length === 0 && (
@@ -64,6 +75,9 @@ export default function SettingsSecurity() {
                                 key={sshKey.fingerprint_sha_256}
                                 type={sshKey.type}
                                 fingerprint={sshKey.fingerprint_sha_256}
+                                onDelete={() =>
+                                    deleteSSHKey(sshKey.fingerprint_sha_256)
+                                }
                             />
                         ))}
                     </SSHKeys>

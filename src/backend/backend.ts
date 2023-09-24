@@ -11,6 +11,7 @@ import { Dependencies as DependenciesUpdate } from "../models/update";
 import { DockerContainerInfo } from "../models/docker";
 import { About } from "../models/about";
 import { Hardware } from "../models/hardware";
+import { SSHKeys } from "../models/security";
 
 type InstallServiceParams = {
     method: InstallMethod;
@@ -43,6 +44,8 @@ export const api = {
             get: () => server.get<SSHKeys>("/security/ssh"),
             add: (authorized_key: string) =>
                 server.post("/security/ssh", { authorized_key }),
+            delete: (fingerprint: string) =>
+                server.delete(`/security/ssh/${fingerprint}`),
         },
     },
 

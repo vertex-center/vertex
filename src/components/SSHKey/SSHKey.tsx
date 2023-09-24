@@ -5,6 +5,8 @@ import ListInfo from "../List/ListInfo";
 import ListTitle from "../List/ListTitle";
 import ListDescription from "../List/ListDescription";
 import List, { ListProps } from "../List/List";
+import Button from "../Button/Button";
+import ListActions from "../List/ListActions";
 
 export function SSHKeys(props: ListProps) {
     return <List {...props} />;
@@ -13,10 +15,11 @@ export function SSHKeys(props: ListProps) {
 type SSHKeyProps = {
     type: string;
     fingerprint: string;
+    onDelete: () => void;
 };
 
 export default function SSHKey(props: SSHKeyProps) {
-    const { type, fingerprint } = props;
+    const { type, fingerprint, onDelete } = props;
 
     return (
         <ListItem>
@@ -29,6 +32,11 @@ export default function SSHKey(props: SSHKeyProps) {
                     {type} - {fingerprint}
                 </ListDescription>
             </ListInfo>
+            <ListActions>
+                <Button rightSymbol="delete" onClick={onDelete}>
+                    Delete
+                </Button>
+            </ListActions>
         </ListItem>
     );
 }
