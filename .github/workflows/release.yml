@@ -39,13 +39,6 @@ jobs:
   build-docker:
     name: Build Docker images
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      matrix:
-        platform:
-          - linux/arm
-          - linux/arm64
-          - linux/amd64
     permissions:
       contents: read
       packages: write
@@ -79,6 +72,6 @@ jobs:
         with:
           context: .
           push: true
-          platforms: ${{ matrix.platform }}
+          platforms: linux/amd64,linux/arm64,linux/arm
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
