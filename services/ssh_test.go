@@ -106,6 +106,15 @@ func (suite *SSHServiceTestSuite) TestAdd() {
 	suite.Equal(2, len(keys))
 }
 
+func (suite *SSHServiceTestSuite) TestAddInvalidKey() {
+	err := suite.service.Add("invalid")
+	suite.Error(err)
+
+	keys, err := suite.service.GetAll()
+	suite.NoError(err)
+	suite.Equal(1, len(keys))
+}
+
 func generatePublicKey() ([]byte, error) {
 	key, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
