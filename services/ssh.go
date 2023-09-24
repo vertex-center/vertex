@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/types"
@@ -59,7 +60,7 @@ func (s *SSHService) GetAll() ([]types.PublicKey, error) {
 		bytes = rest
 	}
 
-	var keys []types.PublicKey
+	keys := []types.PublicKey{}
 	for _, key := range publicKeys {
 		keys = append(keys, types.PublicKey{
 			Type:              key.Type(),
@@ -87,6 +88,31 @@ func (s *SSHService) Add(authorizedKey string) error {
 
 	_, err = file.WriteString(authorizedKey + "\n")
 	return err
+}
+
+// Delete deletes an SSH key from the authorized keys file.
+func (s *SSHService) Delete(fingerprint string) error {
+	content, err := os.ReadFile(s.authorizedKeysPath)
+	if err != nil {
+		return err
+	}
+
+	lines := strings.Split(string(content), "\n")
+	for i, line := range lines {
+		key, _, _, _, _ := ssh.ParseAuthorizedKey([]byte(line))
+		if key == nil {
+			continue
+		}
+
+		fingerprintLine := ssh.FingerprintSHA256(key)
+
+		if fingerprintLine == fingerprint {
+			lines = append(lines[:i], lines[i+1:]...)
+			break
+		}
+	}
+
+	return os.WriteFile(s.authorizedKeysPath, []byte(strings.Join(lines, "\n")), 0644)
 }
 
 func getAuthorizedKeysPath() (string, error) {

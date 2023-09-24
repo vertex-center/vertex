@@ -17,8 +17,10 @@ type SSHServiceTestSuite struct {
 	service            SSHService
 	authorizedKeysFile *os.File
 
-	key           string
-	authorizedKey ssh.PublicKey
+	// Test data
+	keys           []string
+	authorizedKeys []ssh.PublicKey
+	fingerprints   []string
 }
 
 func TestSSHServiceTestSuite(t *testing.T) {
@@ -26,13 +28,18 @@ func TestSSHServiceTestSuite(t *testing.T) {
 }
 
 func (suite *SSHServiceTestSuite) SetupSuite() {
-	var err error
-	suite.key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6IPH4bqdhPVQUfdmuisPdQJO6Tv2+a0OZ9qLs6W0W2flxn6/yQmYut02cl0UtNcDtmb4RqNj2ms2v2TeDVSWVZkUR/q4jjZSSljQEpTd3r1YhYrO/GPDNiIUMm5HvZ8qIfBQA6gn9uMT1g6FO53O64ACNr+ItU4gNdr+S44MNJRMxMy6+s/LsFlQjyO2MbPQHQ6HSOgTLrCNiH8NTLA/evekrZ/rmIZrrES2vQvw5pbCDgEOkLZruRSMMFJFStb6tlGoiN/jQpfX51jebDVLZ1/U3SU5+7LNN6DxZYE9w1eCA2G8L8q1PUYju+b4F6IhGA1AYXPaAaR12qRJ4lLeN"
-	// Another key if needed:
-	// suite.key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCtkVmRevgiIRc7QHahcd01d+0qjtZj1KcY5u25TQW7GomgVuJukdKupnUP2Q1DGo1JjI0OMaIVcEAs4rQgHDAIYovHSeQpkhb3QzJKpS9YUxq/ZWtBQd7cdyRrwAJuT0uR0m52NopEVaaETSIFH6byScRoOAdKgRPwWv5EiHleklOuZCG2/BKq2FtHIb5xb7eAEeMy/5ebu1f4C211/q/Y0AIy/Gp7rJGTDSutTi2UXMQxo3kVDykIIg/xqH2h5IUvYOR8Y+t6f9rbKPcglc+9ygmYHeqrIVmkFzru1sbOOCHlIfv1N53RVp5A9734cHm9u3FzfIPkV+j0tOJ8dhdP"
-	suite.authorizedKey, _, _, _, err = ssh.ParseAuthorizedKey([]byte(suite.key))
-	if err != nil {
-		suite.FailNow(err.Error())
+	suite.keys = []string{
+		"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6IPH4bqdhPVQUfdmuisPdQJO6Tv2+a0OZ9qLs6W0W2flxn6/yQmYut02cl0UtNcDtmb4RqNj2ms2v2TeDVSWVZkUR/q4jjZSSljQEpTd3r1YhYrO/GPDNiIUMm5HvZ8qIfBQA6gn9uMT1g6FO53O64ACNr+ItU4gNdr+S44MNJRMxMy6+s/LsFlQjyO2MbPQHQ6HSOgTLrCNiH8NTLA/evekrZ/rmIZrrES2vQvw5pbCDgEOkLZruRSMMFJFStb6tlGoiN/jQpfX51jebDVLZ1/U3SU5+7LNN6DxZYE9w1eCA2G8L8q1PUYju+b4F6IhGA1AYXPaAaR12qRJ4lLeN",
+		"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCtkVmRevgiIRc7QHahcd01d+0qjtZj1KcY5u25TQW7GomgVuJukdKupnUP2Q1DGo1JjI0OMaIVcEAs4rQgHDAIYovHSeQpkhb3QzJKpS9YUxq/ZWtBQd7cdyRrwAJuT0uR0m52NopEVaaETSIFH6byScRoOAdKgRPwWv5EiHleklOuZCG2/BKq2FtHIb5xb7eAEeMy/5ebu1f4C211/q/Y0AIy/Gp7rJGTDSutTi2UXMQxo3kVDykIIg/xqH2h5IUvYOR8Y+t6f9rbKPcglc+9ygmYHeqrIVmkFzru1sbOOCHlIfv1N53RVp5A9734cHm9u3FzfIPkV+j0tOJ8dhdP",
+	}
+
+	for _, key := range suite.keys {
+		k, _, _, _, _ := ssh.ParseAuthorizedKey([]byte(key))
+		if k == nil {
+			continue
+		}
+		suite.authorizedKeys = append(suite.authorizedKeys, k)
+		suite.fingerprints = append(suite.fingerprints, ssh.FingerprintSHA256(k))
 	}
 }
 
@@ -44,9 +51,11 @@ func (suite *SSHServiceTestSuite) SetupTest() {
 		suite.FailNow(err.Error())
 	}
 
-	_, err = suite.authorizedKeysFile.WriteString(suite.key + "\n")
-	if err != nil {
-		suite.FailNow(err.Error())
+	for i := range suite.keys {
+		_, err = suite.authorizedKeysFile.WriteString(suite.keys[i] + "\n")
+		if err != nil {
+			suite.FailNow(err.Error())
+		}
 	}
 
 	suite.service = NewSSHService(&SSHServiceParams{
@@ -62,14 +71,12 @@ func (suite *SSHServiceTestSuite) TearDownTest() {
 }
 
 func (suite *SSHServiceTestSuite) TestGetAll() {
-	fingerprint := ssh.FingerprintSHA256(suite.authorizedKey)
-
 	keys, err := suite.service.GetAll()
 	suite.NoError(err)
-	suite.Equal(1, len(keys))
-	for _, key := range keys {
+	suite.Equal(2, len(keys))
+	for i, key := range keys {
 		suite.Equal("ssh-rsa", key.Type)
-		suite.Equal(fingerprint, key.FingerprintSHA256)
+		suite.Equal(suite.fingerprints[i], key.FingerprintSHA256)
 	}
 }
 
@@ -79,7 +86,7 @@ func (suite *SSHServiceTestSuite) TestGetAllInvalidKey() {
 
 	keys, err := suite.service.GetAll()
 	suite.NoError(err)
-	suite.Equal(1, len(keys))
+	suite.Equal(2, len(keys))
 }
 
 func (suite *SSHServiceTestSuite) TestGetAllNoSuchFile() {
@@ -103,12 +110,21 @@ func (suite *SSHServiceTestSuite) TestAdd() {
 
 	keys, err := suite.service.GetAll()
 	suite.NoError(err)
-	suite.Equal(2, len(keys))
+	suite.Equal(3, len(keys))
 }
 
 func (suite *SSHServiceTestSuite) TestAddInvalidKey() {
 	err := suite.service.Add("invalid")
 	suite.Error(err)
+
+	keys, err := suite.service.GetAll()
+	suite.NoError(err)
+	suite.Equal(2, len(keys))
+}
+
+func (suite *SSHServiceTestSuite) TestDelete() {
+	err := suite.service.Delete(ssh.FingerprintSHA256(suite.authorizedKeys[0]))
+	suite.NoError(err)
 
 	keys, err := suite.service.GetAll()
 	suite.NoError(err)

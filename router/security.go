@@ -13,6 +13,7 @@ import (
 func addSecurityRoutes(r *gin.RouterGroup) {
 	r.GET("/ssh", handleGetSSHKey)
 	r.POST("/ssh", handleAddSSHKey)
+	r.DELETE("/ssh/:fingerprint", handleDeleteSSHKey)
 }
 
 // handleGetSSHKey handles the retrieval of the SSH key.
@@ -66,4 +67,30 @@ func handleAddSSHKey(c *gin.Context) {
 	}
 
 	c.Status(http.StatusCreated)
+}
+
+// handleDeleteSSHKey handles the deletion of an SSH key.
+// Errors can be:
+//   - failed_to_parse_body: failed to parse the request body.
+//   - failed_to_delete_ssh_key: failed to delete the SSH key.
+func handleDeleteSSHKey(c *gin.Context) {
+	fingerprint := c.Param("fingerprint")
+	if fingerprint == "" {
+		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
+			Code:    "invalid_fingerprint",
+			Message: "invalid fingerprint",
+		})
+		return
+	}
+
+	err := sshService.Delete(fingerprint)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
+			Code:    "failed_to_delete_ssh_key",
+			Message: fmt.Sprintf("failed to delete SSH key: %v", err),
+		})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }
