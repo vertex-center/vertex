@@ -3,6 +3,7 @@ package services
 import (
 	"crypto/rand"
 	"crypto/rsa"
+	"errors"
 	"os"
 	"testing"
 
@@ -55,7 +56,9 @@ func (suite *SSHServiceTestSuite) SetupTest() {
 
 func (suite *SSHServiceTestSuite) TearDownTest() {
 	err := os.Remove(suite.authorizedKeysFile.Name())
-	suite.NoError(err)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		suite.NoError(err)
+	}
 }
 
 func (suite *SSHServiceTestSuite) TestGetAll() {
@@ -77,6 +80,16 @@ func (suite *SSHServiceTestSuite) TestGetAllInvalidKey() {
 	keys, err := suite.service.GetAll()
 	suite.NoError(err)
 	suite.Equal(1, len(keys))
+}
+
+func (suite *SSHServiceTestSuite) TestGetAllNoSuchFile() {
+	suite.authorizedKeysFile.Close()
+	err := os.Remove(suite.service.authorizedKeysPath)
+	suite.NoError(err)
+
+	keys, err := suite.service.GetAll()
+	suite.NoError(err)
+	suite.Equal(0, len(keys))
 }
 
 func (suite *SSHServiceTestSuite) TestAdd() {

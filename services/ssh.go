@@ -43,7 +43,10 @@ func NewSSHService(params *SSHServiceParams) SSHService {
 
 func (s *SSHService) GetAll() ([]types.PublicKey, error) {
 	bytes, err := os.ReadFile(s.authorizedKeysPath)
-	if err != nil {
+	if err != nil && errors.Is(err, os.ErrNotExist) {
+		log.Info("authorized_keys file does not exist")
+		return []types.PublicKey{}, nil
+	} else if err != nil {
 		return nil, err
 	}
 
