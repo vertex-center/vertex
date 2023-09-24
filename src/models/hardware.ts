@@ -7,5 +7,6 @@ export type Host = {
 };
 
 export type Hardware = {
+    dockerized?: boolean;
     host?: Host;
 };
