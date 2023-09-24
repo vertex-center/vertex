@@ -30,24 +30,12 @@ Vertex is designed to be installed on low-powered computers like Raspberry Pi, s
 
 ## Installation
 
-### Method 1: From binaries
+Vertex can be installed in multiple ways:
+- With binaries;
+- With Docker;
+- From sources, compiling with Go.
 
-Binaries are released regularly. The latest release is available [here](https://github.com/vertex-center/vertex/releases/).
-
-Decompress and execute the binary. Then, go to http://localhost:6130/. Enjoy!
-
-### Method 2: Manual
-
-1. Clone this repository
-   ```bash
-   git clone https://github.com/vertex-center/vertex
-   cd vertex
-   ```
-2. Run Vertex
-   ```bash
-   go run .
-   ```
-3. Access from http://localhost:6130/
+Everything about the installation process is available in the [Vertex Documentation](https://vertex-center.github.io/vertex-docs/).
 
 ## Available services
 
