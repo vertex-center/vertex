@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -18,6 +17,7 @@ import (
 	"github.com/docker/go-connections/nat"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
+	"github.com/vertex-center/vertex/pkg/vdocker"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 )
@@ -464,8 +464,7 @@ func (a RunnerDockerAdapter) getPath(instance types.Instance) string {
 	base := storage.Path
 
 	// If Vertex is running itself inside Docker, the instances are stored in the Vertex container volume.
-	_, err := os.Stat("/.dockerenv")
-	if err == nil {
+	if vdocker.RunningInDocker() {
 		containers, err := a.cli.ContainerList(context.Background(), dockertypes.ContainerListOptions{
 			All: true,
 		})
