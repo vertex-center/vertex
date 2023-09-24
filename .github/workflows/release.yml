@@ -36,8 +36,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build-docker:
-    name: Build Docker images
+  release-docker:
+    name: Release Docker images
     runs-on: ubuntu-latest
     permissions:
       contents: read
