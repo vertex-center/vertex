@@ -211,7 +211,6 @@ func (a RunnerDockerAdapter) Info(instance types.Instance) (map[string]any, erro
 			"architecture": imageInfo.Architecture,
 			"os":           imageInfo.Os,
 			"size":         imageInfo.Size,
-			"virtual_size": imageInfo.VirtualSize,
 			"tags":         imageInfo.RepoTags,
 		},
 	}, nil
