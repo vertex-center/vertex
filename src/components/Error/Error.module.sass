@@ -34,13 +34,13 @@
     flex-direction: column
     gap: 4px
 
-    & > :first-child
-        border-bottom-left-radius: 0
-        border-bottom-right-radius: 0
-
-    & > :not(:first-child):not(:last-child)
+    & > *
         border-radius: 0
 
     & > :last-child
-        border-top-left-radius: 0
-        border-top-right-radius: 0
+        border-bottom-left-radius: dimensions.$border-radius-lg
+        border-bottom-right-radius: dimensions.$border-radius-lg
+
+    & > :first-child
+        border-top-left-radius: dimensions.$border-radius-lg
+        border-top-right-radius: dimensions.$border-radius-lg
