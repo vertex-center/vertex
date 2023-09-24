@@ -9,6 +9,7 @@ import List from "../List/List";
 import ListInfo from "../List/ListInfo";
 import ListTitle from "../List/ListTitle";
 import ListDescription from "../List/ListDescription";
+import ListActions from "../List/ListActions";
 
 export function Updates(props: PropsWithChildren) {
     if (!props.children) return null;
@@ -53,9 +54,11 @@ export default function Update(props: Props) {
                 isLoading ? (
                     <Progress infinite />
                 ) : (
-                    <Button rightSymbol="download" onClick={onUpdate}>
-                        Update
-                    </Button>
+                    <ListActions>
+                        <Button rightSymbol="download" onClick={onUpdate}>
+                            Update
+                        </Button>
+                    </ListActions>
                 )
             ) : (
                 <div className={styles.status}>
