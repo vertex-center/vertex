@@ -11,7 +11,7 @@ require (
 	github.com/gin-contrib/sse v0.1.0
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.9.1
-	github.com/go-co-op/gocron v1.33.1
+	github.com/go-co-op/gocron v1.34.2
 	github.com/go-git/go-git/v5 v5.6.1
 	github.com/google/go-github/v50 v50.0.0
 	github.com/google/uuid v1.3.1
