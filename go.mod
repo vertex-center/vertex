@@ -13,7 +13,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-co-op/gocron v1.33.1
 	github.com/go-git/go-git/v5 v5.6.1
-	github.com/google/go-github/v50 v50.0.0
+	github.com/google/go-github/v50 v50.2.0
 	github.com/google/uuid v1.3.1
 	github.com/pkg/errors v0.9.1
 	github.com/shirou/gopsutil/v3 v3.23.8
@@ -91,7 +91,7 @@ require (
 	golang.org/x/arch v0.3.0 // indirect
 	golang.org/x/mod v0.11.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
-	golang.org/x/oauth2 v0.4.0 // indirect
+	golang.org/x/oauth2 v0.6.0 // indirect
 	golang.org/x/sys v0.11.0 // indirect
 	golang.org/x/text v0.12.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect
