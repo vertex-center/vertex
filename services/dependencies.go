@@ -17,6 +17,7 @@ import (
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
+	"github.com/vertex-center/vertex/pkg/vdocker"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 	"golang.org/x/exp/slices"
@@ -51,11 +52,14 @@ type DependenciesService struct {
 }
 
 func NewDependenciesService(currentVertexVersion string) DependenciesService {
-	var dependencies = append([]*types.Dependency{{
-		ID:      "vertex",
-		Name:    "Vertex",
-		Updater: &vertexUpdater{currentVersion: currentVertexVersion},
-	}}, Dependencies...)
+	var dependencies = Dependencies
+	if !vdocker.RunningInDocker() {
+		dependencies = append([]*types.Dependency{{
+			ID:      "vertex",
+			Name:    "Vertex",
+			Updater: &vertexUpdater{currentVersion: currentVertexVersion},
+		}}, Dependencies...)
+	}
 
 	for _, dependency := range dependencies {
 		dependency.Version = dependency.Updater.GetCurrentVersion()

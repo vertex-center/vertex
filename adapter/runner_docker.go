@@ -17,6 +17,7 @@ import (
 	"github.com/docker/go-connections/nat"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
+	"github.com/vertex-center/vertex/pkg/vdocker"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 )
@@ -460,5 +461,26 @@ func (a RunnerDockerAdapter) watchForLogs(containerID string, instance *types.In
 }
 
 func (a RunnerDockerAdapter) getPath(instance types.Instance) string {
-	return path.Join(storage.Path, "instances", instance.UUID.String())
+	base := storage.Path
+
+	// If Vertex is running itself inside Docker, the instances are stored in the Vertex container volume.
+	if vdocker.RunningInDocker() {
+		containers, err := a.cli.ContainerList(context.Background(), dockertypes.ContainerListOptions{
+			All: true,
+		})
+		if err != nil {
+			log.Error(err)
+		} else {
+			for _, c := range containers {
+				// find the docker container that has a volume /live, which is the Vertex container.
+				for _, m := range c.Mounts {
+					if m.Destination == "/live" {
+						base = m.Source
+					}
+				}
+			}
+		}
+	}
+
+	return path.Join(base, "instances", instance.UUID.String())
 }
