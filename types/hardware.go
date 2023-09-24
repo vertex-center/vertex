@@ -23,5 +23,9 @@ type Host struct {
 }
 
 type Hardware struct {
+	// Dockerized is true if the application is running inside a Docker container.
+	Dockerized bool `json:"dockerized"`
+
+	// Host is the host information.
 	Host Host `json:"host"`
 }

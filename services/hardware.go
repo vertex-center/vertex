@@ -4,6 +4,7 @@ import (
 	"runtime"
 
 	"github.com/shirou/gopsutil/v3/host"
+	"github.com/vertex-center/vertex/pkg/vdocker"
 	"github.com/vertex-center/vertex/types"
 )
 
@@ -18,6 +19,7 @@ func (s HardwareService) GetHardware() types.Hardware {
 	if err != nil {
 		// fallback to runtime.GOOS and runtime.GOARCH
 		return types.Hardware{
+			Dockerized: vdocker.RunningInDocker(),
 			Host: types.Host{
 				OS:   runtime.GOOS,
 				Arch: runtime.GOARCH,
@@ -26,6 +28,7 @@ func (s HardwareService) GetHardware() types.Hardware {
 	}
 
 	return types.Hardware{
+		Dockerized: vdocker.RunningInDocker(),
 		Host: types.Host{
 			OS:       stats.OS,
 			Arch:     stats.KernelArch,
