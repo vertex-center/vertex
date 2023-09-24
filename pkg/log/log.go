@@ -1,12 +1,30 @@
 package log
 
-import "github.com/vertex-center/vlog"
+import (
+	"os"
+	"strings"
 
-var Default = *vlog.New(
-	vlog.WithOutputStd(),
-	vlog.WithOutputFile("live/logs", vlog.LogFormatText),
-	vlog.WithOutputFile("live/logs", vlog.LogFormatJson),
+	"github.com/vertex-center/vlog"
 )
+
+var Default vlog.Logger
+
+func init() {
+	if strings.HasSuffix(os.Args[0], ".test") {
+		Default = *vlog.New(
+			vlog.WithOutputStd(),
+		)
+		Default.Info("test logger initialized")
+	} else {
+		println("Using full logger")
+		Default = *vlog.New(
+			vlog.WithOutputStd(),
+			vlog.WithOutputFile("live/logs", vlog.LogFormatText),
+			vlog.WithOutputFile("live/logs", vlog.LogFormatJson),
+		)
+		Default.Info("full logger initialized")
+	}
+}
 
 func Debug(msg string, fields ...vlog.KeyValue) {
 	Default.Debug(msg, fields...)
