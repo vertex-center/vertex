@@ -9,16 +9,16 @@ import (
 	"io"
 	"os"
 	"path"
-	"path/filepath"
+	"strings"
 )
 
 var (
-	ErrMustBeLocal = errors.New("security: src must be a local file")
+	ErrZipSlipAttack = errors.New("security: paths must be local")
 )
 
 func Unzip(src string, dest string) error {
-	if !filepath.IsLocal(src) || !filepath.IsLocal(dest) {
-		return ErrMustBeLocal
+	if zipSlipAttack(src) || zipSlipAttack(dest) {
+		return ErrZipSlipAttack
 	}
 
 	reader, err := zip.OpenReader(src)
@@ -27,11 +27,15 @@ func Unzip(src string, dest string) error {
 	}
 
 	for _, header := range reader.File {
-		if !filepath.IsLocal(header.Name) {
-			return ErrMustBeLocal
+		if zipSlipAttack(header.Name) {
+			return ErrZipSlipAttack
 		}
 
 		p := path.Join(dest, header.Name)
+
+		if zipSlipAttack(p) {
+			return ErrZipSlipAttack
+		}
 
 		if header.FileInfo().IsDir() {
 			err = os.MkdirAll(p, os.ModePerm)
@@ -74,8 +78,8 @@ func Unzip(src string, dest string) error {
 // Untar a tarball to a destination. src is the path to
 // the tarball, and dest is the path to the destination directory.
 func Untar(src string, dest string) error {
-	if !filepath.IsLocal(src) || !filepath.IsLocal(dest) {
-		return ErrMustBeLocal
+	if zipSlipAttack(src) || zipSlipAttack(dest) {
+		return ErrZipSlipAttack
 	}
 
 	archive, err := os.Open(src)
@@ -102,11 +106,15 @@ func Untar(src string, dest string) error {
 			return err
 		}
 
-		if !filepath.IsLocal(header.Name) {
-			return ErrMustBeLocal
+		if zipSlipAttack(header.Name) {
+			return ErrZipSlipAttack
 		}
 
 		p := path.Join(dest, header.Name)
+
+		if zipSlipAttack(p) {
+			return ErrZipSlipAttack
+		}
 
 		switch header.Typeflag {
 		case tar.TypeDir:
@@ -142,4 +150,9 @@ func Untar(src string, dest string) error {
 	}
 
 	return nil
+}
+
+// CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')
+func zipSlipAttack(path string) bool {
+	return strings.Contains(path, "..")
 }
