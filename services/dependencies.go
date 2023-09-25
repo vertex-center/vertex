@@ -1,7 +1,6 @@
 package services
 
 import (
-	"archive/zip"
 	"context"
 	"errors"
 	"fmt"
@@ -17,6 +16,7 @@ import (
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
+	"github.com/vertex-center/vertex/pkg/varchiver"
 	"github.com/vertex-center/vertex/pkg/vdocker"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
@@ -245,12 +245,14 @@ func (d *clientUpdater) InstallUpdate() error {
 				return err
 			}
 
-			err = download(dir, *asset.BrowserDownloadURL)
+			tempZipPath := path.Join(dir, "temp.zip")
+
+			err = download(tempZipPath, *asset.BrowserDownloadURL)
 			if err != nil {
 				return err
 			}
 
-			err = unarchive(dir)
+			err = varchiver.Unzip(tempZipPath, dir)
 			if err != nil {
 				return err
 			}
@@ -293,7 +295,7 @@ func download(dir string, url string) error {
 	}
 	defer res.Body.Close()
 
-	file, err := os.Create(path.Join(dir, "temp.zip"))
+	file, err := os.Create(dir)
 	if err != nil {
 		return err
 	}
@@ -301,53 +303,6 @@ func download(dir string, url string) error {
 
 	_, err = io.Copy(file, res.Body)
 	return err
-}
-
-func unarchive(dir string) error {
-	reader, err := zip.OpenReader(path.Join(dir, "temp.zip"))
-	if err != nil {
-		return err
-	}
-
-	for _, header := range reader.File {
-		filepath := path.Join(dir, header.Name)
-
-		if header.FileInfo().IsDir() {
-			err = os.MkdirAll(filepath, os.ModePerm)
-			if err != nil {
-				return err
-			}
-		} else {
-			err = os.MkdirAll(path.Dir(filepath), os.ModePerm)
-			if err != nil {
-				return err
-			}
-
-			file, err := os.Create(filepath)
-			if err != nil {
-				return err
-			}
-
-			content, err := header.Open()
-			if err != nil {
-				return err
-			}
-
-			_, err = io.Copy(file, content)
-			if err != nil {
-				return err
-			}
-
-			err = os.Chmod(filepath, 0755)
-			if err != nil {
-				return err
-			}
-
-			file.Close()
-		}
-	}
-
-	return nil
 }
 
 type gitHubUpdater struct {
