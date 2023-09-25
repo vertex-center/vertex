@@ -18,7 +18,7 @@ var (
 )
 
 type PackageFSAdapter struct {
-	pkgs      map[string]types.Package
+	pkgs      []types.Package
 	pkgsMutex *sync.RWMutex
 
 	dependenciesPath string
@@ -37,7 +37,7 @@ func NewPackageFSAdapter(params *PackageFSAdapterParams) types.PackageAdapterPor
 	}
 
 	adapter := &PackageFSAdapter{
-		pkgs:      map[string]types.Package{},
+		pkgs:      []types.Package{},
 		pkgsMutex: &sync.RWMutex{},
 
 		dependenciesPath: params.dependenciesPath,
@@ -54,18 +54,13 @@ func (a *PackageFSAdapter) GetByID(id string) (types.Package, error) {
 	a.pkgsMutex.RLock()
 	defer a.pkgsMutex.RUnlock()
 
-	pkg, ok := a.pkgs[id]
-	if !ok {
-		return types.Package{}, ErrPkgNotFound
+	for _, pkg := range a.pkgs {
+		if pkg.ID == id {
+			return pkg, nil
+		}
 	}
-	return pkg, nil
-}
 
-func (a *PackageFSAdapter) set(id string, pkg types.Package) {
-	a.pkgsMutex.Lock()
-	defer a.pkgsMutex.Unlock()
-
-	a.pkgs[id] = pkg
+	return types.Package{}, ErrPkgNotFound
 }
 
 func (a *PackageFSAdapter) GetPath(id string) string {
@@ -77,6 +72,11 @@ func (a *PackageFSAdapter) Reload() error {
 	if err != nil {
 		return err
 	}
+
+	a.pkgsMutex.RLock()
+	defer a.pkgsMutex.RUnlock()
+
+	a.pkgs = []types.Package{}
 
 	for _, entry := range dir {
 		if !entry.IsDir() {
@@ -90,7 +90,7 @@ func (a *PackageFSAdapter) Reload() error {
 			return err
 		}
 
-		a.set(name, *pkg)
+		a.pkgs = append(a.pkgs, *pkg)
 	}
 
 	return nil
@@ -106,5 +106,6 @@ func (a *PackageFSAdapter) readFromDisk(id string) (*types.Package, error) {
 
 	var pkg types.Package
 	err = json.Unmarshal(file, &pkg)
+	pkg.ID = id
 	return &pkg, err
 }

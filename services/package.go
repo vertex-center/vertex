@@ -87,13 +87,13 @@ func (s *PackageService) GetByID(id string) (types.Package, error) {
 		return types.Package{}, err
 	}
 
-	installed, err := s.checkIsInstalled(id, pkg)
+	installed, err := s.checkIsInstalled(pkg)
 	pkg.Installed = &installed
 	return pkg, err
 }
 
-func (s *PackageService) checkIsInstalled(id string, pkg types.Package) (bool, error) {
-	pkgPath := s.packageAdapter.GetPath(id)
+func (s *PackageService) checkIsInstalled(pkg types.Package) (bool, error) {
+	pkgPath := s.packageAdapter.GetPath(pkg.ID)
 	isScript := strings.HasPrefix(pkg.Check, "script:")
 
 	if isScript {
