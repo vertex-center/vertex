@@ -29,8 +29,12 @@ func (suite *PackageAdapterTestSuite) SetupSuite() {
 	err := suite.adapter.Reload()
 	assert.NoError(suite.T(), err)
 	assert.NotEqual(suite.T(), 0, len(suite.adapter.pkgs))
-	assert.Equal(suite.T(), "Redis", suite.adapter.pkgs["redis"].Name)
-	assert.Equal(suite.T(), "BSD-3", suite.adapter.pkgs["redis"].License)
+
+	pkg, err := suite.adapter.GetByID("redis")
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), "redis", pkg.ID)
+	assert.Equal(suite.T(), "Redis", pkg.Name)
+	assert.Equal(suite.T(), "BSD-3", pkg.License)
 }
 
 func (suite *PackageAdapterTestSuite) TestGetPath() {
