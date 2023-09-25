@@ -35,7 +35,7 @@ Vertex can be installed in multiple ways:
 - With Docker;
 - From sources, compiling with Go.
 
-Everything about the installation process is available in the [Vertex Documentation](https://vertex-center.github.io/vertex-docs/).
+Everything about the installation process is available in the [Vertex Documentation](https://vertex.quentinguidee.dev/docs/).
 
 ## Available services
 
