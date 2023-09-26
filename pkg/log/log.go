@@ -16,7 +16,6 @@ func init() {
 		)
 		Default.Info("test logger initialized")
 	} else {
-		println("Using full logger")
 		Default = *vlog.New(
 			vlog.WithOutputStd(),
 			vlog.WithOutputFile("live/logs", vlog.LogFormatText),
