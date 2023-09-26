@@ -82,20 +82,20 @@ func getUser(username string) *user.User {
 }
 
 func runVertex(user *user.User) (*exec.Cmd, error) {
-	uid, err := strconv.Atoi(user.Uid)
+	uid, err := strconv.ParseInt(user.Uid, 10, 32)
 	if err != nil {
 		return nil, err
 	}
 
-	gid, err := strconv.Atoi(user.Gid)
+	gid, err := strconv.ParseInt(user.Gid, 10, 32)
 	if err != nil {
 		return nil, err
 	}
 
 	log.Info("Running vertex",
 		vlog.String("username", user.Username),
-		vlog.Int("uid", uid),
-		vlog.Int("gid", gid),
+		vlog.Int64("uid", uid),
+		vlog.Int64("gid", gid),
 	)
 
 	// If vertex init.go is there, build vertex first.
