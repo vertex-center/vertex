@@ -5,6 +5,7 @@
     <envs>
       <env name="DEBUG" value="1" />
     </envs>
+    <sudo value="true" />
     <kind value="PACKAGE" />
     <package value="github.com/vertex-center/vertex/kernel" />
     <directory value="$PROJECT_DIR$" />
