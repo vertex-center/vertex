@@ -26,7 +26,6 @@ func main() {
 		err := r.Start()
 		if err != nil {
 			log.Error(err)
-			return
 		}
 		shutdownChan <- syscall.SIGINT
 	}()
@@ -37,10 +36,14 @@ func main() {
 		u := getUnprivilegedUser()
 		var err error
 		vertex, err = runVertex(u)
-		vertex.Wait()
 		if err != nil {
 			log.Error(err)
+			shutdownChan <- syscall.SIGINT
 			return
+		}
+		err = vertex.Wait()
+		if err != nil {
+			log.Error(err)
 		}
 		shutdownChan <- syscall.SIGINT
 	}()
@@ -50,9 +53,9 @@ func main() {
 
 	<-shutdownChan
 	log.Info("Shutting down...")
-	r.Stop()
+	_ = r.Stop()
 	if vertex != nil && vertex.Process != nil {
-		vertex.Process.Kill()
+		_ = vertex.Process.Kill()
 	}
 }
 
