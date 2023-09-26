@@ -43,6 +43,10 @@ func (r *KernelRouter) Start() error {
 }
 
 func (r *KernelRouter) Stop() error {
+	if r.server == nil {
+		return nil
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 

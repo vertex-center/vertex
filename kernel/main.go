@@ -4,6 +4,7 @@ import (
 	"flag"
 	"os"
 	"os/exec"
+	"os/signal"
 	"os/user"
 	"strconv"
 	"syscall"
@@ -16,37 +17,43 @@ import (
 func main() {
 	ensureRoot()
 
-	r := router.NewKernelRouter()
+	shutdownChan := make(chan os.Signal, 1)
 
+	// Vertex-Kernel
+	var r router.KernelRouter
 	go func() {
+		r = router.NewKernelRouter()
 		err := r.Start()
-		defer r.Stop()
-
 		if err != nil {
 			log.Error(err)
-			os.Exit(1)
+			return
 		}
+		shutdownChan <- syscall.SIGINT
 	}()
 
-	u := getUnprivilegedUser()
-
+	// Vertex
+	var vertex *exec.Cmd
 	go func() {
-		vertex, err := runVertex(u)
-		defer vertex.Process.Kill()
-
+		u := getUnprivilegedUser()
+		var err error
+		vertex, err = runVertex(u)
+		vertex.Wait()
 		if err != nil {
 			log.Error(err)
-			os.Exit(1)
+			return
 		}
-
-		err = vertex.Wait()
-		if err != nil {
-			log.Error(err)
-			os.Exit(1)
-		}
+		shutdownChan <- syscall.SIGINT
 	}()
 
-	select {}
+	// OS interrupt
+	signal.Notify(shutdownChan, os.Interrupt, syscall.SIGTERM)
+
+	<-shutdownChan
+	log.Info("Shutting down...")
+	r.Stop()
+	if vertex != nil && vertex.Process != nil {
+		vertex.Process.Kill()
+	}
 }
 
 func ensureRoot() {
