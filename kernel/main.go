@@ -30,6 +30,17 @@ func main() {
 		shutdownChan <- syscall.SIGINT
 	}()
 
+	// Vertex-Kernel Proxy
+	var rProxy router.ProxyKernelRouter
+	go func() {
+		rProxy = router.NewProxyKernelRouter()
+		err := rProxy.Start()
+		if err != nil {
+			log.Error(err)
+		}
+		shutdownChan <- syscall.SIGINT
+	}()
+
 	// Vertex
 	var vertex *exec.Cmd
 	go func() {
@@ -54,6 +65,7 @@ func main() {
 	<-shutdownChan
 	log.Info("Shutting down...")
 	_ = r.Stop()
+	_ = rProxy.Stop()
 	if vertex != nil && vertex.Process != nil {
 		_ = vertex.Process.Kill()
 	}

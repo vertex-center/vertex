@@ -3,6 +3,7 @@ package router
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -14,11 +15,13 @@ import (
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/adapter"
+	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vlog"
 )
 
 var (
@@ -71,12 +74,6 @@ func NewRouter(about types.About) Router {
 
 func (r *Router) Start(addr string) {
 	go func() {
-		err := proxyService.Start()
-		if err != nil {
-			log.Error(err)
-			return
-		}
-
 		instanceService.StartAll()
 	}()
 
@@ -91,6 +88,11 @@ func (r *Router) Start(addr string) {
 	if err != nil {
 		log.Error(err)
 	}
+
+	url := fmt.Sprintf("http://%s", config.Current.Host)
+	log.Info("Vertex started",
+		vlog.String("url", url),
+	)
 
 	err = r.server.ListenAndServe()
 	if errors.Is(err, http.ErrServerClosed) {
@@ -130,10 +132,6 @@ func (r *Router) handleSignals() {
 		<-c
 		log.Info("shutdown signal sent")
 		r.Stop()
-		err := proxyService.Stop()
-		if err != nil {
-			log.Error(err)
-		}
 		os.Exit(0)
 	}()
 }

@@ -8,8 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/adapter"
 	"github.com/vertex-center/vertex/pkg/ginutils"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vlog"
 )
 
 var (
@@ -48,6 +50,11 @@ func (r *KernelRouter) Start() error {
 		Handler: r.engine,
 	}
 
+	url := "http://localhost:6131"
+	log.Info("Vertex-Kernel started",
+		vlog.String("url", url),
+	)
+
 	return r.server.ListenAndServe()
 }
 
@@ -80,4 +87,5 @@ func (r *KernelRouter) initAPIRoutes() {
 	api := r.engine.Group("/api")
 
 	addDockerKernelRoutes(api.Group("/docker"))
+	addProxyKernelRoutes(api.Group("/proxy"))
 }

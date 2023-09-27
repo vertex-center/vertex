@@ -12,7 +12,6 @@ import (
 	"github.com/vertex-center/vertex/router"
 	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/types"
-	"github.com/vertex-center/vlog"
 )
 
 // version, commit and date will be overridden by goreleaser
@@ -54,9 +53,6 @@ func main() {
 	// Logs
 	url := fmt.Sprintf("http://%s", config.Current.Host)
 	fmt.Printf("\n-- Vertex Client :: %s\n\n", url)
-	log.Info("Vertex started",
-		vlog.String("url", url),
-	)
 
 	r.Start(fmt.Sprintf(":%s", config.Current.Port))
 }
