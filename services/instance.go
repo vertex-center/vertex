@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -9,6 +10,7 @@ import (
 	"path"
 	"reflect"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/antelman107/net-wait-go/wait"
@@ -132,46 +134,52 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		return ErrInstanceAlreadyRunning
 	}
 
-	onLog := func(msg string) {
-		s.eventsAdapter.Send(types.EventInstanceLog{
-			InstanceUUID: uuid,
-			Kind:         types.LogKindOut,
-			Message:      msg,
-		})
-	}
-
-	onErr := func(msg string) {
-		s.eventsAdapter.Send(types.EventInstanceLog{
-			InstanceUUID: uuid,
-			Kind:         types.LogKindErr,
-			Message:      msg,
-		})
-	}
-
 	setStatus := func(status string) {
 		s.setStatus(instance, status)
 	}
 
-	var logsReader io.ReadCloser
+	var stdout io.ReadCloser
 	if instance.IsDockerized() {
-		logsReader, err = s.dockerRunnerAdapter.Start(instance, onLog, onErr, setStatus)
+		stdout, _, err = s.dockerRunnerAdapter.Start(instance, setStatus)
 	} else {
-		logsReader, err = s.fsRunnerAdapter.Start(instance, onLog, onErr, setStatus)
+		stdout, _, err = s.fsRunnerAdapter.Start(instance, setStatus)
 	}
 	if err != nil {
 		s.setStatus(instance, types.InstanceStatusError)
 		return err
 	}
 
+	var wg sync.WaitGroup
+
+	wg.Add(1)
 	go func() {
-		defer logsReader.Close()
-		_, err := io.Copy(os.Stdout, logsReader)
-		if err != nil {
-			log.Warn("failed to copy logs",
-				vlog.String("error", err.Error()),
-			)
+		defer wg.Done()
+
+		scanner := bufio.NewScanner(stdout)
+		for scanner.Scan() {
+			s.eventsAdapter.Send(types.EventInstanceLog{
+				InstanceUUID: uuid,
+				Kind:         types.LogKindOut,
+				Message:      scanner.Text(),
+			})
 		}
 	}()
+
+	//wg.Add(1)
+	//go func() {
+	//	defer wg.Done()
+	//
+	//	scanner := bufio.NewScanner(stderr)
+	//	for scanner.Scan() {
+	//		s.eventsAdapter.Send(types.EventInstanceLog{
+	//			InstanceUUID: uuid,
+	//			Kind:         types.LogKindErr,
+	//			Message:      scanner.Text(),
+	//		})
+	//	}
+	//}()
+
+	wg.Wait()
 
 	s.eventsAdapter.Send(types.EventInstanceLog{
 		InstanceUUID: uuid,

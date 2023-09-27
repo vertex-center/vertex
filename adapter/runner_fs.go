@@ -30,7 +30,7 @@ func (a RunnerFSAdapter) Delete(instance *types.Instance) error {
 	return nil
 }
 
-func (a RunnerFSAdapter) Start(instance *types.Instance, onLog func(msg string), onErr func(msg string), setStatus func(status string)) (io.ReadCloser, error) {
+func (a RunnerFSAdapter) Start(instance *types.Instance, setStatus func(status string)) (stdout io.ReadCloser, stderr io.ReadCloser, err error) {
 	service := instance.Service
 
 	if a.commands[instance.UUID] != nil {
@@ -43,11 +43,12 @@ func (a RunnerFSAdapter) Start(instance *types.Instance, onLog func(msg string),
 	executable := service.Methods.Script.Filename
 	command := "./" + executable
 
-	_, err := os.Stat(path.Join(dir, executable))
+	_, err = os.Stat(path.Join(dir, executable))
 	if errors.Is(err, os.ErrNotExist) {
-		return nil, fmt.Errorf("executable %s were not found", command)
+		err = fmt.Errorf("executable %s were not found", command)
+		return
 	} else if err != nil {
-		return nil, err
+		return
 	}
 
 	a.commands[instance.UUID] = exec.Command(command)
@@ -56,9 +57,10 @@ func (a RunnerFSAdapter) Start(instance *types.Instance, onLog func(msg string),
 	cmd.Dir = dir
 	cmd.Env = os.Environ()
 
-	envFile, err := os.Open(path.Join(a.getPath(*instance), ".env"))
+	var envFile *os.File
+	envFile, err = os.Open(path.Join(a.getPath(*instance), ".env"))
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	envScanner := bufio.NewScanner(envFile)
@@ -71,29 +73,24 @@ func (a RunnerFSAdapter) Start(instance *types.Instance, onLog func(msg string),
 
 	cmd.Stdin = os.Stdin
 
-	stdoutReader, err := cmd.StdoutPipe()
+	stdout, err = cmd.StdoutPipe()
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	stderrReader, err := cmd.StderrPipe()
+	stderr, err = cmd.StderrPipe()
 	if err != nil {
-		return nil, err
+		_ = stdout.Close()
+		return
 	}
-
-	// TODO: Also return the errors
-	stderrScanner := bufio.NewScanner(stderrReader)
-	go func() {
-		for stderrScanner.Scan() {
-			onErr(stderrScanner.Text())
-		}
-	}()
 
 	setStatus(types.InstanceStatusRunning)
 
 	err = cmd.Start()
 	if err != nil {
-		return nil, err
+		_ = stdout.Close()
+		_ = stderr.Close()
+		return
 	}
 
 	go func() {
@@ -106,7 +103,7 @@ func (a RunnerFSAdapter) Start(instance *types.Instance, onLog func(msg string),
 		setStatus(types.InstanceStatusOff)
 	}()
 
-	return stdoutReader, nil
+	return
 }
 
 func (a RunnerFSAdapter) Stop(instance *types.Instance) error {
