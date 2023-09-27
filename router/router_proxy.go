@@ -9,23 +9,18 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vlog"
 )
 
-var (
-	proxyKernelService services.ProxyKernelService
-)
-
-type ProxyKernelRouter struct {
+type ProxyRouter struct {
 	server *http.Server
 	engine *gin.Engine
 }
 
-func NewProxyKernelRouter() ProxyKernelRouter {
+func NewProxyRouter() ProxyRouter {
 	gin.SetMode(gin.ReleaseMode)
 
-	r := ProxyKernelRouter{
+	r := ProxyRouter{
 		engine: gin.New(),
 	}
 
@@ -33,13 +28,12 @@ func NewProxyKernelRouter() ProxyKernelRouter {
 	r.engine.Use(ginutils.Logger("PROXY"))
 	r.engine.Use(gin.Recovery())
 
-	r.initServices()
 	r.initAPIRoutes()
 
 	return r
 }
 
-func (r *ProxyKernelRouter) Start() error {
+func (r *ProxyRouter) Start() error {
 	r.server = &http.Server{
 		Addr:    ":80",
 		Handler: r.engine,
@@ -53,7 +47,7 @@ func (r *ProxyKernelRouter) Start() error {
 	return r.server.ListenAndServe()
 }
 
-func (r *ProxyKernelRouter) Stop() error {
+func (r *ProxyRouter) Stop() error {
 	if r.server == nil {
 		return nil
 	}
@@ -70,10 +64,6 @@ func (r *ProxyKernelRouter) Stop() error {
 	return nil
 }
 
-func (r *ProxyKernelRouter) initServices() {
-	proxyKernelService = services.NewProxyKernelService()
-}
-
-func (r *ProxyKernelRouter) initAPIRoutes() {
-	r.engine.Any("/*path", proxyKernelService.HandleProxy)
+func (r *ProxyRouter) initAPIRoutes() {
+	r.engine.Any("/*path", proxyService.HandleProxy)
 }

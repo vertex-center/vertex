@@ -1,13 +1,11 @@
 package adapter
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"os"
 	"path"
 
-	"github.com/carlmjohnson/requests"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
@@ -89,12 +87,6 @@ func (a *ProxyFSAdapter) read() {
 		log.Error(err)
 		return
 	}
-
-	err = a.notify()
-	if err != nil {
-		log.Error(err)
-		return
-	}
 }
 
 func (a *ProxyFSAdapter) write() error {
@@ -105,17 +97,5 @@ func (a *ProxyFSAdapter) write() error {
 		return err
 	}
 
-	err = os.WriteFile(p, bytes, os.ModePerm)
-	if err != nil {
-		return err
-	}
-
-	return a.notify()
-}
-
-func (a *ProxyFSAdapter) notify() error {
-	return requests.URL("http://localhost:6131/api/proxy").
-		Post().
-		BodyJSON(a.redirects).
-		Fetch(context.Background())
+	return os.WriteFile(p, bytes, os.ModePerm)
 }

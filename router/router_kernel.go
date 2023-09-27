@@ -87,5 +87,4 @@ func (r *KernelRouter) initAPIRoutes() {
 	api := r.engine.Group("/api")
 
 	addDockerKernelRoutes(api.Group("/docker"))
-	addProxyKernelRoutes(api.Group("/proxy"))
 }
