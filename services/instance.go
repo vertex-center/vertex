@@ -138,11 +138,11 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		s.setStatus(instance, status)
 	}
 
-	var stdout io.ReadCloser
+	var stdout, stderr io.ReadCloser
 	if instance.IsDockerized() {
-		stdout, _, err = s.dockerRunnerAdapter.Start(instance, setStatus)
+		stdout, stderr, err = s.dockerRunnerAdapter.Start(instance, setStatus)
 	} else {
-		stdout, _, err = s.fsRunnerAdapter.Start(instance, setStatus)
+		stdout, stderr, err = s.fsRunnerAdapter.Start(instance, setStatus)
 	}
 	if err != nil {
 		s.setStatus(instance, types.InstanceStatusError)
@@ -165,19 +165,19 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		}
 	}()
 
-	//wg.Add(1)
-	//go func() {
-	//	defer wg.Done()
-	//
-	//	scanner := bufio.NewScanner(stderr)
-	//	for scanner.Scan() {
-	//		s.eventsAdapter.Send(types.EventInstanceLog{
-	//			InstanceUUID: uuid,
-	//			Kind:         types.LogKindErr,
-	//			Message:      scanner.Text(),
-	//		})
-	//	}
-	//}()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+
+		scanner := bufio.NewScanner(stderr)
+		for scanner.Scan() {
+			s.eventsAdapter.Send(types.EventInstanceLog{
+				InstanceUUID: uuid,
+				Kind:         types.LogKindErr,
+				Message:      scanner.Text(),
+			})
+		}
+	}()
 
 	wg.Wait()
 

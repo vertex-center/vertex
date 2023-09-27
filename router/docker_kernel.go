@@ -18,7 +18,8 @@ func addDockerKernelRoutes(r *gin.RouterGroup) {
 	r.POST("/container/:id/start", handleStartDockerContainer)
 	r.POST("/container/:id/stop", handleStopDockerContainer)
 	r.GET("/container/:id/info", handleInfoDockerContainer)
-	r.GET("/container/:id/logs", handleLogsDockerContainer)
+	r.GET("/container/:id/logs/stdout", handleLogsStdoutDockerContainer)
+	r.GET("/container/:id/logs/stderr", handleLogsStderrDockerContainer)
 	r.GET("/container/:id/wait/:cond", handleWaitDockerContainer)
 	r.GET("/image/:id/info", handleInfoDockerImage)
 	r.POST("/image/pull", handlePullDockerImage)
@@ -121,10 +122,10 @@ func handleInfoDockerContainer(c *gin.Context) {
 	c.JSON(http.StatusOK, info)
 }
 
-func handleLogsDockerContainer(c *gin.Context) {
+func handleLogsStdoutDockerContainer(c *gin.Context) {
 	id := c.Param("id")
 
-	r, err := dockerKernelService.LogsContainer(id)
+	stdout, err := dockerKernelService.LogsStdoutContainer(id)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_get_container_logs",
@@ -133,7 +134,40 @@ func handleLogsDockerContainer(c *gin.Context) {
 		return
 	}
 
-	scanner := bufio.NewScanner(r)
+	scanner := bufio.NewScanner(stdout)
+
+	c.Stream(func(w io.Writer) bool {
+		if scanner.Err() != nil {
+			log.Error(scanner.Err())
+			return false
+		}
+
+		if !scanner.Scan() {
+			return false
+		}
+
+		_, err := io.WriteString(w, scanner.Text()+"\n")
+		if err != nil {
+			log.Error(err)
+			return false
+		}
+		return true
+	})
+}
+
+func handleLogsStderrDockerContainer(c *gin.Context) {
+	id := c.Param("id")
+
+	stderr, err := dockerKernelService.LogsStderrContainer(id)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
+			Code:    "failed_to_get_container_logs",
+			Message: err.Error(),
+		})
+		return
+	}
+
+	scanner := bufio.NewScanner(stderr)
 
 	c.Stream(func(w io.Writer) bool {
 		if scanner.Err() != nil {

@@ -98,9 +98,17 @@ func (a DockerCliAdapter) InfoContainer(id string) (types.InfoContainerResponse,
 	}, nil
 }
 
-func (a DockerCliAdapter) LogsContainer(id string) (io.ReadCloser, error) {
+func (a DockerCliAdapter) LogsStdoutContainer(id string) (io.ReadCloser, error) {
 	return a.cli.ContainerLogs(context.Background(), id, dockertypes.ContainerLogsOptions{
 		ShowStdout: true,
+		Timestamps: false,
+		Follow:     true,
+		Tail:       "0",
+	})
+}
+
+func (a DockerCliAdapter) LogsStderrContainer(id string) (io.ReadCloser, error) {
+	return a.cli.ContainerLogs(context.Background(), id, dockertypes.ContainerLogsOptions{
 		ShowStderr: true,
 		Timestamps: false,
 		Follow:     true,

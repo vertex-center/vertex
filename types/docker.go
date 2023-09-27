@@ -70,7 +70,8 @@ type DockerAdapterPort interface {
 	StartContainer(id string) error
 	StopContainer(id string) error
 	InfoContainer(id string) (InfoContainerResponse, error)
-	LogsContainer(id string) (io.ReadCloser, error)
+	LogsStdoutContainer(id string) (io.ReadCloser, error)
+	LogsStderrContainer(id string) (io.ReadCloser, error)
 	WaitContainer(id string, cond WaitContainerCondition) error
 	InfoImage(id string) (InfoImageResponse, error)
 	PullImage(options PullImageOptions) (io.ReadCloser, error)

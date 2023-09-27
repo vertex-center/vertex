@@ -39,8 +39,7 @@ func (a RunnerDockerAdapter) Delete(instance *types.Instance) error {
 }
 
 func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(status string)) (io.ReadCloser, io.ReadCloser, error) {
-	//rErr, wErr := io.Pipe()
-	rErr := io.ReadCloser(nil)
+	rErr, wErr := io.Pipe()
 	rOut, wOut := io.Pipe()
 
 	go func() {
@@ -53,7 +52,7 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 
 		// Build
 		var err error
-		var stdout io.ReadCloser
+		var stdout, stderr io.ReadCloser
 		if service.Methods.Docker.Dockerfile != nil {
 			stdout, err = a.buildImageFromDockerfile(instancePath, imageName)
 		} else if service.Methods.Docker.Image != nil {
@@ -68,7 +67,6 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 
 		var wg sync.WaitGroup
 
-		// Send stdout to wOut
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -80,7 +78,6 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 			}
 		}()
 
-		//Send stderr to wErr
 		//wg.Add(1)
 		//go func() {
 		//	defer wg.Done()
@@ -192,7 +189,7 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 		}
 		setStatus(types.InstanceStatusRunning)
 
-		stdout, err = a.readLogs(id)
+		stdout, stderr, err = a.readLogs(id)
 		if err != nil {
 			return
 		}
@@ -205,9 +202,15 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 			}
 		}()
 
-		a.watchForStatusChange(id, instance, setStatus)
+		go func() {
+			_, err := io.Copy(wErr, stderr)
+			if err != nil {
+				log.Error(err)
+				return
+			}
+		}()
 
-		return
+		a.watchForStatusChange(id, instance, setStatus)
 	}()
 
 	return rOut, rErr, nil
@@ -439,20 +442,36 @@ func (a RunnerDockerAdapter) watchForStatusChange(containerID string, instance *
 	}()
 }
 
-func (a RunnerDockerAdapter) readLogs(containerID string) (io.ReadCloser, error) {
-	req, err := requests.URL("http://localhost:6131/").
-		Pathf("/api/docker/container/%s/logs", containerID).
+func (a RunnerDockerAdapter) readLogs(containerID string) (stdout io.ReadCloser, stderr io.ReadCloser, err error) {
+	var reqStdout, reqStderr *http.Request
+	reqStdout, err = requests.URL("http://localhost:6131/").
+		Pathf("/api/docker/container/%s/logs/stdout", containerID).
 		Request(context.Background())
 	if err != nil {
-		return nil, err
+		return
+	}
+
+	reqStderr, err = requests.URL("http://localhost:6131/").
+		Pathf("/api/docker/container/%s/logs/stderr", containerID).
+		Request(context.Background())
+	if err != nil {
+		return
 	}
 
 	var res *http.Response
-	res, err = http.DefaultClient.Do(req)
+	res, err = http.DefaultClient.Do(reqStdout)
 	if err != nil {
-		return nil, err
+		return
 	}
-	return res.Body, nil
+	stdout = res.Body
+
+	res, err = http.DefaultClient.Do(reqStderr)
+	if err != nil {
+		_ = stdout.Close()
+		return
+	}
+	stderr = res.Body
+	return
 }
 
 func (a RunnerDockerAdapter) getPath(instance types.Instance) string {

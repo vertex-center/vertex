@@ -41,8 +41,12 @@ func (s DockerKernelService) InfoContainer(id string) (types.InfoContainerRespon
 	return s.dockerAdapter.InfoContainer(id)
 }
 
-func (s DockerKernelService) LogsContainer(id string) (io.ReadCloser, error) {
-	return s.dockerAdapter.LogsContainer(id)
+func (s DockerKernelService) LogsStdoutContainer(id string) (io.ReadCloser, error) {
+	return s.dockerAdapter.LogsStdoutContainer(id)
+}
+
+func (s DockerKernelService) LogsStderrContainer(id string) (io.ReadCloser, error) {
+	return s.dockerAdapter.LogsStderrContainer(id)
 }
 
 func (s DockerKernelService) WaitContainer(id string, cond types.WaitContainerCondition) error {
