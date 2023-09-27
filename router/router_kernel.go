@@ -6,7 +6,16 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/adapter"
 	"github.com/vertex-center/vertex/pkg/ginutils"
+	"github.com/vertex-center/vertex/services"
+	"github.com/vertex-center/vertex/types"
+)
+
+var (
+	dockerCliAdapter types.DockerAdapterPort
+
+	dockerKernelService services.DockerKernelService
 )
 
 type KernelRouter struct {
@@ -60,13 +69,15 @@ func (r *KernelRouter) Stop() error {
 }
 
 func (r *KernelRouter) initAdapters() {
-	// TODO: Implement
+	dockerCliAdapter = adapter.NewDockerCliAdapter()
 }
 
 func (r *KernelRouter) initServices() {
-	// TODO: Implement
+	dockerKernelService = services.NewDockerKernelService(dockerCliAdapter)
 }
 
 func (r *KernelRouter) initAPIRoutes() {
-	// TODO: Implement
+	api := r.engine.Group("/api")
+
+	addDockerKernelRoutes(api.Group("/docker"))
 }

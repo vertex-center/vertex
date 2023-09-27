@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path"
@@ -29,7 +30,7 @@ func (a RunnerFSAdapter) Delete(instance *types.Instance) error {
 	return nil
 }
 
-func (a RunnerFSAdapter) Start(instance *types.Instance, onLog func(msg string), onErr func(msg string), setStatus func(status string)) error {
+func (a RunnerFSAdapter) Start(instance *types.Instance, onLog func(msg string), onErr func(msg string), setStatus func(status string)) (io.ReadCloser, error) {
 	service := instance.Service
 
 	if a.commands[instance.UUID] != nil {
@@ -44,9 +45,9 @@ func (a RunnerFSAdapter) Start(instance *types.Instance, onLog func(msg string),
 
 	_, err := os.Stat(path.Join(dir, executable))
 	if errors.Is(err, os.ErrNotExist) {
-		return fmt.Errorf("executable %s were not found", command)
+		return nil, fmt.Errorf("executable %s were not found", command)
 	} else if err != nil {
-		return err
+		return nil, err
 	}
 
 	a.commands[instance.UUID] = exec.Command(command)
@@ -57,7 +58,7 @@ func (a RunnerFSAdapter) Start(instance *types.Instance, onLog func(msg string),
 
 	envFile, err := os.Open(path.Join(a.getPath(*instance), ".env"))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	envScanner := bufio.NewScanner(envFile)
@@ -72,21 +73,15 @@ func (a RunnerFSAdapter) Start(instance *types.Instance, onLog func(msg string),
 
 	stdoutReader, err := cmd.StdoutPipe()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	stderrReader, err := cmd.StderrPipe()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	stdoutScanner := bufio.NewScanner(stdoutReader)
-	go func() {
-		for stdoutScanner.Scan() {
-			onLog(stdoutScanner.Text())
-		}
-	}()
-
+	// TODO: Also return the errors
 	stderrScanner := bufio.NewScanner(stderrReader)
 	go func() {
 		for stderrScanner.Scan() {
@@ -98,7 +93,7 @@ func (a RunnerFSAdapter) Start(instance *types.Instance, onLog func(msg string),
 
 	err = cmd.Start()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	go func() {
@@ -111,7 +106,7 @@ func (a RunnerFSAdapter) Start(instance *types.Instance, onLog func(msg string),
 		setStatus(types.InstanceStatusOff)
 	}()
 
-	return nil
+	return stdoutReader, nil
 }
 
 func (a RunnerFSAdapter) Stop(instance *types.Instance) error {

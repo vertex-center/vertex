@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"os"
 	"path"
@@ -151,27 +152,38 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		s.setStatus(instance, status)
 	}
 
+	var logsReader io.ReadCloser
 	if instance.IsDockerized() {
-		err = s.dockerRunnerAdapter.Start(instance, onLog, onErr, setStatus)
+		logsReader, err = s.dockerRunnerAdapter.Start(instance, onLog, onErr, setStatus)
 	} else {
-		err = s.fsRunnerAdapter.Start(instance, onLog, onErr, setStatus)
+		logsReader, err = s.fsRunnerAdapter.Start(instance, onLog, onErr, setStatus)
 	}
-
 	if err != nil {
 		s.setStatus(instance, types.InstanceStatusError)
-	} else {
-		s.eventsAdapter.Send(types.EventInstanceLog{
-			InstanceUUID: uuid,
-			Kind:         types.LogKindVertexOut,
-			Message:      "Instance started.",
-		})
-
-		log.Info("instance started",
-			vlog.String("uuid", uuid.String()),
-		)
+		return err
 	}
 
-	return err
+	go func() {
+		defer logsReader.Close()
+		_, err := io.Copy(os.Stdout, logsReader)
+		if err != nil {
+			log.Warn("failed to copy logs",
+				vlog.String("error", err.Error()),
+			)
+		}
+	}()
+
+	s.eventsAdapter.Send(types.EventInstanceLog{
+		InstanceUUID: uuid,
+		Kind:         types.LogKindVertexOut,
+		Message:      "Instance started.",
+	})
+
+	log.Info("instance started",
+		vlog.String("uuid", uuid.String()),
+	)
+
+	return nil
 }
 
 func (s *InstanceService) StartAll() {

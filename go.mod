@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/antelman107/net-wait-go v0.0.0-20220211074630-12d8a944b87d
+	github.com/carlmjohnson/requests v0.23.4
 	github.com/disgoorg/disgo v0.16.10
 	github.com/docker/docker v24.0.6+incompatible
 	github.com/docker/go-connections v0.4.0

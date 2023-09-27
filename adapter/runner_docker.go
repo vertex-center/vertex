@@ -3,17 +3,15 @@ package adapter
 import (
 	"bufio"
 	"context"
-	"encoding/json"
 	"errors"
 	"io"
+	"net/http"
 	"path"
 	"path/filepath"
 	"strings"
 
-	dockertypes "github.com/docker/docker/api/types"
+	"github.com/carlmjohnson/requests"
 	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/client"
-	"github.com/docker/docker/pkg/archive"
 	"github.com/docker/go-connections/nat"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
@@ -22,27 +20,10 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-type RunnerDockerAdapter struct {
-	cli *client.Client
-}
-
-type dockerMessage struct {
-	Stream string `json:"stream"`
-}
+type RunnerDockerAdapter struct{}
 
 func NewRunnerDockerAdapter() RunnerDockerAdapter {
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	if err != nil {
-		log.Warn("couldn't connect with the Docker cli.",
-			vlog.String("error", err.Error()),
-		)
-
-		return RunnerDockerAdapter{}
-	}
-
-	return RunnerDockerAdapter{
-		cli: cli,
-	}
+	return RunnerDockerAdapter{}
 }
 
 func (a RunnerDockerAdapter) Delete(instance *types.Instance) error {
@@ -51,10 +32,13 @@ func (a RunnerDockerAdapter) Delete(instance *types.Instance) error {
 		return err
 	}
 
-	return a.cli.ContainerRemove(context.Background(), id, dockertypes.ContainerRemoveOptions{})
+	return requests.URL("http://localhost:6131/").
+		Pathf("/api/docker/container/%s", id).
+		Delete().
+		Fetch(context.Background())
 }
 
-func (a RunnerDockerAdapter) Start(instance *types.Instance, onLog func(msg string), onErr func(msg string), setStatus func(status string)) error {
+func (a RunnerDockerAdapter) Start(instance *types.Instance, onLog func(msg string), onErr func(msg string), setStatus func(status string)) (io.ReadCloser, error) {
 	imageName := instance.DockerImageName()
 
 	setStatus(types.InstanceStatusBuilding)
@@ -74,7 +58,7 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, onLog func(msg stri
 
 	if err != nil {
 		onErr(err.Error())
-		return err
+		return nil, err
 	}
 
 	// Create
@@ -86,14 +70,14 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, onLog func(msg stri
 			vlog.String("container_name", containerName),
 		)
 
-		options := createContainerOptions{
-			imageName:     imageName,
-			containerName: containerName,
-			exposedPorts:  nat.PortSet{},
-			portBindings:  nat.PortMap{},
-			binds:         []string{},
-			env:           []string{},
-			capAdd:        []string{},
+		options := types.CreateContainerOptions{
+			ImageName:     imageName,
+			ContainerName: containerName,
+			ExposedPorts:  nat.PortSet{},
+			PortBindings:  nat.PortMap{},
+			Binds:         []string{},
+			Env:           []string{},
+			CapAdd:        []string{},
 		}
 
 		// exposedPorts and portBindings
@@ -111,9 +95,9 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, onLog func(msg stri
 			}
 
 			var err error
-			options.exposedPorts, options.portBindings, err = nat.ParsePortSpecs(all)
+			options.ExposedPorts, options.PortBindings, err = nat.ParsePortSpecs(all)
 			if err != nil {
-				return err
+				return nil, err
 			}
 		}
 
@@ -124,9 +108,9 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, onLog func(msg stri
 					source, err = filepath.Abs(path.Join(instancePath, "volumes", source))
 				}
 				if err != nil {
-					return err
+					return nil, err
 				}
-				options.binds = append(options.binds, source+":"+target)
+				options.Binds = append(options.Binds, source+":"+target)
 			}
 		}
 
@@ -134,45 +118,51 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, onLog func(msg stri
 		if service.Methods.Docker.Environment != nil {
 			for in, out := range *service.Methods.Docker.Environment {
 				value := instance.Env[out]
-				options.env = append(options.env, in+"="+value)
+				options.Env = append(options.Env, in+"="+value)
 			}
 		}
 
 		// capAdd
 		if service.Methods.Docker.Capabilities != nil {
-			options.capAdd = *service.Methods.Docker.Capabilities
+			options.CapAdd = *service.Methods.Docker.Capabilities
 		}
 
 		// sysctls
 		if service.Methods.Docker.Sysctls != nil {
-			options.sysctls = *service.Methods.Docker.Sysctls
+			options.Sysctls = *service.Methods.Docker.Sysctls
 		}
 
 		if service.Methods.Docker.Dockerfile != nil {
 			id, err = a.createContainer(options)
 		} else if service.Methods.Docker.Image != nil {
-			options.imageName = *service.Methods.Docker.Image
+			options.ImageName = *service.Methods.Docker.Image
 			id, err = a.createContainer(options)
 		}
 		if err != nil {
-			return err
+			return nil, err
 		}
 	} else if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Start
-	err = a.cli.ContainerStart(context.Background(), id, dockertypes.ContainerStartOptions{})
+	err = requests.URL("http://localhost:6131/").
+		Pathf("/api/docker/container/%s/start", id).
+		Post().
+		Fetch(context.Background())
 	if err != nil {
 		setStatus(types.InstanceStatusError)
-		return err
+		return nil, err
 	}
 	setStatus(types.InstanceStatusRunning)
 
-	a.watchForLogs(id, instance, onLog)
+	logsReader, err := a.readLogs(id)
+	if err != nil {
+		return nil, err
+	}
 	a.watchForStatusChange(id, instance, setStatus)
 
-	return nil
+	return logsReader, nil
 }
 
 func (a RunnerDockerAdapter) Stop(instance *types.Instance) error {
@@ -181,7 +171,10 @@ func (a RunnerDockerAdapter) Stop(instance *types.Instance) error {
 		return err
 	}
 
-	return a.cli.ContainerStop(context.Background(), id, container.StopOptions{})
+	return requests.URL("http://localhost:6131/").
+		Pathf("/api/docker/container/%s/stop", id).
+		Post().
+		Fetch(context.Background())
 }
 
 func (a RunnerDockerAdapter) Info(instance types.Instance) (map[string]any, error) {
@@ -190,29 +183,27 @@ func (a RunnerDockerAdapter) Info(instance types.Instance) (map[string]any, erro
 		return nil, err
 	}
 
-	info, err := a.cli.ContainerInspect(context.Background(), id)
+	var info types.InfoContainerResponse
+	err = requests.URL("http://localhost:6131/").
+		Pathf("/api/docker/container/%s/info", id).
+		ToJSON(&info).
+		Fetch(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
-	imageInfo, _, err := a.cli.ImageInspectWithRaw(context.Background(), info.Image)
+	var imageInfo types.InfoImageResponse
+	err = requests.URL("http://localhost:6131/").
+		Pathf("/api/docker/image/%s/info", info.Image).
+		ToJSON(&imageInfo).
+		Fetch(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
 	return map[string]any{
-		"container": map[string]any{
-			"id":       info.ID,
-			"name":     info.Name,
-			"platform": info.Platform,
-		},
-		"image": map[string]any{
-			"id":           imageInfo.ID,
-			"architecture": imageInfo.Architecture,
-			"os":           imageInfo.Os,
-			"size":         imageInfo.Size,
-			"tags":         imageInfo.RepoTags,
-		},
+		"container": info,
+		"image":     imageInfo,
 	}, nil
 }
 
@@ -232,7 +223,11 @@ func (a RunnerDockerAdapter) CheckForUpdates(instance *types.Instance) error {
 	}
 	defer res.Close()
 
-	imageInfo, _, err := a.cli.ImageInspectWithRaw(context.Background(), imageName)
+	var imageInfo types.InfoImageResponse
+	err = requests.URL("http://localhost:6131/").
+		Pathf("/api/docker/%s/info", imageName).
+		ToJSON(&imageInfo).
+		Fetch(context.Background())
 	if err != nil {
 		return err
 	}
@@ -267,16 +262,17 @@ func (a RunnerDockerAdapter) HasUpdateAvailable(instance types.Instance) (bool, 
 	return false, nil
 }
 
-func (a RunnerDockerAdapter) getContainer(instance types.Instance) (dockertypes.Container, error) {
-	containers, err := a.cli.ContainerList(context.Background(), dockertypes.ContainerListOptions{
-		All: true,
-	})
+func (a RunnerDockerAdapter) getContainer(instance types.Instance) (types.Container, error) {
+	var containers []types.Container
+	err := requests.URL("http://localhost:6131/").
+		Path("/api/docker/containers").
+		ToJSON(&containers).
+		Fetch(context.Background())
 	if err != nil {
-		return dockertypes.Container{}, err
+		return types.Container{}, err
 	}
 
-	var dockerContainer *dockertypes.Container
-
+	var dockerContainer *types.Container
 	for _, c := range containers {
 		name := c.Names[0]
 		if name == "/"+instance.DockerContainerName() {
@@ -286,7 +282,7 @@ func (a RunnerDockerAdapter) getContainer(instance types.Instance) (dockertypes.
 	}
 
 	if dockerContainer == nil {
-		return dockertypes.Container{}, ErrContainerNotFound
+		return types.Container{}, ErrContainerNotFound
 	}
 
 	return *dockerContainer, nil
@@ -309,11 +305,22 @@ func (a RunnerDockerAdapter) getImageID(instance types.Instance) (string, error)
 }
 
 func (a RunnerDockerAdapter) pullImage(imageName string) (io.ReadCloser, error) {
-	res, err := a.cli.ImagePull(context.Background(), imageName, dockertypes.ImagePullOptions{})
+	options := types.PullImageOptions{Image: imageName}
+
+	req, err := requests.URL("http://localhost:6131/").
+		Path("/api/docker/image/pull").
+		Post().
+		BodyJSON(options).
+		Request(context.Background())
 	if err != nil {
 		return nil, err
 	}
-	return res, nil
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	return res.Body, nil
 }
 
 func (a RunnerDockerAdapter) buildImageFromName(imageName string, onMsg func(msg string)) error {
@@ -321,35 +328,40 @@ func (a RunnerDockerAdapter) buildImageFromName(imageName string, onMsg func(msg
 	if err != nil {
 		return err
 	}
+	defer res.Close()
 
 	scanner := bufio.NewScanner(res)
 	for scanner.Scan() {
 		if scanner.Err() != nil {
 			return scanner.Err()
 		}
-		onMsg(scanner.Text())
+		text := scanner.Text()
+		log.Info(text)
+		onMsg(text)
 	}
 
 	return nil
 }
 
 func (a RunnerDockerAdapter) buildImageFromDockerfile(instancePath string, imageName string, onMsg func(msg string)) error {
-	buildOptions := dockertypes.ImageBuildOptions{
+	options := types.BuildImageOptions{
+		Dir:        instancePath,
+		Name:       imageName,
 		Dockerfile: "Dockerfile",
-		Tags:       []string{imageName},
-		Remove:     true,
 	}
 
-	reader, err := archive.TarWithOptions(instancePath, &archive.TarOptions{
-		ExcludePatterns: []string{".git/**/*"},
-	})
+	req, err := requests.URL("http://localhost:6131/").
+		Pathf("/api/docker/image/build").
+		Post().
+		BodyJSON(options).
+		Request(context.Background())
 	if err != nil {
 		return err
 	}
 
-	res, err := a.cli.ImageBuild(context.Background(), reader, buildOptions)
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return err
+		log.Error(err)
 	}
 	defer res.Body.Close()
 
@@ -358,52 +370,26 @@ func (a RunnerDockerAdapter) buildImageFromDockerfile(instancePath string, image
 		if scanner.Err() != nil {
 			return scanner.Err()
 		}
-		msg := dockerMessage{}
-		err := json.Unmarshal(scanner.Bytes(), &msg)
-		if err != nil {
-			log.Warn("Failed to parse message",
-				vlog.String("message", scanner.Text()),
-			)
-		} else {
-			if msg.Stream != "" {
-				onMsg(msg.Stream)
-			}
-		}
+		text := scanner.Text()
+		log.Info(text)
+		onMsg(text)
 	}
 
-	log.Info("Docker build: success.")
 	return nil
 }
 
-type createContainerOptions struct {
-	imageName     string
-	containerName string
-	exposedPorts  nat.PortSet
-	portBindings  nat.PortMap
-	binds         []string
-	env           []string
-	capAdd        []string
-	sysctls       map[string]string
-}
-
-func (a RunnerDockerAdapter) createContainer(options createContainerOptions) (string, error) {
-	config := container.Config{
-		Image:        options.imageName,
-		ExposedPorts: options.exposedPorts,
-		Env:          options.env,
-		Tty:          true,
-		AttachStdout: true,
-		AttachStderr: true,
+func (a RunnerDockerAdapter) createContainer(options types.CreateContainerOptions) (string, error) {
+	var res types.CreateContainerResponse
+	err := requests.URL("http://localhost:6131/").
+		Pathf("/api/docker/container").
+		Post().
+		BodyJSON(options).
+		ToJSON(&res).
+		Fetch(context.Background())
+	if err != nil {
+		return "", err
 	}
 
-	hostConfig := container.HostConfig{
-		Binds:        options.binds,
-		PortBindings: options.portBindings,
-		CapAdd:       options.capAdd,
-		Sysctls:      options.sysctls,
-	}
-
-	res, err := a.cli.ContainerCreate(context.Background(), &config, &hostConfig, nil, nil, options.containerName)
 	for _, warn := range res.Warnings {
 		log.Warn("warning while creating container",
 			vlog.String("warning", warn),
@@ -414,49 +400,28 @@ func (a RunnerDockerAdapter) createContainer(options createContainerOptions) (st
 
 func (a RunnerDockerAdapter) watchForStatusChange(containerID string, instance *types.Instance, setStatus func(status string)) {
 	go func() {
-		resChan, errChan := a.cli.ContainerWait(context.Background(), containerID, container.WaitConditionNotRunning)
+		err := requests.URL("http://localhost:6131/").
+			Pathf("/api/docker/container/%s/wait/%s", containerID, container.WaitConditionNotRunning).
+			Fetch(context.Background())
 
-		select {
-		case err := <-errChan:
-			if err != nil {
-				log.Error(err,
-					vlog.String("uuid", instance.UUID.String()),
-				)
-			}
-		case status := <-resChan:
-			log.Info("container exited",
-				vlog.String("uuid", instance.UUID.String()),
-				vlog.Int64("status", status.StatusCode),
-			)
-			setStatus(types.InstanceStatusOff)
-		}
-	}()
-}
-
-func (a RunnerDockerAdapter) watchForLogs(containerID string, instance *types.Instance, onLog func(msg string)) {
-	go func() {
-		logs, err := a.cli.ContainerLogs(context.Background(), containerID, dockertypes.ContainerLogsOptions{
-			ShowStdout: true,
-			ShowStderr: true,
-			Timestamps: false,
-			Follow:     true,
-			Tail:       "0",
-		})
 		if err != nil {
 			log.Error(err,
 				vlog.String("uuid", instance.UUID.String()),
 			)
+			return
 		}
 
-		scanner := bufio.NewScanner(logs)
-		for scanner.Scan() {
-			onLog(scanner.Text())
-		}
-		_ = logs.Close()
-		log.Info("logs pipe closed",
-			vlog.String("uuid", instance.UUID.String()),
-		)
+		setStatus(types.InstanceStatusOff)
 	}()
+}
+
+func (a RunnerDockerAdapter) readLogs(containerID string) (io.ReadCloser, error) {
+	r, w := io.Pipe()
+	err := requests.URL("http://localhost:6131/").
+		Pathf("/api/docker/container/%s/logs", containerID).
+		ToWriter(w).
+		Fetch(context.Background())
+	return r, err
 }
 
 func (a RunnerDockerAdapter) getPath(instance types.Instance) string {
@@ -464,9 +429,11 @@ func (a RunnerDockerAdapter) getPath(instance types.Instance) string {
 
 	// If Vertex is running itself inside Docker, the instances are stored in the Vertex container volume.
 	if vdocker.RunningInDocker() {
-		containers, err := a.cli.ContainerList(context.Background(), dockertypes.ContainerListOptions{
-			All: true,
-		})
+		var containers []types.Container
+		err := requests.URL("http://localhost:6131/").
+			Path("/api/docker/containers").
+			ToJSON(&containers).
+			Fetch(context.Background())
 		if err != nil {
 			log.Error(err)
 		} else {
