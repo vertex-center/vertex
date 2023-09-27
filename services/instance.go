@@ -15,6 +15,7 @@ import (
 	"github.com/antelman107/net-wait-go/wait"
 	"github.com/go-git/go-git/v5"
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/adapter"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
@@ -714,8 +715,17 @@ func (s *InstanceService) RecreateContainer(instance *types.Instance) error {
 	}
 
 	err := s.dockerRunnerAdapter.Delete(instance)
-	if err != nil {
+	if err != nil && !errors.Is(err, adapter.ErrContainerNotFound) {
 		return err
 	}
-	return s.Start(instance.UUID)
+
+	go func() {
+		err := s.Start(instance.UUID)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+	}()
+
+	return nil
 }
