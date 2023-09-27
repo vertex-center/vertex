@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"io"
 	"net"
 	"os"
 	"path"
@@ -138,12 +137,14 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		s.setStatus(instance, status)
 	}
 
-	var stdout, stderr io.ReadCloser
+	var runner types.RunnerAdapterPort
 	if instance.IsDockerized() {
-		stdout, stderr, err = s.dockerRunnerAdapter.Start(instance, setStatus)
+		runner = s.dockerRunnerAdapter
 	} else {
-		stdout, stderr, err = s.fsRunnerAdapter.Start(instance, setStatus)
+		runner = s.fsRunnerAdapter
 	}
+
+	stdout, stderr, err := runner.Start(instance, setStatus)
 	if err != nil {
 		s.setStatus(instance, types.InstanceStatusError)
 		return err
@@ -157,6 +158,9 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 
 		scanner := bufio.NewScanner(stdout)
 		for scanner.Scan() {
+			if scanner.Err() != nil {
+				break
+			}
 			s.eventsAdapter.Send(types.EventInstanceLog{
 				InstanceUUID: uuid,
 				Kind:         types.LogKindOut,
@@ -171,6 +175,9 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 
 		scanner := bufio.NewScanner(stderr)
 		for scanner.Scan() {
+			if scanner.Err() != nil {
+				break
+			}
 			s.eventsAdapter.Send(types.EventInstanceLog{
 				InstanceUUID: uuid,
 				Kind:         types.LogKindErr,
@@ -179,15 +186,16 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		}
 	}()
 
+	// Wait for the instance until stopped
 	wg.Wait()
 
+	// Log stopped
 	s.eventsAdapter.Send(types.EventInstanceLog{
 		InstanceUUID: uuid,
 		Kind:         types.LogKindVertexOut,
-		Message:      "Instance started.",
+		Message:      "Stopping instance...",
 	})
-
-	log.Info("instance started",
+	log.Info("stopping instance",
 		vlog.String("uuid", uuid.String()),
 	)
 
@@ -239,16 +247,6 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 	if err != nil {
 		return err
 	}
-
-	s.eventsAdapter.Send(types.EventInstanceLog{
-		InstanceUUID: uuid,
-		Kind:         types.LogKindVertexOut,
-		Message:      "Stopping instance...",
-	})
-
-	log.Info("stopping instance",
-		vlog.String("uuid", uuid.String()),
-	)
 
 	if !instance.IsRunning() {
 		s.eventsAdapter.Send(types.EventInstanceLog{

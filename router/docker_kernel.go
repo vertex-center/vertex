@@ -133,20 +133,19 @@ func handleLogsStdoutDockerContainer(c *gin.Context) {
 		})
 		return
 	}
+	defer stdout.Close()
 
 	scanner := bufio.NewScanner(stdout)
 
 	c.Stream(func(w io.Writer) bool {
 		if scanner.Err() != nil {
-			log.Error(scanner.Err())
 			return false
 		}
-
 		if !scanner.Scan() {
 			return false
 		}
 
-		_, err := io.WriteString(w, scanner.Text()+"\n")
+		_, err := fmt.Fprintln(w, scanner.Text())
 		if err != nil {
 			log.Error(err)
 			return false
@@ -166,20 +165,19 @@ func handleLogsStderrDockerContainer(c *gin.Context) {
 		})
 		return
 	}
+	defer stderr.Close()
 
 	scanner := bufio.NewScanner(stderr)
 
 	c.Stream(func(w io.Writer) bool {
 		if scanner.Err() != nil {
-			log.Error(scanner.Err())
 			return false
 		}
-
 		if !scanner.Scan() {
 			return false
 		}
 
-		_, err := io.WriteString(w, scanner.Text()+"\n")
+		_, err := fmt.Fprintln(w, scanner.Text())
 		if err != nil {
 			log.Error(err)
 			return false
@@ -244,15 +242,13 @@ func handlePullDockerImage(c *gin.Context) {
 
 	c.Stream(func(w io.Writer) bool {
 		if scanner.Err() != nil {
-			log.Error(scanner.Err())
 			return false
 		}
-
 		if !scanner.Scan() {
 			return false
 		}
 
-		_, err := io.WriteString(w, scanner.Text()+"\n")
+		_, err := fmt.Fprintln(w, scanner.Text())
 		if err != nil {
 			log.Error(err)
 			return false

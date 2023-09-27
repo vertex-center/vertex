@@ -1,8 +1,10 @@
 package adapter
 
 import (
+	"bufio"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"path"
@@ -63,7 +65,6 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 		if err != nil {
 			return
 		}
-		defer stdout.Close()
 
 		var wg sync.WaitGroup
 
@@ -71,10 +72,17 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 		go func() {
 			defer wg.Done()
 			defer stdout.Close()
-			_, err := io.Copy(wOut, stdout)
-			if err != nil {
-				log.Error(err)
-				return
+
+			scanner := bufio.NewScanner(stdout)
+			for scanner.Scan() {
+				if scanner.Err() != nil {
+					log.Error(scanner.Err())
+					return
+				}
+				_, err := fmt.Fprintln(wOut, scanner.Text())
+				if err != nil {
+					return
+				}
 			}
 		}()
 
@@ -195,6 +203,9 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 		}
 
 		go func() {
+			defer stdout.Close()
+			defer wOut.Close()
+
 			_, err := io.Copy(wOut, stdout)
 			if err != nil {
 				log.Error(err)
@@ -203,7 +214,10 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 		}()
 
 		go func() {
-			_, err := io.Copy(wErr, stderr)
+			defer stderr.Close()
+			defer wErr.Close()
+
+			_, err := io.Copy(wOut, stdout)
 			if err != nil {
 				log.Error(err)
 				return
@@ -458,20 +472,36 @@ func (a RunnerDockerAdapter) readLogs(containerID string) (stdout io.ReadCloser,
 		return
 	}
 
-	var res *http.Response
-	res, err = http.DefaultClient.Do(reqStdout)
-	if err != nil {
-		return
-	}
-	stdout = res.Body
+	rOut, wOut := io.Pipe()
+	rErr, wErr := io.Pipe()
 
-	res, err = http.DefaultClient.Do(reqStderr)
-	if err != nil {
-		_ = stdout.Close()
-		return
-	}
-	stderr = res.Body
-	return
+	go func() {
+		res, err := http.DefaultClient.Do(reqStdout)
+		if err != nil {
+			return
+		}
+		defer res.Body.Close()
+
+		_, err = io.Copy(wOut, res.Body)
+		if err != nil {
+			return
+		}
+	}()
+
+	go func() {
+		res, err := http.DefaultClient.Do(reqStderr)
+		if err != nil {
+			return
+		}
+		defer res.Body.Close()
+
+		_, err = io.Copy(wErr, res.Body)
+		if err != nil {
+			return
+		}
+	}()
+
+	return rOut, rErr, nil
 }
 
 func (a RunnerDockerAdapter) getPath(instance types.Instance) string {
