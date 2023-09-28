@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"syscall"
 
+	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/router"
 	"github.com/vertex-center/vlog"
@@ -17,6 +18,8 @@ import (
 
 func main() {
 	ensureRoot()
+
+	parseArgs()
 
 	shutdownChan := make(chan os.Signal, 1)
 
@@ -65,43 +68,53 @@ func ensureRoot() {
 	}
 }
 
-func getUserAndGroupID() (uid uint32, gid uint32, err error) {
+func parseArgs() {
 	flagUsername := flag.String("user", "", "username of the unprivileged user")
 	flagUID := flag.Uint("uid", 0, "uid of the unprivileged user")
 	flagGID := flag.Uint("gid", 0, "gid of the unprivileged user")
 
+	// Copy/paste from cmd/main/main.go
+	flagPort := flag.String("port", config.Current.Port, "The Vertex port")
+	flagHost := flag.String("host", config.Current.Host, "The Vertex access url")
+
 	flag.Parse()
+
+	config.Current.Host = *flagHost
+	config.Current.Port = *flagPort
 
 	if *flagUsername != "" {
 		u, err := user.Lookup(*flagUsername)
 		if err != nil {
-			return 0, 0, err
+			log.Error(err)
+			os.Exit(1)
 		}
 
 		uid, err := strconv.ParseInt(u.Uid, 10, 32)
 		if err != nil {
-			return 0, 0, err
+			log.Error(err)
+			os.Exit(1)
 		}
 
 		gid, err := strconv.ParseInt(u.Gid, 10, 32)
 		if err != nil {
-			return 0, 0, err
+			log.Error(err)
+			os.Exit(1)
 		}
 
-		return uint32(uid), uint32(gid), nil
+		config.KernelCurrent.Uid = uint32(uid)
+		config.KernelCurrent.Gid = uint32(gid)
+		return
 	}
 
-	return uint32(*flagUID), uint32(*flagGID), nil
+	config.KernelCurrent.Uid = uint32(*flagUID)
+	config.KernelCurrent.Gid = uint32(*flagGID)
 }
 
 func runVertex() (*exec.Cmd, error) {
-	uid, gid, err := getUserAndGroupID()
-	if err != nil {
-		return nil, err
-	}
+	uid, gid := config.KernelCurrent.Uid, config.KernelCurrent.Gid
 
 	// If go.mod is there, build vertex first.
-	_, err = os.Stat("go.mod")
+	_, err := os.Stat("go.mod")
 	if err == nil {
 		log.Info("init.go found. Building vertex...")
 		buildVertex()
@@ -122,7 +135,7 @@ func runVertex() (*exec.Cmd, error) {
 		vlog.Uint32("gid", gid),
 	)
 
-	cmd = exec.Command("./vertex")
+	cmd = exec.Command("./vertex", "-port", config.Current.Port, "-host", config.Current.Host)
 	cmd.SysProcAttr = &syscall.SysProcAttr{}
 	cmd.SysProcAttr.Credential = &syscall.Credential{Uid: uid, Gid: gid}
 	cmd.Stdout = os.Stdout
