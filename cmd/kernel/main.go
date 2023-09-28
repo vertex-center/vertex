@@ -34,9 +34,8 @@ func main() {
 	// Vertex
 	var vertex *exec.Cmd
 	go func() {
-		u := getUnprivilegedUser()
 		var err error
-		vertex, err = runVertex(u)
+		vertex, err = runVertex()
 		if err != nil {
 			log.Error(err)
 			shutdownChan <- syscall.SIGINT
@@ -66,35 +65,43 @@ func ensureRoot() {
 	}
 }
 
-func getUnprivilegedUser() *user.User {
-	flagUnprivilegedUsername := flag.String("u", "vertex", "unprivileged username")
+func getUserAndGroupID() (uid uint32, gid uint32, err error) {
+	flagUsername := flag.String("user", "", "username of the unprivileged user")
+	flagUID := flag.Uint("uid", 0, "uid of the unprivileged user")
+	flagGID := flag.Uint("gid", 0, "gid of the unprivileged user")
+
 	flag.Parse()
-	username := *flagUnprivilegedUsername
-	return getUser(username)
-}
 
-func getUser(username string) *user.User {
-	u, err := user.Lookup(username)
-	if err != nil {
-		log.Error(err)
-		os.Exit(1)
+	if *flagUsername != "" {
+		u, err := user.Lookup(*flagUsername)
+		if err != nil {
+			return 0, 0, err
+		}
+
+		uid, err := strconv.ParseInt(u.Uid, 10, 32)
+		if err != nil {
+			return 0, 0, err
+		}
+
+		gid, err := strconv.ParseInt(u.Gid, 10, 32)
+		if err != nil {
+			return 0, 0, err
+		}
+
+		return uint32(uid), uint32(gid), nil
 	}
-	return u
+
+	return uint32(*flagUID), uint32(*flagGID), nil
 }
 
-func runVertex(user *user.User) (*exec.Cmd, error) {
-	uid, err := strconv.ParseInt(user.Uid, 10, 32)
+func runVertex() (*exec.Cmd, error) {
+	uid, gid, err := getUserAndGroupID()
 	if err != nil {
 		return nil, err
 	}
 
-	gid, err := strconv.ParseInt(user.Gid, 10, 32)
-	if err != nil {
-		return nil, err
-	}
-
-	// If vertex init.go is there, build vertex first.
-	_, err = os.Stat("init.go")
+	// If go.mod is there, build vertex first.
+	_, err = os.Stat("go.mod")
 	if err == nil {
 		log.Info("init.go found. Building vertex...")
 		buildVertex()
@@ -111,14 +118,13 @@ func runVertex(user *user.User) (*exec.Cmd, error) {
 
 	// Run Vertex
 	log.Info("running vertex",
-		vlog.String("as", user.Username),
-		vlog.Int64("uid", uid),
-		vlog.Int64("gid", gid),
+		vlog.Uint32("uid", uid),
+		vlog.Uint32("gid", gid),
 	)
 
 	cmd = exec.Command("./vertex")
 	cmd.SysProcAttr = &syscall.SysProcAttr{}
-	cmd.SysProcAttr.Credential = &syscall.Credential{Uid: uint32(uid), Gid: uint32(gid)}
+	cmd.SysProcAttr.Credential = &syscall.Credential{Uid: uid, Gid: gid}
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
