@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"os"
 	"os/exec"
@@ -99,6 +100,15 @@ func runVertex(user *user.User) (*exec.Cmd, error) {
 		buildVertex()
 	}
 
+	// Allow Vertex Proxy to use the port 80
+	cmd := exec.Command("setcap", "'cap_net_bind_service=+ep'", "vertex")
+	err = cmd.Run()
+	if err != nil {
+		log.Error(errors.New("error trying to allow ./vertex to use the port 80"),
+			vlog.String("msg", err.Error()),
+		)
+	}
+
 	// Run Vertex
 	log.Info("running vertex",
 		vlog.String("as", user.Username),
@@ -106,7 +116,7 @@ func runVertex(user *user.User) (*exec.Cmd, error) {
 		vlog.Int64("gid", gid),
 	)
 
-	cmd := exec.Command("./vertex")
+	cmd = exec.Command("./vertex")
 	cmd.SysProcAttr = &syscall.SysProcAttr{}
 	cmd.SysProcAttr.Credential = &syscall.Credential{Uid: uint32(uid), Gid: uint32(gid)}
 	cmd.Stdout = os.Stdout
