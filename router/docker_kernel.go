@@ -147,7 +147,7 @@ func handleLogsStdoutDockerContainer(c *gin.Context) {
 
 		_, err := fmt.Fprintln(w, scanner.Text())
 		if err != nil {
-			log.Error(err)
+			log.ErrorKernel(err)
 			return false
 		}
 		return true
@@ -179,7 +179,7 @@ func handleLogsStderrDockerContainer(c *gin.Context) {
 
 		_, err := fmt.Fprintln(w, scanner.Text())
 		if err != nil {
-			log.Error(err)
+			log.ErrorKernel(err)
 			return false
 		}
 		return true
@@ -250,7 +250,7 @@ func handlePullDockerImage(c *gin.Context) {
 
 		_, err := fmt.Fprintln(w, scanner.Text())
 		if err != nil {
-			log.Error(err)
+			log.ErrorKernel(err)
 			return false
 		}
 		return true
@@ -282,7 +282,7 @@ func handleBuildDockerImage(c *gin.Context) {
 
 	c.Stream(func(w io.Writer) bool {
 		if scanner.Err() != nil {
-			log.Error(scanner.Err())
+			log.ErrorKernel(scanner.Err())
 			return false
 		}
 
@@ -292,7 +292,7 @@ func handleBuildDockerImage(c *gin.Context) {
 
 		_, err := io.WriteString(w, scanner.Text()+"\n")
 		if err != nil {
-			log.Error(err)
+			log.ErrorKernel(err)
 			return false
 		}
 		return true

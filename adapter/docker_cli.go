@@ -20,7 +20,7 @@ type DockerCliAdapter struct {
 func NewDockerCliAdapter() DockerCliAdapter {
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
-		log.Warn("couldn't connect with the Docker cli.",
+		log.WarnKernel("couldn't connect with the Docker cli.",
 			vlog.String("error", err.Error()),
 		)
 

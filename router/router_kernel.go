@@ -52,7 +52,7 @@ func (r *KernelRouter) Start() error {
 	}
 
 	url := "http://localhost:6131"
-	log.Info("Vertex-Kernel started",
+	log.InfoKernel("vertex-kernel started",
 		vlog.String("url", url),
 	)
 
