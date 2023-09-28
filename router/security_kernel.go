@@ -1,6 +1,7 @@
 package router
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"net/http"
@@ -10,17 +11,17 @@ import (
 	"github.com/vertex-center/vertex/types"
 )
 
-func addSecurityRoutes(r *gin.RouterGroup) {
-	r.GET("/ssh", handleGetSSHKey)
-	r.POST("/ssh", handleAddSSHKey)
-	r.DELETE("/ssh/:fingerprint", handleDeleteSSHKey)
+func addSecurityKernelRoutes(r *gin.RouterGroup) {
+	r.GET("/ssh", handleGetSSHKeyKernel)
+	r.POST("/ssh", handleAddSSHKeyKernel)
+	r.DELETE("/ssh/:fingerprint", handleDeleteSSHKeyKernel)
 }
 
 // handleGetSSHKey handles the retrieval of the SSH key.
 // Errors can be:
 //   - failed_to_get_ssh_keys: failed to get the SSH keys.
-func handleGetSSHKey(c *gin.Context) {
-	keys, err := sshService.GetAll()
+func handleGetSSHKeyKernel(c *gin.Context) {
+	keys, err := sshKernelService.GetAll()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_get_ssh_keys",
@@ -32,17 +33,13 @@ func handleGetSSHKey(c *gin.Context) {
 	c.JSON(http.StatusOK, keys)
 }
 
-type AddSSHKeyBody struct {
-	AuthorizedKey string `json:"authorized_key"`
-}
-
 // handleAddSSHKey handles the addition of an SSH key.
 // Errors can be:
 //   - failed_to_parse_body: failed to parse the request body.
 //   - failed_to_add_ssh_key: failed to add the SSH key.
-func handleAddSSHKey(c *gin.Context) {
-	var body AddSSHKeyBody
-	err := c.BindJSON(&body)
+func handleAddSSHKeyKernel(c *gin.Context) {
+	buf := new(bytes.Buffer)
+	_, err := buf.ReadFrom(c.Request.Body)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
 			Code:    "failed_to_parse_body",
@@ -50,8 +47,9 @@ func handleAddSSHKey(c *gin.Context) {
 		})
 		return
 	}
+	key := buf.String()
 
-	err = sshService.Add(body.AuthorizedKey)
+	err = sshKernelService.Add(key)
 	if err != nil && errors.Is(err, services.ErrInvalidPublicKey) {
 		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
 			Code:    "invalid_public_key",
@@ -73,7 +71,7 @@ func handleAddSSHKey(c *gin.Context) {
 // Errors can be:
 //   - failed_to_parse_body: failed to parse the request body.
 //   - failed_to_delete_ssh_key: failed to delete the SSH key.
-func handleDeleteSSHKey(c *gin.Context) {
+func handleDeleteSSHKeyKernel(c *gin.Context) {
 	fingerprint := c.Param("fingerprint")
 	if fingerprint == "" {
 		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
@@ -83,7 +81,7 @@ func handleDeleteSSHKey(c *gin.Context) {
 		return
 	}
 
-	err := sshService.Delete(fingerprint)
+	err := sshKernelService.Delete(fingerprint)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_delete_ssh_key",

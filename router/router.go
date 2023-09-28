@@ -157,7 +157,7 @@ func (r *Router) initServices(about types.About) {
 	dependenciesService = services.NewDependenciesService(about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)
 	hardwareService = services.NewHardwareService()
-	sshService = services.NewSSHService(nil)
+	sshService = services.NewSSHService()
 }
 
 func (r *Router) initAPIRoutes(about types.About) {

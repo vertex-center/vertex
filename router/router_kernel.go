@@ -18,6 +18,7 @@ var (
 	dockerCliAdapter types.DockerAdapterPort
 
 	dockerKernelService services.DockerKernelService
+	sshKernelService    services.SSHKernelService
 )
 
 type KernelRouter struct {
@@ -81,10 +82,12 @@ func (r *KernelRouter) initAdapters() {
 
 func (r *KernelRouter) initServices() {
 	dockerKernelService = services.NewDockerKernelService(dockerCliAdapter)
+	sshKernelService = services.NewSSHKernelService(nil)
 }
 
 func (r *KernelRouter) initAPIRoutes() {
 	api := r.engine.Group("/api")
 
 	addDockerKernelRoutes(api.Group("/docker"))
+	addSecurityKernelRoutes(api.Group("/security"))
 }
