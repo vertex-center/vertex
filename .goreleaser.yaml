@@ -1,5 +1,5 @@
 builds:
-  - main: ./kernel
+  - main: ./cmd/kernel
     id: "vertex-kernel"
     binary: vertex-kernel
     goos:
@@ -12,7 +12,7 @@ builds:
       - arm
       - arm64
 
-  - main: .
+  - main: ./cmd/main
     id: "vertex"
     binary: vertex
     goos:

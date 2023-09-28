@@ -7,7 +7,7 @@
     </envs>
     <sudo value="true" />
     <kind value="PACKAGE" />
-    <package value="github.com/vertex-center/vertex/kernel" />
+    <package value="github.com/vertex-center/vertex/cmd/kernel" />
     <directory value="$PROJECT_DIR$" />
     <filePath value="$PROJECT_DIR$/kernel/main.go" />
     <method v="2" />

@@ -92,18 +92,19 @@ func runVertex(user *user.User) (*exec.Cmd, error) {
 		return nil, err
 	}
 
-	log.Info("Running vertex",
-		vlog.String("username", user.Username),
-		vlog.Int64("uid", uid),
-		vlog.Int64("gid", gid),
-	)
-
 	// If vertex init.go is there, build vertex first.
 	_, err = os.Stat("init.go")
 	if err == nil {
 		log.Info("init.go found. Building vertex...")
 		buildVertex()
 	}
+
+	// Run Vertex
+	log.Info("running vertex",
+		vlog.String("as", user.Username),
+		vlog.Int64("uid", uid),
+		vlog.Int64("gid", gid),
+	)
 
 	cmd := exec.Command("./vertex")
 	cmd.SysProcAttr = &syscall.SysProcAttr{}
@@ -116,7 +117,7 @@ func runVertex(user *user.User) (*exec.Cmd, error) {
 
 func buildVertex() {
 	log.Info("Building vertex")
-	cmd := exec.Command("go", "build", "-o", "vertex", "init.go")
+	cmd := exec.Command("go", "build", "-o", "vertex", "cmd/main/main.go")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()

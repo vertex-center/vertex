@@ -6,7 +6,7 @@
       <env name="DEBUG" value="1" />
     </envs>
     <kind value="PACKAGE" />
-    <package value="github.com/vertex-center/vertex" />
+    <package value="github.com/vertex-center/vertex/cmd/main" />
     <directory value="$PROJECT_DIR$" />
     <filePath value="$PROJECT_DIR$/init.go" />
     <method v="2" />
