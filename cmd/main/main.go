@@ -28,6 +28,8 @@ func main() {
 
 	parseArgs()
 
+	checkNotRoot()
+
 	err := setupDependencies()
 	if err != nil {
 		log.Error(fmt.Errorf("failed to setup dependencies: %v", err))
@@ -92,6 +94,12 @@ func parseArgs() {
 	}
 	config.Current.Host = *flagHost
 	config.Current.Port = *flagPort
+}
+
+func checkNotRoot() {
+	if os.Getuid() == 0 {
+		log.Warn("while vertex-kernel must be run as root, the vertex user should not be root")
+	}
 }
 
 func setupDependencies() error {

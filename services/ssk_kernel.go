@@ -35,7 +35,7 @@ func NewSSHKernelService(params *SSHKernelServiceParams) SSHKernelService {
 		var err error
 		s.authorizedKeysPath, err = getAuthorizedKeysPath()
 		if err != nil {
-			log.ErrorKernel(err)
+			log.Error(err)
 		}
 	}
 
@@ -45,7 +45,7 @@ func NewSSHKernelService(params *SSHKernelServiceParams) SSHKernelService {
 func (s *SSHKernelService) GetAll() ([]types.PublicKey, error) {
 	bytes, err := os.ReadFile(s.authorizedKeysPath)
 	if err != nil && errors.Is(err, os.ErrNotExist) {
-		log.InfoKernel("authorized_keys file does not exist")
+		log.Info("authorized_keys file does not exist")
 		return []types.PublicKey{}, nil
 	} else if err != nil {
 		return nil, err
