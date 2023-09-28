@@ -1,14 +1,15 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run Vertex" type="GoApplicationRunConfiguration" factoryName="Go Application">
+  <configuration default="false" name="Run Vertex Kernel" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="Vertex" />
     <working_directory value="$PROJECT_DIR$" />
     <envs>
       <env name="DEBUG" value="1" />
     </envs>
+    <sudo value="true" />
     <kind value="PACKAGE" />
-    <package value="github.com/vertex-center/vertex/cmd/main" />
+    <package value="github.com/vertex-center/vertex/cmd/kernel" />
     <directory value="$PROJECT_DIR$" />
-    <filePath value="$PROJECT_DIR$/init.go" />
+    <filePath value="$PROJECT_DIR$/kernel/main.go" />
     <method v="2" />
   </configuration>
 </component>

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"net"
@@ -8,11 +9,13 @@ import (
 	"path"
 	"reflect"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/antelman107/net-wait-go/wait"
 	"github.com/go-git/go-git/v5"
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/adapter"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
@@ -131,47 +134,73 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		return ErrInstanceAlreadyRunning
 	}
 
-	onLog := func(msg string) {
-		s.eventsAdapter.Send(types.EventInstanceLog{
-			InstanceUUID: uuid,
-			Kind:         types.LogKindOut,
-			Message:      msg,
-		})
-	}
-
-	onErr := func(msg string) {
-		s.eventsAdapter.Send(types.EventInstanceLog{
-			InstanceUUID: uuid,
-			Kind:         types.LogKindErr,
-			Message:      msg,
-		})
-	}
-
 	setStatus := func(status string) {
 		s.setStatus(instance, status)
 	}
 
+	var runner types.RunnerAdapterPort
 	if instance.IsDockerized() {
-		err = s.dockerRunnerAdapter.Start(instance, onLog, onErr, setStatus)
+		runner = s.dockerRunnerAdapter
 	} else {
-		err = s.fsRunnerAdapter.Start(instance, onLog, onErr, setStatus)
+		runner = s.fsRunnerAdapter
 	}
 
+	stdout, stderr, err := runner.Start(instance, setStatus)
 	if err != nil {
 		s.setStatus(instance, types.InstanceStatusError)
-	} else {
-		s.eventsAdapter.Send(types.EventInstanceLog{
-			InstanceUUID: uuid,
-			Kind:         types.LogKindVertexOut,
-			Message:      "Instance started.",
-		})
-
-		log.Info("instance started",
-			vlog.String("uuid", uuid.String()),
-		)
+		return err
 	}
 
-	return err
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+
+		scanner := bufio.NewScanner(stdout)
+		for scanner.Scan() {
+			if scanner.Err() != nil {
+				break
+			}
+			s.eventsAdapter.Send(types.EventInstanceLog{
+				InstanceUUID: uuid,
+				Kind:         types.LogKindOut,
+				Message:      scanner.Text(),
+			})
+		}
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+
+		scanner := bufio.NewScanner(stderr)
+		for scanner.Scan() {
+			if scanner.Err() != nil {
+				break
+			}
+			s.eventsAdapter.Send(types.EventInstanceLog{
+				InstanceUUID: uuid,
+				Kind:         types.LogKindErr,
+				Message:      scanner.Text(),
+			})
+		}
+	}()
+
+	// Wait for the instance until stopped
+	wg.Wait()
+
+	// Log stopped
+	s.eventsAdapter.Send(types.EventInstanceLog{
+		InstanceUUID: uuid,
+		Kind:         types.LogKindVertexOut,
+		Message:      "Stopping instance...",
+	})
+	log.Info("stopping instance",
+		vlog.String("uuid", uuid.String()),
+	)
+
+	return nil
 }
 
 func (s *InstanceService) StartAll() {
@@ -219,16 +248,6 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 	if err != nil {
 		return err
 	}
-
-	s.eventsAdapter.Send(types.EventInstanceLog{
-		InstanceUUID: uuid,
-		Kind:         types.LogKindVertexOut,
-		Message:      "Stopping instance...",
-	})
-
-	log.Info("stopping instance",
-		vlog.String("uuid", uuid.String()),
-	)
 
 	if !instance.IsRunning() {
 		s.eventsAdapter.Send(types.EventInstanceLog{
@@ -696,8 +715,17 @@ func (s *InstanceService) RecreateContainer(instance *types.Instance) error {
 	}
 
 	err := s.dockerRunnerAdapter.Delete(instance)
-	if err != nil {
+	if err != nil && !errors.Is(err, adapter.ErrContainerNotFound) {
 		return err
 	}
-	return s.Start(instance.UUID)
+
+	go func() {
+		err := s.Start(instance.UUID)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+	}()
+
+	return nil
 }

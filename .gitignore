@@ -1,6 +1,9 @@
 .idea
 
 live
+live_kernel
 
 vertex
 vertex-old
+vertex-kernel
+vertex-kernel-old

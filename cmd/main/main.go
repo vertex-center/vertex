@@ -12,7 +12,6 @@ import (
 	"github.com/vertex-center/vertex/router"
 	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/types"
-	"github.com/vertex-center/vlog"
 )
 
 // version, commit and date will be overridden by goreleaser
@@ -28,6 +27,8 @@ func main() {
 	log.Info("Vertex starting...")
 
 	parseArgs()
+
+	checkNotRoot()
 
 	err := setupDependencies()
 	if err != nil {
@@ -51,12 +52,19 @@ func main() {
 	})
 	defer r.Stop()
 
+	// Vertex-Kernel Proxy
+	var rProxy router.ProxyRouter
+	go func() {
+		rProxy = router.NewProxyRouter()
+		err := rProxy.Start()
+		if err != nil {
+			log.Error(err)
+		}
+	}()
+
 	// Logs
 	url := fmt.Sprintf("http://%s", config.Current.Host)
 	fmt.Printf("\n-- Vertex Client :: %s\n\n", url)
-	log.Info("Vertex started",
-		vlog.String("url", url),
-	)
 
 	r.Start(fmt.Sprintf(":%s", config.Current.Port))
 }
@@ -86,6 +94,12 @@ func parseArgs() {
 	}
 	config.Current.Host = *flagHost
 	config.Current.Port = *flagPort
+}
+
+func checkNotRoot() {
+	if os.Getuid() == 0 {
+		log.Warn("while vertex-kernel must be run as root, the vertex user should not be root")
+	}
 }
 
 func setupDependencies() error {

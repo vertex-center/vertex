@@ -1,8 +1,10 @@
 package types
 
+import "io"
+
 type RunnerAdapterPort interface {
 	Delete(instance *Instance) error
-	Start(instance *Instance, onLog func(msg string), onErr func(msg string), setStatus func(status string)) error
+	Start(instance *Instance, setStatus func(status string)) (stdout io.ReadCloser, stderr io.ReadCloser, err error)
 	Stop(instance *Instance) error
 	Info(instance Instance) (map[string]any, error)
 
