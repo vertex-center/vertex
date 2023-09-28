@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"path"
+	"sync"
 
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/pkg/log"
@@ -14,7 +15,9 @@ import (
 )
 
 type ProxyFSAdapter struct {
-	redirects types.ProxyRedirects
+	redirects      types.ProxyRedirects
+	redirectsMutex sync.RWMutex
+
 	proxyPath string
 }
 
@@ -40,7 +43,9 @@ func NewProxyFSAdapter(params *ProxyFSAdapterParams) types.ProxyAdapterPort {
 	}
 
 	adapter := &ProxyFSAdapter{
-		redirects: types.ProxyRedirects{},
+		redirects:      types.ProxyRedirects{},
+		redirectsMutex: sync.RWMutex{},
+
 		proxyPath: params.proxyPath,
 	}
 	adapter.read()
@@ -49,10 +54,16 @@ func NewProxyFSAdapter(params *ProxyFSAdapterParams) types.ProxyAdapterPort {
 }
 
 func (a *ProxyFSAdapter) GetRedirects() types.ProxyRedirects {
+	a.redirectsMutex.RLock()
+	defer a.redirectsMutex.RUnlock()
+
 	return a.redirects
 }
 
 func (a *ProxyFSAdapter) GetRedirectByHost(host string) *types.ProxyRedirect {
+	a.redirectsMutex.RLock()
+	defer a.redirectsMutex.RUnlock()
+
 	for _, redirect := range a.redirects {
 		if redirect.Source == host {
 			return &redirect
@@ -62,11 +73,17 @@ func (a *ProxyFSAdapter) GetRedirectByHost(host string) *types.ProxyRedirect {
 }
 
 func (a *ProxyFSAdapter) AddRedirect(id uuid.UUID, redirect types.ProxyRedirect) error {
+	a.redirectsMutex.Lock()
+	defer a.redirectsMutex.Unlock()
+
 	a.redirects[id] = redirect
 	return a.write()
 }
 
 func (a *ProxyFSAdapter) RemoveRedirect(id uuid.UUID) error {
+	a.redirectsMutex.Lock()
+	defer a.redirectsMutex.Unlock()
+
 	delete(a.redirects, id)
 	return a.write()
 }
@@ -82,6 +99,9 @@ func (a *ProxyFSAdapter) read() {
 		return
 	}
 
+	a.redirectsMutex.Lock()
+	defer a.redirectsMutex.Unlock()
+
 	err = json.Unmarshal(file, &a.redirects)
 	if err != nil {
 		log.Error(err)
@@ -91,6 +111,9 @@ func (a *ProxyFSAdapter) read() {
 
 func (a *ProxyFSAdapter) write() error {
 	p := path.Join(a.proxyPath, "redirects.json")
+
+	a.redirectsMutex.RLock()
+	defer a.redirectsMutex.RUnlock()
 
 	bytes, err := json.MarshalIndent(a.redirects, "", "\t")
 	if err != nil {
