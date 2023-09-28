@@ -178,7 +178,17 @@ func (d *vertexUpdater) InstallUpdate() error {
 		return fmt.Errorf("failed to rename old executable: %v", err)
 	}
 
+	err = os.Rename("vertex-kernel", "vertex-kernel-old")
+	if err != nil {
+		return fmt.Errorf("failed to rename old executable: %v", err)
+	}
+
 	err = os.Rename(path.Join(dir, "vertex"), "vertex")
+	if err != nil {
+		return err
+	}
+
+	err = os.Rename(path.Join(dir, "vertex-kernel"), "vertex-kernel")
 	if err != nil {
 		return err
 	}
