@@ -6,7 +6,7 @@ import classNames from "classnames";
 type DockAppProps = {
     to: string;
     symbol: string;
-    color?: string;
+    name: string;
 };
 
 function DockApp(props: DockAppProps) {
@@ -23,6 +23,7 @@ function DockApp(props: DockAppProps) {
             }
         >
             <Symbol className={styles.icon} name={symbol} />
+            <span className={styles.name}>{props.name}</span>
         </NavLink>
     );
 }
@@ -31,10 +32,10 @@ export default function Dock() {
     return (
         <div className={styles.dockContainer}>
             <div className={styles.dock}>
-                <DockApp to="/instances" symbol="storage" />
-                <DockApp to="/proxy" symbol="router" />
+                <DockApp to="/instances" symbol="storage" name="Instances" />
+                <DockApp to="/proxy" symbol="router" name="Reverse Proxy" />
                 <div className={styles.separator} />
-                <DockApp to="/settings" symbol="settings" />
+                <DockApp to="/settings" symbol="settings" name="Settings" />
             </div>
         </div>
     );

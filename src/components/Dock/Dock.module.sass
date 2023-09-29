@@ -47,16 +47,29 @@
         opacity: 0
         transition: all 0.15s ease-in-out
 
+    & .icon
+        text-shadow: 0 0 30px colors.$fg-secondary
+        font-size: 26px
+
+    & .name
+        position: absolute
+        top: -35px
+        display: none
+        background-color: colors.$bg-tertiary
+        padding: 5px 10px
+        border-radius: dimensions.$border-radius-lg
+
     &Active
         bottom: 4px
         border-color: colors.$bg-tertiary-hover
+
         &::after
             width: 20px
             opacity: 1
 
-    & .icon
-        text-shadow: 0 0 30px colors.$fg-secondary
-        font-size: 26px
+    &:hover
+        & .name
+            display: block
 
 .separator
     width: 1px
