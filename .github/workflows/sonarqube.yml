@@ -15,14 +15,19 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check if SonarQube is available, else skip the next steps
+        id: availability
+        run: |
+          curl --head --fail --silent --location --output /dev/null ${{ secrets.SONAR_HOST_URL }} || OUT=$?
+          if [ $OUT -ne 0 ]; then
+            echo "SonarQube is not available, skipping."
+            echo "SONAR_AVAILABLE=0" >> $GITHUB_OUTPUT
+          else
+            echo "SONAR_AVAILABLE=1" >> $GITHUB_OUTPUT
+          fi
+
       - uses: sonarsource/sonarqube-scan-action@master
+        if: steps.availability.outputs.SONAR_AVAILABLE == '1'
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-
-      # If you wish to fail your job when the Quality Gate is red, uncomment the
-      # following lines. This would typically be used to fail a deployment.
-      # - uses: sonarsource/sonarqube-quality-gate-action@master
-      #   timeout-minutes: 5
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
