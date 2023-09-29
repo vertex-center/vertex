@@ -122,7 +122,11 @@ export default function SettingsSecurity() {
                 <Horizontal gap={6}>
                     <Spacer />
                     <Button onClick={dismissPopup}>Cancel</Button>
-                    <Button primary onClick={createSSHKey}>
+                    <Button
+                        disabled={authorizedKey === ""}
+                        primary
+                        onClick={createSSHKey}
+                    >
                         Create
                     </Button>
                 </Horizontal>
