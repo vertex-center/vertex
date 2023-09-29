@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"os"
 	"os/exec"
@@ -13,13 +12,20 @@ import (
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/router"
-	"github.com/vertex-center/vlog"
 )
 
 func main() {
 	ensureRoot()
-
 	parseArgs()
+
+	// If go.mod is there, build vertex first.
+	_, err := os.Stat("go.mod")
+	if err == nil {
+		log.Info("init.go found. Building vertex...")
+		buildVertex()
+	}
+
+	allowPort80()
 
 	shutdownChan := make(chan os.Signal, 1)
 
@@ -109,42 +115,6 @@ func parseArgs() {
 
 	config.KernelCurrent.Uid = uint32(*flagUID)
 	config.KernelCurrent.Gid = uint32(*flagGID)
-}
-
-func runVertex() (*exec.Cmd, error) {
-	uid, gid := config.KernelCurrent.Uid, config.KernelCurrent.Gid
-
-	// If go.mod is there, build vertex first.
-	_, err := os.Stat("go.mod")
-	if err == nil {
-		log.Info("init.go found. Building vertex...")
-		buildVertex()
-	}
-
-	// Allow Vertex Proxy to use the port 80
-	cmd := exec.Command("setcap", "cap_net_bind_service=+ep", "vertex")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	err = cmd.Run()
-	if err != nil {
-		log.Error(errors.New("error trying to allow ./vertex to use the port 80"),
-			vlog.String("msg", err.Error()),
-		)
-	}
-
-	// Run Vertex
-	log.Info("running vertex",
-		vlog.Uint32("uid", uid),
-		vlog.Uint32("gid", gid),
-	)
-
-	cmd = exec.Command("./vertex", "-port", config.Current.Port, "-host", config.Current.Host)
-	cmd.SysProcAttr = &syscall.SysProcAttr{}
-	cmd.SysProcAttr.Credential = &syscall.Credential{Uid: uid, Gid: gid}
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	return cmd, cmd.Start()
 }
 
 func buildVertex() {
