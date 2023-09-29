@@ -73,18 +73,20 @@ func (a *ProxyFSAdapter) GetRedirectByHost(host string) *types.ProxyRedirect {
 }
 
 func (a *ProxyFSAdapter) AddRedirect(id uuid.UUID, redirect types.ProxyRedirect) error {
-	a.redirectsMutex.Lock()
-	defer a.redirectsMutex.Unlock()
-
-	a.redirects[id] = redirect
+	func() {
+		a.redirectsMutex.Lock()
+		defer a.redirectsMutex.Unlock()
+		a.redirects[id] = redirect
+	}()
 	return a.write()
 }
 
 func (a *ProxyFSAdapter) RemoveRedirect(id uuid.UUID) error {
-	a.redirectsMutex.Lock()
-	defer a.redirectsMutex.Unlock()
-
-	delete(a.redirects, id)
+	func() {
+		a.redirectsMutex.Lock()
+		defer a.redirectsMutex.Unlock()
+		delete(a.redirects, id)
+	}()
 	return a.write()
 }
 
