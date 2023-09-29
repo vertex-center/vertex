@@ -9,8 +9,8 @@ RUN go mod download
 
 COPY . ./
 
-RUN go build -o /vertex -ldflags="-X 'main.version=$(git describe --tags --always --dirty)' -X 'main.commit=$(git rev-parse HEAD)' -X 'main.date=$(date -u +'%Y-%m-%dT%H:%M:%SZ')'" cmd/main/main.go
-RUN go build -o /vertex-kernel cmd/kernel/main.go
+RUN go build -o /vertex -ldflags="-X 'main.version=$(git describe --tags --always --dirty)' -X 'main.commit=$(git rev-parse HEAD)' -X 'main.date=$(date -u +'%Y-%m-%dT%H:%M:%SZ')'" ./cmd/main
+RUN go build -o /vertex-kernel ./cmd/kernel
 
 FROM build-stage AS test-stage
 RUN go test -v ./...
