@@ -56,10 +56,11 @@ func main() {
 
 	<-shutdownChan
 	log.Info("Shutting down...")
-	_ = r.Stop()
 	if vertex != nil && vertex.Process != nil {
-		_ = vertex.Process.Kill()
+		_ = vertex.Process.Signal(os.Interrupt)
+		_, _ = vertex.Process.Wait()
 	}
+	_ = r.Stop()
 }
 
 func ensureRoot() {
