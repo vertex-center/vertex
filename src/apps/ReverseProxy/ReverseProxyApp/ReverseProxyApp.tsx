@@ -1,7 +1,7 @@
 import { BigTitle, Title } from "../../../components/Text/Text";
 import styles from "./ReverseProxyApp.module.sass";
 import ProxyRedirect from "../../../components/ProxyRedirect/ProxyRedirect";
-import { Horizontal } from "../../../components/Layouts/Layouts";
+import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
 import Button from "../../../components/Button/Button";
 import { useFetch } from "../../../hooks/useFetch";
 import { api } from "../../../backend/backend";
@@ -69,16 +69,19 @@ export default function ReverseProxyApp() {
                 onDismiss={closeNewRedirectPopup}
             >
                 <Title>New redirection</Title>
-                <Input
-                    label="Source"
-                    value={source}
-                    onChange={onSourceChange}
-                />
-                <Input
-                    label="Target"
-                    value={target}
-                    onChange={onTargetChange}
-                />
+                <Vertical gap={20} className={styles.input}>
+                    <Input
+                        className={styles.input}
+                        label="Source"
+                        value={source}
+                        onChange={onSourceChange}
+                    />
+                    <Input
+                        label="Target"
+                        value={target}
+                        onChange={onTargetChange}
+                    />
+                </Vertical>
                 <Horizontal gap={10}>
                     <Spacer />
                     <Button onClick={closeNewRedirectPopup}>Cancel</Button>
