@@ -33,7 +33,7 @@ function Item({ children, to, symbol }: ItemProps) {
 export default function Header({ children }: HTMLProps<HTMLHeadingElement>) {
     return (
         <header className={styles.header}>
-            <Link to="/infrastructure" className={styles.logo}>
+            <Link to="/instances" className={styles.logo}>
                 <Logo />
             </Link>
             {children}

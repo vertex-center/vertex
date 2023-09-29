@@ -1,0 +1,46 @@
+@use "../../../../styles/colors"
+@use "../../../../styles/dimensions"
+@use "../../../../styles/fonts"
+
+.title
+    margin: 0 40px
+
+    @include dimensions.extra-small-or-less
+        margin: 0 30px
+
+.nav
+    display: grid
+    grid-template-columns: repeat(3, 1fr)
+    gap: 10px
+
+    @include dimensions.large-or-less
+        grid-template-columns: repeat(2, 1fr)
+
+    @include dimensions.medium-or-less
+        grid-template-columns: 1fr
+
+    &Item
+        display: flex
+        flex-direction: column
+        gap: 16px
+        background-color: colors.$bg-secondary
+        border-radius: dimensions.$border-radius-lg
+        padding: 15px 30px
+        border: 1px solid colors.$bg-secondary
+        transition: all 0.1s ease
+        cursor: pointer
+        -webkit-user-select: none
+        -ms-user-select: none
+        user-select: none
+
+        &:hover
+            background-color: colors.$bg-secondary-hover
+
+        &Disabled
+            cursor: not-allowed
+            pointer-events: none
+            background-color: colors.$bg-primary
+            color: colors.$fg-tertiary
+
+            &:hover
+                background-color: colors.$bg-secondary

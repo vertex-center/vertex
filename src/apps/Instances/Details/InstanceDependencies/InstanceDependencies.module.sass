@@ -1,0 +1,14 @@
+@use "../../../../styles/colors"
+@use "../../../../styles/dimensions"
+
+.title, .dependencies
+    margin: 0 40px
+
+    @include dimensions.extra-small-or-less
+        margin: 0 30px
+
+.installed
+    color: colors.$green
+
+.notInstalled
+    color: colors.$red

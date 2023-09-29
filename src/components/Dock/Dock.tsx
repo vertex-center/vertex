@@ -32,7 +32,7 @@ export default function Dock(props: Props) {
     return (
         <div className={styles.dockContainer}>
             <div className={styles.dock}>
-                <DockApp to="/infrastructure" symbol="storage" />
+                <DockApp to="/instances" symbol="storage" />
                 <DockApp to="/proxy" symbol="router" />
                 <div className={styles.separator} />
                 <DockApp to="/settings" symbol="settings" />

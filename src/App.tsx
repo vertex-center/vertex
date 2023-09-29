@@ -1,28 +1,28 @@
 import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
-import Infrastructure from "./pages/Infrastructure/Infrastructure";
-import BayDetails from "./pages/BayDetails/BayDetails";
-import BayDetailsLogs from "./pages/BayDetailsLogs/BayDetailsLogs";
-import BayDetailsEnv from "./pages/BayDetailsEnv/BayDetailsEnv";
-import BayDetailsDependencies from "./pages/BayDetailsDependencies";
-import BayDetailsHome from "./pages/BayDetailsHome/BayDetailsHome";
-import Settings from "./pages/Settings/Settings";
-import SettingsTheme from "./pages/SettingsTheme/SettingsTheme";
+import InstancesApp from "./apps/Instances/InstancesApp/InstancesApp";
+import Instance from "./apps/Instances/Details/Instance/Instance";
+import InstanceLogs from "./apps/Instances/Details/InstanceLogs/InstanceLogs";
+import InstanceEnv from "./apps/Instances/Details/InstanceEnv/InstanceEnv";
+import InstanceDependencies from "./apps/Instances/Details/InstanceDependencies";
+import InstanceHome from "./apps/Instances/Details/InstanceHome/InstanceHome";
+import SettingsApp from "./apps/Settings/SettingsApp/SettingsApp";
+import SettingsTheme from "./apps/Settings/SettingsTheme/SettingsTheme";
 import { useContext } from "react";
 import { ThemeContext } from "./main";
 import classNames from "classnames";
-import SettingsAbout from "./pages/SettingsAbout/SettingsAbout";
-import SettingsUpdates from "./pages/SettingsUpdates/SettingsUpdates";
-import BayDetailsDocker from "./pages/BayDetailsDocker/BayDetailsDocker";
-import BayDetailsSettings from "./pages/BayDetailsSettings/BayDetailsSettings";
-import Store from "./pages/Store/Store";
+import SettingsAbout from "./apps/Settings/SettingsAbout/SettingsAbout";
+import SettingsUpdates from "./apps/Settings/SettingsUpdates/SettingsUpdates";
+import InstanceDocker from "./apps/Instances/Details/InstanceDocker/InstanceDocker";
+import InstanceSettings from "./apps/Instances/Details/InstanceSettings/InstanceSettings";
+import InstancesStore from "./apps/Instances/InstancesStore/InstancesStore";
 import Dock from "./components/Dock/Dock";
-import BayDetailsUpdate from "./pages/BayDetailsUpdate/BayDetailsUpdate";
-import ReverseProxy from "./pages/ReverseProxy/ReverseProxy";
-import SettingsNotifications from "./pages/SettingsNotifications/SettingsNotifications";
+import InstanceUpdate from "./apps/Instances/Details/InstanceUpdate/InstanceUpdate";
+import ReverseProxyApp from "./apps/ReverseProxy/ReverseProxyApp/ReverseProxyApp";
+import SettingsNotifications from "./apps/Settings/SettingsNotifications/SettingsNotifications";
 import Header from "./components/Header/Header";
-import BayDetailsDatabase from "./pages/BayDetailsDatabase/BayDetailsDatabase";
-import SettingsHardware from "./pages/SettingsHardware/SettingsHardware";
-import SettingsSecurity from "./pages/SettingsSecurity/SettingsSecurity";
+import InstanceDetailsDatabase from "./apps/Instances/Details/InstanceDatabase/InstanceDetailsDatabase";
+import SettingsHardware from "./apps/Settings/SettingsHardware/SettingsHardware";
+import SettingsSecurity from "./apps/Settings/SettingsSecurity/SettingsSecurity";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -35,52 +35,50 @@ function App() {
                     <Routes>
                         <Route
                             path="/"
-                            element={<Navigate to="/infrastructure" />}
+                            element={<Navigate to="/instances" />}
                             index
                         />
+                        <Route path="/instances" element={<InstancesApp />} />
                         <Route
-                            path="/infrastructure"
-                            element={<Infrastructure />}
+                            path="/instances/add"
+                            element={<InstancesStore />}
                         />
-                        <Route path="/proxy" element={<ReverseProxy />} />
-                        <Route
-                            path="/infrastructure/:uuid/"
-                            element={<BayDetails />}
-                        >
+                        <Route path="/proxy" element={<ReverseProxyApp />} />
+                        <Route path="/instances/:uuid/" element={<Instance />}>
                             <Route
-                                path="/infrastructure/:uuid/home"
-                                element={<BayDetailsHome />}
+                                path="/instances/:uuid/home"
+                                element={<InstanceHome />}
                             />
                             <Route
-                                path="/infrastructure/:uuid/docker"
-                                element={<BayDetailsDocker />}
+                                path="/instances/:uuid/docker"
+                                element={<InstanceDocker />}
                             />
                             <Route
-                                path="/infrastructure/:uuid/logs"
-                                element={<BayDetailsLogs />}
+                                path="/instances/:uuid/logs"
+                                element={<InstanceLogs />}
                             />
                             <Route
-                                path="/infrastructure/:uuid/environment"
-                                element={<BayDetailsEnv />}
+                                path="/instances/:uuid/environment"
+                                element={<InstanceEnv />}
                             />
                             <Route
-                                path="/infrastructure/:uuid/database"
-                                element={<BayDetailsDatabase />}
+                                path="/instances/:uuid/database"
+                                element={<InstanceDetailsDatabase />}
                             />
                             <Route
-                                path="/infrastructure/:uuid/dependencies"
-                                element={<BayDetailsDependencies />}
+                                path="/instances/:uuid/dependencies"
+                                element={<InstanceDependencies />}
                             />
                             <Route
-                                path="/infrastructure/:uuid/update"
-                                element={<BayDetailsUpdate />}
+                                path="/instances/:uuid/update"
+                                element={<InstanceUpdate />}
                             />
                             <Route
-                                path="/infrastructure/:uuid/settings"
-                                element={<BayDetailsSettings />}
+                                path="/instances/:uuid/settings"
+                                element={<InstanceSettings />}
                             />
                         </Route>
-                        <Route path="/settings" element={<Settings />}>
+                        <Route path="/settings" element={<SettingsApp />}>
                             <Route
                                 path="/settings/theme"
                                 element={<SettingsTheme />}
@@ -106,7 +104,6 @@ function App() {
                                 element={<SettingsAbout />}
                             />
                         </Route>
-                        <Route path="/marketplace" element={<Store />} />
                     </Routes>
                 </div>
                 <Dock />
