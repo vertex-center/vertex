@@ -121,7 +121,9 @@ func runVertex() (*exec.Cmd, error) {
 	}
 
 	// Allow Vertex Proxy to use the port 80
-	cmd := exec.Command("setcap", "'cap_net_bind_service=+ep'", "vertex")
+	cmd := exec.Command("setcap", "cap_net_bind_service=+ep", "vertex")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 	err = cmd.Run()
 	if err != nil {
 		log.Error(errors.New("error trying to allow ./vertex to use the port 80"),
