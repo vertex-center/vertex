@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - dev
+      - hotfix
+      - main
   pull_request:
     types: [opened, synchronize, reopened]
 
