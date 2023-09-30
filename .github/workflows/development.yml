@@ -1,6 +1,15 @@
 name: Development
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - dev
+      - hotfix
+  pull_request:
+    branches:
+      - dev
+      - hotfix
+      - main
 
 jobs:
   build:
