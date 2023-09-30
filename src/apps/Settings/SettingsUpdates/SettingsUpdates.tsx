@@ -14,6 +14,7 @@ import { api } from "../../../backend/backend";
 import styles from "./SettingsUpdates.module.sass";
 import Update, { Updates } from "../../../components/Update/Update";
 import { APIError } from "../../../components/Error/Error";
+import ToggleButton from "../../../components/ToggleButton/ToggleButton";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -25,6 +26,8 @@ export default function SettingsUpdates() {
     const [error, setError] = useState();
     const [updateError, setUpdateError] = useState();
     const [showMessage, setShowMessage] = useState<boolean>(false);
+
+    const [beta, setBeta] = useState<boolean>(false);
 
     const reload = useCallback((refresh?: boolean) => {
         setIsLoading(true);
@@ -39,6 +42,10 @@ export default function SettingsUpdates() {
             .finally(() => setIsLoading(false));
     }, []);
 
+    useEffect(() => {
+        getChannel();
+    }, []);
+
     const updateService = (name: string) => {
         return api.dependencies
             .install([{ name }])
@@ -47,6 +54,31 @@ export default function SettingsUpdates() {
             })
             .catch(setUpdateError)
             .finally(reload);
+    };
+
+    const getChannel = () => {
+        api.settings
+            .get()
+            .then((res) => {
+                console.log(res.data);
+                setBeta(res?.data?.updates?.channel === "beta");
+            })
+            .catch(setError);
+    };
+
+    const onEnableBetaChange = (beta: boolean) => {
+        setBeta(beta);
+        setIsLoading(true);
+
+        const channel = beta ? "beta" : "stable";
+
+        api.settings
+            .patch({ updates: { channel } })
+            .then(() => {
+                reload(true);
+            })
+            .catch(setError)
+            .finally(() => setIsLoading(false));
     };
 
     useEffect(reload, []);
@@ -58,6 +90,11 @@ export default function SettingsUpdates() {
     return (
         <Vertical gap={20}>
             <Title className={styles.title}>Updates</Title>
+            <Horizontal className={styles.toggle} alignItems="center">
+                <Text>Enable Beta channel</Text>
+                <Spacer />
+                <ToggleButton value={beta} onChange={onEnableBetaChange} />
+            </Horizontal>
             {!isLoading && !error && (
                 <Horizontal alignItems="center" gap={20}>
                     <Button onClick={() => reload(true)} rightSymbol="refresh">
