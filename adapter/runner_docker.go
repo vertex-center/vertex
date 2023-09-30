@@ -19,6 +19,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/pkg/vdocker"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/types/api"
 	"github.com/vertex-center/vlog"
 )
 
@@ -34,14 +35,14 @@ func (a RunnerDockerAdapter) Delete(instance *types.Instance) error {
 		return err
 	}
 
-	apiError := types.APIError{}
+	apiError := api.Error{}
 	err = requests.URL("http://localhost:6131/").
 		Pathf("/api/docker/container/%s", id).
 		Delete().
 		ErrorJSON(&apiError).
 		Fetch(context.Background())
 
-	if apiError.Code == "container_not_found" {
+	if apiError.Code == api.ErrContainerNotFound {
 		return ErrContainerNotFound
 	}
 	return err

@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/types/api"
 )
 
 func addServicesRoutes(r *gin.RouterGroup) {
@@ -34,8 +35,8 @@ func handleServiceInstall(c *gin.Context) {
 	var body downloadBody
 	err := c.BindJSON(&body)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
-			Code:    "failed_to_parse_body",
+		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
+			Code:    api.ErrFailedToParseBody,
 			Message: fmt.Sprintf("failed to parse request body: %v", err),
 		})
 		return
@@ -43,14 +44,14 @@ func handleServiceInstall(c *gin.Context) {
 
 	i, err := instanceService.Install(body.ServiceID, body.Method)
 	if err != nil && errors.Is(err, types.ErrServiceNotFound) {
-		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
-			Code:    "service_not_found",
+		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
+			Code:    api.ErrServiceNotFound,
 			Message: fmt.Sprintf("service not found: %v", err),
 		})
 		return
 	} else if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_install_service",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToInstallService,
 			Message: fmt.Sprintf("failed to install service: %v", err),
 		})
 		return

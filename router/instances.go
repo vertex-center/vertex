@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/types/api"
 )
 
 func addInstancesRoutes(r *gin.RouterGroup) {
@@ -42,8 +43,8 @@ func handleSearchInstances(c *gin.Context) {
 func handleCheckForUpdates(c *gin.Context) {
 	instances, err := instanceService.CheckForUpdates()
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "check_for_updates_failed",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToCheckForUpdates,
 			Message: err.Error(),
 		})
 		return

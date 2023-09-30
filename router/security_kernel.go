@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/services"
-	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/types/api"
 )
 
 func addSecurityKernelRoutes(r *gin.RouterGroup) {
@@ -23,8 +23,8 @@ func addSecurityKernelRoutes(r *gin.RouterGroup) {
 func handleGetSSHKeyKernel(c *gin.Context) {
 	keys, err := sshKernelService.GetAll()
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_get_ssh_keys",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToGetSSHKeys,
 			Message: fmt.Sprintf("failed to get SSH keys: %v", err),
 		})
 		return
@@ -41,8 +41,8 @@ func handleAddSSHKeyKernel(c *gin.Context) {
 	buf := new(bytes.Buffer)
 	_, err := buf.ReadFrom(c.Request.Body)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
-			Code:    "failed_to_parse_body",
+		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
+			Code:    api.ErrFailedToParseBody,
 			Message: fmt.Sprintf("failed to parse request body: %v", err),
 		})
 		return
@@ -51,14 +51,14 @@ func handleAddSSHKeyKernel(c *gin.Context) {
 
 	err = sshKernelService.Add(key)
 	if err != nil && errors.Is(err, services.ErrInvalidPublicKey) {
-		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
-			Code:    "invalid_public_key",
+		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
+			Code:    api.ErrInvalidPublicKey,
 			Message: fmt.Sprintf("error while parsing the public key: %v", err),
 		})
 		return
 	} else if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_add_ssh_key",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToAddSSHKey,
 			Message: fmt.Sprintf("failed to add SSH key: %v", err),
 		})
 		return
@@ -74,8 +74,8 @@ func handleAddSSHKeyKernel(c *gin.Context) {
 func handleDeleteSSHKeyKernel(c *gin.Context) {
 	fingerprint := c.Param("fingerprint")
 	if fingerprint == "" {
-		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
-			Code:    "invalid_fingerprint",
+		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
+			Code:    api.ErrInvalidFingerprint,
 			Message: "invalid fingerprint",
 		})
 		return
@@ -83,8 +83,8 @@ func handleDeleteSSHKeyKernel(c *gin.Context) {
 
 	err := sshKernelService.Delete(fingerprint)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_delete_ssh_key",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToDeleteSSHKey,
 			Message: fmt.Sprintf("failed to delete SSH key: %v", err),
 		})
 		return

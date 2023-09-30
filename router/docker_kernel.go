@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/docker/docker/client"
+	"github.com/vertex-center/vertex/types/api"
 
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/log"
@@ -31,8 +32,8 @@ func addDockerKernelRoutes(r *gin.RouterGroup) {
 func handleListDockerContainers(c *gin.Context) {
 	containers, err := dockerKernelService.ListContainers()
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_list_containers",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToListContainers,
 			Message: err.Error(),
 		})
 		return
@@ -46,14 +47,14 @@ func handleDeleteDockerContainer(c *gin.Context) {
 
 	err := dockerKernelService.DeleteContainer(id)
 	if err != nil && client.IsErrNotFound(err) {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "container_not_found",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrContainerNotFound,
 			Message: err.Error(),
 		})
 		return
 	} else if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_delete_container",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToDeleteContainer,
 			Message: err.Error(),
 		})
 		return
@@ -66,8 +67,8 @@ func handleCreateDockerContainer(c *gin.Context) {
 	var options types.CreateContainerOptions
 	err := c.BindJSON(&options)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
-			Code:    "failed_to_parse_body",
+		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
+			Code:    api.ErrFailedToParseBody,
 			Message: fmt.Sprintf("failed to parse request body: %v", err),
 		})
 		return
@@ -75,8 +76,8 @@ func handleCreateDockerContainer(c *gin.Context) {
 
 	res, err := dockerKernelService.CreateContainer(options)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_create_container",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToCreateContainer,
 			Message: err.Error(),
 		})
 		return
@@ -90,8 +91,8 @@ func handleStartDockerContainer(c *gin.Context) {
 
 	err := dockerKernelService.StartContainer(id)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_start_container",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToStartContainer,
 			Message: err.Error(),
 		})
 		return
@@ -105,8 +106,8 @@ func handleStopDockerContainer(c *gin.Context) {
 
 	err := dockerKernelService.StopContainer(id)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_stop_container",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToStopContainer,
 			Message: err.Error(),
 		})
 		return
@@ -120,8 +121,8 @@ func handleInfoDockerContainer(c *gin.Context) {
 
 	info, err := dockerKernelService.InfoContainer(id)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_get_container_info",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToGetContainerInfo,
 			Message: err.Error(),
 		})
 		return
@@ -135,8 +136,8 @@ func handleLogsStdoutDockerContainer(c *gin.Context) {
 
 	stdout, err := dockerKernelService.LogsStdoutContainer(id)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_get_container_logs",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToGetContainerLogs,
 			Message: err.Error(),
 		})
 		return
@@ -167,8 +168,8 @@ func handleLogsStderrDockerContainer(c *gin.Context) {
 
 	stderr, err := dockerKernelService.LogsStderrContainer(id)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_get_container_logs",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToGetContainerLogs,
 			Message: err.Error(),
 		})
 		return
@@ -200,8 +201,8 @@ func handleWaitDockerContainer(c *gin.Context) {
 
 	err := dockerKernelService.WaitContainer(id, types.WaitContainerCondition(cond))
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_wait_container",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToWaitContainer,
 			Message: err.Error(),
 		})
 		return
@@ -215,8 +216,8 @@ func handleInfoDockerImage(c *gin.Context) {
 
 	info, err := dockerKernelService.InfoImage(id)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_get_image_info",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToGetImageInfo,
 			Message: err.Error(),
 		})
 		return
@@ -229,8 +230,8 @@ func handlePullDockerImage(c *gin.Context) {
 	var options types.PullImageOptions
 	err := c.BindJSON(&options)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
-			Code:    "failed_to_parse_body",
+		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
+			Code:    api.ErrFailedToParseBody,
 			Message: fmt.Sprintf("failed to parse request body: %v", err),
 		})
 		return
@@ -238,8 +239,8 @@ func handlePullDockerImage(c *gin.Context) {
 
 	r, err := dockerKernelService.PullImage(options)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_pull_image",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToPullImage,
 			Message: err.Error(),
 		})
 		return
@@ -269,8 +270,8 @@ func handleBuildDockerImage(c *gin.Context) {
 	var options types.BuildImageOptions
 	err := c.BindJSON(&options)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
-			Code:    "failed_to_parse_body",
+		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
+			Code:    api.ErrFailedToParseBody,
 			Message: fmt.Sprintf("failed to parse request body: %v", err),
 		})
 		return
@@ -278,8 +279,8 @@ func handleBuildDockerImage(c *gin.Context) {
 
 	res, err := dockerKernelService.BuildImage(options)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_build_image",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToBuildImage,
 			Message: err.Error(),
 		})
 		return

@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/types/api"
 )
 
 func addProxyRoutes(r *gin.RouterGroup) {
@@ -34,8 +35,8 @@ func handleAddRedirect(c *gin.Context) {
 	var body handleAddRedirectBody
 	err := c.BindJSON(&body)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
-			Code:    "failed_to_parse_body",
+		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
+			Code:    api.ErrFailedToParseBody,
 			Message: fmt.Sprintf("failed to parse request body: %v", err),
 		})
 		return
@@ -48,8 +49,8 @@ func handleAddRedirect(c *gin.Context) {
 
 	err = proxyService.AddRedirect(redirect)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_add_redirect",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToAddRedirect,
 			Message: fmt.Sprintf("failed to add redirect: %v", err),
 		})
 		return
@@ -66,8 +67,8 @@ func handleAddRedirect(c *gin.Context) {
 func handleRemoveRedirect(c *gin.Context) {
 	idString := c.Param("id")
 	if idString == "" {
-		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
-			Code:    "missing_redirect_uuid",
+		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
+			Code:    api.ErrRedirectUuidMissing,
 			Message: "missing redirect uuid",
 		})
 		return
@@ -75,8 +76,8 @@ func handleRemoveRedirect(c *gin.Context) {
 
 	id, err := uuid.Parse(idString)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
-			Code:    "invalid_redirect_uuid",
+		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
+			Code:    api.ErrRedirectUuidInvalid,
 			Message: "invalid redirect uuid",
 		})
 		return
@@ -84,8 +85,8 @@ func handleRemoveRedirect(c *gin.Context) {
 
 	err = proxyService.RemoveRedirect(id)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_remove_redirect",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToRemoveRedirect,
 			Message: fmt.Sprintf("failed to remove redirect: %v", err),
 		})
 		return
