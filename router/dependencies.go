@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/types/api"
 )
 
 func addDependenciesRoutes(r *gin.RouterGroup) {
@@ -24,8 +25,8 @@ func handleGetDependencies(c *gin.Context) {
 		var err error
 		dependencies, err = dependenciesService.CheckForUpdates(settingsService.GetChannel())
 		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-				Code:    "failed_to_check_for_updates",
+			_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+				Code:    api.ErrFailedToCheckForUpdates,
 				Message: fmt.Sprintf("failed to check for updates: %v", err),
 			})
 			return
@@ -53,8 +54,8 @@ func handleUpdateDependencies(c *gin.Context) {
 	var body executeUpdatesBody
 	err := c.BindJSON(&body)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, types.APIError{
-			Code:    "failed_to_parse_body",
+		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
+			Code:    api.ErrFailedToParseBody,
 			Message: fmt.Sprintf("failed to parse request body: %v", err),
 		})
 		return
@@ -69,8 +70,8 @@ func handleUpdateDependencies(c *gin.Context) {
 
 	err = dependenciesService.InstallUpdates(updates)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_install_updates",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToInstallUpdates,
 			Message: fmt.Sprintf("failed to install updates: %v", err),
 		})
 		return
@@ -78,8 +79,8 @@ func handleUpdateDependencies(c *gin.Context) {
 
 	err = serviceService.Reload()
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_reload_services",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToReloadServices,
 			Message: fmt.Sprintf("failed to reload services: %v", err),
 		})
 		return
@@ -87,8 +88,8 @@ func handleUpdateDependencies(c *gin.Context) {
 
 	err = packageService.Reload()
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
-			Code:    "failed_to_reload_packages",
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToReloadPackages,
 			Message: fmt.Sprintf("failed to reload packages: %v", err),
 		})
 		return
