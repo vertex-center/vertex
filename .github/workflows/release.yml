@@ -1,9 +1,10 @@
-name: Release
+name: Release (stable)
 
 on:
   push:
     tags:
-      - "*"
+      - "v*"
+      - "!v*-beta*"
 
 permissions:
   contents: write
