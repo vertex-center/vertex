@@ -12,7 +12,7 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-func runVertex() (*exec.Cmd, error) {
+func runVertex(args ...string) (*exec.Cmd, error) {
 	uid, gid := config.KernelCurrent.Uid, config.KernelCurrent.Gid
 
 	log.Info("running vertex",
@@ -20,7 +20,7 @@ func runVertex() (*exec.Cmd, error) {
 		vlog.Uint32("gid", gid),
 	)
 
-	cmd := exec.Command("./vertex", "-port", config.Current.Port, "-host", config.Current.Host)
+	cmd := exec.Command("./vertex", args...)
 	cmd.SysProcAttr = &syscall.SysProcAttr{}
 	cmd.SysProcAttr.Credential = &syscall.Credential{Uid: uid, Gid: gid}
 	cmd.Stdout = os.Stdout

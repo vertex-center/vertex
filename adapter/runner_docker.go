@@ -15,6 +15,7 @@ import (
 	"github.com/carlmjohnson/requests"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/go-connections/nat"
+	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/pkg/vdocker"
@@ -36,7 +37,7 @@ func (a RunnerDockerAdapter) Delete(instance *types.Instance) error {
 	}
 
 	apiError := api.Error{}
-	err = requests.URL("http://localhost:6131/").
+	err = requests.URL(config.Current.HostKernel).
 		Pathf("/api/docker/container/%s", id).
 		Delete().
 		ErrorJSON(&apiError).
@@ -195,7 +196,7 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 		}
 
 		// Start
-		err = requests.URL("http://localhost:6131/").
+		err = requests.URL(config.Current.HostKernel).
 			Pathf("/api/docker/container/%s/start", id).
 			Post().
 			Fetch(context.Background())
@@ -244,7 +245,7 @@ func (a RunnerDockerAdapter) Stop(instance *types.Instance) error {
 		return err
 	}
 
-	return requests.URL("http://localhost:6131/").
+	return requests.URL(config.Current.HostKernel).
 		Pathf("/api/docker/container/%s/stop", id).
 		Post().
 		Fetch(context.Background())
@@ -257,7 +258,7 @@ func (a RunnerDockerAdapter) Info(instance types.Instance) (map[string]any, erro
 	}
 
 	var info types.InfoContainerResponse
-	err = requests.URL("http://localhost:6131/").
+	err = requests.URL(config.Current.HostKernel).
 		Pathf("/api/docker/container/%s/info", id).
 		ToJSON(&info).
 		Fetch(context.Background())
@@ -266,7 +267,7 @@ func (a RunnerDockerAdapter) Info(instance types.Instance) (map[string]any, erro
 	}
 
 	var imageInfo types.InfoImageResponse
-	err = requests.URL("http://localhost:6131/").
+	err = requests.URL(config.Current.HostKernel).
 		Pathf("/api/docker/image/%s/info", info.Image).
 		ToJSON(&imageInfo).
 		Fetch(context.Background())
@@ -297,7 +298,7 @@ func (a RunnerDockerAdapter) CheckForUpdates(instance *types.Instance) error {
 	defer res.Close()
 
 	var imageInfo types.InfoImageResponse
-	err = requests.URL("http://localhost:6131/").
+	err = requests.URL(config.Current.HostKernel).
 		Pathf("/api/docker/%s/info", imageName).
 		ToJSON(&imageInfo).
 		Fetch(context.Background())
@@ -337,7 +338,7 @@ func (a RunnerDockerAdapter) HasUpdateAvailable(instance types.Instance) (bool, 
 
 func (a RunnerDockerAdapter) getContainer(instance types.Instance) (types.Container, error) {
 	var containers []types.Container
-	err := requests.URL("http://localhost:6131/").
+	err := requests.URL(config.Current.HostKernel).
 		Path("/api/docker/containers").
 		ToJSON(&containers).
 		Fetch(context.Background())
@@ -380,7 +381,7 @@ func (a RunnerDockerAdapter) getImageID(instance types.Instance) (string, error)
 func (a RunnerDockerAdapter) pullImage(imageName string) (io.ReadCloser, error) {
 	options := types.PullImageOptions{Image: imageName}
 
-	req, err := requests.URL("http://localhost:6131/").
+	req, err := requests.URL(config.Current.HostKernel).
 		Path("/api/docker/image/pull").
 		Post().
 		BodyJSON(options).
@@ -411,7 +412,7 @@ func (a RunnerDockerAdapter) buildImageFromDockerfile(instancePath string, image
 		Dockerfile: "Dockerfile",
 	}
 
-	req, err := requests.URL("http://localhost:6131/").
+	req, err := requests.URL(config.Current.HostKernel).
 		Pathf("/api/docker/image/build").
 		Post().
 		BodyJSON(options).
@@ -429,7 +430,7 @@ func (a RunnerDockerAdapter) buildImageFromDockerfile(instancePath string, image
 
 func (a RunnerDockerAdapter) createContainer(options types.CreateContainerOptions) (string, error) {
 	var res types.CreateContainerResponse
-	err := requests.URL("http://localhost:6131/").
+	err := requests.URL(config.Current.HostKernel).
 		Pathf("/api/docker/container").
 		Post().
 		BodyJSON(options).
@@ -449,7 +450,7 @@ func (a RunnerDockerAdapter) createContainer(options types.CreateContainerOption
 
 func (a RunnerDockerAdapter) watchForStatusChange(containerID string, instance *types.Instance, setStatus func(status string)) {
 	go func() {
-		err := requests.URL("http://localhost:6131/").
+		err := requests.URL(config.Current.HostKernel).
 			Pathf("/api/docker/container/%s/wait/%s", containerID, container.WaitConditionNotRunning).
 			Fetch(context.Background())
 
@@ -466,14 +467,14 @@ func (a RunnerDockerAdapter) watchForStatusChange(containerID string, instance *
 
 func (a RunnerDockerAdapter) readLogs(containerID string) (stdout io.ReadCloser, stderr io.ReadCloser, err error) {
 	var reqStdout, reqStderr *http.Request
-	reqStdout, err = requests.URL("http://localhost:6131/").
+	reqStdout, err = requests.URL(config.Current.HostKernel).
 		Pathf("/api/docker/container/%s/logs/stdout", containerID).
 		Request(context.Background())
 	if err != nil {
 		return
 	}
 
-	reqStderr, err = requests.URL("http://localhost:6131/").
+	reqStderr, err = requests.URL(config.Current.HostKernel).
 		Pathf("/api/docker/container/%s/logs/stderr", containerID).
 		Request(context.Background())
 	if err != nil {
@@ -518,7 +519,7 @@ func (a RunnerDockerAdapter) getPath(instance types.Instance) string {
 	// If Vertex is running itself inside Docker, the instances are stored in the Vertex container volume.
 	if vdocker.RunningInDocker() {
 		var containers []types.Container
-		err := requests.URL("http://localhost:6131/").
+		err := requests.URL(config.Current.HostKernel).
 			Path("/api/docker/containers").
 			ToJSON(&containers).
 			Fetch(context.Background())

@@ -2,11 +2,13 @@ package router
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/adapter"
+	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/services"
@@ -47,13 +49,12 @@ func NewKernelRouter() KernelRouter {
 
 func (r *KernelRouter) Start() error {
 	r.server = &http.Server{
-		Addr:    ":6131",
+		Addr:    fmt.Sprintf(":%s", config.KernelCurrent.PortKernel),
 		Handler: r.engine,
 	}
 
-	url := "http://localhost:6131"
 	log.Info("vertex-kernel started",
-		vlog.String("url", url),
+		vlog.String("url", config.KernelCurrent.HostKernel),
 	)
 
 	return r.server.ListenAndServe()

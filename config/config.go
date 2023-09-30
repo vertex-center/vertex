@@ -11,18 +11,24 @@ import (
 var Current = New()
 
 type Config struct {
-	Host string `json:"host"`
-	Port string `json:"port"`
+	HostVertex string `json:"host"`
+	PortVertex string `json:"port"`
+
+	HostKernel string `json:"host_kernel"`
+	PortKernel string `json:"port_kernel"`
 }
 
 func New() Config {
 	return Config{
-		Host: "127.0.0.1:6130",
-		Port: "6130",
+		HostVertex: "127.0.0.1:6130",
+		PortVertex: "6130",
+
+		HostKernel: "http://localhost:6131",
+		PortKernel: "6131",
 	}
 }
 
 func (c Config) Apply() error {
-	configJsContent := fmt.Sprintf("window.apiURL = \"http://%s\";", c.Host)
+	configJsContent := fmt.Sprintf("window.apiURL = \"http://%s\";", c.HostVertex)
 	return os.WriteFile(path.Join(storage.Path, "client", "dist", "config.js"), []byte(configJsContent), os.ModePerm)
 }

@@ -5,12 +5,10 @@ package main
 import (
 	"os"
 	"os/exec"
-
-	"github.com/vertex-center/vertex/config"
 )
 
-func runVertex() (*exec.Cmd, error) {
-	cmd := exec.Command("vertex.exe", "-port", config.Current.Port, "-host", config.Current.Host)
+func runVertex(args ...string) (*exec.Cmd, error) {
+	cmd := exec.Command("vertex.exe", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
