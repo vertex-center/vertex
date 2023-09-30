@@ -7,3 +7,7 @@ vertex
 vertex-old
 vertex-kernel
 vertex-kernel-old
+
+coverage.out
+report.json
+.scannerwork

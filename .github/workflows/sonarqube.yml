@@ -15,6 +15,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.20'
+
       - name: Check if SonarQube is available, else skip the next steps
         id: availability
         run: |
@@ -25,6 +30,12 @@ jobs:
           else
             echo "SONAR_AVAILABLE=1" >> $GITHUB_OUTPUT
           fi
+
+      - name: Run test coverage
+        run: go test -coverprofile=coverage.out ./...
+
+      - name: Run test json
+        run: go test -json ./... > report.json
 
       - uses: sonarsource/sonarqube-scan-action@master
         if: steps.availability.outputs.SONAR_AVAILABLE == '1'
