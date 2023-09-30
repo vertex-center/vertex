@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - dev
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   build:
@@ -20,25 +22,14 @@ jobs:
         with:
           go-version: '1.20'
 
-      - name: Check if SonarQube is available, else skip the next steps
-        id: availability
-        run: |
-          curl --head --fail --silent --location --output /dev/null ${{ secrets.SONAR_HOST_URL }} || OUT=$?
-          if [ $OUT -ne 0 ]; then
-            echo "SonarQube is not available, skipping."
-            echo "SONAR_AVAILABLE=0" >> $GITHUB_OUTPUT
-          else
-            echo "SONAR_AVAILABLE=1" >> $GITHUB_OUTPUT
-          fi
-
       - name: Run test coverage
         run: go test -coverprofile=coverage.out ./...
 
       - name: Run test json
         run: go test -json ./... > report.json
 
-      - uses: sonarsource/sonarqube-scan-action@master
-        if: steps.availability.outputs.SONAR_AVAILABLE == '1'
+      - name: Run Scan
+        uses: SonarSource/sonarcloud-github-action@master
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
