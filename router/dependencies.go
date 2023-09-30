@@ -22,7 +22,7 @@ func handleGetDependencies(c *gin.Context) {
 	var dependencies types.Dependencies
 	if reload == "true" {
 		var err error
-		dependencies, err = dependenciesService.CheckForUpdates()
+		dependencies, err = dependenciesService.CheckForUpdates(settingsService.GetChannel())
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 				Code:    "failed_to_check_for_updates",

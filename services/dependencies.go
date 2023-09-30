@@ -76,7 +76,7 @@ func (s *DependenciesService) GetCachedUpdates() types.Dependencies {
 	return s.dependencies
 }
 
-func (s *DependenciesService) CheckForUpdates() (types.Dependencies, error) {
+func (s *DependenciesService) CheckForUpdates(channel types.SettingsUpdatesChannel) (types.Dependencies, error) {
 	log.Info("fetching all updates...")
 
 	for _, dependency := range s.dependencies.Items {
@@ -84,7 +84,7 @@ func (s *DependenciesService) CheckForUpdates() (types.Dependencies, error) {
 			vlog.String("id", dependency.ID),
 		)
 
-		update, err := dependency.Updater.CheckForUpdate()
+		update, err := dependency.Updater.CheckForUpdate(channel)
 		if err != nil {
 			log.Error(err)
 		}
@@ -120,7 +120,7 @@ type vertexUpdater struct {
 	release *github.RepositoryRelease
 }
 
-func (d *vertexUpdater) CheckForUpdate() (*types.DependencyUpdate, error) {
+func (d *vertexUpdater) CheckForUpdate(channel types.SettingsUpdatesChannel) (*types.DependencyUpdate, error) {
 	if d.currentVersion == "dev" {
 		log.Info("skipping vertex update in 'dev' version")
 		return nil, nil
@@ -135,14 +135,22 @@ func (d *vertexUpdater) CheckForUpdate() (*types.DependencyUpdate, error) {
 	client := github.NewClient(nil)
 
 	// get the latest release
-	release, _, err := client.Repositories.GetLatestRelease(context.Background(), "vertex-center", "vertex")
-	if err != nil {
-		return nil, err
+	if channel == types.SettingsUpdatesChannelBeta {
+		releases, _, err := client.Repositories.ListReleases(context.Background(), "vertex-center", "vertex", nil)
+		if err != nil {
+			return nil, err
+		}
+		d.release = releases[0]
+	} else {
+		release, _, err := client.Repositories.GetLatestRelease(context.Background(), "vertex-center", "vertex")
+		if err != nil {
+			return nil, err
+		}
+		d.release = release
 	}
-	d.release = release
 
 	// check if the version is different
-	latestVersion := *release.TagName
+	latestVersion := *d.release.TagName
 	latestVersion = strings.TrimPrefix(latestVersion, "v")
 
 	if d.currentVersion == latestVersion {
@@ -213,7 +221,7 @@ type clientUpdater struct {
 	release        *github.RepositoryRelease
 }
 
-func (d *clientUpdater) CheckForUpdate() (*types.DependencyUpdate, error) {
+func (d *clientUpdater) CheckForUpdate(channel types.SettingsUpdatesChannel) (*types.DependencyUpdate, error) {
 	client := github.NewClient(nil)
 
 	owner := "vertex-center"
@@ -329,7 +337,7 @@ func newGitHubUpdater(dir string, name string, repo string) *gitHubUpdater {
 	}
 }
 
-func (d *gitHubUpdater) CheckForUpdate() (*types.DependencyUpdate, error) {
+func (d *gitHubUpdater) CheckForUpdate(channel types.SettingsUpdatesChannel) (*types.DependencyUpdate, error) {
 	client := github.NewClient(nil)
 
 	// Local

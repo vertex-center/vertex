@@ -69,6 +69,21 @@ func (a *SettingsFSAdapter) SetNotificationsWebhook(webhook *string) error {
 	return a.write()
 }
 
+func (a *SettingsFSAdapter) GetChannel() *types.SettingsUpdatesChannel {
+	if a.settings.Updates == nil {
+		return nil
+	}
+	return a.settings.Updates.Channel
+}
+
+func (a *SettingsFSAdapter) SetChannel(channel *types.SettingsUpdatesChannel) error {
+	if a.settings.Updates == nil {
+		a.settings.Updates = &types.SettingsUpdates{}
+	}
+	a.settings.Updates.Channel = channel
+	return a.write()
+}
+
 func (a *SettingsFSAdapter) read() error {
 	p := path.Join(a.settingsPath, "settings.json")
 	file, err := os.ReadFile(p)
@@ -77,6 +92,7 @@ func (a *SettingsFSAdapter) read() error {
 		log.Info("settings.json doesn't exists or could not be found")
 		return nil
 	} else if err != nil {
+		log.Info("failed to read settings.json")
 		return err
 	}
 

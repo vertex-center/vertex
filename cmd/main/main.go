@@ -124,7 +124,7 @@ func setupDependency(dep types.DependencyUpdater) error {
 	}
 
 	// download
-	_, err = dep.CheckForUpdate()
+	_, err = dep.CheckForUpdate(types.SettingsUpdatesChannelStable)
 	if err != nil && !errors.Is(err, services.ErrDependencyNotInstalled) {
 		return err
 	}

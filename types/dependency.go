@@ -7,7 +7,7 @@ import "time"
 type DependencyUpdater interface {
 	// CheckForUpdate will check if the dependency has an update available. If
 	// true, it returns the Dependency, or nil otherwise.
-	CheckForUpdate() (*DependencyUpdate, error)
+	CheckForUpdate(channel SettingsUpdatesChannel) (*DependencyUpdate, error)
 
 	// InstallUpdate will install the previously fetched update.
 	InstallUpdate() error
