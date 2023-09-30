@@ -93,7 +93,7 @@ func (s *InstanceService) Delete(uuid uuid.UUID) error {
 	} else {
 		err = s.fsRunnerAdapter.Delete(instance)
 	}
-	if err != nil {
+	if err != nil && !errors.Is(err, adapter.ErrContainerNotFound) {
 		return err
 	}
 

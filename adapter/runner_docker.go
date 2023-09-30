@@ -34,10 +34,17 @@ func (a RunnerDockerAdapter) Delete(instance *types.Instance) error {
 		return err
 	}
 
-	return requests.URL("http://localhost:6131/").
+	apiError := types.APIError{}
+	err = requests.URL("http://localhost:6131/").
 		Pathf("/api/docker/container/%s", id).
 		Delete().
+		ErrorJSON(&apiError).
 		Fetch(context.Background())
+
+	if apiError.Code == "container_not_found" {
+		return ErrContainerNotFound
+	}
+	return err
 }
 
 func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(status string)) (io.ReadCloser, io.ReadCloser, error) {

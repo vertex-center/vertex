@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/docker/docker/client"
+
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/types"
@@ -43,7 +45,13 @@ func handleDeleteDockerContainer(c *gin.Context) {
 	id := c.Param("id")
 
 	err := dockerKernelService.DeleteContainer(id)
-	if err != nil {
+	if err != nil && client.IsErrNotFound(err) {
+		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
+			Code:    "container_not_found",
+			Message: err.Error(),
+		})
+		return
+	} else if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, types.APIError{
 			Code:    "failed_to_delete_container",
 			Message: err.Error(),
