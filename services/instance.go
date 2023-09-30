@@ -499,7 +499,7 @@ func (s *InstanceService) remapDatabaseEnv(uuid uuid.UUID) error {
 			return err
 		}
 
-		host := config.Current.Host
+		host := config.Current.HostVertex
 		if strings.Contains(host, ":") {
 			host, _, err = net.SplitHostPort(host)
 			if err != nil {

@@ -89,7 +89,7 @@ func (r *Router) Start(addr string) {
 		log.Error(err)
 	}
 
-	url := fmt.Sprintf("http://%s", config.Current.Host)
+	url := fmt.Sprintf("http://%s", config.Current.HostVertex)
 	log.Info("Vertex started",
 		vlog.String("url", url),
 	)
