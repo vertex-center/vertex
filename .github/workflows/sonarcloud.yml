@@ -1,4 +1,4 @@
-name: SonarQube
+name: SonarCloud
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    name: Run SonarQube
+    name: Run SonarCloud
     runs-on: ubuntu-latest
     permissions: read-all
     steps:
