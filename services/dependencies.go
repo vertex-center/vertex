@@ -35,11 +35,6 @@ var (
 			Name:    "Vertex Services",
 			Updater: newGitHubUpdater("services", "Vertex Services", "vertex-services"),
 		},
-		{
-			ID:      "vertex-dependencies",
-			Name:    "Vertex Dependencies",
-			Updater: newGitHubUpdater("packages", "Vertex Dependencies", "vertex-dependencies"),
-		},
 	}
 )
 

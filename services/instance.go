@@ -38,10 +38,9 @@ type InstanceService struct {
 	eventsAdapter   types.EventAdapterPort
 
 	dockerRunnerAdapter types.RunnerAdapterPort
-	fsRunnerAdapter     types.RunnerAdapterPort
 }
 
-func NewInstanceService(serviceAdapter types.ServiceAdapterPort, instanceAdapter types.InstanceAdapterPort, dockerRunnerAdapter types.RunnerAdapterPort, fsRunnerAdapter types.RunnerAdapterPort, instanceLogsAdapter types.InstanceLogsAdapterPort, eventRepo types.EventAdapterPort) InstanceService {
+func NewInstanceService(serviceAdapter types.ServiceAdapterPort, instanceAdapter types.InstanceAdapterPort, dockerRunnerAdapter types.RunnerAdapterPort, instanceLogsAdapter types.InstanceLogsAdapterPort, eventRepo types.EventAdapterPort) InstanceService {
 	s := InstanceService{
 		uuid: uuid.New(),
 
@@ -50,7 +49,6 @@ func NewInstanceService(serviceAdapter types.ServiceAdapterPort, instanceAdapter
 		logsAdapter:         instanceLogsAdapter,
 		eventsAdapter:       eventRepo,
 		dockerRunnerAdapter: dockerRunnerAdapter,
-		fsRunnerAdapter:     fsRunnerAdapter,
 	}
 
 	s.reload()
@@ -91,7 +89,7 @@ func (s *InstanceService) Delete(uuid uuid.UUID) error {
 	if instance.IsDockerized() {
 		err = s.dockerRunnerAdapter.Delete(instance)
 	} else {
-		err = s.fsRunnerAdapter.Delete(instance)
+		return fmt.Errorf("instance is not dockerized")
 	}
 	if err != nil && !errors.Is(err, adapter.ErrContainerNotFound) {
 		return err
@@ -142,7 +140,7 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 	if instance.IsDockerized() {
 		runner = s.dockerRunnerAdapter
 	} else {
-		runner = s.fsRunnerAdapter
+		return fmt.Errorf("instance is not dockerized")
 	}
 
 	stdout, stderr, err := runner.Start(instance, setStatus)
@@ -263,7 +261,7 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 	if instance.IsDockerized() {
 		err = s.dockerRunnerAdapter.Stop(instance)
 	} else {
-		err = s.fsRunnerAdapter.Stop(instance)
+		return fmt.Errorf("instance is not dockerized")
 	}
 
 	if err == nil {
@@ -374,7 +372,7 @@ func (s *InstanceService) CheckForUpdates() (map[uuid.UUID]*types.Instance, erro
 		if instance.IsDockerized() {
 			err = s.dockerRunnerAdapter.CheckForUpdates(instance)
 		} else {
-			err = s.fsRunnerAdapter.CheckForUpdates(instance)
+			return s.GetAll(), fmt.Errorf("instance is not dockerized")
 		}
 
 		if err != nil {

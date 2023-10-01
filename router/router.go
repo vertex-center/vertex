@@ -26,17 +26,14 @@ import (
 
 var (
 	runnerDockerAdapter   types.RunnerAdapterPort
-	runnerFSAdapter       types.RunnerAdapterPort
 	instanceFSAdapter     types.InstanceAdapterPort
 	instanceLogsFSAdapter types.InstanceLogsAdapterPort
 	eventInMemoryAdapter  types.EventAdapterPort
-	packageFSAdapter      types.PackageAdapterPort
 	serviceFSAdapter      types.ServiceAdapterPort
 	proxyFSAdapter        types.ProxyAdapterPort
 	settingsFSAdapter     types.SettingsAdapterPort
 	sshKernelApiAdapter   types.SshAdapterPort
 
-	packageService       services.PackageService
 	notificationsService services.NotificationsService
 	serviceService       services.ServiceService
 	proxyService         services.ProxyService
@@ -139,11 +136,9 @@ func (r *Router) handleSignals() {
 
 func (r *Router) initAdapters() {
 	runnerDockerAdapter = adapter.NewRunnerDockerAdapter()
-	runnerFSAdapter = adapter.NewRunnerFSAdapter()
 	instanceFSAdapter = adapter.NewInstanceFSAdapter(nil)
 	instanceLogsFSAdapter = adapter.NewInstanceLogsFSAdapter()
 	eventInMemoryAdapter = adapter.NewEventInMemoryAdapter()
-	packageFSAdapter = adapter.NewPackageFSAdapter(nil)
 	serviceFSAdapter = adapter.NewServiceFSAdapter(nil)
 	proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
 	settingsFSAdapter = adapter.NewSettingsFSAdapter(nil)
@@ -153,8 +148,7 @@ func (r *Router) initAdapters() {
 func (r *Router) initServices(about types.About) {
 	proxyService = services.NewProxyService(proxyFSAdapter)
 	notificationsService = services.NewNotificationsService(settingsFSAdapter, eventInMemoryAdapter, instanceFSAdapter)
-	instanceService = services.NewInstanceService(serviceFSAdapter, instanceFSAdapter, runnerDockerAdapter, runnerFSAdapter, instanceLogsFSAdapter, eventInMemoryAdapter)
-	packageService = services.NewPackageService(packageFSAdapter)
+	instanceService = services.NewInstanceService(serviceFSAdapter, instanceFSAdapter, runnerDockerAdapter, instanceLogsFSAdapter, eventInMemoryAdapter)
 	serviceService = services.NewServiceService(serviceFSAdapter)
 	dependenciesService = services.NewDependenciesService(about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)
@@ -172,7 +166,6 @@ func (r *Router) initAPIRoutes(about types.About) {
 	addServicesRoutes(api.Group("/services"))
 	addInstancesRoutes(api.Group("/instances"))
 	addInstanceRoutes(api.Group("/instance/:instance_uuid"))
-	addPackagesRoutes(api.Group("/packages"))
 	addProxyRoutes(api.Group("/proxy"))
 	addDependenciesRoutes(api.Group("/dependencies"))
 	addSettingsRoutes(api.Group("/settings"))

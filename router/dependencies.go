@@ -86,14 +86,5 @@ func handleUpdateDependencies(c *gin.Context) {
 		return
 	}
 
-	err = packageService.Reload()
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToReloadPackages,
-			Message: fmt.Sprintf("failed to reload packages: %v", err),
-		})
-		return
-	}
-
 	c.Status(http.StatusNoContent)
 }
