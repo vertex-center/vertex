@@ -3,7 +3,6 @@ import InstancesApp from "./apps/Instances/InstancesApp/InstancesApp";
 import Instance from "./apps/Instances/Details/Instance/Instance";
 import InstanceLogs from "./apps/Instances/Details/InstanceLogs/InstanceLogs";
 import InstanceEnv from "./apps/Instances/Details/InstanceEnv/InstanceEnv";
-import InstanceDependencies from "./apps/Instances/Details/InstanceDependencies";
 import InstanceHome from "./apps/Instances/Details/InstanceHome/InstanceHome";
 import SettingsApp from "./apps/Settings/SettingsApp/SettingsApp";
 import SettingsTheme from "./apps/Settings/SettingsTheme/SettingsTheme";
@@ -64,10 +63,6 @@ function App() {
                             <Route
                                 path="/instances/:uuid/database"
                                 element={<InstanceDetailsDatabase />}
-                            />
-                            <Route
-                                path="/instances/:uuid/dependencies"
-                                element={<InstanceDependencies />}
                             />
                             <Route
                                 path="/instances/:uuid/update"

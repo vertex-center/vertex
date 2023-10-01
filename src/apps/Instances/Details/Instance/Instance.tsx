@@ -124,13 +124,6 @@ export default function Instance() {
                             symbol="tune"
                             name="Environment"
                         />
-                        {instance?.install_method !== "docker" && (
-                            <SidebarItem
-                                to={`/instances/${uuid}/dependencies`}
-                                symbol="widgets"
-                                name="Dependencies"
-                            />
-                        )}
                         {instance?.service?.databases && (
                             <SidebarItem
                                 to={`/instances/${uuid}/database`}
