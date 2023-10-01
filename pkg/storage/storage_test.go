@@ -4,12 +4,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	fixtures "github.com/go-git/go-git-fixtures/v4"
 	"github.com/stretchr/testify/suite"
 )
-
-const PathLive = "live_test"
-const PathRepo = "live_test/repo"
 
 type RepositoryTestSuite struct {
 	suite.Suite
@@ -19,24 +16,21 @@ func TestRepositoryTestSuite(t *testing.T) {
 	suite.Run(t, new(RepositoryTestSuite))
 }
 
-func (suite *RepositoryTestSuite) TearDownSuite() {
-	err := os.RemoveAll(PathLive)
-	assert.NoError(suite.T(), err)
-}
+func (suite *RepositoryTestSuite) TestCloneOrPullRepository() {
+	fs := fixtures.Basic().One().DotGit()
 
-func (suite *RepositoryTestSuite) TestDownloadLatestRepository() {
-	err := os.MkdirAll(PathRepo, os.ModePerm)
-	assert.NoError(suite.T(), err)
+	dir, err := os.MkdirTemp("", "*_live_test")
+	suite.NoError(err)
 
-	url := "https://github.com/vertex-center/vertex-services"
+	defer os.RemoveAll(dir)
 
 	// reload to test Clone()
-	err = CloneOrPullRepository(url, PathRepo)
-	assert.NoError(suite.T(), err)
-	assert.DirExists(suite.T(), PathRepo)
+	err = CloneOrPullRepository(fs.Root(), dir)
+	suite.NoError(err)
+	suite.DirExists(dir)
 
 	// reload to test Pull()
-	err = CloneOrPullRepository(url, PathRepo)
-	assert.NoError(suite.T(), err)
-	assert.DirExists(suite.T(), PathRepo)
+	err = CloneOrPullRepository(fs.Root(), dir)
+	suite.NoError(err)
+	suite.DirExists(dir)
 }
