@@ -484,6 +484,16 @@ func (s *InstanceService) SetDatabases(id uuid.UUID, databases map[string]uuid.U
 	return s.instanceAdapter.SaveSettings(i)
 }
 
+func (s *InstanceService) SetVersion(id uuid.UUID, value string) error {
+	i, err := s.Get(id)
+	if err != nil {
+		return err
+	}
+
+	i.Version = &value
+	return s.instanceAdapter.SaveSettings(i)
+}
+
 // remapDatabaseEnv remaps the environment variables of an instance.
 func (s *InstanceService) remapDatabaseEnv(uuid uuid.UUID) error {
 	instance, err := s.Get(uuid)
@@ -546,6 +556,18 @@ func (s *InstanceService) GetDockerContainerInfo(uuid uuid.UUID) (map[string]any
 
 func (s *InstanceService) GetLatestLogs(uuid uuid.UUID) ([]types.LogLine, error) {
 	return s.logsAdapter.LoadBuffer(uuid)
+}
+
+func (s *InstanceService) GetAllVersions(instance *types.Instance, useCache bool) ([]string, error) {
+	if !useCache || len(instance.CacheVersions) == 0 {
+		versions, err := s.dockerRunnerAdapter.GetAllVersions(*instance)
+		if err != nil {
+			return nil, err
+		}
+		instance.CacheVersions = versions
+	}
+
+	return instance.CacheVersions, nil
 }
 
 func (s *InstanceService) CloneRepository(dir string, url string) error {

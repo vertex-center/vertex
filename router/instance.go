@@ -27,6 +27,7 @@ func addInstanceRoutes(r *gin.RouterGroup) {
 	r.POST("/docker/recreate", handleRecreateDockerContainer)
 	r.GET("/logs", handleGetLogs)
 	r.POST("/update/service", handleUpdateService)
+	r.GET("/versions", handleGetVersions)
 }
 
 // getParamInstanceUUID returns the UUID of the instance in the URL.
@@ -138,6 +139,7 @@ type handlePatchInstanceBody struct {
 	LaunchOnStartup *bool                `json:"launch_on_startup,omitempty"`
 	DisplayName     *string              `json:"display_name,omitempty"`
 	Databases       map[string]uuid.UUID `json:"databases,omitempty"`
+	Version         *string              `json:"version,omitempty"`
 }
 
 // handlePatchInstance updates the instance with the UUID in the URL.
@@ -210,6 +212,23 @@ func handlePatchInstance(c *gin.Context) {
 			_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
 				Code:    api.ErrFailedToSetDatabase,
 				Message: fmt.Sprintf("failed to set databases: %v", err),
+			})
+			return
+		}
+	}
+
+	if body.Version != nil {
+		err = instanceService.SetVersion(*uid, *body.Version)
+		if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
+			_ = c.AbortWithError(http.StatusNotFound, api.Error{
+				Code:    api.ErrInstanceNotFound,
+				Message: fmt.Sprintf("instance %s not found", uid),
+			})
+			return
+		} else if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+				Code:    api.ErrFailedToSetVersion,
+				Message: fmt.Sprintf("failed to set version: %v", err),
 			})
 			return
 		}
@@ -509,4 +528,27 @@ func handleUpdateService(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
+}
+
+// handleGetVersions returns the versions of the instance with the UUID in the URL.
+// Errors can be:
+//   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
+func handleGetVersions(c *gin.Context) {
+	instance := getInstance(c)
+	if instance == nil {
+		return
+	}
+
+	useCache := c.Query("reload") != "true"
+
+	versions, err := instanceService.GetAllVersions(instance, useCache)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToGetVersions,
+			Message: fmt.Sprintf("failed to get versions: %v", err),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, versions)
 }

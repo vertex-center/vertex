@@ -38,9 +38,12 @@ type InstanceSettings struct {
 	// DisplayName is a custom name for the instance.
 	DisplayName *string `json:"display_name,omitempty"`
 
-	// Database describes the databases used by the instance.
+	// Databases describes the databases used by the instance.
 	// The key is the database ID, and the value is the database instance UUID.
 	Databases map[string]uuid.UUID `json:"databases,omitempty"`
+
+	// Version is the version of the program.
+	Version *string `json:"version,omitempty"`
 }
 
 type EnvVariables map[string]string
@@ -55,6 +58,8 @@ type Instance struct {
 
 	Update        *InstanceUpdate `json:"update,omitempty"`
 	ServiceUpdate ServiceUpdate   `json:"service_update,omitempty"`
+
+	CacheVersions []string `json:"cache_versions,omitempty"`
 }
 
 type InstanceQuery struct {
@@ -97,7 +102,7 @@ type InstanceAdapterPort interface {
 	Reload(func(uuid uuid.UUID))
 }
 
-func (i *Instance) DockerImageName() string {
+func (i *Instance) DockerImageVertexName() string {
 	return "vertex_image_" + i.UUID.String()
 }
 
@@ -156,4 +161,15 @@ func (i *Instance) HasOneOfFeatures(featureTypes []string) bool {
 	}
 
 	return false
+}
+
+func (i *Instance) GetVersion() string {
+	if i.InstanceSettings.Version == nil {
+		return "latest"
+	}
+	return *i.InstanceSettings.Version
+}
+
+func (i *Instance) GetImageNameWithTag() string {
+	return *i.Service.Methods.Docker.Image + ":" + i.GetVersion()
 }
