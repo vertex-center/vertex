@@ -38,6 +38,7 @@ const (
 	ErrFailedToSetLaunchOnStartup    = "failed_to_set_launch_on_startup"
 	ErrFailedToSetDisplayName        = "failed_to_set_display_name"
 	ErrFailedToSetDatabase           = "failed_to_set_database"
+	ErrFailedToSetVersion            = "failed_to_set_version"
 	ErrFailedToSetEnv                = "failed_to_set_env"
 
 	ErrFailedToCheckForUpdates = "failed_to_check_for_updates"

@@ -55,7 +55,7 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 	rOut, wOut := io.Pipe()
 
 	go func() {
-		imageName := instance.DockerImageName()
+		imageName := instance.DockerImageVertexName()
 
 		setStatus(types.InstanceStatusBuilding)
 
@@ -68,7 +68,7 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 		if service.Methods.Docker.Dockerfile != nil {
 			stdout, err = a.buildImageFromDockerfile(instancePath, imageName)
 		} else if service.Methods.Docker.Image != nil {
-			stdout, err = a.buildImageFromName(*service.Methods.Docker.Image)
+			stdout, err = a.buildImageFromName(instance.GetImageNameWithTag())
 		} else {
 			err = errors.New("no Docker methods found")
 		}
@@ -123,7 +123,6 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 			)
 
 			options := types.CreateContainerOptions{
-				ImageName:     imageName,
 				ContainerName: containerName,
 				ExposedPorts:  nat.PortSet{},
 				PortBindings:  nat.PortMap{},
@@ -184,9 +183,10 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 			}
 
 			if service.Methods.Docker.Dockerfile != nil {
+				options.ImageName = instance.DockerImageVertexName()
 				id, err = a.createContainer(options)
 			} else if service.Methods.Docker.Image != nil {
-				options.ImageName = *service.Methods.Docker.Image
+				options.ImageName = instance.GetImageNameWithTag()
 				id, err = a.createContainer(options)
 			}
 			if err != nil {
@@ -290,7 +290,7 @@ func (a RunnerDockerAdapter) CheckForUpdates(instance *types.Instance) error {
 		return nil
 	}
 
-	imageName := *service.Methods.Docker.Image
+	imageName := instance.GetImageNameWithTag()
 
 	res, err := a.pullImage(imageName)
 	if err != nil {

@@ -139,6 +139,7 @@ type handlePatchInstanceBody struct {
 	LaunchOnStartup *bool                `json:"launch_on_startup,omitempty"`
 	DisplayName     *string              `json:"display_name,omitempty"`
 	Databases       map[string]uuid.UUID `json:"databases,omitempty"`
+	Version         *string              `json:"version,omitempty"`
 }
 
 // handlePatchInstance updates the instance with the UUID in the URL.
@@ -211,6 +212,23 @@ func handlePatchInstance(c *gin.Context) {
 			_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
 				Code:    api.ErrFailedToSetDatabase,
 				Message: fmt.Sprintf("failed to set databases: %v", err),
+			})
+			return
+		}
+	}
+
+	if body.Version != nil {
+		err = instanceService.SetVersion(*uid, *body.Version)
+		if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
+			_ = c.AbortWithError(http.StatusNotFound, api.Error{
+				Code:    api.ErrInstanceNotFound,
+				Message: fmt.Sprintf("instance %s not found", uid),
+			})
+			return
+		} else if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+				Code:    api.ErrFailedToSetVersion,
+				Message: fmt.Sprintf("failed to set version: %v", err),
 			})
 			return
 		}

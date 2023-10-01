@@ -484,6 +484,16 @@ func (s *InstanceService) SetDatabases(id uuid.UUID, databases map[string]uuid.U
 	return s.instanceAdapter.SaveSettings(i)
 }
 
+func (s *InstanceService) SetVersion(id uuid.UUID, value string) error {
+	i, err := s.Get(id)
+	if err != nil {
+		return err
+	}
+
+	i.Version = &value
+	return s.instanceAdapter.SaveSettings(i)
+}
+
 // remapDatabaseEnv remaps the environment variables of an instance.
 func (s *InstanceService) remapDatabaseEnv(uuid uuid.UUID) error {
 	instance, err := s.Get(uuid)
