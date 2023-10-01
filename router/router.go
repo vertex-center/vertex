@@ -34,6 +34,7 @@ var (
 	serviceFSAdapter      types.ServiceAdapterPort
 	proxyFSAdapter        types.ProxyAdapterPort
 	settingsFSAdapter     types.SettingsAdapterPort
+	sshKernelApiAdapter   types.SshAdapterPort
 
 	packageService       services.PackageService
 	notificationsService services.NotificationsService
@@ -43,7 +44,7 @@ var (
 	dependenciesService  services.DependenciesService
 	settingsService      services.SettingsService
 	hardwareService      services.HardwareService
-	sshService           services.SSHService
+	sshService           services.SshService
 )
 
 type Router struct {
@@ -146,6 +147,7 @@ func (r *Router) initAdapters() {
 	serviceFSAdapter = adapter.NewServiceFSAdapter(nil)
 	proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
 	settingsFSAdapter = adapter.NewSettingsFSAdapter(nil)
+	sshKernelApiAdapter = adapter.NewSshKernelApiAdapter()
 }
 
 func (r *Router) initServices(about types.About) {
@@ -157,7 +159,7 @@ func (r *Router) initServices(about types.About) {
 	dependenciesService = services.NewDependenciesService(about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)
 	hardwareService = services.NewHardwareService()
-	sshService = services.NewSSHService()
+	sshService = services.NewSSHService(sshKernelApiAdapter)
 }
 
 func (r *Router) initAPIRoutes(about types.About) {

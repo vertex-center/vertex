@@ -1,40 +1,28 @@
 package services
 
 import (
-	"context"
-
-	"github.com/carlmjohnson/requests"
-	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/types"
 )
 
-type SSHService struct{}
+type SshService struct {
+	adapter types.SshAdapterPort
+}
 
-func NewSSHService() SSHService {
-	s := SSHService{}
+func NewSSHService(sshAdapter types.SshAdapterPort) SshService {
+	s := SshService{
+		adapter: sshAdapter,
+	}
 	return s
 }
 
-func (s *SSHService) GetAll() ([]types.PublicKey, error) {
-	var keys []types.PublicKey
-	err := requests.URL(config.Current.HostKernel).
-		Path("/api/security/ssh").
-		ToJSON(&keys).
-		Fetch(context.Background())
-	return keys, err
+func (s *SshService) GetAll() ([]types.PublicKey, error) {
+	return s.adapter.GetAll()
 }
 
-func (s *SSHService) Add(key string) error {
-	return requests.URL(config.Current.HostKernel).
-		Path("/api/security/ssh").
-		Post().
-		BodyBytes([]byte(key)).
-		Fetch(context.Background())
+func (s *SshService) Add(key string) error {
+	return s.adapter.Add(key)
 }
 
-func (s *SSHService) Delete(fingerprint string) error {
-	return requests.URL(config.Current.HostKernel).
-		Pathf("/api/security/ssh/%s", fingerprint).
-		Delete().
-		Fetch(context.Background())
+func (s *SshService) Delete(fingerprint string) error {
+	return s.adapter.Remove(fingerprint)
 }
