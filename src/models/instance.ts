@@ -31,6 +31,7 @@ export type Instance = {
     launch_on_startup?: boolean;
     display_name?: string;
     databases?: { [key: string]: string };
+    version?: string;
     update?: InstanceUpdate;
     service_update?: ServiceUpdate;
 };

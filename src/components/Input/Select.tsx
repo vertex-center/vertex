@@ -88,6 +88,7 @@ export default function Select(props: Props) {
             </div>
             <SelectOptions opened={opened} toggle={toggle}>
                 {Children.map(children, (child) => {
+                    if (!child) return;
                     // @ts-ignore
                     return cloneElement(child, {
                         onClick: onChange,

@@ -91,6 +91,11 @@ export const api = {
             service: (id: string) =>
                 server.post(`/instance/${id}/update/service`),
         },
+
+        versions: {
+            get: (id: string) =>
+                server.get<string[]>(`/instance/${id}/versions`),
+        },
     },
 
     packages: {

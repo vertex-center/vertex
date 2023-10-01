@@ -13,6 +13,11 @@ import Input from "../../../../components/Input/Input";
 import styles from "./InstanceSettings.module.sass";
 import { api } from "../../../../backend/backend";
 import { APIError } from "../../../../components/Error/Error";
+import Select, {
+    SelectOption,
+    SelectValue,
+} from "../../../../components/Input/Select";
+import VersionTag from "../../../../components/VersionTag/VersionTag";
 
 type Props = {};
 
@@ -23,6 +28,8 @@ export default function InstanceSettings(props: Props) {
 
     const [displayName, setDisplayName] = useState<string>();
     const [launchOnStartup, setLaunchOnStartup] = useState<boolean>();
+    const [version, setVersion] = useState<string>();
+    const [versions, setVersions] = useState<string[]>();
 
     // undefined = not saved AND never modified
     const [saved, setSaved] = useState<boolean>(undefined);
@@ -33,7 +40,18 @@ export default function InstanceSettings(props: Props) {
         if (!instance) return;
         setLaunchOnStartup(instance?.launch_on_startup ?? true);
         setDisplayName(instance?.display_name ?? instance?.service?.name);
+        setVersion(instance?.version ?? "latest");
+        reloadVersions();
     }, [instance]);
+
+    const reloadVersions = (cache = true) => {
+        api.instance.versions
+            .get(instance.uuid)
+            .then((res) => {
+                setVersions(res.data?.reverse());
+            })
+            .catch(setError);
+    };
 
     const save = () => {
         setUploading(true);
@@ -41,6 +59,7 @@ export default function InstanceSettings(props: Props) {
             .patch(uuid, {
                 launch_on_startup: launchOnStartup,
                 display_name: displayName,
+                version: version,
             })
             .then(() => {
                 setSaved(true);
@@ -50,6 +69,21 @@ export default function InstanceSettings(props: Props) {
                 setUploading(false);
             });
     };
+
+    const onVersionChange = (v: any) => {
+        setVersion(v);
+        setSaved(false);
+    };
+
+    const versionValue = (
+        <SelectValue>
+            {version === "latest" ? (
+                "Always pull latest version"
+            ) : (
+                <VersionTag>{version}</VersionTag>
+            )}
+        </SelectValue>
+    );
 
     return (
         <Fragment>
@@ -65,6 +99,36 @@ export default function InstanceSettings(props: Props) {
                 }}
                 disabled={displayName === undefined}
             />
+            <div className={styles.versionSelect}>
+                <Select
+                    label="Version"
+                    onChange={onVersionChange}
+                    // @ts-ignore
+                    value={versionValue}
+                >
+                    {versions?.includes("latest") && (
+                        <SelectOption value="latest">
+                            Always pull latest version
+                        </SelectOption>
+                    )}
+                    {versions?.map((v) => {
+                        if (v === "latest") {
+                            return null;
+                        }
+                        return (
+                            <SelectOption key={v} value={v}>
+                                <VersionTag>{v}</VersionTag>
+                            </SelectOption>
+                        );
+                    })}
+                </Select>
+                <Button
+                    rightSymbol="refresh"
+                    onClick={() => reloadVersions(true)}
+                >
+                    Refresh
+                </Button>
+            </div>
             <Horizontal className={styles.toggle} alignItems="center">
                 <Text>Launch on Startup</Text>
                 <Spacer />
