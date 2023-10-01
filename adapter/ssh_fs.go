@@ -13,7 +13,6 @@ import (
 
 type SshFsAdapter struct {
 	authorizedKeysPath string
-	authorizedKeys     []types.PublicKey
 }
 
 type SshFsAdapterParams struct {
