@@ -548,6 +548,18 @@ func (s *InstanceService) GetLatestLogs(uuid uuid.UUID) ([]types.LogLine, error)
 	return s.logsAdapter.LoadBuffer(uuid)
 }
 
+func (s *InstanceService) GetAllVersions(instance *types.Instance, useCache bool) ([]string, error) {
+	if !useCache || len(instance.CacheVersions) == 0 {
+		versions, err := s.dockerRunnerAdapter.GetAllVersions(*instance)
+		if err != nil {
+			return nil, err
+		}
+		instance.CacheVersions = versions
+	}
+
+	return instance.CacheVersions, nil
+}
+
 func (s *InstanceService) CloneRepository(dir string, url string) error {
 	_, err := git.PlainClone(dir, false, &git.CloneOptions{
 		URL:      url,

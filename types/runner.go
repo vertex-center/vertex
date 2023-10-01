@@ -10,4 +10,5 @@ type RunnerAdapterPort interface {
 
 	CheckForUpdates(instance *Instance) error
 	HasUpdateAvailable(instance Instance) (bool, error)
+	GetAllVersions(instance Instance) ([]string, error)
 }

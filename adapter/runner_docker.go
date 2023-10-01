@@ -15,6 +15,7 @@ import (
 	"github.com/carlmjohnson/requests"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/go-connections/nat"
+	"github.com/google/go-containerregistry/pkg/crane"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
@@ -329,6 +330,17 @@ func (a RunnerDockerAdapter) CheckForUpdates(instance *types.Instance) error {
 	}
 
 	return nil
+}
+
+func (a RunnerDockerAdapter) GetAllVersions(instance types.Instance) ([]string, error) {
+	if instance.Service.Methods.Docker == nil {
+		return nil, errors.New("no Docker methods found")
+	}
+	image := *instance.Service.Methods.Docker.Image
+	log.Debug("querying all versions of image",
+		vlog.String("image", image),
+	)
+	return crane.ListTags(image)
 }
 
 func (a RunnerDockerAdapter) HasUpdateAvailable(instance types.Instance) (bool, error) {

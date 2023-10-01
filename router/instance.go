@@ -27,6 +27,7 @@ func addInstanceRoutes(r *gin.RouterGroup) {
 	r.POST("/docker/recreate", handleRecreateDockerContainer)
 	r.GET("/logs", handleGetLogs)
 	r.POST("/update/service", handleUpdateService)
+	r.GET("/versions", handleGetVersions)
 }
 
 // getParamInstanceUUID returns the UUID of the instance in the URL.
@@ -509,4 +510,27 @@ func handleUpdateService(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
+}
+
+// handleGetVersions returns the versions of the instance with the UUID in the URL.
+// Errors can be:
+//   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
+func handleGetVersions(c *gin.Context) {
+	instance := getInstance(c)
+	if instance == nil {
+		return
+	}
+
+	useCache := c.Query("reload") != "true"
+
+	versions, err := instanceService.GetAllVersions(instance, useCache)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrFailedToGetVersions,
+			Message: fmt.Sprintf("failed to get versions: %v", err),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, versions)
 }

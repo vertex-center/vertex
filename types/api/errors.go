@@ -34,6 +34,7 @@ const (
 	ErrFailedToDeleteInstance        = "failed_to_delete_instance"
 	ErrFailedToGetInstanceLogs       = "failed_to_get_logs"
 	ErrFailedToUpdateServiceInstance = "failed_to_update_service_instance"
+	ErrFailedToGetVersions           = "failed_to_get_versions"
 	ErrFailedToSetLaunchOnStartup    = "failed_to_set_launch_on_startup"
 	ErrFailedToSetDisplayName        = "failed_to_set_display_name"
 	ErrFailedToSetDatabase           = "failed_to_set_database"
