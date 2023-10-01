@@ -8,7 +8,7 @@ type SshService struct {
 	adapter types.SshAdapterPort
 }
 
-func NewSSHService(sshAdapter types.SshAdapterPort) SshService {
+func NewSshService(sshAdapter types.SshAdapterPort) SshService {
 	s := SshService{
 		adapter: sshAdapter,
 	}

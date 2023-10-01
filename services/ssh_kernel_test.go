@@ -9,12 +9,12 @@ import (
 )
 
 const (
-	key         = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6IPH4bqdhPVQUfdmuisPdQJO6Tv2+a0OZ9qLs6W0W2flxn6/yQmYut02cl0UtNcDtmb4RqNj2ms2v2TeDVSWVZkUR/q4jjZSSljQEpTd3r1YhYrO/GPDNiIUMm5HvZ8qIfBQA6gn9uMT1g6FO53O64ACNr+ItU4gNdr+S44MNJRMxMy6+s/LsFlQjyO2MbPQHQ6HSOgTLrCNiH8NTLA/evekrZ/rmIZrrES2vQvw5pbCDgEOkLZruRSMMFJFStb6tlGoiN/jQpfX51jebDVLZ1/U3SU5+7LNN6DxZYE9w1eCA2G8L8q1PUYju+b4F6IhGA1AYXPaAaR12qRJ4lLeN"
-	fingerprint = "SHA256:eLfsDB1H1SrvT7Bgo9U1i/ATcldIrOqin2H0MGEy5I8"
+	testDataAuthorizedKey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6IPH4bqdhPVQUfdmuisPdQJO6Tv2+a0OZ9qLs6W0W2flxn6/yQmYut02cl0UtNcDtmb4RqNj2ms2v2TeDVSWVZkUR/q4jjZSSljQEpTd3r1YhYrO/GPDNiIUMm5HvZ8qIfBQA6gn9uMT1g6FO53O64ACNr+ItU4gNdr+S44MNJRMxMy6+s/LsFlQjyO2MbPQHQ6HSOgTLrCNiH8NTLA/evekrZ/rmIZrrES2vQvw5pbCDgEOkLZruRSMMFJFStb6tlGoiN/jQpfX51jebDVLZ1/U3SU5+7LNN6DxZYE9w1eCA2G8L8q1PUYju+b4F6IhGA1AYXPaAaR12qRJ4lLeN"
+	testDataFingerprint   = "SHA256:eLfsDB1H1SrvT7Bgo9U1i/ATcldIrOqin2H0MGEy5I8"
 )
 
 var (
-	authorizedKeys = []types.PublicKey{
+	testDataAuthorizedKeys = []types.PublicKey{
 		{
 			Type:              "ssh-rsa",
 			FingerprintSHA256: "SHA256:eLfsDB1H1SrvT7Bgo9U1i/ATcldIrOqin2H0MGEy5I8",
@@ -43,26 +43,26 @@ func (suite *SshKernelServiceTestSuite) SetupSuite() {
 }
 
 func (suite *SshKernelServiceTestSuite) TestGetAll() {
-	suite.adapter.On("GetAll").Return(authorizedKeys, nil)
+	suite.adapter.On("GetAll").Return(testDataAuthorizedKeys, nil)
 
 	keys, err := suite.service.GetAll()
 
 	suite.NoError(err)
-	suite.Equal(authorizedKeys, keys)
+	suite.Equal(testDataAuthorizedKeys, keys)
 	suite.adapter.AssertExpectations(suite.T())
 }
 
 func (suite *SshKernelServiceTestSuite) TestAdd() {
-	suite.adapter.On("Add", key).Return(nil)
+	suite.adapter.On("Add", testDataAuthorizedKey).Return(nil)
 
-	err := suite.service.Add(key)
+	err := suite.service.Add(testDataAuthorizedKey)
 
 	suite.NoError(err)
 	suite.adapter.AssertExpectations(suite.T())
 }
 
 func (suite *SshKernelServiceTestSuite) TestAddInvalidKey() {
-	suite.adapter.On("Add", key).Return(nil)
+	suite.adapter.On("Add", testDataAuthorizedKey).Return(nil)
 
 	err := suite.service.Add("invalid")
 
@@ -72,9 +72,9 @@ func (suite *SshKernelServiceTestSuite) TestAddInvalidKey() {
 }
 
 func (suite *SshKernelServiceTestSuite) TestDelete() {
-	suite.adapter.On("Remove", fingerprint).Return(nil)
+	suite.adapter.On("Remove", testDataFingerprint).Return(nil)
 
-	err := suite.service.Delete(fingerprint)
+	err := suite.service.Delete(testDataFingerprint)
 
 	suite.NoError(err)
 	suite.adapter.AssertExpectations(suite.T())
