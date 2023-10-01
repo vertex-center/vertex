@@ -7,12 +7,12 @@ import styles from "./InstancesStore.module.sass";
 import Service from "../../../components/Service/Service";
 import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
 import Spacer from "../../../components/Spacer/Spacer";
-import { SegmentedButtons } from "../../../components/SegmentedButton";
 import Button from "../../../components/Button/Button";
 import Popup from "../../../components/Popup/Popup";
-import { InstallMethod, Instances } from "../../../models/instance";
+import { Instances } from "../../../models/instance";
 import { api } from "../../../backend/backend";
 import { APIError, Errors } from "../../../components/Error/Error";
+import ServiceLogo from "../../../components/ServiceLogo/ServiceLogo";
 
 type Downloading = {
     service: ServiceModel;
@@ -28,8 +28,6 @@ export default function InstancesStore() {
         reload: reloadInstances,
     } = useFetch<Instances>(api.instances.get);
 
-    const [installMethod, setInstallMethod] = useState<InstallMethod>();
-
     const [showInstallPopup, setShowInstallPopup] = useState<boolean>(false);
 
     const [selectedService, setSelectedService] = useState<ServiceModel>();
@@ -42,21 +40,7 @@ export default function InstancesStore() {
     const openInstallPopup = (service: ServiceModel) => {
         setSelectedService(service);
         setShowInstallPopup(true);
-        setInstallMethod("script");
         setPopupError(undefined);
-
-        const { script, release, docker } = service.methods;
-
-        if (script) {
-            setInstallMethod("script");
-        } else if (release) {
-            setInstallMethod("release");
-        } else if (docker) {
-            setInstallMethod("docker");
-        } else {
-            // @ts-ignore
-            setPopupError("This service doesn't have installation method.");
-        }
     };
 
     const closeInstallPopup = () => {
@@ -73,7 +57,7 @@ export default function InstancesStore() {
 
         api.services
             .install({
-                method: installMethod,
+                method: "docker",
                 service_id: service.id,
             })
             .catch(setError)
@@ -90,37 +74,11 @@ export default function InstancesStore() {
             show={showInstallPopup}
             onDismiss={() => setShowInstallPopup(false)}
         >
-            <Title>Download {selectedService?.name}</Title>
-            {!popupError && (
-                <Horizontal alignItems="center" gap={12}>
-                    <Text>Installation method</Text>
-                    <Spacer />
-                    <SegmentedButtons
-                        value={installMethod}
-                        onChange={(v) => setInstallMethod(v)}
-                        items={[
-                            {
-                                label: "Script",
-                                value: "script",
-                                rightSymbol: "description",
-                                disabled: !selectedService?.methods?.script,
-                            },
-                            {
-                                label: "Release",
-                                value: "release",
-                                rightSymbol: "package",
-                                disabled: !selectedService?.methods?.release,
-                            },
-                            {
-                                label: "Docker",
-                                value: "docker",
-                                rightSymbol: "deployed_code",
-                                disabled: !selectedService?.methods?.docker,
-                            },
-                        ]}
-                    />
-                </Horizontal>
-            )}
+            <Horizontal gap={15} alignItems="center">
+                {selectedService && <ServiceLogo service={selectedService} />}
+                <Title>{selectedService?.name}</Title>
+            </Horizontal>
+            <Text>{selectedService?.description}</Text>
             <APIError style={{ margin: 0 }} error={popupError} />
             <Horizontal gap={8}>
                 <Spacer />
@@ -128,10 +86,10 @@ export default function InstancesStore() {
                 <Button
                     onClick={install}
                     primary
-                    rightSymbol="download"
+                    rightSymbol="add"
                     disabled={popupError !== undefined}
                 >
-                    Download
+                    Create instance
                 </Button>
             </Horizontal>
         </Popup>
