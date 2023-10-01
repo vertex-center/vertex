@@ -11,13 +11,13 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-func allowPort80() {
+func allowPortsManagement() {
 	cmd := exec.Command("setcap", "cap_net_bind_service=+ep", "vertex")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
 	if err != nil {
-		log.Error(errors.New("error trying to allow ./vertex to use the port 80"),
+		log.Error(errors.New("error trying to allow ./vertex to manage ports"),
 			vlog.String("msg", err.Error()),
 		)
 	}

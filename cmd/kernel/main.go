@@ -25,7 +25,7 @@ func main() {
 		buildVertex()
 	}
 
-	allowPort80()
+	allowPortsManagement()
 
 	shutdownChan := make(chan os.Signal, 1)
 
@@ -49,6 +49,8 @@ func main() {
 			"-host", config.KernelCurrent.HostVertex,
 			"-host-kernel", config.KernelCurrent.HostKernel,
 			"-port-kernel", config.KernelCurrent.PortKernel,
+			"-host-proxy", config.KernelCurrent.HostProxy,
+			"-port-proxy", config.KernelCurrent.PortProxy,
 		}...)
 		if err != nil {
 			log.Error(err)
@@ -92,12 +94,17 @@ func parseArgs() {
 	flagHostKernel := flag.String("host-kernel", config.Current.HostKernel, "The Vertex Kernel access url")
 	flagPortKernel := flag.String("port-kernel", config.Current.PortKernel, "The Vertex Kernel port")
 
+	flagHostProxy := flag.String("host-proxy", config.Current.HostProxy, "The Vertex Proxy access url")
+	flagPortProxy := flag.String("port-proxy", config.Current.PortProxy, "The Vertex Proxy port")
+
 	flag.Parse()
 
 	config.KernelCurrent.HostVertex = *flagHost
 	config.KernelCurrent.PortVertex = *flagPort
 	config.KernelCurrent.HostKernel = *flagHostKernel
 	config.KernelCurrent.PortKernel = *flagPortKernel
+	config.KernelCurrent.HostProxy = *flagHostProxy
+	config.KernelCurrent.PortProxy = *flagPortProxy
 
 	if *flagUsername != "" {
 		u, err := user.Lookup(*flagUsername)

@@ -88,6 +88,9 @@ func parseArgs() {
 	flagHostKernel := flag.String("host-kernel", config.Current.HostKernel, "The Vertex Kernel access url")
 	flagPortKernel := flag.String("port-kernel", config.Current.PortKernel, "The Vertex Kernel port")
 
+	flagHostProxy := flag.String("host-proxy", config.Current.HostProxy, "The Vertex Proxy access url")
+	flagPortProxy := flag.String("port-proxy", config.Current.PortProxy, "The Vertex Proxy port")
+
 	flag.Parse()
 
 	if *flagVersion || *flagV {
@@ -106,6 +109,8 @@ func parseArgs() {
 	config.Current.PortVertex = *flagPort
 	config.Current.HostKernel = *flagHostKernel
 	config.Current.PortKernel = *flagPortKernel
+	config.Current.HostProxy = *flagHostProxy
+	config.Current.PortProxy = *flagPortProxy
 }
 
 func checkNotRoot() {

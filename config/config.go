@@ -16,6 +16,9 @@ type Config struct {
 
 	HostKernel string `json:"host_kernel"`
 	PortKernel string `json:"port_kernel"`
+
+	HostProxy string `json:"host_proxy"`
+	PortProxy string `json:"port_proxy"`
 }
 
 func New() Config {
@@ -25,6 +28,9 @@ func New() Config {
 
 		HostKernel: "http://localhost:6131",
 		PortKernel: "6131",
+
+		HostProxy: "http://localhost:80",
+		PortProxy: "80",
 	}
 }
 

@@ -2,6 +2,6 @@
 
 package main
 
-func allowPort80() {
+func allowPortsManagement() {
 	// ignored on Windows
 }

@@ -2,11 +2,13 @@ package router
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
@@ -35,13 +37,12 @@ func NewProxyRouter() ProxyRouter {
 
 func (r *ProxyRouter) Start() error {
 	r.server = &http.Server{
-		Addr:    ":80",
+		Addr:    fmt.Sprintf(":%s", config.Current.PortProxy),
 		Handler: r.engine,
 	}
 
-	url := "http://localhost:80"
 	log.Info("Vertex-Proxy started",
-		vlog.String("url", url),
+		vlog.String("url", config.Current.HostProxy),
 	)
 
 	return r.server.ListenAndServe()
