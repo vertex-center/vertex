@@ -8,7 +8,9 @@ import (
 	"runtime"
 
 	"github.com/vertex-center/vertex/config"
+	"github.com/vertex-center/vertex/migration"
 	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/router"
 	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/types"
@@ -26,11 +28,16 @@ func main() {
 
 	log.Info("Vertex starting...")
 
+	err := migration.NewMigrationTool(storage.Path).Migrate()
+	if err != nil {
+		panic(err)
+	}
+
 	parseArgs()
 
 	checkNotRoot()
 
-	err := setupDependencies()
+	err = setupDependencies()
 	if err != nil {
 		log.Error(fmt.Errorf("failed to setup dependencies: %v", err))
 		return
