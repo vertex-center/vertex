@@ -15,7 +15,8 @@
     gap: 30px
     position: relative
     border: 1px solid transparent
-    padding: 20px 40px
+    padding: 0 40px
+    height: 84px
 
     &Clickable
         cursor: pointer
@@ -76,11 +77,19 @@
     &Count
         color: colors.$fg-tertiary
 
+@keyframes loading
+    0%
+        opacity: 0.7
+    50%
+        opacity: 1
+    100%
+        opacity: 0.7
+
 .led
     width: 14px
     height: 14px
     border-radius: 50%
-    background-color: colors.$red
+    background-color: colors.$fg-tertiary
     position: relative
     transition: background-color 0.1s ease
 
@@ -93,7 +102,7 @@
         right: -4px
         border-radius: 50%
         opacity: 0.2
-        background-color: colors.$red
+        background-color: colors.$fg-tertiary
         transition: background-color 0.4s ease
 
     &Gray

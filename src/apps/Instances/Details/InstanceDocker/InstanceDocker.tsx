@@ -14,6 +14,7 @@ import {
 } from "../../../../components/KeyValueInfo/KeyValueInfo";
 import byteSize from "byte-size";
 import { APIError } from "../../../../components/Error/Error";
+import { ProgressOverlay } from "../../../../components/Progress/Progress";
 
 export default function InstanceDocker() {
     const { uuid } = useParams();
@@ -22,6 +23,7 @@ export default function InstanceDocker() {
         data: info,
         error,
         reload: reloadContainerInfo,
+        loading,
     } = useFetch<DockerContainerInfo>(() => api.instance.docker.get(uuid));
 
     const [recreatingContainer, setRecreatingContainer] = useState(false);
@@ -51,22 +53,34 @@ export default function InstanceDocker() {
 
     return (
         <Vertical gap={30}>
+            <ProgressOverlay show={loading} />
             <APIError error={recreatingContainerError} />
 
             <Vertical gap={20}>
                 <Title className={styles.title}>Container</Title>
                 <KeyValueGroup>
-                    <KeyValueInfo name="ID" type="code" symbol="tag">
+                    <KeyValueInfo
+                        name="ID"
+                        type="code"
+                        symbol="tag"
+                        loading={loading}
+                    >
                         {info?.container?.id}
                     </KeyValueInfo>
                     <KeyValueInfo
                         name="Container Name"
                         type="code"
                         symbol="badge"
+                        loading={loading}
                     >
                         {info?.container?.name}
                     </KeyValueInfo>
-                    <KeyValueInfo name="Platform" type="code" symbol="computer">
+                    <KeyValueInfo
+                        name="Platform"
+                        type="code"
+                        symbol="computer"
+                        loading={loading}
+                    >
                         {info?.container?.platform}
                     </KeyValueInfo>
                 </KeyValueGroup>
@@ -75,23 +89,44 @@ export default function InstanceDocker() {
             <Vertical gap={20}>
                 <Title className={styles.title}>Image</Title>
                 <KeyValueGroup>
-                    <KeyValueInfo name="ID" type="code" symbol="tag">
+                    <KeyValueInfo
+                        name="ID"
+                        type="code"
+                        symbol="tag"
+                        loading={loading}
+                    >
                         {info?.image?.id}
                     </KeyValueInfo>
                     <KeyValueInfo
                         name="Architecture"
                         type="code"
                         symbol="memory"
+                        loading={loading}
                     >
                         {info?.image?.architecture}
                     </KeyValueInfo>
-                    <KeyValueInfo name="OS" type="code" symbol="computer">
+                    <KeyValueInfo
+                        name="OS"
+                        type="code"
+                        symbol="computer"
+                        loading={loading}
+                    >
                         {info?.image?.os}
                     </KeyValueInfo>
-                    <KeyValueInfo name="Size" type="code" symbol="straighten">
+                    <KeyValueInfo
+                        name="Size"
+                        type="code"
+                        symbol="straighten"
+                        loading={loading}
+                    >
                         {byteSize(info?.image?.size).toString()}
                     </KeyValueInfo>
-                    <KeyValueInfo name="Tags" type="code" symbol="sell">
+                    <KeyValueInfo
+                        name="Tags"
+                        type="code"
+                        symbol="sell"
+                        loading={loading}
+                    >
                         {info?.image?.tags?.join(", ")}
                     </KeyValueInfo>
                 </KeyValueGroup>
@@ -104,7 +139,7 @@ export default function InstanceDocker() {
                         <Button
                             leftSymbol="restart_alt"
                             onClick={recreateContainer}
-                            disabled={recreatingContainer}
+                            disabled={recreatingContainer || loading}
                         >
                             Recreate container
                         </Button>

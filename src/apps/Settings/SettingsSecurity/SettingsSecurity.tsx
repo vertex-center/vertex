@@ -15,12 +15,14 @@ import Spacer from "../../../components/Spacer/Spacer";
 import Code from "../../../components/Code/Code";
 import Input from "../../../components/Input/Input";
 import Progress from "../../../components/Progress";
+import { ProgressOverlay } from "../../../components/Progress/Progress";
 
 export default function SettingsSecurity() {
     const {
         data: sshKeys,
         error,
         reload,
+        loading,
     } = useFetch<SSHKeysModel>(api.security.ssh.get);
 
     const [showPopup, setShowPopup] = useState(false);
@@ -57,6 +59,7 @@ export default function SettingsSecurity() {
 
     return (
         <Fragment>
+            <ProgressOverlay show={loading} />
             <Vertical gap={20}>
                 <Title className={styles.title}>SSH keys</Title>
                 {(error || deleteError) && (

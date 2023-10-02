@@ -101,7 +101,7 @@ export default function InstancesApp() {
 
     return (
         <div className={styles.server}>
-            {loading && <ProgressOverlay />}
+            <ProgressOverlay show={loading} />
             <div className={styles.title}>
                 <BigTitle>Instances</BigTitle>
             </div>

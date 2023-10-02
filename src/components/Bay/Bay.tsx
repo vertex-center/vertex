@@ -6,6 +6,7 @@ import { SiDocker } from "@icons-pack/react-simple-icons";
 import { InstallMethod, InstanceUpdate } from "../../models/instance";
 import { Link } from "react-router-dom";
 import { Fragment, MouseEventHandler } from "react";
+import LoadingValue from "../LoadingValue/LoadingValue";
 
 type ButtonProps = {
     symbol: string;
@@ -25,11 +26,11 @@ function LED({ status }: LEDProps) {
         <div
             className={classNames({
                 [styles.led]: true,
+                [styles.ledRed]: status === "error" || status === "off",
                 [styles.ledGreen]: status === "running",
                 [styles.ledYellow]: status === "building",
                 [styles.ledOrange]:
                     status === "starting" || status === "stopping",
-                [styles.ledRed]: status === "error",
             })}
         ></div>
     );
@@ -85,7 +86,7 @@ function LCD(props: LCDProps) {
         <Vertical gap={10}>
             <Horizontal gap={8}>
                 <Horizontal gap={8}>
-                    {name}
+                    {name ?? <LoadingValue />}
                     {count && <div className={styles.lcdCount}>{count}</div>}
                 </Horizontal>
                 {dockerized && (
@@ -98,15 +99,15 @@ function LCD(props: LCDProps) {
             <div
                 className={classNames({
                     [styles.lcdGray]: true,
+                    [styles.lcdRed]: status === "error",
                     [styles.lcdGreen]: status === "running",
                     [styles.lcdYellow]: status === "building",
                     [styles.lcdOrange]:
                         status === "starting" || status === "stopping",
-                    [styles.lcdRed]: status === "error",
                     [styles.lcdDownloading]: status === "downloading",
                 })}
             >
-                {message}
+                {message ?? <LoadingValue />}
             </div>
         </Vertical>
     );

@@ -5,10 +5,11 @@ import Symbol from "../Symbol/Symbol";
 type Props = {
     value: boolean;
     onChange: (value: boolean) => void;
+    disabled?: boolean;
 };
 
 export default function ToggleButton(props: Props) {
-    const { value } = props;
+    const { value, disabled } = props;
 
     const onChange = () => props.onChange(!value);
 
@@ -16,6 +17,7 @@ export default function ToggleButton(props: Props) {
         <div
             className={classNames({
                 [styles.toggle]: true,
+                [styles.disabled]: disabled,
                 [styles.on]: value,
             })}
             onClick={onChange}

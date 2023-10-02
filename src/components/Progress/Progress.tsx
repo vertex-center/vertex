@@ -1,7 +1,8 @@
 import styles from "./Progress.module.sass";
 import classNames from "classnames";
 
-export function ProgressOverlay() {
+export function ProgressOverlay({ show }: { show?: boolean }) {
+    if (!show) return null;
     return (
         <div className={styles.top}>
             <Progress infinite small />

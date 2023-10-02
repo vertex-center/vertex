@@ -7,12 +7,14 @@ import styles from "./SettingsHardware.module.sass";
 import { Vertical } from "../../../components/Layouts/Layouts";
 import { APIError } from "../../../components/Error/Error";
 import List from "../../../components/List/List";
+import { ProgressOverlay } from "../../../components/Progress/Progress";
 
 export default function SettingsHardware() {
-    const { data: hardware, error } = useFetch(api.hardware.get);
+    const { data: hardware, error, loading } = useFetch(api.hardware.get);
 
     return (
         <Vertical gap={20}>
+            <ProgressOverlay show={loading} />
             <Title className={styles.title}>Hardware</Title>
             <APIError error={error} />
             <List>

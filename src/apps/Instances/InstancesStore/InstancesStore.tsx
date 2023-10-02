@@ -13,15 +13,18 @@ import { Instances } from "../../../models/instance";
 import { api } from "../../../backend/backend";
 import { APIError, Errors } from "../../../components/Error/Error";
 import ServiceLogo from "../../../components/ServiceLogo/ServiceLogo";
+import { ProgressOverlay } from "../../../components/Progress/Progress";
 
 type Downloading = {
     service: ServiceModel;
 };
 
 export default function InstancesStore() {
-    const { data: services, error: servicesError } = useFetch<ServiceModel[]>(
-        api.services.available.get
-    );
+    const {
+        data: services,
+        error: servicesError,
+        loading,
+    } = useFetch<ServiceModel[]>(api.services.available.get);
     const {
         data: instances,
         error: instancesError,
@@ -97,6 +100,7 @@ export default function InstancesStore() {
 
     return (
         <Fragment>
+            <ProgressOverlay show={loading} />
             <div className={styles.page}>
                 <Horizontal
                     className={styles.title}

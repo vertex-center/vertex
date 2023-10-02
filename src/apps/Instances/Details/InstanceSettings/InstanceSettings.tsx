@@ -5,7 +5,6 @@ import Spacer from "../../../../components/Spacer/Spacer";
 import Button from "../../../../components/Button/Button";
 import { useParams } from "react-router-dom";
 import useInstance from "../../../../hooks/useInstance";
-import Progress from "../../../../components/Progress";
 import Symbol from "../../../../components/Symbol/Symbol";
 import ToggleButton from "../../../../components/ToggleButton/ToggleButton";
 import Input from "../../../../components/Input/Input";
@@ -19,18 +18,20 @@ import Select, {
 } from "../../../../components/Input/Select";
 import VersionTag from "../../../../components/VersionTag/VersionTag";
 import classNames from "classnames";
+import { ProgressOverlay } from "../../../../components/Progress/Progress";
 
 type Props = {};
 
 export default function InstanceSettings(props: Props) {
     const { uuid } = useParams();
 
-    const { instance } = useInstance(uuid);
+    const { instance, loading: instanceLoading } = useInstance(uuid);
 
     const [displayName, setDisplayName] = useState<string>();
     const [launchOnStartup, setLaunchOnStartup] = useState<boolean>();
     const [version, setVersion] = useState<string>();
     const [versions, setVersions] = useState<string[]>();
+    const [versionsLoading, setVersionsLoading] = useState<boolean>(false);
 
     // undefined = not saved AND never modified
     const [saved, setSaved] = useState<boolean>(undefined);
@@ -46,12 +47,16 @@ export default function InstanceSettings(props: Props) {
     }, [instance]);
 
     const reloadVersions = (cache = true) => {
+        setVersionsLoading(true);
         api.instance.versions
-            .get(instance.uuid)
+            .get(instance.uuid, cache)
             .then((res) => {
                 setVersions(res.data?.reverse());
             })
-            .catch(setError);
+            .catch(setError)
+            .finally(() => {
+                setVersionsLoading(false);
+            });
     };
 
     const save = () => {
@@ -92,6 +97,9 @@ export default function InstanceSettings(props: Props) {
 
     return (
         <Fragment>
+            <ProgressOverlay
+                show={instanceLoading || versionsLoading || uploading}
+            />
             <Title className={styles.title}>Settings</Title>
             <APIError error={error} />
             <Input
@@ -102,12 +110,13 @@ export default function InstanceSettings(props: Props) {
                     setDisplayName(e.target.value);
                     setSaved(false);
                 }}
-                disabled={displayName === undefined}
+                disabled={instanceLoading}
             />
             <div className={styles.versionSelect}>
                 <Select
                     label="Version"
                     onChange={onVersionChange}
+                    disabled={instanceLoading || versionsLoading}
                     // @ts-ignore
                     value={versionValue}
                 >
@@ -133,7 +142,8 @@ export default function InstanceSettings(props: Props) {
                 </Select>
                 <Button
                     rightSymbol="refresh"
-                    onClick={() => reloadVersions(true)}
+                    onClick={() => reloadVersions(false)}
+                    disabled={instanceLoading || versionsLoading}
                 >
                     Refresh
                 </Button>
@@ -147,6 +157,7 @@ export default function InstanceSettings(props: Props) {
                         setLaunchOnStartup(v);
                         setSaved(false);
                     }}
+                    disabled={instanceLoading}
                 />
             </Horizontal>
             <Button
@@ -159,7 +170,6 @@ export default function InstanceSettings(props: Props) {
             >
                 Save
             </Button>
-            {uploading && <Progress infinite />}
             {!uploading && saved && (
                 <Horizontal
                     className={styles.saved}

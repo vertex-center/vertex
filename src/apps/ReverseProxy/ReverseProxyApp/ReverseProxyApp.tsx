@@ -10,12 +10,14 @@ import React, { useState } from "react";
 import Input from "../../../components/Input/Input";
 import Spacer from "../../../components/Spacer/Spacer";
 import { APIError } from "../../../components/Error/Error";
+import { ProgressOverlay } from "../../../components/Progress/Progress";
 
 export default function ReverseProxyApp() {
     const {
         data: redirects,
         error,
         reload,
+        loading,
     } = useFetch<ProxyRedirects>(api.proxy.redirects.get);
 
     const [showNewRedirectPopup, setShowNewRedirectPopup] = useState(false);
@@ -43,6 +45,7 @@ export default function ReverseProxyApp() {
 
     return (
         <div>
+            <ProgressOverlay show={loading} />
             <div className={styles.title}>
                 <BigTitle>Reverse Proxy</BigTitle>
             </div>

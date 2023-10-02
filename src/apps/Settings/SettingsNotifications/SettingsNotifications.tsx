@@ -9,13 +9,18 @@ import { api } from "../../../backend/backend";
 import styles from "./SettingsNotifications.module.sass";
 import { Vertical } from "../../../components/Layouts/Layouts";
 import { APIError } from "../../../components/Error/Error";
+import { ProgressOverlay } from "../../../components/Progress/Progress";
 
 export default function SettingsNotifications() {
     const [webhook, setWebhook] = useState<string>();
     const [changed, setChanged] = useState(false);
     const [saving, setSaving] = useState(false);
 
-    const { data: settings, error } = useFetch<Settings>(api.settings.get);
+    const {
+        data: settings,
+        error,
+        loading,
+    } = useFetch<Settings>(api.settings.get);
 
     useEffect(() => {
         setWebhook(settings?.notifications?.webhook);
@@ -37,6 +42,7 @@ export default function SettingsNotifications() {
 
     return (
         <Vertical gap={20}>
+            <ProgressOverlay show={loading} />
             <Title className={styles.title}>Notifications</Title>
             <APIError error={error} />
             {!error && (
@@ -45,6 +51,8 @@ export default function SettingsNotifications() {
                         label="Webhook"
                         value={webhook}
                         onChange={onWebhookChange}
+                        disabled={loading}
+                        placeholder={loading && "Loading..."}
                     />
                     <Button
                         large

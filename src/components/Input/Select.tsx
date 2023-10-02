@@ -77,7 +77,11 @@ export default function Select(props: Props) {
         <div className={styles.select}>
             {label && <label className={styles.label}>{label}</label>}
             <div
-                className={classNames(styles.input, className)}
+                className={classNames({
+                    [styles.input]: true,
+                    [styles.inputDisabled]: others.disabled,
+                    [className]: true,
+                })}
                 {...others}
                 onClick={toggle}
             >

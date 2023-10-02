@@ -1,4 +1,4 @@
-import { Fragment, useEffect } from "react";
+import { Fragment } from "react";
 import { Title } from "../../../../components/Text/Text";
 import Symbol from "../../../../components/Symbol/Symbol";
 
@@ -7,39 +7,17 @@ import { useParams } from "react-router-dom";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
 import Spacer from "../../../../components/Spacer/Spacer";
 import classNames from "classnames";
-import {
-    registerSSE,
-    registerSSEEvent,
-    unregisterSSE,
-    unregisterSSEEvent,
-} from "../../../../backend/sse";
 import useInstance from "../../../../hooks/useInstance";
+import { ProgressOverlay } from "../../../../components/Progress/Progress";
 
 export default function InstanceHome() {
     const { uuid } = useParams();
 
-    const { instance, setInstance } = useInstance(uuid);
-
-    useEffect(() => {
-        if (uuid === undefined) return;
-
-        const sse = registerSSE(`/instance/${uuid}/events`);
-
-        const onStatusChange = (e) => {
-            setInstance((instance) => ({ ...instance, status: e.data }));
-        };
-
-        registerSSEEvent(sse, "status_change", onStatusChange);
-
-        return () => {
-            unregisterSSEEvent(sse, "status_change", onStatusChange);
-
-            unregisterSSE(sse);
-        };
-    }, [uuid]);
+    const { instance, loading } = useInstance(uuid);
 
     return (
         <Fragment>
+            <ProgressOverlay show={loading} />
             <Title className={styles.title}>URLs</Title>
             <nav className={styles.nav}>
                 {instance?.service?.urls &&

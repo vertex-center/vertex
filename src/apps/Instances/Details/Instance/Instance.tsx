@@ -23,12 +23,13 @@ import Progress from "../../../../components/Progress";
 import { SiDocker } from "@icons-pack/react-simple-icons";
 import useInstance from "../../../../hooks/useInstance";
 import { APIError } from "../../../../components/Error/Error";
+import { ProgressOverlay } from "../../../../components/Progress/Progress";
 
 export default function Instance() {
     const { uuid } = useParams();
     const navigate = useNavigate();
 
-    const { instance, setInstance } = useInstance(uuid);
+    const { instance, setInstance, loading } = useInstance(uuid);
 
     const [showDeletePopup, setShowDeletePopup] = useState<boolean>();
     const [deleting, setDeleting] = useState<boolean>(false);
@@ -79,8 +80,100 @@ export default function Instance() {
         setError(undefined);
     };
 
+    const content = (
+        <Horizontal className={styles.content}>
+            <Sidebar root={`/instances/${uuid}`}>
+                <SidebarGroup>
+                    <SidebarItem
+                        to={`/instances/${uuid}/home`}
+                        symbol="home"
+                        name="Home"
+                    />
+                </SidebarGroup>
+                <SidebarGroup title="Analyze">
+                    <SidebarItem
+                        to={`/instances/${uuid}/logs`}
+                        symbol="terminal"
+                        name="Logs"
+                    />
+                    {instance?.install_method === "docker" && (
+                        <SidebarItem
+                            to={`/instances/${uuid}/docker`}
+                            symbol={<SiDocker size={20} />}
+                            name="Docker"
+                        />
+                    )}
+                </SidebarGroup>
+                <SidebarGroup title="Manage">
+                    <SidebarItem
+                        to={`/instances/${uuid}/environment`}
+                        symbol="tune"
+                        name="Environment"
+                    />
+                    {instance?.service?.databases && (
+                        <SidebarItem
+                            to={`/instances/${uuid}/database`}
+                            symbol="database"
+                            name="Database"
+                        />
+                    )}
+                    <SidebarItem
+                        to={`/instances/${uuid}/update`}
+                        symbol="update"
+                        name="Update"
+                        notifications={
+                            instance?.service_update?.available ? 1 : undefined
+                        }
+                    />
+                    <SidebarItem
+                        to={`/instances/${uuid}/settings`}
+                        symbol="settings"
+                        name="Settings"
+                    />
+                    <SidebarItem
+                        onClick={() => setShowDeletePopup(true)}
+                        symbol="delete"
+                        name="Delete"
+                        red
+                    />
+                </SidebarGroup>
+            </Sidebar>
+            <div className={styles.side}>
+                <Outlet />
+            </div>
+            <Popup show={showDeletePopup} onDismiss={dismissDeletePopup}>
+                <Title>
+                    Delete {instance?.display_name ?? instance?.service?.name}?
+                </Title>
+                <Text>
+                    Are you sure you want to delete{" "}
+                    {instance?.display_name ?? instance?.service?.name}? All
+                    data will be permanently deleted.
+                </Text>
+                {deleting && <Progress infinite />}
+                <APIError style={{ margin: 0 }} error={error} />
+                <Horizontal gap={10}>
+                    <Spacer />
+                    <Button onClick={dismissDeletePopup} disabled={deleting}>
+                        Cancel
+                    </Button>
+                    <Button
+                        primary
+                        color="red"
+                        onClick={onDeleteInstance}
+                        disabled={deleting}
+                        rightSymbol="delete"
+                    >
+                        Confirm
+                    </Button>
+                </Horizontal>
+            </Popup>
+        </Horizontal>
+    );
+
     return (
         <div className={styles.details}>
+            <ProgressOverlay show={loading} />
             <div className={styles.bay}>
                 <Bay
                     instances={[
@@ -95,100 +188,7 @@ export default function Instance() {
                     ]}
                 />
             </div>
-            <Horizontal className={styles.content}>
-                <Sidebar root={`/instances/${uuid}`}>
-                    <SidebarGroup>
-                        <SidebarItem
-                            to={`/instances/${uuid}/home`}
-                            symbol="home"
-                            name="Home"
-                        />
-                    </SidebarGroup>
-                    <SidebarGroup title="Analyze">
-                        <SidebarItem
-                            to={`/instances/${uuid}/logs`}
-                            symbol="terminal"
-                            name="Logs"
-                        />
-                        {instance?.install_method === "docker" && (
-                            <SidebarItem
-                                to={`/instances/${uuid}/docker`}
-                                symbol={<SiDocker size={20} />}
-                                name="Docker"
-                            />
-                        )}
-                    </SidebarGroup>
-                    <SidebarGroup title="Manage">
-                        <SidebarItem
-                            to={`/instances/${uuid}/environment`}
-                            symbol="tune"
-                            name="Environment"
-                        />
-                        {instance?.service?.databases && (
-                            <SidebarItem
-                                to={`/instances/${uuid}/database`}
-                                symbol="database"
-                                name="Database"
-                            />
-                        )}
-                        <SidebarItem
-                            to={`/instances/${uuid}/update`}
-                            symbol="update"
-                            name="Update"
-                            notifications={
-                                instance?.service_update?.available
-                                    ? 1
-                                    : undefined
-                            }
-                        />
-                        <SidebarItem
-                            to={`/instances/${uuid}/settings`}
-                            symbol="settings"
-                            name="Settings"
-                        />
-                        <SidebarItem
-                            onClick={() => setShowDeletePopup(true)}
-                            symbol="delete"
-                            name="Delete"
-                            red
-                        />
-                    </SidebarGroup>
-                </Sidebar>
-                <div className={styles.side}>
-                    <Outlet />
-                </div>
-                <Popup show={showDeletePopup} onDismiss={dismissDeletePopup}>
-                    <Title>
-                        Delete{" "}
-                        {instance?.display_name ?? instance?.service?.name}?
-                    </Title>
-                    <Text>
-                        Are you sure you want to delete{" "}
-                        {instance?.display_name ?? instance?.service?.name}? All
-                        data will be permanently deleted.
-                    </Text>
-                    {deleting && <Progress infinite />}
-                    <APIError style={{ margin: 0 }} error={error} />
-                    <Horizontal gap={10}>
-                        <Spacer />
-                        <Button
-                            onClick={dismissDeletePopup}
-                            disabled={deleting}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            primary
-                            color="red"
-                            onClick={onDeleteInstance}
-                            disabled={deleting}
-                            rightSymbol="delete"
-                        >
-                            Confirm
-                        </Button>
-                    </Horizontal>
-                </Popup>
-            </Horizontal>
+            {!loading && content}
         </div>
     );
 }

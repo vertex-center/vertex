@@ -23,6 +23,13 @@ const server = axios.create({
     baseURL: `${window.apiURL}/api`,
 });
 
+server.interceptors.response.use(async (response) => {
+    if (process.env.NODE_ENV === "development")
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    return response;
+});
+
 export const api = {
     about: {
         get: () => server.get<About>("/about"),
@@ -93,8 +100,10 @@ export const api = {
         },
 
         versions: {
-            get: (id: string) =>
-                server.get<string[]>(`/instance/${id}/versions`),
+            get: (id: string, cache?: boolean) =>
+                server.get<string[]>(
+                    `/instance/${id}/versions?reload=${!cache}`
+                ),
         },
     },
 

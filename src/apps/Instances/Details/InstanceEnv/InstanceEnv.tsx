@@ -8,9 +8,9 @@ import { Horizontal } from "../../../../components/Layouts/Layouts";
 import useInstance from "../../../../hooks/useInstance";
 import { Env, EnvVariable } from "../../../../models/service";
 import styles from "./InstanceEnv.module.sass";
-import Loading from "../../../../components/Loading/Loading";
 import { api } from "../../../../backend/backend";
 import { APIError } from "../../../../components/Error/Error";
+import { ProgressOverlay } from "../../../../components/Progress/Progress";
 
 type Props = {};
 
@@ -19,7 +19,7 @@ export default function InstanceEnv(props: Props) {
 
     const [env, setEnv] = useState<{ env: EnvVariable; value: any }[]>();
 
-    const { instance } = useInstance(uuid);
+    const { instance, loading } = useInstance(uuid);
 
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState();
@@ -64,6 +64,7 @@ export default function InstanceEnv(props: Props) {
 
     return (
         <Fragment>
+            <ProgressOverlay show={loading || uploading} />
             <Title className={styles.title}>Environment</Title>
             {env?.map((env, i) => (
                 <EnvVariableInput
@@ -85,7 +86,6 @@ export default function InstanceEnv(props: Props) {
                 {instance?.install_method === "docker" &&
                     "+ Recreate container"}
             </Button>
-            {uploading && <Loading />}
             {saved && (
                 <Horizontal
                     className={styles.saved}

@@ -11,19 +11,24 @@ import { api } from "../../../../backend/backend";
 import { Title } from "../../../../components/Text/Text";
 import styles from "./InstanceLogs.module.sass";
 import { APIError } from "../../../../components/Error/Error";
+import { ProgressOverlay } from "../../../../components/Progress/Progress";
 
 export default function InstanceLogs() {
     const { uuid } = useParams();
 
     const [logs, setLogs] = useState<LogLine[]>([]);
     const [error, setError] = useState();
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (uuid === undefined) return;
+        setLoading(true);
         api.instance.logs
             .get(uuid)
             .then((res) => setLogs(res.data))
-            .catch(setError);
-    }, []);
+            .catch(setError)
+            .finally(() => setLoading(false));
+    }, [uuid]);
 
     useEffect(() => {
         if (uuid === undefined) return;
@@ -65,6 +70,7 @@ export default function InstanceLogs() {
 
     return (
         <Fragment>
+            <ProgressOverlay show={loading} />
             <Title className={styles.title}>Logs</Title>
             <APIError error={error} />
             <Logs lines={logs} />

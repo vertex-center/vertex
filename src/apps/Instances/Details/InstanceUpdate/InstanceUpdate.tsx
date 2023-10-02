@@ -7,11 +7,12 @@ import { api } from "../../../../backend/backend";
 import Update, { Updates } from "../../../../components/Update/Update";
 import { useState } from "react";
 import { APIError } from "../../../../components/Error/Error";
+import { ProgressOverlay } from "../../../../components/Progress/Progress";
 
 export default function InstanceUpdate() {
     const { uuid } = useParams();
 
-    const { instance, reloadInstance } = useInstance(uuid);
+    const { instance, reloadInstance, loading } = useInstance(uuid);
 
     const [error, setError] = useState();
 
@@ -24,9 +25,10 @@ export default function InstanceUpdate() {
 
     return (
         <Vertical gap={20}>
+            <ProgressOverlay show={loading} />
             <Title className={styles.title}>Update</Title>
             <APIError error={error} />
-            {!error && (
+            {!error && !loading && (
                 <Updates>
                     <Update
                         name="Vertex integration"

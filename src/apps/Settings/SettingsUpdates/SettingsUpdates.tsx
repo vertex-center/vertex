@@ -5,7 +5,6 @@ import Button from "../../../components/Button/Button";
 import Spacer from "../../../components/Spacer/Spacer";
 import Symbol from "../../../components/Symbol/Symbol";
 import Popup from "../../../components/Popup/Popup";
-import Loading from "../../../components/Loading/Loading";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import { Dependencies } from "../../../models/update";
@@ -15,6 +14,7 @@ import styles from "./SettingsUpdates.module.sass";
 import Update, { Updates } from "../../../components/Update/Update";
 import { APIError } from "../../../components/Error/Error";
 import ToggleButton from "../../../components/ToggleButton/ToggleButton";
+import { ProgressOverlay } from "../../../components/Progress/Progress";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -89,12 +89,15 @@ export default function SettingsUpdates() {
 
     return (
         <Vertical gap={20}>
+            <ProgressOverlay show={isLoading} />
             <Title className={styles.title}>Updates</Title>
-            <Horizontal className={styles.toggle} alignItems="center">
-                <Text>Enable Beta channel</Text>
-                <Spacer />
-                <ToggleButton value={beta} onChange={onEnableBetaChange} />
-            </Horizontal>
+            {!isLoading && !error && (
+                <Horizontal className={styles.toggle} alignItems="center">
+                    <Text>Enable Beta channel</Text>
+                    <Spacer />
+                    <ToggleButton value={beta} onChange={onEnableBetaChange} />
+                </Horizontal>
+            )}
             {!isLoading && !error && (
                 <Horizontal alignItems="center" gap={20}>
                     <Button onClick={() => reload(true)} rightSymbol="refresh">
@@ -111,7 +114,6 @@ export default function SettingsUpdates() {
                     )}
                 </Horizontal>
             )}
-            {isLoading && <Loading />}
             {!error && !isLoading && dependencies?.items?.length === 0 && (
                 <Horizontal alignItems="center">
                     <Symbol name="check" />
