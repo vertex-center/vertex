@@ -36,6 +36,8 @@ export default function InstanceLogs() {
         const sse = registerSSE(`/instance/${uuid}/events`);
 
         const onStdout = (e) => {
+            console.error(e.data);
+
             setLogs((logs) => [
                 ...logs,
                 {
@@ -55,12 +57,54 @@ export default function InstanceLogs() {
             ]);
         };
 
+        const onDownload = (e) => {
+            setLogs((logs) => {
+                const dl = JSON.parse(e.data);
+
+                let downloads = [];
+                if (
+                    logs.length > 0 &&
+                    logs[logs.length - 1].kind === "downloads"
+                ) {
+                    downloads = logs[logs.length - 1].message;
+                }
+
+                const i = downloads.findIndex((d) => d.id === dl.id);
+
+                if (i === -1) {
+                    downloads = [...downloads, dl];
+                } else {
+                    downloads[i] = dl;
+                }
+
+                if (logs.length === 0) return logs;
+                if (logs[logs.length - 1].kind === "downloads") {
+                    const lgs = [...logs];
+                    lgs[logs.length - 1] = {
+                        kind: "downloads",
+                        message: downloads,
+                    };
+                    return lgs;
+                } else {
+                    return [
+                        ...logs,
+                        {
+                            kind: "downloads",
+                            message: downloads,
+                        },
+                    ];
+                }
+            });
+        };
+
         registerSSEEvent(sse, "stdout", onStdout);
         registerSSEEvent(sse, "stderr", onStderr);
+        registerSSEEvent(sse, "download", onDownload);
 
         return () => {
             unregisterSSEEvent(sse, "stdout", onStdout);
             unregisterSSEEvent(sse, "stderr", onStderr);
+            unregisterSSEEvent(sse, "download", onDownload);
 
             unregisterSSE(sse);
         };

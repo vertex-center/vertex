@@ -13,10 +13,11 @@ export function ProgressOverlay({ show }: { show?: boolean }) {
 type Props = {
     infinite?: boolean;
     small?: boolean;
+    value?: number;
 };
 
 export default function Progress(props: Props) {
-    const { infinite, small } = props;
+    const { infinite, small, value } = props;
 
     return (
         <div
@@ -31,6 +32,9 @@ export default function Progress(props: Props) {
                     [styles.barInfinite]: infinite,
                     [styles.barSmall]: small,
                 })}
+                style={{
+                    width: `${value}%`,
+                }}
             />
         </div>
     );
