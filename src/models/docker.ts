@@ -9,7 +9,6 @@ export type DockerContainerInfo = {
         architecture?: string;
         os?: string;
         size?: number;
-        virtual_size?: number;
         tags?: string[];
     };
 };

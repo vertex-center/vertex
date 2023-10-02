@@ -91,13 +91,6 @@ export default function InstanceDocker() {
                     <KeyValueInfo name="Size" type="code" symbol="straighten">
                         {byteSize(info?.image?.size).toString()}
                     </KeyValueInfo>
-                    <KeyValueInfo
-                        name="Virtual size"
-                        type="code"
-                        symbol="straighten"
-                    >
-                        {byteSize(info?.image?.virtual_size).toString()}
-                    </KeyValueInfo>
                     <KeyValueInfo name="Tags" type="code" symbol="sell">
                         {info?.image?.tags?.join(", ")}
                     </KeyValueInfo>
