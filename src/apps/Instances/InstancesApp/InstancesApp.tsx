@@ -7,13 +7,13 @@ import {
     unregisterSSE,
     unregisterSSEEvent,
 } from "../../../backend/sse";
-import Progress from "../../../components/Progress";
 import { Instance, Instances } from "../../../models/instance";
 import { BigTitle } from "../../../components/Text/Text";
 import Button from "../../../components/Button/Button";
 import { Horizontal } from "../../../components/Layouts/Layouts";
 import { api } from "../../../backend/backend";
 import { APIError } from "../../../components/Error/Error";
+import { ProgressOverlay } from "../../../components/Progress/Progress";
 
 export default function InstancesApp() {
     const [loading, setLoading] = useState(true);
@@ -101,7 +101,7 @@ export default function InstancesApp() {
 
     return (
         <div className={styles.server}>
-            {loading && <Progress infinite small />}
+            {loading && <ProgressOverlay />}
             <div className={styles.title}>
                 <BigTitle>Instances</BigTitle>
             </div>
