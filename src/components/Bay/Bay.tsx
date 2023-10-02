@@ -25,9 +25,11 @@ function LED({ status }: LEDProps) {
         <div
             className={classNames({
                 [styles.led]: true,
-                [styles.ledRunning]: status === "running",
-                [styles.ledError]: status === "error",
-                [styles.ledDownloading]: status === "downloading",
+                [styles.ledGreen]: status === "running",
+                [styles.ledYellow]: status === "building",
+                [styles.ledOrange]:
+                    status === "starting" || status === "stopping",
+                [styles.ledRed]: status === "error",
             })}
         ></div>
     );

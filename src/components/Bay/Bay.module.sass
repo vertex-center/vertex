@@ -61,10 +61,6 @@
         color: colors.$red
         opacity: 1
 
-    &Downloading
-        color: colors.$blue
-        opacity: 1
-
     &Green
         color: colors.$green
         opacity: 1
@@ -86,6 +82,7 @@
     border-radius: 50%
     background-color: colors.$red
     position: relative
+    transition: background-color 0.4s ease
 
     &::after
         content: ''
@@ -97,25 +94,31 @@
         border-radius: 50%
         opacity: 0.2
         background-color: colors.$red
+        transition: background-color 0.4s ease 0.1s
 
-    &Error
+    &Gray
+        background-color: colors.$fg-secondary
+        opacity: 0.6
+
+    &Red
         background-color: colors.$red
+        &::after
+            background-color: colors.$red
 
-    &Downloading
-        transition: all 0.1s ease
-        animation: pulse-blue 0.4s ease infinite alternate-reverse
-
-    &Running
+    &Green
         background-color: colors.$green
-
         &::after
             background-color: colors.$green
 
-@keyframes pulse-blue
-    from
-        background-color: transparent
-    to
-        background-color: colors.$blue
+    &Yellow
+        background-color: colors.$yellow
+        &::after
+            background-color: colors.$yellow
+
+    &Orange
+        background-color: colors.$orange
+        &::after
+            background-color: colors.$orange
 
 .button
     position: absolute
