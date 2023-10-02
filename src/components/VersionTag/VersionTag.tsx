@@ -1,6 +1,15 @@
-import { PropsWithChildren } from "react";
+import { HTMLProps } from "react";
 import styles from "./VersionTag.module.sass";
+import classNames from "classnames";
 
-export default function VersionTag({ children }: PropsWithChildren) {
-    return <span className={styles.tag}>{children}</span>;
+type Props = HTMLProps<HTMLSpanElement>;
+
+export default function VersionTag(props: Props) {
+    const { children, className, ...others } = props;
+
+    return (
+        <span className={classNames(styles.tag, className)} {...others}>
+            {children}
+        </span>
+    );
 }

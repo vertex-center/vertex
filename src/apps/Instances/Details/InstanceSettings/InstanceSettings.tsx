@@ -18,6 +18,7 @@ import Select, {
     SelectValue,
 } from "../../../../components/Input/Select";
 import VersionTag from "../../../../components/VersionTag/VersionTag";
+import classNames from "classnames";
 
 type Props = {};
 
@@ -76,7 +77,11 @@ export default function InstanceSettings(props: Props) {
     };
 
     const versionValue = (
-        <SelectValue>
+        <SelectValue
+            className={classNames({
+                [styles.versionValue]: version !== "latest",
+            })}
+        >
             {version === "latest" ? (
                 "Always pull latest version"
             ) : (
@@ -116,7 +121,11 @@ export default function InstanceSettings(props: Props) {
                             return null;
                         }
                         return (
-                            <SelectOption key={v} value={v}>
+                            <SelectOption
+                                key={v}
+                                value={v}
+                                className={styles.versionOption}
+                            >
                                 <VersionTag>{v}</VersionTag>
                             </SelectOption>
                         );
