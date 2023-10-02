@@ -23,12 +23,12 @@ const server = axios.create({
     baseURL: `${window.apiURL}/api`,
 });
 
-server.interceptors.response.use(async (response) => {
-    if (process.env.NODE_ENV === "development")
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    return response;
-});
+// server.interceptors.response.use(async (response) => {
+//     if (process.env.NODE_ENV === "development")
+//         await new Promise((resolve) => setTimeout(resolve, 1000));
+//
+//     return response;
+// });
 
 export const api = {
     about: {
