@@ -3,6 +3,7 @@ package adapter
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -14,6 +15,7 @@ import (
 
 	"github.com/carlmjohnson/requests"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/go-connections/nat"
 	"github.com/google/go-containerregistry/pkg/crane"
 	"github.com/vertex-center/vertex/config"
@@ -89,8 +91,33 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 					log.Error(scanner.Err())
 					return
 				}
-				_, err := fmt.Fprintln(wOut, scanner.Text())
+
+				var msg jsonmessage.JSONMessage
+				err := json.Unmarshal(scanner.Bytes(), &msg)
 				if err != nil {
+					log.Error(err)
+					continue
+				}
+
+				progress := types.DownloadProgress{
+					ID:     msg.ID,
+					Status: msg.Status,
+				}
+
+				if msg.Progress != nil {
+					progress.Current = msg.Progress.Current
+					progress.Total = msg.Progress.Total
+				}
+
+				progressJSON, err := json.Marshal(progress)
+				if err != nil {
+					log.Error(err)
+					continue
+				}
+
+				_, err = fmt.Fprintf(wOut, "%s %s\n", "DOWNLOAD", progressJSON)
+				if err != nil {
+					log.Error(err)
 					return
 				}
 			}

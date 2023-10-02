@@ -71,6 +71,13 @@ type InstanceUpdate struct {
 	LatestVersion  string `json:"latest_version"`
 }
 
+type DownloadProgress struct {
+	ID      string `json:"id"`
+	Status  string `json:"status"`
+	Current int64  `json:"current,omitempty"`
+	Total   int64  `json:"total,omitempty"`
+}
+
 func NewInstance(id uuid.UUID, service Service) Instance {
 	return Instance{
 		Service: service,

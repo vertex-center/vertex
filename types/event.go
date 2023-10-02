@@ -10,6 +10,7 @@ const (
 	EventNameInstanceStatusChange = "status_change"
 	EventNameInstanceStdout       = "stdout"
 	EventNameInstanceStderr       = "stderr"
+	EventNameInstanceDownload     = "download"
 )
 
 type Listener interface {
