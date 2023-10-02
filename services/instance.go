@@ -113,6 +113,10 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 		return err
 	}
 
+	if instance.IsBusy() {
+		return nil
+	}
+
 	s.eventsAdapter.Send(types.EventInstanceLog{
 		InstanceUUID: uuid,
 		Kind:         types.LogKindOut,
@@ -245,6 +249,10 @@ func (s *InstanceService) Stop(uuid uuid.UUID) error {
 	instance, err := s.instanceAdapter.Get(uuid)
 	if err != nil {
 		return err
+	}
+
+	if instance.IsBusy() {
+		return nil
 	}
 
 	if !instance.IsRunning() {

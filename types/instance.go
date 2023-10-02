@@ -114,6 +114,10 @@ func (i *Instance) IsRunning() bool {
 	return i.Status != InstanceStatusOff && i.Status != InstanceStatusError
 }
 
+func (i *Instance) IsBusy() bool {
+	return i.Status == InstanceStatusBuilding || i.Status == InstanceStatusStarting || i.Status == InstanceStatusStopping
+}
+
 func (i *Instance) IsDockerized() bool {
 	return i.InstanceSettings.InstallMethod != nil && *i.InstanceSettings.InstallMethod == InstanceInstallMethodDocker
 }
