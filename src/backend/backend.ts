@@ -6,7 +6,6 @@ import {
     Instances,
 } from "../models/instance";
 import { Env, Service } from "../models/service";
-import { Dependencies } from "../models/dependency";
 import { Dependencies as DependenciesUpdate } from "../models/update";
 import { DockerContainerInfo } from "../models/docker";
 import { About } from "../models/about";
@@ -82,11 +81,6 @@ export const api = {
                 server.patch(`/instance/${id}/environment`, env),
         },
 
-        dependencies: {
-            get: (id: string) =>
-                server.get<Dependencies>(`/instance/${id}/dependencies`),
-        },
-
         docker: {
             get: (id: string) =>
                 server.get<DockerContainerInfo>(`/instance/${id}/docker`),
@@ -105,11 +99,6 @@ export const api = {
                     `/instance/${id}/versions?reload=${!cache}`
                 ),
         },
-    },
-
-    packages: {
-        install: (packages: any) =>
-            server.post(`/packages/install`, { packages }),
     },
 
     dependencies: {
