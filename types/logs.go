@@ -5,6 +5,7 @@ import "github.com/google/uuid"
 const (
 	LogKindOut       = "out"
 	LogKindErr       = "err"
+	LogKindDownload  = "download"
 	LogKindVertexOut = "vertex_out"
 	LogKindVertexErr = "vertex_err"
 )

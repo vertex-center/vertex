@@ -164,6 +164,16 @@ func (s *InstanceService) Start(uuid uuid.UUID) error {
 			if scanner.Err() != nil {
 				break
 			}
+
+			if strings.HasPrefix(scanner.Text(), "DOWNLOAD") {
+				s.eventsAdapter.Send(types.EventInstanceLog{
+					InstanceUUID: uuid,
+					Kind:         types.LogKindDownload,
+					Message:      strings.TrimPrefix(scanner.Text(), "DOWNLOAD"),
+				})
+				continue
+			}
+
 			s.eventsAdapter.Send(types.EventInstanceLog{
 				InstanceUUID: uuid,
 				Kind:         types.LogKindOut,

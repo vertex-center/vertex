@@ -389,9 +389,14 @@ func handleInstanceEvents(c *gin.Context) {
 					Event: types.EventNameInstanceStdout,
 					Data:  e.Message,
 				}
-			} else {
+			} else if e.Kind == types.LogKindErr || e.Kind == types.LogKindVertexErr {
 				eventsChan <- sse.Event{
 					Event: types.EventNameInstanceStderr,
+					Data:  e.Message,
+				}
+			} else if e.Kind == types.LogKindDownload {
+				eventsChan <- sse.Event{
+					Event: types.EventNameInstanceDownload,
 					Data:  e.Message,
 				}
 			}
