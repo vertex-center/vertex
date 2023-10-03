@@ -14,7 +14,11 @@ func NewServiceService(serviceAdapter types.ServiceAdapterPort) ServiceService {
 	}
 }
 
-func (s *ServiceService) ListAvailable() []types.Service {
+func (s *ServiceService) GetById(id string) (types.Service, error) {
+	return s.serviceAdapter.Get(id)
+}
+
+func (s *ServiceService) GetAll() []types.Service {
 	return s.serviceAdapter.GetAll()
 }
 

@@ -18,7 +18,7 @@ func addServicesRoutes(r *gin.RouterGroup) {
 
 // handleServicesAvailable handles the retrieval of all available services.
 func handleServicesAvailable(c *gin.Context) {
-	c.JSON(http.StatusOK, serviceService.ListAvailable())
+	c.JSON(http.StatusOK, serviceService.GetAll())
 }
 
 type downloadBody struct {
@@ -42,7 +42,16 @@ func handleServiceInstall(c *gin.Context) {
 		return
 	}
 
-	i, err := instanceService.Install(body.ServiceID, body.Method)
+	service, err := serviceService.GetById(body.ServiceID)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
+			Code:    api.ErrServiceNotFound,
+			Message: fmt.Sprintf("service not found: %v", err),
+		})
+		return
+	}
+
+	instance, err := instanceService.Install(service, body.Method)
 	if err != nil && errors.Is(err, types.ErrServiceNotFound) {
 		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
 			Code:    api.ErrServiceNotFound,
@@ -58,6 +67,6 @@ func handleServiceInstall(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"instance": i,
+		"instance": instance,
 	})
 }

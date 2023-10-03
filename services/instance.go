@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"path"
 	"reflect"
 	"strings"
 	"sync"
@@ -32,7 +31,6 @@ var (
 type InstanceService struct {
 	uuid uuid.UUID
 
-	serviceAdapter  types.ServiceAdapterPort
 	instanceAdapter types.InstanceAdapterPort
 	logsAdapter     types.InstanceLogsAdapterPort
 	eventsAdapter   types.EventAdapterPort
@@ -40,11 +38,10 @@ type InstanceService struct {
 	dockerRunnerAdapter types.RunnerAdapterPort
 }
 
-func NewInstanceService(serviceAdapter types.ServiceAdapterPort, instanceAdapter types.InstanceAdapterPort, dockerRunnerAdapter types.RunnerAdapterPort, instanceLogsAdapter types.InstanceLogsAdapterPort, eventRepo types.EventAdapterPort) InstanceService {
+func NewInstanceService(instanceAdapter types.InstanceAdapterPort, dockerRunnerAdapter types.RunnerAdapterPort, instanceLogsAdapter types.InstanceLogsAdapterPort, eventRepo types.EventAdapterPort) InstanceService {
 	s := InstanceService{
 		uuid: uuid.New(),
 
-		serviceAdapter:      serviceAdapter,
 		instanceAdapter:     instanceAdapter,
 		logsAdapter:         instanceLogsAdapter,
 		eventsAdapter:       eventRepo,
@@ -325,26 +322,19 @@ func (s *InstanceService) WriteEnv(uuid uuid.UUID, environment map[string]string
 	return s.instanceAdapter.SaveEnv(i)
 }
 
-func (s *InstanceService) Install(serviceID string, method string) (*types.Instance, error) {
+func (s *InstanceService) Install(service types.Service, method string) (*types.Instance, error) {
 	id := uuid.New()
 	dir := s.instanceAdapter.GetPath(id)
 
-	service, err := s.serviceAdapter.Get(serviceID)
+	err := os.Mkdir(dir, os.ModePerm)
 	if err != nil {
 		return nil, err
 	}
 
-	err = os.Mkdir(dir, os.ModePerm)
-	if err != nil {
-		return nil, err
-	}
-
-	if method == types.InstanceInstallMethodScript {
-		err = s.PreInstallForScript(service, dir)
-	} else if method == types.InstanceInstallMethodRelease {
-		err = s.PreInstallForRelease(service, dir)
-	} else if method == types.InstanceInstallMethodDocker {
+	if method == types.InstanceInstallMethodDocker {
 		err = s.PreInstallForDocker(service, dir)
+	} else {
+		err = ErrInstallMethodDoesNotExists
 	}
 	if err != nil {
 		return nil, err
@@ -403,21 +393,13 @@ func (s *InstanceService) CheckForUpdates() (map[uuid.UUID]*types.Instance, erro
 
 // CheckForServiceUpdate checks if the service of an instance has an update.
 // If it has, it sets the instance's ServiceUpdate field.
-func (s *InstanceService) CheckForServiceUpdate(uuid uuid.UUID) error {
+func (s *InstanceService) CheckForServiceUpdate(uuid uuid.UUID, latest types.Service) error {
 	instance, err := s.Get(uuid)
 	if err != nil {
 		return err
 	}
 
 	current := instance.Service
-	latest, err := s.serviceAdapter.Get(current.ID)
-	if err != nil && errors.Is(err, types.ErrServiceNotFound) {
-		// If the service does not exist in the service repository, that means
-		// that the instance is using a custom service.
-		return nil
-	} else if err != nil {
-		return err
-	}
 
 	upToDate := reflect.DeepEqual(latest, current)
 	log.Debug("service up-to-date", vlog.Bool("up_to_date", upToDate))
@@ -425,19 +407,12 @@ func (s *InstanceService) CheckForServiceUpdate(uuid uuid.UUID) error {
 	return nil
 }
 
-func (s *InstanceService) UpdateService(uuid uuid.UUID) error {
+// UpdateService updates the service of an instance by its UUID.
+// The service passed is the latest version of the service.
+func (s *InstanceService) UpdateService(uuid uuid.UUID, service types.Service) error {
 	instance, err := s.Get(uuid)
 	if err != nil {
 		return err
-	}
-
-	service, err := s.serviceAdapter.Get(instance.Service.ID)
-	if err != nil && errors.Is(err, types.ErrServiceNotFound) {
-		log.Debug("service does not exist in the service repository, using the instance's service",
-			vlog.String("uuid", uuid.String()),
-		)
-	} else if err != nil {
-		log.Error(err)
 	}
 
 	if service.Version <= types.MaxSupportedVersion {
@@ -452,7 +427,7 @@ func (s *InstanceService) UpdateService(uuid uuid.UUID) error {
 			return err
 		}
 
-		err = s.CheckForServiceUpdate(uuid)
+		err = s.CheckForServiceUpdate(uuid, service)
 		if err != nil {
 			return err
 		}
@@ -683,42 +658,9 @@ func (s *InstanceService) load(uuid uuid.UUID) error {
 		return err
 	}
 
-	err = s.CheckForServiceUpdate(uuid)
+	err = s.CheckForServiceUpdate(uuid, service)
 	if err != nil {
 		return err
-	}
-
-	return nil
-}
-
-func (s *InstanceService) PreInstallForScript(service types.Service, dir string) error {
-	if service.Methods.Script == nil {
-		return ErrInstallMethodDoesNotExists
-	}
-
-	if service.Methods.Script.Clone != nil {
-		err := s.CloneRepository(dir, service.Methods.Script.Clone.Repository)
-		if err != nil {
-			return err
-		}
-	}
-
-	script, err := s.serviceAdapter.GetScript(service.ID)
-	if err != nil {
-		return err
-	}
-
-	err = os.WriteFile(path.Join(dir, service.Methods.Script.Filename), script, os.ModePerm)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *InstanceService) PreInstallForRelease(service types.Service, dir string) error {
-	if service.Methods.Release == nil {
-		return ErrInstallMethodDoesNotExists
 	}
 
 	return nil

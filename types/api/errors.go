@@ -5,7 +5,6 @@ const (
 
 	ErrFailedToInstallUpdates = "failed_to_install_updates"
 	ErrFailedToReloadServices = "failed_to_reload_services"
-	ErrFailedToReloadPackages = "failed_to_reload_packages"
 
 	ErrFailedToListContainers    = "failed_to_list_containers"
 	ErrFailedToDeleteContainer   = "failed_to_delete_container"
@@ -27,7 +26,6 @@ const (
 	ErrInstanceAlreadyRunning        = "instance_already_running"
 	ErrInstanceStillRunning          = "instance_still_running"
 	ErrInstanceNotRunning            = "instance_not_running"
-	ErrInstanceNotUsingScript        = "instance_not_using_script"
 	ErrFailedToGetInstance           = "failed_to_get_instance"
 	ErrFailedToStartInstance         = "failed_to_start_instance"
 	ErrFailedToStopInstance          = "failed_to_stop_instance"

@@ -518,12 +518,21 @@ func handleGetLogs(c *gin.Context) {
 // Errors can be:
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
 func handleUpdateService(c *gin.Context) {
-	uid := getParamInstanceUUID(c)
-	if uid == nil {
+	instance := getInstance(c)
+	if instance == nil {
 		return
 	}
 
-	err := instanceService.UpdateService(*uid)
+	service, err := serviceService.GetById(instance.Service.ID)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
+			Code:    api.ErrServiceNotFound,
+			Message: fmt.Sprintf("failed to get service: %v", err),
+		})
+		return
+	}
+
+	err = instanceService.UpdateService(instance.UUID, service)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
 			Code:    api.ErrFailedToUpdateServiceInstance,

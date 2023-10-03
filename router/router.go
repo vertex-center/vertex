@@ -148,7 +148,7 @@ func (r *Router) initAdapters() {
 func (r *Router) initServices(about types.About) {
 	proxyService = services.NewProxyService(proxyFSAdapter)
 	notificationsService = services.NewNotificationsService(settingsFSAdapter, eventInMemoryAdapter, instanceFSAdapter)
-	instanceService = services.NewInstanceService(serviceFSAdapter, instanceFSAdapter, runnerDockerAdapter, instanceLogsFSAdapter, eventInMemoryAdapter)
+	instanceService = services.NewInstanceService(instanceFSAdapter, runnerDockerAdapter, instanceLogsFSAdapter, eventInMemoryAdapter)
 	serviceService = services.NewServiceService(serviceFSAdapter)
 	dependenciesService = services.NewDependenciesService(about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)
