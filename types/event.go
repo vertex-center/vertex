@@ -46,6 +46,10 @@ func (t TempListener) GetUUID() uuid.UUID {
 
 // Events
 
+type EventInstanceLoaded struct {
+	InstanceUuid uuid.UUID
+}
+
 type EventInstanceLog struct {
 	InstanceUUID uuid.UUID
 	Kind         string

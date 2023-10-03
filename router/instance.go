@@ -502,7 +502,7 @@ func handleGetLogs(c *gin.Context) {
 		return
 	}
 
-	logs, err := instanceService.GetLatestLogs(*uid)
+	logs, err := instanceLogsService.GetLatestLogs(*uid)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
 			Code:    api.ErrFailedToGetInstanceLogs,

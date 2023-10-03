@@ -29,28 +29,17 @@ var (
 )
 
 type InstanceService struct {
-	uuid uuid.UUID
-
-	instanceAdapter types.InstanceAdapterPort
-	logsAdapter     types.InstanceLogsAdapterPort
-	eventsAdapter   types.EventAdapterPort
-
+	instanceAdapter     types.InstanceAdapterPort
+	eventsAdapter       types.EventAdapterPort
 	dockerRunnerAdapter types.RunnerAdapterPort
 }
 
-func NewInstanceService(instanceAdapter types.InstanceAdapterPort, dockerRunnerAdapter types.RunnerAdapterPort, instanceLogsAdapter types.InstanceLogsAdapterPort, eventRepo types.EventAdapterPort) InstanceService {
+func NewInstanceService(instanceAdapter types.InstanceAdapterPort, dockerRunnerAdapter types.RunnerAdapterPort, eventRepo types.EventAdapterPort) InstanceService {
 	s := InstanceService{
-		uuid: uuid.New(),
-
 		instanceAdapter:     instanceAdapter,
-		logsAdapter:         instanceLogsAdapter,
 		eventsAdapter:       eventRepo,
 		dockerRunnerAdapter: dockerRunnerAdapter,
 	}
-
-	s.reload()
-
-	eventRepo.AddListener(&s)
 
 	return s
 }
@@ -547,10 +536,6 @@ func (s *InstanceService) GetDockerContainerInfo(uuid uuid.UUID) (map[string]any
 	return info, nil
 }
 
-func (s *InstanceService) GetLatestLogs(uuid uuid.UUID) ([]types.LogLine, error) {
-	return s.logsAdapter.LoadBuffer(uuid)
-}
-
 func (s *InstanceService) GetAllVersions(instance *types.Instance, useCache bool) ([]string, error) {
 	if !useCache || len(instance.CacheVersions) == 0 {
 		versions, err := s.dockerRunnerAdapter.GetAllVersions(*instance)
@@ -591,20 +576,6 @@ func (s *InstanceService) Symlink(path string, repo string) error {
 	return os.Symlink(p, path)
 }
 
-func (s *InstanceService) OnEvent(e interface{}) {
-	switch e := e.(type) {
-	case types.EventInstanceLog:
-		s.logsAdapter.Push(e.InstanceUUID, types.LogLine{
-			Kind:    e.Kind,
-			Message: e.Message,
-		})
-	}
-}
-
-func (s *InstanceService) GetUUID() uuid.UUID {
-	return s.uuid
-}
-
 func (s *InstanceService) setStatus(instance *types.Instance, status string) {
 	if instance.Status == status {
 		return
@@ -618,7 +589,7 @@ func (s *InstanceService) setStatus(instance *types.Instance, status string) {
 	})
 }
 
-func (s *InstanceService) reload() {
+func (s *InstanceService) LoadAll() {
 	s.instanceAdapter.Reload(func(uuid uuid.UUID) {
 		err := s.load(uuid)
 		if err != nil {
@@ -653,15 +624,14 @@ func (s *InstanceService) load(uuid uuid.UUID) error {
 		return err
 	}
 
-	err = s.logsAdapter.Open(uuid)
-	if err != nil {
-		return err
-	}
-
 	err = s.CheckForServiceUpdate(uuid, service)
 	if err != nil {
 		return err
 	}
+
+	s.eventsAdapter.Send(types.EventInstanceLoaded{
+		InstanceUuid: uuid,
+	})
 
 	return nil
 }

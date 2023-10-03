@@ -38,6 +38,7 @@ var (
 	serviceService       services.ServiceService
 	proxyService         services.ProxyService
 	instanceService      services.InstanceService
+	instanceLogsService  services.InstanceLogsService
 	dependenciesService  services.DependenciesService
 	settingsService      services.SettingsService
 	hardwareService      services.HardwareService
@@ -72,6 +73,7 @@ func NewRouter(about types.About) Router {
 
 func (r *Router) Start(addr string) {
 	go func() {
+		instanceService.LoadAll()
 		instanceService.StartAll()
 	}()
 
@@ -148,7 +150,8 @@ func (r *Router) initAdapters() {
 func (r *Router) initServices(about types.About) {
 	proxyService = services.NewProxyService(proxyFSAdapter)
 	notificationsService = services.NewNotificationsService(settingsFSAdapter, eventInMemoryAdapter, instanceFSAdapter)
-	instanceService = services.NewInstanceService(instanceFSAdapter, runnerDockerAdapter, instanceLogsFSAdapter, eventInMemoryAdapter)
+	instanceService = services.NewInstanceService(instanceFSAdapter, runnerDockerAdapter, eventInMemoryAdapter)
+	instanceLogsService = services.NewInstanceLogsService(instanceLogsFSAdapter, eventInMemoryAdapter)
 	serviceService = services.NewServiceService(serviceFSAdapter)
 	dependenciesService = services.NewDependenciesService(about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)
