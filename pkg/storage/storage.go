@@ -24,17 +24,20 @@ var (
 	ErrNoReleasesForThisOS = errors.New("this repository has no releases appropriate for this OS")
 )
 
-func CloneOrPullRepository(url string, dest string) error {
-	log.Info("downloading repository",
+func CloneRepository(url string, dest string) error {
+	log.Info("cloning repository",
 		vlog.String("url", url),
 	)
-
 	_, err := git.PlainClone(dest, false, &git.CloneOptions{
 		URL:      url,
 		Progress: os.Stdout,
 	})
+	return err
+}
 
-	if errors.Is(err, git.ErrRepositoryAlreadyExists) {
+func CloneOrPullRepository(url string, dest string) error {
+	err := CloneRepository(url, dest)
+	if err != nil && errors.Is(err, git.ErrRepositoryAlreadyExists) {
 		repo, err := git.PlainOpen(dest)
 		if err != nil {
 			return err
