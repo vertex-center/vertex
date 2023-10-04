@@ -33,8 +33,8 @@ func NewRunnerDockerAdapter() RunnerDockerAdapter {
 	return RunnerDockerAdapter{}
 }
 
-func (a RunnerDockerAdapter) Delete(instance *types.Instance) error {
-	id, err := a.getContainerID(*instance)
+func (a RunnerDockerAdapter) Delete(inst *types.Instance) error {
+	id, err := a.getContainerID(*inst)
 	if err != nil {
 		return err
 	}
@@ -52,17 +52,17 @@ func (a RunnerDockerAdapter) Delete(instance *types.Instance) error {
 	return err
 }
 
-func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(status string)) (io.ReadCloser, io.ReadCloser, error) {
+func (a RunnerDockerAdapter) Start(inst *types.Instance, setStatus func(status string)) (io.ReadCloser, io.ReadCloser, error) {
 	rErr, wErr := io.Pipe()
 	rOut, wOut := io.Pipe()
 
 	go func() {
-		imageName := instance.DockerImageVertexName()
+		imageName := inst.DockerImageVertexName()
 
 		setStatus(types.InstanceStatusBuilding)
 
-		instancePath := a.getPath(*instance)
-		service := instance.Service
+		instancePath := a.getPath(*inst)
+		service := inst.Service
 
 		// Build
 		var err error
@@ -70,7 +70,7 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 		if service.Methods.Docker.Dockerfile != nil {
 			stdout, err = a.buildImageFromDockerfile(instancePath, imageName)
 		} else if service.Methods.Docker.Image != nil {
-			stdout, err = a.buildImageFromName(instance.GetImageNameWithTag())
+			stdout, err = a.buildImageFromName(inst.GetImageNameWithTag())
 		} else {
 			err = errors.New("no Docker methods found")
 		}
@@ -134,16 +134,16 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 		//	}
 		//}()
 
-		log.Info("waiting for image to be built", vlog.String("uuid", instance.UUID.String()))
+		log.Info("waiting for image to be built", vlog.String("uuid", inst.UUID.String()))
 
 		wg.Wait()
 
-		log.Info("image built", vlog.String("uuid", instance.UUID.String()))
+		log.Info("image built", vlog.String("uuid", inst.UUID.String()))
 
 		// Create
-		id, err := a.getContainerID(*instance)
+		id, err := a.getContainerID(*inst)
 		if errors.Is(err, ErrContainerNotFound) {
-			containerName := instance.DockerContainerName()
+			containerName := inst.DockerContainerName()
 
 			log.Info("container doesn't exists, create it.",
 				vlog.String("container_name", containerName),
@@ -165,7 +165,7 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 				for in, out := range *service.Methods.Docker.Ports {
 					for _, e := range service.Env {
 						if e.Type == "port" && e.Default == out {
-							out = instance.Env[e.Name]
+							out = inst.Env[e.Name]
 							all = append(all, out+":"+in)
 							break
 						}
@@ -194,7 +194,7 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 			// env
 			if service.Methods.Docker.Environment != nil {
 				for in, out := range *service.Methods.Docker.Environment {
-					value := instance.Env[out]
+					value := inst.Env[out]
 					options.Env = append(options.Env, in+"="+value)
 				}
 			}
@@ -210,10 +210,10 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 			}
 
 			if service.Methods.Docker.Dockerfile != nil {
-				options.ImageName = instance.DockerImageVertexName()
+				options.ImageName = inst.DockerImageVertexName()
 				id, err = a.createContainer(options)
 			} else if service.Methods.Docker.Image != nil {
-				options.ImageName = instance.GetImageNameWithTag()
+				options.ImageName = inst.GetImageNameWithTag()
 				id, err = a.createContainer(options)
 			}
 			if err != nil {
@@ -261,14 +261,14 @@ func (a RunnerDockerAdapter) Start(instance *types.Instance, setStatus func(stat
 			}
 		}()
 
-		a.watchForStatusChange(id, instance, setStatus)
+		a.watchForStatusChange(id, inst, setStatus)
 	}()
 
 	return rOut, rErr, nil
 }
 
-func (a RunnerDockerAdapter) Stop(instance *types.Instance) error {
-	id, err := a.getContainerID(*instance)
+func (a RunnerDockerAdapter) Stop(inst *types.Instance) error {
+	id, err := a.getContainerID(*inst)
 	if err != nil {
 		return err
 	}
@@ -279,8 +279,8 @@ func (a RunnerDockerAdapter) Stop(instance *types.Instance) error {
 		Fetch(context.Background())
 }
 
-func (a RunnerDockerAdapter) Info(instance types.Instance) (map[string]any, error) {
-	id, err := a.getContainerID(instance)
+func (a RunnerDockerAdapter) Info(inst types.Instance) (map[string]any, error) {
+	id, err := a.getContainerID(inst)
 	if err != nil {
 		return nil, err
 	}
@@ -309,15 +309,15 @@ func (a RunnerDockerAdapter) Info(instance types.Instance) (map[string]any, erro
 	}, nil
 }
 
-func (a RunnerDockerAdapter) CheckForUpdates(instance *types.Instance) error {
-	service := instance.Service
+func (a RunnerDockerAdapter) CheckForUpdates(inst *types.Instance) error {
+	service := inst.Service
 
 	if service.Methods.Docker.Image == nil {
 		// TODO: Support Dockerfile updates
 		return nil
 	}
 
-	imageName := instance.GetImageNameWithTag()
+	imageName := inst.GetImageNameWithTag()
 
 	res, err := a.pullImage(imageName)
 	if err != nil {
@@ -336,21 +336,21 @@ func (a RunnerDockerAdapter) CheckForUpdates(instance *types.Instance) error {
 
 	latestImageID := imageInfo.ID
 
-	currentImageID, err := a.getImageID(*instance)
+	currentImageID, err := a.getImageID(*inst)
 	if err != nil {
 		return err
 	}
 
 	if latestImageID == currentImageID {
 		log.Info("already up-to-date",
-			vlog.String("uuid", instance.UUID.String()),
+			vlog.String("uuid", inst.UUID.String()),
 		)
-		instance.Update = nil
+		inst.Update = nil
 	} else {
 		log.Info("a new update is available",
-			vlog.String("uuid", instance.UUID.String()),
+			vlog.String("uuid", inst.UUID.String()),
 		)
-		instance.Update = &types.InstanceUpdate{
+		inst.Update = &types.InstanceUpdate{
 			CurrentVersion: currentImageID,
 			LatestVersion:  latestImageID,
 		}
@@ -359,23 +359,23 @@ func (a RunnerDockerAdapter) CheckForUpdates(instance *types.Instance) error {
 	return nil
 }
 
-func (a RunnerDockerAdapter) GetAllVersions(instance types.Instance) ([]string, error) {
-	if instance.Service.Methods.Docker == nil {
+func (a RunnerDockerAdapter) GetAllVersions(inst types.Instance) ([]string, error) {
+	if inst.Service.Methods.Docker == nil {
 		return nil, errors.New("no Docker methods found")
 	}
-	image := *instance.Service.Methods.Docker.Image
+	image := *inst.Service.Methods.Docker.Image
 	log.Debug("querying all versions of image",
 		vlog.String("image", image),
 	)
 	return crane.ListTags(image)
 }
 
-func (a RunnerDockerAdapter) HasUpdateAvailable(instance types.Instance) (bool, error) {
+func (a RunnerDockerAdapter) HasUpdateAvailable(inst types.Instance) (bool, error) {
 	//TODO implement me
 	return false, nil
 }
 
-func (a RunnerDockerAdapter) getContainer(instance types.Instance) (types.Container, error) {
+func (a RunnerDockerAdapter) getContainer(inst types.Instance) (types.Container, error) {
 	var containers []types.Container
 	err := requests.URL(config.Current.HostKernel).
 		Path("/api/docker/containers").
@@ -388,7 +388,7 @@ func (a RunnerDockerAdapter) getContainer(instance types.Instance) (types.Contai
 	var dockerContainer *types.Container
 	for _, c := range containers {
 		name := c.Names[0]
-		if name == "/"+instance.DockerContainerName() {
+		if name == "/"+inst.DockerContainerName() {
 			dockerContainer = &c
 			break
 		}
@@ -401,16 +401,16 @@ func (a RunnerDockerAdapter) getContainer(instance types.Instance) (types.Contai
 	return *dockerContainer, nil
 }
 
-func (a RunnerDockerAdapter) getContainerID(instance types.Instance) (string, error) {
-	c, err := a.getContainer(instance)
+func (a RunnerDockerAdapter) getContainerID(inst types.Instance) (string, error) {
+	c, err := a.getContainer(inst)
 	if err != nil {
 		return "", err
 	}
 	return c.ID, nil
 }
 
-func (a RunnerDockerAdapter) getImageID(instance types.Instance) (string, error) {
-	c, err := a.getContainer(instance)
+func (a RunnerDockerAdapter) getImageID(inst types.Instance) (string, error) {
+	c, err := a.getContainer(inst)
 	if err != nil {
 		return "", err
 	}
@@ -487,7 +487,7 @@ func (a RunnerDockerAdapter) createContainer(options types.CreateContainerOption
 	return res.ID, err
 }
 
-func (a RunnerDockerAdapter) watchForStatusChange(containerID string, instance *types.Instance, setStatus func(status string)) {
+func (a RunnerDockerAdapter) watchForStatusChange(containerID string, inst *types.Instance, setStatus func(status string)) {
 	go func() {
 		err := requests.URL(config.Current.HostKernel).
 			Pathf("/api/docker/container/%s/wait/%s", containerID, container.WaitConditionNotRunning).
@@ -495,7 +495,7 @@ func (a RunnerDockerAdapter) watchForStatusChange(containerID string, instance *
 
 		if err != nil {
 			log.Error(err,
-				vlog.String("uuid", instance.UUID.String()),
+				vlog.String("uuid", inst.UUID.String()),
 			)
 			return
 		}
@@ -552,7 +552,7 @@ func (a RunnerDockerAdapter) readLogs(containerID string) (stdout io.ReadCloser,
 	return rOut, rErr, nil
 }
 
-func (a RunnerDockerAdapter) getPath(instance types.Instance) string {
+func (a RunnerDockerAdapter) getPath(inst types.Instance) string {
 	base := storage.Path
 
 	// If Vertex is running itself inside Docker, the instances are stored in the Vertex container volume.
@@ -576,5 +576,5 @@ func (a RunnerDockerAdapter) getPath(instance types.Instance) string {
 		}
 	}
 
-	return path.Join(base, "instances", instance.UUID.String())
+	return path.Join(base, "instances", inst.UUID.String())
 }

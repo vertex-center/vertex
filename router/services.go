@@ -51,7 +51,7 @@ func handleServiceInstall(c *gin.Context) {
 		return
 	}
 
-	instance, err := instanceService.Install(service, body.Method)
+	inst, err := instanceService.Install(service, body.Method)
 	if err != nil && errors.Is(err, types.ErrServiceNotFound) {
 		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
 			Code:    api.ErrServiceNotFound,
@@ -67,6 +67,6 @@ func handleServiceInstall(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"instance": instance,
+		"instance": inst,
 	})
 }

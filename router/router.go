@@ -25,24 +25,31 @@ import (
 )
 
 var (
-	runnerDockerAdapter   types.RunnerAdapterPort
-	instanceFSAdapter     types.InstanceAdapterPort
-	instanceLogsFSAdapter types.InstanceLogsAdapterPort
-	eventInMemoryAdapter  types.EventAdapterPort
-	serviceFSAdapter      types.ServiceAdapterPort
-	proxyFSAdapter        types.ProxyAdapterPort
-	settingsFSAdapter     types.SettingsAdapterPort
-	sshKernelApiAdapter   types.SshAdapterPort
+	runnerDockerAdapter       types.RunnerAdapterPort
+	instanceFSAdapter         types.InstanceAdapterPort
+	instanceEnvFSAdapter      types.InstanceEnvAdapterPort
+	instanceLogsFSAdapter     types.InstanceLogsAdapterPort
+	instanceServiceFSAdapter  types.InstanceServiceAdapterPort
+	instanceSettingsFSAdapter types.InstanceSettingsAdapterPort
+	eventInMemoryAdapter      types.EventAdapterPort
+	serviceFSAdapter          types.ServiceAdapterPort
+	proxyFSAdapter            types.ProxyAdapterPort
+	settingsFSAdapter         types.SettingsAdapterPort
+	sshKernelApiAdapter       types.SshAdapterPort
 
-	notificationsService services.NotificationsService
-	serviceService       services.ServiceService
-	proxyService         services.ProxyService
-	instanceService      services.InstanceService
-	instanceLogsService  services.InstanceLogsService
-	dependenciesService  services.DependenciesService
-	settingsService      services.SettingsService
-	hardwareService      services.HardwareService
-	sshService           services.SshService
+	notificationsService    services.NotificationsService
+	serviceService          services.ServiceService
+	proxyService            services.ProxyService
+	instanceService         services.InstanceService
+	instanceEnvService      services.InstanceEnvService
+	instanceLogsService     services.InstanceLogsService
+	instanceRunnerService   services.InstanceRunnerService
+	instanceServiceService  services.InstanceServiceService
+	instanceSettingsService services.InstanceSettingsService
+	dependenciesService     services.DependenciesService
+	settingsService         services.SettingsService
+	hardwareService         services.HardwareService
+	sshService              services.SshService
 )
 
 type Router struct {
@@ -139,7 +146,10 @@ func (r *Router) handleSignals() {
 func (r *Router) initAdapters() {
 	runnerDockerAdapter = adapter.NewRunnerDockerAdapter()
 	instanceFSAdapter = adapter.NewInstanceFSAdapter(nil)
+	instanceEnvFSAdapter = adapter.NewInstanceEnvFSAdapter(nil)
 	instanceLogsFSAdapter = adapter.NewInstanceLogsFSAdapter()
+	instanceServiceFSAdapter = adapter.NewInstanceServiceFSAdapter(nil)
+	instanceSettingsFSAdapter = adapter.NewInstanceSettingsFSAdapter(nil)
 	eventInMemoryAdapter = adapter.NewEventInMemoryAdapter()
 	serviceFSAdapter = adapter.NewServiceFSAdapter(nil)
 	proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
@@ -150,8 +160,20 @@ func (r *Router) initAdapters() {
 func (r *Router) initServices(about types.About) {
 	proxyService = services.NewProxyService(proxyFSAdapter)
 	notificationsService = services.NewNotificationsService(settingsFSAdapter, eventInMemoryAdapter, instanceFSAdapter)
-	instanceService = services.NewInstanceService(instanceFSAdapter, runnerDockerAdapter, eventInMemoryAdapter)
+	instanceService = services.NewInstanceService(services.InstanceServiceParams{
+		InstanceAdapter: instanceFSAdapter,
+		EventsAdapter:   eventInMemoryAdapter,
+
+		InstanceRunnerService:   &instanceRunnerService,
+		InstanceServiceService:  &instanceServiceService,
+		InstanceEnvService:      &instanceEnvService,
+		InstanceSettingsService: &instanceSettingsService,
+	})
+	instanceEnvService = services.NewInstanceEnvService(instanceEnvFSAdapter)
 	instanceLogsService = services.NewInstanceLogsService(instanceLogsFSAdapter, eventInMemoryAdapter)
+	instanceRunnerService = services.NewInstanceRunnerService(eventInMemoryAdapter, runnerDockerAdapter)
+	instanceServiceService = services.NewInstanceServiceService(instanceServiceFSAdapter)
+	instanceSettingsService = services.NewInstanceSettingsService(instanceSettingsFSAdapter)
 	serviceService = services.NewServiceService(serviceFSAdapter)
 	dependenciesService = services.NewDependenciesService(about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)

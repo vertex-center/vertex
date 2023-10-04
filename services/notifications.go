@@ -3,8 +3,6 @@ package services
 import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/webhook"
-	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/types"
 )
 
@@ -43,7 +41,7 @@ func (s *NotificationsService) StartWebhook() error {
 		switch e := e.(type) {
 		case types.EventInstanceStatusChange:
 			if e.Status == types.InstanceStatusOff || e.Status == types.InstanceStatusError || e.Status == types.InstanceStatusRunning {
-				s.sendStatus(e.InstanceUUID, e.Status)
+				s.sendStatus(e.Name, e.Status)
 			}
 		}
 	})
@@ -57,7 +55,7 @@ func (s *NotificationsService) StopWebhook() {
 	s.eventsAdapter.RemoveListener(s.listener)
 }
 
-func (s *NotificationsService) sendStatus(instanceUUID uuid.UUID, status string) {
+func (s *NotificationsService) sendStatus(name string, status string) {
 	var color int
 
 	switch status {
@@ -69,24 +67,13 @@ func (s *NotificationsService) sendStatus(instanceUUID uuid.UUID, status string)
 		color = 10038562
 	}
 
-	instance, err := s.instanceAdapter.Get(instanceUUID)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-
-	var name = instance.Service.Name
-	if instance.DisplayName != nil {
-		name = *instance.DisplayName
-	}
-
 	embed := discord.NewEmbedBuilder().
 		SetTitle(name).
 		SetDescriptionf("Status: %s", status).
 		SetColor(color).
 		Build()
 
-	_, err = s.client.CreateEmbeds([]discord.Embed{embed})
+	_, err := s.client.CreateEmbeds([]discord.Embed{embed})
 	if err != nil {
 		return
 	}

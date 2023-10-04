@@ -91,11 +91,11 @@ func getInstance(c *gin.Context) *types.Instance {
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
 func handleGetInstance(c *gin.Context) {
-	instance := getInstance(c)
-	if instance == nil {
+	inst := getInstance(c)
+	if inst == nil {
 		return
 	}
-	c.JSON(http.StatusOK, instance)
+	c.JSON(http.StatusOK, inst)
 }
 
 // handleDeleteInstance deletes the instance with the UUID in the URL.
@@ -156,6 +156,11 @@ func handlePatchInstance(c *gin.Context) {
 		return
 	}
 
+	inst := getInstance(c)
+	if inst == nil {
+		return
+	}
+
 	var body handlePatchInstanceBody
 	err := c.BindJSON(&body)
 	if err != nil {
@@ -167,7 +172,7 @@ func handlePatchInstance(c *gin.Context) {
 	}
 
 	if body.LaunchOnStartup != nil {
-		err = instanceService.SetLaunchOnStartup(*uid, *body.LaunchOnStartup)
+		err = instanceSettingsService.SetLaunchOnStartup(inst, *body.LaunchOnStartup)
 		if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
 			_ = c.AbortWithError(http.StatusNotFound, api.Error{
 				Code:    api.ErrInstanceNotFound,
@@ -184,7 +189,7 @@ func handlePatchInstance(c *gin.Context) {
 	}
 
 	if body.DisplayName != nil {
-		err = instanceService.SetDisplayName(*uid, *body.DisplayName)
+		err = instanceSettingsService.SetDisplayName(inst, *body.DisplayName)
 		if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
 			_ = c.AbortWithError(http.StatusNotFound, api.Error{
 				Code:    api.ErrInstanceNotFound,
@@ -201,7 +206,7 @@ func handlePatchInstance(c *gin.Context) {
 	}
 
 	if body.Databases != nil {
-		err = instanceService.SetDatabases(*uid, body.Databases)
+		err = instanceService.SetDatabases(inst, body.Databases)
 		if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
 			_ = c.AbortWithError(http.StatusNotFound, api.Error{
 				Code:    api.ErrInstanceNotFound,
@@ -218,7 +223,7 @@ func handlePatchInstance(c *gin.Context) {
 	}
 
 	if body.Version != nil {
-		err = instanceService.SetVersion(*uid, *body.Version)
+		err = instanceSettingsService.SetVersion(inst, *body.Version)
 		if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
 			_ = c.AbortWithError(http.StatusNotFound, api.Error{
 				Code:    api.ErrInstanceNotFound,
@@ -245,28 +250,28 @@ func handlePatchInstance(c *gin.Context) {
 //   - instance_already_running: the instance with the given UUID is already running
 //   - failed_to_start_instance: failed to start the instance
 func handleStartInstance(c *gin.Context) {
-	uid := getParamInstanceUUID(c)
-	if uid == nil {
+	inst := getInstance(c)
+	if inst == nil {
 		return
 	}
 
-	err := instanceService.Start(*uid)
+	err := instanceRunnerService.Start(inst)
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
 		_ = c.AbortWithError(http.StatusNotFound, api.Error{
 			Code:    api.ErrInstanceNotFound,
-			Message: fmt.Sprintf("instance %s not found", uid),
+			Message: fmt.Sprintf("instance %s not found", inst.UUID),
 		})
 		return
 	} else if err != nil && errors.Is(err, services.ErrInstanceAlreadyRunning) {
 		_ = c.AbortWithError(http.StatusConflict, api.Error{
 			Code:    api.ErrInstanceAlreadyRunning,
-			Message: fmt.Sprintf("instance %s is already running", uid),
+			Message: fmt.Sprintf("instance %s is already running", inst.UUID),
 		})
 		return
 	} else if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
 			Code:    api.ErrFailedToStartInstance,
-			Message: fmt.Sprintf("failed to start instance %s: %v", uid, err),
+			Message: fmt.Sprintf("failed to start instance %s: %v", inst.UUID, err),
 		})
 		return
 	}
@@ -282,28 +287,28 @@ func handleStartInstance(c *gin.Context) {
 //   - instance_not_running: the instance with the given UUID is not running
 //   - failed_to_stop_instance: failed to stop the instance
 func handleStopInstance(c *gin.Context) {
-	uid := getParamInstanceUUID(c)
-	if uid == nil {
+	inst := getInstance(c)
+	if inst == nil {
 		return
 	}
 
-	err := instanceService.Stop(*uid)
+	err := instanceRunnerService.Stop(inst)
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
 		_ = c.AbortWithError(http.StatusNotFound, api.Error{
 			Code:    api.ErrInstanceNotFound,
-			Message: fmt.Sprintf("instance %s not found", uid),
+			Message: fmt.Sprintf("instance %s not found", inst.UUID),
 		})
 		return
 	} else if err != nil && errors.Is(err, services.ErrInstanceNotRunning) {
 		_ = c.AbortWithError(http.StatusConflict, api.Error{
 			Code:    api.ErrInstanceNotRunning,
-			Message: fmt.Sprintf("instance %s is not running", uid),
+			Message: fmt.Sprintf("instance %s is not running", inst.UUID),
 		})
 		return
 	} else if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
 			Code:    api.ErrFailedToStopInstance,
-			Message: fmt.Sprintf("failed to stop instance %s: %v", uid, err),
+			Message: fmt.Sprintf("failed to stop instance %s: %v", inst.UUID, err),
 		})
 		return
 	}
@@ -330,16 +335,16 @@ func handlePatchEnvironment(c *gin.Context) {
 		return
 	}
 
-	i := getInstance(c)
-	if i == nil {
+	inst := getInstance(c)
+	if inst == nil {
 		return
 	}
 
-	err = instanceService.WriteEnv(i.UUID, environment)
+	err = instanceEnvService.Save(inst, environment)
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
 		_ = c.AbortWithError(http.StatusNotFound, api.Error{
 			Code:    api.ErrInstanceNotFound,
-			Message: fmt.Sprintf("instance %s not found", i.UUID),
+			Message: fmt.Sprintf("instance %s not found", inst.UUID),
 		})
 		return
 	} else if err != nil {
@@ -350,7 +355,7 @@ func handlePatchEnvironment(c *gin.Context) {
 		return
 	}
 
-	err = instanceService.RecreateContainer(i)
+	err = instanceRunnerService.RecreateContainer(inst)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
 			Code:    api.ErrFailedToRecreateContainer,
@@ -367,8 +372,8 @@ func handlePatchEnvironment(c *gin.Context) {
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
 func handleInstanceEvents(c *gin.Context) {
-	instance := getInstance(c)
-	if instance == nil {
+	inst := getInstance(c)
+	if inst == nil {
 		return
 	}
 
@@ -380,7 +385,7 @@ func handleInstanceEvents(c *gin.Context) {
 	listener := types.NewTempListener(func(e interface{}) {
 		switch e := e.(type) {
 		case types.EventInstanceLog:
-			if instance.UUID != e.InstanceUUID {
+			if inst.UUID != e.InstanceUUID {
 				break
 			}
 
@@ -402,7 +407,7 @@ func handleInstanceEvents(c *gin.Context) {
 			}
 
 		case types.EventInstanceStatusChange:
-			if instance.UUID != e.InstanceUUID {
+			if inst.UUID != e.InstanceUUID {
 				break
 			}
 
@@ -451,12 +456,12 @@ func handleInstanceEvents(c *gin.Context) {
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
 //   - failed_to_get_docker_container_info: failed to get the Docker container info
 func handleGetDocker(c *gin.Context) {
-	uid := getParamInstanceUUID(c)
-	if uid == nil {
+	inst := getInstance(c)
+	if inst == nil {
 		return
 	}
 
-	info, err := instanceService.GetDockerContainerInfo(*uid)
+	info, err := instanceRunnerService.GetDockerContainerInfo(*inst)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
 			Code:    api.ErrFailedToGetContainerInfo,
@@ -474,12 +479,12 @@ func handleGetDocker(c *gin.Context) {
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
 //   - failed_to_recreate_container: failed to recreate the Docker container
 func handleRecreateDockerContainer(c *gin.Context) {
-	i := getInstance(c)
-	if i == nil {
+	inst := getInstance(c)
+	if inst == nil {
 		return
 	}
 
-	err := instanceService.RecreateContainer(i)
+	err := instanceRunnerService.RecreateContainer(inst)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
 			Code:    api.ErrFailedToRecreateContainer,
@@ -518,12 +523,12 @@ func handleGetLogs(c *gin.Context) {
 // Errors can be:
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
 func handleUpdateService(c *gin.Context) {
-	instance := getInstance(c)
-	if instance == nil {
+	inst := getInstance(c)
+	if inst == nil {
 		return
 	}
 
-	service, err := serviceService.GetById(instance.Service.ID)
+	service, err := serviceService.GetById(inst.Service.ID)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
 			Code:    api.ErrServiceNotFound,
@@ -532,7 +537,7 @@ func handleUpdateService(c *gin.Context) {
 		return
 	}
 
-	err = instanceService.UpdateService(instance.UUID, service)
+	err = instanceServiceService.Update(inst, service)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
 			Code:    api.ErrFailedToUpdateServiceInstance,
@@ -548,14 +553,14 @@ func handleUpdateService(c *gin.Context) {
 // Errors can be:
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
 func handleGetVersions(c *gin.Context) {
-	instance := getInstance(c)
-	if instance == nil {
+	inst := getInstance(c)
+	if inst == nil {
 		return
 	}
 
 	useCache := c.Query("reload") != "true"
 
-	versions, err := instanceService.GetAllVersions(instance, useCache)
+	versions, err := instanceRunnerService.GetAllVersions(inst, useCache)
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
 			Code:    api.ErrFailedToGetVersions,
