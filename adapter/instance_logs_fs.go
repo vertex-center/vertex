@@ -90,6 +90,19 @@ func (a *InstanceLogsFSAdapter) Push(uuid uuid.UUID, line types.LogLine) {
 	}
 }
 
+func (a *InstanceLogsFSAdapter) Pop(uuid uuid.UUID) (types.LogLine, error) {
+	l, err := a.getLogger(uuid)
+	if err != nil {
+		return types.LogLine{}, err
+	}
+	if len(l.buffer) == 0 {
+		return types.LogLine{}, types.ErrBufferEmpty
+	}
+	line := l.buffer[len(l.buffer)-1]
+	l.buffer = l.buffer[:len(l.buffer)-1]
+	return line, nil
+}
+
 func (a *InstanceLogsFSAdapter) CloseAll() error {
 	var errs []error
 	for id := range a.loggers {

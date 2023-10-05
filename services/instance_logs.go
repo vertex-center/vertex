@@ -1,6 +1,8 @@
 package services
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/types"
@@ -37,15 +39,41 @@ func (s *InstanceLogsService) GetLatestLogs(uuid uuid.UUID) ([]types.LogLine, er
 func (s *InstanceLogsService) OnEvent(e interface{}) {
 	switch e := e.(type) {
 	case types.EventInstanceLog:
-		s.logsAdapter.Push(e.InstanceUUID, types.LogLine{
-			Kind:    e.Kind,
-			Message: e.Message,
-		})
+		s.onLogReceived(e)
 	case types.EventInstanceLoaded:
 		err := s.logsAdapter.Open(e.InstanceUuid)
 		if err != nil {
 			log.Error(err)
 			return
 		}
+	}
+}
+
+func (s *InstanceLogsService) onLogReceived(e types.EventInstanceLog) {
+	switch e.Kind {
+	case types.LogKindDownload:
+		var downloads *types.LogLineMessageDownloads
+		download := e.Message.(*types.LogLineMessageDownload)
+
+		line, err := s.logsAdapter.Pop(e.InstanceUUID)
+		if err != nil && !errors.Is(err, types.ErrBufferEmpty) {
+			log.Error(err)
+			return
+		}
+		if line.Kind == types.LogKindDownloads {
+			downloads = line.Message.(*types.LogLineMessageDownloads)
+			downloads.Merge(download.DownloadProgress)
+		} else {
+			downloads = types.NewLogLineMessageDownloads(download.DownloadProgress)
+		}
+		s.logsAdapter.Push(e.InstanceUUID, types.LogLine{
+			Kind:    types.LogKindDownloads,
+			Message: downloads,
+		})
+	default:
+		s.logsAdapter.Push(e.InstanceUUID, types.LogLine{
+			Kind:    e.Kind,
+			Message: e.Message,
+		})
 	}
 }

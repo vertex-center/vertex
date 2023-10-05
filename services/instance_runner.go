@@ -2,6 +2,7 @@ package services
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"path"
@@ -59,7 +60,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 	s.eventsAdapter.Send(types.EventInstanceLog{
 		InstanceUUID: inst.UUID,
 		Kind:         types.LogKindOut,
-		Message:      "Starting instance...",
+		Message:      types.NewLogLineMessageString("Starting instance..."),
 	})
 
 	log.Info("starting instance",
@@ -70,7 +71,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 		s.eventsAdapter.Send(types.EventInstanceLog{
 			InstanceUUID: inst.UUID,
 			Kind:         types.LogKindVertexErr,
-			Message:      ErrInstanceAlreadyRunning.Error(),
+			Message:      types.NewLogLineMessageString(ErrInstanceAlreadyRunning.Error()),
 		})
 		return ErrInstanceAlreadyRunning
 	}
@@ -105,10 +106,19 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 			}
 
 			if strings.HasPrefix(scanner.Text(), "DOWNLOAD") {
+				msg := strings.TrimPrefix(scanner.Text(), "DOWNLOAD")
+
+				var downloadProgress types.DownloadProgress
+				err := json.Unmarshal([]byte(msg), &downloadProgress)
+				if err != nil {
+					log.Error(err)
+					continue
+				}
+
 				s.eventsAdapter.Send(types.EventInstanceLog{
 					InstanceUUID: inst.UUID,
 					Kind:         types.LogKindDownload,
-					Message:      strings.TrimPrefix(scanner.Text(), "DOWNLOAD"),
+					Message:      types.NewLogLineMessageDownload(&downloadProgress),
 				})
 				continue
 			}
@@ -116,7 +126,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 			s.eventsAdapter.Send(types.EventInstanceLog{
 				InstanceUUID: inst.UUID,
 				Kind:         types.LogKindOut,
-				Message:      scanner.Text(),
+				Message:      types.NewLogLineMessageString(scanner.Text()),
 			})
 		}
 	}()
@@ -133,7 +143,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 			s.eventsAdapter.Send(types.EventInstanceLog{
 				InstanceUUID: inst.UUID,
 				Kind:         types.LogKindErr,
-				Message:      scanner.Text(),
+				Message:      types.NewLogLineMessageString(scanner.Text()),
 			})
 		}
 	}()
@@ -145,7 +155,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 	s.eventsAdapter.Send(types.EventInstanceLog{
 		InstanceUUID: inst.UUID,
 		Kind:         types.LogKindVertexOut,
-		Message:      "Stopping instance...",
+		Message:      types.NewLogLineMessageString("Stopping instance..."),
 	})
 	log.Info("stopping instance",
 		vlog.String("uuid", inst.UUID.String()),
@@ -166,7 +176,7 @@ func (s *InstanceRunnerService) Stop(inst *types.Instance) error {
 		s.eventsAdapter.Send(types.EventInstanceLog{
 			InstanceUUID: inst.UUID,
 			Kind:         types.LogKindVertexErr,
-			Message:      ErrInstanceNotRunning.Error(),
+			Message:      types.NewLogLineMessageString(ErrInstanceNotRunning.Error()),
 		})
 		return ErrInstanceNotRunning
 	}
@@ -184,7 +194,7 @@ func (s *InstanceRunnerService) Stop(inst *types.Instance) error {
 		s.eventsAdapter.Send(types.EventInstanceLog{
 			InstanceUUID: inst.UUID,
 			Kind:         types.LogKindVertexOut,
-			Message:      "Instance stopped.",
+			Message:      types.NewLogLineMessageString("Instance stopped."),
 		})
 
 		log.Info("inst stopped",

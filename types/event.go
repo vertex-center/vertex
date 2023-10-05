@@ -53,7 +53,7 @@ type EventInstanceLoaded struct {
 type EventInstanceLog struct {
 	InstanceUUID uuid.UUID
 	Kind         string
-	Message      string
+	Message      LogLineMessage
 }
 
 type EventInstanceStatusChange struct {
