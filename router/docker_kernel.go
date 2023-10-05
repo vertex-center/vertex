@@ -7,14 +7,14 @@ import (
 	"net/http"
 
 	"github.com/docker/docker/client"
+	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types/api"
 
-	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/types"
 )
 
-func addDockerKernelRoutes(r *gin.RouterGroup) {
+func addDockerKernelRoutes(r *router.Group) {
 	r.GET("/containers", handleListDockerContainers)
 	r.POST("/container", handleCreateDockerContainer)
 	r.DELETE("/container/:id", handleDeleteDockerContainer)
@@ -29,7 +29,7 @@ func addDockerKernelRoutes(r *gin.RouterGroup) {
 	r.POST("/image/build", handleBuildDockerImage)
 }
 
-func handleListDockerContainers(c *gin.Context) {
+func handleListDockerContainers(c *router.Context) {
 	containers, err := dockerKernelService.ListContainers()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
@@ -42,7 +42,7 @@ func handleListDockerContainers(c *gin.Context) {
 	c.JSON(http.StatusOK, containers)
 }
 
-func handleDeleteDockerContainer(c *gin.Context) {
+func handleDeleteDockerContainer(c *router.Context) {
 	id := c.Param("id")
 
 	err := dockerKernelService.DeleteContainer(id)
@@ -63,7 +63,7 @@ func handleDeleteDockerContainer(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func handleCreateDockerContainer(c *gin.Context) {
+func handleCreateDockerContainer(c *router.Context) {
 	var options types.CreateContainerOptions
 	err := c.BindJSON(&options)
 	if err != nil {
@@ -86,7 +86,7 @@ func handleCreateDockerContainer(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-func handleStartDockerContainer(c *gin.Context) {
+func handleStartDockerContainer(c *router.Context) {
 	id := c.Param("id")
 
 	err := dockerKernelService.StartContainer(id)
@@ -101,7 +101,7 @@ func handleStartDockerContainer(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func handleStopDockerContainer(c *gin.Context) {
+func handleStopDockerContainer(c *router.Context) {
 	id := c.Param("id")
 
 	err := dockerKernelService.StopContainer(id)
@@ -116,7 +116,7 @@ func handleStopDockerContainer(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func handleInfoDockerContainer(c *gin.Context) {
+func handleInfoDockerContainer(c *router.Context) {
 	id := c.Param("id")
 
 	info, err := dockerKernelService.InfoContainer(id)
@@ -131,7 +131,7 @@ func handleInfoDockerContainer(c *gin.Context) {
 	c.JSON(http.StatusOK, info)
 }
 
-func handleLogsStdoutDockerContainer(c *gin.Context) {
+func handleLogsStdoutDockerContainer(c *router.Context) {
 	id := c.Param("id")
 
 	stdout, err := dockerKernelService.LogsStdoutContainer(id)
@@ -163,7 +163,7 @@ func handleLogsStdoutDockerContainer(c *gin.Context) {
 	})
 }
 
-func handleLogsStderrDockerContainer(c *gin.Context) {
+func handleLogsStderrDockerContainer(c *router.Context) {
 	id := c.Param("id")
 
 	stderr, err := dockerKernelService.LogsStderrContainer(id)
@@ -195,7 +195,7 @@ func handleLogsStderrDockerContainer(c *gin.Context) {
 	})
 }
 
-func handleWaitDockerContainer(c *gin.Context) {
+func handleWaitDockerContainer(c *router.Context) {
 	id := c.Param("id")
 	cond := c.Param("cond")
 
@@ -211,7 +211,7 @@ func handleWaitDockerContainer(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func handleInfoDockerImage(c *gin.Context) {
+func handleInfoDockerImage(c *router.Context) {
 	id := c.Param("id")
 
 	info, err := dockerKernelService.InfoImage(id)
@@ -226,7 +226,7 @@ func handleInfoDockerImage(c *gin.Context) {
 	c.JSON(http.StatusOK, info)
 }
 
-func handlePullDockerImage(c *gin.Context) {
+func handlePullDockerImage(c *router.Context) {
 	var options types.PullImageOptions
 	err := c.BindJSON(&options)
 	if err != nil {
@@ -266,7 +266,7 @@ func handlePullDockerImage(c *gin.Context) {
 	})
 }
 
-func handleBuildDockerImage(c *gin.Context) {
+func handleBuildDockerImage(c *router.Context) {
 	var options types.BuildImageOptions
 	err := c.BindJSON(&options)
 	if err != nil {

@@ -7,9 +7,9 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 )
@@ -38,7 +38,7 @@ func (s *ProxyService) RemoveRedirect(id uuid.UUID) error {
 	return s.proxyAdapter.RemoveRedirect(id)
 }
 
-func (s *ProxyService) HandleProxy(c *gin.Context) {
+func (s *ProxyService) HandleProxy(c *router.Context) {
 	host := c.Request.Host
 
 	redirect := s.proxyAdapter.GetRedirectByHost(host)

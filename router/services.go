@@ -6,18 +6,19 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
 )
 
-func addServicesRoutes(r *gin.RouterGroup) {
+func addServicesRoutes(r *router.Group) {
 	r.GET("/available", handleServicesAvailable)
 	r.POST("/install", handleServiceInstall)
 	r.Static("/icons", "./live/services/icons")
 }
 
 // handleServicesAvailable handles the retrieval of all available services.
-func handleServicesAvailable(c *gin.Context) {
+func handleServicesAvailable(c *router.Context) {
 	c.JSON(http.StatusOK, serviceService.GetAll())
 }
 
@@ -31,7 +32,7 @@ type downloadBody struct {
 //   - failed_to_parse_body: failed to parse the request body.
 //   - service_not_found: the service was not found.
 //   - failed_to_install_service: failed to install the service.
-func handleServiceInstall(c *gin.Context) {
+func handleServiceInstall(c *router.Context) {
 	var body downloadBody
 	err := c.BindJSON(&body)
 	if err != nil {

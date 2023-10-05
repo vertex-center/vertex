@@ -4,18 +4,18 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
 )
 
-func addSettingsRoutes(r *gin.RouterGroup) {
+func addSettingsRoutes(r *router.Group) {
 	r.GET("", handleGetSettings)
 	r.PATCH("", handlePatchSettings)
 }
 
 // handleGetSettings handles the retrieval of all settings.
-func handleGetSettings(c *gin.Context) {
+func handleGetSettings(c *router.Context) {
 	c.JSON(http.StatusOK, settingsFSAdapter.GetSettings())
 }
 
@@ -23,7 +23,7 @@ func handleGetSettings(c *gin.Context) {
 // Errors can be:
 //   - failed_to_parse_body: failed to parse the request body.
 //   - failed_to_update_settings: failed to update the settings.
-func handlePatchSettings(c *gin.Context) {
+func handlePatchSettings(c *router.Context) {
 	var settings types.Settings
 	err := c.BindJSON(&settings)
 	if err != nil {

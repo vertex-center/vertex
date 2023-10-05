@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
 )
 
-func addDependenciesRoutes(r *gin.RouterGroup) {
+func addDependenciesRoutes(r *router.Group) {
 	r.GET("", handleGetDependencies)
 	r.POST("/update", handleUpdateDependencies)
 }
@@ -17,7 +17,7 @@ func addDependenciesRoutes(r *gin.RouterGroup) {
 // handleGetPackages handles the retrieval of all dependencies.
 // Errors can be:
 //   - failed_to_get_dependencies: failed to get dependencies.
-func handleGetDependencies(c *gin.Context) {
+func handleGetDependencies(c *router.Context) {
 	reload := c.Query("reload")
 
 	var dependencies types.Dependencies
@@ -50,7 +50,7 @@ type executeUpdatesBody struct {
 //   - failed_to_install_updates: failed to install the updates.
 //   - failed_to_reload_services: failed to reload the services.
 //   - failed_to_reload_packages: failed to reload the packages.
-func handleUpdateDependencies(c *gin.Context) {
+func handleUpdateDependencies(c *router.Context) {
 	var body executeUpdatesBody
 	err := c.BindJSON(&body)
 	if err != nil {

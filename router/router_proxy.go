@@ -3,7 +3,6 @@ package router
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -11,24 +10,24 @@ import (
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vlog"
 )
 
 type ProxyRouter struct {
-	server *http.Server
-	engine *gin.Engine
+	*router.Router
 }
 
 func NewProxyRouter() ProxyRouter {
 	gin.SetMode(gin.ReleaseMode)
 
 	r := ProxyRouter{
-		engine: gin.New(),
+		Router: router.New(),
 	}
 
-	r.engine.Use(cors.Default())
-	r.engine.Use(ginutils.Logger("PROXY"))
-	r.engine.Use(gin.Recovery())
+	r.Use(cors.Default())
+	r.Use(ginutils.Logger("PROXY"))
+	r.Use(gin.Recovery())
 
 	r.initAPIRoutes()
 
@@ -36,35 +35,17 @@ func NewProxyRouter() ProxyRouter {
 }
 
 func (r *ProxyRouter) Start() error {
-	r.server = &http.Server{
-		Addr:    fmt.Sprintf(":%s", config.Current.PortProxy),
-		Handler: r.engine,
-	}
-
-	log.Info("Vertex-Proxy started",
-		vlog.String("url", config.Current.HostProxy),
-	)
-
-	return r.server.ListenAndServe()
+	log.Info("Vertex-Proxy started", vlog.String("url", config.Current.HostProxy))
+	addr := fmt.Sprintf(":%s", config.Current.PortProxy)
+	return r.Router.Start(addr)
 }
 
 func (r *ProxyRouter) Stop() error {
-	if r.server == nil {
-		return nil
-	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-
-	err := r.server.Shutdown(ctx)
-	if err != nil {
-		return err
-	}
-
-	r.server = nil
-	return nil
+	return r.Router.Stop(ctx)
 }
 
 func (r *ProxyRouter) initAPIRoutes() {
-	r.engine.Any("/*path", proxyService.HandleProxy)
+	r.Any("/*path", proxyService.HandleProxy)
 }

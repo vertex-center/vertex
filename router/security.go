@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/types/api"
 )
 
-func addSecurityRoutes(r *gin.RouterGroup) {
+func addSecurityRoutes(r *router.Group) {
 	r.GET("/ssh", handleGetSSHKey)
 	r.POST("/ssh", handleAddSSHKey)
 	r.DELETE("/ssh/:fingerprint", handleDeleteSSHKey)
@@ -19,7 +19,7 @@ func addSecurityRoutes(r *gin.RouterGroup) {
 // handleGetSSHKey handles the retrieval of the SSH key.
 // Errors can be:
 //   - failed_to_get_ssh_keys: failed to get the SSH keys.
-func handleGetSSHKey(c *gin.Context) {
+func handleGetSSHKey(c *router.Context) {
 	keys, err := sshService.GetAll()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
@@ -40,7 +40,7 @@ type AddSSHKeyBody struct {
 // Errors can be:
 //   - failed_to_parse_body: failed to parse the request body.
 //   - failed_to_add_ssh_key: failed to add the SSH key.
-func handleAddSSHKey(c *gin.Context) {
+func handleAddSSHKey(c *router.Context) {
 	var body AddSSHKeyBody
 	err := c.BindJSON(&body)
 	if err != nil {
@@ -73,7 +73,7 @@ func handleAddSSHKey(c *gin.Context) {
 // Errors can be:
 //   - failed_to_parse_body: failed to parse the request body.
 //   - failed_to_delete_ssh_key: failed to delete the SSH key.
-func handleDeleteSSHKey(c *gin.Context) {
+func handleDeleteSSHKey(c *router.Context) {
 	fingerprint := c.Param("fingerprint")
 	if fingerprint == "" {
 		_ = c.AbortWithError(http.StatusBadRequest, api.Error{

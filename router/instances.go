@@ -5,13 +5,13 @@ import (
 	"net/http"
 
 	"github.com/gin-contrib/sse"
-	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
 )
 
-func addInstancesRoutes(r *gin.RouterGroup) {
+func addInstancesRoutes(r *router.Group) {
 	r.GET("", handleGetInstances)
 	r.GET("/search", handleSearchInstances)
 	r.GET("/checkupdates", handleCheckForUpdates)
@@ -19,13 +19,13 @@ func addInstancesRoutes(r *gin.RouterGroup) {
 }
 
 // handleGetInstances returns all installed instances.
-func handleGetInstances(c *gin.Context) {
+func handleGetInstances(c *router.Context) {
 	installed := instanceService.GetAll()
 	c.JSON(http.StatusOK, installed)
 }
 
 // handleSearchInstances returns all installed instances that match the query.
-func handleSearchInstances(c *gin.Context) {
+func handleSearchInstances(c *router.Context) {
 	query := types.InstanceQuery{}
 
 	features := c.QueryArray("features[]")
@@ -40,7 +40,7 @@ func handleSearchInstances(c *gin.Context) {
 // handleCheckForUpdates checks for updates for all installed instances.
 // Errors can be:
 //   - check_for_updates_failed
-func handleCheckForUpdates(c *gin.Context) {
+func handleCheckForUpdates(c *router.Context) {
 	instances, err := instanceService.CheckForUpdates()
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
@@ -54,7 +54,7 @@ func handleCheckForUpdates(c *gin.Context) {
 }
 
 // handleInstancesEvents returns a stream of events related to instances.
-func handleInstancesEvents(c *gin.Context) {
+func handleInstancesEvents(c *router.Context) {
 	eventsChan := make(chan sse.Event)
 	defer close(eventsChan)
 

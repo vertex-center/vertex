@@ -7,15 +7,15 @@ import (
 	"net/http"
 
 	"github.com/gin-contrib/sse"
-	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
 )
 
-func addInstanceRoutes(r *gin.RouterGroup) {
+func addInstanceRoutes(r *router.Group) {
 	r.GET("", handleGetInstance)
 	r.DELETE("", handleDeleteInstance)
 	r.PATCH("", handlePatchInstance)
@@ -34,7 +34,7 @@ func addInstanceRoutes(r *gin.RouterGroup) {
 // Errors can be:
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
-func getParamInstanceUUID(c *gin.Context) *uuid.UUID {
+func getParamInstanceUUID(c *router.Context) *uuid.UUID {
 	p := c.Param("instance_uuid")
 	if p == "" {
 		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
@@ -62,7 +62,7 @@ func getParamInstanceUUID(c *gin.Context) *uuid.UUID {
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
 //   - instance_not_found: the instance with the given UUID was not found
 //   - failed_to_retrieve_instance: failed to retrieve the instance from the database
-func getInstance(c *gin.Context) *types.Instance {
+func getInstance(c *router.Context) *types.Instance {
 	instanceUUID := getParamInstanceUUID(c)
 	if instanceUUID == nil {
 		return nil
@@ -90,7 +90,7 @@ func getInstance(c *gin.Context) *types.Instance {
 // Errors can be:
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
-func handleGetInstance(c *gin.Context) {
+func handleGetInstance(c *router.Context) {
 	inst := getInstance(c)
 	if inst == nil {
 		return
@@ -105,7 +105,7 @@ func handleGetInstance(c *gin.Context) {
 //   - instance_not_found: the instance with the given UUID was not found
 //   - instance_still_running: the instance with the given UUID is still running
 //   - failed_to_delete_instance: failed to delete the instance from the database
-func handleDeleteInstance(c *gin.Context) {
+func handleDeleteInstance(c *router.Context) {
 	uid := getParamInstanceUUID(c)
 	if uid == nil {
 		return
@@ -150,7 +150,7 @@ type handlePatchInstanceBody struct {
 //   - instance_not_found: the instance with the given UUID was not found
 //   - failed_to_set_launch_on_startup: failed to set the launch on startup value
 //   - failed_to_set_display_name: failed to set the display name
-func handlePatchInstance(c *gin.Context) {
+func handlePatchInstance(c *router.Context) {
 	uid := getParamInstanceUUID(c)
 	if uid == nil {
 		return
@@ -249,7 +249,7 @@ func handlePatchInstance(c *gin.Context) {
 //   - instance_not_found: the instance with the given UUID was not found
 //   - instance_already_running: the instance with the given UUID is already running
 //   - failed_to_start_instance: failed to start the instance
-func handleStartInstance(c *gin.Context) {
+func handleStartInstance(c *router.Context) {
 	inst := getInstance(c)
 	if inst == nil {
 		return
@@ -286,7 +286,7 @@ func handleStartInstance(c *gin.Context) {
 //   - instance_not_found: the instance with the given UUID was not found
 //   - instance_not_running: the instance with the given UUID is not running
 //   - failed_to_stop_instance: failed to stop the instance
-func handleStopInstance(c *gin.Context) {
+func handleStopInstance(c *router.Context) {
 	inst := getInstance(c)
 	if inst == nil {
 		return
@@ -324,7 +324,7 @@ func handleStopInstance(c *gin.Context) {
 //   - instance_not_found: the instance with the given UUID was not found
 //   - failed_to_save_environment: failed to save the environment
 //   - failed_to_recreate_container: failed to recreate the Docker container
-func handlePatchEnvironment(c *gin.Context) {
+func handlePatchEnvironment(c *router.Context) {
 	var environment map[string]string
 	err := c.BindJSON(&environment)
 	if err != nil {
@@ -371,7 +371,7 @@ func handlePatchEnvironment(c *gin.Context) {
 // Errors can be:
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
-func handleInstanceEvents(c *gin.Context) {
+func handleInstanceEvents(c *router.Context) {
 	inst := getInstance(c)
 	if inst == nil {
 		return
@@ -455,7 +455,7 @@ func handleInstanceEvents(c *gin.Context) {
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
 //   - failed_to_get_docker_container_info: failed to get the Docker container info
-func handleGetDocker(c *gin.Context) {
+func handleGetDocker(c *router.Context) {
 	inst := getInstance(c)
 	if inst == nil {
 		return
@@ -478,7 +478,7 @@ func handleGetDocker(c *gin.Context) {
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
 //   - failed_to_recreate_container: failed to recreate the Docker container
-func handleRecreateDockerContainer(c *gin.Context) {
+func handleRecreateDockerContainer(c *router.Context) {
 	inst := getInstance(c)
 	if inst == nil {
 		return
@@ -501,7 +501,7 @@ func handleRecreateDockerContainer(c *gin.Context) {
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
 //   - failed_to_get_logs: failed to get the logs
-func handleGetLogs(c *gin.Context) {
+func handleGetLogs(c *router.Context) {
 	uid := getParamInstanceUUID(c)
 	if uid == nil {
 		return
@@ -522,7 +522,7 @@ func handleGetLogs(c *gin.Context) {
 // handleUpdateService updates the service of the instance with the UUID in the URL.
 // Errors can be:
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
-func handleUpdateService(c *gin.Context) {
+func handleUpdateService(c *router.Context) {
 	inst := getInstance(c)
 	if inst == nil {
 		return
@@ -552,7 +552,7 @@ func handleUpdateService(c *gin.Context) {
 // handleGetVersions returns the versions of the instance with the UUID in the URL.
 // Errors can be:
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
-func handleGetVersions(c *gin.Context) {
+func handleGetVersions(c *router.Context) {
 	inst := getInstance(c)
 	if inst == nil {
 		return

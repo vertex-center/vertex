@@ -3,7 +3,6 @@ package router
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +10,7 @@ import (
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
@@ -24,21 +24,20 @@ var (
 )
 
 type KernelRouter struct {
-	server *http.Server
-	engine *gin.Engine
+	*router.Router
 }
 
 func NewKernelRouter() KernelRouter {
 	gin.SetMode(gin.ReleaseMode)
 
 	r := KernelRouter{
-		engine: gin.New(),
+		Router: router.New(),
 	}
 
-	r.engine.Use(ginutils.ErrorHandler())
-	r.engine.Use(ginutils.Logger("KERNEL"))
-	r.engine.Use(gin.Recovery())
-	r.engine.GET("/ping", handlePing)
+	r.Use(ginutils.ErrorHandler())
+	r.Use(ginutils.Logger("KERNEL"))
+	r.Use(gin.Recovery())
+	r.GET("/ping", handlePing)
 
 	r.initAdapters()
 	r.initServices()
@@ -48,33 +47,15 @@ func NewKernelRouter() KernelRouter {
 }
 
 func (r *KernelRouter) Start() error {
-	r.server = &http.Server{
-		Addr:    fmt.Sprintf(":%s", config.KernelCurrent.PortKernel),
-		Handler: r.engine,
-	}
-
-	log.Info("vertex-kernel started",
-		vlog.String("url", config.KernelCurrent.HostKernel),
-	)
-
-	return r.server.ListenAndServe()
+	log.Info("vertex-kernel started", vlog.String("url", config.KernelCurrent.HostKernel))
+	addr := fmt.Sprintf(":%s", config.KernelCurrent.PortKernel)
+	return r.Router.Start(addr)
 }
 
 func (r *KernelRouter) Stop() error {
-	if r.server == nil {
-		return nil
-	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-
-	err := r.server.Shutdown(ctx)
-	if err != nil {
-		return err
-	}
-
-	r.server = nil
-	return nil
+	return r.Router.Stop(ctx)
 }
 
 func (r *KernelRouter) initAdapters() {
@@ -87,7 +68,7 @@ func (r *KernelRouter) initServices() {
 }
 
 func (r *KernelRouter) initAPIRoutes() {
-	api := r.engine.Group("/api")
+	api := r.Group("/api")
 
 	addDockerKernelRoutes(api.Group("/docker"))
 	addSecurityKernelRoutes(api.Group("/security"))
