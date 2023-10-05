@@ -11,7 +11,6 @@ export type Download = {
 export default function Downloads(props: { downloads?: Download[] }) {
     const { downloads } = props;
 
-    console.log(downloads);
     if (!downloads) return null;
     if (downloads.length === 0) return null;
 

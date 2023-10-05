@@ -42,7 +42,7 @@ export default function InstanceLogs() {
                 ...logs,
                 {
                     kind: "out",
-                    message: e.data,
+                    message: JSON.parse(e.data),
                 },
             ]);
         };
@@ -52,7 +52,7 @@ export default function InstanceLogs() {
                 ...logs,
                 {
                     kind: "err",
-                    message: e.data,
+                    message: JSON.parse(e.data),
                 },
             ]);
         };

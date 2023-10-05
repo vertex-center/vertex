@@ -24,7 +24,7 @@ function Line(props: LogLine) {
                 [styles.lineError]: kind === "err",
             })}
         >
-            <div>{message}</div>
+            <div>{message.value}</div>
         </div>
     );
 }
