@@ -15,9 +15,17 @@ func (c *Context) AbortWithError(statusCode int, err Error) {
 	_ = c.Context.AbortWithError(statusCode, err)
 }
 
-func (c *Context) Abort(err Error) {
-	c.AbortWithError(http.StatusInternalServerError, err)
+// 200
+
+func (c *Context) JSON(data interface{}) {
+	c.Context.JSON(http.StatusOK, data)
 }
+
+func (c *Context) OK() {
+	c.Context.Status(http.StatusNoContent)
+}
+
+// 400
 
 func (c *Context) BadRequest(err Error) {
 	c.AbortWithError(http.StatusBadRequest, err)
@@ -29,6 +37,12 @@ func (c *Context) NotFound(err Error) {
 
 func (c *Context) Conflict(err Error) {
 	c.AbortWithError(http.StatusConflict, err)
+}
+
+// 500
+
+func (c *Context) Abort(err Error) {
+	c.AbortWithError(http.StatusInternalServerError, err)
 }
 
 func (c *Context) ParseBody(obj interface{}) error {

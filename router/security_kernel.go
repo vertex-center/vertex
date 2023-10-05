@@ -31,7 +31,7 @@ func handleGetSSHKeyKernel(c *router.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, keys)
+	c.JSON(keys)
 }
 
 // handleAddSSHKey handles the addition of an SSH key.
@@ -96,5 +96,5 @@ func handleDeleteSSHKeyKernel(c *router.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }

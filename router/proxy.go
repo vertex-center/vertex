@@ -2,7 +2,6 @@ package router
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -19,7 +18,7 @@ func addProxyRoutes(r *router.Group) {
 // handleGetRedirects handles the retrieval of all redirects.
 func handleGetRedirects(c *router.Context) {
 	redirects := proxyService.GetRedirects()
-	c.JSON(http.StatusOK, redirects)
+	c.JSON(redirects)
 }
 
 type handleAddRedirectBody struct {
@@ -53,7 +52,7 @@ func handleAddRedirect(c *router.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }
 
 // handleRemoveRedirect handles the removal of a redirect.
@@ -92,5 +91,5 @@ func handleRemoveRedirect(c *router.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }

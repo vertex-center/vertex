@@ -3,7 +3,6 @@ package router
 import (
 	"errors"
 	"fmt"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -19,7 +18,7 @@ func addServicesRoutes(r *router.Group) {
 
 // handleServicesAvailable handles the retrieval of all available services.
 func handleServicesAvailable(c *router.Context) {
-	c.JSON(http.StatusOK, serviceService.GetAll())
+	c.JSON(serviceService.GetAll())
 }
 
 type downloadBody struct {
@@ -66,7 +65,7 @@ func handleServiceInstall(c *router.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(gin.H{
 		"instance": inst,
 	})
 }

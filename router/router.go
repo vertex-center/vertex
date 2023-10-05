@@ -118,7 +118,7 @@ func (r *Router) Stop() {
 }
 
 func handlePing(c *router.Context) {
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(gin.H{
 		"message": "pong",
 	})
 }
@@ -176,7 +176,7 @@ func (r *Router) initAPIRoutes(about types.About) {
 	api := r.Group("/api")
 	api.GET("/ping", handlePing)
 	api.GET("/about", func(c *router.Context) {
-		c.JSON(http.StatusOK, about)
+		c.JSON(about)
 	})
 
 	addServicesRoutes(api.Group("/services"))

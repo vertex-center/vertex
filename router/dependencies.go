@@ -2,7 +2,6 @@ package router
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types"
@@ -36,7 +35,7 @@ func handleGetDependencies(c *router.Context) {
 		dependencies = dependenciesService.GetCachedUpdates()
 	}
 
-	c.JSON(http.StatusOK, dependencies)
+	c.JSON(dependencies)
 }
 
 type executeUpdatesBody struct {
@@ -85,5 +84,5 @@ func handleUpdateDependencies(c *router.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }

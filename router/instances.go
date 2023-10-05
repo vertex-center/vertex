@@ -2,7 +2,6 @@ package router
 
 import (
 	"io"
-	"net/http"
 
 	"github.com/gin-contrib/sse"
 	"github.com/vertex-center/vertex/pkg/log"
@@ -21,7 +20,7 @@ func addInstancesRoutes(r *router.Group) {
 // handleGetInstances returns all installed instances.
 func handleGetInstances(c *router.Context) {
 	installed := instanceService.GetAll()
-	c.JSON(http.StatusOK, installed)
+	c.JSON(installed)
 }
 
 // handleSearchInstances returns all installed instances that match the query.
@@ -34,7 +33,7 @@ func handleSearchInstances(c *router.Context) {
 	}
 
 	installed := instanceService.Search(query)
-	c.JSON(http.StatusOK, installed)
+	c.JSON(installed)
 }
 
 // handleCheckForUpdates checks for updates for all installed instances.
@@ -51,7 +50,7 @@ func handleCheckForUpdates(c *router.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, instances)
+	c.JSON(instances)
 }
 
 // handleInstancesEvents returns a stream of events related to instances.

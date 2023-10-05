@@ -30,7 +30,7 @@ func handleGetSSHKey(c *router.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, keys)
+	c.JSON(keys)
 }
 
 type AddSSHKeyBody struct {
@@ -93,5 +93,5 @@ func handleDeleteSSHKey(c *router.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }

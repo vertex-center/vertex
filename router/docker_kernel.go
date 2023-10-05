@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"net/http"
 
 	"github.com/docker/docker/client"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -40,7 +39,7 @@ func handleListDockerContainers(c *router.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, containers)
+	c.JSON(containers)
 }
 
 func handleDeleteDockerContainer(c *router.Context) {
@@ -63,7 +62,7 @@ func handleDeleteDockerContainer(c *router.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }
 
 func handleCreateDockerContainer(c *router.Context) {
@@ -83,7 +82,7 @@ func handleCreateDockerContainer(c *router.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, res)
+	c.JSON(res)
 }
 
 func handleStartDockerContainer(c *router.Context) {
@@ -99,7 +98,7 @@ func handleStartDockerContainer(c *router.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }
 
 func handleStopDockerContainer(c *router.Context) {
@@ -115,7 +114,7 @@ func handleStopDockerContainer(c *router.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }
 
 func handleInfoDockerContainer(c *router.Context) {
@@ -131,7 +130,7 @@ func handleInfoDockerContainer(c *router.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, info)
+	c.JSON(info)
 }
 
 func handleLogsStdoutDockerContainer(c *router.Context) {
@@ -214,7 +213,7 @@ func handleWaitDockerContainer(c *router.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }
 
 func handleInfoDockerImage(c *router.Context) {
@@ -230,7 +229,7 @@ func handleInfoDockerImage(c *router.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, info)
+	c.JSON(info)
 }
 
 func handlePullDockerImage(c *router.Context) {

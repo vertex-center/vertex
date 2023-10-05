@@ -9,5 +9,5 @@ func addHardwareRoutes(r *router.Group) {
 }
 
 func handleGetHardware(c *router.Context) {
-	c.JSON(200, hardwareService.GetHardware())
+	c.JSON(hardwareService.GetHardware())
 }

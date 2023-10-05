@@ -1,8 +1,6 @@
 package router
 
 import (
-	"net/http"
-
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
@@ -15,7 +13,7 @@ func addSettingsRoutes(r *router.Group) {
 
 // handleGetSettings handles the retrieval of all settings.
 func handleGetSettings(c *router.Context) {
-	c.JSON(http.StatusOK, settingsFSAdapter.GetSettings())
+	c.JSON(settingsFSAdapter.GetSettings())
 }
 
 // handlePatchSettings handles the update of all settings.
@@ -39,5 +37,5 @@ func handlePatchSettings(c *router.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, settings)
+	c.JSON(settings)
 }

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net/http"
 
 	"github.com/gin-contrib/sse"
 	"github.com/google/uuid"
@@ -99,7 +98,7 @@ func handleGetInstance(c *router.Context) {
 	if inst == nil {
 		return
 	}
-	c.JSON(http.StatusOK, inst)
+	c.JSON(inst)
 }
 
 // handleDeleteInstance deletes the instance with the UUID in the URL.
@@ -139,7 +138,7 @@ func handleDeleteInstance(c *router.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }
 
 type handlePatchInstanceBody struct {
@@ -222,7 +221,7 @@ func handlePatchInstance(c *router.Context) {
 		}
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }
 
 // handleStartInstance starts the instance with the UUID in the URL.
@@ -262,7 +261,7 @@ func handleStartInstance(c *router.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }
 
 // handleStopInstance stops the instance with the UUID in the URL.
@@ -295,7 +294,7 @@ func handleStopInstance(c *router.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }
 
 // handlePatchEnvironment updates the environment of the instance with the UUID in the URL.
@@ -338,7 +337,7 @@ func handlePatchEnvironment(c *router.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }
 
 // handleInstanceEvents returns a stream of events for the instance with the UUID in the URL.
@@ -445,7 +444,7 @@ func handleGetDocker(c *router.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, info)
+	c.JSON(info)
 }
 
 // handleRecreateDockerContainer recreates the Docker container of the instance with the UUID in the URL.
@@ -469,7 +468,7 @@ func handleRecreateDockerContainer(c *router.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }
 
 // handleGetLogs returns the latest logs of the instance with the UUID in the URL.
@@ -493,7 +492,7 @@ func handleGetLogs(c *router.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, logs)
+	c.JSON(logs)
 }
 
 // handleUpdateService updates the service of the instance with the UUID in the URL.
@@ -525,7 +524,7 @@ func handleUpdateService(c *router.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }
 
 // handleGetVersions returns the versions of the instance with the UUID in the URL.
@@ -549,5 +548,5 @@ func handleGetVersions(c *router.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, versions)
+	c.JSON(versions)
 }
