@@ -2,14 +2,13 @@ package router
 
 import (
 	"fmt"
-	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
 )
 
-func addDependenciesRoutes(r *gin.RouterGroup) {
+func addDependenciesRoutes(r *router.Group) {
 	r.GET("", handleGetDependencies)
 	r.POST("/update", handleUpdateDependencies)
 }
@@ -17,7 +16,7 @@ func addDependenciesRoutes(r *gin.RouterGroup) {
 // handleGetPackages handles the retrieval of all dependencies.
 // Errors can be:
 //   - failed_to_get_dependencies: failed to get dependencies.
-func handleGetDependencies(c *gin.Context) {
+func handleGetDependencies(c *router.Context) {
 	reload := c.Query("reload")
 
 	var dependencies types.Dependencies
@@ -25,9 +24,10 @@ func handleGetDependencies(c *gin.Context) {
 		var err error
 		dependencies, err = dependenciesService.CheckForUpdates(settingsService.GetChannel())
 		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-				Code:    api.ErrFailedToCheckForUpdates,
-				Message: fmt.Sprintf("failed to check for updates: %v", err),
+			c.Abort(router.Error{
+				Code:           api.ErrFailedToCheckForUpdates,
+				PublicMessage:  "Failed to check for updates.",
+				PrivateMessage: err.Error(),
 			})
 			return
 		}
@@ -35,7 +35,7 @@ func handleGetDependencies(c *gin.Context) {
 		dependencies = dependenciesService.GetCachedUpdates()
 	}
 
-	c.JSON(http.StatusOK, dependencies)
+	c.JSON(dependencies)
 }
 
 type executeUpdatesBody struct {
@@ -50,14 +50,10 @@ type executeUpdatesBody struct {
 //   - failed_to_install_updates: failed to install the updates.
 //   - failed_to_reload_services: failed to reload the services.
 //   - failed_to_reload_packages: failed to reload the packages.
-func handleUpdateDependencies(c *gin.Context) {
+func handleUpdateDependencies(c *router.Context) {
 	var body executeUpdatesBody
-	err := c.BindJSON(&body)
+	err := c.ParseBody(&body)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrFailedToParseBody,
-			Message: fmt.Sprintf("failed to parse request body: %v", err),
-		})
 		return
 	}
 
@@ -70,21 +66,23 @@ func handleUpdateDependencies(c *gin.Context) {
 
 	err = dependenciesService.InstallUpdates(updates)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToInstallUpdates,
-			Message: fmt.Sprintf("failed to install updates: %v", err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToInstallUpdates,
+			PublicMessage:  "Failed to install updates.",
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
 	err = serviceService.Reload()
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToReloadServices,
-			Message: fmt.Sprintf("failed to reload services: %v", err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToReloadServices,
+			PublicMessage:  "Failed to reload services.",
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }

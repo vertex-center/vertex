@@ -20,6 +20,7 @@ import (
 	"github.com/google/go-containerregistry/pkg/crane"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/pkg/vdocker"
 	"github.com/vertex-center/vertex/types"
@@ -39,7 +40,7 @@ func (a RunnerDockerAdapter) Delete(inst *types.Instance) error {
 		return err
 	}
 
-	apiError := api.Error{}
+	apiError := router.Error{}
 	err = requests.URL(config.Current.HostKernel).
 		Pathf("/api/docker/container/%s", id).
 		Delete().

@@ -1,13 +1,13 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/pkg/router"
 )
 
-func addHardwareRoutes(r *gin.RouterGroup) {
+func addHardwareRoutes(r *router.Group) {
 	r.GET("", handleGetHardware)
 }
 
-func handleGetHardware(c *gin.Context) {
-	c.JSON(200, hardwareService.GetHardware())
+func handleGetHardware(c *router.Context) {
+	c.JSON(hardwareService.GetHardware())
 }

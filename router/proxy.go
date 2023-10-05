@@ -2,24 +2,23 @@ package router
 
 import (
 	"fmt"
-	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
 )
 
-func addProxyRoutes(r *gin.RouterGroup) {
+func addProxyRoutes(r *router.Group) {
 	r.GET("/redirects", handleGetRedirects)
 	r.POST("/redirect", handleAddRedirect)
 	r.DELETE("/redirect/:id", handleRemoveRedirect)
 }
 
 // handleGetRedirects handles the retrieval of all redirects.
-func handleGetRedirects(c *gin.Context) {
+func handleGetRedirects(c *router.Context) {
 	redirects := proxyService.GetRedirects()
-	c.JSON(http.StatusOK, redirects)
+	c.JSON(redirects)
 }
 
 type handleAddRedirectBody struct {
@@ -31,14 +30,10 @@ type handleAddRedirectBody struct {
 // Errors can be:
 //   - failed_to_parse_body: failed to parse the request body.
 //   - failed_to_add_redirect: failed to add the redirect.
-func handleAddRedirect(c *gin.Context) {
+func handleAddRedirect(c *router.Context) {
 	var body handleAddRedirectBody
-	err := c.BindJSON(&body)
+	err := c.ParseBody(&body)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrFailedToParseBody,
-			Message: fmt.Sprintf("failed to parse request body: %v", err),
-		})
 		return
 	}
 
@@ -49,14 +44,15 @@ func handleAddRedirect(c *gin.Context) {
 
 	err = proxyService.AddRedirect(redirect)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToAddRedirect,
-			Message: fmt.Sprintf("failed to add redirect: %v", err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToAddRedirect,
+			PublicMessage:  fmt.Sprintf("Failed to add redirect '%s' to '%s'.", redirect.Source, redirect.Target),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }
 
 // handleRemoveRedirect handles the removal of a redirect.
@@ -64,33 +60,36 @@ func handleAddRedirect(c *gin.Context) {
 //   - missing_redirect_uuid: missing redirect uuid.
 //   - invalid_redirect_uuid: invalid redirect uuid.
 //   - failed_to_remove_redirect: failed to remove the redirect.
-func handleRemoveRedirect(c *gin.Context) {
+func handleRemoveRedirect(c *router.Context) {
 	idString := c.Param("id")
 	if idString == "" {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrRedirectUuidMissing,
-			Message: "missing redirect uuid",
+		c.BadRequest(router.Error{
+			Code:           api.ErrRedirectUuidMissing,
+			PublicMessage:  "The request is missing the redirect UUID.",
+			PrivateMessage: "Field 'id' is required.",
 		})
 		return
 	}
 
 	id, err := uuid.Parse(idString)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrRedirectUuidInvalid,
-			Message: "invalid redirect uuid",
+		c.BadRequest(router.Error{
+			Code:           api.ErrRedirectUuidInvalid,
+			PublicMessage:  "The redirect UUID is invalid.",
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
 	err = proxyService.RemoveRedirect(id)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToRemoveRedirect,
-			Message: fmt.Sprintf("failed to remove redirect: %v", err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToRemoveRedirect,
+			PublicMessage:  fmt.Sprintf("Failed to remove redirect '%s'.", id),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }

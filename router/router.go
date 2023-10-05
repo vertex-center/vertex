@@ -18,6 +18,7 @@ import (
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/types"
@@ -53,23 +54,22 @@ var (
 )
 
 type Router struct {
-	server *http.Server
-	engine *gin.Engine
+	*router.Router
 }
 
 func NewRouter(about types.About) Router {
 	gin.SetMode(gin.ReleaseMode)
 
 	r := Router{
-		engine: gin.New(),
+		Router: router.New(),
 	}
 
-	r.engine.Use(cors.Default())
-	r.engine.Use(ginutils.ErrorHandler())
-	r.engine.Use(ginutils.Logger("MAIN"))
-	r.engine.Use(gin.Recovery())
-	r.engine.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
-	r.engine.GET("/ping", handlePing)
+	r.Use(cors.Default())
+	r.Use(ginutils.ErrorHandler())
+	r.Use(ginutils.Logger("MAIN"))
+	r.Use(gin.Recovery())
+	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
+	r.GET("/ping", handlePing)
 
 	r.initAdapters()
 	r.initServices(about)
@@ -86,22 +86,15 @@ func (r *Router) Start(addr string) {
 
 	r.handleSignals()
 
-	r.server = &http.Server{
-		Addr:    addr,
-		Handler: r.engine,
-	}
-
 	err := notificationsService.StartWebhook()
 	if err != nil {
 		log.Error(err)
 	}
 
 	url := fmt.Sprintf("http://%s", config.Current.HostVertex)
-	log.Info("Vertex started",
-		vlog.String("url", url),
-	)
+	log.Info("Vertex started", vlog.String("url", url))
 
-	err = r.server.ListenAndServe()
+	err = r.Router.Start(addr)
 	if errors.Is(err, http.ErrServerClosed) {
 		log.Info("Vertex closed")
 	} else if err != nil {
@@ -117,17 +110,15 @@ func (r *Router) Stop() {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
-	err := r.server.Shutdown(ctx)
+	err := r.Router.Stop(ctx)
 	if err != nil {
 		log.Error(err)
 		return
 	}
-
-	r.server = nil
 }
 
-func handlePing(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
+func handlePing(c *router.Context) {
+	c.JSON(gin.H{
 		"message": "pong",
 	})
 }
@@ -182,10 +173,10 @@ func (r *Router) initServices(about types.About) {
 }
 
 func (r *Router) initAPIRoutes(about types.About) {
-	api := r.engine.Group("/api")
+	api := r.Group("/api")
 	api.GET("/ping", handlePing)
-	api.GET("/about", func(c *gin.Context) {
-		c.JSON(http.StatusOK, about)
+	api.GET("/about", func(c *router.Context) {
+		c.JSON(about)
 	})
 
 	addServicesRoutes(api.Group("/services"))
@@ -198,7 +189,7 @@ func (r *Router) initAPIRoutes(about types.About) {
 	addSecurityRoutes(api.Group("/security"))
 }
 
-func headersSSE(c *gin.Context) {
+func headersSSE(c *router.Context) {
 	c.Writer.Header().Set("Content-Type", sse.ContentType)
 	c.Writer.Header().Set("Cache-Control", "no-cache")
 	c.Writer.Header().Set("Connection", "keep-alive")

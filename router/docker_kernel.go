@@ -4,17 +4,16 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"net/http"
 
 	"github.com/docker/docker/client"
+	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types/api"
 
-	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/types"
 )
 
-func addDockerKernelRoutes(r *gin.RouterGroup) {
+func addDockerKernelRoutes(r *router.Group) {
 	r.GET("/containers", handleListDockerContainers)
 	r.POST("/container", handleCreateDockerContainer)
 	r.DELETE("/container/:id", handleDeleteDockerContainer)
@@ -29,116 +28,120 @@ func addDockerKernelRoutes(r *gin.RouterGroup) {
 	r.POST("/image/build", handleBuildDockerImage)
 }
 
-func handleListDockerContainers(c *gin.Context) {
+func handleListDockerContainers(c *router.Context) {
 	containers, err := dockerKernelService.ListContainers()
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToListContainers,
-			Message: err.Error(),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToListContainers,
+			PublicMessage:  "Failed to list containers.",
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, containers)
+	c.JSON(containers)
 }
 
-func handleDeleteDockerContainer(c *gin.Context) {
+func handleDeleteDockerContainer(c *router.Context) {
 	id := c.Param("id")
 
 	err := dockerKernelService.DeleteContainer(id)
 	if err != nil && client.IsErrNotFound(err) {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrContainerNotFound,
-			Message: err.Error(),
+		c.NotFound(router.Error{
+			Code:           api.ErrContainerNotFound,
+			PublicMessage:  fmt.Sprintf("Container %s not found.", id),
+			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToDeleteContainer,
-			Message: err.Error(),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToDeleteContainer,
+			PublicMessage:  fmt.Sprintf("Failed to delete container %s.", id),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }
 
-func handleCreateDockerContainer(c *gin.Context) {
+func handleCreateDockerContainer(c *router.Context) {
 	var options types.CreateContainerOptions
-	err := c.BindJSON(&options)
+	err := c.ParseBody(&options)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrFailedToParseBody,
-			Message: fmt.Sprintf("failed to parse request body: %v", err),
-		})
 		return
 	}
 
 	res, err := dockerKernelService.CreateContainer(options)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToCreateContainer,
-			Message: err.Error(),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToCreateContainer,
+			PublicMessage:  "Failed to create container.",
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, res)
+	c.JSON(res)
 }
 
-func handleStartDockerContainer(c *gin.Context) {
+func handleStartDockerContainer(c *router.Context) {
 	id := c.Param("id")
 
 	err := dockerKernelService.StartContainer(id)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToStartContainer,
-			Message: err.Error(),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToStartContainer,
+			PublicMessage:  fmt.Sprintf("Failed to start container %s.", id),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }
 
-func handleStopDockerContainer(c *gin.Context) {
+func handleStopDockerContainer(c *router.Context) {
 	id := c.Param("id")
 
 	err := dockerKernelService.StopContainer(id)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToStopContainer,
-			Message: err.Error(),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToStopContainer,
+			PublicMessage:  fmt.Sprintf("Failed to stop container %s.", id),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }
 
-func handleInfoDockerContainer(c *gin.Context) {
+func handleInfoDockerContainer(c *router.Context) {
 	id := c.Param("id")
 
 	info, err := dockerKernelService.InfoContainer(id)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToGetContainerInfo,
-			Message: err.Error(),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToGetContainerInfo,
+			PublicMessage:  fmt.Sprintf("Failed to get info for container %s.", id),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, info)
+	c.JSON(info)
 }
 
-func handleLogsStdoutDockerContainer(c *gin.Context) {
+func handleLogsStdoutDockerContainer(c *router.Context) {
 	id := c.Param("id")
 
 	stdout, err := dockerKernelService.LogsStdoutContainer(id)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToGetContainerLogs,
-			Message: err.Error(),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToGetContainerLogs,
+			PublicMessage:  fmt.Sprintf("Failed to get logs for container %s.", id),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
@@ -163,14 +166,15 @@ func handleLogsStdoutDockerContainer(c *gin.Context) {
 	})
 }
 
-func handleLogsStderrDockerContainer(c *gin.Context) {
+func handleLogsStderrDockerContainer(c *router.Context) {
 	id := c.Param("id")
 
 	stderr, err := dockerKernelService.LogsStderrContainer(id)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToGetContainerLogs,
-			Message: err.Error(),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToGetContainerLogs,
+			PublicMessage:  fmt.Sprintf("Failed to get logs for container %s.", id),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
@@ -195,53 +199,52 @@ func handleLogsStderrDockerContainer(c *gin.Context) {
 	})
 }
 
-func handleWaitDockerContainer(c *gin.Context) {
+func handleWaitDockerContainer(c *router.Context) {
 	id := c.Param("id")
 	cond := c.Param("cond")
 
 	err := dockerKernelService.WaitContainer(id, types.WaitContainerCondition(cond))
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToWaitContainer,
-			Message: err.Error(),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToWaitContainer,
+			PublicMessage:  fmt.Sprintf("Failed to wait the event '%s' for container %s.", cond, id),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.OK()
 }
 
-func handleInfoDockerImage(c *gin.Context) {
+func handleInfoDockerImage(c *router.Context) {
 	id := c.Param("id")
 
 	info, err := dockerKernelService.InfoImage(id)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToGetImageInfo,
-			Message: err.Error(),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToGetImageInfo,
+			PublicMessage:  fmt.Sprintf("Failed to get info for image %s.", id),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, info)
+	c.JSON(info)
 }
 
-func handlePullDockerImage(c *gin.Context) {
+func handlePullDockerImage(c *router.Context) {
 	var options types.PullImageOptions
-	err := c.BindJSON(&options)
+	err := c.ParseBody(&options)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrFailedToParseBody,
-			Message: fmt.Sprintf("failed to parse request body: %v", err),
-		})
 		return
 	}
 
 	r, err := dockerKernelService.PullImage(options)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToPullImage,
-			Message: err.Error(),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToPullImage,
+			PublicMessage:  "Failed to pull image.",
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
@@ -266,22 +269,19 @@ func handlePullDockerImage(c *gin.Context) {
 	})
 }
 
-func handleBuildDockerImage(c *gin.Context) {
+func handleBuildDockerImage(c *router.Context) {
 	var options types.BuildImageOptions
-	err := c.BindJSON(&options)
+	err := c.ParseBody(&options)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrFailedToParseBody,
-			Message: fmt.Sprintf("failed to parse request body: %v", err),
-		})
 		return
 	}
 
 	res, err := dockerKernelService.BuildImage(options)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToBuildImage,
-			Message: err.Error(),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToBuildImage,
+			PublicMessage:  "Failed to build image.",
+			PrivateMessage: err.Error(),
 		})
 		return
 	}

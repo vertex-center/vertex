@@ -3,22 +3,22 @@ package router
 import (
 	"errors"
 	"fmt"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
 )
 
-func addServicesRoutes(r *gin.RouterGroup) {
+func addServicesRoutes(r *router.Group) {
 	r.GET("/available", handleServicesAvailable)
 	r.POST("/install", handleServiceInstall)
 	r.Static("/icons", "./live/services/icons")
 }
 
 // handleServicesAvailable handles the retrieval of all available services.
-func handleServicesAvailable(c *gin.Context) {
-	c.JSON(http.StatusOK, serviceService.GetAll())
+func handleServicesAvailable(c *router.Context) {
+	c.JSON(serviceService.GetAll())
 }
 
 type downloadBody struct {
@@ -31,42 +31,41 @@ type downloadBody struct {
 //   - failed_to_parse_body: failed to parse the request body.
 //   - service_not_found: the service was not found.
 //   - failed_to_install_service: failed to install the service.
-func handleServiceInstall(c *gin.Context) {
+func handleServiceInstall(c *router.Context) {
 	var body downloadBody
-	err := c.BindJSON(&body)
+	err := c.ParseBody(&body)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrFailedToParseBody,
-			Message: fmt.Sprintf("failed to parse request body: %v", err),
-		})
 		return
 	}
 
 	service, err := serviceService.GetById(body.ServiceID)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrServiceNotFound,
-			Message: fmt.Sprintf("service not found: %v", err),
+		c.NotFound(router.Error{
+			Code:           api.ErrServiceNotFound,
+			PublicMessage:  fmt.Sprintf("Service not found: %s.", body.ServiceID),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
 	inst, err := instanceService.Install(service, body.Method)
 	if err != nil && errors.Is(err, types.ErrServiceNotFound) {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrServiceNotFound,
-			Message: fmt.Sprintf("service not found: %v", err),
+		c.NotFound(router.Error{
+			Code:           api.ErrServiceNotFound,
+			PublicMessage:  fmt.Sprintf("Service not found: %s.", body.ServiceID),
+			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToInstallService,
-			Message: fmt.Sprintf("failed to install service: %v", err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToInstallService,
+			PublicMessage:  fmt.Sprintf("Failed to install service '%s'.", service.Name),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(gin.H{
 		"instance": inst,
 	})
 }
