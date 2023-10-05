@@ -37,18 +37,20 @@ func addInstanceRoutes(r *router.Group) {
 func getParamInstanceUUID(c *router.Context) *uuid.UUID {
 	p := c.Param("instance_uuid")
 	if p == "" {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrInstanceUuidMissing,
-			Message: "'instance_uuid' was missing in the URL",
+		c.BadRequest(router.Error{
+			Code:           api.ErrInstanceUuidMissing,
+			PublicMessage:  "The request was missing the instance UUID.",
+			PrivateMessage: "Field 'instance_uuid' is required.",
 		})
 		return nil
 	}
 
 	uid, err := uuid.Parse(p)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrInstanceUuidInvalid,
-			Message: fmt.Sprintf("'%s' is not a valid UUID", p),
+		c.BadRequest(router.Error{
+			Code:           api.ErrInstanceUuidInvalid,
+			PublicMessage:  "The instance UUID is invalid.",
+			PrivateMessage: err.Error(),
 		})
 		return nil
 	}
@@ -70,15 +72,17 @@ func getInstance(c *router.Context) *types.Instance {
 
 	instance, err := instanceService.Get(*instanceUUID)
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
-		_ = c.AbortWithError(http.StatusNotFound, api.Error{
-			Code:    api.ErrInstanceNotFound,
-			Message: fmt.Sprintf("instance %s not found", instanceUUID),
+		c.NotFound(router.Error{
+			Code:           api.ErrInstanceNotFound,
+			PublicMessage:  fmt.Sprintf("Instance %s not found.", instanceUUID),
+			PrivateMessage: err.Error(),
 		})
 		return nil
 	} else if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToGetInstance,
-			Message: fmt.Sprintf("failed to retrieve instance %s: %v", instanceUUID, err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToGetInstance,
+			PublicMessage:  fmt.Sprintf("Failed to retrieve instance %s.", instanceUUID),
+			PrivateMessage: err.Error(),
 		})
 		return nil
 	}
@@ -113,21 +117,24 @@ func handleDeleteInstance(c *router.Context) {
 
 	err := instanceService.Delete(*uid)
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
-		_ = c.AbortWithError(http.StatusNotFound, api.Error{
-			Code:    api.ErrInstanceNotFound,
-			Message: fmt.Sprintf("instance %s not found", uid),
+		c.NotFound(router.Error{
+			Code:           api.ErrInstanceNotFound,
+			PublicMessage:  fmt.Sprintf("Instance %s not found.", uid),
+			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil && errors.Is(err, types.ErrInstanceStillRunning) {
-		_ = c.AbortWithError(http.StatusConflict, api.Error{
-			Code:    api.ErrInstanceStillRunning,
-			Message: fmt.Sprintf("instance %s is still running", uid),
+		c.Conflict(router.Error{
+			Code:           api.ErrInstanceStillRunning,
+			PublicMessage:  fmt.Sprintf("Instance %s is still running.", uid),
+			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToDeleteInstance,
-			Message: fmt.Sprintf("failed to delete instance %s, %v", uid, err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToDeleteInstance,
+			PublicMessage:  fmt.Sprintf("Failed to delete instance %s.", uid),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
@@ -162,27 +169,18 @@ func handlePatchInstance(c *router.Context) {
 	}
 
 	var body handlePatchInstanceBody
-	err := c.BindJSON(&body)
+	err := c.ParseBody(&body)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrFailedToParseBody,
-			Message: fmt.Sprintf("failed to parse request body: %v", err),
-		})
 		return
 	}
 
 	if body.LaunchOnStartup != nil {
 		err = instanceSettingsService.SetLaunchOnStartup(inst, *body.LaunchOnStartup)
-		if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
-			_ = c.AbortWithError(http.StatusNotFound, api.Error{
-				Code:    api.ErrInstanceNotFound,
-				Message: fmt.Sprintf("instance %s not found", uid),
-			})
-			return
-		} else if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-				Code:    api.ErrFailedToSetLaunchOnStartup,
-				Message: fmt.Sprintf("failed to set launch on startup: %v", err),
+		if err != nil {
+			c.Abort(router.Error{
+				Code:           api.ErrFailedToSetLaunchOnStartup,
+				PublicMessage:  "Failed to change launch on startup.",
+				PrivateMessage: err.Error(),
 			})
 			return
 		}
@@ -190,16 +188,11 @@ func handlePatchInstance(c *router.Context) {
 
 	if body.DisplayName != nil {
 		err = instanceSettingsService.SetDisplayName(inst, *body.DisplayName)
-		if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
-			_ = c.AbortWithError(http.StatusNotFound, api.Error{
-				Code:    api.ErrInstanceNotFound,
-				Message: fmt.Sprintf("instance %s not found", uid),
-			})
-			return
-		} else if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-				Code:    api.ErrFailedToSetDisplayName,
-				Message: fmt.Sprintf("failed to set display name: %v", err),
+		if err != nil {
+			c.Abort(router.Error{
+				Code:           api.ErrFailedToSetDisplayName,
+				PublicMessage:  "Failed to change display name.",
+				PrivateMessage: err.Error(),
 			})
 			return
 		}
@@ -207,16 +200,11 @@ func handlePatchInstance(c *router.Context) {
 
 	if body.Databases != nil {
 		err = instanceService.SetDatabases(inst, body.Databases)
-		if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
-			_ = c.AbortWithError(http.StatusNotFound, api.Error{
-				Code:    api.ErrInstanceNotFound,
-				Message: fmt.Sprintf("instance %s not found", uid),
-			})
-			return
-		} else if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-				Code:    api.ErrFailedToSetDatabase,
-				Message: fmt.Sprintf("failed to set databases: %v", err),
+		if err != nil {
+			c.Abort(router.Error{
+				Code:           api.ErrFailedToSetDatabase,
+				PublicMessage:  "Failed to change databases.",
+				PrivateMessage: err.Error(),
 			})
 			return
 		}
@@ -224,16 +212,11 @@ func handlePatchInstance(c *router.Context) {
 
 	if body.Version != nil {
 		err = instanceSettingsService.SetVersion(inst, *body.Version)
-		if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
-			_ = c.AbortWithError(http.StatusNotFound, api.Error{
-				Code:    api.ErrInstanceNotFound,
-				Message: fmt.Sprintf("instance %s not found", uid),
-			})
-			return
-		} else if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-				Code:    api.ErrFailedToSetVersion,
-				Message: fmt.Sprintf("failed to set version: %v", err),
+		if err != nil {
+			c.Abort(router.Error{
+				Code:           api.ErrFailedToSetVersion,
+				PublicMessage:  "Failed to change version.",
+				PrivateMessage: err.Error(),
 			})
 			return
 		}
@@ -257,21 +240,24 @@ func handleStartInstance(c *router.Context) {
 
 	err := instanceRunnerService.Start(inst)
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
-		_ = c.AbortWithError(http.StatusNotFound, api.Error{
-			Code:    api.ErrInstanceNotFound,
-			Message: fmt.Sprintf("instance %s not found", inst.UUID),
+		c.NotFound(router.Error{
+			Code:           api.ErrInstanceNotFound,
+			PublicMessage:  fmt.Sprintf("Instance %s not found.", inst.UUID),
+			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil && errors.Is(err, services.ErrInstanceAlreadyRunning) {
-		_ = c.AbortWithError(http.StatusConflict, api.Error{
-			Code:    api.ErrInstanceAlreadyRunning,
-			Message: fmt.Sprintf("instance %s is already running", inst.UUID),
+		c.Conflict(router.Error{
+			Code:           api.ErrInstanceAlreadyRunning,
+			PublicMessage:  fmt.Sprintf("Instance %s is already running.", inst.UUID),
+			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToStartInstance,
-			Message: fmt.Sprintf("failed to start instance %s: %v", inst.UUID, err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToStartInstance,
+			PublicMessage:  fmt.Sprintf("Failed to start instance %s.", inst.UUID),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
@@ -293,22 +279,18 @@ func handleStopInstance(c *router.Context) {
 	}
 
 	err := instanceRunnerService.Stop(inst)
-	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
-		_ = c.AbortWithError(http.StatusNotFound, api.Error{
-			Code:    api.ErrInstanceNotFound,
-			Message: fmt.Sprintf("instance %s not found", inst.UUID),
-		})
-		return
-	} else if err != nil && errors.Is(err, services.ErrInstanceNotRunning) {
-		_ = c.AbortWithError(http.StatusConflict, api.Error{
-			Code:    api.ErrInstanceNotRunning,
-			Message: fmt.Sprintf("instance %s is not running", inst.UUID),
+	if err != nil && errors.Is(err, services.ErrInstanceNotRunning) {
+		c.Conflict(router.Error{
+			Code:           api.ErrInstanceNotRunning,
+			PublicMessage:  fmt.Sprintf("Instance %s is not running.", inst.UUID),
+			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToStopInstance,
-			Message: fmt.Sprintf("failed to stop instance %s: %v", inst.UUID, err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToStopInstance,
+			PublicMessage:  fmt.Sprintf("Failed to stop instance %s.", inst.UUID),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
@@ -326,12 +308,8 @@ func handleStopInstance(c *router.Context) {
 //   - failed_to_recreate_container: failed to recreate the Docker container
 func handlePatchEnvironment(c *router.Context) {
 	var environment map[string]string
-	err := c.BindJSON(&environment)
+	err := c.ParseBody(&environment)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrFailedToParseBody,
-			Message: fmt.Sprintf("failed to parse request body: %v", err),
-		})
 		return
 	}
 
@@ -341,25 +319,21 @@ func handlePatchEnvironment(c *router.Context) {
 	}
 
 	err = instanceEnvService.Save(inst, environment)
-	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
-		_ = c.AbortWithError(http.StatusNotFound, api.Error{
-			Code:    api.ErrInstanceNotFound,
-			Message: fmt.Sprintf("instance %s not found", inst.UUID),
-		})
-		return
-	} else if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToSetEnv,
-			Message: fmt.Sprintf("failed to save environment: %v", err),
+	if err != nil {
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToSetEnv,
+			PublicMessage:  "failed to set environment",
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
 	err = instanceRunnerService.RecreateContainer(inst)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToRecreateContainer,
-			Message: fmt.Sprintf("failed to recreate container: %v", err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToRecreateContainer,
+			PublicMessage:  "Failed to recreate container.",
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
@@ -463,9 +437,10 @@ func handleGetDocker(c *router.Context) {
 
 	info, err := instanceRunnerService.GetDockerContainerInfo(*inst)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToGetContainerInfo,
-			Message: fmt.Sprintf("failed to get docker container info: %v", err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToGetContainerInfo,
+			PublicMessage:  fmt.Sprintf("Failed to get info for container %s.", inst.UUID),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
@@ -486,9 +461,10 @@ func handleRecreateDockerContainer(c *router.Context) {
 
 	err := instanceRunnerService.RecreateContainer(inst)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToRecreateContainer,
-			Message: fmt.Sprintf("failed to recreate container: %v", err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToRecreateContainer,
+			PublicMessage:  fmt.Sprintf("Failed to recreate container %s.", inst.UUID),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
@@ -509,9 +485,10 @@ func handleGetLogs(c *router.Context) {
 
 	logs, err := instanceLogsService.GetLatestLogs(*uid)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToGetInstanceLogs,
-			Message: fmt.Sprintf("failed to get logs: %v", err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToGetInstanceLogs,
+			PublicMessage:  fmt.Sprintf("Failed to get logs for instance %s.", uid),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
@@ -530,18 +507,20 @@ func handleUpdateService(c *router.Context) {
 
 	service, err := serviceService.GetById(inst.Service.ID)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrServiceNotFound,
-			Message: fmt.Sprintf("failed to get service: %v", err),
+		c.NotFound(router.Error{
+			Code:           api.ErrServiceNotFound,
+			PublicMessage:  fmt.Sprintf("Service %s not found.", inst.Service.ID),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
 	err = instanceServiceService.Update(inst, service)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToUpdateServiceInstance,
-			Message: fmt.Sprintf("failed to update service: %v", err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToUpdateServiceInstance,
+			PublicMessage:  fmt.Sprintf("Failed to update service for instance %s.", inst.UUID),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
@@ -562,9 +541,10 @@ func handleGetVersions(c *router.Context) {
 
 	versions, err := instanceRunnerService.GetAllVersions(inst, useCache)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToGetVersions,
-			Message: fmt.Sprintf("failed to get versions: %v", err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToGetVersions,
+			PublicMessage:  fmt.Sprintf("Failed to get versions for instance %s.", inst.UUID),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}

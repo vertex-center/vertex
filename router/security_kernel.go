@@ -23,9 +23,10 @@ func addSecurityKernelRoutes(r *router.Group) {
 func handleGetSSHKeyKernel(c *router.Context) {
 	keys, err := sshKernelService.GetAll()
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToGetSSHKeys,
-			Message: fmt.Sprintf("failed to get SSH keys: %v", err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToGetSSHKeys,
+			PublicMessage:  "Failed to get SSH keys.",
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
@@ -41,9 +42,10 @@ func handleAddSSHKeyKernel(c *router.Context) {
 	buf := new(bytes.Buffer)
 	_, err := buf.ReadFrom(c.Request.Body)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrFailedToParseBody,
-			Message: fmt.Sprintf("failed to parse request body: %v", err),
+		c.BadRequest(router.Error{
+			Code:           api.ErrFailedToParseBody,
+			PublicMessage:  "Failed to parse request body.",
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
@@ -51,15 +53,17 @@ func handleAddSSHKeyKernel(c *router.Context) {
 
 	err = sshKernelService.Add(key)
 	if err != nil && errors.Is(err, services.ErrInvalidPublicKey) {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrInvalidPublicKey,
-			Message: fmt.Sprintf("error while parsing the public key: %v", err),
+		c.BadRequest(router.Error{
+			Code:           api.ErrInvalidPublicKey,
+			PublicMessage:  "Invalid public key.",
+			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToAddSSHKey,
-			Message: fmt.Sprintf("failed to add SSH key: %v", err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToAddSSHKey,
+			PublicMessage:  "Failed to add SSH key.",
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
@@ -74,18 +78,20 @@ func handleAddSSHKeyKernel(c *router.Context) {
 func handleDeleteSSHKeyKernel(c *router.Context) {
 	fingerprint := c.Param("fingerprint")
 	if fingerprint == "" {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrInvalidFingerprint,
-			Message: "invalid fingerprint",
+		c.BadRequest(router.Error{
+			Code:           api.ErrInvalidFingerprint,
+			PublicMessage:  "The request is missing the fingerprint.",
+			PrivateMessage: "Field 'fingerprint' is required.",
 		})
 		return
 	}
 
 	err := sshKernelService.Delete(fingerprint)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToDeleteSSHKey,
-			Message: fmt.Sprintf("failed to delete SSH key: %v", err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToDeleteSSHKey,
+			PublicMessage:  fmt.Sprintf("Failed to delete SSH key with fingerprint '%s'.", fingerprint),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}

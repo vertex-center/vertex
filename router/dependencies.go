@@ -25,9 +25,10 @@ func handleGetDependencies(c *router.Context) {
 		var err error
 		dependencies, err = dependenciesService.CheckForUpdates(settingsService.GetChannel())
 		if err != nil {
-			_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-				Code:    api.ErrFailedToCheckForUpdates,
-				Message: fmt.Sprintf("failed to check for updates: %v", err),
+			c.Abort(router.Error{
+				Code:           api.ErrFailedToCheckForUpdates,
+				PublicMessage:  "Failed to check for updates.",
+				PrivateMessage: err.Error(),
 			})
 			return
 		}
@@ -52,12 +53,8 @@ type executeUpdatesBody struct {
 //   - failed_to_reload_packages: failed to reload the packages.
 func handleUpdateDependencies(c *router.Context) {
 	var body executeUpdatesBody
-	err := c.BindJSON(&body)
+	err := c.ParseBody(&body)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrFailedToParseBody,
-			Message: fmt.Sprintf("failed to parse request body: %v", err),
-		})
 		return
 	}
 
@@ -70,18 +67,20 @@ func handleUpdateDependencies(c *router.Context) {
 
 	err = dependenciesService.InstallUpdates(updates)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToInstallUpdates,
-			Message: fmt.Sprintf("failed to install updates: %v", err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToInstallUpdates,
+			PublicMessage:  "Failed to install updates.",
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
 	err = serviceService.Reload()
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToReloadServices,
-			Message: fmt.Sprintf("failed to reload services: %v", err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToReloadServices,
+			PublicMessage:  "Failed to reload services.",
+			PrivateMessage: err.Error(),
 		})
 		return
 	}

@@ -43,9 +43,10 @@ func handleSearchInstances(c *router.Context) {
 func handleCheckForUpdates(c *router.Context) {
 	instances, err := instanceService.CheckForUpdates()
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToCheckForUpdates,
-			Message: err.Error(),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToCheckForUpdates,
+			PublicMessage:  "Failed to check for updates.",
+			PrivateMessage: err.Error(),
 		})
 		return
 	}

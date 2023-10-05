@@ -33,12 +33,8 @@ type handleAddRedirectBody struct {
 //   - failed_to_add_redirect: failed to add the redirect.
 func handleAddRedirect(c *router.Context) {
 	var body handleAddRedirectBody
-	err := c.BindJSON(&body)
+	err := c.ParseBody(&body)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrFailedToParseBody,
-			Message: fmt.Sprintf("failed to parse request body: %v", err),
-		})
 		return
 	}
 
@@ -49,9 +45,10 @@ func handleAddRedirect(c *router.Context) {
 
 	err = proxyService.AddRedirect(redirect)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToAddRedirect,
-			Message: fmt.Sprintf("failed to add redirect: %v", err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToAddRedirect,
+			PublicMessage:  fmt.Sprintf("Failed to add redirect '%s' to '%s'.", redirect.Source, redirect.Target),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
@@ -67,27 +64,30 @@ func handleAddRedirect(c *router.Context) {
 func handleRemoveRedirect(c *router.Context) {
 	idString := c.Param("id")
 	if idString == "" {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrRedirectUuidMissing,
-			Message: "missing redirect uuid",
+		c.BadRequest(router.Error{
+			Code:           api.ErrRedirectUuidMissing,
+			PublicMessage:  "The request is missing the redirect UUID.",
+			PrivateMessage: "Field 'id' is required.",
 		})
 		return
 	}
 
 	id, err := uuid.Parse(idString)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, api.Error{
-			Code:    api.ErrRedirectUuidInvalid,
-			Message: "invalid redirect uuid",
+		c.BadRequest(router.Error{
+			Code:           api.ErrRedirectUuidInvalid,
+			PublicMessage:  "The redirect UUID is invalid.",
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
 	err = proxyService.RemoveRedirect(id)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, api.Error{
-			Code:    api.ErrFailedToRemoveRedirect,
-			Message: fmt.Sprintf("failed to remove redirect: %v", err),
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToRemoveRedirect,
+			PublicMessage:  fmt.Sprintf("Failed to remove redirect '%s'.", id),
+			PrivateMessage: err.Error(),
 		})
 		return
 	}
