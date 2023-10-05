@@ -35,9 +35,6 @@ export default function InstanceDocker() {
 
         api.instance.docker
             .recreate(uuid)
-            .then(() => {
-                reloadContainerInfo().then();
-            })
             .catch((err) => {
                 setRecreatingContainerError(
                     err?.response?.data?.message ?? err?.message
