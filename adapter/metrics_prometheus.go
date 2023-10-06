@@ -1,10 +1,12 @@
 package adapter
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
 	"path"
+	"sync"
 
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
@@ -13,12 +15,18 @@ import (
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vlog"
 	"gopkg.in/yaml.v3"
 )
 
+var ErrMetricNotFound = errors.New("metric not found")
+
 type PrometheusAdapter struct {
-	instancesStatus *prometheus.GaugeVec
-	instancesCount  prometheus.Gauge
+	gauges    map[string]prometheus.Gauge
+	gaugeVecs map[string]*prometheus.GaugeVec
+
+	// mutex for all maps
+	mutex *sync.RWMutex
 
 	reg *prometheus.Registry
 }
@@ -27,24 +35,13 @@ func NewMetricsPrometheusAdapter() *PrometheusAdapter {
 	reg := prometheus.NewRegistry()
 
 	a := &PrometheusAdapter{
-		reg: reg,
-		instancesStatus: prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "vertex_instance_status",
-				Help: "The status of the instance (0 = off, 1 = on)",
-			},
-			[]string{"instance_uuid"},
-		),
-		instancesCount: prometheus.NewGauge(
-			prometheus.GaugeOpts{
-				Name: "vertex_instances_count",
-				Help: "The number of instances installed",
-			},
-		),
-	}
+		gauges:    map[string]prometheus.Gauge{},
+		gaugeVecs: map[string]*prometheus.GaugeVec{},
 
-	reg.MustRegister(a.instancesStatus)
-	reg.MustRegister(a.instancesCount)
+		mutex: &sync.RWMutex{},
+
+		reg: reg,
+	}
 
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
@@ -90,36 +87,67 @@ func (a *PrometheusAdapter) ConfigureInstance(uuid uuid.UUID) error {
 	return os.WriteFile(p, bytes, 0644)
 }
 
-func (a *PrometheusAdapter) UpdateInstanceStatus(uuid uuid.UUID, status types.MetricInstanceStatus) {
-	a.instancesStatus.WithLabelValues(uuid.String()).Set(float64(status))
-}
+func (a *PrometheusAdapter) RegisterMetrics(metrics []types.Metric) {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 
-func (a *PrometheusAdapter) SetInstancesCount(count int) {
-	a.instancesCount.Set(float64(count))
-}
-
-func (a *PrometheusAdapter) IncrementInstancesCount() {
-	a.instancesCount.Inc()
-}
-
-func (a *PrometheusAdapter) DecrementInstancesCount() {
-	a.instancesCount.Dec()
-}
-
-func (a *PrometheusAdapter) GetMetrics() ([]types.Metric, error) {
-	metrics, err := a.reg.Gather()
-	if err != nil {
-		return nil, err
-	}
-
-	var results []types.Metric
 	for _, m := range metrics {
-		results = append(results, types.Metric{
-			Name:        m.GetName(),
-			Description: m.GetHelp(),
-			Type:        m.GetType().String(),
-		})
+		switch m.Type {
+		case types.MetricTypeOnOff:
+			fallthrough
+		case types.MetricTypeInteger:
+			opts := prometheus.GaugeOpts{
+				Name: m.ID,
+				Help: m.Description,
+			}
+			if m.Labels != nil {
+				collector := prometheus.NewGaugeVec(opts, m.Labels)
+				a.gaugeVecs[m.ID] = collector
+				a.reg.MustRegister(collector)
+			} else {
+				collector := prometheus.NewGauge(opts)
+				a.gauges[m.ID] = collector
+				a.reg.MustRegister(collector)
+			}
+		}
 	}
+}
 
-	return results, nil
+func (a *PrometheusAdapter) Set(metricID string, value interface{}, labels ...string) {
+	a.mutex.RLock()
+	defer a.mutex.RUnlock()
+
+	if collector, ok := a.gaugeVecs[metricID]; ok {
+		collector.WithLabelValues(labels...).Set(value.(float64))
+	} else if collector, ok := a.gauges[metricID]; ok {
+		collector.Set(value.(float64))
+	} else {
+		log.Error(ErrMetricNotFound, vlog.String("metric_id", metricID))
+	}
+}
+
+func (a *PrometheusAdapter) Inc(metricID string, labels ...string) {
+	a.mutex.RLock()
+	defer a.mutex.RUnlock()
+
+	if collector, ok := a.gaugeVecs[metricID]; ok {
+		collector.WithLabelValues(labels...).Inc()
+	} else if collector, ok := a.gauges[metricID]; ok {
+		collector.Inc()
+	} else {
+		log.Error(ErrMetricNotFound, vlog.String("metric_id", metricID))
+	}
+}
+
+func (a *PrometheusAdapter) Dec(metricID string, labels ...string) {
+	a.mutex.RLock()
+	defer a.mutex.RUnlock()
+
+	if collector, ok := a.gaugeVecs[metricID]; ok {
+		collector.WithLabelValues(labels...).Dec()
+	} else if collector, ok := a.gauges[metricID]; ok {
+		collector.Dec()
+	} else {
+		log.Error(ErrMetricNotFound, vlog.String("metric_id", metricID))
+	}
 }

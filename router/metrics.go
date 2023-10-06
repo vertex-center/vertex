@@ -10,7 +10,7 @@ import (
 )
 
 func addMetricsRoutes(r *router.Group) {
-	r.GET("/collector/:collector", handleGetMetrics)
+	r.GET("", handleGetMetrics)
 	r.POST("/collector/:collector/install", handleInstallMetricsCollector)
 }
 
@@ -68,20 +68,5 @@ func handleInstallMetricsCollector(c *router.Context) {
 }
 
 func handleGetMetrics(c *router.Context) {
-	collector, err := getCollector(c)
-	if err != nil {
-		return
-	}
-
-	metrics, err := metricsService.GetMetrics(collector)
-	if err != nil {
-		c.Abort(router.Error{
-			Code:           api.ErrFailedToGetMetrics,
-			PublicMessage:  "Failed to get metrics.",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(metrics)
+	c.JSON(metricsService.GetMetrics())
 }

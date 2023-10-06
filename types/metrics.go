@@ -4,30 +4,34 @@ import (
 	"github.com/google/uuid"
 )
 
-type MetricInstanceStatus int
+const (
+	MetricStatusOff float64 = 0.0
+	MetricStatusOn  float64 = 1.0
+)
+
+type MetricType string
 
 const (
-	MetricStatusOff MetricInstanceStatus = 0
-	MetricStatusOn  MetricInstanceStatus = 1
+	MetricTypeOnOff   MetricType = "metric_type_on_off"
+	MetricTypeInteger MetricType = "metric_type_number"
 )
 
 type Metric struct {
-	Name        string `json:"name"`
-	Description string `json:"description,omitempty"`
-	Type        string `json:"type,omitempty"`
+	ID          string     `json:"id"`
+	Name        string     `json:"name"`
+	Description string     `json:"description,omitempty"`
+	Type        MetricType `json:"type,omitempty"`
+	Labels      []string   `json:"labels,omitempty"`
 }
 
 type MetricsAdapterPort interface {
 	// ConfigureInstance configures an instance to monitor the metrics of Vertex.
 	ConfigureInstance(uuid uuid.UUID) error
 
-	// UpdateInstanceStatus updates the status of an instance.
-	UpdateInstanceStatus(uuid uuid.UUID, status MetricInstanceStatus)
+	// RegisterMetrics registers the metrics that can be monitored.
+	RegisterMetrics(metrics []Metric)
 
-	SetInstancesCount(count int)
-	IncrementInstancesCount()
-	DecrementInstancesCount()
-
-	// GetMetrics returns the monitored metrics.
-	GetMetrics() ([]Metric, error)
+	Set(metricID string, value interface{}, labels ...string)
+	Inc(metricID string, labels ...string)
+	Dec(metricID string, labels ...string)
 }
