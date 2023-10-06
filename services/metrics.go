@@ -26,7 +26,7 @@ func NewMetricsService(adapter types.MetricsAdapterPort, eventsAdapter types.Eve
 			Name:        "Instance Status",
 			Description: "The status of the instance",
 			Type:        types.MetricTypeOnOff,
-			Labels:      []string{"instance_uuid"},
+			Labels:      []string{"uuid", "service_id"},
 		},
 		{
 			ID:          MetricIDInstancesCount,
@@ -69,7 +69,7 @@ func (s *MetricsService) GetMetrics() []types.Metric {
 func (s *MetricsService) OnEvent(e interface{}) {
 	switch e := e.(type) {
 	case types.EventInstanceStatusChange:
-		s.updateStatus(e.InstanceUUID, e.Status)
+		s.updateStatus(e.InstanceUUID, e.ServiceID, e.Status)
 	case types.EventInstanceCreated:
 		s.adapter.Inc(MetricIDInstancesCount)
 	case types.EventInstanceDeleted:
@@ -83,11 +83,11 @@ func (s *MetricsService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *MetricsService) updateStatus(uuid uuid.UUID, status string) {
+func (s *MetricsService) updateStatus(uuid uuid.UUID, serviceId string, status string) {
 	switch status {
 	case types.InstanceStatusRunning:
-		s.adapter.Set(MetricIDInstanceStatus, types.MetricStatusOn, uuid.String())
+		s.adapter.Set(MetricIDInstanceStatus, types.MetricStatusOn, uuid.String(), serviceId)
 	default:
-		s.adapter.Set(MetricIDInstanceStatus, types.MetricStatusOff, uuid.String())
+		s.adapter.Set(MetricIDInstanceStatus, types.MetricStatusOff, uuid.String(), serviceId)
 	}
 }
