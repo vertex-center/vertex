@@ -2,10 +2,8 @@ package services
 
 import (
 	"errors"
-	"net"
 	"os"
 	"path"
-	"strings"
 	"sync"
 	"time"
 
@@ -330,13 +328,7 @@ func (s *InstanceService) remapDatabaseEnv(inst *types.Instance) error {
 			return err
 		}
 
-		host := config.Current.HostVertex
-		if strings.Contains(host, ":") {
-			host, _, err = net.SplitHostPort(host)
-			if err != nil {
-				return err
-			}
-		}
+		host := config.Current.Host
 
 		dbEnvNames := (*db.Service.Features.Databases)[0]
 		iEnvNames := inst.Service.Databases[databaseID].Names

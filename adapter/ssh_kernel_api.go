@@ -15,7 +15,7 @@ type SshKernelApiAdapter struct {
 func NewSshKernelApiAdapter() types.SshAdapterPort {
 	return &SshKernelApiAdapter{
 		config: func(rb *requests.Builder) {
-			rb.BaseURL(config.Current.HostKernel)
+			rb.BaseURL(config.Current.KernelURL())
 		},
 	}
 }

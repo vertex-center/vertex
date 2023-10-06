@@ -35,7 +35,7 @@ func NewProxyRouter() ProxyRouter {
 }
 
 func (r *ProxyRouter) Start() error {
-	log.Info("Vertex-Proxy started", vlog.String("url", config.Current.HostProxy))
+	log.Info("Vertex-Proxy started", vlog.String("url", config.Current.ProxyURL()))
 	addr := fmt.Sprintf(":%s", config.Current.PortProxy)
 	return r.Router.Start(addr)
 }

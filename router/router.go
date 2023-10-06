@@ -3,7 +3,6 @@ package router
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -93,7 +92,7 @@ func (r *Router) Start(addr string) {
 		log.Error(err)
 	}
 
-	url := fmt.Sprintf("http://%s", config.Current.HostVertex)
+	url := config.Current.VertexURL()
 	log.Info("Vertex started", vlog.String("url", url))
 
 	err = r.Router.Start(addr)

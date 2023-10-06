@@ -47,7 +47,7 @@ func NewKernelRouter() KernelRouter {
 }
 
 func (r *KernelRouter) Start() error {
-	log.Info("vertex-kernel started", vlog.String("url", config.KernelCurrent.HostKernel))
+	log.Info("vertex-kernel started", vlog.String("url", config.KernelCurrent.KernelURL()))
 	addr := fmt.Sprintf(":%s", config.KernelCurrent.PortKernel)
 	return r.Router.Start(addr)
 }

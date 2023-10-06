@@ -1,10 +1,10 @@
 package adapter
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
@@ -53,8 +53,7 @@ func (a *PrometheusAdapter) ConfigureInstance(uuid uuid.UUID) error {
 		return err
 	}
 
-	host := strings.Split(config.Current.HostVertex, ":")
-	url := host[0] + ":2112"
+	url := fmt.Sprintf("%s:%s", config.Current.Host, config.Current.PortPrometheus)
 
 	data := map[string]interface{}{
 		"scrape_configs": []map[string]interface{}{

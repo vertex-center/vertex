@@ -5,36 +5,56 @@ import (
 	"os"
 	"path"
 
+	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/pkg/net"
 	"github.com/vertex-center/vertex/pkg/storage"
 )
+
+const urlFormat = "http://%s:%s"
 
 var Current = New()
 
 type Config struct {
-	HostVertex string `json:"host"`
-	PortVertex string `json:"port"`
+	Host string `json:"host"`
 
-	HostKernel string `json:"host_kernel"`
-	PortKernel string `json:"port_kernel"`
-
-	HostProxy string `json:"host_proxy"`
-	PortProxy string `json:"port_proxy"`
+	Port           string `json:"port"`
+	PortKernel     string `json:"port_kernel"`
+	PortProxy      string `json:"port_proxy"`
+	PortPrometheus string `json:"port_prometheus"`
 }
 
 func New() Config {
-	return Config{
-		HostVertex: "127.0.0.1:6130",
-		PortVertex: "6130",
-
-		HostKernel: "http://localhost:6131",
-		PortKernel: "6131",
-
-		HostProxy: "http://localhost:80",
-		PortProxy: "80",
+	host, err := net.LocalIP()
+	if err != nil {
+		log.Error(err)
+		host = "127.0.0.1"
 	}
+
+	c := Config{
+		Host: host,
+
+		Port:           "6130",
+		PortKernel:     "6131",
+		PortProxy:      "80",
+		PortPrometheus: "2112",
+	}
+
+	return c
+}
+
+func (c Config) VertexURL() string {
+	return fmt.Sprintf(urlFormat, c.Host, c.Port)
+}
+
+func (c Config) KernelURL() string {
+	return fmt.Sprintf(urlFormat, c.Host, c.PortKernel)
+}
+
+func (c Config) ProxyURL() string {
+	return fmt.Sprintf(urlFormat, c.Host, c.PortProxy)
 }
 
 func (c Config) Apply() error {
-	configJsContent := fmt.Sprintf("window.apiURL = \"http://%s\";", c.HostVertex)
+	configJsContent := fmt.Sprintf("window.apiURL = \"%s\";", c.VertexURL())
 	return os.WriteFile(path.Join(storage.Path, "client", "dist", "config.js"), []byte(configJsContent), os.ModePerm)
 }

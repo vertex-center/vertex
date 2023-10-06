@@ -70,10 +70,10 @@ func main() {
 	}()
 
 	// Logs
-	url := fmt.Sprintf("http://%s", config.Current.HostVertex)
+	url := config.Current.VertexURL()
 	fmt.Printf("\n-- Vertex Client :: %s\n\n", url)
 
-	r.Start(fmt.Sprintf(":%s", config.Current.PortVertex))
+	r.Start(fmt.Sprintf(":%s", config.Current.Port))
 }
 
 func parseArgs() {
@@ -82,14 +82,14 @@ func parseArgs() {
 	flagDate := flag.Bool("date", false, "Print the release date")
 	flagCommit := flag.Bool("commit", false, "Print the commit hash")
 
-	flagPort := flag.String("port", config.Current.PortVertex, "The Vertex port")
-	flagHost := flag.String("host", config.Current.HostVertex, "The Vertex access url")
+	var (
+		flagHost = flag.String("host", config.Current.Host, "The Vertex access url")
 
-	flagHostKernel := flag.String("host-kernel", config.Current.HostKernel, "The Vertex Kernel access url")
-	flagPortKernel := flag.String("port-kernel", config.Current.PortKernel, "The Vertex Kernel port")
-
-	flagHostProxy := flag.String("host-proxy", config.Current.HostProxy, "The Vertex Proxy access url")
-	flagPortProxy := flag.String("port-proxy", config.Current.PortProxy, "The Vertex Proxy port")
+		flagPort           = flag.String("port", config.Current.Port, "The Vertex port")
+		flagPortKernel     = flag.String("port-kernel", config.Current.PortKernel, "The Vertex Kernel port")
+		flagPortProxy      = flag.String("port-proxy", config.Current.PortProxy, "The Vertex Proxy port")
+		flagPortPrometheus = flag.String("port-prometheus", config.Current.PortPrometheus, "The Prometheus port")
+	)
 
 	flag.Parse()
 
@@ -105,12 +105,11 @@ func parseArgs() {
 		fmt.Println(commit)
 		os.Exit(0)
 	}
-	config.Current.HostVertex = *flagHost
-	config.Current.PortVertex = *flagPort
-	config.Current.HostKernel = *flagHostKernel
+	config.Current.Host = *flagHost
+	config.Current.Port = *flagPort
 	config.Current.PortKernel = *flagPortKernel
-	config.Current.HostProxy = *flagHostProxy
 	config.Current.PortProxy = *flagPortProxy
+	config.Current.PortPrometheus = *flagPortPrometheus
 }
 
 func checkNotRoot() {
