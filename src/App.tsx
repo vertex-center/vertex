@@ -24,6 +24,7 @@ import SettingsHardware from "./apps/Settings/SettingsHardware/SettingsHardware"
 import SettingsSecurity from "./apps/Settings/SettingsSecurity/SettingsSecurity";
 import MonitoringApp from "./apps/Monitoring/MonitoringApp/MonitoringApp";
 import Prometheus from "./apps/Monitoring/Prometheus/Prometheus";
+import MetricsList from "./apps/Monitoring/MetricsList/MetricsList";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -45,6 +46,10 @@ function App() {
                             element={<InstancesStore />}
                         />
                         <Route path="/monitoring" element={<MonitoringApp />}>
+                            <Route
+                                path="/monitoring/metrics"
+                                element={<MetricsList />}
+                            />
                             <Route
                                 path="/monitoring/prometheus"
                                 element={<Prometheus />}

@@ -16,6 +16,13 @@ export default function MonitoringApp() {
 
             <Horizontal className={styles.content}>
                 <Sidebar root="/monitoring">
+                    <SidebarGroup title="Overview">
+                        <SidebarItem
+                            symbol="rule"
+                            to="/monitoring/metrics"
+                            name="Metrics"
+                        />
+                    </SidebarGroup>
                     <SidebarGroup title="Collectors">
                         <SidebarItem
                             symbol={<SiPrometheus size={20} />}

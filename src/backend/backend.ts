@@ -11,6 +11,7 @@ import { DockerContainerInfo } from "../models/docker";
 import { About } from "../models/about";
 import { Hardware } from "../models/hardware";
 import { SSHKeys } from "../models/security";
+import { Metric } from "../models/metrics";
 
 type InstallServiceParams = {
     method: InstallMethod;
@@ -102,8 +103,8 @@ export const api = {
     },
 
     metrics: {
+        get: () => server.get<Metric[]>(`/metrics`),
         collector: (collector: string) => ({
-            get: () => server.get(`/metrics/collector/${collector}`),
             install: () =>
                 server.post(`/metrics/collector/${collector}/install`),
         }),

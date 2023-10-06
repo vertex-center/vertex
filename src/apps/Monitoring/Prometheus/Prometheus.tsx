@@ -1,4 +1,4 @@
-import { SubTitle, Text, Title } from "../../../components/Text/Text";
+import { Text, Title } from "../../../components/Text/Text";
 import styles from "./Prometheus.module.sass";
 import { Vertical } from "../../../components/Layouts/Layouts";
 import { useFetch } from "../../../hooks/useFetch";
@@ -14,7 +14,6 @@ import {
     unregisterSSE,
     unregisterSSEEvent,
 } from "../../../backend/sse";
-import Metrics from "../Metrics/Metrics";
 
 export default function Prometheus() {
     const {
@@ -23,12 +22,6 @@ export default function Prometheus() {
         loading: loadingInstances,
         error: errorInstances,
     } = useFetch<Instances>(api.instances.get);
-
-    const {
-        data: metrics,
-        loading: loadingMetrics,
-        error: errorMetrics,
-    } = useFetch<Metric[]>(api.metrics.collector("prometheus").get);
 
     const [downloading, setDownloading] = useState(false);
     const [error, setError] = useState();
@@ -96,14 +89,12 @@ export default function Prometheus() {
 
     return (
         <Vertical gap={30}>
-            <ProgressOverlay
-                show={loadingInstances || downloading || loadingMetrics}
-            />
+            <ProgressOverlay show={loadingInstances || downloading} />
 
             <Vertical gap={20}>
                 <Title className={styles.title}>Prometheus</Title>
                 <Text className={styles.content}>
-                    Prometheus allows you to collect metrics from Vertex.
+                    Prometheus allows you to collect metrics gathered by Vertex.
                     {instance?.status === "not-installed" && (
                         <Fragment>
                             {" "}
@@ -112,7 +103,7 @@ export default function Prometheus() {
                         </Fragment>
                     )}
                 </Text>
-                <APIError error={error ?? errorInstances ?? errorMetrics} />
+                <APIError error={error ?? errorInstances} />
                 <Bay
                     instances={[
                         {
@@ -131,13 +122,6 @@ export default function Prometheus() {
                     ]}
                 />
             </Vertical>
-
-            {metrics && (
-                <Vertical gap={20}>
-                    <SubTitle className={styles.title}>Metrics</SubTitle>
-                    <Metrics metrics={metrics} />
-                </Vertical>
-            )}
         </Vertical>
     );
 }
