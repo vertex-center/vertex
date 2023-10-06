@@ -26,7 +26,7 @@ func (suite *SshKernelApiAdapterTestSuite) SetupTest() {
 
 func (suite *SshKernelApiAdapterTestSuite) TestGetAll() {
 	gock.Off()
-	gock.New(config.Current.HostKernel).
+	gock.New(config.Current.KernelURL()).
 		Get("/api/security/ssh").
 		Reply(http.StatusOK).
 		JSON([]types.PublicKey{})
@@ -38,7 +38,7 @@ func (suite *SshKernelApiAdapterTestSuite) TestGetAll() {
 
 func (suite *SshKernelApiAdapterTestSuite) TestAdd() {
 	gock.Off()
-	gock.New(config.Current.HostKernel).
+	gock.New(config.Current.KernelURL()).
 		Post("/api/security/ssh").
 		Reply(http.StatusOK)
 
@@ -48,7 +48,7 @@ func (suite *SshKernelApiAdapterTestSuite) TestAdd() {
 
 func (suite *SshKernelApiAdapterTestSuite) TestDelete() {
 	gock.Off()
-	gock.New(config.Current.HostKernel).
+	gock.New(config.Current.KernelURL()).
 		Delete("/api/security/ssh/fingerprint").
 		Reply(http.StatusOK)
 

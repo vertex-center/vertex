@@ -45,12 +45,11 @@ func main() {
 	go func() {
 		var err error
 		vertex, err = runVertex([]string{
-			"-port", config.KernelCurrent.PortVertex,
-			"-host", config.KernelCurrent.HostVertex,
-			"-host-kernel", config.KernelCurrent.HostKernel,
+			"-host", config.KernelCurrent.Host,
+			"-port", config.KernelCurrent.Port,
 			"-port-kernel", config.KernelCurrent.PortKernel,
-			"-host-proxy", config.KernelCurrent.HostProxy,
 			"-port-proxy", config.KernelCurrent.PortProxy,
+			"-port-prometheus", config.KernelCurrent.PortPrometheus,
 		}...)
 		if err != nil {
 			log.Error(err)
@@ -83,28 +82,26 @@ func ensureRoot() {
 }
 
 func parseArgs() {
-	flagUsername := flag.String("user", "", "username of the unprivileged user")
-	flagUID := flag.Uint("uid", 0, "uid of the unprivileged user")
-	flagGID := flag.Uint("gid", 0, "gid of the unprivileged user")
+	var (
+		flagUsername = flag.String("user", "", "username of the unprivileged user")
+		flagUID      = flag.Uint("uid", 0, "uid of the unprivileged user")
+		flagGID      = flag.Uint("gid", 0, "gid of the unprivileged user")
 
-	// Copy/paste from cmd/main/main.go
-	flagPort := flag.String("port", config.Current.PortVertex, "The Vertex port")
-	flagHost := flag.String("host", config.Current.HostVertex, "The Vertex access url")
+		flagHost = flag.String("host", config.Current.Host, "The Vertex access url")
 
-	flagHostKernel := flag.String("host-kernel", config.Current.HostKernel, "The Vertex Kernel access url")
-	flagPortKernel := flag.String("port-kernel", config.Current.PortKernel, "The Vertex Kernel port")
-
-	flagHostProxy := flag.String("host-proxy", config.Current.HostProxy, "The Vertex Proxy access url")
-	flagPortProxy := flag.String("port-proxy", config.Current.PortProxy, "The Vertex Proxy port")
+		flagPort           = flag.String("port", config.Current.Port, "The Vertex port")
+		flagPortKernel     = flag.String("port-kernel", config.Current.PortKernel, "The Vertex Kernel port")
+		flagPortProxy      = flag.String("port-proxy", config.Current.PortProxy, "The Vertex Proxy port")
+		flagPortPrometheus = flag.String("port-prometheus", config.Current.PortPrometheus, "The Prometheus port")
+	)
 
 	flag.Parse()
 
-	config.KernelCurrent.HostVertex = *flagHost
-	config.KernelCurrent.PortVertex = *flagPort
-	config.KernelCurrent.HostKernel = *flagHostKernel
+	config.KernelCurrent.Host = *flagHost
+	config.KernelCurrent.Port = *flagPort
 	config.KernelCurrent.PortKernel = *flagPortKernel
-	config.KernelCurrent.HostProxy = *flagHostProxy
 	config.KernelCurrent.PortProxy = *flagPortProxy
+	config.KernelCurrent.PortPrometheus = *flagPortPrometheus
 
 	if *flagUsername != "" {
 		u, err := user.Lookup(*flagUsername)
