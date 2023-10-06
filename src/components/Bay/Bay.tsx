@@ -2,11 +2,11 @@ import styles from "./Bay.module.sass";
 import Symbol from "../Symbol/Symbol";
 import classNames from "classnames";
 import { Horizontal, Vertical } from "../Layouts/Layouts";
-import { SiDocker } from "@icons-pack/react-simple-icons";
-import { InstallMethod, InstanceUpdate } from "../../models/instance";
 import { Link } from "react-router-dom";
 import { Fragment, MouseEventHandler } from "react";
 import LoadingValue from "../LoadingValue/LoadingValue";
+import { Instance } from "../../models/instance";
+import LogoIcon from "../Logo/LogoIcon";
 
 type ButtonProps = {
     symbol: string;
@@ -47,14 +47,14 @@ type Status =
     | "not-installed";
 
 type LCDProps = {
-    name: string;
-    status: Status | string;
+    instance: Partial<Instance>;
     count?: number;
-    dockerized?: boolean;
 };
 
 function LCD(props: LCDProps) {
-    const { name, status, count, dockerized } = props;
+    const { instance, count } = props;
+    const { display_name, service, status } = instance ?? {};
+    const { name } = service ?? {};
 
     let message;
     switch (status) {
@@ -90,15 +90,9 @@ function LCD(props: LCDProps) {
         <Vertical gap={10}>
             <Horizontal gap={8}>
                 <Horizontal gap={8}>
-                    {name ?? <LoadingValue />}
+                    {display_name ?? name ?? <LoadingValue />}
                     {count && <div className={styles.lcdCount}>{count}</div>}
                 </Horizontal>
-                {dockerized && (
-                    <SiDocker
-                        size={15}
-                        style={{ marginTop: -1, opacity: 0.5 }}
-                    />
-                )}
             </Horizontal>
             <div
                 className={classNames({
@@ -121,14 +115,9 @@ function LCD(props: LCDProps) {
 
 type Props = {
     instances: {
-        name: string;
-        status: Status | string;
+        value: Partial<Instance>;
         count?: number;
-        method?: InstallMethod;
-        update?: InstanceUpdate;
-
         to?: string;
-
         onPower?: () => void;
         onInstall?: () => void;
     }[];
@@ -142,34 +131,37 @@ export default function Bay(props: Props) {
         e.preventDefault();
     };
 
+    const tags = {
+        "vertex-prometheus-collector": "Vertex Monitoring",
+    };
+
     return (
         <div className={styles.group}>
             {instances.map((instance) => {
+                const inst = instance.value;
+                const tag = inst?.tags?.find((tag) => tag in tags);
+                const count = instance.count;
                 const content = (
                     <Fragment>
-                        <LED status={instance.status} />
-                        <LCD
-                            name={instance.name}
-                            count={instance.count}
-                            status={instance.status}
-                            dockerized={instance.method === "docker"}
-                        />
-                        {instance?.update && (
-                            <div>
-                                Update available:{" "}
-                                {instance.update.current_version} {"->"}{" "}
-                                {instance.update.latest_version}
+                        <LED status={inst?.status} />
+                        <LCD instance={inst} count={count} />
+
+                        {tag && (
+                            <div className={styles.lcdTag}>
+                                <LogoIcon />
+                                <div>{tags[tag]}</div>
                             </div>
                         )}
+
                         {instance?.onPower &&
-                            instance?.status !== "not-installed" && (
+                            inst?.status !== "not-installed" && (
                                 <Button
                                     symbol="power_rounded"
                                     onClick={(e: any) => onPower(e, instance)}
                                 />
                             )}
                         {instance?.onInstall &&
-                            instance?.status === "not-installed" && (
+                            inst?.status === "not-installed" && (
                                 <Button
                                     symbol="download"
                                     onClick={instance.onInstall}

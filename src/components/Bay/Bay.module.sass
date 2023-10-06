@@ -15,7 +15,7 @@
     gap: 30px
     position: relative
     border: 1px solid transparent
-    padding: 0 40px
+    padding: 0 100px 0 40px
     height: 84px
 
     &Clickable
@@ -76,6 +76,19 @@
 
     &Count
         color: colors.$fg-tertiary
+
+    &Tag
+        display: flex
+        flex-direction: row
+        gap: 10px
+        align-items: center
+        white-space: nowrap
+        color: colors.$fg-secondary
+        overflow: hidden
+
+        @include dimensions.extra-small-or-less
+            display: none
+
 
 @keyframes loading
     0%

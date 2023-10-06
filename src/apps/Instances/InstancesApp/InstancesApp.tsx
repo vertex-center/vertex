@@ -114,20 +114,19 @@ export default function InstancesApp() {
 
             {!loading && !error && (
                 <div className={styles.bays}>
-                    <Bay instances={[{ name: "Vertex", status }]} />
+                    <Bay
+                        instances={[
+                            { value: { display_name: "Vertex", status } },
+                        ]}
+                    />
                     {installedGrouped?.map((instances, i) => (
                         <Bay
                             key={i}
                             instances={instances.map((instance, i) => ({
-                                name:
-                                    instance?.display_name ??
-                                    instance?.service?.name,
-                                status: instance.status,
+                                value: instance,
                                 count: instances.length > 1 ? i + 1 : undefined,
                                 to: `/instances/${instance.uuid}/`,
                                 onPower: () => toggleInstance(instance.uuid),
-                                method: instance.install_method,
-                                update: instance.update,
                             }))}
                         />
                     ))}

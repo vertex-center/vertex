@@ -108,15 +108,10 @@ export default function Prometheus() {
                 <Bay
                     instances={[
                         {
-                            name:
-                                instance?.display_name ??
-                                instance?.service?.name,
-                            status: instance?.status,
-
+                            value: instance,
                             to: instance?.uuid
                                 ? `/instances/${instance?.uuid}`
                                 : undefined,
-
                             onInstall: onInstall,
                             onPower: () => onPower(instance),
                         },

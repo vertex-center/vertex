@@ -178,12 +178,8 @@ export default function Instance() {
                 <Bay
                     instances={[
                         {
-                            name:
-                                instance?.display_name ??
-                                instance?.service?.name,
-                            status: instance?.status,
+                            value: instance,
                             onPower: () => toggleInstance(uuid),
-                            method: instance?.install_method,
                         },
                     ]}
                 />
