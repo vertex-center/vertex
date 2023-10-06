@@ -44,7 +44,7 @@ func NewMetricsPrometheusAdapter() *PrometheusAdapter {
 	}
 
 	go func() {
-		http.Handle("/metrics", promhttp.Handler())
+		http.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
 		err := http.ListenAndServe(":2112", nil)
 		if err != nil {
 			log.Error(err)
@@ -91,6 +91,7 @@ func (a *PrometheusAdapter) RegisterMetrics(metrics []types.Metric) {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
+	var err error
 	for _, m := range metrics {
 		switch m.Type {
 		case types.MetricTypeOnOff:
