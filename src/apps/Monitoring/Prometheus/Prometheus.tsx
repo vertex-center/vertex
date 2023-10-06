@@ -1,4 +1,4 @@
-import { Text, Title } from "../../../components/Text/Text";
+import { SubTitle, Text, Title } from "../../../components/Text/Text";
 import styles from "./Prometheus.module.sass";
 import { Vertical } from "../../../components/Layouts/Layouts";
 import { useFetch } from "../../../hooks/useFetch";
@@ -14,13 +14,21 @@ import {
     unregisterSSE,
     unregisterSSEEvent,
 } from "../../../backend/sse";
+import Metrics from "../Metrics/Metrics";
 
 export default function Prometheus() {
     const {
         data: instances,
         reload: reloadInstances,
         loading: loadingInstances,
+        error: errorInstances,
     } = useFetch<Instances>(api.instances.get);
+
+    const {
+        data: metrics,
+        loading: loadingMetrics,
+        error: errorMetrics,
+    } = useFetch<Metric[]>(api.metrics.collector("prometheus").get);
 
     const [downloading, setDownloading] = useState(false);
     const [error, setError] = useState();
@@ -50,7 +58,8 @@ export default function Prometheus() {
         setDownloading(true);
 
         api.metrics
-            .install("prometheus")
+            .collector("prometheus")
+            .install()
             .catch(setError)
             .finally(() => {
                 setDownloading(false);
@@ -86,38 +95,49 @@ export default function Prometheus() {
     };
 
     return (
-        <Vertical gap={20}>
-            <ProgressOverlay show={loadingInstances || downloading} />
-
-            <Title className={styles.title}>Prometheus</Title>
-
-            <Text className={styles.content}>
-                Prometheus allows you to collect metrics from Vertex.
-                {instance?.status === "not-installed" && (
-                    <Fragment>
-                        {" "}
-                        To enable collection, you first need to install
-                        Prometheus with Vertex Instances.
-                    </Fragment>
-                )}
-            </Text>
-            <APIError error={error} />
-
-            <Bay
-                instances={[
-                    {
-                        name: instance?.display_name ?? instance?.service?.name,
-                        status: instance?.status,
-
-                        to: instance?.uuid
-                            ? `/instances/${instance?.uuid}`
-                            : undefined,
-
-                        onInstall: onInstall,
-                        onPower: () => onPower(instance),
-                    },
-                ]}
+        <Vertical gap={30}>
+            <ProgressOverlay
+                show={loadingInstances || downloading || loadingMetrics}
             />
+
+            <Vertical gap={20}>
+                <Title className={styles.title}>Prometheus</Title>
+                <Text className={styles.content}>
+                    Prometheus allows you to collect metrics from Vertex.
+                    {instance?.status === "not-installed" && (
+                        <Fragment>
+                            {" "}
+                            To enable collection, you first need to install
+                            Prometheus with Vertex Instances.
+                        </Fragment>
+                    )}
+                </Text>
+                <APIError error={error ?? errorInstances ?? errorMetrics} />
+                <Bay
+                    instances={[
+                        {
+                            name:
+                                instance?.display_name ??
+                                instance?.service?.name,
+                            status: instance?.status,
+
+                            to: instance?.uuid
+                                ? `/instances/${instance?.uuid}`
+                                : undefined,
+
+                            onInstall: onInstall,
+                            onPower: () => onPower(instance),
+                        },
+                    ]}
+                />
+            </Vertical>
+
+            {metrics && (
+                <Vertical gap={20}>
+                    <SubTitle className={styles.title}>Metrics</SubTitle>
+                    <Metrics metrics={metrics} />
+                </Vertical>
+            )}
         </Vertical>
     );
 }
