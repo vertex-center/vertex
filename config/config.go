@@ -5,6 +5,8 @@ import (
 	"os"
 	"path"
 
+	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/pkg/net"
 	"github.com/vertex-center/vertex/pkg/storage"
 )
 
@@ -22,14 +24,22 @@ type Config struct {
 }
 
 func New() Config {
-	return Config{
-		Host: "127.0.0.1",
+	host, err := net.LocalIP()
+	if err != nil {
+		log.Error(err)
+		host = "127.0.0.1"
+	}
+
+	c := Config{
+		Host: host,
 
 		Port:           "6130",
 		PortKernel:     "6131",
 		PortProxy:      "80",
 		PortPrometheus: "2112",
 	}
+
+	return c
 }
 
 func (c Config) VertexURL() string {
