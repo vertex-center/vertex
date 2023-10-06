@@ -41,7 +41,7 @@ func (s *InstanceLogsService) OnEvent(e interface{}) {
 	case types.EventInstanceLog:
 		s.onLogReceived(e)
 	case types.EventInstanceLoaded:
-		err := s.logsAdapter.Open(e.InstanceUuid)
+		err := s.logsAdapter.Open(e.Instance.UUID)
 		if err != nil {
 			log.Error(err)
 			return

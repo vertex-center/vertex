@@ -15,10 +15,12 @@ require (
 	github.com/go-co-op/gocron v1.35.0
 	github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20230305113008-0c11038e723f
 	github.com/go-git/go-git/v5 v5.9.0
+	github.com/go-ping/ping v1.1.0
 	github.com/google/go-containerregistry v0.16.1
 	github.com/google/go-github/v50 v50.2.0
 	github.com/google/uuid v1.3.1
 	github.com/h2non/gock v1.2.0
+	github.com/prometheus/client_golang v1.14.0
 	github.com/shirou/gopsutil/v3 v3.23.9
 	github.com/stretchr/testify v1.8.4
 	github.com/vertex-center/vlog v1.0.2
@@ -33,7 +35,9 @@ require (
 	github.com/Microsoft/go-winio v0.6.1 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20230828082145-3c4c8a2d2371 // indirect
 	github.com/acomagu/bufpipe v1.0.4 // indirect
+	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/cloudflare/circl v1.3.3 // indirect
 	github.com/containerd/containerd v1.7.0 // indirect
@@ -73,6 +77,7 @@ require (
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
+	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/moby/patternmatcher v0.5.0 // indirect
 	github.com/moby/sys/sequential v0.5.0 // indirect
@@ -88,6 +93,9 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
+	github.com/prometheus/client_model v0.3.0 // indirect
+	github.com/prometheus/common v0.37.0 // indirect
+	github.com/prometheus/procfs v0.8.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/sasha-s/go-csync v0.0.0-20210812194225-61421b77c44b // indirect

@@ -58,4 +58,7 @@ const (
 	ErrFailedToInstallService router.ErrCode = "failed_to_install_service"
 
 	ErrFailedToPatchSettings router.ErrCode = "failed_to_patch_settings"
+
+	ErrCollectorNotFound                router.ErrCode = "collector_not_found"
+	ErrFailedToConfigureMetricsInstance router.ErrCode = "failed_to_configure_metrics_instance"
 )
