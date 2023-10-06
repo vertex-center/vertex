@@ -24,6 +24,10 @@ type MetricsAdapterPort interface {
 	// UpdateInstanceStatus updates the status of an instance.
 	UpdateInstanceStatus(uuid uuid.UUID, status MetricInstanceStatus)
 
+	SetInstancesCount(count int)
+	IncrementInstancesCount()
+	DecrementInstancesCount()
+
 	// GetMetrics returns the monitored metrics.
 	GetMetrics() ([]Metric, error)
 }

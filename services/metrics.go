@@ -38,6 +38,12 @@ func (s *MetricsService) OnEvent(e interface{}) {
 	switch e := e.(type) {
 	case types.EventInstanceStatusChange:
 		s.updateStatus(e.InstanceUUID, e.Status)
+	case types.EventInstanceCreated:
+		s.adapter.IncrementInstancesCount()
+	case types.EventInstanceDeleted:
+		s.adapter.DecrementInstancesCount()
+	case types.EventInstancesLoaded:
+		s.adapter.SetInstancesCount(e.Count)
 	}
 }
 

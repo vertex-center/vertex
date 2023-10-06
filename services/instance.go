@@ -135,6 +135,7 @@ func (s *InstanceService) Delete(uuid uuid.UUID) error {
 
 	delete(s.instances, uuid)
 
+	s.eventsAdapter.Send(types.EventInstanceDeleted{})
 	s.eventsAdapter.Send(types.EventInstancesChange{})
 	return nil
 }
@@ -244,7 +245,14 @@ func (s *InstanceService) Install(service types.Service, method string) (*types.
 
 	inst.ResetDefaultEnv()
 	err = s.instanceEnvService.Save(inst, inst.Env)
-	return inst, err
+	if err != nil {
+		return nil, err
+	}
+
+	s.eventsAdapter.Send(types.EventInstanceCreated{})
+	s.eventsAdapter.Send(types.EventInstancesChange{})
+
+	return inst, nil
 }
 
 func (s *InstanceService) CheckForUpdates() (map[uuid.UUID]*types.Instance, error) {
@@ -264,13 +272,19 @@ func (s *InstanceService) LoadAll() {
 		return
 	}
 
+	loaded := 0
 	for _, id := range uuids {
 		err := s.load(id)
 		if err != nil {
 			log.Error(err)
 			continue
 		}
+		loaded += 1
 	}
+
+	s.eventsAdapter.Send(types.EventInstancesLoaded{
+		Count: loaded,
+	})
 }
 
 func (s *InstanceService) load(uuid uuid.UUID) error {

@@ -17,7 +17,8 @@ import (
 )
 
 type PrometheusAdapter struct {
-	status *prometheus.GaugeVec
+	instancesStatus *prometheus.GaugeVec
+	instancesCount  prometheus.Gauge
 
 	reg *prometheus.Registry
 }
@@ -27,16 +28,23 @@ func NewMetricsPrometheusAdapter() *PrometheusAdapter {
 
 	a := &PrometheusAdapter{
 		reg: reg,
-		status: prometheus.NewGaugeVec(
+		instancesStatus: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Name: "vertex_instance_status",
 				Help: "The status of the instance (0 = off, 1 = on)",
 			},
 			[]string{"instance_uuid"},
 		),
+		instancesCount: prometheus.NewGauge(
+			prometheus.GaugeOpts{
+				Name: "vertex_instances_count",
+				Help: "The number of instances installed",
+			},
+		),
 	}
 
-	reg.MustRegister(a.status)
+	reg.MustRegister(a.instancesStatus)
+	reg.MustRegister(a.instancesCount)
 
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
@@ -83,7 +91,19 @@ func (a *PrometheusAdapter) ConfigureInstance(uuid uuid.UUID) error {
 }
 
 func (a *PrometheusAdapter) UpdateInstanceStatus(uuid uuid.UUID, status types.MetricInstanceStatus) {
-	a.status.WithLabelValues(uuid.String()).Set(float64(status))
+	a.instancesStatus.WithLabelValues(uuid.String()).Set(float64(status))
+}
+
+func (a *PrometheusAdapter) SetInstancesCount(count int) {
+	a.instancesCount.Set(float64(count))
+}
+
+func (a *PrometheusAdapter) IncrementInstancesCount() {
+	a.instancesCount.Inc()
+}
+
+func (a *PrometheusAdapter) DecrementInstancesCount() {
+	a.instancesCount.Dec()
 }
 
 func (a *PrometheusAdapter) GetMetrics() ([]types.Metric, error) {
