@@ -52,9 +52,14 @@ func NewMetricsService(adapter types.MetricsAdapterPort, eventsAdapter types.Eve
 	return s
 }
 
-// ConfigureInstance will configure an instance to monitor the metrics of Vertex.
-func (s *MetricsService) ConfigureInstance(inst *types.Instance) error {
+// ConfigureCollector will configure an instance to monitor the metrics of Vertex.
+func (s *MetricsService) ConfigureCollector(inst *types.Instance) error {
 	return s.adapter.ConfigureInstance(inst.UUID)
+}
+
+func (s *MetricsService) ConfigureVisualizer(inst *types.Instance) error {
+	// TODO: Implement
+	return nil
 }
 
 func (s *MetricsService) GetMetrics() []types.Metric {
