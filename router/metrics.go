@@ -57,6 +57,9 @@ func handleInstallMetricsCollector(c *router.Context) {
 	}
 
 	err = metricsService.ConfigureInstance(inst)
+	if err == nil {
+		err = instanceSettingsService.SetTags(inst, []string{"vertex-prometheus-collector"})
+	}
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToConfigureMetricsInstance,
@@ -65,6 +68,8 @@ func handleInstallMetricsCollector(c *router.Context) {
 		})
 		return
 	}
+
+	c.OK()
 }
 
 func handleGetMetrics(c *router.Context) {

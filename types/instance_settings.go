@@ -20,6 +20,9 @@ type InstanceSettings struct {
 
 	// Version is the version of the program.
 	Version *string `json:"version,omitempty"`
+
+	// Tags are the tags assigned to the instance.
+	Tags []string `json:"tags,omitempty"`
 }
 
 type InstanceSettingsAdapterPort interface {

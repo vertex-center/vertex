@@ -48,3 +48,8 @@ func (s *InstanceSettingsService) SetVersion(inst *types.Instance, value string)
 	inst.Version = &value
 	return s.adapter.Save(inst.UUID, inst.InstanceSettings)
 }
+
+func (s *InstanceSettingsService) SetTags(inst *types.Instance, tags []string) error {
+	inst.Tags = tags
+	return s.adapter.Save(inst.UUID, inst.InstanceSettings)
+}
