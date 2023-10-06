@@ -31,7 +31,8 @@ export default function Prometheus() {
     useEffect(() => {
         if (!instances) return;
         const inst = Object.entries(instances).find(
-            ([_, instance]) => instance.service.id === "prometheus"
+            ([_, instance]) =>
+                instance?.tags?.includes("vertex-prometheus-collector") ?? false
         );
         if (!inst) {
             setInstance({

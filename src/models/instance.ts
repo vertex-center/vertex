@@ -34,6 +34,7 @@ export type Instance = {
     version?: string;
     update?: InstanceUpdate;
     service_update?: ServiceUpdate;
+    tags?: string[];
 };
 
 export type Instances = { [uuid: string]: Instance };
