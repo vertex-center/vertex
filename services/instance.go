@@ -307,7 +307,7 @@ func (s *InstanceService) load(uuid uuid.UUID) error {
 	}
 
 	s.eventsAdapter.Send(types.EventInstanceLoaded{
-		InstanceUuid: uuid,
+		Instance: &inst,
 	})
 
 	return nil

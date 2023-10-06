@@ -26,17 +26,18 @@ import (
 )
 
 var (
-	runnerDockerAdapter       types.RunnerAdapterPort
-	instanceFSAdapter         types.InstanceAdapterPort
-	instanceEnvFSAdapter      types.InstanceEnvAdapterPort
-	instanceLogsFSAdapter     types.InstanceLogsAdapterPort
-	instanceServiceFSAdapter  types.InstanceServiceAdapterPort
-	instanceSettingsFSAdapter types.InstanceSettingsAdapterPort
-	eventInMemoryAdapter      types.EventAdapterPort
-	serviceFSAdapter          types.ServiceAdapterPort
-	proxyFSAdapter            types.ProxyAdapterPort
-	settingsFSAdapter         types.SettingsAdapterPort
-	sshKernelApiAdapter       types.SshAdapterPort
+	runnerDockerAdapter        types.RunnerAdapterPort
+	instanceFSAdapter          types.InstanceAdapterPort
+	instanceEnvFSAdapter       types.InstanceEnvAdapterPort
+	instanceLogsFSAdapter      types.InstanceLogsAdapterPort
+	instanceServiceFSAdapter   types.InstanceServiceAdapterPort
+	instanceSettingsFSAdapter  types.InstanceSettingsAdapterPort
+	metricsPrometheusFsAdapter types.MetricsAdapterPort
+	eventInMemoryAdapter       types.EventAdapterPort
+	serviceFSAdapter           types.ServiceAdapterPort
+	proxyFSAdapter             types.ProxyAdapterPort
+	settingsFSAdapter          types.SettingsAdapterPort
+	sshKernelApiAdapter        types.SshAdapterPort
 
 	notificationsService    services.NotificationsService
 	serviceService          services.ServiceService
@@ -47,6 +48,7 @@ var (
 	instanceRunnerService   services.InstanceRunnerService
 	instanceServiceService  services.InstanceServiceService
 	instanceSettingsService services.InstanceSettingsService
+	metricsService          services.MetricsService
 	dependenciesService     services.DependenciesService
 	settingsService         services.SettingsService
 	hardwareService         services.HardwareService
@@ -141,6 +143,7 @@ func (r *Router) initAdapters() {
 	instanceLogsFSAdapter = adapter.NewInstanceLogsFSAdapter()
 	instanceServiceFSAdapter = adapter.NewInstanceServiceFSAdapter(nil)
 	instanceSettingsFSAdapter = adapter.NewInstanceSettingsFSAdapter(nil)
+	metricsPrometheusFsAdapter = adapter.NewMetricsPrometheusAdapter()
 	eventInMemoryAdapter = adapter.NewEventInMemoryAdapter()
 	serviceFSAdapter = adapter.NewServiceFSAdapter(nil)
 	proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
@@ -165,6 +168,7 @@ func (r *Router) initServices(about types.About) {
 	instanceRunnerService = services.NewInstanceRunnerService(eventInMemoryAdapter, runnerDockerAdapter)
 	instanceServiceService = services.NewInstanceServiceService(instanceServiceFSAdapter)
 	instanceSettingsService = services.NewInstanceSettingsService(instanceSettingsFSAdapter)
+	metricsService = services.NewMetricsService(metricsPrometheusFsAdapter, eventInMemoryAdapter)
 	serviceService = services.NewServiceService(serviceFSAdapter)
 	dependenciesService = services.NewDependenciesService(about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)
@@ -182,6 +186,7 @@ func (r *Router) initAPIRoutes(about types.About) {
 	addServicesRoutes(api.Group("/services"))
 	addInstancesRoutes(api.Group("/instances"))
 	addInstanceRoutes(api.Group("/instance/:instance_uuid"))
+	addMetricsRoutes(api.Group("/metrics"))
 	addProxyRoutes(api.Group("/proxy"))
 	addDependenciesRoutes(api.Group("/dependencies"))
 	addSettingsRoutes(api.Group("/settings"))
