@@ -9,12 +9,37 @@ $border: 1px solid colors.$bg-secondary
     flex-direction: row
     align-items: center
     gap: 15px
-    padding: 15px 0
-    border-bottom: $border
+    padding: 15px 25px
     position: relative
+    border-radius: dimensions.$border-radius-lg
+    cursor: pointer
+
+    @include dimensions.medium-or-less
+        padding: 20px 25px 25px
+
+    &:hover
+        background-color: colors.$bg-primary-hover
+
+    &:after
+        content: ''
+        position: absolute
+        bottom: 0
+        left: 25px
+        right: 25px
+        height: 1px
+        background-color: colors.$bg-secondary
+        transition: opacity 0.2s ease-in-out
 
     &:first-child
-        border-top: $border
+        &:before
+            content: ''
+            position: absolute
+            top: 0
+            left: 25px
+            right: 25px
+            height: 1px
+            background-color: colors.$bg-secondary
+            transition: opacity 0.2s ease-in-out
 
     @include dimensions.medium-or-less
         flex-direction: column
@@ -39,8 +64,3 @@ $border: 1px solid colors.$bg-secondary
 
 .count
     white-space: nowrap
-
-.add
-    @include dimensions.medium-or-less
-        position: absolute
-        right: 0

@@ -2,7 +2,6 @@ import { Service as ServiceModel } from "../../models/service";
 
 import styles from "./Service.module.sass";
 import { Caption } from "../Text/Text";
-import Button from "../Button/Button";
 import Progress from "../Progress";
 import ServiceLogo from "../ServiceLogo/ServiceLogo";
 
@@ -24,7 +23,7 @@ export default function Service(props: Props) {
     }
 
     return (
-        <div className={styles.service}>
+        <div className={styles.service} onClick={onInstall}>
             <div className={styles.logo}>
                 <ServiceLogo service={service} />
             </div>
@@ -36,15 +35,6 @@ export default function Service(props: Props) {
                 <Caption className={styles.count}>{installedCountText}</Caption>
             )}
             {downloading && <Progress infinite />}
-            {!downloading && (
-                <Button
-                    className={styles.add}
-                    rightSymbol="add"
-                    onClick={onInstall}
-                >
-                    New instance
-                </Button>
-            )}
         </div>
     );
 }
