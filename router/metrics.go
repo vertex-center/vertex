@@ -10,10 +10,11 @@ import (
 )
 
 func addMetricsRoutes(r *router.Group) {
-	r.POST("/install/:collector", handleInstallMetricsCollector)
+	r.GET("/collector/:collector", handleGetMetrics)
+	r.POST("/collector/:collector/install", handleInstallMetricsCollector)
 }
 
-func handleInstallMetricsCollector(c *router.Context) {
+func getCollector(c *router.Context) (string, error) {
 	collector := c.Param("collector")
 	if collector != "prometheus" {
 		c.NotFound(router.Error{
@@ -21,6 +22,15 @@ func handleInstallMetricsCollector(c *router.Context) {
 			PublicMessage:  fmt.Sprintf("Collector not found: %s.", collector),
 			PrivateMessage: "The collector is not supported. It should be 'prometheus'.",
 		})
+		return "", errors.New("collector not found")
+	}
+	return collector, nil
+
+}
+
+func handleInstallMetricsCollector(c *router.Context) {
+	collector, err := getCollector(c)
+	if err != nil {
 		return
 	}
 
@@ -55,4 +65,23 @@ func handleInstallMetricsCollector(c *router.Context) {
 		})
 		return
 	}
+}
+
+func handleGetMetrics(c *router.Context) {
+	collector, err := getCollector(c)
+	if err != nil {
+		return
+	}
+
+	metrics, err := metricsService.GetMetrics(collector)
+	if err != nil {
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToGetMetrics,
+			PublicMessage:  "Failed to get metrics.",
+			PrivateMessage: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(metrics)
 }

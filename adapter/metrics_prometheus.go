@@ -18,10 +18,15 @@ import (
 
 type PrometheusAdapter struct {
 	status *prometheus.GaugeVec
+
+	reg *prometheus.Registry
 }
 
 func NewMetricsPrometheusAdapter() *PrometheusAdapter {
+	reg := prometheus.NewRegistry()
+
 	a := &PrometheusAdapter{
+		reg: reg,
 		status: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Name: "vertex_instance_status",
@@ -31,7 +36,7 @@ func NewMetricsPrometheusAdapter() *PrometheusAdapter {
 		),
 	}
 
-	prometheus.MustRegister(a.status)
+	reg.MustRegister(a.status)
 
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
@@ -79,4 +84,22 @@ func (a *PrometheusAdapter) ConfigureInstance(uuid uuid.UUID) error {
 
 func (a *PrometheusAdapter) UpdateInstanceStatus(uuid uuid.UUID, status types.MetricInstanceStatus) {
 	a.status.WithLabelValues(uuid.String()).Set(float64(status))
+}
+
+func (a *PrometheusAdapter) GetMetrics() ([]types.Metric, error) {
+	metrics, err := a.reg.Gather()
+	if err != nil {
+		return nil, err
+	}
+
+	var results []types.Metric
+	for _, m := range metrics {
+		results = append(results, types.Metric{
+			Name:        m.GetName(),
+			Description: m.GetHelp(),
+			Type:        m.GetType().String(),
+		})
+	}
+
+	return results, nil
 }

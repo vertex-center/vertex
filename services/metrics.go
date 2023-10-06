@@ -30,6 +30,10 @@ func (s *MetricsService) ConfigureInstance(inst *types.Instance) error {
 	return s.adapter.ConfigureInstance(inst.UUID)
 }
 
+func (s *MetricsService) GetMetrics(collector string) ([]types.Metric, error) {
+	return s.adapter.GetMetrics()
+}
+
 func (s *MetricsService) OnEvent(e interface{}) {
 	switch e := e.(type) {
 	case types.EventInstanceStatusChange:
