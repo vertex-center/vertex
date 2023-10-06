@@ -12,7 +12,11 @@ export default function ServiceLogo(props: Props) {
     const iconURL = new URL(window.apiURL);
     iconURL.pathname = `/api/services/icons/${service?.icon}`;
 
-    if (service?.icon) {
+    if (!service?.icon) {
+        return <Symbol name="extension" style={{ opacity: 0.8 }} />;
+    }
+
+    if (service?.icon.endsWith(".svg")) {
         return (
             <span
                 style={{
@@ -25,5 +29,14 @@ export default function ServiceLogo(props: Props) {
         );
     }
 
-    return <Symbol name="extension" style={{ opacity: 0.8 }} />;
+    return (
+        <img
+            alt="Service icon"
+            src={iconURL.href}
+            style={{
+                width: 24,
+                height: 24,
+            }}
+        />
+    );
 }
