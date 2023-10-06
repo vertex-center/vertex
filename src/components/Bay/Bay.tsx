@@ -43,7 +43,8 @@ type Status =
     | "running"
     | "stopping"
     | "error"
-    | "downloading";
+    | "downloading"
+    | "not-installed";
 
 type LCDProps = {
     name: string;
@@ -77,6 +78,9 @@ function LCD(props: LCDProps) {
             break;
         case "downloading":
             message = "Downloading...";
+            break;
+        case "not-installed":
+            message = "Not installed";
             break;
         default:
             message = status;
@@ -126,6 +130,7 @@ type Props = {
         to?: string;
 
         onPower?: () => void;
+        onInstall?: () => void;
     }[];
 };
 
@@ -156,12 +161,20 @@ export default function Bay(props: Props) {
                                 {instance.update.latest_version}
                             </div>
                         )}
-                        {instance?.onPower && (
-                            <Button
-                                symbol="power_rounded"
-                                onClick={(e: any) => onPower(e, instance)}
-                            />
-                        )}
+                        {instance?.onPower &&
+                            instance?.status !== "not-installed" && (
+                                <Button
+                                    symbol="power_rounded"
+                                    onClick={(e: any) => onPower(e, instance)}
+                                />
+                            )}
+                        {instance?.onInstall &&
+                            instance?.status === "not-installed" && (
+                                <Button
+                                    symbol="download"
+                                    onClick={instance.onInstall}
+                                />
+                            )}
                     </Fragment>
                 );
 

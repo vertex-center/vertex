@@ -101,6 +101,11 @@ export const api = {
         },
     },
 
+    metrics: {
+        install: (collector: string) =>
+            server.post(`/metrics/install/${collector}`),
+    },
+
     dependencies: {
         get: (reload?: boolean) =>
             server.get<DependenciesUpdate>(

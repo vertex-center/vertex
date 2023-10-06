@@ -1,9 +1,8 @@
 import styles from "./Sidebar.module.sass";
-import { Horizontal } from "../Layouts/Layouts";
 import Symbol from "../Symbol/Symbol";
 import classNames from "classnames";
 import { NavLink, useLocation } from "react-router-dom";
-import { HTMLProps, PropsWithChildren } from "react";
+import { Fragment, HTMLProps, PropsWithChildren } from "react";
 import { Text } from "../Text/Text";
 import Spacer from "../Spacer/Spacer";
 
@@ -23,11 +22,18 @@ type ItemProps = {
 };
 
 export function SidebarItem(props: ItemProps) {
-    const { to, symbol, name, onClick, red } = props;
+    const { to, name, onClick, red } = props;
+
+    let symbol: any;
+    if (typeof props.symbol === "string") {
+        symbol = <Symbol name={props.symbol} />;
+    } else {
+        symbol = props.symbol;
+    }
 
     const content = (
-        <Horizontal alignItems="center" gap={12}>
-            <Symbol className={styles.symbol} name={symbol} />
+        <Fragment>
+            <div className={styles.symbol}>{symbol}</div>
             {name}
             <Spacer />
             {props.notifications && (
@@ -35,7 +41,7 @@ export function SidebarItem(props: ItemProps) {
                     {props.notifications}
                 </div>
             )}
-        </Horizontal>
+        </Fragment>
     );
 
     const className = classNames({

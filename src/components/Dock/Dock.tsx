@@ -33,6 +33,11 @@ export default function Dock() {
         <div className={styles.dockContainer}>
             <div className={styles.dock}>
                 <DockApp to="/instances" symbol="storage" name="Instances" />
+                <DockApp
+                    to="/monitoring"
+                    symbol="monitoring"
+                    name="Monitoring"
+                />
                 <DockApp to="/proxy" symbol="router" name="Reverse Proxy" />
                 <div className={styles.separator} />
                 <DockApp to="/settings" symbol="settings" name="Settings" />

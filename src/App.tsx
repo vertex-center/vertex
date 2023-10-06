@@ -22,6 +22,8 @@ import Header from "./components/Header/Header";
 import InstanceDetailsDatabase from "./apps/Instances/Details/InstanceDatabase/InstanceDetailsDatabase";
 import SettingsHardware from "./apps/Settings/SettingsHardware/SettingsHardware";
 import SettingsSecurity from "./apps/Settings/SettingsSecurity/SettingsSecurity";
+import MonitoringApp from "./apps/Monitoring/MonitoringApp/MonitoringApp";
+import Prometheus from "./apps/Monitoring/Prometheus/Prometheus";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -42,6 +44,12 @@ function App() {
                             path="/instances/add"
                             element={<InstancesStore />}
                         />
+                        <Route path="/monitoring" element={<MonitoringApp />}>
+                            <Route
+                                path="/monitoring/prometheus"
+                                element={<Prometheus />}
+                            />
+                        </Route>
                         <Route path="/proxy" element={<ReverseProxyApp />} />
                         <Route path="/instances/:uuid/" element={<Instance />}>
                             <Route
