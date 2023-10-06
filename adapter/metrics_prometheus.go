@@ -103,13 +103,16 @@ func (a *PrometheusAdapter) RegisterMetrics(metrics []types.Metric) {
 			if m.Labels != nil {
 				collector := prometheus.NewGaugeVec(opts, m.Labels)
 				a.gaugeVecs[m.ID] = collector
-				a.reg.MustRegister(collector)
+				err = a.reg.Register(collector)
 			} else {
 				collector := prometheus.NewGauge(opts)
 				a.gauges[m.ID] = collector
-				a.reg.MustRegister(collector)
+				err = a.reg.Register(collector)
 			}
 		}
+	}
+	if err != nil {
+		log.Error(err)
 	}
 }
 
