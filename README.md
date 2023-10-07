@@ -16,8 +16,8 @@
 Vertex Web UI allows you to interact with your Vertex instance easily. You can monitor, setup, start and stop services
 without any technical knowledge.
 
-<img width="1515" alt="image" src="https://user-images.githubusercontent.com/12123721/229261331-b2c8de51-f88a-458d-9eff-0ea73c83a0ad.png">
-<img width="822" alt="image" src="https://user-images.githubusercontent.com/12123721/229261568-399c5970-600b-4023-96b1-bddd7feba81e.png">
+<img width="1524" alt="image" src="https://github.com/vertex-center/vertex-webui/assets/12123721/36c0a95d-0ff4-416a-9d13-2381f6af88f5">
+<img width="1524" alt="image" src="https://github.com/vertex-center/vertex-webui/assets/12123721/d9f8f073-7e1f-48d5-abd3-ba31ee1b6f43">
 
 ## Install
 
