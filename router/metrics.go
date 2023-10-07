@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
 )
 
@@ -49,18 +48,16 @@ func handleInstallMetricsCollector(c *router.Context) {
 
 	service, err := serviceService.GetById(collector)
 	if err != nil {
-		return
-	}
-
-	inst, err := instanceService.Install(service, "docker")
-	if err != nil && errors.Is(err, types.ErrServiceNotFound) {
 		c.NotFound(router.Error{
 			Code:           api.ErrServiceNotFound,
 			PublicMessage:  fmt.Sprintf("Service not found: %s.", collector),
 			PrivateMessage: err.Error(),
 		})
 		return
-	} else if err != nil {
+	}
+
+	inst, err := instanceService.Install(service, "docker")
+	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToInstallService,
 			PublicMessage:  fmt.Sprintf("Failed to install service '%s'.", service.Name),
@@ -93,18 +90,16 @@ func handleInstallMetricsVisualizer(c *router.Context) {
 
 	service, err := serviceService.GetById(visualizer)
 	if err != nil {
-		return
-	}
-
-	inst, err := instanceService.Install(service, "docker")
-	if err != nil && errors.Is(err, types.ErrServiceNotFound) {
 		c.NotFound(router.Error{
 			Code:           api.ErrServiceNotFound,
 			PublicMessage:  fmt.Sprintf("Service not found: %s.", visualizer),
 			PrivateMessage: err.Error(),
 		})
 		return
-	} else if err != nil {
+	}
+
+	inst, err := instanceService.Install(service, "docker")
+	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToInstallService,
 			PublicMessage:  fmt.Sprintf("Failed to install service '%s'.", service.Name),
