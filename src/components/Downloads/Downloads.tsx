@@ -27,13 +27,16 @@ export default function Downloads(props: { downloads?: Download[] }) {
                                 <div className={styles.downloadID}>{dl.id}</div>
                             )}
                             {dl.status}
-                            {dl.current && dl.total && (
-                                <div className={styles.downloadProgress}>
-                                    <Progress
-                                        value={(dl.current / dl.total) * 100}
-                                    />
-                                </div>
-                            )}
+                            {dl.current !== undefined &&
+                                dl.total !== undefined && (
+                                    <div className={styles.downloadProgress}>
+                                        <Progress
+                                            value={
+                                                (dl.current / dl.total) * 100
+                                            }
+                                        />
+                                    </div>
+                                )}
                         </div>
                     );
                 })}
