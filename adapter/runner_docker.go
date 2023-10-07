@@ -76,6 +76,8 @@ func (a RunnerDockerAdapter) Start(inst *types.Instance, setStatus func(status s
 			err = errors.New("no Docker methods found")
 		}
 		if err != nil {
+			log.Error(err)
+			setStatus(types.InstanceStatusError)
 			return
 		}
 
@@ -433,8 +435,10 @@ func (a RunnerDockerAdapter) pullImage(imageName string) (io.ReadCloser, error) 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
+	} else if res.StatusCode >= 200 && res.StatusCode < 300 {
+		return res.Body, nil
 	}
-	return res.Body, nil
+	return nil, errors.New("failed to pull image")
 }
 
 func (a RunnerDockerAdapter) buildImageFromName(imageName string) (io.ReadCloser, error) {
