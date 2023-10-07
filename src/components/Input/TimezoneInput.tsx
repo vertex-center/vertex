@@ -50,7 +50,7 @@ export default function TimezoneInput(props: Readonly<Props>) {
             >
                 <SelectOption value="">None</SelectOption>
                 {timezones.map((value) => (
-                    <SelectOption value={value.value}>
+                    <SelectOption key={value.value} value={value.value}>
                         {value.text}
                     </SelectOption>
                 ))}
@@ -60,7 +60,9 @@ export default function TimezoneInput(props: Readonly<Props>) {
                 // @ts-ignore
                 <Select className={className} value={timezoneValue} {...others}>
                     {timezoneGroup.utc.map((value) => (
-                        <SelectOption value={value}>{value}</SelectOption>
+                        <SelectOption key={value} value={value}>
+                            {value}
+                        </SelectOption>
                     ))}
                 </Select>
             )}

@@ -37,6 +37,28 @@ export default function Update(props: Readonly<Props>) {
         props.onUpdate().finally(() => setIsLoading(false));
     };
 
+    let status: JSX.Element;
+    if (available) {
+        if (isLoading) {
+            status = <Progress infinite />;
+        } else {
+            status = (
+                <ListActions>
+                    <Button rightSymbol="download" onClick={onUpdate}>
+                        Update
+                    </Button>
+                </ListActions>
+            );
+        }
+    } else {
+        status = (
+            <div className={styles.status}>
+                <Symbol name="check" />
+                Up-to-date
+            </div>
+        );
+    }
+
     return (
         <ListItem>
             <ListInfo>
@@ -50,22 +72,7 @@ export default function Update(props: Readonly<Props>) {
                     </ListDescription>
                 )}
             </ListInfo>
-            {available ? (
-                isLoading ? (
-                    <Progress infinite />
-                ) : (
-                    <ListActions>
-                        <Button rightSymbol="download" onClick={onUpdate}>
-                            Update
-                        </Button>
-                    </ListActions>
-                )
-            ) : (
-                <div className={styles.status}>
-                    <Symbol name="check" />
-                    Up-to-date
-                </div>
-            )}
+            {status}
         </ListItem>
     );
 }

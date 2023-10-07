@@ -22,7 +22,6 @@ export default function InstanceDocker() {
     const {
         data: info,
         error,
-        reload: reloadContainerInfo,
         loading,
     } = useFetch<DockerContainerInfo>(() => api.instance.docker.get(uuid));
 

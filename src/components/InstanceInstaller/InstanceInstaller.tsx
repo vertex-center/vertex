@@ -3,7 +3,7 @@ import { APIError } from "../Error/Error";
 import { Fragment, useEffect, useState } from "react";
 import { ProgressOverlay } from "../Progress/Progress";
 import { useFetch } from "../../hooks/useFetch";
-import { Instances } from "../../models/instance";
+import { Instance, Instances } from "../../models/instance";
 import { api } from "../../backend/backend";
 import {
     registerSSE,
@@ -18,6 +18,12 @@ type Props = {
     install: () => Promise<any>;
 };
 
+type Inst = Partial<
+    Instance & {
+        onPower: (inst: Instance) => Promise<void>;
+    }
+>;
+
 export default function InstanceInstaller(props: Readonly<Props>) {
     const { name, tag, install } = props;
 
@@ -31,7 +37,7 @@ export default function InstanceInstaller(props: Readonly<Props>) {
     const [downloading, setDownloading] = useState(false);
     const [error, setError] = useState();
 
-    const [instance, setInstance] = useState<any>();
+    const [instance, setInstance] = useState<Inst>();
 
     useEffect(() => {
         if (!instances) return;
@@ -63,13 +69,12 @@ export default function InstanceInstaller(props: Readonly<Props>) {
             });
     };
 
-    const onPower = async (instance: any) => {
-        if (instance?.status === "off" || instance?.status === "error") {
-            await api.instance.start(instance.uuid);
+    const onPower = async (inst: Inst) => {
+        if (inst?.status === "off" || inst?.status === "error") {
+            await api.instance.start(inst.uuid);
+            return;
         }
-        {
-            await api.instance.stop(instance.uuid);
-        }
+        await api.instance.stop(inst.uuid);
     };
 
     useEffect(() => {
@@ -78,7 +83,7 @@ export default function InstanceInstaller(props: Readonly<Props>) {
         const sse = registerSSE(`/instance/${instance.uuid}/events`);
 
         const onStatusChange = (e: any) => {
-            setInstance((instance) => ({ ...instance, status: e.data }));
+            setInstance((inst) => ({ ...inst, status: e.data }));
         };
 
         registerSSEEvent(sse, "status_change", onStatusChange);
@@ -93,7 +98,7 @@ export default function InstanceInstaller(props: Readonly<Props>) {
     return (
         <Fragment>
             <ProgressOverlay show={downloading || loadingInstances} />
-            <APIError error={error || errorInstances} />
+            <APIError error={error ?? errorInstances} />
             <Bay
                 instances={[
                     {
@@ -102,7 +107,9 @@ export default function InstanceInstaller(props: Readonly<Props>) {
                             ? `/instances/${instance?.uuid}`
                             : undefined,
                         onInstall: onInstall,
-                        onPower: () => onPower(instance),
+                        onPower: async () => {
+                            await onPower(instance);
+                        },
                     },
                 ]}
             />

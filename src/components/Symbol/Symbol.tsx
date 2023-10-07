@@ -3,8 +3,8 @@ import classNames from "classnames";
 import styles from "./Symbol.module.sass";
 import { HTMLProps } from "react";
 
-export type SymbolProps = HTMLProps<HTMLSpanElement> & {
-    name: string;
+export type SymbolProps = Omit<HTMLProps<HTMLSpanElement>, "name"> & {
+    name: string | JSX.Element;
     rotating?: boolean;
 };
 

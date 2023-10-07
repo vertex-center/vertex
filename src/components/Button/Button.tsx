@@ -7,8 +7,8 @@ import Spacer from "../Spacer/Spacer";
 import { Link } from "react-router-dom";
 
 export type ButtonProps = HTMLProps<HTMLButtonElement> & {
-    leftSymbol?: string | any;
-    rightSymbol?: string | any;
+    leftSymbol?: string | JSX.Element;
+    rightSymbol?: string | JSX.Element;
 
     selected?: boolean;
     selectable?: boolean;

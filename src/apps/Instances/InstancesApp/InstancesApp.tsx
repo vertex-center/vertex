@@ -39,8 +39,6 @@ export default function InstancesApp() {
     }, [installed]);
 
     const fetchServices = () => {
-        // setError(undefined);
-
         api.instances
             .get()
             .then((res) => {
@@ -119,9 +117,9 @@ export default function InstancesApp() {
                             { value: { display_name: "Vertex", status } },
                         ]}
                     />
-                    {installedGrouped?.map((instances, i) => (
+                    {installedGrouped?.map((instances) => (
                         <Bay
-                            key={i}
+                            key={instances[0].service?.id}
                             instances={instances.map((instance, i) => ({
                                 value: instance,
                                 count: instances.length > 1 ? i + 1 : undefined,

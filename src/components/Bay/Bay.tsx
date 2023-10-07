@@ -63,7 +63,9 @@ function LCD(props: Readonly<LCDProps>) {
             <Horizontal gap={8}>
                 <Horizontal gap={8}>
                     {display_name ?? name ?? <LoadingValue />}
-                    {count && <div className={styles.lcdCount}>{count}</div>}
+                    {count !== undefined && (
+                        <div className={styles.lcdCount}>{count}</div>
+                    )}
                 </Horizontal>
             </Horizontal>
             <div
@@ -90,7 +92,7 @@ type Props = {
         value: Partial<Instance>;
         count?: number;
         to?: string;
-        onPower?: () => void;
+        onPower?: () => Promise<void>;
         onInstall?: () => void;
     }[];
 };
@@ -151,12 +153,20 @@ export default function Bay(props: Readonly<Props>) {
 
                 if (instance.to)
                     return (
-                        <Link to={instance.to} className={classnames}>
+                        <Link
+                            key={inst.uuid}
+                            to={instance.to}
+                            className={classnames}
+                        >
                             {content}
                         </Link>
                     );
 
-                return <div className={classnames}>{content}</div>;
+                return (
+                    <div key={inst.uuid} className={classnames}>
+                        {content}
+                    </div>
+                );
             })}
         </div>
     );

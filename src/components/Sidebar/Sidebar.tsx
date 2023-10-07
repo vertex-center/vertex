@@ -40,7 +40,7 @@ export function SidebarItem(props: Readonly<ItemProps>) {
             <div className={styles.symbol}>{symbol}</div>
             {name}
             <Spacer />
-            {props.notifications && (
+            {props.notifications !== undefined && (
                 <div className={styles.notifications}>
                     {props.notifications}
                 </div>
