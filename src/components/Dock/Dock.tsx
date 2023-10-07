@@ -38,6 +38,7 @@ export default function Dock() {
                     symbol="monitoring"
                     name="Monitoring"
                 />
+                <DockApp to="/tunnels" symbol="subway" name="Tunnels" />
                 <DockApp to="/proxy" symbol="router" name="Reverse Proxy" />
                 <div className={styles.separator} />
                 <DockApp to="/settings" symbol="settings" name="Settings" />

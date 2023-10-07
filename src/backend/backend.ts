@@ -102,6 +102,12 @@ export const api = {
         },
     },
 
+    tunnels: {
+        provider: (provider: string) => ({
+            install: () => server.post(`/tunnels/provider/${provider}/install`),
+        }),
+    },
+
     metrics: {
         get: () => server.get<Metric[]>(`/metrics`),
         collector: (collector: string) => ({

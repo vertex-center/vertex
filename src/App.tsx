@@ -26,6 +26,8 @@ import MonitoringApp from "./apps/Monitoring/MonitoringApp/MonitoringApp";
 import Prometheus from "./apps/Monitoring/Prometheus/Prometheus";
 import MetricsList from "./apps/Monitoring/MetricsList/MetricsList";
 import Grafana from "./apps/Monitoring/Grafana/Grafana";
+import TunnelsApp from "./apps/Tunnels/TunnelsApp/TunnelsApp";
+import CloudflareTunnels from "./apps/Tunnels/CloudflareTunnels/CloudflareTunnels";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -58,6 +60,12 @@ function App() {
                             <Route
                                 path="/monitoring/grafana"
                                 element={<Grafana />}
+                            />
+                        </Route>
+                        <Route path="/tunnels" element={<TunnelsApp />}>
+                            <Route
+                                path="/tunnels/cloudflare"
+                                element={<CloudflareTunnels />}
                             />
                         </Route>
                         <Route path="/proxy" element={<ReverseProxyApp />} />
