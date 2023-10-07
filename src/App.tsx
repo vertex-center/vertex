@@ -25,6 +25,7 @@ import SettingsSecurity from "./apps/Settings/SettingsSecurity/SettingsSecurity"
 import MonitoringApp from "./apps/Monitoring/MonitoringApp/MonitoringApp";
 import Prometheus from "./apps/Monitoring/Prometheus/Prometheus";
 import MetricsList from "./apps/Monitoring/MetricsList/MetricsList";
+import Grafana from "./apps/Monitoring/Grafana/Grafana";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -53,6 +54,10 @@ function App() {
                             <Route
                                 path="/monitoring/prometheus"
                                 element={<Prometheus />}
+                            />
+                            <Route
+                                path="/monitoring/grafana"
+                                element={<Grafana />}
                             />
                         </Route>
                         <Route path="/proxy" element={<ReverseProxyApp />} />

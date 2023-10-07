@@ -6,7 +6,7 @@ import Sidebar, {
     SidebarItem,
 } from "../../../components/Sidebar/Sidebar";
 import { Horizontal } from "../../../components/Layouts/Layouts";
-import { SiPrometheus } from "@icons-pack/react-simple-icons";
+import { SiGrafana, SiPrometheus } from "@icons-pack/react-simple-icons";
 import { Outlet } from "react-router-dom";
 
 export default function MonitoringApp() {
@@ -28,6 +28,13 @@ export default function MonitoringApp() {
                             symbol={<SiPrometheus size={20} />}
                             to="/monitoring/prometheus"
                             name="Prometheus"
+                        />
+                    </SidebarGroup>
+                    <SidebarGroup title="Visualizations">
+                        <SidebarItem
+                            symbol={<SiGrafana size={20} />}
+                            to="/monitoring/grafana"
+                            name="Grafana"
                         />
                     </SidebarGroup>
                 </Sidebar>

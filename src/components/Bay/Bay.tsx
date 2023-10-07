@@ -133,6 +133,7 @@ export default function Bay(props: Props) {
 
     const tags = {
         "vertex-prometheus-collector": "Vertex Monitoring",
+        "vertex-grafana-visualizer": "Vertex Monitoring",
     };
 
     return (

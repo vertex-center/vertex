@@ -108,6 +108,10 @@ export const api = {
             install: () =>
                 server.post(`/metrics/collector/${collector}/install`),
         }),
+        visualizer: (visualizer: string) => ({
+            install: () =>
+                server.post(`/metrics/visualizer/${visualizer}/install`),
+        }),
     },
 
     dependencies: {
