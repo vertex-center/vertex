@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"sync"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -21,55 +22,90 @@ var (
 )
 
 type InstanceLogger struct {
-	file *os.File
+	uuid uuid.UUID
 
-	buffer []types.LogLine
-
+	file        *os.File
+	buffer      []types.LogLine
 	currentLine int
+	scheduler   *gocron.Scheduler
+
+	dir string
 }
 
 type InstanceLogsFSAdapter struct {
-	loggers map[uuid.UUID]*InstanceLogger
+	loggers      map[uuid.UUID]*InstanceLogger
+	loggersMutex sync.RWMutex
+
+	instancesPath string
 }
 
-func NewInstanceLogsFSAdapter() types.InstanceLogsAdapterPort {
-	r := &InstanceLogsFSAdapter{
-		loggers: map[uuid.UUID]*InstanceLogger{},
+type InstanceLogsFSAdapterParams struct {
+	InstancesPath string
+}
+
+func NewInstanceLogsFSAdapter(params *InstanceLogsFSAdapterParams) types.InstanceLogsAdapterPort {
+	if params == nil {
+		params = &InstanceLogsFSAdapterParams{}
 	}
-	r.startCron()
-	return r
+
+	if params.InstancesPath == "" {
+		params.InstancesPath = path.Join(storage.Path, "instances")
+	}
+
+	return &InstanceLogsFSAdapter{
+		loggers:      map[uuid.UUID]*InstanceLogger{},
+		loggersMutex: sync.RWMutex{},
+
+		instancesPath: params.InstancesPath,
+	}
 }
 
-func (a *InstanceLogsFSAdapter) Open(uuid uuid.UUID) error {
-	dir := path.Join(storage.Path, "instances", uuid.String(), ".vertex", "logs")
+func (a *InstanceLogsFSAdapter) Register(uuid uuid.UUID) error {
+	dir := a.dir(uuid)
+
 	err := os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
 		return err
 	}
 
-	filename := fmt.Sprintf("logs_%s.txt", time.Now().Format(time.DateOnly))
-	filepath := path.Join(dir, filename)
+	l := InstanceLogger{
+		uuid:   uuid,
+		buffer: []types.LogLine{},
+		dir:    dir,
+	}
 
-	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
+	a.loggersMutex.Lock()
+	defer a.loggersMutex.Unlock()
+	a.loggers[uuid] = &l
+
+	err = l.Open()
 	if err != nil {
 		return err
 	}
 
-	l := InstanceLogger{
-		buffer: []types.LogLine{},
-	}
-	l.file = file
-
-	a.loggers[uuid] = &l
-	return nil
+	return l.startCron()
 }
 
-func (a *InstanceLogsFSAdapter) Close(uuid uuid.UUID) error {
+func (a *InstanceLogsFSAdapter) Unregister(uuid uuid.UUID) error {
 	l, err := a.getLogger(uuid)
 	if err != nil {
 		return err
 	}
-	return l.Close()
+
+	err = l.stopCron()
+	if err != nil {
+		return err
+	}
+
+	err = l.Close()
+	if err != nil {
+		return err
+	}
+
+	a.loggersMutex.Lock()
+	defer a.loggersMutex.Unlock()
+	delete(a.loggers, uuid)
+	return nil
 }
 
 func (a *InstanceLogsFSAdapter) Push(uuid uuid.UUID, line types.LogLine) {
@@ -103,17 +139,6 @@ func (a *InstanceLogsFSAdapter) Pop(uuid uuid.UUID) (types.LogLine, error) {
 	return line, nil
 }
 
-func (a *InstanceLogsFSAdapter) CloseAll() error {
-	var errs []error
-	for id := range a.loggers {
-		err := a.Close(id)
-		if err != nil {
-			errs = append(errs, err)
-		}
-	}
-	return errors.Join(errs...)
-}
-
 func (a *InstanceLogsFSAdapter) LoadBuffer(uuid uuid.UUID) ([]types.LogLine, error) {
 	l, err := a.getLogger(uuid)
 	if err != nil {
@@ -122,11 +147,20 @@ func (a *InstanceLogsFSAdapter) LoadBuffer(uuid uuid.UUID) ([]types.LogLine, err
 	return l.buffer, nil
 }
 
-func (l *InstanceLogger) Close() error {
-	return l.file.Close()
+func (a *InstanceLogsFSAdapter) UnregisterAll() error {
+	for _, l := range a.loggers {
+		err := a.Unregister(l.uuid)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (a *InstanceLogsFSAdapter) getLogger(uuid uuid.UUID) (*InstanceLogger, error) {
+	a.loggersMutex.RLock()
+	defer a.loggersMutex.RUnlock()
+
 	l, ok := a.loggers[uuid]
 	if !ok {
 		return nil, ErrLoggerNotFound
@@ -134,24 +168,54 @@ func (a *InstanceLogsFSAdapter) getLogger(uuid uuid.UUID) (*InstanceLogger, erro
 	return l, nil
 }
 
-func (a *InstanceLogsFSAdapter) startCron() {
-	s := gocron.NewScheduler(time.Local)
-	_, err := s.Every(1).Day().At("00:00").Do(func() {
-		for id := range a.loggers {
-			err := a.Close(id)
-			if err != nil {
-				log.Error(err)
-				continue
-			}
-			err = a.Open(id)
-			if err != nil {
-				log.Error(err)
-			}
+func (a *InstanceLogsFSAdapter) dir(uuid uuid.UUID) string {
+	return path.Join(a.instancesPath, uuid.String(), ".vertex", "logs")
+}
+
+func (l *InstanceLogger) Open() error {
+	filename := fmt.Sprintf("logs_%s.txt", time.Now().Format(time.DateOnly))
+	filepath := path.Join(l.dir, filename)
+
+	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	l.file = file
+
+	return nil
+}
+
+func (l *InstanceLogger) Close() error {
+	err := l.file.Close()
+	if err != nil {
+		return err
+	}
+	l.file = nil
+	return nil
+}
+
+func (l *InstanceLogger) startCron() error {
+	l.scheduler = gocron.NewScheduler(time.Local)
+	_, err := l.scheduler.Every(1).Day().At("00:00").Do(func() {
+		err := l.Close()
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		err = l.Open()
+		if err != nil {
+			log.Error(err)
 		}
 	})
 	if err != nil {
-		log.Error(err)
-		return
+		return err
 	}
-	s.StartAsync()
+	l.scheduler.StartAsync()
+	return nil
+}
+
+func (l *InstanceLogger) stopCron() error {
+	l.scheduler.Clear()
+	l.scheduler.Stop()
+	return nil
 }

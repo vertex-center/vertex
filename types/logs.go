@@ -18,16 +18,15 @@ const (
 )
 
 type InstanceLogsAdapterPort interface {
-	Open(uuid uuid.UUID) error
-	Close(uuid uuid.UUID) error
+	Register(uuid uuid.UUID) error
+	Unregister(uuid uuid.UUID) error
+	UnregisterAll() error
 
 	Push(uuid uuid.UUID, line LogLine)
 	Pop(uuid uuid.UUID) (LogLine, error)
 
 	// LoadBuffer will load the latest logs kept in memory.
 	LoadBuffer(uuid uuid.UUID) ([]LogLine, error)
-
-	CloseAll() error
 }
 
 var ErrBufferEmpty = errors.New("the buffer is empty")

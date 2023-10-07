@@ -107,11 +107,15 @@ func (r *Router) Stop() {
 	// TODO: Stop() must also stop handleSignals()
 
 	instanceService.StopAll()
+	err := instanceLogsFSAdapter.UnregisterAll()
+	if err != nil {
+		log.Error(err)
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
-	err := r.Router.Stop(ctx)
+	err = r.Router.Stop(ctx)
 	if err != nil {
 		log.Error(err)
 		return
@@ -139,7 +143,7 @@ func (r *Router) initAdapters() {
 	runnerDockerAdapter = adapter.NewRunnerDockerAdapter()
 	instanceFSAdapter = adapter.NewInstanceFSAdapter(nil)
 	instanceEnvFSAdapter = adapter.NewInstanceEnvFSAdapter(nil)
-	instanceLogsFSAdapter = adapter.NewInstanceLogsFSAdapter()
+	instanceLogsFSAdapter = adapter.NewInstanceLogsFSAdapter(nil)
 	instanceServiceFSAdapter = adapter.NewInstanceServiceFSAdapter(nil)
 	instanceSettingsFSAdapter = adapter.NewInstanceSettingsFSAdapter(nil)
 	metricsPrometheusFsAdapter = adapter.NewMetricsPrometheusAdapter()
