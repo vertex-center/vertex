@@ -13,6 +13,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vlog"
 )
 
 const bufferSize = 50
@@ -181,7 +182,7 @@ func (l *InstanceLogger) Open() error {
 		return err
 	}
 	l.file = file
-
+	log.Info("opened instance logger", vlog.String("uuid", l.uuid.String()))
 	return nil
 }
 
@@ -191,6 +192,7 @@ func (l *InstanceLogger) Close() error {
 		return err
 	}
 	l.file = nil
+	log.Info("closed instance logger", vlog.String("uuid", l.uuid.String()))
 	return nil
 }
 
