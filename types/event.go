@@ -64,7 +64,10 @@ type EventInstanceStatusChange struct {
 }
 
 type EventInstanceCreated struct{}
-type EventInstanceDeleted struct{}
+type EventInstanceDeleted struct {
+	InstanceUUID uuid.UUID
+	ServiceID    string
+}
 
 // Events instances
 

@@ -1,6 +1,8 @@
 package services
 
 import (
+	"math"
+
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/types"
 )
@@ -74,6 +76,7 @@ func (s *MetricsService) OnEvent(e interface{}) {
 		s.adapter.Inc(MetricIDInstancesCount)
 	case types.EventInstanceDeleted:
 		s.adapter.Dec(MetricIDInstancesCount)
+		s.adapter.Set(MetricIDInstanceStatus, math.NaN(), e.InstanceUUID.String(), e.ServiceID)
 	case types.EventInstancesLoaded:
 		s.adapter.Set(MetricIDInstancesCount, float64(e.Count))
 	}

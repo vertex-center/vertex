@@ -116,6 +116,8 @@ func (s *InstanceService) Delete(uuid uuid.UUID) error {
 		return err
 	}
 
+	serviceID := instance.Service.ID
+
 	if instance.IsRunning() {
 		return types.ErrInstanceStillRunning
 	}
@@ -132,11 +134,14 @@ func (s *InstanceService) Delete(uuid uuid.UUID) error {
 
 	s.instancesMutex.Lock()
 	defer s.instancesMutex.Unlock()
-
 	delete(s.instances, uuid)
 
-	s.eventsAdapter.Send(types.EventInstanceDeleted{})
+	s.eventsAdapter.Send(types.EventInstanceDeleted{
+		InstanceUUID: uuid,
+		ServiceID:    serviceID,
+	})
 	s.eventsAdapter.Send(types.EventInstancesChange{})
+
 	return nil
 }
 
