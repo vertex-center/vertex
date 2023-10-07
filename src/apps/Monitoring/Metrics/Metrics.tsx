@@ -11,7 +11,7 @@ type Props = {
     metrics?: Metric[];
 };
 
-export default function Metrics(props: Props) {
+export default function Metrics(props: Readonly<Props>) {
     if (!props.metrics) return null;
 
     let symbols = {

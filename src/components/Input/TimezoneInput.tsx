@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 type Props = SelectProps;
 
-export default function TimezoneInput(props: Props) {
+export default function TimezoneInput(props: Readonly<Props>) {
     const { className, label, value, ...others } = props;
 
     const [group, setGroup] = useState<string>("none");

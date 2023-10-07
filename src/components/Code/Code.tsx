@@ -10,7 +10,7 @@ type Props = HTMLProps<HTMLDivElement> & {
     language: string;
 };
 
-export default function Code(props: Props) {
+export default function Code(props: Readonly<Props>) {
     const { language, code, className, ...others } = props;
 
     return (

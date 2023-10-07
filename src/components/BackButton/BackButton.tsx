@@ -6,7 +6,7 @@ type Props = {
     to: string;
 };
 
-export default function BackButton(props: Props) {
+export default function BackButton(props: Readonly<Props>) {
     const { to } = props;
 
     return (

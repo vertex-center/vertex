@@ -5,7 +5,7 @@ import { HTMLProps } from "react";
 
 export type ListSymbolProps = HTMLProps<HTMLDivElement>;
 
-export default function ListSymbol(props: ListSymbolProps) {
+export default function ListSymbol(props: Readonly<ListSymbolProps>) {
     const { className, ...others } = props;
     return <div className={classNames(styles.symbol, className)} {...others} />;
 }

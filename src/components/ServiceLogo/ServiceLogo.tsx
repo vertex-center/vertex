@@ -5,7 +5,7 @@ type Props = {
     service?: Service;
 };
 
-export default function ServiceLogo(props: Props) {
+export default function ServiceLogo(props: Readonly<Props>) {
     const { service } = props;
 
     // @ts-ignore

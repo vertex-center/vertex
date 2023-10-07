@@ -8,7 +8,7 @@ type Props = {
     disabled?: boolean;
 };
 
-export default function ToggleButton(props: Props) {
+export default function ToggleButton(props: Readonly<Props>) {
     const { value, disabled } = props;
 
     const onChange = () => props.onChange(!value);

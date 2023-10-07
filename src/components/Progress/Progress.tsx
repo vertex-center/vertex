@@ -16,7 +16,7 @@ type Props = {
     value?: number;
 };
 
-export default function Progress(props: Props) {
+export default function Progress(props: Readonly<Props>) {
     const { infinite, small, value } = props;
 
     return (

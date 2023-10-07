@@ -9,7 +9,7 @@ type Props = {
     onDelete?: () => void;
 };
 
-export default function ProxyRedirect(props: Props) {
+export default function ProxyRedirect(props: Readonly<Props>) {
     const { source, target, enabled, onDelete } = props;
 
     return (

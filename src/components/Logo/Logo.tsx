@@ -4,7 +4,7 @@ type Props = {
     iconOnly?: boolean;
 };
 
-export default function Logo({ iconOnly }: Props) {
+export default function Logo({ iconOnly }: Readonly<Props>) {
     return (
         <div className={styles.logo}>
             <img width={30} src="/images/logo.png" alt="Logo" />

@@ -22,7 +22,7 @@ type Props = HTMLProps<HTMLDivElement> & {
     error?: any;
 };
 
-export default function Error(props: Props) {
+export default function Error(props: Readonly<Props>) {
     const { error, className, ...others } = props;
 
     let err = error?.message ?? error;
@@ -44,7 +44,7 @@ type APIErrorProps = HTMLProps<HTMLDivElement> & {
     error?: AxiosError;
 };
 
-export function APIError(props: APIErrorProps) {
+export function APIError(props: Readonly<APIErrorProps>) {
     const { error, ...others } = props;
 
     if (!error) return null;

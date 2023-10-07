@@ -22,7 +22,7 @@ import { ProgressOverlay } from "../../../../components/Progress/Progress";
 
 type Props = {};
 
-export default function InstanceSettings(props: Props) {
+export default function InstanceSettings(props: Readonly<Props>) {
     const { uuid } = useParams();
 
     const { instance, loading: instanceLoading } = useInstance(uuid);

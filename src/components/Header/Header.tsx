@@ -11,7 +11,7 @@ type ItemProps = PropsWithChildren<{
     symbol: string;
 }>;
 
-function Item({ children, to, symbol }: ItemProps) {
+function Item({ children, to, symbol }: Readonly<ItemProps>) {
     return (
         <NavLink
             to={to}

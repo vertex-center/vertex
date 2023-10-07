@@ -4,7 +4,7 @@ import classNames from "classnames";
 
 type Props = HTMLProps<HTMLSpanElement>;
 
-export default function VersionTag(props: Props) {
+export default function VersionTag(props: Readonly<Props>) {
     const { children, className, ...others } = props;
 
     return (

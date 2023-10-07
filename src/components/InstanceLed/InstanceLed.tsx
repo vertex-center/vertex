@@ -16,7 +16,7 @@ type LEDProps = {
     status: Status | string;
 };
 
-export function InstanceLed(props: LEDProps) {
+export function InstanceLed(props: Readonly<LEDProps>) {
     const { small, status } = props;
     return (
         <div

@@ -12,7 +12,7 @@ type Props = {
     installedCount?: number;
 };
 
-export default function Service(props: Props) {
+export default function Service(props: Readonly<Props>) {
     const { service, onInstall, downloading, installedCount } = props;
 
     let installedCountText = "";

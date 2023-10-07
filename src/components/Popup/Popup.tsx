@@ -7,7 +7,7 @@ type Props = PropsWithChildren<{
     onDismiss: () => void;
 }>;
 
-export default function Popup(props: Props) {
+export default function Popup(props: Readonly<Props>) {
     const { show, onDismiss, children } = props;
 
     return (

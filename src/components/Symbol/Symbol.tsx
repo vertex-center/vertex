@@ -8,7 +8,7 @@ export type SymbolProps = HTMLProps<HTMLSpanElement> & {
     rotating?: boolean;
 };
 
-export default function Symbol(props: SymbolProps) {
+export default function Symbol(props: Readonly<SymbolProps>) {
     const { name, rotating, className, ...others } = props;
     return (
         <span

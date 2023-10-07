@@ -11,7 +11,7 @@ type Props = {
     disabled?: boolean;
 };
 
-export default function EnvVariableInput(props: Props) {
+export default function EnvVariableInput(props: Readonly<Props>) {
     const { env, value, onChange, disabled } = props;
 
     const inputProps = {

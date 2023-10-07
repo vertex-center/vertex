@@ -5,7 +5,7 @@ import Spacer from "../Spacer/Spacer";
 import Symbol from "../Symbol/Symbol";
 import LoadingValue from "../LoadingValue/LoadingValue";
 
-export function KeyValueGroup(props: PropsWithChildren) {
+export function KeyValueGroup(props: Readonly<PropsWithChildren>) {
     const { children } = props;
     return <div className={styles.group}>{children}</div>;
 }
@@ -19,7 +19,7 @@ type Props = PropsWithChildren<{
     loading?: boolean;
 }>;
 
-export function KeyValueInfo(props: Props) {
+export function KeyValueInfo(props: Readonly<Props>) {
     const { name, type, symbol, loading, children } = props;
 
     let content = children;

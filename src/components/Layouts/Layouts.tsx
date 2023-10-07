@@ -10,7 +10,7 @@ type Props = HTMLProps<HTMLDivElement> & {
     justifyContent?: CSS.Property.JustifyContent;
 };
 
-function Layout(props: Props) {
+function Layout(props: Readonly<Props>) {
     const { className, gap, alignItems, justifyContent, style, ...others } =
         props;
 
@@ -30,7 +30,7 @@ function Layout(props: Props) {
     );
 }
 
-export function Vertical({ className, ...others }: Props) {
+export function Vertical({ className, ...others }: Readonly<Props>) {
     return (
         <Layout
             className={classNames(styles.vertical, className)}
@@ -39,7 +39,7 @@ export function Vertical({ className, ...others }: Props) {
     );
 }
 
-export function Horizontal({ className, ...others }: Props) {
+export function Horizontal({ className, ...others }: Readonly<Props>) {
     return (
         <Layout
             className={classNames(styles.horizontal, className)}

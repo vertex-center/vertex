@@ -14,7 +14,7 @@ import { ProgressOverlay } from "../../../../components/Progress/Progress";
 
 type Props = {};
 
-export default function InstanceEnv(props: Props) {
+export default function InstanceEnv(props: Readonly<Props>) {
     const { uuid } = useParams();
 
     const [env, setEnv] = useState<{ env: EnvVariable; value: any }[]>();

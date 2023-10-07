@@ -26,7 +26,7 @@ type DatabaseProps = {
     onChange?: (name: string, dbUUID: string) => void;
 };
 
-function Database(props: DatabaseProps) {
+function Database(props: Readonly<DatabaseProps>) {
     const { instance, dbID, dbDefinition, onChange } = props;
 
     const [database, setDatabase] = useState<Instance>();

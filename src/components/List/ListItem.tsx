@@ -4,7 +4,7 @@ import { HTMLProps } from "react";
 
 export type ListItemProps = HTMLProps<HTMLDivElement>;
 
-export default function ListItem(props: ListItemProps) {
+export default function ListItem(props: Readonly<ListItemProps>) {
     const { className, ...others } = props;
     return <div className={classNames(styles.item, className)} {...others} />;
 }

@@ -6,7 +6,7 @@ import { api } from "../../../backend/backend";
 
 type Props = {};
 
-export default function CloudflareTunnels(props: Props) {
+export default function CloudflareTunnels(props: Readonly<Props>) {
     return (
         <Vertical gap={30}>
             <Vertical gap={20}>

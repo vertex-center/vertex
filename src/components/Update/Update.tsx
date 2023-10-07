@@ -11,7 +11,7 @@ import ListTitle from "../List/ListTitle";
 import ListDescription from "../List/ListDescription";
 import ListActions from "../List/ListActions";
 
-export function Updates(props: PropsWithChildren) {
+export function Updates(props: Readonly<PropsWithChildren>) {
     if (!props.children) return null;
     return <List {...props} />;
 }
@@ -27,7 +27,7 @@ type Props = {
     onUpdate: () => Promise<void>;
 };
 
-export default function Update(props: Props) {
+export default function Update(props: Readonly<Props>) {
     const { name, available, version, latest_version } = props;
 
     const [isLoading, setIsLoading] = useState(false);

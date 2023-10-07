@@ -14,7 +14,7 @@ type ButtonProps = {
     onClick: MouseEventHandler<HTMLSpanElement>;
 };
 
-function Button({ symbol, onClick }: ButtonProps) {
+function Button({ symbol, onClick }: Readonly<ButtonProps>) {
     return <Symbol className={styles.button} name={symbol} onClick={onClick} />;
 }
 
@@ -23,7 +23,7 @@ type LCDProps = {
     count?: number;
 };
 
-function LCD(props: LCDProps) {
+function LCD(props: Readonly<LCDProps>) {
     const { instance, count } = props;
     const { display_name, service, status } = instance ?? {};
     const { name } = service ?? {};
@@ -95,7 +95,7 @@ type Props = {
     }[];
 };
 
-export default function Bay(props: Props) {
+export default function Bay(props: Readonly<Props>) {
     const { instances } = props;
 
     const onPower = (e: any, instance: any) => {

@@ -5,7 +5,7 @@ type Props = {
     text?: string;
 };
 
-export default function Loading({ text }: Props) {
+export default function Loading({ text }: Readonly<Props>) {
     return (
         <Horizontal alignItems="center" gap={8}>
             <Symbol name="sync" rotating />

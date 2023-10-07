@@ -16,7 +16,7 @@ type Props = {
     hardware?: HardwareModel;
 };
 
-export default function Hardware(props: Props) {
+export default function Hardware(props: Readonly<Props>) {
     if (!props.hardware) return null;
     if (!props.hardware.host) return null;
 

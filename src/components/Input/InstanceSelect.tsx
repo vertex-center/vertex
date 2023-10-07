@@ -12,7 +12,7 @@ type Props = {
     query?: InstanceQuery;
 };
 
-export default function InstanceSelect(props: Props) {
+export default function InstanceSelect(props: Readonly<Props>) {
     const { instance, onChange, query } = props;
 
     const search = () => api.instances.search(query).catch(console.error);

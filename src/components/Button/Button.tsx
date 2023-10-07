@@ -26,7 +26,7 @@ export type ButtonProps = HTMLProps<HTMLButtonElement> & {
     large?: boolean;
 };
 
-export default function Button(props: ButtonProps) {
+export default function Button(props: Readonly<ButtonProps>) {
     const {
         children,
         leftSymbol,

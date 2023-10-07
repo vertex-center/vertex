@@ -25,7 +25,7 @@ type ItemProps = {
     red?: boolean;
 };
 
-export function SidebarItem(props: ItemProps) {
+export function SidebarItem(props: Readonly<ItemProps>) {
     const { to, name, onClick, red, led } = props;
 
     let symbol: any;
@@ -82,7 +82,7 @@ type GroupProps = PropsWithChildren<{
     title?: string;
 }>;
 
-export function SidebarGroup(props: GroupProps) {
+export function SidebarGroup(props: Readonly<GroupProps>) {
     const { title, children } = props;
 
     return (
@@ -97,7 +97,7 @@ type Props = HTMLProps<HTMLDivElement> & {
     root: string;
 };
 
-export default function Sidebar(props: Props) {
+export default function Sidebar(props: Readonly<Props>) {
     const { children, root } = props;
 
     const location = useLocation();

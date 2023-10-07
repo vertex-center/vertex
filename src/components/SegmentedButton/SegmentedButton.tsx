@@ -8,7 +8,7 @@ type SegmentedButtonProps = ButtonProps & {
     value: any;
 };
 
-export function SegmentedButton(props: SegmentedButtonProps) {
+export function SegmentedButton(props: Readonly<SegmentedButtonProps>) {
     const { children, className, selected, ...others } = props;
 
     return (
@@ -37,7 +37,7 @@ type Props = {
     }[];
 };
 
-export function SegmentedButtons(props: Props) {
+export function SegmentedButtons(props: Readonly<Props>) {
     const { value, onChange, items, disabled } = props;
 
     return (

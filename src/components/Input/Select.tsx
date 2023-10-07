@@ -10,7 +10,7 @@ type OptionProps = HTMLProps<HTMLDivElement> & {
     value?: any;
 };
 
-export function SelectOption(props: OptionProps) {
+export function SelectOption(props: Readonly<OptionProps>) {
     const { className, onClick, value, ...others } = props;
 
     return (
@@ -24,7 +24,7 @@ export function SelectOption(props: OptionProps) {
 
 type SelectValueProps = HTMLProps<HTMLDivElement>;
 
-export function SelectValue(props: SelectValueProps) {
+export function SelectValue(props: Readonly<SelectValueProps>) {
     const { className, ...others } = props;
 
     return (
@@ -40,7 +40,7 @@ type SelectOptionsProps = HTMLProps<HTMLDivElement> & {
     toggle?: () => void;
 };
 
-export function SelectOptions(props: SelectOptionsProps) {
+export function SelectOptions(props: Readonly<SelectOptionsProps>) {
     const { opened, toggle, className, ...others } = props;
 
     return (
@@ -61,7 +61,7 @@ type Props = HTMLProps<HTMLDivElement> & {
     onChange?: (value: any) => void;
 };
 
-export default function Select(props: Props) {
+export default function Select(props: Readonly<Props>) {
     const { className, value, label, children, ...others } = props;
 
     const [opened, setOpened] = useState(false);

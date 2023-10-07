@@ -5,7 +5,7 @@ import styles from "./Input.module.sass";
 
 type Props = InputProps;
 
-export default function PortInput(props: Props) {
+export default function PortInput(props: Readonly<Props>) {
     const { className, ...others } = props;
 
     return (

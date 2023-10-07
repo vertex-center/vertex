@@ -5,7 +5,7 @@ import styles from "./List.module.sass";
 
 export type ListDescriptionProps = HTMLProps<HTMLDivElement>;
 
-export default function ListDescription(props: ListDescriptionProps) {
+export default function ListDescription(props: Readonly<ListDescriptionProps>) {
     const { className, ...others } = props;
     return (
         <div

@@ -18,7 +18,7 @@ type Props = {
     install: () => Promise<any>;
 };
 
-export default function InstanceInstaller(props: Props) {
+export default function InstanceInstaller(props: Readonly<Props>) {
     const { name, tag, install } = props;
 
     const {

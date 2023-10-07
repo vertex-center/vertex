@@ -9,7 +9,7 @@ type DockAppProps = {
     name: string;
 };
 
-function DockApp(props: DockAppProps) {
+function DockApp(props: Readonly<DockAppProps>) {
     const { to, symbol } = props;
 
     return (

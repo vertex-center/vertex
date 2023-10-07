@@ -33,7 +33,7 @@ type Props = HTMLProps<HTMLDivElement> & {
     lines: LogLine[];
 };
 
-export default function Logs(props: Props) {
+export default function Logs(props: Readonly<Props>) {
     const { lines } = props;
 
     const { ref } = useScrollPercentage<HTMLDivElement>({

@@ -8,7 +8,7 @@ import List, { ListProps } from "../List/List";
 import Button from "../Button/Button";
 import ListActions from "../List/ListActions";
 
-export function SSHKeys(props: ListProps) {
+export function SSHKeys(props: Readonly<ListProps>) {
     return <List {...props} />;
 }
 
@@ -18,7 +18,7 @@ type SSHKeyProps = {
     onDelete: () => void;
 };
 
-export default function SSHKey(props: SSHKeyProps) {
+export default function SSHKey(props: Readonly<SSHKeyProps>) {
     const { type, fingerprint, onDelete } = props;
 
     return (

@@ -8,7 +8,7 @@ type Props = PropsWithChildren & {
     sidebar: JSX.Element;
 };
 
-export default function PageWithSidebar(props: Props) {
+export default function PageWithSidebar(props: Readonly<Props>) {
     const { title, sidebar, children } = props;
     return (
         <Fragment>

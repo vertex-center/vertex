@@ -4,7 +4,7 @@ import classNames from "classnames";
 
 export type ListProps = HTMLProps<HTMLDivElement>;
 
-export default function List(props: ListProps) {
+export default function List(props: Readonly<ListProps>) {
     const { className, ...others } = props;
     return <div className={classNames(styles.list, className)} {...others} />;
 }
