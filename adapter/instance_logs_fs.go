@@ -120,7 +120,7 @@ func (a *InstanceLogsFSAdapter) Push(uuid uuid.UUID, line types.LogLine) {
 		l.buffer = l.buffer[1:]
 	}
 
-	_, err = fmt.Fprintf(l.file, "%s\n", line.Message)
+	_, err = fmt.Fprintf(l.file, "%s\n", line.Message.String())
 	if err != nil {
 		log.Error(err)
 	}

@@ -3,6 +3,7 @@ package types
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/pkg/log"
@@ -37,7 +38,9 @@ type LogLine struct {
 	Message LogLineMessage `json:"message"`
 }
 
-type LogLineMessage interface{}
+type LogLineMessage interface {
+	String() string
+}
 
 type LogLineMessageString struct {
 	Value string `json:"value"`
@@ -47,6 +50,10 @@ func NewLogLineMessageString(s string) *LogLineMessageString {
 	return &LogLineMessageString{
 		Value: s,
 	}
+}
+
+func (m *LogLineMessageString) String() string {
+	return m.Value
 }
 
 type LogLineMessageDownload struct {
@@ -61,6 +68,13 @@ func NewLogLineMessageDownload(p *DownloadProgress) *LogLineMessageDownload {
 
 func (m *LogLineMessageDownload) MarshalJSON() ([]byte, error) {
 	return json.Marshal(m.DownloadProgress)
+}
+
+func (m *LogLineMessageDownload) String() string {
+	if m.DownloadProgress == nil {
+		return ""
+	}
+	return fmt.Sprintf("%v", *m.DownloadProgress)
 }
 
 type DownloadProgressGroup []*DownloadProgress
@@ -95,4 +109,19 @@ func (m *LogLineMessageDownloads) Merge(progress *DownloadProgress) {
 
 func (m *LogLineMessageDownloads) MarshalJSON() ([]byte, error) {
 	return json.Marshal(m.DownloadProgressGroup)
+}
+
+func (m *LogLineMessageDownloads) String() string {
+	if m.DownloadProgressGroup == nil {
+		return ""
+	}
+	s := ""
+	for _, p := range *m.DownloadProgressGroup {
+		if p == nil {
+			continue
+		}
+		s += fmt.Sprintf("%+v\n", *p)
+	}
+	s = s[:len(s)-1]
+	return s
 }
