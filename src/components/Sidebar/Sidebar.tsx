@@ -5,6 +5,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { Fragment, HTMLProps, PropsWithChildren } from "react";
 import { Text } from "../Text/Text";
 import Spacer from "../Spacer/Spacer";
+import { InstanceLed, Status } from "../InstanceLed/InstanceLed";
 
 function SidebarTitle({ children }: PropsWithChildren) {
     return <Text className={styles.title}>{children}</Text>;
@@ -17,12 +18,15 @@ type ItemProps = {
     symbol: string | any;
     name: string;
     notifications?: number;
+    led?: {
+        status: Status | string;
+    };
 
     red?: boolean;
 };
 
 export function SidebarItem(props: ItemProps) {
-    const { to, name, onClick, red } = props;
+    const { to, name, onClick, red, led } = props;
 
     let symbol: any;
     if (typeof props.symbol === "string") {
@@ -40,6 +44,9 @@ export function SidebarItem(props: ItemProps) {
                 <div className={styles.notifications}>
                     {props.notifications}
                 </div>
+            )}
+            {led && led.status !== "not-installed" && (
+                <InstanceLed {...led} small />
             )}
         </Fragment>
     );

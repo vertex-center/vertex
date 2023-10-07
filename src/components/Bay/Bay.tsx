@@ -7,6 +7,7 @@ import { Fragment, MouseEventHandler } from "react";
 import LoadingValue from "../LoadingValue/LoadingValue";
 import { Instance } from "../../models/instance";
 import LogoIcon from "../Logo/LogoIcon";
+import { InstanceLed } from "../InstanceLed/InstanceLed";
 
 type ButtonProps = {
     symbol: string;
@@ -16,35 +17,6 @@ type ButtonProps = {
 function Button({ symbol, onClick }: ButtonProps) {
     return <Symbol className={styles.button} name={symbol} onClick={onClick} />;
 }
-
-type LEDProps = {
-    status: Status | string;
-};
-
-function LED({ status }: LEDProps) {
-    return (
-        <div
-            className={classNames({
-                [styles.led]: true,
-                [styles.ledRed]: status === "error" || status === "off",
-                [styles.ledGreen]: status === "running",
-                [styles.ledYellow]: status === "building",
-                [styles.ledOrange]:
-                    status === "starting" || status === "stopping",
-            })}
-        ></div>
-    );
-}
-
-type Status =
-    | "off"
-    | "building"
-    | "starting"
-    | "running"
-    | "stopping"
-    | "error"
-    | "downloading"
-    | "not-installed";
 
 type LCDProps = {
     instance: Partial<Instance>;
@@ -145,7 +117,7 @@ export default function Bay(props: Props) {
                 const count = instance.count;
                 const content = (
                     <Fragment>
-                        <LED status={inst?.status} />
+                        <InstanceLed status={inst?.status} />
                         <LCD instance={inst} count={count} />
 
                         {tag && (

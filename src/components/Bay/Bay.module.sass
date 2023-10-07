@@ -98,50 +98,6 @@
     100%
         opacity: 0.7
 
-.led
-    width: 14px
-    height: 14px
-    border-radius: 50%
-    background-color: colors.$fg-tertiary
-    position: relative
-    transition: background-color 0.1s ease
-
-    &::after
-        content: ''
-        position: absolute
-        top: -4px
-        bottom: -4px
-        left: -4px
-        right: -4px
-        border-radius: 50%
-        opacity: 0.2
-        background-color: colors.$fg-tertiary
-        transition: background-color 0.4s ease
-
-    &Gray
-        background-color: colors.$fg-secondary
-        opacity: 0.6
-
-    &Red
-        background-color: colors.$red
-        &::after
-            background-color: colors.$red
-
-    &Green
-        background-color: colors.$green
-        &::after
-            background-color: colors.$green
-
-    &Yellow
-        background-color: colors.$yellow
-        &::after
-            background-color: colors.$yellow
-
-    &Orange
-        background-color: colors.$orange
-        &::after
-            background-color: colors.$orange
-
 .button
     position: absolute
     display: flex
