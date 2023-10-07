@@ -210,6 +210,11 @@ func (a RunnerDockerAdapter) Start(inst *types.Instance, setStatus func(status s
 				options.Sysctls = *service.Methods.Docker.Sysctls
 			}
 
+			// cmd
+			if service.Methods.Docker.Cmd != nil {
+				options.Cmd = strings.Split(*service.Methods.Docker.Cmd, " ")
+			}
+
 			if service.Methods.Docker.Dockerfile != nil {
 				options.ImageName = inst.DockerImageVertexName()
 				id, err = a.createContainer(options)

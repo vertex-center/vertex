@@ -57,6 +57,7 @@ func (a DockerCliAdapter) CreateContainer(options types.CreateContainerOptions) 
 		Tty:          true,
 		AttachStdout: true,
 		AttachStderr: true,
+		Cmd:          options.Cmd,
 	}
 
 	hostConfig := container.HostConfig{
