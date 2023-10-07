@@ -209,6 +209,9 @@ type ServiceMethodDocker struct {
 
 	// Sysctls allows to modify kernel parameters.
 	Sysctls *map[string]string `yaml:"sysctls,omitempty" json:"sysctls,omitempty"`
+
+	// Cmd is the command to run in the container.
+	Cmd *string `yaml:"command,omitempty" json:"command,omitempty"`
 }
 
 type ServiceMethods struct {

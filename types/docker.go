@@ -29,6 +29,7 @@ type CreateContainerOptions struct {
 	Env           []string          `json:"env,omitempty"`
 	CapAdd        []string          `json:"cap_add,omitempty"`
 	Sysctls       map[string]string `json:"sysctls,omitempty"`
+	Cmd           []string          `json:"cmd,omitempty"`
 }
 
 type BuildImageOptions struct {
