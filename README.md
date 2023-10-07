@@ -24,9 +24,8 @@ Vertex is a program that allows you to create your self-hosted server easily. In
 
 Vertex is designed to be installed on low-powered computers like Raspberry Pi, so prioritizing compiled languages like Go, Rust or C++.
 
-<img width="1884" alt="image" src="https://github.com/vertex-center/vertex/assets/12123721/a2b59a98-3b0d-4323-9db3-2078683eaf90">
-
-<img width="1884" alt="image" src="https://github.com/vertex-center/vertex/assets/12123721/1b801d93-3ea0-4547-a6e6-4ccb3caf2c4c">
+<img width="1524" alt="image" src="https://github.com/vertex-center/vertex-webui/assets/12123721/36c0a95d-0ff4-416a-9d13-2381f6af88f5">
+<img width="1524" alt="image" src="https://github.com/vertex-center/vertex-webui/assets/12123721/d9f8f073-7e1f-48d5-abd3-ba31ee1b6f43">
 
 ## Installation
 
@@ -36,12 +35,6 @@ Vertex can be installed in multiple ways:
 - From sources, compiling with Go.
 
 Everything about the installation process is available in the [Vertex Documentation](https://vertex.quentinguidee.dev/docs/).
-
-## Available services
-
-All services are fetched from [Vertex Services](https://github.com/vertex-center/vertex-services). Installation can be done in one click, using Docker or package manager. Everything is handled automatically.
-
-<img width="1884" alt="image" src="https://github.com/vertex-center/vertex/assets/12123721/30fef18d-ec3a-46e5-b73c-9c26d8a19a9f">
 
 ## License
 
