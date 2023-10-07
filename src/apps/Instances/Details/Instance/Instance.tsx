@@ -22,7 +22,7 @@ import Button from "../../../../components/Button/Button";
 import Progress from "../../../../components/Progress";
 import { SiDocker } from "@icons-pack/react-simple-icons";
 import useInstance from "../../../../hooks/useInstance";
-import { APIError } from "../../../../components/Error/ErrorBox";
+import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 
 export default function Instance() {

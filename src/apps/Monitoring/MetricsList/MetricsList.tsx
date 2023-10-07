@@ -4,7 +4,7 @@ import Metrics from "../Metrics/Metrics";
 import { useFetch } from "../../../hooks/useFetch";
 import { api } from "../../../backend/backend";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
-import { APIError } from "../../../components/Error/ErrorBox";
+import { APIError } from "../../../components/Error/APIError";
 import { Title } from "../../../components/Text/Text";
 import { Metric } from "../../../models/metrics";
 

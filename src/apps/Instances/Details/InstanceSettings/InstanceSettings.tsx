@@ -11,7 +11,7 @@ import Input from "../../../../components/Input/Input";
 
 import styles from "./InstanceSettings.module.sass";
 import { api } from "../../../../backend/backend";
-import { APIError } from "../../../../components/Error/ErrorBox";
+import { APIError } from "../../../../components/Error/APIError";
 import Select, {
     SelectOption,
     SelectValue,
