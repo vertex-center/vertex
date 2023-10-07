@@ -1,5 +1,5 @@
 import Bay from "../Bay/Bay";
-import { APIError } from "../Error/Error";
+import { APIError } from "../Error/ErrorBox";
 import { Fragment, useEffect, useState } from "react";
 import { ProgressOverlay } from "../Progress/Progress";
 import { useFetch } from "../../hooks/useFetch";

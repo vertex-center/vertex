@@ -8,7 +8,7 @@ import { api } from "../../../backend/backend";
 
 import styles from "./SettingsNotifications.module.sass";
 import { Vertical } from "../../../components/Layouts/Layouts";
-import { APIError } from "../../../components/Error/Error";
+import { APIError } from "../../../components/Error/ErrorBox";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 
 export default function SettingsNotifications() {

@@ -13,7 +13,7 @@ import {
     KeyValueInfo,
 } from "../../../../components/KeyValueInfo/KeyValueInfo";
 import byteSize from "byte-size";
-import { APIError } from "../../../../components/Error/Error";
+import { APIError } from "../../../../components/Error/ErrorBox";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 
 export default function InstanceDocker() {

@@ -9,7 +9,7 @@ import useInstance from "../../../../hooks/useInstance";
 import { Env, EnvVariable } from "../../../../models/service";
 import styles from "./InstanceEnv.module.sass";
 import { api } from "../../../../backend/backend";
-import { APIError } from "../../../../components/Error/Error";
+import { APIError } from "../../../../components/Error/ErrorBox";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 
 type Props = {};

@@ -12,7 +12,7 @@ import { api } from "../../../backend/backend";
 
 import styles from "./SettingsUpdates.module.sass";
 import Update, { Updates } from "../../../components/Update/Update";
-import { APIError } from "../../../components/Error/Error";
+import { APIError } from "../../../components/Error/ErrorBox";
 import ToggleButton from "../../../components/ToggleButton/ToggleButton";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 

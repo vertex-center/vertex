@@ -10,7 +10,7 @@ import { useParams } from "react-router-dom";
 import { api } from "../../../../backend/backend";
 import { Title } from "../../../../components/Text/Text";
 import styles from "./InstanceLogs.module.sass";
-import { APIError } from "../../../../components/Error/Error";
+import { APIError } from "../../../../components/Error/ErrorBox";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 
 export default function InstanceLogs() {

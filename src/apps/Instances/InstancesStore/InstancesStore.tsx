@@ -11,7 +11,7 @@ import Button from "../../../components/Button/Button";
 import Popup from "../../../components/Popup/Popup";
 import { Instances } from "../../../models/instance";
 import { api } from "../../../backend/backend";
-import { APIError, Errors } from "../../../components/Error/Error";
+import { APIError, Errors } from "../../../components/Error/ErrorBox";
 import ServiceLogo from "../../../components/ServiceLogo/ServiceLogo";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 

@@ -6,7 +6,7 @@ import { Vertical } from "../../../../components/Layouts/Layouts";
 import { api } from "../../../../backend/backend";
 import Update, { Updates } from "../../../../components/Update/Update";
 import { useState } from "react";
-import { APIError } from "../../../../components/Error/Error";
+import { APIError } from "../../../../components/Error/ErrorBox";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 
 export default function InstanceUpdate() {

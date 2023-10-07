@@ -3,7 +3,7 @@ import { SubTitle, Title } from "../../../components/Text/Text";
 import styles from "./SettingsSecurity.module.sass";
 import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
 import SSHKey, { SSHKeys } from "../../../components/SSHKey/SSHKey";
-import { APIError, Errors } from "../../../components/Error/Error";
+import { APIError, Errors } from "../../../components/Error/ErrorBox";
 import ListItem from "../../../components/List/ListItem";
 import { useFetch } from "../../../hooks/useFetch";
 import { api } from "../../../backend/backend";

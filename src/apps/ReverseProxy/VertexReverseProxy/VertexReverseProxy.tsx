@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import styles from "./VertexReverseProxy.module.sass";
 import { Title } from "../../../components/Text/Text";
-import { APIError } from "../../../components/Error/Error";
+import { APIError } from "../../../components/Error/ErrorBox";
 import ProxyRedirect from "../../../components/ProxyRedirect/ProxyRedirect";
 import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
 import Button from "../../../components/Button/Button";
