@@ -4,17 +4,12 @@ import Sidebar, {
     SidebarItem,
 } from "../../../components/Sidebar/Sidebar";
 import { SiCloudflare } from "@icons-pack/react-simple-icons";
-import { Fragment, useEffect } from "react";
-import {
-    registerSSE,
-    registerSSEEvent,
-    unregisterSSE,
-    unregisterSSEEvent,
-} from "../../../backend/sse";
+import { Fragment } from "react";
 import { useFetch } from "../../../hooks/useFetch";
 import { Instances } from "../../../models/instance";
 import { api } from "../../../backend/backend";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
+import { useServerEvent } from "../../../hooks/useEvent";
 
 export default function TunnelsApp() {
     const {
@@ -27,22 +22,12 @@ export default function TunnelsApp() {
         inst.tags?.includes("vertex-cloudflare-tunnel")
     );
 
-    useEffect(() => {
-        const sse = registerSSE("/instances/events");
-
-        const onChange = (e) => {
+    useServerEvent("/instances/events", {
+        change: (e) => {
             console.log(e);
-            reloadInstances();
-        };
-
-        registerSSEEvent(sse, "change", onChange);
-
-        return () => {
-            unregisterSSEEvent(sse, "change", onChange);
-
-            unregisterSSE(sse);
-        };
-    }, [instances]);
+            reloadInstances().finally();
+        },
+    });
 
     const sidebar = (
         <Sidebar root="/tunnels">

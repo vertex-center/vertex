@@ -1,16 +1,10 @@
 import Bay from "../../../../components/Bay/Bay";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api } from "../../../../backend/backend";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 
 import styles from "./Instance.module.sass";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
-import {
-    registerSSE,
-    registerSSEEvent,
-    unregisterSSE,
-    unregisterSSEEvent,
-} from "../../../../backend/sse";
 import Spacer from "../../../../components/Spacer/Spacer";
 import Sidebar, {
     SidebarGroup,
@@ -24,6 +18,7 @@ import { SiDocker } from "@icons-pack/react-simple-icons";
 import useInstance from "../../../../hooks/useInstance";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
+import { useServerEvent } from "../../../../hooks/useEvent";
 
 export default function Instance() {
     const { uuid } = useParams();
@@ -35,23 +30,13 @@ export default function Instance() {
     const [deleting, setDeleting] = useState<boolean>(false);
     const [error, setError] = useState();
 
-    useEffect(() => {
-        if (uuid === undefined) return;
+    const route = uuid ? `/instance/${uuid}/events` : "";
 
-        const sse = registerSSE(`/instance/${uuid}/events`);
-
-        const onStatusChange = (e) => {
+    useServerEvent(route, {
+        status_change: (e) => {
             setInstance((instance) => ({ ...instance, status: e.data }));
-        };
-
-        registerSSEEvent(sse, "status_change", onStatusChange);
-
-        return () => {
-            unregisterSSEEvent(sse, "status_change", onStatusChange);
-
-            unregisterSSE(sse);
-        };
-    }, [uuid]);
+        },
+    });
 
     const toggleInstance = async (uuid: string) => {
         if (instance.status === "off" || instance.status === "error") {

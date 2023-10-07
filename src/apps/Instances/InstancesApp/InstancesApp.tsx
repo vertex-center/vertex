@@ -1,12 +1,6 @@
 import styles from "./InstancesApp.module.sass";
 import Bay from "../../../components/Bay/Bay";
 import { useEffect, useState } from "react";
-import {
-    registerSSE,
-    registerSSEEvent,
-    unregisterSSE,
-    unregisterSSEEvent,
-} from "../../../backend/sse";
 import { Instance, Instances } from "../../../models/instance";
 import { BigTitle } from "../../../components/Text/Text";
 import Button from "../../../components/Button/Button";
@@ -14,6 +8,7 @@ import { Horizontal } from "../../../components/Layouts/Layouts";
 import { api } from "../../../backend/backend";
 import { APIError } from "../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
+import { useServerEvent } from "../../../hooks/useEvent";
 
 export default function InstancesApp() {
     const [loading, setLoading] = useState(true);
@@ -56,29 +51,16 @@ export default function InstancesApp() {
             });
     };
 
-    useEffect(() => {
-        const sse = registerSSE("/instances/events");
-
-        const onOpen = (e) => {
+    useServerEvent("/instances/events", {
+        change: (e) => {
             console.log(e);
             fetchServices();
-        };
-
-        const onChange = (e) => {
+        },
+        open: (e) => {
             console.log(e);
             fetchServices();
-        };
-
-        registerSSEEvent(sse, "open", onOpen);
-        registerSSEEvent(sse, "change", onChange);
-
-        return () => {
-            unregisterSSEEvent(sse, "open", onOpen);
-            unregisterSSEEvent(sse, "change", onChange);
-
-            unregisterSSE(sse);
-        };
-    }, []);
+        },
+    });
 
     const toggleInstance = async (uuid: string) => {
         if (

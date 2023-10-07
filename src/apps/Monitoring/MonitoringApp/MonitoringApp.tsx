@@ -7,14 +7,9 @@ import PageWithSidebar from "../../../components/PageWithSidebar/PageWithSidebar
 import { useFetch } from "../../../hooks/useFetch";
 import { api } from "../../../backend/backend";
 import { Instances } from "../../../models/instance";
-import { Fragment, useEffect } from "react";
-import {
-    registerSSE,
-    registerSSEEvent,
-    unregisterSSE,
-    unregisterSSEEvent,
-} from "../../../backend/sse";
+import { Fragment } from "react";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
+import { useServerEvent } from "../../../hooks/useEvent";
 
 export default function MonitoringApp() {
     const {
@@ -31,22 +26,12 @@ export default function MonitoringApp() {
         inst.tags?.includes("vertex-grafana-visualizer")
     );
 
-    useEffect(() => {
-        const sse = registerSSE("/instances/events");
-
-        const onChange = (e) => {
+    useServerEvent("/instances/events", {
+        change: (e) => {
             console.log(e);
-            reloadInstances();
-        };
-
-        registerSSEEvent(sse, "change", onChange);
-
-        return () => {
-            unregisterSSEEvent(sse, "change", onChange);
-
-            unregisterSSE(sse);
-        };
-    }, [instances]);
+            reloadInstances().finally();
+        },
+    });
 
     const sidebar = (
         <Sidebar root="/monitoring">

@@ -1,16 +1,14 @@
 import { v4 as uuidv4 } from "uuid";
 
-type UUID = string;
-
 type SSE = {
     eventSource: EventSource;
     url: string;
     watchers: number;
 };
 
-const allSSE: { [uuid: UUID]: SSE } = {};
+const allSSE: { [uuid: string]: SSE } = {};
 
-export function registerSSE(url: string): UUID {
+export function registerSSE(url: string): string {
     let uuid = Object.keys(allSSE).find((uuid) => allSSE[uuid].url === url);
 
     if (uuid !== undefined) {
@@ -29,7 +27,7 @@ export function registerSSE(url: string): UUID {
     return uuid;
 }
 
-export function unregisterSSE(uuid: UUID) {
+export function unregisterSSE(uuid: string) {
     allSSE[uuid].watchers--;
     console.log(allSSE[uuid].watchers, "registered on", uuid);
     if (allSSE[uuid].watchers === 0) {
@@ -40,7 +38,7 @@ export function unregisterSSE(uuid: UUID) {
 }
 
 export function registerSSEEvent(
-    uuid: UUID,
+    uuid: string,
     key: string,
     handler: (e: any) => void
 ) {
@@ -48,7 +46,7 @@ export function registerSSEEvent(
 }
 
 export function unregisterSSEEvent(
-    uuid: UUID,
+    uuid: string,
     key: string,
     handler: (e: any) => void
 ) {

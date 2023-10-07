@@ -8,6 +8,7 @@ import LoadingValue from "../LoadingValue/LoadingValue";
 import { Instance } from "../../models/instance";
 import LogoIcon from "../Logo/LogoIcon";
 import { InstanceLed } from "../InstanceLed/InstanceLed";
+import { v4 as uuidv4 } from "uuid";
 
 type ButtonProps = {
     icon: string;
@@ -117,6 +118,8 @@ export default function Bay(props: Readonly<Props>) {
                 const inst = instance.value;
                 const tag = inst?.tags?.find((tag) => tag in tags);
                 const count = instance.count;
+                // The uuidv4() is used to generate a unique key for instances that are not yet loaded.
+                const key = inst?.uuid ?? uuidv4();
                 const content = (
                     <Fragment>
                         <InstanceLed status={inst?.status} />
@@ -153,17 +156,13 @@ export default function Bay(props: Readonly<Props>) {
 
                 if (instance.to)
                     return (
-                        <Link
-                            key={inst.uuid}
-                            to={instance.to}
-                            className={classnames}
-                        >
+                        <Link key={key} to={instance.to} className={classnames}>
                             {content}
                         </Link>
                     );
 
                 return (
-                    <div key={inst.uuid} className={classnames}>
+                    <div key={key} className={classnames}>
                         {content}
                     </div>
                 );

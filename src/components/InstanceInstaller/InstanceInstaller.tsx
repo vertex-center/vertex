@@ -5,12 +5,7 @@ import { ProgressOverlay } from "../Progress/Progress";
 import { useFetch } from "../../hooks/useFetch";
 import { Instance, Instances } from "../../models/instance";
 import { api } from "../../backend/backend";
-import {
-    registerSSE,
-    registerSSEEvent,
-    unregisterSSE,
-    unregisterSSEEvent,
-} from "../../backend/sse";
+import { useServerEvent } from "../../hooks/useEvent";
 
 type Props = {
     name: string;
@@ -70,6 +65,10 @@ export default function InstanceInstaller(props: Readonly<Props>) {
     };
 
     const onPower = async (inst: Inst) => {
+        if (!inst) {
+            console.error("Instance not found");
+            return;
+        }
         if (inst?.status === "off" || inst?.status === "error") {
             await api.instance.start(inst.uuid);
             return;
@@ -77,23 +76,13 @@ export default function InstanceInstaller(props: Readonly<Props>) {
         await api.instance.stop(inst.uuid);
     };
 
-    useEffect(() => {
-        if (instance?.uuid === undefined) return;
+    const route = instance?.uuid ? `/instance/${instance?.uuid}/events` : "";
 
-        const sse = registerSSE(`/instance/${instance.uuid}/events`);
-
-        const onStatusChange = (e: any) => {
-            setInstance((inst) => ({ ...inst, status: e.data }));
-        };
-
-        registerSSEEvent(sse, "status_change", onStatusChange);
-
-        return () => {
-            unregisterSSEEvent(sse, "status_change", onStatusChange);
-
-            unregisterSSE(sse);
-        };
-    }, [instance]);
+    useServerEvent(route, {
+        status_change: (e) => {
+            setInstance((instance) => ({ ...instance, status: e.data }));
+        },
+    });
 
     return (
         <Fragment>
@@ -107,9 +96,7 @@ export default function InstanceInstaller(props: Readonly<Props>) {
                             ? `/instances/${instance?.uuid}`
                             : undefined,
                         onInstall: onInstall,
-                        onPower: async () => {
-                            await onPower(instance);
-                        },
+                        onPower: () => onPower(instance),
                     },
                 ]}
             />
