@@ -63,4 +63,6 @@ const (
 	ErrVisualizerNotFound               router.ErrCode = "visualizer_not_found"
 	ErrFailedToConfigureMetricsInstance router.ErrCode = "failed_to_configure_metrics_instance"
 	ErrFailedToGetMetrics               router.ErrCode = "failed_to_get_metrics"
+
+	ErrFailedToConfigureTunnelInstance router.ErrCode = "failed_to_configure_tunnel_instance"
 )

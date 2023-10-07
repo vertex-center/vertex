@@ -191,6 +191,7 @@ func (r *Router) initAPIRoutes(about types.About) {
 	addSettingsRoutes(api.Group("/settings"))
 	addHardwareRoutes(api.Group("/hardware"))
 	addSecurityRoutes(api.Group("/security"))
+	addTunnelsRoutes(api.Group("/tunnels"))
 }
 
 func headersSSE(c *router.Context) {
