@@ -1,5 +1,5 @@
 import styles from "./Sidebar.module.sass";
-import Symbol from "../Symbol/Symbol";
+import Icon from "../Icon/Icon";
 import classNames from "classnames";
 import { NavLink, useLocation } from "react-router-dom";
 import { Fragment, HTMLProps, PropsWithChildren } from "react";
@@ -15,7 +15,7 @@ type ItemProps = {
     to?: string;
     onClick?: () => void;
 
-    symbol: string | any;
+    icon: string | any;
     name: string;
     notifications?: number;
     led?: {
@@ -28,16 +28,16 @@ type ItemProps = {
 export function SidebarItem(props: Readonly<ItemProps>) {
     const { to, name, onClick, red, led } = props;
 
-    let symbol: any;
-    if (typeof props.symbol === "string") {
-        symbol = <Symbol name={props.symbol} />;
+    let icon: any;
+    if (typeof props.icon === "string") {
+        icon = <Icon name={props.icon} />;
     } else {
-        symbol = props.symbol;
+        icon = props.icon;
     }
 
     const content = (
         <Fragment>
-            <div className={styles.symbol}>{symbol}</div>
+            <div className={styles.icon}>{icon}</div>
             {name}
             <Spacer />
             {props.notifications !== undefined && (

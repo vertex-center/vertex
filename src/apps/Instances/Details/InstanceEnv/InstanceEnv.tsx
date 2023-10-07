@@ -3,7 +3,7 @@ import { Title } from "../../../../components/Text/Text";
 import { useParams } from "react-router-dom";
 import EnvVariableInput from "../../../../components/EnvVariableInput/EnvVariableInput";
 import Button from "../../../../components/Button/Button";
-import Symbol from "../../../../components/Symbol/Symbol";
+import Icon from "../../../../components/Icon/Icon";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
 import useInstance from "../../../../hooks/useInstance";
 import { Env, EnvVariable } from "../../../../models/service";
@@ -17,7 +17,12 @@ type Props = {};
 export default function InstanceEnv(props: Readonly<Props>) {
     const { uuid } = useParams();
 
-    const [env, setEnv] = useState<{ env: EnvVariable; value: any }[]>();
+    const [env, setEnv] = useState<
+        {
+            env: EnvVariable;
+            value: any;
+        }[]
+    >();
 
     const { instance, loading } = useInstance(uuid);
 
@@ -78,7 +83,7 @@ export default function InstanceEnv(props: Readonly<Props>) {
                 primary
                 large
                 onClick={save}
-                rightSymbol="save"
+                rightIcon="save"
                 loading={uploading}
                 disabled={saved || saved === undefined}
             >
@@ -92,7 +97,7 @@ export default function InstanceEnv(props: Readonly<Props>) {
                     alignItems="center"
                     gap={4}
                 >
-                    <Symbol name="check" />
+                    <Icon name="check" />
                     Saved!
                 </Horizontal>
             )}

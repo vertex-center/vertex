@@ -3,7 +3,7 @@ import classNames from "classnames";
 
 import styles from "./Input.module.sass";
 import Spacer from "../Spacer/Spacer";
-import Symbol from "../Symbol/Symbol";
+import Icon from "../Icon/Icon";
 
 type OptionProps = HTMLProps<HTMLDivElement> & {
     onClick?: (value: any) => void;
@@ -87,8 +87,8 @@ export default function Select(props: Readonly<Props>) {
             >
                 {value}
                 <Spacer />
-                {opened && <Symbol name="expand_less" />}
-                {!opened && <Symbol name="expand_more" />}
+                {opened && <Icon name="expand_less" />}
+                {!opened && <Icon name="expand_more" />}
             </div>
             <SelectOptions opened={opened} toggle={toggle}>
                 {Children.map(children, (child) => {

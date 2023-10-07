@@ -88,7 +88,7 @@ export default function SettingsSecurity() {
                 <div>
                     <Button
                         primary
-                        leftSymbol="add"
+                        leftIcon="add"
                         onClick={() => setShowPopup(true)}
                     >
                         Create an SSH key

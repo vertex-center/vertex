@@ -1,6 +1,6 @@
-import Symbol from "../Symbol/Symbol";
+import Icon from "../Icon/Icon";
 import ListItem from "../List/ListItem";
-import ListSymbol from "../List/ListSymbol";
+import ListIcon from "../List/ListIcon";
 import ListInfo from "../List/ListInfo";
 import ListTitle from "../List/ListTitle";
 import ListDescription from "../List/ListDescription";
@@ -23,9 +23,9 @@ export default function SSHKey(props: Readonly<SSHKeyProps>) {
 
     return (
         <ListItem>
-            <ListSymbol>
-                <Symbol name="key" />
-            </ListSymbol>
+            <ListIcon>
+                <Icon name="key" />
+            </ListIcon>
             <ListInfo>
                 <ListTitle>SSH Key</ListTitle>
                 <ListDescription>
@@ -33,7 +33,7 @@ export default function SSHKey(props: Readonly<SSHKeyProps>) {
                 </ListDescription>
             </ListInfo>
             <ListActions>
-                <Button rightSymbol="delete" onClick={onDelete}>
+                <Button rightIcon="delete" onClick={onDelete}>
                     Delete
                 </Button>
             </ListActions>

@@ -89,7 +89,7 @@ export default function InstancesStore() {
                 <Button
                     onClick={install}
                     primary
-                    rightSymbol="add"
+                    rightIcon="add"
                     disabled={popupError !== undefined}
                 >
                     Create instance

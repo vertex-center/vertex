@@ -3,7 +3,7 @@ import { Caption, Text, Title } from "../../../components/Text/Text";
 import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
 import Button from "../../../components/Button/Button";
 import Spacer from "../../../components/Spacer/Spacer";
-import Symbol from "../../../components/Symbol/Symbol";
+import Icon from "../../../components/Icon/Icon";
 import Popup from "../../../components/Popup/Popup";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
@@ -100,7 +100,7 @@ export default function SettingsUpdates() {
             )}
             {!isLoading && !error && (
                 <Horizontal alignItems="center" gap={20}>
-                    <Button onClick={() => reload(true)} rightSymbol="refresh">
+                    <Button onClick={() => reload(true)} rightIcon="refresh">
                         Check for updates
                     </Button>
                     {dependencies?.last_updates_check && (
@@ -116,7 +116,7 @@ export default function SettingsUpdates() {
             )}
             {!error && !isLoading && dependencies?.items?.length === 0 && (
                 <Horizontal alignItems="center">
-                    <Symbol name="check" />
+                    <Icon name="check" />
                     <Text>Everything is up-to-date.</Text>
                 </Horizontal>
             )}
@@ -142,7 +142,7 @@ export default function SettingsUpdates() {
                 </Text>
                 <Horizontal>
                     <Spacer />
-                    <Button primary onClick={dismissPopup} rightSymbol="check">
+                    <Button primary onClick={dismissPopup} rightIcon="check">
                         OK
                     </Button>
                 </Horizontal>

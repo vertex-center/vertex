@@ -1,5 +1,5 @@
 import styles from "./Bay.module.sass";
-import Symbol from "../Symbol/Symbol";
+import Icon from "../Icon/Icon";
 import classNames from "classnames";
 import { Horizontal, Vertical } from "../Layouts/Layouts";
 import { Link } from "react-router-dom";
@@ -10,12 +10,12 @@ import LogoIcon from "../Logo/LogoIcon";
 import { InstanceLed } from "../InstanceLed/InstanceLed";
 
 type ButtonProps = {
-    symbol: string;
+    icon: string;
     onClick: MouseEventHandler<HTMLSpanElement>;
 };
 
-function Button({ symbol, onClick }: Readonly<ButtonProps>) {
-    return <Symbol className={styles.button} name={symbol} onClick={onClick} />;
+function Button({ icon, onClick }: Readonly<ButtonProps>) {
+    return <Icon className={styles.button} name={icon} onClick={onClick} />;
 }
 
 type LCDProps = {
@@ -132,14 +132,14 @@ export default function Bay(props: Readonly<Props>) {
                         {instance?.onPower &&
                             inst?.status !== "not-installed" && (
                                 <Button
-                                    symbol="power_rounded"
+                                    icon="power_rounded"
                                     onClick={(e: any) => onPower(e, instance)}
                                 />
                             )}
                         {instance?.onInstall &&
                             inst?.status === "not-installed" && (
                                 <Button
-                                    symbol="download"
+                                    icon="download"
                                     onClick={instance.onInstall}
                                 />
                             )}

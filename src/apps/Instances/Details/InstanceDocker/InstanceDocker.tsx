@@ -58,7 +58,7 @@ export default function InstanceDocker() {
                     <KeyValueInfo
                         name="ID"
                         type="code"
-                        symbol="tag"
+                        icon="tag"
                         loading={loading}
                     >
                         {info?.container?.id}
@@ -66,7 +66,7 @@ export default function InstanceDocker() {
                     <KeyValueInfo
                         name="Container Name"
                         type="code"
-                        symbol="badge"
+                        icon="badge"
                         loading={loading}
                     >
                         {info?.container?.name}
@@ -74,7 +74,7 @@ export default function InstanceDocker() {
                     <KeyValueInfo
                         name="Platform"
                         type="code"
-                        symbol="computer"
+                        icon="computer"
                         loading={loading}
                     >
                         {info?.container?.platform}
@@ -88,7 +88,7 @@ export default function InstanceDocker() {
                     <KeyValueInfo
                         name="ID"
                         type="code"
-                        symbol="tag"
+                        icon="tag"
                         loading={loading}
                     >
                         {info?.image?.id}
@@ -96,7 +96,7 @@ export default function InstanceDocker() {
                     <KeyValueInfo
                         name="Architecture"
                         type="code"
-                        symbol="memory"
+                        icon="memory"
                         loading={loading}
                     >
                         {info?.image?.architecture}
@@ -104,7 +104,7 @@ export default function InstanceDocker() {
                     <KeyValueInfo
                         name="OS"
                         type="code"
-                        symbol="computer"
+                        icon="computer"
                         loading={loading}
                     >
                         {info?.image?.os}
@@ -112,7 +112,7 @@ export default function InstanceDocker() {
                     <KeyValueInfo
                         name="Size"
                         type="code"
-                        symbol="straighten"
+                        icon="straighten"
                         loading={loading}
                     >
                         {byteSize(info?.image?.size).toString()}
@@ -120,7 +120,7 @@ export default function InstanceDocker() {
                     <KeyValueInfo
                         name="Tags"
                         type="code"
-                        symbol="sell"
+                        icon="sell"
                         loading={loading}
                     >
                         {info?.image?.tags?.join(", ")}
@@ -133,7 +133,7 @@ export default function InstanceDocker() {
                 <Vertical gap={8}>
                     <Horizontal alignItems="center" gap={20}>
                         <Button
-                            leftSymbol="restart_alt"
+                            leftIcon="restart_alt"
                             onClick={recreateContainer}
                             disabled={recreatingContainer || loading}
                         >

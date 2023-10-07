@@ -1,4 +1,4 @@
-import Symbol from "../Symbol/Symbol";
+import Icon from "../Icon/Icon";
 import { Service } from "../../models/service";
 
 type Props = {
@@ -13,7 +13,7 @@ export default function ServiceLogo(props: Readonly<Props>) {
     iconURL.pathname = `/api/services/icons/${service?.icon}`;
 
     if (!service?.icon) {
-        return <Symbol name="extension" style={{ opacity: 0.8 }} />;
+        return <Icon name="extension" style={{ opacity: 0.8 }} />;
     }
 
     if (service?.icon.endsWith(".svg")) {

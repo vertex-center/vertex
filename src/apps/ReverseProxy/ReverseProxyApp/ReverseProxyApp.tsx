@@ -10,7 +10,7 @@ export default function ReverseProxyApp() {
             <SidebarGroup title="Providers">
                 <SidebarItem
                     name="Vertex Reverse Proxy"
-                    symbol="router"
+                    icon="router"
                     to="/reverse-proxy/vertex"
                 />
             </SidebarGroup>

@@ -1,4 +1,4 @@
-import Symbol from "../Symbol/Symbol";
+import Icon from "../Icon/Icon";
 import { Horizontal } from "../Layouts/Layouts";
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
 export default function Loading({ text }: Readonly<Props>) {
     return (
         <Horizontal alignItems="center" gap={8}>
-            <Symbol name="sync" rotating />
+            <Icon name="sync" rotating />
             <div>{text ?? "Loading..."}</div>
         </Horizontal>
     );

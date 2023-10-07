@@ -8,34 +8,30 @@ export default function SettingsApp() {
     let sidebar = (
         <Sidebar root="/settings">
             <SidebarGroup title="Settings">
-                <SidebarItem
-                    to="/settings/theme"
-                    symbol="palette"
-                    name="Theme"
-                />
+                <SidebarItem to="/settings/theme" icon="palette" name="Theme" />
             </SidebarGroup>
             <SidebarGroup title="Administration">
                 <SidebarItem
                     to="/settings/notifications"
-                    symbol="notifications"
+                    icon="notifications"
                     name="Notifications"
                 />
                 <SidebarItem
                     to="/settings/hardware"
-                    symbol="hard_drive"
+                    icon="hard_drive"
                     name="Hardware"
                 />
                 <SidebarItem
                     to="/settings/security"
-                    symbol="key"
+                    icon="key"
                     name="Security"
                 />
                 <SidebarItem
                     to="/settings/updates"
-                    symbol="update"
+                    icon="update"
                     name="Updates"
                 />
-                <SidebarItem to="/settings/about" symbol="info" name="About" />
+                <SidebarItem to="/settings/about" icon="info" name="About" />
             </SidebarGroup>
         </Sidebar>
     );

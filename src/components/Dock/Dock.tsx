@@ -1,16 +1,16 @@
 import styles from "./Dock.module.sass";
-import Symbol from "../Symbol/Symbol";
+import Icon from "../Icon/Icon";
 import { NavLink } from "react-router-dom";
 import classNames from "classnames";
 
 type DockAppProps = {
     to: string;
-    symbol: string;
+    icon: string;
     name: string;
 };
 
 function DockApp(props: Readonly<DockAppProps>) {
-    const { to, symbol } = props;
+    const { to, icon } = props;
 
     return (
         <NavLink
@@ -22,7 +22,7 @@ function DockApp(props: Readonly<DockAppProps>) {
                 })
             }
         >
-            <Symbol className={styles.icon} name={symbol} />
+            <Icon className={styles.icon} name={icon} />
             <span className={styles.name}>{props.name}</span>
         </NavLink>
     );
@@ -32,20 +32,16 @@ export default function Dock() {
     return (
         <div className={styles.dockContainer}>
             <div className={styles.dock}>
-                <DockApp to="/instances" symbol="storage" name="Instances" />
-                <DockApp
-                    to="/monitoring"
-                    symbol="monitoring"
-                    name="Monitoring"
-                />
-                <DockApp to="/tunnels" symbol="subway" name="Tunnels" />
+                <DockApp to="/instances" icon="storage" name="Instances" />
+                <DockApp to="/monitoring" icon="monitoring" name="Monitoring" />
+                <DockApp to="/tunnels" icon="subway" name="Tunnels" />
                 <DockApp
                     to="/reverse-proxy"
-                    symbol="router"
+                    icon="router"
                     name="Reverse Proxy"
                 />
                 <div className={styles.separator} />
-                <DockApp to="/settings" symbol="settings" name="Settings" />
+                <DockApp to="/settings" icon="settings" name="Settings" />
             </div>
         </div>
     );

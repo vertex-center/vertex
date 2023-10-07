@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import Symbol from "../Symbol/Symbol";
+import Icon from "../Icon/Icon";
 import styles from "./BackButton.module.sass";
 
 type Props = {
@@ -11,7 +11,7 @@ export default function BackButton(props: Readonly<Props>) {
 
     return (
         <Link to={to} className={styles.button}>
-            <Symbol name="arrow_back" />
+            <Icon name="arrow_back" />
         </Link>
     );
 }

@@ -1,5 +1,5 @@
 import styles from "./ProxyRedirect.module.sass";
-import Symbol from "../Symbol/Symbol";
+import Icon from "../Icon/Icon";
 import classNames from "classnames";
 
 type Props = {
@@ -21,19 +21,19 @@ export default function ProxyRedirect(props: Readonly<Props>) {
         >
             <div className={styles.wrapper}>
                 <div className={styles.url}>
-                    <Symbol name="link" />
+                    <Icon name="link" />
                     {source}
                 </div>
                 <div className={styles.line} />
-                <Symbol className={styles.arrow} name="double_arrow" />
+                <Icon className={styles.arrow} name="double_arrow" />
                 <div className={styles.line} />
                 <div className={styles.url}>
-                    <Symbol name="subdirectory_arrow_right" />
+                    <Icon name="subdirectory_arrow_right" />
                     {target}
                 </div>
             </div>
             <div className={styles.delete} onClick={onDelete}>
-                <Symbol name="close" />
+                <Icon name="close" />
             </div>
         </div>
     );

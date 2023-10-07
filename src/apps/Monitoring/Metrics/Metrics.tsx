@@ -1,7 +1,7 @@
 import List from "../../../components/List/List";
 import ListItem from "../../../components/List/ListItem";
-import ListSymbol from "../../../components/List/ListSymbol";
-import Symbol from "../../../components/Symbol/Symbol";
+import ListIcon from "../../../components/List/ListIcon";
+import Icon from "../../../components/Icon/Icon";
 import ListTitle from "../../../components/List/ListTitle";
 import ListInfo from "../../../components/List/ListInfo";
 import ListDescription from "../../../components/List/ListDescription";
@@ -14,7 +14,7 @@ type Props = {
 export default function Metrics(props: Readonly<Props>) {
     if (!props.metrics) return null;
 
-    let symbols = {
+    let icons = {
         metric_type_on_off: "toggle_on",
         metric_type_number: "show_chart",
     };
@@ -23,9 +23,9 @@ export default function Metrics(props: Readonly<Props>) {
         <List>
             {props.metrics.map((metric) => (
                 <ListItem key={metric.name}>
-                    <ListSymbol>
-                        <Symbol name={symbols[metric.type] ?? "show_chart"} />
-                    </ListSymbol>
+                    <ListIcon>
+                        <Icon name={icons[metric.type] ?? "show_chart"} />
+                    </ListIcon>
                     <ListInfo>
                         <ListTitle>{metric.name}</ListTitle>
                         <ListDescription>{metric.description}</ListDescription>

@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { Title } from "../../../../components/Text/Text";
-import Symbol from "../../../../components/Symbol/Symbol";
+import Icon from "../../../../components/Icon/Icon";
 
 import styles from "./InstanceHome.module.sass";
 import { useParams } from "react-router-dom";
@@ -39,6 +39,7 @@ export default function InstanceHome() {
 
                             return (
                                 <a
+                                    key={u.port}
                                     href={url.href}
                                     target="_blank"
                                     rel="noreferrer"
@@ -48,12 +49,9 @@ export default function InstanceHome() {
                                     })}
                                 >
                                     <Horizontal>
-                                        <Symbol
-                                            className={styles.navItemSymbol}
-                                            name="public"
-                                        />
+                                        <Icon name="public" />
                                         <Spacer />
-                                        <Symbol name="open_in_new" />
+                                        <Icon name="open_in_new" />
                                     </Horizontal>
                                     <div>{url.href}</div>
                                 </a>

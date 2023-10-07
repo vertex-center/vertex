@@ -1,14 +1,14 @@
 import classNames from "classnames";
 
-import styles from "./Symbol.module.sass";
+import styles from "./Icon.module.sass";
 import { HTMLProps } from "react";
 
-export type SymbolProps = Omit<HTMLProps<HTMLSpanElement>, "name"> & {
+export type IconProps = Omit<HTMLProps<HTMLSpanElement>, "name"> & {
     name: string | JSX.Element;
     rotating?: boolean;
 };
 
-export default function Symbol(props: Readonly<SymbolProps>) {
+export default function Icon(props: Readonly<IconProps>) {
     const { name, rotating, className, ...others } = props;
     return (
         <span

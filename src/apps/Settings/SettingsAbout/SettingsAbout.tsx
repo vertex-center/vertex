@@ -26,7 +26,7 @@ export default function SettingsAbout() {
                     <KeyValueInfo
                         name="Version"
                         type="code"
-                        symbol="tag"
+                        icon="tag"
                         loading={loading}
                     >
                         {about?.version}
@@ -34,7 +34,7 @@ export default function SettingsAbout() {
                     <KeyValueInfo
                         name="Commit"
                         type="code"
-                        symbol="commit"
+                        icon="commit"
                         loading={loading}
                     >
                         {about?.commit}
@@ -42,7 +42,7 @@ export default function SettingsAbout() {
                     <KeyValueInfo
                         name="Release date"
                         type="code"
-                        symbol="calendar_month"
+                        icon="calendar_month"
                         loading={loading}
                     >
                         {about?.date}
@@ -50,7 +50,7 @@ export default function SettingsAbout() {
                     <KeyValueInfo
                         name="Compiled for"
                         type="code"
-                        symbol="memory"
+                        icon="memory"
                         loading={loading}
                     >
                         {about?.os}

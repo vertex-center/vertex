@@ -1,14 +1,14 @@
 import { Fragment, HTMLProps } from "react";
 
 import styles from "./Button.module.sass";
-import Symbol from "../Symbol/Symbol";
+import Icon from "../Icon/Icon";
 import classNames from "classnames";
 import Spacer from "../Spacer/Spacer";
 import { Link } from "react-router-dom";
 
 export type ButtonProps = HTMLProps<HTMLButtonElement> & {
-    leftSymbol?: string | JSX.Element;
-    rightSymbol?: string | JSX.Element;
+    leftIcon?: string | JSX.Element;
+    rightIcon?: string | JSX.Element;
 
     selected?: boolean;
     selectable?: boolean;
@@ -29,8 +29,8 @@ export type ButtonProps = HTMLProps<HTMLButtonElement> & {
 export default function Button(props: Readonly<ButtonProps>) {
     const {
         children,
-        leftSymbol,
-        rightSymbol,
+        leftIcon,
+        rightIcon,
         loading,
         disabled,
         primary,
@@ -47,17 +47,13 @@ export default function Button(props: Readonly<ButtonProps>) {
 
     const content = (
         <Fragment>
-            {leftSymbol && (
-                <Symbol className={styles.symbol} name={leftSymbol} />
-            )}
+            {leftIcon && <Icon className={styles.icon} name={leftIcon} />}
             <div>{children}</div>
-            {rightSymbol && (
-                <Symbol className={styles.symbol} name={rightSymbol} />
-            )}
+            {rightIcon && <Icon className={styles.icon} name={rightIcon} />}
             {selectable && (
                 <Fragment>
                     <Spacer />
-                    <Symbol
+                    <Icon
                         style={{
                             opacity: selected ? 1 : 0.5,
                             color: selected ? "var(--bg-accent)" : "inherit",

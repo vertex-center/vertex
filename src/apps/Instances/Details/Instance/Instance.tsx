@@ -86,20 +86,20 @@ export default function Instance() {
                 <SidebarGroup>
                     <SidebarItem
                         to={`/instances/${uuid}/home`}
-                        symbol="home"
+                        icon="home"
                         name="Home"
                     />
                 </SidebarGroup>
                 <SidebarGroup title="Analyze">
                     <SidebarItem
                         to={`/instances/${uuid}/logs`}
-                        symbol="terminal"
+                        icon="terminal"
                         name="Logs"
                     />
                     {instance?.install_method === "docker" && (
                         <SidebarItem
                             to={`/instances/${uuid}/docker`}
-                            symbol={<SiDocker size={20} />}
+                            icon={<SiDocker size={20} />}
                             name="Docker"
                         />
                     )}
@@ -107,19 +107,19 @@ export default function Instance() {
                 <SidebarGroup title="Manage">
                     <SidebarItem
                         to={`/instances/${uuid}/environment`}
-                        symbol="tune"
+                        icon="tune"
                         name="Environment"
                     />
                     {instance?.service?.databases && (
                         <SidebarItem
                             to={`/instances/${uuid}/database`}
-                            symbol="database"
+                            icon="database"
                             name="Database"
                         />
                     )}
                     <SidebarItem
                         to={`/instances/${uuid}/update`}
-                        symbol="update"
+                        icon="update"
                         name="Update"
                         notifications={
                             instance?.service_update?.available ? 1 : undefined
@@ -127,12 +127,12 @@ export default function Instance() {
                     />
                     <SidebarItem
                         to={`/instances/${uuid}/settings`}
-                        symbol="settings"
+                        icon="settings"
                         name="Settings"
                     />
                     <SidebarItem
                         onClick={() => setShowDeletePopup(true)}
-                        symbol="delete"
+                        icon="delete"
                         name="Delete"
                         red
                     />
@@ -162,7 +162,7 @@ export default function Instance() {
                         color="red"
                         onClick={onDeleteInstance}
                         disabled={deleting}
-                        rightSymbol="delete"
+                        rightIcon="delete"
                     >
                         Confirm
                     </Button>

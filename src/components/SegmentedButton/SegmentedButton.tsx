@@ -32,7 +32,7 @@ type Props = {
     items: {
         label?: string;
         value: any;
-        rightSymbol?: string;
+        rightIcon?: string;
         disabled?: boolean;
     }[];
 };
@@ -50,7 +50,7 @@ export function SegmentedButtons(props: Readonly<Props>) {
                         onClick={() => onChange(item.value)}
                         selected={value === item.value}
                         disabled={disabled || item.disabled}
-                        rightSymbol={item.rightSymbol}
+                        rightIcon={item.rightIcon}
                     >
                         {item.label ?? item.value}
                     </SegmentedButton>

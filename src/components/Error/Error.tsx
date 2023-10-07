@@ -1,5 +1,5 @@
 import styles from "./Error.module.sass";
-import Symbol from "../Symbol/Symbol";
+import Icon from "../Icon/Icon";
 import { AxiosError } from "axios";
 import { HTMLProps } from "react";
 import classNames from "classnames";
@@ -30,7 +30,7 @@ export default function Error(props: Readonly<Props>) {
     return (
         <div className={classNames(styles.box, className)} {...others}>
             <div className={styles.error}>
-                <Symbol className={styles.symbol} name="error" />
+                <Icon className={styles.icon} name="error" />
                 <h1>Error</h1>
             </div>
             <div className={styles.content}>

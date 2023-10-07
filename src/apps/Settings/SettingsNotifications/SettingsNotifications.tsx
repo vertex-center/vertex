@@ -56,7 +56,7 @@ export default function SettingsNotifications() {
                     />
                     <Button
                         large
-                        rightSymbol="save"
+                        rightIcon="save"
                         onClick={onSave}
                         disabled={!changed || saving}
                     >

@@ -2,7 +2,7 @@ import { PropsWithChildren, useState } from "react";
 
 import styles from "./Update.module.sass";
 import Button from "../Button/Button";
-import Symbol from "../Symbol/Symbol";
+import Icon from "../Icon/Icon";
 import Progress from "../Progress";
 import ListItem from "../List/ListItem";
 import List from "../List/List";
@@ -44,7 +44,7 @@ export default function Update(props: Readonly<Props>) {
         } else {
             status = (
                 <ListActions>
-                    <Button rightSymbol="download" onClick={onUpdate}>
+                    <Button rightIcon="download" onClick={onUpdate}>
                         Update
                     </Button>
                 </ListActions>
@@ -53,7 +53,7 @@ export default function Update(props: Readonly<Props>) {
     } else {
         status = (
             <div className={styles.status}>
-                <Symbol name="check" />
+                <Icon name="check" />
                 Up-to-date
             </div>
         );

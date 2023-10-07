@@ -5,7 +5,7 @@ import Spacer from "../../../../components/Spacer/Spacer";
 import Button from "../../../../components/Button/Button";
 import { useParams } from "react-router-dom";
 import useInstance from "../../../../hooks/useInstance";
-import Symbol from "../../../../components/Symbol/Symbol";
+import Icon from "../../../../components/Icon/Icon";
 import ToggleButton from "../../../../components/ToggleButton/ToggleButton";
 import Input from "../../../../components/Input/Input";
 
@@ -141,7 +141,7 @@ export default function InstanceSettings(props: Readonly<Props>) {
                     })}
                 </Select>
                 <Button
-                    rightSymbol="refresh"
+                    rightIcon="refresh"
                     onClick={() => reloadVersions(false)}
                     disabled={instanceLoading || versionsLoading}
                 >
@@ -164,7 +164,7 @@ export default function InstanceSettings(props: Readonly<Props>) {
                 primary
                 large
                 onClick={save}
-                rightSymbol="save"
+                rightIcon="save"
                 loading={uploading}
                 disabled={saved || saved === undefined}
             >
@@ -176,7 +176,7 @@ export default function InstanceSettings(props: Readonly<Props>) {
                     alignItems="center"
                     gap={4}
                 >
-                    <Symbol name="check" />
+                    <Icon name="check" />
                     Saved!
                 </Horizontal>
             )}

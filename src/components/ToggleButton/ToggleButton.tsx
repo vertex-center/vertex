@@ -1,6 +1,6 @@
 import styles from "./ToggleButton.module.sass";
 import classNames from "classnames";
-import Symbol from "../Symbol/Symbol";
+import Icon from "../Icon/Icon";
 
 type Props = {
     value: boolean;
@@ -23,8 +23,8 @@ export default function ToggleButton(props: Readonly<Props>) {
             onClick={onChange}
         >
             <div className={styles.dot}>
-                <Symbol
-                    className={styles.symbol}
+                <Icon
+                    className={styles.icon}
                     name={value ? "check" : "close"}
                 />
             </div>

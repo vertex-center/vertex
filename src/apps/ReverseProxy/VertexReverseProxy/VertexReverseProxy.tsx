@@ -61,7 +61,7 @@ export default function VertexReverseProxy() {
                     ))}
             </div>
             <Horizontal className={styles.addRedirect} gap={10}>
-                <Button primary onClick={openNewRedirectPopup} leftSymbol="add">
+                <Button primary onClick={openNewRedirectPopup} leftIcon="add">
                     Add redirection
                 </Button>
             </Horizontal>

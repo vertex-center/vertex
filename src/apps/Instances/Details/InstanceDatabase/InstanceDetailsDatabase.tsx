@@ -98,7 +98,9 @@ export default function InstanceDetailsDatabase() {
     const [saved, setSaved] = useState<boolean>(undefined);
     const [uploading, setUploading] = useState<boolean>(false);
 
-    const [databases, setDatabases] = useState<{ [name: string]: string }>();
+    const [databases, setDatabases] = useState<{
+        [name: string]: string;
+    }>();
 
     const save = () => {
         setUploading(true);
@@ -133,7 +135,7 @@ export default function InstanceDetailsDatabase() {
                 primary
                 large
                 onClick={save}
-                rightSymbol="save"
+                rightIcon="save"
                 loading={uploading}
                 disabled={saved || saved === undefined}
             >

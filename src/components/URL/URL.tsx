@@ -1,5 +1,5 @@
 import { PropsWithChildren } from "react";
-import Symbol from "../Symbol/Symbol";
+import Icon from "../Icon/Icon";
 
 import styles from "./URL.module.sass";
 
@@ -10,7 +10,7 @@ type Props = PropsWithChildren<{
 export default function URL({ children, href }: Readonly<Props>) {
     return (
         <a href={href} className={styles.url}>
-            <Symbol name="link" />
+            <Icon name="link" />
             {children}
         </a>
     );

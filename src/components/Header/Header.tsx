@@ -4,14 +4,14 @@ import { Link, NavLink } from "react-router-dom";
 import styles from "./Header.module.sass";
 import Logo from "../Logo/Logo";
 import classNames from "classnames";
-import Symbol from "../Symbol/Symbol";
+import Icon from "../Icon/Icon";
 
 type ItemProps = PropsWithChildren<{
     to: string;
-    symbol: string;
+    icon: string;
 }>;
 
-function Item({ children, to, symbol }: Readonly<ItemProps>) {
+function Item({ children, to, icon }: Readonly<ItemProps>) {
     return (
         <NavLink
             to={to}
@@ -23,7 +23,7 @@ function Item({ children, to, symbol }: Readonly<ItemProps>) {
             }
         >
             <li className={styles.itemContent}>
-                <Symbol className={styles.itemSymbol} name={symbol} />
+                <Icon className={styles.itemIcon} name={icon} />
                 <div>{children}</div>
             </li>
         </NavLink>

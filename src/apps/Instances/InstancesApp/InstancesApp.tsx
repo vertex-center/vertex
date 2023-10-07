@@ -129,7 +129,7 @@ export default function InstancesApp() {
                         />
                     ))}
                     <Horizontal className={styles.addBay} gap={10}>
-                        <Button primary to="/instances/add" leftSymbol="add">
+                        <Button primary to="/instances/add" leftIcon="add">
                             Create instance
                         </Button>
                     </Horizontal>
