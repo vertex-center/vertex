@@ -28,6 +28,7 @@ import MetricsList from "./apps/Monitoring/MetricsList/MetricsList";
 import Grafana from "./apps/Monitoring/Grafana/Grafana";
 import TunnelsApp from "./apps/Tunnels/TunnelsApp/TunnelsApp";
 import CloudflareTunnels from "./apps/Tunnels/CloudflareTunnels/CloudflareTunnels";
+import VertexReverseProxy from "./apps/ReverseProxy/VertexReverseProxy/VertexReverseProxy";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -68,7 +69,15 @@ function App() {
                                 element={<CloudflareTunnels />}
                             />
                         </Route>
-                        <Route path="/proxy" element={<ReverseProxyApp />} />
+                        <Route
+                            path="/reverse-proxy"
+                            element={<ReverseProxyApp />}
+                        >
+                            <Route
+                                path="/reverse-proxy/vertex"
+                                element={<VertexReverseProxy />}
+                            />
+                        </Route>
                         <Route path="/instances/:uuid/" element={<Instance />}>
                             <Route
                                 path="/instances/:uuid/home"
