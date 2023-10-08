@@ -30,7 +30,7 @@ export default function TunnelsApp() {
     });
 
     const sidebar = (
-        <Sidebar root="/tunnels">
+        <Sidebar root="/app/vx-tunnels">
             <SidebarGroup title="Providers">
                 <SidebarItem
                     icon={<SiCloudflare size={20} />}

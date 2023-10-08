@@ -6,7 +6,7 @@ import Sidebar, {
 
 export default function ReverseProxyApp() {
     const sidebar = (
-        <Sidebar root="/reverse-proxy">
+        <Sidebar root="/app/vx-reverse-proxy">
             <SidebarGroup title="Providers">
                 <SidebarItem
                     name="Vertex Reverse Proxy"

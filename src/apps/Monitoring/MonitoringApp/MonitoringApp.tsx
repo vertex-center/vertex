@@ -34,7 +34,7 @@ export default function MonitoringApp() {
     });
 
     const sidebar = (
-        <Sidebar root="/monitoring">
+        <Sidebar root="/app/vx-monitoring">
             <SidebarGroup title="Overview">
                 <SidebarItem
                     icon="rule"

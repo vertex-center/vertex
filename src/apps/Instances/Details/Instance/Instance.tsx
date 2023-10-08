@@ -67,7 +67,7 @@ export default function Instance() {
 
     const content = (
         <Horizontal className={styles.content}>
-            <Sidebar root={`/instances/${uuid}`}>
+            <Sidebar root={`/app/vx-instances/${uuid}`}>
                 <SidebarGroup>
                     <SidebarItem
                         to={`/app/vx-instances/${uuid}/home`}
