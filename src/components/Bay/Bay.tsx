@@ -13,10 +13,21 @@ import { v4 as uuidv4 } from "uuid";
 type ButtonProps = {
     icon: string;
     onClick: MouseEventHandler<HTMLSpanElement>;
+    disabled?: boolean;
 };
 
-function Button({ icon, onClick }: Readonly<ButtonProps>) {
-    return <Icon className={styles.button} name={icon} onClick={onClick} />;
+function Button({ icon, onClick, disabled }: Readonly<ButtonProps>) {
+    return (
+        <Icon
+            disabled={disabled}
+            className={classNames({
+                [styles.button]: true,
+                [styles.buttonDisabled]: disabled,
+            })}
+            name={icon}
+            onClick={onClick}
+        />
+    );
 }
 
 type LCDProps = {
@@ -137,6 +148,11 @@ export default function Bay(props: Readonly<Props>) {
                                 <Button
                                     icon="power_rounded"
                                     onClick={(e: any) => onPower(e, instance)}
+                                    disabled={
+                                        inst?.status === "building" ||
+                                        inst?.status === "starting" ||
+                                        inst?.status === "stopping"
+                                    }
                                 />
                             )}
                         {instance?.onInstall &&
