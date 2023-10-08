@@ -18,14 +18,15 @@ export default function SqlApp() {
         reload: reloadInstances,
     } = useFetch<Instances>(api.instances.get);
 
+    const dbs = Object.values(instances ?? {})?.filter(
+        (i) => i?.service?.features?.databases?.length >= 1
+    );
+
     const sidebar = (
         <Sidebar root="/app/vx-sql">
-            <SidebarGroup title="Your databases">
-                {Object.values(instances ?? {})
-                    ?.filter(
-                        (i) => i?.service?.features?.databases?.length >= 1
-                    )
-                    ?.map((inst) => {
+            {Object.values(dbs).length > 0 && (
+                <SidebarGroup title="Your databases">
+                    {dbs?.map((inst) => {
                         let icon: string | JSX.Element = "database";
                         const type = inst?.service?.features?.databases?.find(
                             (d) => d.category === "sql"
@@ -44,7 +45,8 @@ export default function SqlApp() {
                             />
                         );
                     })}
-            </SidebarGroup>
+                </SidebarGroup>
+            )}
             <SidebarGroup title="Create">
                 <SidebarItem
                     icon="download"
