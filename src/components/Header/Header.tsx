@@ -7,16 +7,18 @@ export default function Header() {
     const location = useLocation();
 
     let name = "Vertex";
+    let to = "/app/vx-instances";
     if (location.pathname.startsWith("/app/")) {
         const app = apps.find((app) => location.pathname.includes(app.to));
         if (app) {
             name = app.name;
+            to = app.to;
         }
     }
 
     return (
         <header className={styles.header}>
-            <Link to="/app/vx-instances" className={styles.logo}>
+            <Link to={to} className={styles.logo}>
                 <Logo name={name} />
             </Link>
         </header>
