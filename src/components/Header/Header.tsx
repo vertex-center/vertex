@@ -1,42 +1,13 @@
-import { HTMLProps, PropsWithChildren } from "react";
-import { Link, NavLink } from "react-router-dom";
-
+import { Link } from "react-router-dom";
 import styles from "./Header.module.sass";
 import Logo from "../Logo/Logo";
-import classNames from "classnames";
-import Icon from "../Icon/Icon";
 
-type ItemProps = PropsWithChildren<{
-    to: string;
-    icon: string;
-}>;
-
-function Item({ children, to, icon }: Readonly<ItemProps>) {
-    return (
-        <NavLink
-            to={to}
-            className={({ isActive }) =>
-                classNames({
-                    [styles.item]: true,
-                    [styles.itemActive]: isActive,
-                })
-            }
-        >
-            <li className={styles.itemContent}>
-                <Icon className={styles.itemIcon} name={icon} />
-                <div>{children}</div>
-            </li>
-        </NavLink>
-    );
-}
-
-export default function Header({ children }: HTMLProps<HTMLHeadingElement>) {
+export default function Header() {
     return (
         <header className={styles.header}>
             <Link to="/instances" className={styles.logo}>
                 <Logo />
             </Link>
-            {children}
         </header>
     );
 }
