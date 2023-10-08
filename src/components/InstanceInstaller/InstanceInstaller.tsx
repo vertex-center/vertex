@@ -93,7 +93,7 @@ export default function InstanceInstaller(props: Readonly<Props>) {
                     {
                         value: instance,
                         to: instance?.uuid
-                            ? `/instances/${instance?.uuid}`
+                            ? `/app/vx-instances/${instance?.uuid}`
                             : undefined,
                         onInstall: onInstall,
                         onPower: () => onPower(instance),

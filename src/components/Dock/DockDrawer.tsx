@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { BigTitle, Caption, Title } from "../Text/Text";
 import { Link } from "react-router-dom";
 import { Vertical } from "../Layouts/Layouts";
-import { apps } from "./Dock";
+import { apps } from "../../models/app";
 import Icon from "../Icon/Icon";
 import LogoIcon from "../Logo/LogoIcon";
 

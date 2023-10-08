@@ -38,14 +38,14 @@ export default function MonitoringApp() {
             <SidebarGroup title="Overview">
                 <SidebarItem
                     icon="rule"
-                    to="/monitoring/metrics"
+                    to="/app/vx-monitoring/metrics"
                     name="Metrics"
                 />
             </SidebarGroup>
             <SidebarGroup title="Collectors">
                 <SidebarItem
                     icon={<SiPrometheus size={20} />}
-                    to="/monitoring/prometheus"
+                    to="/app/vx-monitoring/prometheus"
                     name="Prometheus"
                     led={ledPrometheus && { status: ledPrometheus?.status }}
                 />
@@ -53,7 +53,7 @@ export default function MonitoringApp() {
             <SidebarGroup title="Visualizations">
                 <SidebarItem
                     icon={<SiGrafana size={20} />}
-                    to="/monitoring/grafana"
+                    to="/app/vx-monitoring/grafana"
                     name="Grafana"
                     led={ledGrafana && { status: ledGrafana?.status }}
                 />

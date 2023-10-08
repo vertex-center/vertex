@@ -41,70 +41,79 @@ function App() {
                     <Routes>
                         <Route
                             path="/"
-                            element={<Navigate to="/instances" />}
+                            element={<Navigate to="/app/vx-instances" />}
                             index
                         />
-                        <Route path="/instances" element={<InstancesApp />} />
                         <Route
-                            path="/instances/add"
+                            path="/app/vx-instances"
+                            element={<InstancesApp />}
+                        />
+                        <Route
+                            path="/app/vx-instances/add"
                             element={<InstancesStore />}
                         />
-                        <Route path="/monitoring" element={<MonitoringApp />}>
+                        <Route
+                            path="/app/vx-monitoring"
+                            element={<MonitoringApp />}
+                        >
                             <Route
-                                path="/monitoring/metrics"
+                                path="/app/vx-monitoring/metrics"
                                 element={<MetricsList />}
                             />
                             <Route
-                                path="/monitoring/prometheus"
+                                path="/app/vx-monitoring/prometheus"
                                 element={<Prometheus />}
                             />
                             <Route
-                                path="/monitoring/grafana"
+                                path="/app/vx-monitoring/grafana"
                                 element={<Grafana />}
                             />
                         </Route>
-                        <Route path="/tunnels" element={<TunnelsApp />}>
+                        <Route path="/app/vx-tunnels" element={<TunnelsApp />}>
                             <Route
-                                path="/tunnels/cloudflare"
+                                path="/app/vx-tunnels/cloudflare"
                                 element={<CloudflareTunnels />}
                             />
                         </Route>
                         <Route
-                            path="/reverse-proxy"
+                            path="/app/vx-reverse-proxy"
                             element={<ReverseProxyApp />}
                         >
                             <Route
-                                path="/reverse-proxy/vertex"
+                                path="/app/vx-reverse-proxy/vertex"
                                 element={<VertexReverseProxy />}
                             />
                         </Route>
-                        <Route path="/instances/:uuid/" element={<Instance />}>
+                        <Route
+                            path="/app/vx-instances/:uuid/"
+                            element={<Instance />}
+                        >
                             <Route
-                                path="/instances/:uuid/home"
+                                path="/app/vx-instances/:uuid/home"
                                 element={<InstanceHome />}
                             />
                             <Route
-                                path="/instances/:uuid/docker"
+                                path="/app/vx-instances/:uuid/docker"
                                 element={<InstanceDocker />}
                             />
                             <Route
-                                path="/instances/:uuid/logs"
+                                path="/app/vx-instances/:uuid/logs"
                                 element={<InstanceLogs />}
                             />
                             <Route
-                                path="/instances/:uuid/environment"
+                                path="/app/vx-instances/:uuid/environment"
                                 element={<InstanceEnv />}
                             />
                             <Route
-                                path="/instances/:uuid/database"
+                                path="/app/vx-instances/:uuid/database"
                                 element={<InstanceDetailsDatabase />}
                             />
                             <Route
-                                path="/instances/:uuid/update"
+                                path="/app/vx-instances/:uuid/update"
                                 element={<InstanceUpdate />}
                             />
                             <Route
-                                path="/instances/:uuid/settings"
+                                path="/app/vx-instances/:uuid/settings"
                                 element={<InstanceSettings />}
                             />
                         </Route>

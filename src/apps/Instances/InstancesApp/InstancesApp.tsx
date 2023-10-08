@@ -83,7 +83,7 @@ export default function InstancesApp() {
         <div className={styles.server}>
             <ProgressOverlay show={loading} />
             <div className={styles.title}>
-                <BigTitle>Instances</BigTitle>
+                <BigTitle>All instances</BigTitle>
             </div>
 
             {error && (
@@ -105,13 +105,17 @@ export default function InstancesApp() {
                             instances={instances.map((instance, i) => ({
                                 value: instance,
                                 count: instances.length > 1 ? i + 1 : undefined,
-                                to: `/instances/${instance.uuid}/`,
+                                to: `/app/vx-instances/${instance.uuid}/`,
                                 onPower: () => toggleInstance(instance.uuid),
                             }))}
                         />
                     ))}
                     <Horizontal className={styles.addBay} gap={10}>
-                        <Button primary to="/instances/add" leftIcon="add">
+                        <Button
+                            primary
+                            to="/app/vx-instances/add"
+                            leftIcon="add"
+                        >
                             Create instance
                         </Button>
                     </Horizontal>

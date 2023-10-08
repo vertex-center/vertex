@@ -4,6 +4,7 @@ import { NavLink } from "react-router-dom";
 import classNames from "classnames";
 import DockDrawer from "./DockDrawer";
 import { Fragment, useState } from "react";
+import { apps } from "../../models/app";
 
 type DockAppProps = {
     to?: string;
@@ -11,33 +12,6 @@ type DockAppProps = {
     name: string;
     onClick?: () => void;
 };
-
-export const apps = [
-    {
-        to: "/instances",
-        icon: "storage",
-        name: "Vertex Instances",
-        description: "Create and manage instances.",
-    },
-    {
-        to: "/monitoring",
-        icon: "monitoring",
-        name: "Vertex Monitoring",
-        description: "Monitor everything.",
-    },
-    {
-        to: "/tunnels",
-        icon: "subway",
-        name: "Vertex Tunnels",
-        description: "Create and manage tunnels.",
-    },
-    {
-        to: "/reverse-proxy",
-        icon: "router",
-        name: "Vertex Reverse Proxy",
-        description: "Redirect traffic to your instances.",
-    },
-];
 
 export function DockApp(props: Readonly<DockAppProps>) {
     const { to, icon, name, onClick } = props;

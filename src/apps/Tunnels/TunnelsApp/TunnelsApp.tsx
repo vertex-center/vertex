@@ -34,7 +34,7 @@ export default function TunnelsApp() {
             <SidebarGroup title="Providers">
                 <SidebarItem
                     icon={<SiCloudflare size={20} />}
-                    to="/tunnels/cloudflare"
+                    to="/app/vx-tunnels/cloudflare"
                     name="Cloudflare Tunnel"
                     led={ledCloudflared && { status: ledCloudflared?.status }}
                 />

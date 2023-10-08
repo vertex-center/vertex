@@ -11,7 +11,7 @@ export default function ReverseProxyApp() {
                 <SidebarItem
                     name="Vertex Reverse Proxy"
                     icon="router"
-                    to="/reverse-proxy/vertex"
+                    to="/app/vx-reverse-proxy/vertex"
                 />
             </SidebarGroup>
         </Sidebar>

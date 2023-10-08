@@ -70,20 +70,20 @@ export default function Instance() {
             <Sidebar root={`/instances/${uuid}`}>
                 <SidebarGroup>
                     <SidebarItem
-                        to={`/instances/${uuid}/home`}
+                        to={`/app/vx-instances/${uuid}/home`}
                         icon="home"
                         name="Home"
                     />
                 </SidebarGroup>
                 <SidebarGroup title="Analyze">
                     <SidebarItem
-                        to={`/instances/${uuid}/logs`}
+                        to={`/app/vx-instances/${uuid}/logs`}
                         icon="terminal"
                         name="Logs"
                     />
                     {instance?.install_method === "docker" && (
                         <SidebarItem
-                            to={`/instances/${uuid}/docker`}
+                            to={`/app/vx-instances/${uuid}/docker`}
                             icon={<SiDocker size={20} />}
                             name="Docker"
                         />
@@ -91,19 +91,19 @@ export default function Instance() {
                 </SidebarGroup>
                 <SidebarGroup title="Manage">
                     <SidebarItem
-                        to={`/instances/${uuid}/environment`}
+                        to={`/app/vx-instances/${uuid}/environment`}
                         icon="tune"
                         name="Environment"
                     />
                     {instance?.service?.databases && (
                         <SidebarItem
-                            to={`/instances/${uuid}/database`}
+                            to={`/app/vx-instances/${uuid}/database`}
                             icon="database"
                             name="Database"
                         />
                     )}
                     <SidebarItem
-                        to={`/instances/${uuid}/update`}
+                        to={`/app/vx-instances/${uuid}/update`}
                         icon="update"
                         name="Update"
                         notifications={
@@ -111,7 +111,7 @@ export default function Instance() {
                         }
                     />
                     <SidebarItem
-                        to={`/instances/${uuid}/settings`}
+                        to={`/app/vx-instances/${uuid}/settings`}
                         icon="settings"
                         name="Settings"
                     />
