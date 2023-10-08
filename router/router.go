@@ -195,6 +195,7 @@ func (r *Router) initAPIRoutes(about types.About) {
 	addSettingsRoutes(api.Group("/settings"))
 	addHardwareRoutes(api.Group("/hardware"))
 	addSecurityRoutes(api.Group("/security"))
+	addSQLRoutes(api.Group("/sql"))
 	addTunnelsRoutes(api.Group("/tunnels"))
 }
 

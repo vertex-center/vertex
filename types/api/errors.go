@@ -65,4 +65,7 @@ const (
 	ErrFailedToGetMetrics               router.ErrCode = "failed_to_get_metrics"
 
 	ErrFailedToConfigureTunnelInstance router.ErrCode = "failed_to_configure_tunnel_instance"
+
+	ErrSQLDatabaseNotFound                  router.ErrCode = "sql_database_not_found"
+	ErrFailedToConfigureSQLDatabaseInstance router.ErrCode = "failed_to_configure_sql_database_instance"
 )
