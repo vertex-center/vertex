@@ -56,8 +56,7 @@ export default function SqlApp() {
     );
 
     useServerEvent("/instances/events", {
-        change: (e) => {
-            console.log(e);
+        change: () => {
             reloadInstances().finally();
         },
     });

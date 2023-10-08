@@ -7,6 +7,7 @@ import Bay from "../../../components/Bay/Bay";
 import { v4 as uuidv4 } from "uuid";
 import { useServerEvent } from "../../../hooks/useEvent";
 import { APIError } from "../../../components/Error/APIError";
+import { useEffect } from "react";
 
 type Props = {};
 
@@ -18,6 +19,10 @@ export default function SqlDatabase(props: Readonly<Props>) {
         reload,
         error,
     } = useFetch<Instance>(() => api.instance.get(uuid));
+
+    useEffect(() => {
+        reload().finally();
+    }, [uuid]);
 
     const onPower = async (inst: Instance) => {
         if (!inst) {
@@ -31,7 +36,7 @@ export default function SqlDatabase(props: Readonly<Props>) {
         await api.instance.stop(inst.uuid);
     };
 
-    const route = instance?.uuid ? `/instance/${instance?.uuid}/events` : "";
+    const route = uuid ? `/instance/${uuid}/events` : "";
 
     useServerEvent(route, {
         status_change: () => {
