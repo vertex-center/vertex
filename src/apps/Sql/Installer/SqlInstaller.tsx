@@ -57,6 +57,7 @@ export default function SqlInstaller() {
                 setDownloading((d) =>
                     d?.filter(({ service: s }) => s.id !== service.id)
                 );
+                reloadInstances().catch(console.error);
             });
     };
 
