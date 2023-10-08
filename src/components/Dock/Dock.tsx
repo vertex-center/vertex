@@ -49,7 +49,7 @@ export function DockApp(props: Readonly<DockAppProps>) {
         </Fragment>
     );
 
-    if (onClick) {
+    if (!to) {
         return (
             <div className={styles.app} onClick={onClick}>
                 {content}
@@ -60,6 +60,7 @@ export function DockApp(props: Readonly<DockAppProps>) {
     return (
         <NavLink
             to={to}
+            onClick={onClick}
             className={({ isActive }) =>
                 classNames({
                     [styles.app]: true,
@@ -89,10 +90,19 @@ export default function Dock() {
             >
                 <div className={styles.dock}>
                     {apps.map((app) => (
-                        <DockApp key={app.to} {...app} />
+                        <DockApp
+                            key={app.to}
+                            {...app}
+                            onClick={() => setDrawerOpen(false)}
+                        />
                     ))}
                     <div className={styles.separator} />
-                    <DockApp to="/settings" icon="settings" name="Settings" />
+                    <DockApp
+                        to="/settings"
+                        icon="settings"
+                        name="Settings"
+                        onClick={() => setDrawerOpen(false)}
+                    />
                     <DockApp
                         icon="apps"
                         name="Apps"
