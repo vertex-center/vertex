@@ -29,6 +29,8 @@ import Grafana from "./apps/Monitoring/Grafana/Grafana";
 import TunnelsApp from "./apps/Tunnels/TunnelsApp/TunnelsApp";
 import CloudflareTunnels from "./apps/Tunnels/CloudflareTunnels/CloudflareTunnels";
 import VertexReverseProxy from "./apps/ReverseProxy/VertexReverseProxy/VertexReverseProxy";
+import SqlApp from "./apps/Sql/SqlApp/SqlApp";
+import SqlInstaller from "./apps/Sql/Installer/SqlInstaller";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -52,6 +54,12 @@ function App() {
                             path="/app/vx-instances/add"
                             element={<InstancesStore />}
                         />
+                        <Route path="/app/vx-sql" element={<SqlApp />}>
+                            <Route
+                                path="/app/vx-sql/install"
+                                element={<SqlInstaller />}
+                            />
+                        </Route>
                         <Route
                             path="/app/vx-monitoring"
                             element={<MonitoringApp />}

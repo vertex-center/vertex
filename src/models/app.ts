@@ -15,6 +15,13 @@ export const apps: VertexApp[] = [
         description: "Create and manage instances.",
     },
     {
+        id: "vertex-sql",
+        to: "/app/vx-sql",
+        icon: "database",
+        name: "Vertex SQL",
+        description: "Create and manage databases.",
+    },
+    {
         id: "vertex-monitoring",
         to: "/app/vx-monitoring",
         icon: "monitoring",
