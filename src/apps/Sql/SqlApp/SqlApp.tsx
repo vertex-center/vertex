@@ -3,10 +3,48 @@ import Sidebar, {
     SidebarGroup,
     SidebarItem,
 } from "../../../components/Sidebar/Sidebar";
+import { api } from "../../../backend/backend";
+import { Instances } from "../../../models/instance";
+import { useFetch } from "../../../hooks/useFetch";
+import { ProgressOverlay } from "../../../components/Progress/Progress";
+import { Fragment } from "react";
+import { SiPostgresql } from "@icons-pack/react-simple-icons";
+import { useServerEvent } from "../../../hooks/useEvent";
 
 export default function SqlApp() {
+    const {
+        data: instances,
+        loading,
+        reload: reloadInstances,
+    } = useFetch<Instances>(api.instances.get);
+
     const sidebar = (
         <Sidebar root="/app/vx-sql">
+            <SidebarGroup title="Your databases">
+                {Object.values(instances ?? {})
+                    ?.filter(
+                        (i) => i?.service?.features?.databases?.length >= 1
+                    )
+                    ?.map((inst) => {
+                        let icon: string | JSX.Element = "database";
+                        const type = inst?.service?.features?.databases?.find(
+                            (d) => d.category === "sql"
+                        )?.type;
+                        if (type === "postgres") {
+                            icon = <SiPostgresql />;
+                        }
+
+                        return (
+                            <SidebarItem
+                                key={inst.uuid}
+                                icon={icon}
+                                name={inst?.display_name ?? inst.service.name}
+                                to={`/app/vx-sql/db/${inst.uuid}`}
+                                led={{ status: inst?.status }}
+                            />
+                        );
+                    })}
+            </SidebarGroup>
             <SidebarGroup title="Create">
                 <SidebarItem
                     icon="download"
@@ -17,5 +55,17 @@ export default function SqlApp() {
         </Sidebar>
     );
 
-    return <PageWithSidebar title="SQL databases" sidebar={sidebar} />;
+    useServerEvent("/instances/events", {
+        change: (e) => {
+            console.log(e);
+            reloadInstances().finally();
+        },
+    });
+
+    return (
+        <Fragment>
+            <ProgressOverlay show={loading} />
+            <PageWithSidebar title="SQL databases" sidebar={sidebar} />
+        </Fragment>
+    );
 }

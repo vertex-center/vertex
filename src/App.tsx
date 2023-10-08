@@ -31,6 +31,7 @@ import CloudflareTunnels from "./apps/Tunnels/CloudflareTunnels/CloudflareTunnel
 import VertexReverseProxy from "./apps/ReverseProxy/VertexReverseProxy/VertexReverseProxy";
 import SqlApp from "./apps/Sql/SqlApp/SqlApp";
 import SqlInstaller from "./apps/Sql/Installer/SqlInstaller";
+import SqlDatabase from "./apps/Sql/SqlDatabase/SqlDatabase";
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -58,6 +59,10 @@ function App() {
                             <Route
                                 path="/app/vx-sql/install"
                                 element={<SqlInstaller />}
+                            />
+                            <Route
+                                path="/app/vx-sql/db/:uuid"
+                                element={<SqlDatabase />}
                             />
                         </Route>
                         <Route
