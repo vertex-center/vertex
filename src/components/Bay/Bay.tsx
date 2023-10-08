@@ -118,9 +118,15 @@ export default function Bay(props: Readonly<Props>) {
     };
 
     const tags = {
+        // Vertex Monitoring
         "vertex-prometheus-collector": "Vertex Monitoring",
         "vertex-grafana-visualizer": "Vertex Monitoring",
+
+        // Vertex Tunnels
         "vertex-cloudflare-tunnel": "Vertex Tunnels",
+
+        // Vertex SQL
+        "vertex-postgres-sql": "Vertex SQL",
     };
 
     return (

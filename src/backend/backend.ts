@@ -120,6 +120,12 @@ export const api = {
         }),
     },
 
+    sql: {
+        db: (db: string) => ({
+            install: () => server.post(`/sql/db/${db}/install`),
+        }),
+    },
+
     dependencies: {
         get: (reload?: boolean) =>
             server.get<DependenciesUpdate>(

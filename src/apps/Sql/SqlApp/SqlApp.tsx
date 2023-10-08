@@ -18,8 +18,8 @@ export default function SqlApp() {
         reload: reloadInstances,
     } = useFetch<Instances>(api.instances.get);
 
-    const dbs = Object.values(instances ?? {})?.filter(
-        (i) => i?.service?.features?.databases?.length >= 1
+    const dbs = Object.values(instances ?? {})?.filter((i) =>
+        i?.tags?.some((t) => t.includes("vertex-") && t.includes("-sql"))
     );
 
     const sidebar = (

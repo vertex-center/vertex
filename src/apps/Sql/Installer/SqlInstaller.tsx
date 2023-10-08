@@ -47,11 +47,9 @@ export default function SqlInstaller() {
         setDownloading((prev) => [...prev, { service }]);
         setShowPopup(false);
 
-        api.services
-            .install({
-                method: "docker",
-                service_id: service.id,
-            })
+        api.sql
+            .db(service.id)
+            .install()
             .catch(setError)
             .finally(() => {
                 setDownloading((d) =>
