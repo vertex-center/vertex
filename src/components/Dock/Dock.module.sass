@@ -11,6 +11,15 @@
     padding: 10px
     align-items: center
     justify-content: center
+    transition: all 0.15s ease
+
+    @include dimensions.small-or-less
+        gap: 6px
+        padding: 8px
+
+    @include dimensions.extra-small-or-less
+        gap: 4px
+        padding: 8px
 
     &Container
         position: fixed
@@ -20,6 +29,11 @@
         left: 50%
         transform: translateX(-50%)
         bottom: 20px
+        z-index: 100
+        transition: bottom 0.15s ease
+
+        &Open
+            bottom: 15px
 
 .app
     display: inline-flex
@@ -28,40 +42,41 @@
     height: 60px
     width: 60px
     border-radius: dimensions.$border-radius-lg
-    background: linear-gradient(-45deg, colors.$bg-secondary, colors.$bg-tertiary)
-    border: 1px solid colors.$bg-tertiary
+    background-color: colors.$bg-secondary
+    cursor: pointer
 
     &:hover
-        background: linear-gradient(-45deg, colors.$bg-secondary-hover, colors.$bg-tertiary-hover)
-        border-color: colors.$bg-tertiary-hover
+        background-color: colors.$bg-tertiary
 
     &::after
         content: ''
         position: absolute
         width: 8px
-        height: 4px
-        border-top-left-radius: 4px
-        border-top-right-radius: 4px
+        height: 3px
+        border-top-left-radius: 3px
+        border-top-right-radius: 3px
         background-color: colors.$fg-primary
         bottom: 1px
         opacity: 0
         transition: all 0.15s ease-in-out
 
     & .icon
-        text-shadow: 0 0 30px colors.$fg-secondary
+        //text-shadow: 0 0 30px colors.$fg-secondary
         font-size: 26px
+        user-select: none
+        -webkit-user-select: none
+        -moz-user-select: none
 
     & .name
         position: absolute
         top: -35px
         display: none
-        background-color: colors.$bg-tertiary
-        padding: 5px 10px
+        background-color: colors.$bg-secondary-hover
+        padding: 6px 12px
         border-radius: dimensions.$border-radius-lg
 
     &Active
         bottom: 4px
-        border-color: colors.$bg-tertiary-hover
 
         &::after
             width: 20px
@@ -71,9 +86,12 @@
         & .name
             display: block
 
+    @include dimensions.small-or-less
+        height: 55px
+        width: 55px
+
 .separator
     width: 5px
     height: 15px
     border-radius: 3px
     background-color: colors.$bg-tertiary
-
