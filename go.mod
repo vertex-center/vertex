@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/antelman107/net-wait-go v0.0.0-20220211074630-12d8a944b87d
-	github.com/carlmjohnson/requests v0.23.4
+	github.com/carlmjohnson/requests v0.23.5
 	github.com/disgoorg/disgo v0.16.11
 	github.com/docker/docker v24.0.6+incompatible
 	github.com/docker/go-connections v0.4.0
@@ -19,7 +19,7 @@ require (
 	github.com/google/go-github/v50 v50.2.0
 	github.com/google/uuid v1.3.1
 	github.com/h2non/gock v1.2.0
-	github.com/prometheus/client_golang v1.14.0
+	github.com/prometheus/client_golang v1.17.0
 	github.com/shirou/gopsutil/v3 v3.23.9
 	github.com/stretchr/testify v1.8.4
 	github.com/vertex-center/vlog v1.0.2
@@ -99,9 +99,9 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
-	github.com/prometheus/client_model v0.3.0 // indirect
-	github.com/prometheus/common v0.37.0 // indirect
-	github.com/prometheus/procfs v0.8.0 // indirect
+	github.com/prometheus/client_model v0.4.1-0.20230718164431-9a2bf3000d16 // indirect
+	github.com/prometheus/common v0.44.0 // indirect
+	github.com/prometheus/procfs v0.11.1 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/sasha-s/go-csync v0.0.0-20210812194225-61421b77c44b // indirect
@@ -127,7 +127,7 @@ require (
 	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/tools v0.13.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.30.0 // indirect
+	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gotest.tools/v3 v3.4.0 // indirect
