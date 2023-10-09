@@ -120,6 +120,9 @@ type DatabaseFeature struct {
 	// The database Type. Can be redis, postgres...
 	Type string `yaml:"type" json:"type"`
 
+	// The database Category. Can be 'sql', 'redis'...
+	Category string `yaml:"category" json:"category"`
+
 	// The database Port. Must be the name
 	// of an environment variable.
 	Port string `yaml:"port" json:"port"`

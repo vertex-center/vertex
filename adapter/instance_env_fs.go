@@ -71,11 +71,15 @@ func (a *InstanceEnvFSAdapter) Load(uuid uuid.UUID) (types.InstanceEnvVariables,
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := strings.Split(scanner.Text(), "=")
-		if len(line) < 2 {
-			return nil, errors.New("failed to read .env")
+		if len(line) == 1 {
+			env[line[0]] = ""
+			continue
 		}
-
-		env[line[0]] = line[1]
+		if len(line) == 2 {
+			env[line[0]] = line[1]
+			continue
+		}
+		return nil, errors.New("failed to read .env")
 	}
 
 	return env, nil

@@ -284,6 +284,7 @@ func (s *InstanceRunnerService) setStatus(inst *types.Instance, status string) {
 	s.eventsAdapter.Send(types.EventInstanceStatusChange{
 		InstanceUUID: inst.UUID,
 		ServiceID:    inst.Service.ID,
+		Instance:     *inst,
 		Name:         name,
 		Status:       status,
 	})
