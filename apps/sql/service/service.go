@@ -1,4 +1,4 @@
-package services
+package service
 
 import (
 	"errors"
@@ -6,7 +6,8 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/adapter"
+	sqladapter "github.com/vertex-center/vertex/apps/sql/adapter"
+	sqltypes "github.com/vertex-center/vertex/apps/sql/types"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/types"
@@ -14,26 +15,15 @@ import (
 )
 
 type SqlService struct {
-	uuid uuid.UUID
-
-	dbms      map[uuid.UUID]types.SqlDBMSAdapterPort
+	dbms      map[uuid.UUID]sqltypes.SqlDBMSAdapterPort
 	dbmsMutex *sync.RWMutex
-
-	events types.EventAdapterPort
 }
 
-func NewSqlService(eventsAdapter types.EventAdapterPort) SqlService {
-	s := SqlService{
-		uuid: uuid.New(),
-
-		dbms:      map[uuid.UUID]types.SqlDBMSAdapterPort{},
+func NewSqlService() *SqlService {
+	s := &SqlService{
+		dbms:      map[uuid.UUID]sqltypes.SqlDBMSAdapterPort{},
 		dbmsMutex: &sync.RWMutex{},
-
-		events: eventsAdapter,
 	}
-
-	s.events.AddListener(&s)
-
 	return s
 }
 
@@ -52,8 +42,8 @@ func (s *SqlService) getDbFeature(inst *types.Instance) (types.DatabaseFeature, 
 	return types.DatabaseFeature{}, errors.New("no sql database found")
 }
 
-func (s *SqlService) Get(inst *types.Instance) (types.SqlDBMS, error) {
-	db := types.SqlDBMS{}
+func (s *SqlService) Get(inst *types.Instance) (sqltypes.SqlDBMS, error) {
+	db := sqltypes.SqlDBMS{}
 
 	feature, err := s.getDbFeature(inst)
 	if err != nil {
@@ -98,29 +88,7 @@ func (s *SqlService) EnvCredentials(inst *types.Instance, user string, pass stri
 	return env, nil
 }
 
-func (s *SqlService) onInstanceStart(inst *types.Instance) {
-	_, err := s.getDbFeature(inst)
-	if err != nil {
-		// Not a SQL database
-		return
-	}
-
-	s.dbmsMutex.Lock()
-	defer s.dbmsMutex.Unlock()
-
-	if _, ok := s.dbms[inst.UUID]; ok {
-		return
-	}
-
-	dbms, err := s.createDbmsAdapter(inst)
-	if err != nil {
-		return
-	}
-
-	s.dbms[inst.UUID] = dbms
-}
-
-func (s *SqlService) createDbmsAdapter(inst *types.Instance) (types.SqlDBMSAdapterPort, error) {
+func (s *SqlService) createDbmsAdapter(inst *types.Instance) (sqltypes.SqlDBMSAdapterPort, error) {
 	feature, err := s.getDbFeature(inst)
 	if err != nil {
 		return nil, err
@@ -129,7 +97,7 @@ func (s *SqlService) createDbmsAdapter(inst *types.Instance) (types.SqlDBMSAdapt
 	switch feature.Type {
 	case "postgres":
 		log.Info("found postgres DBMS", vlog.String("uuid", inst.UUID.String()))
-		params := &adapter.SqlDBMSPostgresAdapterParams{
+		params := &sqladapter.SqlDBMSPostgresAdapterParams{
 			Host: config.Current.Host,
 		}
 
@@ -145,35 +113,9 @@ func (s *SqlService) createDbmsAdapter(inst *types.Instance) (types.SqlDBMSAdapt
 			params.Password = inst.Env[*feature.Password]
 		}
 
-		return adapter.NewSqlDBMSPostgresAdapter(params), nil
+		return sqladapter.NewSqlDBMSPostgresAdapter(params), nil
 	default:
 		log.Warn("unknown DBMS, generic DBMS used", vlog.String("uuid", inst.UUID.String()))
-		return adapter.NewSqlDBMSAdapter(), nil
+		return sqladapter.NewSqlDBMSAdapter(), nil
 	}
-}
-
-func (s *SqlService) onInstanceStop(uuid uuid.UUID) {
-	s.dbmsMutex.Lock()
-	defer s.dbmsMutex.Unlock()
-
-	if _, ok := s.dbms[uuid]; !ok {
-		return
-	}
-
-	delete(s.dbms, uuid)
-}
-
-func (s *SqlService) OnEvent(e interface{}) {
-	switch e := e.(type) {
-	case types.EventInstanceStatusChange:
-		if e.Status == types.InstanceStatusRunning {
-			s.onInstanceStart(&e.Instance)
-		} else if e.Status == types.InstanceStatusOff {
-			s.onInstanceStop(e.InstanceUUID)
-		}
-	}
-}
-
-func (s *SqlService) GetUUID() uuid.UUID {
-	return s.uuid
 }

@@ -39,6 +39,7 @@ const (
 	ErrFailedToSetDisplayName        router.ErrCode = "failed_to_set_display_name"
 	ErrFailedToSetDatabase           router.ErrCode = "failed_to_set_database"
 	ErrFailedToSetVersion            router.ErrCode = "failed_to_set_version"
+	ErrFailedToSetTags               router.ErrCode = "failed_to_set_tags"
 	ErrFailedToSetEnv                router.ErrCode = "failed_to_set_env"
 
 	ErrFailedToCheckForUpdates router.ErrCode = "failed_to_check_for_updates"
@@ -54,6 +55,7 @@ const (
 	ErrInvalidPublicKey     router.ErrCode = "invalid_public_key"
 	ErrInvalidFingerprint   router.ErrCode = "invalid_fingerprint"
 
+	ErrServiceIdMissing       router.ErrCode = "service_id_missing"
 	ErrServiceNotFound        router.ErrCode = "service_not_found"
 	ErrFailedToInstallService router.ErrCode = "failed_to_install_service"
 

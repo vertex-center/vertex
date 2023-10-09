@@ -146,6 +146,7 @@ type handlePatchInstanceBody struct {
 	DisplayName     *string              `json:"display_name,omitempty"`
 	Databases       map[string]uuid.UUID `json:"databases,omitempty"`
 	Version         *string              `json:"version,omitempty"`
+	Tags            []string             `json:"tags,omitempty"`
 }
 
 // handlePatchInstance updates the instance with the UUID in the URL.
@@ -215,6 +216,18 @@ func handlePatchInstance(c *router.Context) {
 			c.Abort(router.Error{
 				Code:           api.ErrFailedToSetVersion,
 				PublicMessage:  "Failed to change version.",
+				PrivateMessage: err.Error(),
+			})
+			return
+		}
+	}
+
+	if body.Tags != nil {
+		err = instanceSettingsService.SetTags(inst, body.Tags)
+		if err != nil {
+			c.Abort(router.Error{
+				Code:           api.ErrFailedToSetTags,
+				PublicMessage:  "Failed to change tags.",
 				PrivateMessage: err.Error(),
 			})
 			return

@@ -14,6 +14,7 @@ import (
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/adapter"
+	"github.com/vertex-center/vertex/apps/sql"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
@@ -51,19 +52,21 @@ var (
 	dependenciesService     services.DependenciesService
 	settingsService         services.SettingsService
 	hardwareService         services.HardwareService
-	sqlService              services.SqlService
 	sshService              services.SshService
 )
 
 type Router struct {
 	*router.Router
+
+	appsRegistry *types.AppRegistry
 }
 
 func NewRouter(about types.About) Router {
 	gin.SetMode(gin.ReleaseMode)
 
 	r := Router{
-		Router: router.New(),
+		Router:       router.New(),
+		appsRegistry: types.NewAppRegistry(),
 	}
 
 	r.Use(cors.Default())
@@ -73,6 +76,7 @@ func NewRouter(about types.About) Router {
 	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
 	r.GET("/ping", handlePing)
 
+	r.initApps()
 	r.initAdapters()
 	r.initServices(about)
 	r.initAPIRoutes(about)
@@ -140,6 +144,19 @@ func (r *Router) handleSignals() {
 	}()
 }
 
+func (r *Router) initApps() {
+	apps := []types.App{
+		sql.NewApp(),
+	}
+	for _, app := range apps {
+		log.Info("initializing app", vlog.String("name", app.Name()))
+		err := app.Initialize(r.appsRegistry)
+		if err != nil {
+			log.Error(err)
+		}
+	}
+}
+
 func (r *Router) initAdapters() {
 	runnerDockerAdapter = adapter.NewRunnerDockerAdapter()
 	instanceFSAdapter = adapter.NewInstanceFSAdapter(nil)
@@ -153,6 +170,8 @@ func (r *Router) initAdapters() {
 	proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
 	settingsFSAdapter = adapter.NewSettingsFSAdapter(nil)
 	sshKernelApiAdapter = adapter.NewSshKernelApiAdapter()
+
+	eventInMemoryAdapter.AddListener(r.appsRegistry)
 }
 
 func (r *Router) initServices(about types.About) {
@@ -177,7 +196,6 @@ func (r *Router) initServices(about types.About) {
 	dependenciesService = services.NewDependenciesService(about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)
 	hardwareService = services.NewHardwareService()
-	sqlService = services.NewSqlService(eventInMemoryAdapter)
 	sshService = services.NewSshService(sshKernelApiAdapter)
 }
 
@@ -188,6 +206,7 @@ func (r *Router) initAPIRoutes(about types.About) {
 		c.JSON(about)
 	})
 
+	addServiceRoutes(api.Group("/service/:service_id"))
 	addServicesRoutes(api.Group("/services"))
 	addInstancesRoutes(api.Group("/instances"))
 	addInstanceRoutes(api.Group("/instance/:instance_uuid"))
@@ -197,8 +216,11 @@ func (r *Router) initAPIRoutes(about types.About) {
 	addSettingsRoutes(api.Group("/settings"))
 	addHardwareRoutes(api.Group("/hardware"))
 	addSecurityRoutes(api.Group("/security"))
-	addSQLRoutes(api.Group("/sql"))
 	addTunnelsRoutes(api.Group("/tunnels"))
+
+	for group, r := range r.appsRegistry.GetRouters() {
+		r.AddRoutes(api.Group(group))
+	}
 }
 
 func headersSSE(c *router.Context) {
