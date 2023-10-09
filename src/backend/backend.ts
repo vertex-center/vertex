@@ -120,6 +120,15 @@ export const api = {
         }),
     },
 
+    sql: {
+        uuid: (uuid: string) => ({
+            get: () => server.get(`/sql/${uuid}`),
+        }),
+        db: (db: string) => ({
+            install: () => server.post(`/sql/db/${db}/install`),
+        }),
+    },
+
     dependencies: {
         get: (reload?: boolean) =>
             server.get<DependenciesUpdate>(

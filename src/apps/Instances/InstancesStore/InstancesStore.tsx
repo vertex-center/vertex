@@ -1,20 +1,17 @@
 import { useFetch } from "../../../hooks/useFetch";
-import { BigTitle, Text, Title } from "../../../components/Text/Text";
+import { BigTitle } from "../../../components/Text/Text";
 import { Service as ServiceModel } from "../../../models/service";
 import { Fragment, useState } from "react";
 
 import styles from "./InstancesStore.module.sass";
 import Service from "../../../components/Service/Service";
 import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
-import Spacer from "../../../components/Spacer/Spacer";
-import Button from "../../../components/Button/Button";
-import Popup from "../../../components/Popup/Popup";
 import { Instances } from "../../../models/instance";
 import { api } from "../../../backend/backend";
 import { Errors } from "../../../components/Error/Errors";
 import { APIError } from "../../../components/Error/APIError";
-import ServiceLogo from "../../../components/ServiceLogo/ServiceLogo";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
+import ServiceInstallPopup from "../../../components/ServiceInstallPopup/ServiceInstallPopup";
 
 type Downloading = {
     service: ServiceModel;
@@ -37,14 +34,12 @@ export default function InstancesStore() {
     const [selectedService, setSelectedService] = useState<ServiceModel>();
 
     const [error, setError] = useState();
-    const [popupError, setPopupError] = useState();
 
     const [downloading, setDownloading] = useState<Downloading[]>([]);
 
     const openInstallPopup = (service: ServiceModel) => {
         setSelectedService(service);
         setShowInstallPopup(true);
-        setPopupError(undefined);
     };
 
     const closeInstallPopup = () => {
@@ -53,7 +48,6 @@ export default function InstancesStore() {
     };
 
     const install = () => {
-        // UUID to remove from the download queue after installation
         const service = selectedService;
 
         setDownloading((prev) => [...prev, { service }]);
@@ -72,32 +66,6 @@ export default function InstancesStore() {
                 reloadInstances().catch(console.error);
             });
     };
-
-    const installPopup = (
-        <Popup
-            show={showInstallPopup}
-            onDismiss={() => setShowInstallPopup(false)}
-        >
-            <Horizontal gap={15} alignItems="center">
-                {selectedService && <ServiceLogo service={selectedService} />}
-                <Title>{selectedService?.name}</Title>
-            </Horizontal>
-            <Text>{selectedService?.description}</Text>
-            <APIError style={{ margin: 0 }} error={popupError} />
-            <Horizontal gap={8}>
-                <Spacer />
-                <Button onClick={closeInstallPopup}>Cancel</Button>
-                <Button
-                    onClick={install}
-                    primary
-                    rightIcon="add"
-                    disabled={popupError !== undefined}
-                >
-                    Create instance
-                </Button>
-            </Horizontal>
-        </Popup>
-    );
 
     return (
         <Fragment>
@@ -136,7 +104,12 @@ export default function InstancesStore() {
                     ))}
                 </Vertical>
             </div>
-            {installPopup}
+            <ServiceInstallPopup
+                service={selectedService}
+                show={showInstallPopup}
+                dismiss={closeInstallPopup}
+                install={install}
+            />
         </Fragment>
     );
 }

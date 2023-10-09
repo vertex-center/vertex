@@ -45,6 +45,7 @@ export type Features = {
 
 export type DatabaseFeature = {
     type?: string;
+    category?: string;
     port?: string;
     username?: string;
     password?: string;
