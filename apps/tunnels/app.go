@@ -1,14 +1,14 @@
-package sql
+package tunnels
 
 import (
-	"github.com/vertex-center/vertex/apps/sql/router"
+	"github.com/vertex-center/vertex/apps/tunnels/router"
 	"github.com/vertex-center/vertex/types"
 )
 
 const (
-	AppID   = "sql"
-	AppName = "Vertex SQL"
-	Route   = "/sql"
+	AppID   = "tunnels"
+	AppName = "Vertex Tunnels"
+	Route   = "/tunnels"
 )
 
 type App struct {

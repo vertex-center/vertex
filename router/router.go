@@ -15,6 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/adapter"
 	"github.com/vertex-center/vertex/apps/sql"
+	"github.com/vertex-center/vertex/apps/tunnels"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
@@ -147,6 +148,7 @@ func (r *Router) handleSignals() {
 func (r *Router) initApps() {
 	apps := []types.App{
 		sql.NewApp(),
+		tunnels.NewApp(),
 	}
 	for _, app := range apps {
 		log.Info("initializing app", vlog.String("name", app.Name()))
@@ -216,7 +218,6 @@ func (r *Router) initAPIRoutes(about types.About) {
 	addSettingsRoutes(api.Group("/settings"))
 	addHardwareRoutes(api.Group("/hardware"))
 	addSecurityRoutes(api.Group("/security"))
-	addTunnelsRoutes(api.Group("/tunnels"))
 
 	for group, r := range r.appsRegistry.GetRouters() {
 		r.AddRoutes(api.Group(group))
