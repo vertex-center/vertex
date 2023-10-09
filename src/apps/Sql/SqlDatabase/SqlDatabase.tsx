@@ -13,6 +13,14 @@ import {
     KeyValueInfo,
 } from "../../../components/KeyValueInfo/KeyValueInfo";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
+import List from "../../../components/List/List";
+import ListItem from "../../../components/List/ListItem";
+import ListIcon from "../../../components/List/ListIcon";
+import ListInfo from "../../../components/List/ListInfo";
+import ListTitle from "../../../components/List/ListTitle";
+import Icon from "../../../components/Icon/Icon";
+import { Title } from "../../../components/Text/Text";
+import styles from "./SqlDatabase.module.sass";
 
 type Props = {};
 
@@ -30,7 +38,7 @@ export default function SqlDatabase(props: Readonly<Props>) {
         data: db,
         loading: dbLoading,
         error: dbError,
-    } = useFetch<SQLDatabase>(() => api.sql.uuid(uuid).get());
+    } = useFetch<SqlDBMS>(() => api.sql.uuid(uuid).get());
 
     useEffect(() => {
         reload().finally();
@@ -57,28 +65,48 @@ export default function SqlDatabase(props: Readonly<Props>) {
     });
 
     return (
-        <Vertical gap={20}>
+        <Vertical gap={30}>
             <ProgressOverlay show={loading ?? dbLoading} />
-            <APIError error={error ?? dbError} />
-            <Bay
-                instances={[
-                    {
-                        value: instance ?? {
-                            uuid: uuidv4(),
+
+            <Vertical gap={20}>
+                <APIError error={error ?? dbError} />
+                <Bay
+                    instances={[
+                        {
+                            value: instance ?? {
+                                uuid: uuidv4(),
+                            },
+                            to: `/app/vx-instances/${instance?.uuid}`,
+                            onPower: () => onPower(instance),
                         },
-                        to: `/app/vx-instances/${instance?.uuid}`,
-                        onPower: () => onPower(instance),
-                    },
-                ]}
-            />
-            <KeyValueGroup>
-                <KeyValueInfo name="Username" loading={dbLoading}>
-                    {db?.username}
-                </KeyValueInfo>
-                <KeyValueInfo name="Password" loading={dbLoading}>
-                    {db?.password}
-                </KeyValueInfo>
-            </KeyValueGroup>
+                    ]}
+                />
+
+                <KeyValueGroup>
+                    <KeyValueInfo name="Username" loading={dbLoading}>
+                        {db?.username}
+                    </KeyValueInfo>
+                    <KeyValueInfo name="Password" loading={dbLoading}>
+                        {db?.password}
+                    </KeyValueInfo>
+                </KeyValueGroup>
+            </Vertical>
+
+            <Vertical gap={20}>
+                <Title className={styles.title}>Databases</Title>
+                <List>
+                    {db?.databases?.map((db) => (
+                        <ListItem key={db.name}>
+                            <ListIcon>
+                                <Icon name="database" />
+                            </ListIcon>
+                            <ListInfo>
+                                <ListTitle>{db.name}</ListTitle>
+                            </ListInfo>
+                        </ListItem>
+                    ))}
+                </List>
+            </Vertical>
         </Vertical>
     );
 }

@@ -25,7 +25,7 @@ export default function SqlApp() {
     const sidebar = (
         <Sidebar root="/app/vx-sql">
             {Object.values(dbs).length > 0 && (
-                <SidebarGroup title="Your databases">
+                <SidebarGroup title="DBMS">
                     {dbs?.map((inst) => {
                         let icon: string | JSX.Element = "database";
                         const type = inst?.service?.features?.databases?.find(
