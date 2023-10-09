@@ -15,13 +15,13 @@ import (
 )
 
 type SqlService struct {
-	dbms      map[uuid.UUID]sqltypes.SqlDBMSAdapterPort
+	dbms      map[uuid.UUID]sqltypes.DBMSAdapterPort
 	dbmsMutex *sync.RWMutex
 }
 
-func NewSqlService() *SqlService {
+func New() *SqlService {
 	s := &SqlService{
-		dbms:      map[uuid.UUID]sqltypes.SqlDBMSAdapterPort{},
+		dbms:      map[uuid.UUID]sqltypes.DBMSAdapterPort{},
 		dbmsMutex: &sync.RWMutex{},
 	}
 	return s
@@ -42,8 +42,8 @@ func (s *SqlService) getDbFeature(inst *types.Instance) (types.DatabaseFeature, 
 	return types.DatabaseFeature{}, errors.New("no sql database found")
 }
 
-func (s *SqlService) Get(inst *types.Instance) (sqltypes.SqlDBMS, error) {
-	db := sqltypes.SqlDBMS{}
+func (s *SqlService) Get(inst *types.Instance) (sqltypes.DBMS, error) {
+	db := sqltypes.DBMS{}
 
 	feature, err := s.getDbFeature(inst)
 	if err != nil {
@@ -88,7 +88,7 @@ func (s *SqlService) EnvCredentials(inst *types.Instance, user string, pass stri
 	return env, nil
 }
 
-func (s *SqlService) createDbmsAdapter(inst *types.Instance) (sqltypes.SqlDBMSAdapterPort, error) {
+func (s *SqlService) createDbmsAdapter(inst *types.Instance) (sqltypes.DBMSAdapterPort, error) {
 	feature, err := s.getDbFeature(inst)
 	if err != nil {
 		return nil, err
