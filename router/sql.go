@@ -38,7 +38,7 @@ func handleGetDBMS(c *router.Context) {
 	if err != nil {
 		c.NotFound(router.Error{
 			Code:           api.ErrSQLDatabaseNotFound,
-			PublicMessage:  fmt.Sprintf("SQL Database not found: %s.", db),
+			PublicMessage:  fmt.Sprintf("SQL Database not found."),
 			PrivateMessage: err.Error(),
 		})
 		return
