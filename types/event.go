@@ -59,6 +59,7 @@ type EventInstanceLog struct {
 type EventInstanceStatusChange struct {
 	InstanceUUID uuid.UUID
 	ServiceID    string
+	Instance     Instance
 	Name         string
 	Status       string
 }

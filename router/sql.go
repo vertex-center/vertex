@@ -10,11 +10,11 @@ import (
 )
 
 func addSQLRoutes(r *router.Group) {
-	r.GET("/:instance_uuid", handleGetSQLDatabase)
-	r.POST("/db/:db/install", handleInstallSQLDatabase)
+	r.GET("/:instance_uuid", handleGetDBMS)
+	r.POST("/db/:db/install", handleInstallDBMS)
 }
 
-func getSQLDatabase(c *router.Context) (string, error) {
+func getDBMS(c *router.Context) (string, error) {
 	db := c.Param("db")
 	if db != "postgres" {
 		c.NotFound(router.Error{
@@ -28,7 +28,7 @@ func getSQLDatabase(c *router.Context) (string, error) {
 	return db, nil
 }
 
-func handleGetSQLDatabase(c *router.Context) {
+func handleGetDBMS(c *router.Context) {
 	inst := getInstance(c)
 	if inst == nil {
 		return
@@ -47,8 +47,8 @@ func handleGetSQLDatabase(c *router.Context) {
 	c.JSON(db)
 }
 
-func handleInstallSQLDatabase(c *router.Context) {
-	db, err := getSQLDatabase(c)
+func handleInstallDBMS(c *router.Context) {
+	db, err := getDBMS(c)
 	if err != nil {
 		return
 	}
