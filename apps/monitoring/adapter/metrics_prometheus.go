@@ -11,10 +11,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	metricstypes "github.com/vertex-center/vertex/apps/monitoring/types"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 	"gopkg.in/yaml.v3"
 )
@@ -87,16 +87,16 @@ func (a *PrometheusAdapter) ConfigureInstance(uuid uuid.UUID) error {
 	return os.WriteFile(p, bytes, 0644)
 }
 
-func (a *PrometheusAdapter) RegisterMetrics(metrics []types.Metric) {
+func (a *PrometheusAdapter) RegisterMetrics(metrics []metricstypes.Metric) {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
 	var err error
 	for _, m := range metrics {
 		switch m.Type {
-		case types.MetricTypeOnOff:
+		case metricstypes.MetricTypeOnOff:
 			fallthrough
-		case types.MetricTypeInteger:
+		case metricstypes.MetricTypeInteger:
 			opts := prometheus.GaugeOpts{
 				Name: m.ID,
 				Help: m.Description,

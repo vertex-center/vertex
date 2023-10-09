@@ -1,9 +1,11 @@
-package services
+package service
 
 import (
 	"math"
 
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/apps/monitoring/adapter"
+	metricstypes "github.com/vertex-center/vertex/apps/monitoring/types"
 	"github.com/vertex-center/vertex/types"
 )
 
@@ -13,43 +15,33 @@ const (
 )
 
 type MetricsService struct {
-	uuid uuid.UUID
-
-	adapter types.MetricsAdapterPort
-	events  types.EventAdapterPort
-
-	metrics []types.Metric
+	adapter metricstypes.MetricsAdapterPort
+	metrics []metricstypes.Metric
 }
 
-func NewMetricsService(adapter types.MetricsAdapterPort, eventsAdapter types.EventAdapterPort) MetricsService {
-	metrics := []types.Metric{
+func NewMetricsService() *MetricsService {
+	metrics := []metricstypes.Metric{
 		{
 			ID:          MetricIDInstanceStatus,
 			Name:        "Instance Status",
 			Description: "The status of the instance",
-			Type:        types.MetricTypeOnOff,
+			Type:        metricstypes.MetricTypeOnOff,
 			Labels:      []string{"uuid", "service_id"},
 		},
 		{
 			ID:          MetricIDInstancesCount,
 			Name:        "Instances Count",
 			Description: "The number of instances installed",
-			Type:        types.MetricTypeInteger,
+			Type:        metricstypes.MetricTypeInteger,
 		},
 	}
 
-	s := MetricsService{
-		uuid: uuid.New(),
-
-		adapter: adapter,
-		events:  eventsAdapter,
-
+	s := &MetricsService{
+		adapter: adapter.NewMetricsPrometheusAdapter(),
 		metrics: metrics,
 	}
 
 	s.adapter.RegisterMetrics(metrics)
-
-	s.events.AddListener(&s)
 
 	return s
 }
@@ -64,7 +56,7 @@ func (s *MetricsService) ConfigureVisualizer(inst *types.Instance) error {
 	return nil
 }
 
-func (s *MetricsService) GetMetrics() []types.Metric {
+func (s *MetricsService) GetMetrics() []metricstypes.Metric {
 	return s.metrics
 }
 
@@ -82,15 +74,11 @@ func (s *MetricsService) OnEvent(e interface{}) {
 	}
 }
 
-func (s *MetricsService) GetUUID() uuid.UUID {
-	return s.uuid
-}
-
 func (s *MetricsService) updateStatus(uuid uuid.UUID, serviceId string, status string) {
 	switch status {
 	case types.InstanceStatusRunning:
-		s.adapter.Set(MetricIDInstanceStatus, types.MetricStatusOn, uuid.String(), serviceId)
+		s.adapter.Set(MetricIDInstanceStatus, metricstypes.MetricStatusOn, uuid.String(), serviceId)
 	default:
-		s.adapter.Set(MetricIDInstanceStatus, types.MetricStatusOff, uuid.String(), serviceId)
+		s.adapter.Set(MetricIDInstanceStatus, metricstypes.MetricStatusOff, uuid.String(), serviceId)
 	}
 }
