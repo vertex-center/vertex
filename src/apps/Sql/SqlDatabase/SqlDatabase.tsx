@@ -8,6 +8,11 @@ import { v4 as uuidv4 } from "uuid";
 import { useServerEvent } from "../../../hooks/useEvent";
 import { APIError } from "../../../components/Error/APIError";
 import { useEffect } from "react";
+import {
+    KeyValueGroup,
+    KeyValueInfo,
+} from "../../../components/KeyValueInfo/KeyValueInfo";
+import { ProgressOverlay } from "../../../components/Progress/Progress";
 
 type Props = {};
 
@@ -16,9 +21,16 @@ export default function SqlDatabase(props: Readonly<Props>) {
 
     const {
         data: instance,
+        loading,
         reload,
         error,
     } = useFetch<Instance>(() => api.instance.get(uuid));
+
+    const {
+        data: db,
+        loading: dbLoading,
+        error: dbError,
+    } = useFetch<SQLDatabase>(() => api.sql.uuid(uuid).get());
 
     useEffect(() => {
         reload().finally();
@@ -46,7 +58,8 @@ export default function SqlDatabase(props: Readonly<Props>) {
 
     return (
         <Vertical gap={20}>
-            <APIError error={error} />
+            <ProgressOverlay show={loading ?? dbLoading} />
+            <APIError error={error ?? dbError} />
             <Bay
                 instances={[
                     {
@@ -58,6 +71,14 @@ export default function SqlDatabase(props: Readonly<Props>) {
                     },
                 ]}
             />
+            <KeyValueGroup>
+                <KeyValueInfo name="Username" loading={dbLoading}>
+                    {db?.username}
+                </KeyValueInfo>
+                <KeyValueInfo name="Password" loading={dbLoading}>
+                    {db?.password}
+                </KeyValueInfo>
+            </KeyValueGroup>
         </Vertical>
     );
 }
