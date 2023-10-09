@@ -4,10 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/carlmjohnson/requests"
-	"github.com/gin-gonic/gin"
+	instancesapi "github.com/vertex-center/vertex/apps/instances/api"
 	"github.com/vertex-center/vertex/apps/sql/service"
-	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types"
@@ -50,26 +48,15 @@ func (r *AppRouter) getDBMS(c *router.Context) (string, error) {
 }
 
 func (r *AppRouter) handleGetDBMS(c *router.Context) {
-	uuid := c.Param("instance_uuid")
-	if uuid == "" {
-		c.BadRequest(router.Error{
-			Code:           api.ErrInstanceUuidMissing,
-			PublicMessage:  "The request was missing the instance UUID.",
-			PrivateMessage: "Field 'instance_uuid' is required.",
-		})
+	uuid, apiError := instancesapi.GetInstanceUUIDParam(c)
+	if apiError != nil {
+		c.BadRequest(apiError.RouterError())
 		return
 	}
 
-	var inst *types.Instance
-	var apiError router.Error
-	err := requests.URL(config.Current.VertexURL()).
-		Pathf("/api/instance/%s", uuid).
-		ToJSON(&inst).
-		ErrorJSON(&apiError).
-		Fetch(c)
-	if err != nil {
-		log.Error(err)
-		c.NotFound(apiError)
+	inst, apiError := instancesapi.GetInstance(c, uuid)
+	if apiError != nil {
+		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
 	}
 
@@ -92,54 +79,28 @@ func (r *AppRouter) handleInstallDBMS(c *router.Context) {
 		return
 	}
 
-	var serv types.Service
-	var apiError router.Error
-	err = requests.URL(config.Current.VertexURL()).
-		Pathf("/api/service/%s", db).
-		ToJSON(&serv).
-		ErrorJSON(&apiError).
-		Fetch(c)
-	if err != nil {
-		log.Error(err)
-		c.NotFound(apiError)
+	serv, apiError := instancesapi.GetService(c, db)
+	if apiError != nil {
+		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
 	}
 
-	var inst *types.Instance
-	err = requests.URL(config.Current.VertexURL()).
-		Pathf("/api/service/%s/install", db).
-		Post().
-		ToJSON(&inst).
-		ErrorJSON(&apiError).
-		Fetch(c)
-	if err != nil {
-		log.Error(err)
-		c.NotFound(apiError)
+	inst, apiError := instancesapi.InstallService(c, serv.ID)
+	if apiError != nil {
+		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
 	}
 
-	err = requests.URL(config.Current.VertexURL()).
-		Pathf("/api/instance/%s", inst.UUID).
-		Patch().
-		BodyJSON(gin.H{
-			"tags": []string{"vertex-postgres-sql"},
-		}).
-		ErrorJSON(&apiError).
-		Fetch(c)
+	apiError = instancesapi.PatchInstance(c, inst.UUID, types.InstanceSettings{
+		Tags: []string{"vertex-postgres-sql"},
+	})
+	if apiError != nil {
+		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
+		return
+	}
 
 	var env types.InstanceEnvVariables
-	if err == nil {
-		env, err = r.sqlService.EnvCredentials(inst, "postgres", "postgres")
-	}
-	if err == nil {
-		err = requests.URL(config.Current.VertexURL()).
-			Pathf("/api/instance/%s/environment", inst.UUID).
-			Patch().
-			BodyJSON(&env).
-			ErrorJSON(&apiError).
-			Fetch(c)
-	}
-
+	env, err = r.sqlService.EnvCredentials(inst, "postgres", "postgres")
 	if err != nil {
 		log.Error(err)
 		c.Abort(router.Error{
@@ -147,6 +108,12 @@ func (r *AppRouter) handleInstallDBMS(c *router.Context) {
 			PublicMessage:  fmt.Sprintf("Failed to configure SQL Database '%s'.", serv.Name),
 			PrivateMessage: err.Error(),
 		})
+		return
+	}
+
+	apiError = instancesapi.PatchInstanceEnvironment(c, inst.UUID, env)
+	if apiError != nil {
+		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
 	}
 

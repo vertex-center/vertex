@@ -1,10 +1,14 @@
 package types
 
 import (
+	"errors"
+	"net/http"
 	"sync"
 
+	"github.com/carlmjohnson/requests"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/types/api"
 )
 
 type AppRegistry struct {
@@ -82,4 +86,35 @@ type AppRouter interface {
 
 type AppService interface {
 	OnEvent(e interface{})
+}
+
+type AppApiError struct {
+	HttpCode int
+	Code     router.ErrCode `json:"code"`
+	Message  string         `json:"message"`
+}
+
+func (e *AppApiError) RouterError() router.Error {
+	return router.Error{
+		Code:          e.Code,
+		PublicMessage: e.Message,
+	}
+}
+
+func HandleError(requestError error, apiError AppApiError) *AppApiError {
+	if errors.Is(requestError, requests.ErrInvalidHandled) {
+		if requests.HasStatusErr(requestError, http.StatusNotFound) {
+			apiError.HttpCode = http.StatusNotFound
+		} else if requests.HasStatusErr(requestError, http.StatusInternalServerError) {
+			apiError.HttpCode = http.StatusInternalServerError
+		}
+		return &apiError
+	} else if requestError != nil {
+		return &AppApiError{
+			HttpCode: http.StatusInternalServerError,
+			Code:     api.ErrInternalError,
+			Message:  "Internal error.",
+		}
+	}
+	return nil
 }

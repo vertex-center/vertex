@@ -3,6 +3,8 @@ package api
 import "github.com/vertex-center/vertex/pkg/router"
 
 const (
+	ErrInternalError router.ErrCode = "internal_error"
+
 	ErrFailedToParseBody router.ErrCode = "failed_to_parse_body"
 
 	ErrFailedToInstallUpdates router.ErrCode = "failed_to_install_updates"

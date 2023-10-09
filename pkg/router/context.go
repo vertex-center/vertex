@@ -45,6 +45,10 @@ func (c *Context) Abort(err Error) {
 	c.AbortWithError(http.StatusInternalServerError, err)
 }
 
+func (c *Context) AbortWithCode(code int, err Error) {
+	c.AbortWithError(code, err)
+}
+
 func (c *Context) ParseBody(obj interface{}) error {
 	err := c.BindJSON(obj)
 	if err != nil {
