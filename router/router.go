@@ -51,6 +51,7 @@ var (
 	dependenciesService     services.DependenciesService
 	settingsService         services.SettingsService
 	hardwareService         services.HardwareService
+	sqlService              services.SqlService
 	sshService              services.SshService
 )
 
@@ -176,6 +177,7 @@ func (r *Router) initServices(about types.About) {
 	dependenciesService = services.NewDependenciesService(about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)
 	hardwareService = services.NewHardwareService()
+	sqlService = services.NewSqlService()
 	sshService = services.NewSshService(sshKernelApiAdapter)
 }
 

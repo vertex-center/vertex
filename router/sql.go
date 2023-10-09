@@ -5,10 +5,12 @@ import (
 	"fmt"
 
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
 )
 
 func addSQLRoutes(r *router.Group) {
+	r.GET("/:instance_uuid", handleGetSQLDatabase)
 	r.POST("/db/:db/install", handleInstallSQLDatabase)
 }
 
@@ -22,7 +24,27 @@ func getSQLDatabase(c *router.Context) (string, error) {
 		})
 		return "", errors.New("collector not found")
 	}
+
 	return db, nil
+}
+
+func handleGetSQLDatabase(c *router.Context) {
+	inst := getInstance(c)
+	if inst == nil {
+		return
+	}
+
+	db, err := sqlService.Get(inst)
+	if err != nil {
+		c.NotFound(router.Error{
+			Code:           api.ErrSQLDatabaseNotFound,
+			PublicMessage:  fmt.Sprintf("SQL Database not found: %s.", db),
+			PrivateMessage: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(db)
 }
 
 func handleInstallSQLDatabase(c *router.Context) {
@@ -51,7 +73,16 @@ func handleInstallSQLDatabase(c *router.Context) {
 		return
 	}
 
+	var env types.InstanceEnvVariables
+
 	err = instanceSettingsService.SetTags(inst, []string{"vertex-postgres-sql"})
+	if err == nil {
+		env, err = sqlService.EnvCredentials(inst, "postgres", "postgres")
+	}
+	if err == nil {
+		err = instanceEnvService.Save(inst, env)
+	}
+
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToConfigureSQLDatabaseInstance,
