@@ -1,4 +1,4 @@
-package services
+package service
 
 import (
 	"testing"
@@ -6,13 +6,13 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/apps/instances/types"
 )
 
 type InstanceEnvServiceTestSuite struct {
 	suite.Suite
 
-	service InstanceEnvService
+	service *InstanceEnvService
 	adapter MockInstanceEnvAdapter
 }
 

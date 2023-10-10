@@ -1,53 +1,46 @@
-package services
+package service
 
 import (
 	"errors"
 
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/types"
+	vtypes "github.com/vertex-center/vertex/types"
 )
 
 type InstanceLogsService struct {
-	uuid uuid.UUID
-
-	logsAdapter  types.InstanceLogsAdapterPort
-	eventAdapter types.EventAdapterPort
+	adapter types.InstanceLogsAdapterPort
 }
 
-func NewInstanceLogsService(logsAdapter types.InstanceLogsAdapterPort, eventAdapter types.EventAdapterPort) InstanceLogsService {
-	s := InstanceLogsService{
-		uuid: uuid.New(),
-
-		logsAdapter:  logsAdapter,
-		eventAdapter: eventAdapter,
+func NewInstanceLogsService(adapter types.InstanceLogsAdapterPort) *InstanceLogsService {
+	return &InstanceLogsService{
+		adapter: adapter,
 	}
-
-	s.eventAdapter.AddListener(&s)
-
-	return s
-}
-
-func (s *InstanceLogsService) GetUUID() uuid.UUID {
-	return s.uuid
 }
 
 func (s *InstanceLogsService) GetLatestLogs(uuid uuid.UUID) ([]types.LogLine, error) {
-	return s.logsAdapter.LoadBuffer(uuid)
+	return s.adapter.LoadBuffer(uuid)
 }
 
 func (s *InstanceLogsService) OnEvent(e interface{}) {
 	switch e := e.(type) {
-	case types.EventInstanceLog:
+	case vtypes.EventInstanceLog:
 		s.onLogReceived(e)
-	case types.EventInstanceLoaded:
-		err := s.logsAdapter.Register(e.Instance.UUID)
+	case vtypes.EventInstanceLoaded:
+		err := s.adapter.Register(e.Instance.UUID)
 		if err != nil {
 			log.Error(err)
 			return
 		}
-	case types.EventInstanceDeleted:
-		err := s.logsAdapter.Unregister(e.InstanceUUID)
+	case vtypes.EventInstanceDeleted:
+		err := s.adapter.Unregister(e.InstanceUUID)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+	case vtypes.EventServerStop:
+		err := s.adapter.UnregisterAll()
 		if err != nil {
 			log.Error(err)
 			return
@@ -55,13 +48,13 @@ func (s *InstanceLogsService) OnEvent(e interface{}) {
 	}
 }
 
-func (s *InstanceLogsService) onLogReceived(e types.EventInstanceLog) {
+func (s *InstanceLogsService) onLogReceived(e vtypes.EventInstanceLog) {
 	switch e.Kind {
 	case types.LogKindDownload:
 		var downloads *types.LogLineMessageDownloads
 		download := e.Message.(*types.LogLineMessageDownload)
 
-		line, err := s.logsAdapter.Pop(e.InstanceUUID)
+		line, err := s.adapter.Pop(e.InstanceUUID)
 		if err != nil && !errors.Is(err, types.ErrBufferEmpty) {
 			log.Error(err)
 			return
@@ -72,12 +65,12 @@ func (s *InstanceLogsService) onLogReceived(e types.EventInstanceLog) {
 		} else {
 			downloads = types.NewLogLineMessageDownloads(download.DownloadProgress)
 		}
-		s.logsAdapter.Push(e.InstanceUUID, types.LogLine{
+		s.adapter.Push(e.InstanceUUID, types.LogLine{
 			Kind:    types.LogKindDownloads,
 			Message: downloads,
 		})
 	default:
-		s.logsAdapter.Push(e.InstanceUUID, types.LogLine{
+		s.adapter.Push(e.InstanceUUID, types.LogLine{
 			Kind:    e.Kind,
 			Message: e.Message,
 		})

@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/sse"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/adapter"
+	"github.com/vertex-center/vertex/apps/instances"
 	"github.com/vertex-center/vertex/apps/monitoring"
 	"github.com/vertex-center/vertex/apps/sql"
 	"github.com/vertex-center/vertex/apps/tunnels"
@@ -28,45 +28,35 @@ import (
 )
 
 var (
-	runnerDockerAdapter       types.RunnerAdapterPort
-	instanceFSAdapter         types.InstanceAdapterPort
-	instanceEnvFSAdapter      types.InstanceEnvAdapterPort
-	instanceLogsFSAdapter     types.InstanceLogsAdapterPort
-	instanceServiceFSAdapter  types.InstanceServiceAdapterPort
-	instanceSettingsFSAdapter types.InstanceSettingsAdapterPort
-	eventInMemoryAdapter      types.EventAdapterPort
-	serviceFSAdapter          types.ServiceAdapterPort
-	proxyFSAdapter            types.ProxyAdapterPort
-	settingsFSAdapter         types.SettingsAdapterPort
-	sshKernelApiAdapter       types.SshAdapterPort
+	proxyFSAdapter      types.ProxyAdapterPort
+	settingsFSAdapter   types.SettingsAdapterPort
+	sshKernelApiAdapter types.SshAdapterPort
 
-	notificationsService    services.NotificationsService
-	serviceService          services.ServiceService
-	proxyService            services.ProxyService
-	instanceService         services.InstanceService
-	instanceEnvService      services.InstanceEnvService
-	instanceLogsService     services.InstanceLogsService
-	instanceRunnerService   services.InstanceRunnerService
-	instanceServiceService  services.InstanceServiceService
-	instanceSettingsService services.InstanceSettingsService
-	dependenciesService     services.DependenciesService
-	settingsService         services.SettingsService
-	hardwareService         services.HardwareService
-	sshService              services.SshService
+	notificationsService services.NotificationsService
+	proxyService         services.ProxyService
+
+	dependenciesService services.DependenciesService
+	settingsService     services.SettingsService
+	hardwareService     services.HardwareService
+	sshService          services.SshService
 )
 
 type Router struct {
 	*router.Router
 
-	appsRegistry *types.AppRegistry
+	ctx          *types.VertexContext
+	appsRegistry *types.AppsRegistry
 }
 
 func NewRouter(about types.About) Router {
 	gin.SetMode(gin.ReleaseMode)
 
+	ctx := types.NewVertexContext()
+
 	r := Router{
 		Router:       router.New(),
-		appsRegistry: types.NewAppRegistry(),
+		ctx:          ctx,
+		appsRegistry: types.NewAppsRegistry(ctx),
 	}
 
 	r.Use(cors.Default())
@@ -85,10 +75,7 @@ func NewRouter(about types.About) Router {
 }
 
 func (r *Router) Start(addr string) {
-	go func() {
-		instanceService.LoadAll()
-		instanceService.StartAll()
-	}()
+	r.ctx.SendEvent(types.EventServerStart{})
 
 	r.handleSignals()
 
@@ -111,16 +98,12 @@ func (r *Router) Start(addr string) {
 func (r *Router) Stop() {
 	// TODO: Stop() must also stop handleSignals()
 
-	instanceService.StopAll()
-	err := instanceLogsFSAdapter.UnregisterAll()
-	if err != nil {
-		log.Error(err)
-	}
+	r.ctx.SendEvent(types.EventServerStop{})
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
-	err = r.Router.Stop(ctx)
+	err := r.Router.Stop(ctx)
 	if err != nil {
 		log.Error(err)
 		return
@@ -149,6 +132,7 @@ func (r *Router) initApps() {
 		sql.NewApp(),
 		tunnels.NewApp(),
 		monitoring.NewApp(),
+		instances.NewApp(),
 	}
 	for _, app := range apps {
 		log.Info("initializing app", vlog.String("name", app.Name()))
@@ -160,40 +144,15 @@ func (r *Router) initApps() {
 }
 
 func (r *Router) initAdapters() {
-	runnerDockerAdapter = adapter.NewRunnerDockerAdapter()
-	instanceFSAdapter = adapter.NewInstanceFSAdapter(nil)
-	instanceEnvFSAdapter = adapter.NewInstanceEnvFSAdapter(nil)
-	instanceLogsFSAdapter = adapter.NewInstanceLogsFSAdapter(nil)
-	instanceServiceFSAdapter = adapter.NewInstanceServiceFSAdapter(nil)
-	instanceSettingsFSAdapter = adapter.NewInstanceSettingsFSAdapter(nil)
-	eventInMemoryAdapter = adapter.NewEventInMemoryAdapter()
-	serviceFSAdapter = adapter.NewServiceFSAdapter(nil)
 	proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
 	settingsFSAdapter = adapter.NewSettingsFSAdapter(nil)
 	sshKernelApiAdapter = adapter.NewSshKernelApiAdapter()
-
-	eventInMemoryAdapter.AddListener(r.appsRegistry)
 }
 
 func (r *Router) initServices(about types.About) {
 	proxyService = services.NewProxyService(proxyFSAdapter)
-	notificationsService = services.NewNotificationsService(settingsFSAdapter, eventInMemoryAdapter, instanceFSAdapter)
-	instanceService = services.NewInstanceService(services.InstanceServiceParams{
-		InstanceAdapter: instanceFSAdapter,
-		EventsAdapter:   eventInMemoryAdapter,
-
-		InstanceRunnerService:   &instanceRunnerService,
-		InstanceServiceService:  &instanceServiceService,
-		InstanceEnvService:      &instanceEnvService,
-		InstanceSettingsService: &instanceSettingsService,
-	})
-	instanceEnvService = services.NewInstanceEnvService(instanceEnvFSAdapter)
-	instanceLogsService = services.NewInstanceLogsService(instanceLogsFSAdapter, eventInMemoryAdapter)
-	instanceRunnerService = services.NewInstanceRunnerService(eventInMemoryAdapter, runnerDockerAdapter)
-	instanceServiceService = services.NewInstanceServiceService(instanceServiceFSAdapter)
-	instanceSettingsService = services.NewInstanceSettingsService(instanceSettingsFSAdapter)
-	serviceService = services.NewServiceService(serviceFSAdapter)
-	dependenciesService = services.NewDependenciesService(about.Version)
+	notificationsService = services.NewNotificationsService(r.ctx, settingsFSAdapter)
+	dependenciesService = services.NewDependenciesService(r.ctx, about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)
 	hardwareService = services.NewHardwareService()
 	sshService = services.NewSshService(sshKernelApiAdapter)
@@ -206,10 +165,6 @@ func (r *Router) initAPIRoutes(about types.About) {
 		c.JSON(about)
 	})
 
-	addServiceRoutes(api.Group("/service/:service_id"))
-	addServicesRoutes(api.Group("/services"))
-	addInstancesRoutes(api.Group("/instances"))
-	addInstanceRoutes(api.Group("/instance/:instance_uuid"))
 	addProxyRoutes(api.Group("/proxy"))
 	addDependenciesRoutes(api.Group("/dependencies"))
 	addSettingsRoutes(api.Group("/settings"))
@@ -219,11 +174,4 @@ func (r *Router) initAPIRoutes(about types.About) {
 	for group, r := range r.appsRegistry.GetRouters() {
 		r.AddRoutes(api.Group(group))
 	}
-}
-
-func headersSSE(c *router.Context) {
-	c.Writer.Header().Set("Content-Type", sse.ContentType)
-	c.Writer.Header().Set("Cache-Control", "no-cache")
-	c.Writer.Header().Set("Connection", "keep-alive")
-	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 }

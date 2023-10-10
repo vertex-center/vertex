@@ -1,21 +1,21 @@
-package services
+package service
 
 import (
 	"reflect"
 
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 )
 
 type InstanceServiceService struct {
-	instanceServiceAdapter types.InstanceServiceAdapterPort
+	adapter types.InstanceServiceAdapterPort
 }
 
-func NewInstanceServiceService(instanceServiceAdapter types.InstanceServiceAdapterPort) InstanceServiceService {
-	return InstanceServiceService{
-		instanceServiceAdapter: instanceServiceAdapter,
+func NewInstanceServiceService(adapter types.InstanceServiceAdapterPort) *InstanceServiceService {
+	return &InstanceServiceService{
+		adapter: adapter,
 	}
 }
 
@@ -54,9 +54,13 @@ func (s *InstanceServiceService) Update(inst *types.Instance, service types.Serv
 
 func (s *InstanceServiceService) Save(inst *types.Instance, service types.Service) error {
 	inst.Service = service
-	return s.instanceServiceAdapter.Save(inst.UUID, service)
+	return s.adapter.Save(inst.UUID, service)
 }
 
 func (s *InstanceServiceService) Load(uuid uuid.UUID) (types.Service, error) {
-	return s.instanceServiceAdapter.Load(uuid)
+	return s.adapter.Load(uuid)
+}
+
+func (s *InstanceServiceService) OnEvent(e interface{}) {
+	// TODO: Useless
 }

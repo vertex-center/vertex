@@ -2,6 +2,7 @@ package types
 
 import (
 	"github.com/google/uuid"
+	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 )
 
 const (
@@ -16,12 +17,6 @@ const (
 type Listener interface {
 	OnEvent(e interface{})
 	GetUUID() uuid.UUID
-}
-
-type EventAdapterPort interface {
-	AddListener(l Listener)
-	RemoveListener(l Listener)
-	Send(e interface{})
 }
 
 type TempListener struct {
@@ -44,22 +39,28 @@ func (t TempListener) GetUUID() uuid.UUID {
 	return t.uuid
 }
 
+type (
+	EventServerStart         struct{}
+	EventServerStop          struct{}
+	EventDependenciesUpdated struct{}
+)
+
 // Events instance
 
 type EventInstanceLoaded struct {
-	Instance *Instance
+	Instance *instancestypes.Instance
 }
 
 type EventInstanceLog struct {
 	InstanceUUID uuid.UUID
 	Kind         string
-	Message      LogLineMessage
+	Message      instancestypes.LogLineMessage
 }
 
 type EventInstanceStatusChange struct {
 	InstanceUUID uuid.UUID
 	ServiceID    string
-	Instance     Instance
+	Instance     instancestypes.Instance
 	Name         string
 	Status       string
 }

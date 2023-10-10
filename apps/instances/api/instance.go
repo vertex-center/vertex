@@ -5,14 +5,15 @@ import (
 
 	"github.com/carlmjohnson/requests"
 	"github.com/google/uuid"
+	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
 )
 
-func GetInstance(ctx context.Context, uuid uuid.UUID) (*types.Instance, *types.AppApiError) {
-	var inst types.Instance
+func GetInstance(ctx context.Context, uuid uuid.UUID) (*instancestypes.Instance, *types.AppApiError) {
+	var inst instancestypes.Instance
 	var apiError types.AppApiError
 	err := requests.URL(config.Current.VertexURL()).
 		Pathf("/api/instance/%s", uuid).
@@ -32,7 +33,7 @@ func DeleteInstance(ctx context.Context, uuid uuid.UUID) *types.AppApiError {
 	return types.HandleError(err, apiError)
 }
 
-func PatchInstance(ctx context.Context, uuid uuid.UUID, settings types.InstanceSettings) *types.AppApiError {
+func PatchInstance(ctx context.Context, uuid uuid.UUID, settings instancestypes.InstanceSettings) *types.AppApiError {
 	var apiError types.AppApiError
 	err := requests.URL(config.Current.VertexURL()).
 		Pathf("/api/instance/%s", uuid).

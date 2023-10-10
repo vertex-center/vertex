@@ -10,9 +10,9 @@ import (
 
 	"github.com/go-co-op/gocron"
 	"github.com/google/uuid"
+	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 )
 
@@ -26,7 +26,7 @@ type InstanceLogger struct {
 	uuid uuid.UUID
 
 	file        *os.File
-	buffer      []types.LogLine
+	buffer      []instancestypes.LogLine
 	currentLine int
 	scheduler   *gocron.Scheduler
 
@@ -44,7 +44,7 @@ type InstanceLogsFSAdapterParams struct {
 	InstancesPath string
 }
 
-func NewInstanceLogsFSAdapter(params *InstanceLogsFSAdapterParams) types.InstanceLogsAdapterPort {
+func NewInstanceLogsFSAdapter(params *InstanceLogsFSAdapterParams) instancestypes.InstanceLogsAdapterPort {
 	if params == nil {
 		params = &InstanceLogsFSAdapterParams{}
 	}
@@ -71,7 +71,7 @@ func (a *InstanceLogsFSAdapter) Register(uuid uuid.UUID) error {
 
 	l := InstanceLogger{
 		uuid:   uuid,
-		buffer: []types.LogLine{},
+		buffer: []instancestypes.LogLine{},
 		dir:    dir,
 	}
 
@@ -109,7 +109,7 @@ func (a *InstanceLogsFSAdapter) Unregister(uuid uuid.UUID) error {
 	return nil
 }
 
-func (a *InstanceLogsFSAdapter) Push(uuid uuid.UUID, line types.LogLine) {
+func (a *InstanceLogsFSAdapter) Push(uuid uuid.UUID, line instancestypes.LogLine) {
 	l, err := a.getLogger(uuid)
 	if err != nil {
 		log.Error(err)
@@ -127,20 +127,20 @@ func (a *InstanceLogsFSAdapter) Push(uuid uuid.UUID, line types.LogLine) {
 	}
 }
 
-func (a *InstanceLogsFSAdapter) Pop(uuid uuid.UUID) (types.LogLine, error) {
+func (a *InstanceLogsFSAdapter) Pop(uuid uuid.UUID) (instancestypes.LogLine, error) {
 	l, err := a.getLogger(uuid)
 	if err != nil {
-		return types.LogLine{}, err
+		return instancestypes.LogLine{}, err
 	}
 	if len(l.buffer) == 0 {
-		return types.LogLine{}, types.ErrBufferEmpty
+		return instancestypes.LogLine{}, instancestypes.ErrBufferEmpty
 	}
 	line := l.buffer[len(l.buffer)-1]
 	l.buffer = l.buffer[:len(l.buffer)-1]
 	return line, nil
 }
 
-func (a *InstanceLogsFSAdapter) LoadBuffer(uuid uuid.UUID) ([]types.LogLine, error) {
+func (a *InstanceLogsFSAdapter) LoadBuffer(uuid uuid.UUID) ([]instancestypes.LogLine, error) {
 	l, err := a.getLogger(uuid)
 	if err != nil {
 		return nil, err

@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/storage"
-	"github.com/vertex-center/vertex/types"
 )
 
 const InstanceEnvPath = ".env"
@@ -22,7 +22,7 @@ type InstanceEnvFSAdapterParams struct {
 	instancesPath string
 }
 
-func NewInstanceEnvFSAdapter(params *InstanceEnvFSAdapterParams) types.InstanceEnvAdapterPort {
+func NewInstanceEnvFSAdapter(params *InstanceEnvFSAdapterParams) instancestypes.InstanceEnvAdapterPort {
 	if params == nil {
 		params = &InstanceEnvFSAdapterParams{}
 	}
@@ -37,7 +37,7 @@ func NewInstanceEnvFSAdapter(params *InstanceEnvFSAdapterParams) types.InstanceE
 	return adapter
 }
 
-func (a *InstanceEnvFSAdapter) Save(uuid uuid.UUID, env types.InstanceEnvVariables) error {
+func (a *InstanceEnvFSAdapter) Save(uuid uuid.UUID, env instancestypes.InstanceEnvVariables) error {
 	envPath := path.Join(a.instancesPath, uuid.String(), InstanceEnvPath)
 
 	file, err := os.OpenFile(envPath, os.O_WRONLY|os.O_CREATE, os.ModePerm)
@@ -55,7 +55,7 @@ func (a *InstanceEnvFSAdapter) Save(uuid uuid.UUID, env types.InstanceEnvVariabl
 	return nil
 }
 
-func (a *InstanceEnvFSAdapter) Load(uuid uuid.UUID) (types.InstanceEnvVariables, error) {
+func (a *InstanceEnvFSAdapter) Load(uuid uuid.UUID) (instancestypes.InstanceEnvVariables, error) {
 	envPath := path.Join(a.instancesPath, uuid.String(), InstanceEnvPath)
 
 	file, err := os.Open(envPath)
@@ -67,7 +67,7 @@ func (a *InstanceEnvFSAdapter) Load(uuid uuid.UUID) (types.InstanceEnvVariables,
 	}
 	defer file.Close()
 
-	env := types.InstanceEnvVariables{}
+	env := instancestypes.InstanceEnvVariables{}
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := strings.Split(scanner.Text(), "=")

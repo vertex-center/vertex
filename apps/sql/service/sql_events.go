@@ -2,21 +2,22 @@ package service
 
 import (
 	"github.com/google/uuid"
+	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/types"
 )
 
 func (s *SqlService) OnEvent(e interface{}) {
 	switch e := e.(type) {
 	case types.EventInstanceStatusChange:
-		if e.Status == types.InstanceStatusRunning {
+		if e.Status == instancestypes.InstanceStatusRunning {
 			s.onInstanceStart(&e.Instance)
-		} else if e.Status == types.InstanceStatusOff {
+		} else if e.Status == instancestypes.InstanceStatusOff {
 			s.onInstanceStop(e.InstanceUUID)
 		}
 	}
 }
 
-func (s *SqlService) onInstanceStart(inst *types.Instance) {
+func (s *SqlService) onInstanceStart(inst *instancestypes.Instance) {
 	_, err := s.getDbFeature(inst)
 	if err != nil {
 		// Not a SQL database

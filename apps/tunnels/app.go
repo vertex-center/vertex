@@ -19,7 +19,7 @@ func NewApp() *App {
 	return &App{}
 }
 
-func (app *App) Initialize(registry *types.AppRegistry) error {
+func (app *App) Initialize(registry *types.AppsRegistry) error {
 	app.router = router.NewAppRouter()
 
 	registry.RegisterApp(AppID, app)
@@ -28,7 +28,7 @@ func (app *App) Initialize(registry *types.AppRegistry) error {
 	return nil
 }
 
-func (app *App) Uninitialize(registry *types.AppRegistry) error {
+func (app *App) Uninitialize(registry *types.AppsRegistry) error {
 	registry.UnregisterApp(AppID)
 	registry.UnregisterRouter(Route)
 

@@ -4,18 +4,13 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
 )
 
-func addServiceRoutes(r *router.Group) {
-	r.GET("", handleGetService)
-	r.POST("/install", handleServiceInstall)
-}
-
 // handleGetService handles the retrieval of a service.
-func handleGetService(c *router.Context) {
+func (r *AppRouter) handleGetService(c *router.Context) {
 	serviceID := c.Param("service_id")
 	if serviceID == "" {
 		c.BadRequest(router.Error{
@@ -26,7 +21,7 @@ func handleGetService(c *router.Context) {
 		return
 	}
 
-	service, err := serviceService.GetById(serviceID)
+	service, err := r.serviceService.GetById(serviceID)
 	if err != nil {
 		c.NotFound(router.Error{
 			Code:           api.ErrServiceNotFound,
@@ -44,7 +39,7 @@ func handleGetService(c *router.Context) {
 //   - failed_to_parse_body: failed to parse the request body.
 //   - service_not_found: the service was not found.
 //   - failed_to_install_service: failed to install the service.
-func handleServiceInstall(c *router.Context) {
+func (r *AppRouter) handleServiceInstall(c *router.Context) {
 	serviceID := c.Param("service_id")
 	if serviceID == "" {
 		c.BadRequest(router.Error{
@@ -55,7 +50,7 @@ func handleServiceInstall(c *router.Context) {
 		return
 	}
 
-	service, err := serviceService.GetById(serviceID)
+	service, err := r.serviceService.GetById(serviceID)
 	if err != nil {
 		c.NotFound(router.Error{
 			Code:           api.ErrServiceNotFound,
@@ -65,7 +60,7 @@ func handleServiceInstall(c *router.Context) {
 		return
 	}
 
-	inst, err := instanceService.Install(service, "docker")
+	inst, err := r.instanceService.Install(service, "docker")
 	if err != nil && errors.Is(err, types.ErrServiceNotFound) {
 		c.NotFound(router.Error{
 			Code:           api.ErrServiceNotFound,

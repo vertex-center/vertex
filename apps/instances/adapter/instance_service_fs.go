@@ -5,9 +5,9 @@ import (
 	"path"
 
 	"github.com/google/uuid"
+	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 	"gopkg.in/yaml.v3"
 )
@@ -24,7 +24,7 @@ type InstanceServiceFSAdapterParams struct {
 	instancesPath string
 }
 
-func NewInstanceServiceFSAdapter(params *InstanceServiceFSAdapterParams) types.InstanceServiceAdapterPort {
+func NewInstanceServiceFSAdapter(params *InstanceServiceFSAdapterParams) instancestypes.InstanceServiceAdapterPort {
 	if params == nil {
 		params = &InstanceServiceFSAdapterParams{}
 	}
@@ -39,7 +39,7 @@ func NewInstanceServiceFSAdapter(params *InstanceServiceFSAdapterParams) types.I
 	return adapter
 }
 
-func (a *InstanceServiceFSAdapter) Save(uuid uuid.UUID, service types.Service) error {
+func (a *InstanceServiceFSAdapter) Save(uuid uuid.UUID, service instancestypes.Service) error {
 	servicePath := path.Join(a.instancesPath, uuid.String(), InstanceServicePath)
 
 	err := os.MkdirAll(path.Join(a.instancesPath, uuid.String()), os.ModePerm)
@@ -60,16 +60,16 @@ func (a *InstanceServiceFSAdapter) Save(uuid uuid.UUID, service types.Service) e
 	return nil
 }
 
-func (a *InstanceServiceFSAdapter) Load(uuid uuid.UUID) (types.Service, error) {
+func (a *InstanceServiceFSAdapter) Load(uuid uuid.UUID) (instancestypes.Service, error) {
 	servicePath := path.Join(a.instancesPath, uuid.String(), InstanceServicePath)
 
 	data, err := os.ReadFile(servicePath)
 	if err != nil {
 		log.Warn("file not found", vlog.String("path", servicePath))
-		return types.Service{}, err
+		return instancestypes.Service{}, err
 	}
 
-	var service types.Service
+	var service instancestypes.Service
 	err = yaml.Unmarshal(data, &service)
 	return service, err
 }

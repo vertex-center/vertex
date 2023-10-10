@@ -1,4 +1,4 @@
-package services
+package service
 
 import (
 	"errors"
@@ -9,10 +9,11 @@ import (
 
 	"github.com/antelman107/net-wait-go/wait"
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/adapter"
+	"github.com/vertex-center/vertex/apps/instances/adapter"
+	"github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/types"
+	vtypes "github.com/vertex-center/vertex/types"
 )
 
 var (
@@ -24,7 +25,6 @@ var (
 
 type InstanceService struct {
 	instanceAdapter types.InstanceAdapterPort
-	eventsAdapter   types.EventAdapterPort
 
 	instanceRunnerService   *InstanceRunnerService
 	instanceServiceService  *InstanceServiceService
@@ -33,22 +33,24 @@ type InstanceService struct {
 
 	instances      map[uuid.UUID]*types.Instance
 	instancesMutex *sync.RWMutex
+
+	ctx *vtypes.VertexContext
 }
 
 type InstanceServiceParams struct {
 	InstanceAdapter types.InstanceAdapterPort
-	EventsAdapter   types.EventAdapterPort
 
 	InstanceRunnerService   *InstanceRunnerService
 	InstanceServiceService  *InstanceServiceService
 	InstanceEnvService      *InstanceEnvService
 	InstanceSettingsService *InstanceSettingsService
+
+	Ctx *vtypes.VertexContext
 }
 
-func NewInstanceService(params InstanceServiceParams) InstanceService {
-	s := InstanceService{
+func NewInstanceService(params InstanceServiceParams) *InstanceService {
+	return &InstanceService{
 		instanceAdapter: params.InstanceAdapter,
-		eventsAdapter:   params.EventsAdapter,
 
 		instanceRunnerService:   params.InstanceRunnerService,
 		instanceServiceService:  params.InstanceServiceService,
@@ -57,9 +59,9 @@ func NewInstanceService(params InstanceServiceParams) InstanceService {
 
 		instances:      make(map[uuid.UUID]*types.Instance),
 		instancesMutex: &sync.RWMutex{},
-	}
 
-	return s
+		ctx: params.Ctx,
+	}
 }
 
 // Get returns an instance by its UUID. If the instance does not exist,
@@ -136,11 +138,11 @@ func (s *InstanceService) Delete(uuid uuid.UUID) error {
 	defer s.instancesMutex.Unlock()
 	delete(s.instances, uuid)
 
-	s.eventsAdapter.Send(types.EventInstanceDeleted{
+	s.ctx.SendEvent(vtypes.EventInstanceDeleted{
 		InstanceUUID: uuid,
 		ServiceID:    serviceID,
 	})
-	s.eventsAdapter.Send(types.EventInstancesChange{})
+	s.ctx.SendEvent(vtypes.EventInstancesChange{})
 
 	return nil
 }
@@ -254,8 +256,8 @@ func (s *InstanceService) Install(service types.Service, method string) (*types.
 		return nil, err
 	}
 
-	s.eventsAdapter.Send(types.EventInstanceCreated{})
-	s.eventsAdapter.Send(types.EventInstancesChange{})
+	s.ctx.SendEvent(vtypes.EventInstanceCreated{})
+	s.ctx.SendEvent(vtypes.EventInstancesChange{})
 
 	return inst, nil
 }
@@ -287,7 +289,7 @@ func (s *InstanceService) LoadAll() {
 		loaded += 1
 	}
 
-	s.eventsAdapter.Send(types.EventInstancesLoaded{
+	s.ctx.SendEvent(vtypes.EventInstancesLoaded{
 		Count: loaded,
 	})
 }
@@ -323,7 +325,7 @@ func (s *InstanceService) load(uuid uuid.UUID) error {
 		return ErrInstanceAlreadyExists
 	}
 
-	s.eventsAdapter.Send(types.EventInstanceLoaded{
+	s.ctx.SendEvent(vtypes.EventInstanceLoaded{
 		Instance: &inst,
 	})
 
@@ -363,4 +365,16 @@ func (s *InstanceService) remapDatabaseEnv(inst *types.Instance) error {
 	}
 
 	return s.instanceEnvService.Save(inst, inst.Env)
+}
+
+func (s *InstanceService) OnEvent(e interface{}) {
+	switch e.(type) {
+	case vtypes.EventServerStart:
+		go func() {
+			s.LoadAll()
+			s.StartAll()
+		}()
+	case vtypes.EventServerStop:
+		s.StopAll()
+	}
 }

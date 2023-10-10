@@ -6,74 +6,87 @@ import (
 	"sync"
 
 	"github.com/carlmjohnson/requests"
+	"github.com/gin-contrib/sse"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types/api"
 )
 
-type AppRegistry struct {
+type AppsRegistry struct {
 	uuid uuid.UUID
+	ctx  *VertexContext
 
-	apps         map[string]App
-	mutexApps    *sync.RWMutex
-	routers      map[string]AppRouter
-	mutexRouters *sync.RWMutex
+	apps                map[string]App
+	mutexApps           *sync.RWMutex
+	routers             map[string]AppRouter
+	mutexRouters        *sync.RWMutex
+	eventListeners      map[string]*Listener
+	mutexEventListeners *sync.RWMutex
 }
 
-func NewAppRegistry() *AppRegistry {
-	return &AppRegistry{
+func NewAppsRegistry(ctx *VertexContext) *AppsRegistry {
+	r := &AppsRegistry{
 		uuid: uuid.New(),
+		ctx:  ctx,
 
-		apps:         map[string]App{},
-		mutexApps:    &sync.RWMutex{},
-		routers:      map[string]AppRouter{},
-		mutexRouters: &sync.RWMutex{},
+		apps:                map[string]App{},
+		mutexApps:           &sync.RWMutex{},
+		routers:             map[string]AppRouter{},
+		mutexRouters:        &sync.RWMutex{},
+		eventListeners:      map[string]*Listener{},
+		mutexEventListeners: &sync.RWMutex{},
 	}
+	r.ctx.AddListener(r)
+	return r
 }
 
-func (registry *AppRegistry) RegisterApp(name string, app App) {
+func (registry *AppsRegistry) RegisterApp(name string, app App) {
 	registry.mutexApps.Lock()
 	defer registry.mutexApps.Unlock()
 	registry.apps[name] = app
 }
 
-func (registry *AppRegistry) UnregisterApp(name string) {
+func (registry *AppsRegistry) UnregisterApp(name string) {
 	registry.mutexApps.Lock()
 	defer registry.mutexApps.Unlock()
 	delete(registry.apps, name)
 }
 
-func (registry *AppRegistry) RegisterRouter(route string, router AppRouter) {
+func (registry *AppsRegistry) RegisterRouter(route string, router AppRouter) {
 	registry.mutexRouters.Lock()
 	defer registry.mutexRouters.Unlock()
 	registry.routers[route] = router
 }
 
-func (registry *AppRegistry) UnregisterRouter(route string) {
+func (registry *AppsRegistry) UnregisterRouter(route string) {
 	registry.mutexRouters.Lock()
 	defer registry.mutexRouters.Unlock()
 	delete(registry.routers, route)
 }
 
-func (registry *AppRegistry) GetRouters() map[string]AppRouter {
+func (registry *AppsRegistry) GetContext() *VertexContext {
+	return registry.ctx
+}
+
+func (registry *AppsRegistry) GetRouters() map[string]AppRouter {
 	registry.mutexRouters.RLock()
 	defer registry.mutexRouters.RUnlock()
 	return registry.routers
 }
 
-func (registry *AppRegistry) GetUUID() uuid.UUID {
+func (registry *AppsRegistry) GetUUID() uuid.UUID {
 	return registry.uuid
 }
 
-func (registry *AppRegistry) OnEvent(e interface{}) {
+func (registry *AppsRegistry) OnEvent(e interface{}) {
 	for _, app := range registry.apps {
 		app.OnEvent(e)
 	}
 }
 
 type App interface {
-	Initialize(registry *AppRegistry) error
-	Uninitialize(registry *AppRegistry) error
+	Initialize(registry *AppsRegistry) error
+	Uninitialize(registry *AppsRegistry) error
 
 	Name() string
 
@@ -117,4 +130,11 @@ func HandleError(requestError error, apiError AppApiError) *AppApiError {
 		}
 	}
 	return nil
+}
+
+func HeadersSSE(c *router.Context) {
+	c.Writer.Header().Set("Content-Type", sse.ContentType)
+	c.Writer.Header().Set("Cache-Control", "no-cache")
+	c.Writer.Header().Set("Connection", "keep-alive")
+	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 }

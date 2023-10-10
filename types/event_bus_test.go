@@ -1,4 +1,4 @@
-package adapter
+package types
 
 import (
 	"testing"
@@ -12,7 +12,7 @@ import (
 type EventInMemoryAdapterTestSuite struct {
 	suite.Suite
 
-	adapter EventInMemoryAdapter
+	adapter EventBus
 }
 
 func TestEventInMemoryAdapterTestSuite(t *testing.T) {
@@ -20,7 +20,7 @@ func TestEventInMemoryAdapterTestSuite(t *testing.T) {
 }
 
 func (suite *EventInMemoryAdapterTestSuite) SetupSuite() {
-	suite.adapter = *NewEventInMemoryAdapter().(*EventInMemoryAdapter)
+	suite.adapter = *NewEventBus().(*EventBus)
 }
 
 func (suite *EventInMemoryAdapterTestSuite) TestEvents() {

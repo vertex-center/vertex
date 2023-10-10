@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/google/uuid"
+	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/apps/monitoring/adapter"
 	metricstypes "github.com/vertex-center/vertex/apps/monitoring/types"
 	"github.com/vertex-center/vertex/types"
@@ -47,11 +48,11 @@ func NewMetricsService() *MetricsService {
 }
 
 // ConfigureCollector will configure an instance to monitor the metrics of Vertex.
-func (s *MetricsService) ConfigureCollector(inst *types.Instance) error {
+func (s *MetricsService) ConfigureCollector(inst *instancestypes.Instance) error {
 	return s.adapter.ConfigureInstance(inst.UUID)
 }
 
-func (s *MetricsService) ConfigureVisualizer(inst *types.Instance) error {
+func (s *MetricsService) ConfigureVisualizer(inst *instancestypes.Instance) error {
 	// TODO: Implement
 	return nil
 }
@@ -76,7 +77,7 @@ func (s *MetricsService) OnEvent(e interface{}) {
 
 func (s *MetricsService) updateStatus(uuid uuid.UUID, serviceId string, status string) {
 	switch status {
-	case types.InstanceStatusRunning:
+	case instancestypes.InstanceStatusRunning:
 		s.adapter.Set(MetricIDInstanceStatus, metricstypes.MetricStatusOn, uuid.String(), serviceId)
 	default:
 		s.adapter.Set(MetricIDInstanceStatus, metricstypes.MetricStatusOff, uuid.String(), serviceId)

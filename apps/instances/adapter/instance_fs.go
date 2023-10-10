@@ -7,9 +7,9 @@ import (
 	"path"
 
 	"github.com/google/uuid"
+	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 )
 
@@ -27,7 +27,7 @@ type InstanceFSAdapterParams struct {
 	instancesPath string
 }
 
-func NewInstanceFSAdapter(params *InstanceFSAdapterParams) types.InstanceAdapterPort {
+func NewInstanceFSAdapter(params *InstanceFSAdapterParams) instancestypes.InstanceAdapterPort {
 	if params == nil {
 		params = &InstanceFSAdapterParams{}
 	}

@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
-	"github.com/vertex-center/vertex/types"
+	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 )
 
 type InstanceLoggerTestSuite struct {
@@ -25,7 +25,7 @@ func (suite *InstanceLoggerTestSuite) SetupTest() {
 
 	suite.logger = &InstanceLogger{
 		uuid:   uuid.New(),
-		buffer: []types.LogLine{},
+		buffer: []instancestypes.LogLine{},
 		dir:    dir,
 	}
 }
@@ -158,9 +158,9 @@ func (suite *InstanceLogsFSAdapterTestSuite) TestPush() {
 	}()
 
 	// Push
-	suite.adapter.Push(instID, types.LogLine{
-		Kind: types.LogKindVertexErr,
-		Message: &types.LogLineMessageString{
+	suite.adapter.Push(instID, instancestypes.LogLine{
+		Kind: instancestypes.LogKindVertexErr,
+		Message: &instancestypes.LogLineMessageString{
 			Value: "test",
 		},
 	})
@@ -169,8 +169,8 @@ func (suite *InstanceLogsFSAdapterTestSuite) TestPush() {
 	l, err := suite.adapter.getLogger(instID)
 	suite.NoError(err)
 	suite.Len(l.buffer, 1)
-	suite.Equal(types.LogKindVertexErr, l.buffer[0].Kind)
-	suite.Equal("test", l.buffer[0].Message.(*types.LogLineMessageString).Value)
+	suite.Equal(instancestypes.LogKindVertexErr, l.buffer[0].Kind)
+	suite.Equal("test", l.buffer[0].Message.(*instancestypes.LogLineMessageString).Value)
 }
 
 func (suite *InstanceLogsFSAdapterTestSuite) TestPop() {
@@ -185,9 +185,9 @@ func (suite *InstanceLogsFSAdapterTestSuite) TestPop() {
 	}()
 
 	// Push
-	suite.adapter.Push(instID, types.LogLine{
-		Kind: types.LogKindVertexErr,
-		Message: &types.LogLineMessageString{
+	suite.adapter.Push(instID, instancestypes.LogLine{
+		Kind: instancestypes.LogKindVertexErr,
+		Message: &instancestypes.LogLineMessageString{
 			Value: "test",
 		},
 	})
@@ -195,8 +195,8 @@ func (suite *InstanceLogsFSAdapterTestSuite) TestPop() {
 	// Pop
 	line, err := suite.adapter.Pop(instID)
 	suite.NoError(err)
-	suite.Equal(types.LogKindVertexErr, line.Kind)
-	suite.Equal("test", line.Message.(*types.LogLineMessageString).Value)
+	suite.Equal(instancestypes.LogKindVertexErr, line.Kind)
+	suite.Equal("test", line.Message.(*instancestypes.LogLineMessageString).Value)
 
 	// Check that the log was popped
 	l, err := suite.adapter.getLogger(instID)

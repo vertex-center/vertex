@@ -1,17 +1,17 @@
-package services
+package service
 
 import (
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/apps/instances/types"
 )
 
 type InstanceSettingsService struct {
 	adapter types.InstanceSettingsAdapterPort
 }
 
-func NewInstanceSettingsService(instanceSettingsAdapter types.InstanceSettingsAdapterPort) InstanceSettingsService {
-	return InstanceSettingsService{
-		adapter: instanceSettingsAdapter,
+func NewInstanceSettingsService(adapter types.InstanceSettingsAdapterPort) *InstanceSettingsService {
+	return &InstanceSettingsService{
+		adapter: adapter,
 	}
 }
 
@@ -52,4 +52,8 @@ func (s *InstanceSettingsService) SetVersion(inst *types.Instance, value string)
 func (s *InstanceSettingsService) SetTags(inst *types.Instance, tags []string) error {
 	inst.Tags = tags
 	return s.adapter.Save(inst.UUID, inst.InstanceSettings)
+}
+
+func (s *InstanceSettingsService) OnEvent(e interface{}) {
+	// TODO: Useless
 }

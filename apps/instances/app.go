@@ -1,14 +1,14 @@
-package sql
+package instances
 
 import (
-	"github.com/vertex-center/vertex/apps/sql/router"
+	"github.com/vertex-center/vertex/apps/instances/router"
 	"github.com/vertex-center/vertex/types"
 )
 
 const (
-	AppID   = "sql"
-	AppName = "Vertex SQL"
-	Route   = "/sql"
+	AppID   = "instances"
+	AppName = "Vertex Instances"
+	Route   = ""
 )
 
 type App struct {
@@ -20,7 +20,7 @@ func NewApp() *App {
 }
 
 func (app *App) Initialize(registry *types.AppsRegistry) error {
-	app.router = router.NewAppRouter()
+	app.router = router.NewAppRouter(registry.GetContext())
 
 	registry.RegisterApp(AppID, app)
 	registry.RegisterRouter(Route, app.router)

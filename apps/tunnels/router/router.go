@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	instancesapi "github.com/vertex-center/vertex/apps/instances/api"
+	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
@@ -42,7 +43,7 @@ func (r *AppRouter) handleInstallTunnelProvider(c *router.Context) {
 		return
 	}
 
-	apiError = instancesapi.PatchInstance(c, inst.UUID, types.InstanceSettings{
+	apiError = instancesapi.PatchInstance(c, inst.UUID, instancestypes.InstanceSettings{
 		Tags: []string{"vertex-cloudflare-tunnel"},
 	})
 	if apiError != nil {

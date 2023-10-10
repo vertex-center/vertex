@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	instancesapi "github.com/vertex-center/vertex/apps/instances/api"
+	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/apps/sql/service"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -91,7 +92,7 @@ func (r *AppRouter) handleInstallDBMS(c *router.Context) {
 		return
 	}
 
-	apiError = instancesapi.PatchInstance(c, inst.UUID, types.InstanceSettings{
+	apiError = instancesapi.PatchInstance(c, inst.UUID, instancestypes.InstanceSettings{
 		Tags: []string{"vertex-postgres-sql"},
 	})
 	if apiError != nil {
@@ -99,7 +100,7 @@ func (r *AppRouter) handleInstallDBMS(c *router.Context) {
 		return
 	}
 
-	var env types.InstanceEnvVariables
+	var env instancestypes.InstanceEnvVariables
 	env, err = r.sqlService.EnvCredentials(inst, "postgres", "postgres")
 	if err != nil {
 		log.Error(err)

@@ -7,33 +7,19 @@ import (
 
 	"github.com/gin-contrib/sse"
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/apps/instances/service"
+	"github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/services"
-	"github.com/vertex-center/vertex/types"
+	vtypes "github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
 )
-
-func addInstanceRoutes(r *router.Group) {
-	r.GET("", handleGetInstance)
-	r.DELETE("", handleDeleteInstance)
-	r.PATCH("", handlePatchInstance)
-	r.POST("/start", handleStartInstance)
-	r.POST("/stop", handleStopInstance)
-	r.PATCH("/environment", handlePatchEnvironment)
-	r.GET("/events", headersSSE, handleInstanceEvents)
-	r.GET("/docker", handleGetDocker)
-	r.POST("/docker/recreate", handleRecreateDockerContainer)
-	r.GET("/logs", handleGetLogs)
-	r.POST("/update/service", handleUpdateService)
-	r.GET("/versions", handleGetVersions)
-}
 
 // getParamInstanceUUID returns the UUID of the instance in the URL.
 // Errors can be:
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
-func getParamInstanceUUID(c *router.Context) *uuid.UUID {
+func (r *AppRouter) getParamInstanceUUID(c *router.Context) *uuid.UUID {
 	p := c.Param("instance_uuid")
 	if p == "" {
 		c.BadRequest(router.Error{
@@ -63,13 +49,13 @@ func getParamInstanceUUID(c *router.Context) *uuid.UUID {
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
 //   - instance_not_found: the instance with the given UUID was not found
 //   - failed_to_retrieve_instance: failed to retrieve the instance from the database
-func getInstance(c *router.Context) *types.Instance {
-	instanceUUID := getParamInstanceUUID(c)
+func (r *AppRouter) getInstance(c *router.Context) *types.Instance {
+	instanceUUID := r.getParamInstanceUUID(c)
 	if instanceUUID == nil {
 		return nil
 	}
 
-	instance, err := instanceService.Get(*instanceUUID)
+	instance, err := r.instanceService.Get(*instanceUUID)
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
 		c.NotFound(router.Error{
 			Code:           api.ErrInstanceNotFound,
@@ -93,8 +79,8 @@ func getInstance(c *router.Context) *types.Instance {
 // Errors can be:
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
-func handleGetInstance(c *router.Context) {
-	inst := getInstance(c)
+func (r *AppRouter) handleGetInstance(c *router.Context) {
+	inst := r.getInstance(c)
 	if inst == nil {
 		return
 	}
@@ -108,13 +94,13 @@ func handleGetInstance(c *router.Context) {
 //   - instance_not_found: the instance with the given UUID was not found
 //   - instance_still_running: the instance with the given UUID is still running
 //   - failed_to_delete_instance: failed to delete the instance from the database
-func handleDeleteInstance(c *router.Context) {
-	uid := getParamInstanceUUID(c)
+func (r *AppRouter) handleDeleteInstance(c *router.Context) {
+	uid := r.getParamInstanceUUID(c)
 	if uid == nil {
 		return
 	}
 
-	err := instanceService.Delete(*uid)
+	err := r.instanceService.Delete(*uid)
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
 		c.NotFound(router.Error{
 			Code:           api.ErrInstanceNotFound,
@@ -157,13 +143,13 @@ type handlePatchInstanceBody struct {
 //   - instance_not_found: the instance with the given UUID was not found
 //   - failed_to_set_launch_on_startup: failed to set the launch on startup value
 //   - failed_to_set_display_name: failed to set the display name
-func handlePatchInstance(c *router.Context) {
-	uid := getParamInstanceUUID(c)
+func (r *AppRouter) handlePatchInstance(c *router.Context) {
+	uid := r.getParamInstanceUUID(c)
 	if uid == nil {
 		return
 	}
 
-	inst := getInstance(c)
+	inst := r.getInstance(c)
 	if inst == nil {
 		return
 	}
@@ -175,7 +161,7 @@ func handlePatchInstance(c *router.Context) {
 	}
 
 	if body.LaunchOnStartup != nil {
-		err = instanceSettingsService.SetLaunchOnStartup(inst, *body.LaunchOnStartup)
+		err = r.instanceSettingsService.SetLaunchOnStartup(inst, *body.LaunchOnStartup)
 		if err != nil {
 			c.Abort(router.Error{
 				Code:           api.ErrFailedToSetLaunchOnStartup,
@@ -187,7 +173,7 @@ func handlePatchInstance(c *router.Context) {
 	}
 
 	if body.DisplayName != nil {
-		err = instanceSettingsService.SetDisplayName(inst, *body.DisplayName)
+		err = r.instanceSettingsService.SetDisplayName(inst, *body.DisplayName)
 		if err != nil {
 			c.Abort(router.Error{
 				Code:           api.ErrFailedToSetDisplayName,
@@ -199,7 +185,7 @@ func handlePatchInstance(c *router.Context) {
 	}
 
 	if body.Databases != nil {
-		err = instanceService.SetDatabases(inst, body.Databases)
+		err = r.instanceService.SetDatabases(inst, body.Databases)
 		if err != nil {
 			c.Abort(router.Error{
 				Code:           api.ErrFailedToSetDatabase,
@@ -211,7 +197,7 @@ func handlePatchInstance(c *router.Context) {
 	}
 
 	if body.Version != nil {
-		err = instanceSettingsService.SetVersion(inst, *body.Version)
+		err = r.instanceSettingsService.SetVersion(inst, *body.Version)
 		if err != nil {
 			c.Abort(router.Error{
 				Code:           api.ErrFailedToSetVersion,
@@ -223,7 +209,7 @@ func handlePatchInstance(c *router.Context) {
 	}
 
 	if body.Tags != nil {
-		err = instanceSettingsService.SetTags(inst, body.Tags)
+		err = r.instanceSettingsService.SetTags(inst, body.Tags)
 		if err != nil {
 			c.Abort(router.Error{
 				Code:           api.ErrFailedToSetTags,
@@ -244,13 +230,13 @@ func handlePatchInstance(c *router.Context) {
 //   - instance_not_found: the instance with the given UUID was not found
 //   - instance_already_running: the instance with the given UUID is already running
 //   - failed_to_start_instance: failed to start the instance
-func handleStartInstance(c *router.Context) {
-	inst := getInstance(c)
+func (r *AppRouter) handleStartInstance(c *router.Context) {
+	inst := r.getInstance(c)
 	if inst == nil {
 		return
 	}
 
-	err := instanceRunnerService.Start(inst)
+	err := r.instanceRunnerService.Start(inst)
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
 		c.NotFound(router.Error{
 			Code:           api.ErrInstanceNotFound,
@@ -258,7 +244,7 @@ func handleStartInstance(c *router.Context) {
 			PrivateMessage: err.Error(),
 		})
 		return
-	} else if err != nil && errors.Is(err, services.ErrInstanceAlreadyRunning) {
+	} else if err != nil && errors.Is(err, service.ErrInstanceAlreadyRunning) {
 		c.Conflict(router.Error{
 			Code:           api.ErrInstanceAlreadyRunning,
 			PublicMessage:  fmt.Sprintf("Instance %s is already running.", inst.UUID),
@@ -284,14 +270,14 @@ func handleStartInstance(c *router.Context) {
 //   - instance_not_found: the instance with the given UUID was not found
 //   - instance_not_running: the instance with the given UUID is not running
 //   - failed_to_stop_instance: failed to stop the instance
-func handleStopInstance(c *router.Context) {
-	inst := getInstance(c)
+func (r *AppRouter) handleStopInstance(c *router.Context) {
+	inst := r.getInstance(c)
 	if inst == nil {
 		return
 	}
 
-	err := instanceRunnerService.Stop(inst)
-	if err != nil && errors.Is(err, services.ErrInstanceNotRunning) {
+	err := r.instanceRunnerService.Stop(inst)
+	if err != nil && errors.Is(err, service.ErrInstanceNotRunning) {
 		c.Conflict(router.Error{
 			Code:           api.ErrInstanceNotRunning,
 			PublicMessage:  fmt.Sprintf("Instance %s is not running.", inst.UUID),
@@ -318,19 +304,19 @@ func handleStopInstance(c *router.Context) {
 //   - instance_not_found: the instance with the given UUID was not found
 //   - failed_to_save_environment: failed to save the environment
 //   - failed_to_recreate_container: failed to recreate the Docker container
-func handlePatchEnvironment(c *router.Context) {
+func (r *AppRouter) handlePatchEnvironment(c *router.Context) {
 	var environment map[string]string
 	err := c.ParseBody(&environment)
 	if err != nil {
 		return
 	}
 
-	inst := getInstance(c)
+	inst := r.getInstance(c)
 	if inst == nil {
 		return
 	}
 
-	err = instanceEnvService.Save(inst, environment)
+	err = r.instanceEnvService.Save(inst, environment)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToSetEnv,
@@ -340,7 +326,7 @@ func handlePatchEnvironment(c *router.Context) {
 		return
 	}
 
-	err = instanceRunnerService.RecreateContainer(inst)
+	err = r.instanceRunnerService.RecreateContainer(inst)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToRecreateContainer,
@@ -357,8 +343,8 @@ func handlePatchEnvironment(c *router.Context) {
 // Errors can be:
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
-func handleInstanceEvents(c *router.Context) {
-	inst := getInstance(c)
+func (r *AppRouter) handleInstanceEvents(c *router.Context) {
+	inst := r.getInstance(c)
 	if inst == nil {
 		return
 	}
@@ -368,44 +354,44 @@ func handleInstanceEvents(c *router.Context) {
 
 	done := c.Request.Context().Done()
 
-	listener := types.NewTempListener(func(e interface{}) {
+	listener := vtypes.NewTempListener(func(e interface{}) {
 		switch e := e.(type) {
-		case types.EventInstanceLog:
+		case vtypes.EventInstanceLog:
 			if inst.UUID != e.InstanceUUID {
 				break
 			}
 
 			if e.Kind == types.LogKindOut || e.Kind == types.LogKindVertexOut {
 				eventsChan <- sse.Event{
-					Event: types.EventNameInstanceStdout,
+					Event: vtypes.EventNameInstanceStdout,
 					Data:  e.Message,
 				}
 			} else if e.Kind == types.LogKindErr || e.Kind == types.LogKindVertexErr {
 				eventsChan <- sse.Event{
-					Event: types.EventNameInstanceStderr,
+					Event: vtypes.EventNameInstanceStderr,
 					Data:  e.Message,
 				}
 			} else if e.Kind == types.LogKindDownload {
 				eventsChan <- sse.Event{
-					Event: types.EventNameInstanceDownload,
+					Event: vtypes.EventNameInstanceDownload,
 					Data:  e.Message,
 				}
 			}
 
-		case types.EventInstanceStatusChange:
+		case vtypes.EventInstanceStatusChange:
 			if inst.UUID != e.InstanceUUID {
 				break
 			}
 
 			eventsChan <- sse.Event{
-				Event: types.EventNameInstanceStatusChange,
+				Event: vtypes.EventNameInstanceStatusChange,
 				Data:  e.Status,
 			}
 		}
 	})
 
-	eventInMemoryAdapter.AddListener(listener)
-	defer eventInMemoryAdapter.RemoveListener(listener)
+	r.ctx.AddListener(listener)
+	defer r.ctx.RemoveListener(listener)
 
 	first := true
 
@@ -441,13 +427,13 @@ func handleInstanceEvents(c *router.Context) {
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
 //   - failed_to_get_docker_container_info: failed to get the Docker container info
-func handleGetDocker(c *router.Context) {
-	inst := getInstance(c)
+func (r *AppRouter) handleGetDocker(c *router.Context) {
+	inst := r.getInstance(c)
 	if inst == nil {
 		return
 	}
 
-	info, err := instanceRunnerService.GetDockerContainerInfo(*inst)
+	info, err := r.instanceRunnerService.GetDockerContainerInfo(*inst)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToGetContainerInfo,
@@ -465,13 +451,13 @@ func handleGetDocker(c *router.Context) {
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
 //   - failed_to_recreate_container: failed to recreate the Docker container
-func handleRecreateDockerContainer(c *router.Context) {
-	inst := getInstance(c)
+func (r *AppRouter) handleRecreateDockerContainer(c *router.Context) {
+	inst := r.getInstance(c)
 	if inst == nil {
 		return
 	}
 
-	err := instanceRunnerService.RecreateContainer(inst)
+	err := r.instanceRunnerService.RecreateContainer(inst)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToRecreateContainer,
@@ -489,13 +475,13 @@ func handleRecreateDockerContainer(c *router.Context) {
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
 //   - invalid_instance_uuid: the instance_uuid parameter was not a valid UUID
 //   - failed_to_get_logs: failed to get the logs
-func handleGetLogs(c *router.Context) {
-	uid := getParamInstanceUUID(c)
+func (r *AppRouter) handleGetLogs(c *router.Context) {
+	uid := r.getParamInstanceUUID(c)
 	if uid == nil {
 		return
 	}
 
-	logs, err := instanceLogsService.GetLatestLogs(*uid)
+	logs, err := r.instanceLogsService.GetLatestLogs(*uid)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToGetInstanceLogs,
@@ -511,13 +497,13 @@ func handleGetLogs(c *router.Context) {
 // handleUpdateService updates the service of the instance with the UUID in the URL.
 // Errors can be:
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
-func handleUpdateService(c *router.Context) {
-	inst := getInstance(c)
+func (r *AppRouter) handleUpdateService(c *router.Context) {
+	inst := r.getInstance(c)
 	if inst == nil {
 		return
 	}
 
-	service, err := serviceService.GetById(inst.Service.ID)
+	service, err := r.serviceService.GetById(inst.Service.ID)
 	if err != nil {
 		c.NotFound(router.Error{
 			Code:           api.ErrServiceNotFound,
@@ -527,7 +513,7 @@ func handleUpdateService(c *router.Context) {
 		return
 	}
 
-	err = instanceServiceService.Update(inst, service)
+	err = r.instanceServiceService.Update(inst, service)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToUpdateServiceInstance,
@@ -543,15 +529,15 @@ func handleUpdateService(c *router.Context) {
 // handleGetVersions returns the versions of the instance with the UUID in the URL.
 // Errors can be:
 //   - missing_instance_uuid: the instance_uuid parameter was missing in the URL
-func handleGetVersions(c *router.Context) {
-	inst := getInstance(c)
+func (r *AppRouter) handleGetVersions(c *router.Context) {
+	inst := r.getInstance(c)
 	if inst == nil {
 		return
 	}
 
 	useCache := c.Query("reload") != "true"
 
-	versions, err := instanceRunnerService.GetAllVersions(inst, useCache)
+	versions, err := r.instanceRunnerService.GetAllVersions(inst, useCache)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToGetVersions,

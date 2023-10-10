@@ -4,27 +4,21 @@ import (
 	"io"
 
 	"github.com/gin-contrib/sse"
+	"github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types"
+	vtypes "github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
 )
 
-func addInstancesRoutes(r *router.Group) {
-	r.GET("", handleGetInstances)
-	r.GET("/search", handleSearchInstances)
-	r.GET("/checkupdates", handleCheckForUpdates)
-	r.GET("/events", headersSSE, handleInstancesEvents)
-}
-
 // handleGetInstances returns all installed instances.
-func handleGetInstances(c *router.Context) {
-	installed := instanceService.GetAll()
+func (r *AppRouter) handleGetInstances(c *router.Context) {
+	installed := r.instanceService.GetAll()
 	c.JSON(installed)
 }
 
 // handleSearchInstances returns all installed instances that match the query.
-func handleSearchInstances(c *router.Context) {
+func (r *AppRouter) handleSearchInstances(c *router.Context) {
 	query := types.InstanceQuery{}
 
 	features := c.QueryArray("features[]")
@@ -32,15 +26,15 @@ func handleSearchInstances(c *router.Context) {
 		query.Features = features
 	}
 
-	installed := instanceService.Search(query)
+	installed := r.instanceService.Search(query)
 	c.JSON(installed)
 }
 
 // handleCheckForUpdates checks for updates for all installed instances.
 // Errors can be:
 //   - check_for_updates_failed
-func handleCheckForUpdates(c *router.Context) {
-	instances, err := instanceService.CheckForUpdates()
+func (r *AppRouter) handleCheckForUpdates(c *router.Context) {
+	instances, err := r.instanceService.CheckForUpdates()
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToCheckForUpdates,
@@ -54,23 +48,23 @@ func handleCheckForUpdates(c *router.Context) {
 }
 
 // handleInstancesEvents returns a stream of events related to instances.
-func handleInstancesEvents(c *router.Context) {
+func (r *AppRouter) handleInstancesEvents(c *router.Context) {
 	eventsChan := make(chan sse.Event)
 	defer close(eventsChan)
 
 	done := c.Request.Context().Done()
 
-	listener := types.NewTempListener(func(e interface{}) {
+	listener := vtypes.NewTempListener(func(e interface{}) {
 		switch e.(type) {
-		case types.EventInstancesChange:
+		case vtypes.EventInstancesChange:
 			eventsChan <- sse.Event{
-				Event: types.EventNameInstancesChange,
+				Event: vtypes.EventNameInstancesChange,
 			}
 		}
 	})
 
-	eventInMemoryAdapter.AddListener(listener)
-	defer eventInMemoryAdapter.RemoveListener(listener)
+	r.ctx.AddListener(listener)
+	defer r.ctx.RemoveListener(listener)
 
 	first := true
 

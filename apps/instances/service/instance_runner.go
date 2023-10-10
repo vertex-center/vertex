@@ -1,4 +1,4 @@
-package services
+package service
 
 import (
 	"bufio"
@@ -10,22 +10,23 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/adapter"
+	"github.com/vertex-center/vertex/apps/instances/adapter"
+	"github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
-	"github.com/vertex-center/vertex/types"
+	vtypes "github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 )
 
 type InstanceRunnerService struct {
-	eventsAdapter types.EventAdapterPort
-	adapter       types.RunnerAdapterPort
+	ctx     *vtypes.VertexContext
+	adapter types.InstanceRunnerAdapterPort
 }
 
-func NewInstanceRunnerService(eventsAdapter types.EventAdapterPort, dockerRunnerAdapter types.RunnerAdapterPort) InstanceRunnerService {
-	return InstanceRunnerService{
-		eventsAdapter: eventsAdapter,
-		adapter:       dockerRunnerAdapter,
+func NewInstanceRunnerService(ctx *vtypes.VertexContext, adapter types.InstanceRunnerAdapterPort) *InstanceRunnerService {
+	return &InstanceRunnerService{
+		ctx:     ctx,
+		adapter: adapter,
 	}
 }
 
@@ -57,7 +58,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 		return nil
 	}
 
-	s.eventsAdapter.Send(types.EventInstanceLog{
+	s.ctx.SendEvent(vtypes.EventInstanceLog{
 		InstanceUUID: inst.UUID,
 		Kind:         types.LogKindOut,
 		Message:      types.NewLogLineMessageString("Starting instance..."),
@@ -68,7 +69,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 	)
 
 	if inst.IsRunning() {
-		s.eventsAdapter.Send(types.EventInstanceLog{
+		s.ctx.SendEvent(vtypes.EventInstanceLog{
 			InstanceUUID: inst.UUID,
 			Kind:         types.LogKindVertexErr,
 			Message:      types.NewLogLineMessageString(ErrInstanceAlreadyRunning.Error()),
@@ -80,7 +81,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 		s.setStatus(inst, status)
 	}
 
-	var runner types.RunnerAdapterPort
+	var runner types.InstanceRunnerAdapterPort
 	if inst.IsDockerized() {
 		runner = s.adapter
 	} else {
@@ -115,7 +116,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 					continue
 				}
 
-				s.eventsAdapter.Send(types.EventInstanceLog{
+				s.ctx.SendEvent(vtypes.EventInstanceLog{
 					InstanceUUID: inst.UUID,
 					Kind:         types.LogKindDownload,
 					Message:      types.NewLogLineMessageDownload(&downloadProgress),
@@ -123,7 +124,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 				continue
 			}
 
-			s.eventsAdapter.Send(types.EventInstanceLog{
+			s.ctx.SendEvent(vtypes.EventInstanceLog{
 				InstanceUUID: inst.UUID,
 				Kind:         types.LogKindOut,
 				Message:      types.NewLogLineMessageString(scanner.Text()),
@@ -140,7 +141,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 			if scanner.Err() != nil {
 				break
 			}
-			s.eventsAdapter.Send(types.EventInstanceLog{
+			s.ctx.SendEvent(vtypes.EventInstanceLog{
 				InstanceUUID: inst.UUID,
 				Kind:         types.LogKindErr,
 				Message:      types.NewLogLineMessageString(scanner.Text()),
@@ -152,7 +153,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 	wg.Wait()
 
 	// Log stopped
-	s.eventsAdapter.Send(types.EventInstanceLog{
+	s.ctx.SendEvent(vtypes.EventInstanceLog{
 		InstanceUUID: inst.UUID,
 		Kind:         types.LogKindVertexOut,
 		Message:      types.NewLogLineMessageString("Stopping instance..."),
@@ -173,7 +174,7 @@ func (s *InstanceRunnerService) Stop(inst *types.Instance) error {
 	}
 
 	if !inst.IsRunning() {
-		s.eventsAdapter.Send(types.EventInstanceLog{
+		s.ctx.SendEvent(vtypes.EventInstanceLog{
 			InstanceUUID: inst.UUID,
 			Kind:         types.LogKindVertexErr,
 			Message:      types.NewLogLineMessageString(ErrInstanceNotRunning.Error()),
@@ -191,7 +192,7 @@ func (s *InstanceRunnerService) Stop(inst *types.Instance) error {
 	}
 
 	if err == nil {
-		s.eventsAdapter.Send(types.EventInstanceLog{
+		s.ctx.SendEvent(vtypes.EventInstanceLog{
 			InstanceUUID: inst.UUID,
 			Kind:         types.LogKindVertexOut,
 			Message:      types.NewLogLineMessageString("Instance stopped."),
@@ -280,12 +281,16 @@ func (s *InstanceRunnerService) setStatus(inst *types.Instance, status string) {
 	}
 
 	inst.Status = status
-	s.eventsAdapter.Send(types.EventInstancesChange{})
-	s.eventsAdapter.Send(types.EventInstanceStatusChange{
+	s.ctx.SendEvent(vtypes.EventInstancesChange{})
+	s.ctx.SendEvent(vtypes.EventInstanceStatusChange{
 		InstanceUUID: inst.UUID,
 		ServiceID:    inst.Service.ID,
 		Instance:     *inst,
 		Name:         name,
 		Status:       status,
 	})
+}
+
+func (s *InstanceRunnerService) OnEvent(e interface{}) {
+	// TODO: useless
 }
