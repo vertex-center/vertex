@@ -15,8 +15,6 @@ type AppRouter struct {
 	proxyFSAdapter types.ProxyAdapterPort
 
 	proxyService *service.ProxyService
-
-	proxyRouter *ProxyRouter
 }
 
 func NewAppRouter() *AppRouter {
