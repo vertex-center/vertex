@@ -37,7 +37,7 @@ func (s *NotificationsService) StartWebhook() error {
 
 	s.listener = types.NewTempListener(func(e interface{}) {
 		switch e := e.(type) {
-		case types.EventInstanceStatusChange:
+		case instancestypes.EventInstanceStatusChange:
 			if e.Status == instancestypes.InstanceStatusOff || e.Status == instancestypes.InstanceStatusError || e.Status == instancestypes.InstanceStatusRunning {
 				s.sendStatus(e.Name, e.Status)
 			}

@@ -6,8 +6,8 @@ import (
 
 	instancesapi "github.com/vertex-center/vertex/apps/instances/api"
 	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
+	"github.com/vertex-center/vertex/apps/monitoring/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types/api"
 	"github.com/vertex-center/vertex/types/app"
 )
 
@@ -58,7 +58,7 @@ func getTunnelProvider(c *router.Context) (string, error) {
 	provider := c.Param("provider")
 	if provider != "cloudflared" {
 		c.NotFound(router.Error{
-			Code:           api.ErrCollectorNotFound,
+			Code:           types.ErrCodeCollectorNotFound,
 			PublicMessage:  fmt.Sprintf("Provider not found: %s.", provider),
 			PrivateMessage: "The provider is not supported. It should be 'cloudflared'.",
 		})

@@ -6,7 +6,6 @@ import (
 
 	"github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types/api"
 )
 
 // handleGetService handles the retrieval of a service.
@@ -14,7 +13,7 @@ func (r *AppRouter) handleGetService(c *router.Context) {
 	serviceID := c.Param("service_id")
 	if serviceID == "" {
 		c.BadRequest(router.Error{
-			Code:           api.ErrServiceIdMissing,
+			Code:           types.ErrCodeServiceIdMissing,
 			PublicMessage:  "The request was missing the service ID.",
 			PrivateMessage: "Field 'service_id' is required.",
 		})
@@ -24,7 +23,7 @@ func (r *AppRouter) handleGetService(c *router.Context) {
 	service, err := r.serviceService.GetById(serviceID)
 	if err != nil {
 		c.NotFound(router.Error{
-			Code:           api.ErrServiceNotFound,
+			Code:           types.ErrCodeServiceNotFound,
 			PublicMessage:  fmt.Sprintf("Service not found: %s", serviceID),
 			PrivateMessage: err.Error(),
 		})
@@ -43,7 +42,7 @@ func (r *AppRouter) handleServiceInstall(c *router.Context) {
 	serviceID := c.Param("service_id")
 	if serviceID == "" {
 		c.BadRequest(router.Error{
-			Code:           api.ErrServiceIdMissing,
+			Code:           types.ErrCodeServiceIdMissing,
 			PublicMessage:  "The request was missing the service ID.",
 			PrivateMessage: "Field 'service_id' is required.",
 		})
@@ -53,7 +52,7 @@ func (r *AppRouter) handleServiceInstall(c *router.Context) {
 	service, err := r.serviceService.GetById(serviceID)
 	if err != nil {
 		c.NotFound(router.Error{
-			Code:           api.ErrServiceNotFound,
+			Code:           types.ErrCodeServiceNotFound,
 			PublicMessage:  fmt.Sprintf("Service not found: %s.", serviceID),
 			PrivateMessage: err.Error(),
 		})
@@ -63,14 +62,14 @@ func (r *AppRouter) handleServiceInstall(c *router.Context) {
 	inst, err := r.instanceService.Install(service, "docker")
 	if err != nil && errors.Is(err, types.ErrServiceNotFound) {
 		c.NotFound(router.Error{
-			Code:           api.ErrServiceNotFound,
+			Code:           types.ErrCodeServiceNotFound,
 			PublicMessage:  fmt.Sprintf("Service not found: %s.", serviceID),
 			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToInstallService,
+			Code:           types.ErrCodeFailedToInstallService,
 			PublicMessage:  fmt.Sprintf("Failed to install service '%s'.", service.Name),
 			PrivateMessage: err.Error(),
 		})

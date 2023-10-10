@@ -7,7 +7,6 @@ import (
 	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/apps/monitoring/adapter"
 	metricstypes "github.com/vertex-center/vertex/apps/monitoring/types"
-	"github.com/vertex-center/vertex/types"
 )
 
 const (
@@ -63,14 +62,14 @@ func (s *MetricsService) GetMetrics() []metricstypes.Metric {
 
 func (s *MetricsService) OnEvent(e interface{}) {
 	switch e := e.(type) {
-	case types.EventInstanceStatusChange:
+	case instancestypes.EventInstanceStatusChange:
 		s.updateStatus(e.InstanceUUID, e.ServiceID, e.Status)
-	case types.EventInstanceCreated:
+	case instancestypes.EventInstanceCreated:
 		s.adapter.Inc(MetricIDInstancesCount)
-	case types.EventInstanceDeleted:
+	case instancestypes.EventInstanceDeleted:
 		s.adapter.Dec(MetricIDInstancesCount)
 		s.adapter.Set(MetricIDInstanceStatus, math.NaN(), e.InstanceUUID.String(), e.ServiceID)
-	case types.EventInstancesLoaded:
+	case instancestypes.EventInstancesLoaded:
 		s.adapter.Set(MetricIDInstancesCount, float64(e.Count))
 	}
 }

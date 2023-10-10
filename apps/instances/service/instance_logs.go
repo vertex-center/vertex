@@ -25,15 +25,15 @@ func (s *InstanceLogsService) GetLatestLogs(uuid uuid.UUID) ([]types.LogLine, er
 
 func (s *InstanceLogsService) OnEvent(e interface{}) {
 	switch e := e.(type) {
-	case vtypes.EventInstanceLog:
+	case types.EventInstanceLog:
 		s.onLogReceived(e)
-	case vtypes.EventInstanceLoaded:
+	case types.EventInstanceLoaded:
 		err := s.adapter.Register(e.Instance.UUID)
 		if err != nil {
 			log.Error(err)
 			return
 		}
-	case vtypes.EventInstanceDeleted:
+	case types.EventInstanceDeleted:
 		err := s.adapter.Unregister(e.InstanceUUID)
 		if err != nil {
 			log.Error(err)
@@ -48,7 +48,7 @@ func (s *InstanceLogsService) OnEvent(e interface{}) {
 	}
 }
 
-func (s *InstanceLogsService) onLogReceived(e vtypes.EventInstanceLog) {
+func (s *InstanceLogsService) onLogReceived(e types.EventInstanceLog) {
 	switch e.Kind {
 	case types.LogKindDownload:
 		var downloads *types.LogLineMessageDownloads

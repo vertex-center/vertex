@@ -8,7 +8,6 @@ import (
 	"github.com/vertex-center/vertex/apps/reverseproxy/service"
 	"github.com/vertex-center/vertex/apps/reverseproxy/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types/api"
 	"github.com/vertex-center/vertex/types/app"
 )
 
@@ -73,7 +72,7 @@ func (r *AppRouter) handleAddRedirect(c *router.Context) {
 	err = r.proxyService.AddRedirect(redirect)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToAddRedirect,
+			Code:           types.ErrCodeFailedToAddRedirect,
 			PublicMessage:  fmt.Sprintf("Failed to add redirect '%s' to '%s'.", redirect.Source, redirect.Target),
 			PrivateMessage: err.Error(),
 		})
@@ -92,7 +91,7 @@ func (r *AppRouter) handleRemoveRedirect(c *router.Context) {
 	idString := c.Param("id")
 	if idString == "" {
 		c.BadRequest(router.Error{
-			Code:           api.ErrRedirectUuidMissing,
+			Code:           types.ErrCodeRedirectUuidMissing,
 			PublicMessage:  "The request is missing the redirect UUID.",
 			PrivateMessage: "Field 'id' is required.",
 		})
@@ -102,7 +101,7 @@ func (r *AppRouter) handleRemoveRedirect(c *router.Context) {
 	id, err := uuid.Parse(idString)
 	if err != nil {
 		c.BadRequest(router.Error{
-			Code:           api.ErrRedirectUuidInvalid,
+			Code:           types.ErrCodeRedirectUuidInvalid,
 			PublicMessage:  "The redirect UUID is invalid.",
 			PrivateMessage: err.Error(),
 		})
@@ -112,7 +111,7 @@ func (r *AppRouter) handleRemoveRedirect(c *router.Context) {
 	err = r.proxyService.RemoveRedirect(id)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToRemoveRedirect,
+			Code:           types.ErrCodeFailedToRemoveRedirect,
 			PublicMessage:  fmt.Sprintf("Failed to remove redirect '%s'.", id),
 			PrivateMessage: err.Error(),
 		})

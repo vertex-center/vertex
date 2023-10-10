@@ -7,8 +7,8 @@ import (
 	instancesapi "github.com/vertex-center/vertex/apps/instances/api"
 	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/apps/monitoring/service"
+	"github.com/vertex-center/vertex/apps/monitoring/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types/api"
 	"github.com/vertex-center/vertex/types/app"
 )
 
@@ -38,7 +38,7 @@ func getCollector(c *router.Context) (string, error) {
 	collector := c.Param("collector")
 	if collector != "prometheus" {
 		c.NotFound(router.Error{
-			Code:           api.ErrCollectorNotFound,
+			Code:           types.ErrCodeCollectorNotFound,
 			PublicMessage:  fmt.Sprintf("Collector not found: %s.", collector),
 			PrivateMessage: "The collector is not supported. It should be 'prometheus'.",
 		})
@@ -51,7 +51,7 @@ func getVisualizer(c *router.Context) (string, error) {
 	visualizer := c.Param("visualizer")
 	if visualizer != "grafana" {
 		c.NotFound(router.Error{
-			Code:           api.ErrVisualizerNotFound,
+			Code:           types.ErrCodeVisualizerNotFound,
 			PublicMessage:  fmt.Sprintf("Visualizer not found: %s.", visualizer),
 			PrivateMessage: "The visualizer is not supported. It should be 'grafana'.",
 		})
@@ -85,7 +85,7 @@ func (r *AppRouter) handleInstallMetricsCollector(c *router.Context) {
 	err = r.metricsService.ConfigureCollector(inst)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToConfigureMetricsInstance,
+			Code:           types.ErrCodeFailedToConfigureMetricsInstance,
 			PublicMessage:  "Failed to configure instance to monitor Vertex.",
 			PrivateMessage: err.Error(),
 		})
@@ -124,7 +124,7 @@ func (r *AppRouter) handleInstallMetricsVisualizer(c *router.Context) {
 	err = r.metricsService.ConfigureVisualizer(inst)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToConfigureMetricsInstance,
+			Code:           types.ErrCodeFailedToConfigureMetricsInstance,
 			PublicMessage:  "Failed to configure instance to monitor Vertex.",
 			PrivateMessage: err.Error(),
 		})

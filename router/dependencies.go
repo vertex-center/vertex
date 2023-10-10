@@ -3,6 +3,7 @@ package router
 import (
 	"fmt"
 
+	types2 "github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
@@ -25,7 +26,7 @@ func handleGetDependencies(c *router.Context) {
 		dependencies, err = dependenciesService.CheckForUpdates(settingsService.GetChannel())
 		if err != nil {
 			c.Abort(router.Error{
-				Code:           api.ErrFailedToCheckForUpdates,
+				Code:           types2.ErrCodeFailedToCheckForUpdates,
 				PublicMessage:  "Failed to check for updates.",
 				PrivateMessage: err.Error(),
 			})

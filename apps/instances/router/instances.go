@@ -8,7 +8,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 	vtypes "github.com/vertex-center/vertex/types"
-	"github.com/vertex-center/vertex/types/api"
 )
 
 // handleGetInstances returns all installed instances.
@@ -37,7 +36,7 @@ func (r *AppRouter) handleCheckForUpdates(c *router.Context) {
 	instances, err := r.instanceService.CheckForUpdates()
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToCheckForUpdates,
+			Code:           types.ErrCodeFailedToCheckForUpdates,
 			PublicMessage:  "Failed to check for updates.",
 			PrivateMessage: err.Error(),
 		})
@@ -56,9 +55,9 @@ func (r *AppRouter) handleInstancesEvents(c *router.Context) {
 
 	listener := vtypes.NewTempListener(func(e interface{}) {
 		switch e.(type) {
-		case vtypes.EventInstancesChange:
+		case types.EventInstancesChange:
 			eventsChan <- sse.Event{
-				Event: vtypes.EventNameInstancesChange,
+				Event: types.EventNameInstancesChange,
 			}
 		}
 	})

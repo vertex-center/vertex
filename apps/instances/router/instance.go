@@ -23,7 +23,7 @@ func (r *AppRouter) getParamInstanceUUID(c *router.Context) *uuid.UUID {
 	p := c.Param("instance_uuid")
 	if p == "" {
 		c.BadRequest(router.Error{
-			Code:           api.ErrInstanceUuidMissing,
+			Code:           types.ErrCodeInstanceUuidMissing,
 			PublicMessage:  "The request was missing the instance UUID.",
 			PrivateMessage: "Field 'instance_uuid' is required.",
 		})
@@ -33,7 +33,7 @@ func (r *AppRouter) getParamInstanceUUID(c *router.Context) *uuid.UUID {
 	uid, err := uuid.Parse(p)
 	if err != nil {
 		c.BadRequest(router.Error{
-			Code:           api.ErrInstanceUuidInvalid,
+			Code:           types.ErrCodeInstanceUuidInvalid,
 			PublicMessage:  "The instance UUID is invalid.",
 			PrivateMessage: err.Error(),
 		})
@@ -58,14 +58,14 @@ func (r *AppRouter) getInstance(c *router.Context) *types.Instance {
 	instance, err := r.instanceService.Get(*instanceUUID)
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
 		c.NotFound(router.Error{
-			Code:           api.ErrInstanceNotFound,
+			Code:           types.ErrCodeInstanceNotFound,
 			PublicMessage:  fmt.Sprintf("Instance %s not found.", instanceUUID),
 			PrivateMessage: err.Error(),
 		})
 		return nil
 	} else if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToGetInstance,
+			Code:           types.ErrCodeFailedToGetInstance,
 			PublicMessage:  fmt.Sprintf("Failed to retrieve instance %s.", instanceUUID),
 			PrivateMessage: err.Error(),
 		})
@@ -103,21 +103,21 @@ func (r *AppRouter) handleDeleteInstance(c *router.Context) {
 	err := r.instanceService.Delete(*uid)
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
 		c.NotFound(router.Error{
-			Code:           api.ErrInstanceNotFound,
+			Code:           types.ErrCodeInstanceNotFound,
 			PublicMessage:  fmt.Sprintf("Instance %s not found.", uid),
 			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil && errors.Is(err, types.ErrInstanceStillRunning) {
 		c.Conflict(router.Error{
-			Code:           api.ErrInstanceStillRunning,
+			Code:           types.ErrCodeInstanceStillRunning,
 			PublicMessage:  fmt.Sprintf("Instance %s is still running.", uid),
 			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToDeleteInstance,
+			Code:           types.ErrCodeFailedToDeleteInstance,
 			PublicMessage:  fmt.Sprintf("Failed to delete instance %s.", uid),
 			PrivateMessage: err.Error(),
 		})
@@ -164,7 +164,7 @@ func (r *AppRouter) handlePatchInstance(c *router.Context) {
 		err = r.instanceSettingsService.SetLaunchOnStartup(inst, *body.LaunchOnStartup)
 		if err != nil {
 			c.Abort(router.Error{
-				Code:           api.ErrFailedToSetLaunchOnStartup,
+				Code:           types.ErrCodeFailedToSetLaunchOnStartup,
 				PublicMessage:  "Failed to change launch on startup.",
 				PrivateMessage: err.Error(),
 			})
@@ -176,7 +176,7 @@ func (r *AppRouter) handlePatchInstance(c *router.Context) {
 		err = r.instanceSettingsService.SetDisplayName(inst, *body.DisplayName)
 		if err != nil {
 			c.Abort(router.Error{
-				Code:           api.ErrFailedToSetDisplayName,
+				Code:           types.ErrCodeFailedToSetDisplayName,
 				PublicMessage:  "Failed to change display name.",
 				PrivateMessage: err.Error(),
 			})
@@ -188,7 +188,7 @@ func (r *AppRouter) handlePatchInstance(c *router.Context) {
 		err = r.instanceService.SetDatabases(inst, body.Databases)
 		if err != nil {
 			c.Abort(router.Error{
-				Code:           api.ErrFailedToSetDatabase,
+				Code:           types.ErrCodeFailedToSetDatabase,
 				PublicMessage:  "Failed to change databases.",
 				PrivateMessage: err.Error(),
 			})
@@ -200,7 +200,7 @@ func (r *AppRouter) handlePatchInstance(c *router.Context) {
 		err = r.instanceSettingsService.SetVersion(inst, *body.Version)
 		if err != nil {
 			c.Abort(router.Error{
-				Code:           api.ErrFailedToSetVersion,
+				Code:           types.ErrCodeFailedToSetVersion,
 				PublicMessage:  "Failed to change version.",
 				PrivateMessage: err.Error(),
 			})
@@ -212,7 +212,7 @@ func (r *AppRouter) handlePatchInstance(c *router.Context) {
 		err = r.instanceSettingsService.SetTags(inst, body.Tags)
 		if err != nil {
 			c.Abort(router.Error{
-				Code:           api.ErrFailedToSetTags,
+				Code:           types.ErrCodeFailedToSetTags,
 				PublicMessage:  "Failed to change tags.",
 				PrivateMessage: err.Error(),
 			})
@@ -239,21 +239,21 @@ func (r *AppRouter) handleStartInstance(c *router.Context) {
 	err := r.instanceRunnerService.Start(inst)
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
 		c.NotFound(router.Error{
-			Code:           api.ErrInstanceNotFound,
+			Code:           types.ErrCodeInstanceNotFound,
 			PublicMessage:  fmt.Sprintf("Instance %s not found.", inst.UUID),
 			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil && errors.Is(err, service.ErrInstanceAlreadyRunning) {
 		c.Conflict(router.Error{
-			Code:           api.ErrInstanceAlreadyRunning,
+			Code:           types.ErrCodeInstanceAlreadyRunning,
 			PublicMessage:  fmt.Sprintf("Instance %s is already running.", inst.UUID),
 			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToStartInstance,
+			Code:           types.ErrCodeFailedToStartInstance,
 			PublicMessage:  fmt.Sprintf("Failed to start instance %s.", inst.UUID),
 			PrivateMessage: err.Error(),
 		})
@@ -279,14 +279,14 @@ func (r *AppRouter) handleStopInstance(c *router.Context) {
 	err := r.instanceRunnerService.Stop(inst)
 	if err != nil && errors.Is(err, service.ErrInstanceNotRunning) {
 		c.Conflict(router.Error{
-			Code:           api.ErrInstanceNotRunning,
+			Code:           types.ErrCodeInstanceNotRunning,
 			PublicMessage:  fmt.Sprintf("Instance %s is not running.", inst.UUID),
 			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToStopInstance,
+			Code:           types.ErrCodeFailedToStopInstance,
 			PublicMessage:  fmt.Sprintf("Failed to stop instance %s.", inst.UUID),
 			PrivateMessage: err.Error(),
 		})
@@ -319,7 +319,7 @@ func (r *AppRouter) handlePatchEnvironment(c *router.Context) {
 	err = r.instanceEnvService.Save(inst, environment)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToSetEnv,
+			Code:           types.ErrCodeFailedToSetEnv,
 			PublicMessage:  "failed to set environment",
 			PrivateMessage: err.Error(),
 		})
@@ -356,35 +356,35 @@ func (r *AppRouter) handleInstanceEvents(c *router.Context) {
 
 	listener := vtypes.NewTempListener(func(e interface{}) {
 		switch e := e.(type) {
-		case vtypes.EventInstanceLog:
+		case types.EventInstanceLog:
 			if inst.UUID != e.InstanceUUID {
 				break
 			}
 
 			if e.Kind == types.LogKindOut || e.Kind == types.LogKindVertexOut {
 				eventsChan <- sse.Event{
-					Event: vtypes.EventNameInstanceStdout,
+					Event: types.EventNameInstanceStdout,
 					Data:  e.Message,
 				}
 			} else if e.Kind == types.LogKindErr || e.Kind == types.LogKindVertexErr {
 				eventsChan <- sse.Event{
-					Event: vtypes.EventNameInstanceStderr,
+					Event: types.EventNameInstanceStderr,
 					Data:  e.Message,
 				}
 			} else if e.Kind == types.LogKindDownload {
 				eventsChan <- sse.Event{
-					Event: vtypes.EventNameInstanceDownload,
+					Event: types.EventNameInstanceDownload,
 					Data:  e.Message,
 				}
 			}
 
-		case vtypes.EventInstanceStatusChange:
+		case types.EventInstanceStatusChange:
 			if inst.UUID != e.InstanceUUID {
 				break
 			}
 
 			eventsChan <- sse.Event{
-				Event: vtypes.EventNameInstanceStatusChange,
+				Event: types.EventNameInstanceStatusChange,
 				Data:  e.Status,
 			}
 		}
@@ -484,7 +484,7 @@ func (r *AppRouter) handleGetLogs(c *router.Context) {
 	logs, err := r.instanceLogsService.GetLatestLogs(*uid)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToGetInstanceLogs,
+			Code:           types.ErrCodeFailedToGetInstanceLogs,
 			PublicMessage:  fmt.Sprintf("Failed to get logs for instance %s.", uid),
 			PrivateMessage: err.Error(),
 		})
@@ -503,20 +503,20 @@ func (r *AppRouter) handleUpdateService(c *router.Context) {
 		return
 	}
 
-	service, err := r.serviceService.GetById(inst.Service.ID)
+	serv, err := r.serviceService.GetById(inst.Service.ID)
 	if err != nil {
 		c.NotFound(router.Error{
-			Code:           api.ErrServiceNotFound,
+			Code:           types.ErrCodeServiceNotFound,
 			PublicMessage:  fmt.Sprintf("Service %s not found.", inst.Service.ID),
 			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
-	err = r.instanceServiceService.Update(inst, service)
+	err = r.instanceServiceService.Update(inst, serv)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToUpdateServiceInstance,
+			Code:           types.ErrCodeFailedToUpdateServiceInstance,
 			PublicMessage:  fmt.Sprintf("Failed to update service for instance %s.", inst.UUID),
 			PrivateMessage: err.Error(),
 		})
@@ -540,7 +540,7 @@ func (r *AppRouter) handleGetVersions(c *router.Context) {
 	versions, err := r.instanceRunnerService.GetAllVersions(inst, useCache)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToGetVersions,
+			Code:           types.ErrCodeFailedToGetVersions,
 			PublicMessage:  fmt.Sprintf("Failed to get versions for instance %s.", inst.UUID),
 			PrivateMessage: err.Error(),
 		})

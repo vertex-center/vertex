@@ -7,9 +7,9 @@ import (
 	instancesapi "github.com/vertex-center/vertex/apps/instances/api"
 	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/apps/sql/service"
+	"github.com/vertex-center/vertex/apps/sql/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types/api"
 	"github.com/vertex-center/vertex/types/app"
 )
 
@@ -38,7 +38,7 @@ func (r *AppRouter) getDBMS(c *router.Context) (string, error) {
 	db := c.Param("dbms")
 	if db != "postgres" {
 		c.NotFound(router.Error{
-			Code:           api.ErrSQLDatabaseNotFound,
+			Code:           types.ErrCodeSQLDatabaseNotFound,
 			PublicMessage:  fmt.Sprintf("SQL DBMS not found: %s.", db),
 			PrivateMessage: "This SQL DBMS is not supported.",
 		})
@@ -64,7 +64,7 @@ func (r *AppRouter) handleGetDBMS(c *router.Context) {
 	db, err := r.sqlService.Get(inst)
 	if err != nil {
 		c.NotFound(router.Error{
-			Code:           api.ErrSQLDatabaseNotFound,
+			Code:           types.ErrCodeSQLDatabaseNotFound,
 			PublicMessage:  "SQL Database not found.",
 			PrivateMessage: err.Error(),
 		})
@@ -105,7 +105,7 @@ func (r *AppRouter) handleInstallDBMS(c *router.Context) {
 	if err != nil {
 		log.Error(err)
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToConfigureSQLDatabaseInstance,
+			Code:           types.ErrCodeFailedToConfigureSQLDatabaseInstance,
 			PublicMessage:  fmt.Sprintf("Failed to configure SQL Database '%s'.", serv.Name),
 			PrivateMessage: err.Error(),
 		})

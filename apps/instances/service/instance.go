@@ -138,11 +138,11 @@ func (s *InstanceService) Delete(uuid uuid.UUID) error {
 	defer s.instancesMutex.Unlock()
 	delete(s.instances, uuid)
 
-	s.ctx.SendEvent(vtypes.EventInstanceDeleted{
+	s.ctx.SendEvent(types.EventInstanceDeleted{
 		InstanceUUID: uuid,
 		ServiceID:    serviceID,
 	})
-	s.ctx.SendEvent(vtypes.EventInstancesChange{})
+	s.ctx.SendEvent(types.EventInstancesChange{})
 
 	return nil
 }
@@ -256,8 +256,8 @@ func (s *InstanceService) Install(service types.Service, method string) (*types.
 		return nil, err
 	}
 
-	s.ctx.SendEvent(vtypes.EventInstanceCreated{})
-	s.ctx.SendEvent(vtypes.EventInstancesChange{})
+	s.ctx.SendEvent(types.EventInstanceCreated{})
+	s.ctx.SendEvent(types.EventInstancesChange{})
 
 	return inst, nil
 }
@@ -289,7 +289,7 @@ func (s *InstanceService) LoadAll() {
 		loaded += 1
 	}
 
-	s.ctx.SendEvent(vtypes.EventInstancesLoaded{
+	s.ctx.SendEvent(types.EventInstancesLoaded{
 		Count: loaded,
 	})
 }
@@ -325,7 +325,7 @@ func (s *InstanceService) load(uuid uuid.UUID) error {
 		return ErrInstanceAlreadyExists
 	}
 
-	s.ctx.SendEvent(vtypes.EventInstanceLoaded{
+	s.ctx.SendEvent(types.EventInstanceLoaded{
 		Instance: &inst,
 	})
 

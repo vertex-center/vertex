@@ -3,12 +3,11 @@ package service
 import (
 	"github.com/google/uuid"
 	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
-	"github.com/vertex-center/vertex/types"
 )
 
 func (s *SqlService) OnEvent(e interface{}) {
 	switch e := e.(type) {
-	case types.EventInstanceStatusChange:
+	case instancestypes.EventInstanceStatusChange:
 		if e.Status == instancestypes.InstanceStatusRunning {
 			s.onInstanceStart(&e.Instance)
 		} else if e.Status == instancestypes.InstanceStatusOff {

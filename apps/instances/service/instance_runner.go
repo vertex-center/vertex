@@ -58,7 +58,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 		return nil
 	}
 
-	s.ctx.SendEvent(vtypes.EventInstanceLog{
+	s.ctx.SendEvent(types.EventInstanceLog{
 		InstanceUUID: inst.UUID,
 		Kind:         types.LogKindOut,
 		Message:      types.NewLogLineMessageString("Starting instance..."),
@@ -69,7 +69,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 	)
 
 	if inst.IsRunning() {
-		s.ctx.SendEvent(vtypes.EventInstanceLog{
+		s.ctx.SendEvent(types.EventInstanceLog{
 			InstanceUUID: inst.UUID,
 			Kind:         types.LogKindVertexErr,
 			Message:      types.NewLogLineMessageString(ErrInstanceAlreadyRunning.Error()),
@@ -116,7 +116,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 					continue
 				}
 
-				s.ctx.SendEvent(vtypes.EventInstanceLog{
+				s.ctx.SendEvent(types.EventInstanceLog{
 					InstanceUUID: inst.UUID,
 					Kind:         types.LogKindDownload,
 					Message:      types.NewLogLineMessageDownload(&downloadProgress),
@@ -124,7 +124,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 				continue
 			}
 
-			s.ctx.SendEvent(vtypes.EventInstanceLog{
+			s.ctx.SendEvent(types.EventInstanceLog{
 				InstanceUUID: inst.UUID,
 				Kind:         types.LogKindOut,
 				Message:      types.NewLogLineMessageString(scanner.Text()),
@@ -141,7 +141,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 			if scanner.Err() != nil {
 				break
 			}
-			s.ctx.SendEvent(vtypes.EventInstanceLog{
+			s.ctx.SendEvent(types.EventInstanceLog{
 				InstanceUUID: inst.UUID,
 				Kind:         types.LogKindErr,
 				Message:      types.NewLogLineMessageString(scanner.Text()),
@@ -153,7 +153,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 	wg.Wait()
 
 	// Log stopped
-	s.ctx.SendEvent(vtypes.EventInstanceLog{
+	s.ctx.SendEvent(types.EventInstanceLog{
 		InstanceUUID: inst.UUID,
 		Kind:         types.LogKindVertexOut,
 		Message:      types.NewLogLineMessageString("Stopping instance..."),
@@ -174,7 +174,7 @@ func (s *InstanceRunnerService) Stop(inst *types.Instance) error {
 	}
 
 	if !inst.IsRunning() {
-		s.ctx.SendEvent(vtypes.EventInstanceLog{
+		s.ctx.SendEvent(types.EventInstanceLog{
 			InstanceUUID: inst.UUID,
 			Kind:         types.LogKindVertexErr,
 			Message:      types.NewLogLineMessageString(ErrInstanceNotRunning.Error()),
@@ -192,7 +192,7 @@ func (s *InstanceRunnerService) Stop(inst *types.Instance) error {
 	}
 
 	if err == nil {
-		s.ctx.SendEvent(vtypes.EventInstanceLog{
+		s.ctx.SendEvent(types.EventInstanceLog{
 			InstanceUUID: inst.UUID,
 			Kind:         types.LogKindVertexOut,
 			Message:      types.NewLogLineMessageString("Instance stopped."),
@@ -281,8 +281,8 @@ func (s *InstanceRunnerService) setStatus(inst *types.Instance, status string) {
 	}
 
 	inst.Status = status
-	s.ctx.SendEvent(vtypes.EventInstancesChange{})
-	s.ctx.SendEvent(vtypes.EventInstanceStatusChange{
+	s.ctx.SendEvent(types.EventInstancesChange{})
+	s.ctx.SendEvent(types.EventInstanceStatusChange{
 		InstanceUUID: inst.UUID,
 		ServiceID:    inst.Service.ID,
 		Instance:     *inst,

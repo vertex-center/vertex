@@ -132,7 +132,7 @@ func GetInstanceUUIDParam(c *router.Context) (uuid.UUID, *api.Error) {
 	p := c.Param("instance_uuid")
 	if p == "" {
 		return uuid.UUID{}, &api.Error{
-			Code:    api.ErrInstanceUuidMissing,
+			Code:    types.ErrCodeInstanceUuidMissing,
 			Message: "The request was missing the instance UUID.",
 		}
 	}
@@ -140,7 +140,7 @@ func GetInstanceUUIDParam(c *router.Context) (uuid.UUID, *api.Error) {
 	uid, err := uuid.Parse(p)
 	if err != nil {
 		return uuid.UUID{}, &api.Error{
-			Code:    api.ErrInstanceUuidInvalid,
+			Code:    types.ErrCodeInstanceUuidInvalid,
 			Message: "The instance UUID is invalid.",
 		}
 	}
