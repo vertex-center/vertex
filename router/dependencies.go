@@ -74,15 +74,5 @@ func handleUpdateDependencies(c *router.Context) {
 		return
 	}
 
-	err = serviceService.Reload()
-	if err != nil {
-		c.Abort(router.Error{
-			Code:           api.ErrFailedToReloadServices,
-			PublicMessage:  "Failed to reload services.",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
 	c.OK()
 }

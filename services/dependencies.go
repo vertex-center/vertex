@@ -43,10 +43,11 @@ var (
 )
 
 type DependenciesService struct {
+	ctx          *types.VertexContext
 	dependencies types.Dependencies
 }
 
-func NewDependenciesService(currentVertexVersion string) DependenciesService {
+func NewDependenciesService(ctx *types.VertexContext, currentVertexVersion string) DependenciesService {
 	var dependencies = Dependencies
 	if !vdocker.RunningInDocker() {
 		dependencies = append([]*types.Dependency{{
@@ -61,6 +62,7 @@ func NewDependenciesService(currentVertexVersion string) DependenciesService {
 	}
 
 	return DependenciesService{
+		ctx: ctx,
 		dependencies: types.Dependencies{
 			Items: dependencies,
 		},
@@ -96,13 +98,14 @@ func (s *DependenciesService) InstallUpdates(dependenciesID []string) error {
 		if slices.Contains(dependenciesID, dependency.ID) {
 			err := dependency.Updater.InstallUpdate()
 			if err != nil {
-				return err
+				log.Error(err)
 			}
 
 			dependency.Version = dependency.Updater.GetCurrentVersion()
 			dependency.Update = nil
 		}
 	}
+	s.ctx.SendEvent(types.EventDependenciesUpdated{})
 	return nil
 }
 

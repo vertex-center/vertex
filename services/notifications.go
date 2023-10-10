@@ -3,25 +3,23 @@ package services
 import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/webhook"
+	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/types"
 )
 
 // TODO: Move webhooks use to a Discord adapter
 
 type NotificationsService struct {
+	ctx             *types.VertexContext
 	settingsAdapter types.SettingsAdapterPort
-	eventsAdapter   types.EventAdapterPort
-	instanceAdapter types.InstanceAdapterPort
-
-	client   webhook.Client
-	listener types.Listener
+	client          webhook.Client
+	listener        types.Listener
 }
 
-func NewNotificationsService(settingsAdapter types.SettingsAdapterPort, eventsAdapter types.EventAdapterPort, instanceAdapter types.InstanceAdapterPort) NotificationsService {
+func NewNotificationsService(ctx *types.VertexContext, settingsAdapter types.SettingsAdapterPort) NotificationsService {
 	return NotificationsService{
+		ctx:             ctx,
 		settingsAdapter: settingsAdapter,
-		eventsAdapter:   eventsAdapter,
-		instanceAdapter: instanceAdapter,
 	}
 }
 
@@ -40,30 +38,30 @@ func (s *NotificationsService) StartWebhook() error {
 	s.listener = types.NewTempListener(func(e interface{}) {
 		switch e := e.(type) {
 		case types.EventInstanceStatusChange:
-			if e.Status == types.InstanceStatusOff || e.Status == types.InstanceStatusError || e.Status == types.InstanceStatusRunning {
+			if e.Status == instancestypes.InstanceStatusOff || e.Status == instancestypes.InstanceStatusError || e.Status == instancestypes.InstanceStatusRunning {
 				s.sendStatus(e.Name, e.Status)
 			}
 		}
 	})
 
-	s.eventsAdapter.AddListener(s.listener)
+	s.ctx.AddListener(s.listener)
 
 	return nil
 }
 
 func (s *NotificationsService) StopWebhook() {
-	s.eventsAdapter.RemoveListener(s.listener)
+	s.ctx.RemoveListener(s.listener)
 }
 
 func (s *NotificationsService) sendStatus(name string, status string) {
 	var color int
 
 	switch status {
-	case types.InstanceStatusRunning:
+	case instancestypes.InstanceStatusRunning:
 		color = 5763719
-	case types.InstanceStatusOff:
+	case instancestypes.InstanceStatusOff:
 		color = 15548997
-	case types.InstanceStatusError:
+	case instancestypes.InstanceStatusError:
 		color = 10038562
 	}
 

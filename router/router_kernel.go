@@ -18,6 +18,7 @@ import (
 
 var (
 	dockerCliAdapter types.DockerAdapterPort
+	sshAdapter       types.SshAdapterPort
 
 	dockerKernelService services.DockerKernelService
 	sshKernelService    services.SshKernelService
@@ -60,11 +61,12 @@ func (r *KernelRouter) Stop() error {
 
 func (r *KernelRouter) initAdapters() {
 	dockerCliAdapter = adapter.NewDockerCliAdapter()
+	sshAdapter = adapter.NewSshFsAdapter(nil)
 }
 
 func (r *KernelRouter) initServices() {
 	dockerKernelService = services.NewDockerKernelService(dockerCliAdapter)
-	sshKernelService = services.NewSshKernelService(nil)
+	sshKernelService = services.NewSshKernelService(sshAdapter)
 }
 
 func (r *KernelRouter) initAPIRoutes() {
