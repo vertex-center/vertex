@@ -18,8 +18,9 @@ export default function InstanceLogs() {
     useEffect(() => {
         if (uuid === undefined) return;
         setLoading(true);
-        api.instance.logs
-            .get(uuid)
+        api.vxInstances
+            .instance(uuid)
+            .logs.get()
             .then((res) => setLogs(res.data))
             .catch(setError)
             .finally(() => setLoading(false));
@@ -82,7 +83,7 @@ export default function InstanceLogs() {
         });
     };
 
-    const route = uuid ? `/instance/${uuid}/events` : "";
+    const route = uuid ? `/app/vx-instances/instance/${uuid}/events` : "";
 
     useServerEvent(route, {
         stdout: onStdout,

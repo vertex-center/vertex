@@ -37,8 +37,9 @@ function Database(props: Readonly<DatabaseProps>) {
     useEffect(() => {
         const uuid = instance?.databases?.[dbID];
         if (uuid === undefined) return;
-        api.instance
-            .get(uuid)
+        api.vxInstances
+            .instance(uuid)
+            .get()
             .then((res) => {
                 setDatabase(res.data);
             })
@@ -104,8 +105,9 @@ export default function InstanceDetailsDatabase() {
 
     const save = () => {
         setUploading(true);
-        api.instance
-            .patch(uuid, { databases })
+        api.vxInstances
+            .instance(uuid)
+            .patch({ databases })
             .then(() => setSaved(true))
             .catch(console.error)
             .finally(() => setUploading(false));

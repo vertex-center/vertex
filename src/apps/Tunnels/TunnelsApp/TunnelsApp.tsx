@@ -16,13 +16,13 @@ export default function TunnelsApp() {
         data: instances,
         loading,
         reload: reloadInstances,
-    } = useFetch<Instances>(api.instances.get);
+    } = useFetch<Instances>(api.vxInstances.instances.all);
 
     const ledCloudflared = Object.values(instances || {}).find((inst) =>
         inst.tags?.includes("vertex-cloudflare-tunnel")
     );
 
-    useServerEvent("/instances/events", {
+    useServerEvent("/app/vx-instances/instances/events", {
         change: (e) => {
             console.log(e);
             reloadInstances().finally();

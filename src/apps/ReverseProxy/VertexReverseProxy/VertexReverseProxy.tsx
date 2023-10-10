@@ -18,7 +18,7 @@ export default function VertexReverseProxy() {
         error,
         reload,
         loading,
-    } = useFetch<ProxyRedirects>(api.proxy.redirects.get);
+    } = useFetch<ProxyRedirects>(api.vxReverseProxy.redirects.get);
 
     const [showNewRedirectPopup, setShowNewRedirectPopup] = useState(false);
 
@@ -32,7 +32,7 @@ export default function VertexReverseProxy() {
     const closeNewRedirectPopup = () => setShowNewRedirectPopup(false);
 
     const addNewRedirection = () => {
-        api.proxy.redirects
+        api.vxReverseProxy.redirects
             .add(source, target)
             .then(reload)
             .catch(console.error)
@@ -40,7 +40,10 @@ export default function VertexReverseProxy() {
     };
 
     const onDelete = (uuid: string) => {
-        api.proxy.redirects.delete(uuid).then(reload).catch(console.error);
+        api.vxReverseProxy.redirects
+            .delete(uuid)
+            .then(reload)
+            .catch(console.error);
     };
 
     return (

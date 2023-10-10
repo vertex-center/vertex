@@ -16,20 +16,22 @@ export default function SqlInstaller() {
         data: services,
         loading,
         error: servicesError,
-    } = useFetch<ServiceModel[]>(api.services.available.get);
+    } = useFetch<ServiceModel[]>(api.vxInstances.services.all);
     const {
         data: instances,
         error: instancesError,
         reload: reloadInstances,
-    } = useFetch<Instances>(api.instances.get);
+    } = useFetch<Instances>(api.vxInstances.instances.all);
 
     const [selectedService, setSelectedService] = useState<ServiceModel>();
     const [showPopup, setShowPopup] = useState(false);
 
     const [error, setError] = useState();
-    const [downloading, setDownloading] = useState<{ service: ServiceModel }[]>(
-        []
-    );
+    const [downloading, setDownloading] = useState<
+        {
+            service: ServiceModel;
+        }[]
+    >([]);
 
     const open = (service: ServiceModel) => {
         setSelectedService(service);
@@ -47,8 +49,8 @@ export default function SqlInstaller() {
         setDownloading((prev) => [...prev, { service }]);
         setShowPopup(false);
 
-        api.sql
-            .db(service.id)
+        api.vxSql
+            .dbms(service.id)
             .install()
             .catch(setError)
             .finally(() => {

@@ -17,5 +17,5 @@ export function APIError(props: Readonly<APIErrorProps>) {
     if (error.request)
         return <ErrorBox error="No response from server." {...others} />;
 
-    return <ErrorBox error={error.message} {...others} />;
+    return <ErrorBox error={error?.message} {...others} />;
 }

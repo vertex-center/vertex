@@ -16,7 +16,7 @@ export default function Grafana() {
                 <InstanceInstaller
                     name="Grafana"
                     tag="vertex-grafana-visualizer"
-                    install={api.metrics.visualizer("grafana").install}
+                    install={api.vxMonitoring.visualizer("grafana").install}
                 />
             </Vertical>
         </Vertical>

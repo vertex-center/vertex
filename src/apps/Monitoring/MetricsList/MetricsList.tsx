@@ -13,7 +13,7 @@ export default function MetricsList() {
         data: metrics,
         loading: loadingMetrics,
         error: errorMetrics,
-    } = useFetch<Metric[]>(api.metrics.get);
+    } = useFetch<Metric[]>(api.vxMonitoring.metrics);
 
     return (
         <Vertical gap={20}>

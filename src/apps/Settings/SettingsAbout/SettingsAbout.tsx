@@ -14,7 +14,7 @@ import { APIError } from "../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 
 export default function SettingsAbout() {
-    const { data: about, loading, error } = useFetch<About>(api.about.get);
+    const { data: about, loading, error } = useFetch<About>(api.about);
 
     return (
         <Fragment>

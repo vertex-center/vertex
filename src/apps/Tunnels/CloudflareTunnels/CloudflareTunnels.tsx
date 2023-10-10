@@ -18,7 +18,7 @@ export default function CloudflareTunnels(props: Readonly<Props>) {
                 <InstanceInstaller
                     name="Cloudflare Tunnel"
                     tag="vertex-cloudflare-tunnel"
-                    install={api.tunnels.provider("cloudflared").install}
+                    install={api.vxTunnels.provider("cloudflared").install}
                 />
             </Vertical>
         </Vertical>

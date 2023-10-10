@@ -30,7 +30,7 @@ export default function Instance() {
     const [deleting, setDeleting] = useState<boolean>(false);
     const [error, setError] = useState();
 
-    const route = uuid ? `/instance/${uuid}/events` : "";
+    const route = uuid ? `/app/vx-instances/instance/${uuid}/events` : "";
 
     useServerEvent(route, {
         status_change: (e) => {
@@ -40,17 +40,18 @@ export default function Instance() {
 
     const toggleInstance = async (uuid: string) => {
         if (instance.status === "off" || instance.status === "error") {
-            await api.instance.start(uuid);
+            await api.vxInstances.instance(uuid).start();
         } else {
-            await api.instance.stop(uuid);
+            await api.vxInstances.instance(uuid).stop();
         }
     };
 
     const onDeleteInstance = () => {
         setDeleting(true);
         setError(undefined);
-        api.instance
-            .delete(uuid)
+        api.vxInstances
+            .instance(uuid)
+            .delete()
             .then(() => {
                 navigate("/instances");
             })

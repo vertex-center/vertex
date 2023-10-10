@@ -9,8 +9,9 @@ export default function useInstance(uuid?: string) {
     const reloadInstance = useCallback(() => {
         console.log("Fetching instance", uuid);
         setLoading(true);
-        api.instance
-            .get(uuid)
+        api.vxInstances
+            .instance(uuid)
+            .get()
             .then((res) => setInstance(res.data))
             .catch(console.error)
             .finally(() => setLoading(false));

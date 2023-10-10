@@ -15,7 +15,8 @@ type Props = {
 export default function InstanceSelect(props: Readonly<Props>) {
     const { instance, onChange, query } = props;
 
-    const search = () => api.instances.search(query).catch(console.error);
+    const search = () =>
+        api.vxInstances.instances.search(query).catch(console.error);
     const { data: instances, loading } = useFetch<Instances>(search);
 
     if (loading) {

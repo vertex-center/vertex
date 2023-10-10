@@ -32,13 +32,13 @@ export default function SqlDatabase(props: Readonly<Props>) {
         loading,
         reload,
         error,
-    } = useFetch<Instance>(() => api.instance.get(uuid));
+    } = useFetch<Instance>(() => api.vxInstances.instance(uuid).get());
 
     const {
         data: db,
         loading: dbLoading,
         error: dbError,
-    } = useFetch<SqlDBMS>(() => api.sql.uuid(uuid).get());
+    } = useFetch<SqlDBMS>(() => api.vxSql.uuid(uuid).get());
 
     useEffect(() => {
         reload().finally();
@@ -50,13 +50,13 @@ export default function SqlDatabase(props: Readonly<Props>) {
             return;
         }
         if (inst?.status === "off" || inst?.status === "error") {
-            await api.instance.start(inst.uuid);
+            await api.vxInstances.instance(inst.uuid).start();
             return;
         }
-        await api.instance.stop(inst.uuid);
+        await api.vxInstances.instance(inst.uuid).stop();
     };
 
-    const route = uuid ? `/instance/${uuid}/events` : "";
+    const route = uuid ? `/app/vx-instances/instance/${uuid}/events` : "";
 
     useServerEvent(route, {
         status_change: () => {

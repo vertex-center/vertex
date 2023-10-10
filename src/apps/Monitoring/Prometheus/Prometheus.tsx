@@ -16,7 +16,7 @@ export default function Prometheus() {
                 <InstanceInstaller
                     name="Prometheus"
                     tag="vertex-prometheus-collector"
-                    install={api.metrics.collector("prometheus").install}
+                    install={api.vxMonitoring.collector("prometheus").install}
                 />
             </Vertical>
         </Vertical>

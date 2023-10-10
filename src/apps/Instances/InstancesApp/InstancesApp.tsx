@@ -34,8 +34,8 @@ export default function InstancesApp() {
     }, [installed]);
 
     const fetchServices = () => {
-        api.instances
-            .get()
+        api.vxInstances.instances
+            .all()
             .then((res) => {
                 console.log(res.data);
                 setInstalled(res.data);
@@ -51,7 +51,7 @@ export default function InstancesApp() {
             });
     };
 
-    useServerEvent("/instances/events", {
+    useServerEvent("/app/vx-instances/instances/events", {
         change: (e) => {
             console.log(e);
             fetchServices();
@@ -67,14 +67,14 @@ export default function InstancesApp() {
             installed[uuid].status === "off" ||
             installed[uuid].status === "error"
         ) {
-            await api.instance.start(uuid);
+            await api.vxInstances.instance(uuid).start();
         } else {
-            await api.instance.stop(uuid);
+            await api.vxInstances.instance(uuid).stop();
         }
     };
 
     const checkForUpdates = async () => {
-        api.instances.checkForUpdates().then((res) => {
+        api.vxInstances.instances.checkForUpdates().then((res) => {
             setInstalled(res.data);
         });
     };

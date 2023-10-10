@@ -27,7 +27,7 @@ export default function InstanceInstaller(props: Readonly<Props>) {
         reload: reloadInstances,
         loading: loadingInstances,
         error: errorInstances,
-    } = useFetch<Instances>(api.instances.get);
+    } = useFetch<Instances>(api.vxInstances.instances.all);
 
     const [downloading, setDownloading] = useState(false);
     const [error, setError] = useState();
@@ -70,13 +70,15 @@ export default function InstanceInstaller(props: Readonly<Props>) {
             return;
         }
         if (inst?.status === "off" || inst?.status === "error") {
-            await api.instance.start(inst.uuid);
+            await api.vxInstances.instance(inst.uuid).start();
             return;
         }
-        await api.instance.stop(inst.uuid);
+        await api.vxInstances.instance(inst.uuid).stop();
     };
 
-    const route = instance?.uuid ? `/instance/${instance?.uuid}/events` : "";
+    const route = instance?.uuid
+        ? `/app/vx-instances/instance/${instance?.uuid}/events`
+        : "";
 
     useServerEvent(route, {
         status_change: (e) => {

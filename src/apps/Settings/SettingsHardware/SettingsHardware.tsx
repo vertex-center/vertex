@@ -10,7 +10,7 @@ import List from "../../../components/List/List";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 
 export default function SettingsHardware() {
-    const { data: hardware, error, loading } = useFetch(api.hardware.get);
+    const { data: hardware, error, loading } = useFetch(api.hardware);
 
     return (
         <Vertical gap={20}>

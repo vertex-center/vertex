@@ -23,7 +23,9 @@ export default function InstanceDocker() {
         data: info,
         error,
         loading,
-    } = useFetch<DockerContainerInfo>(() => api.instance.docker.get(uuid));
+    } = useFetch<DockerContainerInfo>(() =>
+        api.vxInstances.instance(uuid).docker.get()
+    );
 
     const [recreatingContainer, setRecreatingContainer] = useState(false);
     const [recreatingContainerError, setRecreatingContainerError] = useState();
@@ -32,8 +34,9 @@ export default function InstanceDocker() {
         setRecreatingContainer(true);
         setRecreatingContainerError(undefined);
 
-        api.instance.docker
-            .recreate(uuid)
+        api.vxInstances
+            .instance(uuid)
+            .docker.recreate()
             .catch((err) => {
                 setRecreatingContainerError(
                     err?.response?.data?.message ?? err?.message

@@ -48,8 +48,9 @@ export default function InstanceSettings(props: Readonly<Props>) {
 
     const reloadVersions = (cache = true) => {
         setVersionsLoading(true);
-        api.instance.versions
-            .get(instance.uuid, cache)
+        api.vxInstances
+            .instance(instance.uuid)
+            .versions.get(cache)
             .then((res) => {
                 setVersions(res.data?.reverse());
             })
@@ -61,8 +62,9 @@ export default function InstanceSettings(props: Readonly<Props>) {
 
     const save = () => {
         setUploading(true);
-        api.instance
-            .patch(uuid, {
+        api.vxInstances
+            .instance(uuid)
+            .patch({
                 launch_on_startup: launchOnStartup,
                 display_name: displayName,
                 version: version,

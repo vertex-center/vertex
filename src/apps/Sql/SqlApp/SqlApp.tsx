@@ -16,7 +16,7 @@ export default function SqlApp() {
         data: instances,
         loading,
         reload: reloadInstances,
-    } = useFetch<Instances>(api.instances.get);
+    } = useFetch<Instances>(api.vxInstances.instances.all);
 
     const dbs = Object.values(instances ?? {})?.filter((i) =>
         i?.tags?.some((t) => t.includes("vertex-") && t.includes("-sql"))
@@ -57,7 +57,7 @@ export default function SqlApp() {
         </Sidebar>
     );
 
-    useServerEvent("/instances/events", {
+    useServerEvent("/app/vx-instances/instances/events", {
         change: () => {
             reloadInstances().finally();
         },

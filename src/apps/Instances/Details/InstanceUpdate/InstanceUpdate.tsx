@@ -17,8 +17,9 @@ export default function InstanceUpdate() {
     const [error, setError] = useState();
 
     const updateVertexIntegration = () => {
-        return api.instance.update
-            .service(uuid)
+        return api.vxInstances
+            .instance(uuid)
+            .update.service()
             .then(reloadInstance)
             .catch(setError);
     };

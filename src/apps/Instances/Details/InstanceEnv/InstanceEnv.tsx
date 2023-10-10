@@ -57,8 +57,9 @@ export default function InstanceEnv(props: Readonly<Props>) {
             _env[e.env.name] = e.value;
         });
         setUploading(true);
-        api.instance.env
-            .save(uuid, _env)
+        api.vxInstances
+            .instance(uuid)
+            .env.save(_env)
             .then(console.log)
             .catch(setError)
             .finally(() => {

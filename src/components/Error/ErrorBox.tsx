@@ -10,7 +10,7 @@ type Props = HTMLProps<HTMLDivElement> & {
 export default function ErrorBox(props: Readonly<Props>) {
     const { error, className, ...others } = props;
 
-    let err = error?.message ?? error;
+    let err = error?.message ?? "An unknown error has occurred.";
 
     return (
         <div className={classNames(styles.box, className)} {...others}>

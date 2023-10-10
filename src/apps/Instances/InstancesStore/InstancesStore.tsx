@@ -22,12 +22,12 @@ export default function InstancesStore() {
         data: services,
         error: servicesError,
         loading,
-    } = useFetch<ServiceModel[]>(api.services.available.get);
+    } = useFetch<ServiceModel[]>(api.vxInstances.services.all);
     const {
         data: instances,
         error: instancesError,
         reload: reloadInstances,
-    } = useFetch<Instances>(api.instances.get);
+    } = useFetch<Instances>(api.vxInstances.instances.all);
 
     const [showInstallPopup, setShowInstallPopup] = useState<boolean>(false);
 
@@ -53,11 +53,9 @@ export default function InstancesStore() {
         setDownloading((prev) => [...prev, { service }]);
         setShowInstallPopup(false);
 
-        api.services
-            .install({
-                method: "docker",
-                service_id: service.id,
-            })
+        api.vxInstances
+            .service(service.id)
+            .install()
             .catch(setError)
             .finally(() => {
                 setDownloading(

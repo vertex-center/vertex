@@ -16,7 +16,7 @@ export default function MonitoringApp() {
         data: instances,
         loading,
         reload: reloadInstances,
-    } = useFetch<Instances>(api.instances.get);
+    } = useFetch<Instances>(api.vxInstances.instances.all);
 
     const ledPrometheus = Object.values(instances || {}).find((inst) =>
         inst.tags?.includes("vertex-prometheus-collector")
@@ -26,7 +26,7 @@ export default function MonitoringApp() {
         inst.tags?.includes("vertex-grafana-visualizer")
     );
 
-    useServerEvent("/instances/events", {
+    useServerEvent("/app/vx-instances/instances/events", {
         change: (e) => {
             console.log(e);
             reloadInstances().finally();
