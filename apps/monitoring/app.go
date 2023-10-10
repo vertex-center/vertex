@@ -2,13 +2,13 @@ package monitoring
 
 import (
 	"github.com/vertex-center/vertex/apps/monitoring/router"
-	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/types/app"
 )
 
 const (
-	AppID   = "monitoring"
-	AppName = "Vertex Monitoring"
-	Route   = "/metrics"
+	AppID    = "vx-monitoring"
+	AppName  = "Vertex Monitoring"
+	AppRoute = "/vx-monitoring"
 )
 
 type App struct {
@@ -19,18 +19,18 @@ func NewApp() *App {
 	return &App{}
 }
 
-func (app *App) Initialize(registry *types.AppsRegistry) error {
+func (app *App) Initialize(registry *app.AppsRegistry) error {
 	app.router = router.NewAppRouter()
 
 	registry.RegisterApp(AppID, app)
-	registry.RegisterRouter(Route, app.router)
+	registry.RegisterRouter(AppRoute, app.router)
 
 	return nil
 }
 
-func (app *App) Uninitialize(registry *types.AppsRegistry) error {
+func (app *App) Uninitialize(registry *app.AppsRegistry) error {
 	registry.UnregisterApp(AppID)
-	registry.UnregisterRouter(Route)
+	registry.UnregisterRouter(AppRoute)
 
 	return nil
 }

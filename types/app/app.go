@@ -1,39 +1,36 @@
-package types
+package app
 
 import (
-	"errors"
-	"net/http"
 	"sync"
 
-	"github.com/carlmjohnson/requests"
 	"github.com/gin-contrib/sse"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types/api"
+	"github.com/vertex-center/vertex/types"
 )
 
 type AppsRegistry struct {
 	uuid uuid.UUID
-	ctx  *VertexContext
+	ctx  *types.VertexContext
 
 	apps                map[string]App
 	mutexApps           *sync.RWMutex
-	routers             map[string]AppRouter
+	routers             map[string]Router
 	mutexRouters        *sync.RWMutex
-	eventListeners      map[string]*Listener
+	eventListeners      map[string]*types.Listener
 	mutexEventListeners *sync.RWMutex
 }
 
-func NewAppsRegistry(ctx *VertexContext) *AppsRegistry {
+func NewAppsRegistry(ctx *types.VertexContext) *AppsRegistry {
 	r := &AppsRegistry{
 		uuid: uuid.New(),
 		ctx:  ctx,
 
 		apps:                map[string]App{},
 		mutexApps:           &sync.RWMutex{},
-		routers:             map[string]AppRouter{},
+		routers:             map[string]Router{},
 		mutexRouters:        &sync.RWMutex{},
-		eventListeners:      map[string]*Listener{},
+		eventListeners:      map[string]*types.Listener{},
 		mutexEventListeners: &sync.RWMutex{},
 	}
 	r.ctx.AddListener(r)
@@ -52,7 +49,7 @@ func (registry *AppsRegistry) UnregisterApp(name string) {
 	delete(registry.apps, name)
 }
 
-func (registry *AppsRegistry) RegisterRouter(route string, router AppRouter) {
+func (registry *AppsRegistry) RegisterRouter(route string, router Router) {
 	registry.mutexRouters.Lock()
 	defer registry.mutexRouters.Unlock()
 	registry.routers[route] = router
@@ -64,11 +61,11 @@ func (registry *AppsRegistry) UnregisterRouter(route string) {
 	delete(registry.routers, route)
 }
 
-func (registry *AppsRegistry) GetContext() *VertexContext {
+func (registry *AppsRegistry) GetContext() *types.VertexContext {
 	return registry.ctx
 }
 
-func (registry *AppsRegistry) GetRouters() map[string]AppRouter {
+func (registry *AppsRegistry) GetRouters() map[string]Router {
 	registry.mutexRouters.RLock()
 	defer registry.mutexRouters.RUnlock()
 	return registry.routers
@@ -93,43 +90,12 @@ type App interface {
 	OnEvent(e interface{})
 }
 
-type AppRouter interface {
+type Router interface {
 	AddRoutes(r *router.Group)
 }
 
-type AppService interface {
+type Service interface {
 	OnEvent(e interface{})
-}
-
-type AppApiError struct {
-	HttpCode int
-	Code     router.ErrCode `json:"code"`
-	Message  string         `json:"message"`
-}
-
-func (e *AppApiError) RouterError() router.Error {
-	return router.Error{
-		Code:          e.Code,
-		PublicMessage: e.Message,
-	}
-}
-
-func HandleError(requestError error, apiError AppApiError) *AppApiError {
-	if errors.Is(requestError, requests.ErrInvalidHandled) {
-		if requests.HasStatusErr(requestError, http.StatusNotFound) {
-			apiError.HttpCode = http.StatusNotFound
-		} else if requests.HasStatusErr(requestError, http.StatusInternalServerError) {
-			apiError.HttpCode = http.StatusInternalServerError
-		}
-		return &apiError
-	} else if requestError != nil {
-		return &AppApiError{
-			HttpCode: http.StatusInternalServerError,
-			Code:     api.ErrInternalError,
-			Message:  "Internal error.",
-		}
-	}
-	return nil
 }
 
 func HeadersSSE(c *router.Context) {

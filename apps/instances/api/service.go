@@ -3,31 +3,30 @@ package instancesapi
 import (
 	"context"
 
-	"github.com/carlmjohnson/requests"
-	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
-	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/apps/instances"
+	"github.com/vertex-center/vertex/apps/instances/types"
+	"github.com/vertex-center/vertex/types/api"
 )
 
-func GetService(ctx context.Context, serviceId string) (instancestypes.Service, *types.AppApiError) {
-	var service instancestypes.Service
-	var apiError types.AppApiError
-	err := requests.URL(config.Current.VertexURL()).
-		Pathf("/api/service/%s", serviceId).
+func GetService(ctx context.Context, serviceId string) (types.Service, *api.Error) {
+	var service types.Service
+	var apiError api.Error
+	err := api.AppRequest(instances.AppRoute).
+		Pathf("./service/%s", serviceId).
 		ToJSON(&service).
 		ErrorJSON(&apiError).
 		Fetch(ctx)
-	return service, types.HandleError(err, apiError)
+	return service, api.HandleError(err, apiError)
 }
 
-func InstallService(ctx context.Context, serviceId string) (*instancestypes.Instance, *types.AppApiError) {
-	var inst *instancestypes.Instance
-	var apiError types.AppApiError
-	err := requests.URL(config.Current.VertexURL()).
-		Pathf("/api/service/%s/install", serviceId).
+func InstallService(ctx context.Context, serviceId string) (*types.Instance, *api.Error) {
+	var inst *types.Instance
+	var apiError api.Error
+	err := api.AppRequest(instances.AppRoute).
+		Pathf("./service/%s/install", serviceId).
 		Post().
 		ToJSON(&inst).
 		ErrorJSON(&apiError).
 		Fetch(ctx)
-	return inst, types.HandleError(err, apiError)
+	return inst, api.HandleError(err, apiError)
 }

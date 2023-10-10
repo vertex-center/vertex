@@ -3,13 +3,13 @@ package reverseproxy
 import (
 	"github.com/vertex-center/vertex/apps/reverseproxy/router"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/types/app"
 )
 
 const (
-	AppID   = "reverse-proxy"
-	AppName = "Vertex Reverse Proxy"
-	Route   = "/reverse-proxy"
+	AppID    = "vx-reverse-proxy"
+	AppName  = "Vertex Reverse Proxy"
+	AppRoute = "/vx-reverse-proxy"
 )
 
 type App struct {
@@ -21,7 +21,7 @@ func NewApp() *App {
 	return &App{}
 }
 
-func (app *App) Initialize(registry *types.AppsRegistry) error {
+func (app *App) Initialize(registry *app.AppsRegistry) error {
 	app.router = router.NewAppRouter()
 	app.proxy = router.NewProxyRouter(app.router.GetProxyService())
 
@@ -33,16 +33,16 @@ func (app *App) Initialize(registry *types.AppsRegistry) error {
 	}()
 
 	registry.RegisterApp(AppID, app)
-	registry.RegisterRouter(Route, app.router)
+	registry.RegisterRouter(AppRoute, app.router)
 
 	return nil
 }
 
-func (app *App) Uninitialize(registry *types.AppsRegistry) error {
+func (app *App) Uninitialize(registry *app.AppsRegistry) error {
 	err := app.proxy.Stop()
 
 	registry.UnregisterApp(AppID)
-	registry.UnregisterRouter(Route)
+	registry.UnregisterRouter(AppRoute)
 
 	if err != nil {
 		return err

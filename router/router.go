@@ -25,6 +25,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/types/app"
 	"github.com/vertex-center/vlog"
 )
 
@@ -44,7 +45,7 @@ type Router struct {
 	*router.Router
 
 	ctx          *types.VertexContext
-	appsRegistry *types.AppsRegistry
+	appsRegistry *app.AppsRegistry
 }
 
 func NewRouter(about types.About) Router {
@@ -55,7 +56,7 @@ func NewRouter(about types.About) Router {
 	r := Router{
 		Router:       router.New(),
 		ctx:          ctx,
-		appsRegistry: types.NewAppsRegistry(ctx),
+		appsRegistry: app.NewAppsRegistry(ctx),
 	}
 
 	r.Use(cors.Default())
@@ -127,7 +128,7 @@ func (r *Router) handleSignals() {
 }
 
 func (r *Router) initApps() {
-	apps := []types.App{
+	apps := []app.App{
 		sql.NewApp(),
 		tunnels.NewApp(),
 		monitoring.NewApp(),
@@ -157,6 +158,13 @@ func (r *Router) initServices(about types.About) {
 }
 
 func (r *Router) initAPIRoutes(about types.About) {
+	r.NoRoute(func(c *gin.Context) {
+		c.JSON(http.StatusNotFound, router.Error{
+			Code:          "resource_not_found",
+			PublicMessage: "Resource not found.",
+		})
+	})
+
 	api := r.Group("/api")
 	api.GET("/ping", handlePing)
 	api.GET("/about", func(c *router.Context) {
@@ -169,6 +177,6 @@ func (r *Router) initAPIRoutes(about types.About) {
 	addSecurityRoutes(api.Group("/security"))
 
 	for group, r := range r.appsRegistry.GetRouters() {
-		r.AddRoutes(api.Group(group))
+		r.AddRoutes(api.Group("/app" + group))
 	}
 }

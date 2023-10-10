@@ -3,39 +3,38 @@ package api
 import (
 	"context"
 
-	"github.com/carlmjohnson/requests"
+	"github.com/vertex-center/vertex/apps/monitoring"
 	metricstypes "github.com/vertex-center/vertex/apps/monitoring/types"
-	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/types/api"
 )
 
-func GetMetrics(ctx context.Context) ([]metricstypes.Metric, *types.AppApiError) {
+func GetMetrics(ctx context.Context) ([]metricstypes.Metric, *api.Error) {
 	var metrics []metricstypes.Metric
-	var apiError types.AppApiError
-	err := requests.URL(config.Current.VertexURL()).
-		Path("/api/metrics").
+	var apiError api.Error
+	err := api.AppRequest(monitoring.AppRoute).
+		Path("./metrics").
 		ToJSON(&metrics).
 		ErrorJSON(&apiError).
 		Fetch(ctx)
-	return metrics, types.HandleError(err, apiError)
+	return metrics, api.HandleError(err, apiError)
 }
 
-func InstallMetricsCollector(ctx context.Context, collector string) *types.AppApiError {
-	var apiError types.AppApiError
-	err := requests.URL(config.Current.VertexURL()).
-		Pathf("/api/metrics/collector/%s/install", collector).
+func InstallCollector(ctx context.Context, collector string) *api.Error {
+	var apiError api.Error
+	err := api.AppRequest(monitoring.AppRoute).
+		Pathf("./collector/%s/install", collector).
 		Post().
 		ErrorJSON(&apiError).
 		Fetch(ctx)
-	return types.HandleError(err, apiError)
+	return api.HandleError(err, apiError)
 }
 
-func InstallMetricsVisualizer(ctx context.Context, visualizer string) *types.AppApiError {
-	var apiError types.AppApiError
-	err := requests.URL(config.Current.VertexURL()).
-		Pathf("/api/metrics/visualizer/%s/install", visualizer).
+func InstallVisualizer(ctx context.Context, visualizer string) *api.Error {
+	var apiError api.Error
+	err := api.AppRequest(monitoring.AppRoute).
+		Pathf("./visualizer/%s/install", visualizer).
 		Post().
 		ErrorJSON(&apiError).
 		Fetch(ctx)
-	return types.HandleError(err, apiError)
+	return api.HandleError(err, apiError)
 }

@@ -6,9 +6,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/reverseproxy/adapter"
 	"github.com/vertex-center/vertex/apps/reverseproxy/service"
+	"github.com/vertex-center/vertex/apps/reverseproxy/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
+	"github.com/vertex-center/vertex/types/app"
 )
 
 type AppRouter struct {
@@ -32,8 +33,8 @@ func (r *AppRouter) AddRoutes(group *router.Group) {
 	group.DELETE("/redirect/:id", r.handleRemoveRedirect)
 }
 
-func (r *AppRouter) GetServices() []types.AppService {
-	return []types.AppService{
+func (r *AppRouter) GetServices() []app.Service {
+	return []app.Service{
 		r.proxyService,
 	}
 }

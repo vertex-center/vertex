@@ -3,30 +3,29 @@ package instancesapi
 import (
 	"context"
 
-	"github.com/carlmjohnson/requests"
-	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
-	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/apps/instances"
+	"github.com/vertex-center/vertex/apps/instances/types"
+	"github.com/vertex-center/vertex/types/api"
 )
 
-func GetInstances(ctx context.Context) ([]instancestypes.Instance, *types.AppApiError) {
-	var instances []instancestypes.Instance
-	var apiError types.AppApiError
-	err := requests.URL(config.Current.VertexURL()).
-		Path("/api/instances").
-		ToJSON(&instances).
+func GetInstances(ctx context.Context) ([]types.Instance, *api.Error) {
+	var insts []types.Instance
+	var apiError api.Error
+	err := api.AppRequest(instances.AppRoute).
+		Path("./instances").
+		ToJSON(&insts).
 		ErrorJSON(&apiError).
 		Fetch(ctx)
-	return instances, types.HandleError(err, apiError)
+	return insts, api.HandleError(err, apiError)
 }
 
-func CheckForUpdates(ctx context.Context) ([]instancestypes.Instance, *types.AppApiError) {
-	var instances []instancestypes.Instance
-	var apiError types.AppApiError
-	err := requests.URL(config.Current.VertexURL()).
-		Path("/api/instances/checkupdates").
-		ToJSON(&instances).
+func CheckForUpdates(ctx context.Context) ([]types.Instance, *api.Error) {
+	var insts []types.Instance
+	var apiError api.Error
+	err := api.AppRequest(instances.AppRoute).
+		Path("./instances/checkupdates").
+		ToJSON(&insts).
 		ErrorJSON(&apiError).
 		Fetch(ctx)
-	return instances, types.HandleError(err, apiError)
+	return insts, api.HandleError(err, apiError)
 }

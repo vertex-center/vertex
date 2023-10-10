@@ -6,6 +6,7 @@ import (
 	"github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/router"
 	vtypes "github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/types/app"
 )
 
 type AppRouter struct {
@@ -57,8 +58,8 @@ func NewAppRouter(ctx *vtypes.VertexContext) *AppRouter {
 	return r
 }
 
-func (r *AppRouter) GetServices() []vtypes.AppService {
-	return []vtypes.AppService{
+func (r *AppRouter) GetServices() []app.Service {
+	return []app.Service{
 		r.instanceService,
 		r.instanceEnvService,
 		r.instanceLogsService,
@@ -77,7 +78,7 @@ func (r *AppRouter) AddRoutes(group *router.Group) {
 	instance.POST("/start", r.handleStartInstance)
 	instance.POST("/stop", r.handleStopInstance)
 	instance.PATCH("/environment", r.handlePatchEnvironment)
-	instance.GET("/events", vtypes.HeadersSSE, r.handleInstanceEvents)
+	instance.GET("/events", app.HeadersSSE, r.handleInstanceEvents)
 	instance.GET("/docker", r.handleGetDocker)
 	instance.POST("/docker/recreate", r.handleRecreateDockerContainer)
 	instance.GET("/logs", r.handleGetLogs)
@@ -88,7 +89,7 @@ func (r *AppRouter) AddRoutes(group *router.Group) {
 	instances.GET("", r.handleGetInstances)
 	instances.GET("/search", r.handleSearchInstances)
 	instances.GET("/checkupdates", r.handleCheckForUpdates)
-	instances.GET("/events", vtypes.HeadersSSE, r.handleInstancesEvents)
+	instances.GET("/events", app.HeadersSSE, r.handleInstancesEvents)
 
 	serv := group.Group("/service/:service_id")
 	serv.GET("", r.handleGetService)

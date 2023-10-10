@@ -7,8 +7,8 @@ import (
 	instancesapi "github.com/vertex-center/vertex/apps/instances/api"
 	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
+	"github.com/vertex-center/vertex/types/app"
 )
 
 type AppRouter struct{}
@@ -17,8 +17,8 @@ func NewAppRouter() *AppRouter {
 	return &AppRouter{}
 }
 
-func (r *AppRouter) GetServices() []types.AppService {
-	return []types.AppService{}
+func (r *AppRouter) GetServices() []app.Service {
+	return []app.Service{}
 }
 
 func (r *AppRouter) AddRoutes(group *router.Group) {

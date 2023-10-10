@@ -8,8 +8,8 @@ import (
 	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/apps/monitoring/service"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
+	"github.com/vertex-center/vertex/types/app"
 )
 
 type AppRouter struct {
@@ -22,14 +22,14 @@ func NewAppRouter() *AppRouter {
 	}
 }
 
-func (r *AppRouter) GetServices() []types.AppService {
-	return []types.AppService{
+func (r *AppRouter) GetServices() []app.Service {
+	return []app.Service{
 		r.metricsService,
 	}
 }
 
 func (r *AppRouter) AddRoutes(group *router.Group) {
-	group.GET("", r.handleGetMetrics)
+	group.GET("/metrics", r.handleGetMetrics)
 	group.POST("/collector/:collector/install", r.handleInstallMetricsCollector)
 	group.POST("/visualizer/:visualizer/install", r.handleInstallMetricsVisualizer)
 }

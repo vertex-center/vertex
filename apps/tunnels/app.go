@@ -2,13 +2,13 @@ package tunnels
 
 import (
 	"github.com/vertex-center/vertex/apps/tunnels/router"
-	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/types/app"
 )
 
 const (
-	AppID   = "tunnels"
-	AppName = "Vertex Tunnels"
-	Route   = "/tunnels"
+	AppID    = "vx-tunnels"
+	AppName  = "Vertex Tunnels"
+	AppRoute = "/vx-tunnels"
 )
 
 type App struct {
@@ -19,18 +19,18 @@ func NewApp() *App {
 	return &App{}
 }
 
-func (app *App) Initialize(registry *types.AppsRegistry) error {
+func (app *App) Initialize(registry *app.AppsRegistry) error {
 	app.router = router.NewAppRouter()
 
 	registry.RegisterApp(AppID, app)
-	registry.RegisterRouter(Route, app.router)
+	registry.RegisterRouter(AppRoute, app.router)
 
 	return nil
 }
 
-func (app *App) Uninitialize(registry *types.AppsRegistry) error {
+func (app *App) Uninitialize(registry *app.AppsRegistry) error {
 	registry.UnregisterApp(AppID)
-	registry.UnregisterRouter(Route)
+	registry.UnregisterRouter(AppRoute)
 
 	return nil
 }

@@ -9,8 +9,8 @@ import (
 	"github.com/vertex-center/vertex/apps/sql/service"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
+	"github.com/vertex-center/vertex/types/app"
 )
 
 type AppRouter struct {
@@ -23,26 +23,26 @@ func NewAppRouter() *AppRouter {
 	}
 }
 
-func (r *AppRouter) GetServices() []types.AppService {
-	return []types.AppService{
+func (r *AppRouter) GetServices() []app.Service {
+	return []app.Service{
 		r.sqlService,
 	}
 }
 
 func (r *AppRouter) AddRoutes(group *router.Group) {
-	group.GET("/:instance_uuid", r.handleGetDBMS)
-	group.POST("/db/:db/install", r.handleInstallDBMS)
+	group.GET("/instance/:instance_uuid", r.handleGetDBMS)
+	group.POST("/dbms/:dbms/install", r.handleInstallDBMS)
 }
 
 func (r *AppRouter) getDBMS(c *router.Context) (string, error) {
-	db := c.Param("db")
+	db := c.Param("dbms")
 	if db != "postgres" {
 		c.NotFound(router.Error{
 			Code:           api.ErrSQLDatabaseNotFound,
-			PublicMessage:  fmt.Sprintf("SQL Database not found: %s.", db),
-			PrivateMessage: "This SQL Database is not supported.",
+			PublicMessage:  fmt.Sprintf("SQL DBMS not found: %s.", db),
+			PrivateMessage: "This SQL DBMS is not supported.",
 		})
-		return "", errors.New("collector not found")
+		return "", errors.New("DBMS not found")
 	}
 
 	return db, nil
