@@ -15,6 +15,7 @@ import (
 	"github.com/vertex-center/vertex/adapter"
 	"github.com/vertex-center/vertex/apps/instances"
 	"github.com/vertex-center/vertex/apps/monitoring"
+	"github.com/vertex-center/vertex/apps/reverseproxy"
 	"github.com/vertex-center/vertex/apps/sql"
 	"github.com/vertex-center/vertex/apps/tunnels"
 	"github.com/vertex-center/vertex/config"
@@ -28,12 +29,10 @@ import (
 )
 
 var (
-	proxyFSAdapter      types.ProxyAdapterPort
 	settingsFSAdapter   types.SettingsAdapterPort
 	sshKernelApiAdapter types.SshAdapterPort
 
 	notificationsService services.NotificationsService
-	proxyService         services.ProxyService
 
 	dependenciesService services.DependenciesService
 	settingsService     services.SettingsService
@@ -133,6 +132,7 @@ func (r *Router) initApps() {
 		tunnels.NewApp(),
 		monitoring.NewApp(),
 		instances.NewApp(),
+		reverseproxy.NewApp(),
 	}
 	for _, app := range apps {
 		log.Info("initializing app", vlog.String("name", app.Name()))
@@ -144,13 +144,11 @@ func (r *Router) initApps() {
 }
 
 func (r *Router) initAdapters() {
-	proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
 	settingsFSAdapter = adapter.NewSettingsFSAdapter(nil)
 	sshKernelApiAdapter = adapter.NewSshKernelApiAdapter()
 }
 
 func (r *Router) initServices(about types.About) {
-	proxyService = services.NewProxyService(proxyFSAdapter)
 	notificationsService = services.NewNotificationsService(r.ctx, settingsFSAdapter)
 	dependenciesService = services.NewDependenciesService(r.ctx, about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)
@@ -165,7 +163,6 @@ func (r *Router) initAPIRoutes(about types.About) {
 		c.JSON(about)
 	})
 
-	addProxyRoutes(api.Group("/proxy"))
 	addDependenciesRoutes(api.Group("/dependencies"))
 	addSettingsRoutes(api.Group("/settings"))
 	addHardwareRoutes(api.Group("/hardware"))

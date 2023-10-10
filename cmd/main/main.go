@@ -59,16 +59,6 @@ func main() {
 	})
 	defer r.Stop()
 
-	// Vertex-Kernel Proxy
-	var rProxy router.ProxyRouter
-	go func() {
-		rProxy = router.NewProxyRouter()
-		err := rProxy.Start()
-		if err != nil {
-			log.Error(err)
-		}
-	}()
-
 	// Logs
 	url := config.Current.VertexURL()
 	fmt.Printf("\n-- Vertex Client :: %s\n\n", url)

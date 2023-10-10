@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/apps/reverseproxy/service"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
@@ -16,13 +17,16 @@ import (
 
 type ProxyRouter struct {
 	*router.Router
+
+	proxyService *service.ProxyService
 }
 
-func NewProxyRouter() ProxyRouter {
+func NewProxyRouter(proxyService *service.ProxyService) *ProxyRouter {
 	gin.SetMode(gin.ReleaseMode)
 
-	r := ProxyRouter{
-		Router: router.New(),
+	r := &ProxyRouter{
+		Router:       router.New(),
+		proxyService: proxyService,
 	}
 
 	r.Use(cors.Default())
@@ -47,5 +51,5 @@ func (r *ProxyRouter) Stop() error {
 }
 
 func (r *ProxyRouter) initAPIRoutes() {
-	r.Any("/*path", proxyService.HandleProxy)
+	r.Any("/*path", r.proxyService.HandleProxy)
 }

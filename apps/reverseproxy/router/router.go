@@ -4,20 +4,49 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/apps/reverseproxy/adapter"
+	"github.com/vertex-center/vertex/apps/reverseproxy/service"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"
 )
 
-func addProxyRoutes(r *router.Group) {
-	r.GET("/redirects", handleGetRedirects)
-	r.POST("/redirect", handleAddRedirect)
-	r.DELETE("/redirect/:id", handleRemoveRedirect)
+type AppRouter struct {
+	proxyFSAdapter types.ProxyAdapterPort
+
+	proxyService *service.ProxyService
+
+	proxyRouter *ProxyRouter
+}
+
+func NewAppRouter() *AppRouter {
+	r := &AppRouter{
+		proxyFSAdapter: adapter.NewProxyFSAdapter(nil),
+	}
+	r.proxyService = service.NewProxyService(r.proxyFSAdapter)
+
+	return r
+}
+
+func (r *AppRouter) AddRoutes(group *router.Group) {
+	group.GET("/redirects", r.handleGetRedirects)
+	group.POST("/redirect", r.handleAddRedirect)
+	group.DELETE("/redirect/:id", r.handleRemoveRedirect)
+}
+
+func (r *AppRouter) GetServices() []types.AppService {
+	return []types.AppService{
+		r.proxyService,
+	}
+}
+
+func (r *AppRouter) GetProxyService() *service.ProxyService {
+	return r.proxyService
 }
 
 // handleGetRedirects handles the retrieval of all redirects.
-func handleGetRedirects(c *router.Context) {
-	redirects := proxyService.GetRedirects()
+func (r *AppRouter) handleGetRedirects(c *router.Context) {
+	redirects := r.proxyService.GetRedirects()
 	c.JSON(redirects)
 }
 
@@ -30,7 +59,7 @@ type handleAddRedirectBody struct {
 // Errors can be:
 //   - failed_to_parse_body: failed to parse the request body.
 //   - failed_to_add_redirect: failed to add the redirect.
-func handleAddRedirect(c *router.Context) {
+func (r *AppRouter) handleAddRedirect(c *router.Context) {
 	var body handleAddRedirectBody
 	err := c.ParseBody(&body)
 	if err != nil {
@@ -42,7 +71,7 @@ func handleAddRedirect(c *router.Context) {
 		Target: body.Target,
 	}
 
-	err = proxyService.AddRedirect(redirect)
+	err = r.proxyService.AddRedirect(redirect)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToAddRedirect,
@@ -60,7 +89,7 @@ func handleAddRedirect(c *router.Context) {
 //   - missing_redirect_uuid: missing redirect uuid.
 //   - invalid_redirect_uuid: invalid redirect uuid.
 //   - failed_to_remove_redirect: failed to remove the redirect.
-func handleRemoveRedirect(c *router.Context) {
+func (r *AppRouter) handleRemoveRedirect(c *router.Context) {
 	idString := c.Param("id")
 	if idString == "" {
 		c.BadRequest(router.Error{
@@ -81,7 +110,7 @@ func handleRemoveRedirect(c *router.Context) {
 		return
 	}
 
-	err = proxyService.RemoveRedirect(id)
+	err = r.proxyService.RemoveRedirect(id)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToRemoveRedirect,

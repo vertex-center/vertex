@@ -1,4 +1,4 @@
-package services
+package service
 
 import (
 	"context"
@@ -18,8 +18,8 @@ type ProxyService struct {
 	proxyAdapter types.ProxyAdapterPort
 }
 
-func NewProxyService(proxyAdapter types.ProxyAdapterPort) ProxyService {
-	s := ProxyService{
+func NewProxyService(proxyAdapter types.ProxyAdapterPort) *ProxyService {
+	s := &ProxyService{
 		proxyAdapter: proxyAdapter,
 	}
 	return s
@@ -69,4 +69,8 @@ func (s *ProxyService) HandleProxy(c *router.Context) {
 		request.URL.Path = c.Param("path")
 	}
 	proxy.ServeHTTP(c.Writer, c.Request)
+}
+
+func (s *ProxyService) OnEvent(e interface{}) {
+	// TODO: useless
 }
