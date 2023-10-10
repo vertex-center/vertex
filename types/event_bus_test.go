@@ -20,7 +20,7 @@ func TestEventInMemoryAdapterTestSuite(t *testing.T) {
 }
 
 func (suite *EventInMemoryAdapterTestSuite) SetupSuite() {
-	suite.adapter = *NewEventBus().(*EventBus)
+	suite.adapter = *NewEventBus()
 }
 
 func (suite *EventInMemoryAdapterTestSuite) TestEvents() {
