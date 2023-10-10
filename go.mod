@@ -12,7 +12,7 @@ require (
 	github.com/gin-contrib/sse v0.1.0
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.9.1
-	github.com/go-co-op/gocron v1.35.0
+	github.com/go-co-op/gocron v1.35.2
 	github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20230305113008-0c11038e723f
 	github.com/go-git/go-git/v5 v5.9.0
 	github.com/google/go-containerregistry v0.16.1
@@ -26,8 +26,8 @@ require (
 	golang.org/x/crypto v0.14.0
 	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b
 	gopkg.in/yaml.v3 v3.0.1
-	gorm.io/driver/postgres v1.5.2
-	gorm.io/gorm v1.25.4
+	gorm.io/driver/postgres v1.5.3
+	gorm.io/gorm v1.25.5
 )
 
 require (
