@@ -149,12 +149,22 @@ func (a *InstanceLogsFSAdapter) LoadBuffer(uuid uuid.UUID) ([]instancestypes.Log
 }
 
 func (a *InstanceLogsFSAdapter) UnregisterAll() error {
-	for _, l := range a.loggers {
-		err := a.Unregister(l.uuid)
+	var ids []uuid.UUID
+
+	a.loggersMutex.RLock()
+	for id := range a.loggers {
+		ids = append(ids, id)
+	}
+	a.loggersMutex.RUnlock()
+
+	for _, id := range ids {
+		log.Info("unregistering instance logger", vlog.String("uuid", id.String()))
+		err := a.Unregister(id)
 		if err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 
