@@ -27,7 +27,10 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build",
-        "test": "vite preview"
+        "test": "vite preview",
+        "test-e2e": "start-server-and-test dev http://localhost:5173/ cypress:run",
+        "cypress": "cypress open",
+        "cypress:run": "cypress run"
     },
     "eslintConfig": {
         "extends": [
@@ -56,7 +59,9 @@
         "@vitejs/plugin-react": "^3.1.0",
         "classnames": "^2.3.2",
         "csstype": "^3.1.1",
+        "cypress": "^13.3.0",
         "sass": "^1.58.3",
+        "start-server-and-test": "^2.0.1",
         "typescript": "^5.0.3",
         "vite": "^4.2.1"
     }
