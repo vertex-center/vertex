@@ -98,7 +98,10 @@ func (r *Router) Start(addr string) {
 func (r *Router) Stop() {
 	// TODO: Stop() must also stop handleSignals()
 
+	log.Info("gracefully stopping Vertex")
+
 	r.ctx.DispatchEvent(types.EventServerStop{})
+	r.closeApps()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
@@ -122,7 +125,6 @@ func (r *Router) handleSignals() {
 	go func() {
 		<-c
 		log.Info("shutdown signal sent")
-		r.closeApps()
 		r.Stop()
 		os.Exit(0)
 	}()

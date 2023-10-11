@@ -57,7 +57,6 @@ func main() {
 		OS:   runtime.GOOS,
 		Arch: runtime.GOARCH,
 	})
-	defer r.Stop()
 
 	// Logs
 	url := config.Current.VertexURL()
