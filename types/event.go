@@ -32,5 +32,6 @@ func (t TempListener) GetUUID() uuid.UUID {
 type (
 	EventServerStart         struct{}
 	EventServerStop          struct{}
+	EventServerHardReset     struct{}
 	EventDependenciesUpdated struct{}
 )

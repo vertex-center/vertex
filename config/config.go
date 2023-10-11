@@ -14,7 +14,16 @@ const urlFormat = "http://%s:%s"
 
 var Current = New()
 
+type Mode string
+
+const (
+	ProductionMode Mode = "production"
+	DebugMode      Mode = "debug"
+)
+
 type Config struct {
+	mode Mode
+
 	Host string `json:"host"`
 
 	Port           string `json:"port"`
@@ -31,12 +40,19 @@ func New() Config {
 	}
 
 	c := Config{
+		mode: ProductionMode,
+
 		Host: host,
 
 		Port:           "6130",
 		PortKernel:     "6131",
 		PortProxy:      "80",
 		PortPrometheus: "2112",
+	}
+
+	if os.Getenv("DEBUG") == "1" {
+		log.Warn("debug mode enabled. proceed with caution!")
+		c.mode = DebugMode
 	}
 
 	return c
@@ -52,6 +68,10 @@ func (c Config) KernelURL() string {
 
 func (c Config) ProxyURL() string {
 	return fmt.Sprintf(urlFormat, c.Host, c.PortProxy)
+}
+
+func (c Config) Debug() bool {
+	return c.mode == DebugMode
 }
 
 func (c Config) Apply() error {

@@ -181,6 +181,13 @@ func (r *Router) initAPIRoutes(about types.About) {
 		c.JSON(about)
 	})
 
+	if config.Current.Debug() {
+		api.POST("/hard-reset", func(c *router.Context) {
+			r.ctx.DispatchEvent(types.EventServerHardReset{})
+			c.OK()
+		})
+	}
+
 	addDependenciesRoutes(api.Group("/dependencies"))
 	addSettingsRoutes(api.Group("/settings"))
 	addHardwareRoutes(api.Group("/hardware"))

@@ -4,6 +4,8 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/config"
+	"github.com/vertex-center/vertex/pkg/log"
 )
 
 type EventBus struct {
@@ -33,6 +35,14 @@ func (b *EventBus) RemoveListener(l Listener) {
 }
 
 func (b *EventBus) Send(e interface{}) {
+	if _, ok := e.(EventServerHardReset); ok {
+		if !config.Current.Debug() {
+			log.Warn("hard reset event received but skipped; this can be a malicious application, or you may have forgotten to switch to the development mode.")
+			return
+		}
+		log.Warn("hard reset event dispatched.")
+	}
+
 	b.listenersMutex.RLock()
 	defer b.listenersMutex.RUnlock()
 

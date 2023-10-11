@@ -18,5 +18,8 @@ func (s *InstanceService) OnEvent(e interface{}) {
 		}()
 	case vtypes.EventServerStop:
 		s.StopAll()
+	case vtypes.EventServerHardReset:
+		s.StopAll()
+		s.DeleteAll()
 	}
 }

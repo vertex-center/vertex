@@ -302,6 +302,16 @@ func (s *InstanceService) LoadAll() {
 	})
 }
 
+func (s *InstanceService) DeleteAll() {
+	all := s.GetAll()
+	for _, inst := range all {
+		err := s.Delete(inst.UUID)
+		if err != nil {
+			log.Error(err)
+		}
+	}
+}
+
 func (s *InstanceService) load(uuid uuid.UUID) error {
 	service, err := s.instanceServiceService.Load(uuid)
 	if err != nil {
