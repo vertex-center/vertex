@@ -38,7 +38,7 @@ export default function SqlDatabase(props: Readonly<Props>) {
         data: db,
         loading: dbLoading,
         error: dbError,
-    } = useFetch<SqlDBMS>(() => api.vxSql.uuid(uuid).get());
+    } = useFetch<SqlDBMS>(() => api.vxSql.instance(uuid).get());
 
     useEffect(() => {
         reload().finally();
