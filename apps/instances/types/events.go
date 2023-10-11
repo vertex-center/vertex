@@ -41,4 +41,6 @@ type (
 	EventInstancesLoaded struct {
 		Count int
 	}
+
+	EventInstancesStopped struct{}
 )

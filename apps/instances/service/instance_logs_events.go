@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/log"
-	vtypes "github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vlog"
 )
 
 func (s *InstanceLogsService) GetUUID() uuid.UUID {
@@ -18,18 +18,21 @@ func (s *InstanceLogsService) OnEvent(e interface{}) {
 	case types.EventInstanceLog:
 		s.onLogReceived(e)
 	case types.EventInstanceLoaded:
+		log.Info("registering instance logs", vlog.String("uuid", e.Instance.UUID.String()))
 		err := s.adapter.Register(e.Instance.UUID)
 		if err != nil {
 			log.Error(err)
 			return
 		}
 	case types.EventInstanceDeleted:
+		log.Info("unregistering instance logs", vlog.String("uuid", e.InstanceUUID.String()))
 		err := s.adapter.Unregister(e.InstanceUUID)
 		if err != nil {
 			log.Error(err)
 			return
 		}
-	case vtypes.EventServerStop:
+	case types.EventInstancesStopped:
+		log.Info("unregistering all instance logs")
 		err := s.adapter.UnregisterAll()
 		if err != nil {
 			log.Error(err)

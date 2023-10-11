@@ -209,6 +209,8 @@ func (s *InstanceService) StopAll() {
 			log.Error(err)
 		}
 	}
+
+	s.ctx.DispatchEvent(types.EventInstancesStopped{})
 }
 
 func (s *InstanceService) Install(service types.Service, method string) (*types.Instance, error) {
