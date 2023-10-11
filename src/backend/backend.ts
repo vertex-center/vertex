@@ -148,7 +148,9 @@ export const api = {
 
     vxMonitoring: {
         metrics: async () => {
-            const { data } = await server.get<Metric[]>(`/vx-monitoring`);
+            const { data } = await server.get<Metric[]>(
+                `/app/vx-monitoring/metrics`
+            );
             return data;
         },
         collector: (collector: string) => ({
