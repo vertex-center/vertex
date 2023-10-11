@@ -13,6 +13,7 @@ const (
 )
 
 type App struct {
+	*app.App
 	router *router.AppRouter
 	proxy  *router.ProxyRouter
 }
@@ -21,42 +22,24 @@ func NewApp() *App {
 	return &App{}
 }
 
-func (app *App) Initialize(registry *app.AppsRegistry) error {
-	app.router = router.NewAppRouter()
-	app.proxy = router.NewProxyRouter(app.router.GetProxyService())
+func (a *App) Initialize(app *app.App) error {
+	a.App = app
+	a.router = router.NewAppRouter()
+	a.proxy = router.NewProxyRouter(a.router.GetProxyService())
 
 	go func() {
-		err := app.proxy.Start()
+		err := a.proxy.Start()
 		if err != nil {
 			log.Error(err)
 		}
 	}()
 
-	registry.RegisterApp(AppID, app)
-	registry.RegisterRouter(AppRoute, app.router)
+	app.Register(AppID, AppName)
+	app.RegisterRouter(AppRoute, a.router)
 
 	return nil
 }
 
-func (app *App) Uninitialize(registry *app.AppsRegistry) error {
-	err := app.proxy.Stop()
-
-	registry.UnregisterApp(AppID)
-	registry.UnregisterRouter(AppRoute)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (app *App) Name() string {
-	return AppName
-}
-
-func (app *App) OnEvent(e interface{}) {
-	for _, s := range app.router.GetServices() {
-		s.OnEvent(e)
-	}
+func (a *App) Uninitialize() error {
+	return a.proxy.Stop()
 }

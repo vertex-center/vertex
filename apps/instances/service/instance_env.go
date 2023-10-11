@@ -27,7 +27,3 @@ func (s *InstanceEnvService) Load(inst *types.Instance) error {
 	inst.Env = env
 	return nil
 }
-
-func (s *InstanceEnvService) OnEvent(e interface{}) {
-	// TODO: Useless
-}

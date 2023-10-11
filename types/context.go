@@ -10,7 +10,7 @@ func NewVertexContext() *VertexContext {
 	}
 }
 
-func (c *VertexContext) SendEvent(e interface{}) {
+func (c *VertexContext) DispatchEvent(e interface{}) {
 	c.eventBus.Send(e)
 }
 

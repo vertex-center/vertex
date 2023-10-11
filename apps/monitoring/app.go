@@ -12,6 +12,7 @@ const (
 )
 
 type App struct {
+	*app.App
 	router *router.AppRouter
 }
 
@@ -19,28 +20,12 @@ func NewApp() *App {
 	return &App{}
 }
 
-func (app *App) Initialize(registry *app.AppsRegistry) error {
-	app.router = router.NewAppRouter()
+func (a *App) Initialize(app *app.App) error {
+	a.App = app
+	a.router = router.NewAppRouter(app.Context())
 
-	registry.RegisterApp(AppID, app)
-	registry.RegisterRouter(AppRoute, app.router)
-
-	return nil
-}
-
-func (app *App) Uninitialize(registry *app.AppsRegistry) error {
-	registry.UnregisterApp(AppID)
-	registry.UnregisterRouter(AppRoute)
+	app.Register(AppID, AppName)
+	app.RegisterRouter(AppRoute, a.router)
 
 	return nil
-}
-
-func (app *App) Name() string {
-	return AppName
-}
-
-func (app *App) OnEvent(e interface{}) {
-	for _, s := range app.router.GetServices() {
-		s.OnEvent(e)
-	}
 }

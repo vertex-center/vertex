@@ -60,7 +60,3 @@ func (s *InstanceServiceService) Save(inst *types.Instance, service types.Servic
 func (s *InstanceServiceService) Load(uuid uuid.UUID) (types.Service, error) {
 	return s.adapter.Load(uuid)
 }
-
-func (s *InstanceServiceService) OnEvent(e interface{}) {
-	// TODO: Useless
-}

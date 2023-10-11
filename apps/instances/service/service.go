@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/instances/adapter"
 	"github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/log"
@@ -8,11 +9,13 @@ import (
 )
 
 type ServiceService struct {
+	uuid           uuid.UUID
 	serviceAdapter types.ServiceAdapterPort
 }
 
 func NewServiceService() *ServiceService {
 	return &ServiceService{
+		uuid:           uuid.New(),
 		serviceAdapter: adapter.NewServiceFSAdapter(nil),
 	}
 }
@@ -27,6 +30,10 @@ func (s *ServiceService) GetAll() []types.Service {
 
 func (s *ServiceService) Reload() error {
 	return s.serviceAdapter.Reload()
+}
+
+func (s *ServiceService) GetUUID() uuid.UUID {
+	return s.uuid
 }
 
 func (s *ServiceService) OnEvent(e interface{}) {

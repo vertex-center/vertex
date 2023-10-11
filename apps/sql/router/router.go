@@ -17,9 +17,9 @@ type AppRouter struct {
 	sqlService *service.SqlService
 }
 
-func NewAppRouter() *AppRouter {
+func NewAppRouter(ctx *app.Context) *AppRouter {
 	return &AppRouter{
-		sqlService: service.New(),
+		sqlService: service.New(ctx),
 	}
 }
 

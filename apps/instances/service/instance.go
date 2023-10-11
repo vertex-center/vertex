@@ -13,7 +13,7 @@ import (
 	"github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
-	vtypes "github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/types/app"
 )
 
 var (
@@ -24,6 +24,9 @@ var (
 )
 
 type InstanceService struct {
+	uuid uuid.UUID
+	ctx  *app.Context
+
 	instanceAdapter types.InstanceAdapterPort
 
 	instanceRunnerService   *InstanceRunnerService
@@ -33,23 +36,24 @@ type InstanceService struct {
 
 	instances      map[uuid.UUID]*types.Instance
 	instancesMutex *sync.RWMutex
-
-	ctx *vtypes.VertexContext
 }
 
 type InstanceServiceParams struct {
+	Ctx *app.Context
+
 	InstanceAdapter types.InstanceAdapterPort
 
 	InstanceRunnerService   *InstanceRunnerService
 	InstanceServiceService  *InstanceServiceService
 	InstanceEnvService      *InstanceEnvService
 	InstanceSettingsService *InstanceSettingsService
-
-	Ctx *vtypes.VertexContext
 }
 
 func NewInstanceService(params InstanceServiceParams) *InstanceService {
-	return &InstanceService{
+	s := &InstanceService{
+		uuid: uuid.New(),
+		ctx:  params.Ctx,
+
 		instanceAdapter: params.InstanceAdapter,
 
 		instanceRunnerService:   params.InstanceRunnerService,
@@ -59,9 +63,11 @@ func NewInstanceService(params InstanceServiceParams) *InstanceService {
 
 		instances:      make(map[uuid.UUID]*types.Instance),
 		instancesMutex: &sync.RWMutex{},
-
-		ctx: params.Ctx,
 	}
+
+	s.ctx.AddListener(s)
+
+	return s
 }
 
 // Get returns an instance by its UUID. If the instance does not exist,
@@ -138,11 +144,11 @@ func (s *InstanceService) Delete(uuid uuid.UUID) error {
 	defer s.instancesMutex.Unlock()
 	delete(s.instances, uuid)
 
-	s.ctx.SendEvent(types.EventInstanceDeleted{
+	s.ctx.DispatchEvent(types.EventInstanceDeleted{
 		InstanceUUID: uuid,
 		ServiceID:    serviceID,
 	})
-	s.ctx.SendEvent(types.EventInstancesChange{})
+	s.ctx.DispatchEvent(types.EventInstancesChange{})
 
 	return nil
 }
@@ -256,8 +262,8 @@ func (s *InstanceService) Install(service types.Service, method string) (*types.
 		return nil, err
 	}
 
-	s.ctx.SendEvent(types.EventInstanceCreated{})
-	s.ctx.SendEvent(types.EventInstancesChange{})
+	s.ctx.DispatchEvent(types.EventInstanceCreated{})
+	s.ctx.DispatchEvent(types.EventInstancesChange{})
 
 	return inst, nil
 }
@@ -289,7 +295,7 @@ func (s *InstanceService) LoadAll() {
 		loaded += 1
 	}
 
-	s.ctx.SendEvent(types.EventInstancesLoaded{
+	s.ctx.DispatchEvent(types.EventInstancesLoaded{
 		Count: loaded,
 	})
 }
@@ -325,7 +331,7 @@ func (s *InstanceService) load(uuid uuid.UUID) error {
 		return ErrInstanceAlreadyExists
 	}
 
-	s.ctx.SendEvent(types.EventInstanceLoaded{
+	s.ctx.DispatchEvent(types.EventInstanceLoaded{
 		Instance: &inst,
 	})
 
@@ -365,16 +371,4 @@ func (s *InstanceService) remapDatabaseEnv(inst *types.Instance) error {
 	}
 
 	return s.instanceEnvService.Save(inst, inst.Env)
-}
-
-func (s *InstanceService) OnEvent(e interface{}) {
-	switch e.(type) {
-	case vtypes.EventServerStart:
-		go func() {
-			s.LoadAll()
-			s.StartAll()
-		}()
-	case vtypes.EventServerStop:
-		s.StopAll()
-	}
 }

@@ -19,10 +19,9 @@ type ProxyService struct {
 }
 
 func NewProxyService(proxyAdapter types.ProxyAdapterPort) *ProxyService {
-	s := &ProxyService{
+	return &ProxyService{
 		proxyAdapter: proxyAdapter,
 	}
-	return s
 }
 
 func (s *ProxyService) GetRedirects() types.ProxyRedirects {
@@ -69,8 +68,4 @@ func (s *ProxyService) HandleProxy(c *router.Context) {
 		request.URL.Path = c.Param("path")
 	}
 	proxy.ServeHTTP(c.Writer, c.Request)
-}
-
-func (s *ProxyService) OnEvent(e interface{}) {
-	// TODO: useless
 }

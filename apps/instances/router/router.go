@@ -5,12 +5,11 @@ import (
 	"github.com/vertex-center/vertex/apps/instances/service"
 	"github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	vtypes "github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/app"
 )
 
 type AppRouter struct {
-	ctx *vtypes.VertexContext
+	ctx *app.Context
 
 	instanceAdapter         types.InstanceAdapterPort
 	instanceEnvAdapter      types.InstanceEnvAdapterPort
@@ -29,7 +28,7 @@ type AppRouter struct {
 	serviceService *service.ServiceService
 }
 
-func NewAppRouter(ctx *vtypes.VertexContext) *AppRouter {
+func NewAppRouter(ctx *app.Context) *AppRouter {
 	r := &AppRouter{
 		ctx:                     ctx,
 		instanceAdapter:         adapter.NewInstanceFSAdapter(nil),
@@ -42,7 +41,7 @@ func NewAppRouter(ctx *vtypes.VertexContext) *AppRouter {
 
 	r.serviceService = service.NewServiceService()
 	r.instanceEnvService = service.NewInstanceEnvService(r.instanceEnvAdapter)
-	r.instanceLogsService = service.NewInstanceLogsService(r.instanceLogsAdapter)
+	r.instanceLogsService = service.NewInstanceLogsService(ctx, r.instanceLogsAdapter)
 	r.instanceRunnerService = service.NewInstanceRunnerService(ctx, r.instanceRunnerAdapter)
 	r.instanceServiceService = service.NewInstanceServiceService(r.instanceServiceAdapter)
 	r.instanceSettingsService = service.NewInstanceSettingsService(r.instanceSettingsAdapter)
@@ -56,18 +55,6 @@ func NewAppRouter(ctx *vtypes.VertexContext) *AppRouter {
 	})
 
 	return r
-}
-
-func (r *AppRouter) GetServices() []app.Service {
-	return []app.Service{
-		r.instanceService,
-		r.instanceEnvService,
-		r.instanceLogsService,
-		r.instanceRunnerService,
-		r.instanceSettingsService,
-		r.instanceSettingsService,
-		r.serviceService,
-	}
 }
 
 func (r *AppRouter) AddRoutes(group *router.Group) {

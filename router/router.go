@@ -75,7 +75,7 @@ func NewRouter(about types.About) Router {
 }
 
 func (r *Router) Start(addr string) {
-	r.ctx.SendEvent(types.EventServerStart{})
+	r.ctx.DispatchEvent(types.EventServerStart{})
 
 	r.handleSignals()
 
@@ -98,7 +98,7 @@ func (r *Router) Start(addr string) {
 func (r *Router) Stop() {
 	// TODO: Stop() must also stop handleSignals()
 
-	r.ctx.SendEvent(types.EventServerStop{})
+	r.ctx.DispatchEvent(types.EventServerStop{})
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
@@ -122,26 +122,34 @@ func (r *Router) handleSignals() {
 	go func() {
 		<-c
 		log.Info("shutdown signal sent")
+		r.closeApps()
 		r.Stop()
 		os.Exit(0)
 	}()
 }
 
 func (r *Router) initApps() {
-	apps := []app.App{
+	apps := []app.Interface{
 		sql.NewApp(),
 		tunnels.NewApp(),
 		monitoring.NewApp(),
 		instances.NewApp(),
 		reverseproxy.NewApp(),
 	}
-	for _, app := range apps {
-		log.Info("initializing app", vlog.String("name", app.Name()))
-		err := app.Initialize(r.appsRegistry)
+	for i := range apps {
+		a := app.New(r.ctx)
+		err := apps[i].Initialize(a)
+		r.appsRegistry.RegisterApp(a, apps[i])
 		if err != nil {
-			log.Error(err)
+			log.Error(errors.New("failed to initialize app"), vlog.String("error", err.Error()))
+			continue
 		}
+		log.Info("app initialized", vlog.String("name", a.Name()))
 	}
+}
+
+func (r *Router) closeApps() {
+	r.appsRegistry.Close()
 }
 
 func (r *Router) initAdapters() {
@@ -176,7 +184,9 @@ func (r *Router) initAPIRoutes(about types.About) {
 	addHardwareRoutes(api.Group("/hardware"))
 	addSecurityRoutes(api.Group("/security"))
 
-	for group, r := range r.appsRegistry.GetRouters() {
-		r.AddRoutes(api.Group("/app" + group))
+	for _, r := range r.appsRegistry.Apps() {
+		for group, rtr := range r.Routers() {
+			rtr.AddRoutes(api.Group("/app" + group))
+		}
 	}
 }

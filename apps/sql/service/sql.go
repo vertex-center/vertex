@@ -6,30 +6,34 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
+	"github.com/vertex-center/vertex/apps/instances/types"
 	sqladapter "github.com/vertex-center/vertex/apps/sql/adapter"
 	sqltypes "github.com/vertex-center/vertex/apps/sql/types"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/types/app"
 	"github.com/vertex-center/vlog"
 )
 
 type SqlService struct {
+	uuid      uuid.UUID
 	dbms      map[uuid.UUID]sqltypes.DBMSAdapterPort
 	dbmsMutex *sync.RWMutex
 }
 
-func New() *SqlService {
+func New(ctx *app.Context) *SqlService {
 	s := &SqlService{
+		uuid:      uuid.New(),
 		dbms:      map[uuid.UUID]sqltypes.DBMSAdapterPort{},
 		dbmsMutex: &sync.RWMutex{},
 	}
+	ctx.AddListener(s)
 	return s
 }
 
-func (s *SqlService) getDbFeature(inst *instancestypes.Instance) (instancestypes.DatabaseFeature, error) {
+func (s *SqlService) getDbFeature(inst *types.Instance) (types.DatabaseFeature, error) {
 	if inst.Service.Features == nil || inst.Service.Features.Databases == nil {
-		return instancestypes.DatabaseFeature{}, errors.New("no databases found")
+		return types.DatabaseFeature{}, errors.New("no databases found")
 	}
 
 	dbFeatures := *inst.Service.Features.Databases
@@ -39,10 +43,10 @@ func (s *SqlService) getDbFeature(inst *instancestypes.Instance) (instancestypes
 		}
 	}
 
-	return instancestypes.DatabaseFeature{}, errors.New("no sql database found")
+	return types.DatabaseFeature{}, errors.New("no sql database found")
 }
 
-func (s *SqlService) Get(inst *instancestypes.Instance) (sqltypes.DBMS, error) {
+func (s *SqlService) Get(inst *types.Instance) (sqltypes.DBMS, error) {
 	db := sqltypes.DBMS{}
 
 	feature, err := s.getDbFeature(inst)
@@ -70,7 +74,7 @@ func (s *SqlService) Get(inst *instancestypes.Instance) (sqltypes.DBMS, error) {
 	return db, nil
 }
 
-func (s *SqlService) EnvCredentials(inst *instancestypes.Instance, user string, pass string) (instancestypes.InstanceEnvVariables, error) {
+func (s *SqlService) EnvCredentials(inst *types.Instance, user string, pass string) (types.InstanceEnvVariables, error) {
 	env := inst.Env
 
 	feature, err := s.getDbFeature(inst)
@@ -88,7 +92,7 @@ func (s *SqlService) EnvCredentials(inst *instancestypes.Instance, user string, 
 	return env, nil
 }
 
-func (s *SqlService) createDbmsAdapter(inst *instancestypes.Instance) (sqltypes.DBMSAdapterPort, error) {
+func (s *SqlService) createDbmsAdapter(inst *types.Instance) (sqltypes.DBMSAdapterPort, error) {
 	feature, err := s.getDbFeature(inst)
 	if err != nil {
 		return nil, err

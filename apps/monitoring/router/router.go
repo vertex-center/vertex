@@ -16,9 +16,9 @@ type AppRouter struct {
 	metricsService *service.MetricsService
 }
 
-func NewAppRouter() *AppRouter {
+func NewAppRouter(ctx *app.Context) *AppRouter {
 	return &AppRouter{
-		metricsService: service.NewMetricsService(),
+		metricsService: service.NewMetricsService(ctx),
 	}
 }
 

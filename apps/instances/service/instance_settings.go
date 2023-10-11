@@ -53,7 +53,3 @@ func (s *InstanceSettingsService) SetTags(inst *types.Instance, tags []string) e
 	inst.Tags = tags
 	return s.adapter.Save(inst.UUID, inst.InstanceSettings)
 }
-
-func (s *InstanceSettingsService) OnEvent(e interface{}) {
-	// TODO: Useless
-}

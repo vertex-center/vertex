@@ -105,7 +105,7 @@ func (s *DependenciesService) InstallUpdates(dependenciesID []string) error {
 			dependency.Update = nil
 		}
 	}
-	s.ctx.SendEvent(types.EventDependenciesUpdated{})
+	s.ctx.DispatchEvent(types.EventDependenciesUpdated{})
 	return nil
 }
 

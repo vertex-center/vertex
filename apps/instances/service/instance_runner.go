@@ -14,16 +14,16 @@ import (
 	"github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
-	vtypes "github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/types/app"
 	"github.com/vertex-center/vlog"
 )
 
 type InstanceRunnerService struct {
-	ctx     *vtypes.VertexContext
+	ctx     *app.Context
 	adapter types.InstanceRunnerAdapterPort
 }
 
-func NewInstanceRunnerService(ctx *vtypes.VertexContext, adapter types.InstanceRunnerAdapterPort) *InstanceRunnerService {
+func NewInstanceRunnerService(ctx *app.Context, adapter types.InstanceRunnerAdapterPort) *InstanceRunnerService {
 	return &InstanceRunnerService{
 		ctx:     ctx,
 		adapter: adapter,
@@ -58,7 +58,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 		return nil
 	}
 
-	s.ctx.SendEvent(types.EventInstanceLog{
+	s.ctx.DispatchEvent(types.EventInstanceLog{
 		InstanceUUID: inst.UUID,
 		Kind:         types.LogKindOut,
 		Message:      types.NewLogLineMessageString("Starting instance..."),
@@ -69,7 +69,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 	)
 
 	if inst.IsRunning() {
-		s.ctx.SendEvent(types.EventInstanceLog{
+		s.ctx.DispatchEvent(types.EventInstanceLog{
 			InstanceUUID: inst.UUID,
 			Kind:         types.LogKindVertexErr,
 			Message:      types.NewLogLineMessageString(ErrInstanceAlreadyRunning.Error()),
@@ -116,7 +116,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 					continue
 				}
 
-				s.ctx.SendEvent(types.EventInstanceLog{
+				s.ctx.DispatchEvent(types.EventInstanceLog{
 					InstanceUUID: inst.UUID,
 					Kind:         types.LogKindDownload,
 					Message:      types.NewLogLineMessageDownload(&downloadProgress),
@@ -124,7 +124,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 				continue
 			}
 
-			s.ctx.SendEvent(types.EventInstanceLog{
+			s.ctx.DispatchEvent(types.EventInstanceLog{
 				InstanceUUID: inst.UUID,
 				Kind:         types.LogKindOut,
 				Message:      types.NewLogLineMessageString(scanner.Text()),
@@ -141,7 +141,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 			if scanner.Err() != nil {
 				break
 			}
-			s.ctx.SendEvent(types.EventInstanceLog{
+			s.ctx.DispatchEvent(types.EventInstanceLog{
 				InstanceUUID: inst.UUID,
 				Kind:         types.LogKindErr,
 				Message:      types.NewLogLineMessageString(scanner.Text()),
@@ -153,7 +153,7 @@ func (s *InstanceRunnerService) Start(inst *types.Instance) error {
 	wg.Wait()
 
 	// Log stopped
-	s.ctx.SendEvent(types.EventInstanceLog{
+	s.ctx.DispatchEvent(types.EventInstanceLog{
 		InstanceUUID: inst.UUID,
 		Kind:         types.LogKindVertexOut,
 		Message:      types.NewLogLineMessageString("Stopping instance..."),
@@ -174,7 +174,7 @@ func (s *InstanceRunnerService) Stop(inst *types.Instance) error {
 	}
 
 	if !inst.IsRunning() {
-		s.ctx.SendEvent(types.EventInstanceLog{
+		s.ctx.DispatchEvent(types.EventInstanceLog{
 			InstanceUUID: inst.UUID,
 			Kind:         types.LogKindVertexErr,
 			Message:      types.NewLogLineMessageString(ErrInstanceNotRunning.Error()),
@@ -188,17 +188,17 @@ func (s *InstanceRunnerService) Stop(inst *types.Instance) error {
 	if inst.IsDockerized() {
 		err = s.adapter.Stop(inst)
 	} else {
-		return fmt.Errorf("inst is not dockerized")
+		return fmt.Errorf("instance is not dockerized")
 	}
 
 	if err == nil {
-		s.ctx.SendEvent(types.EventInstanceLog{
+		s.ctx.DispatchEvent(types.EventInstanceLog{
 			InstanceUUID: inst.UUID,
 			Kind:         types.LogKindVertexOut,
 			Message:      types.NewLogLineMessageString("Instance stopped."),
 		})
 
-		log.Info("inst stopped",
+		log.Info("instance stopped",
 			vlog.String("uuid", inst.UUID.String()),
 		)
 
@@ -281,16 +281,12 @@ func (s *InstanceRunnerService) setStatus(inst *types.Instance, status string) {
 	}
 
 	inst.Status = status
-	s.ctx.SendEvent(types.EventInstancesChange{})
-	s.ctx.SendEvent(types.EventInstanceStatusChange{
+	s.ctx.DispatchEvent(types.EventInstancesChange{})
+	s.ctx.DispatchEvent(types.EventInstanceStatusChange{
 		InstanceUUID: inst.UUID,
 		ServiceID:    inst.Service.ID,
 		Instance:     *inst,
 		Name:         name,
 		Status:       status,
 	})
-}
-
-func (s *InstanceRunnerService) OnEvent(e interface{}) {
-	// TODO: useless
 }
