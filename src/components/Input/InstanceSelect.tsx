@@ -1,9 +1,10 @@
 import Select, { SelectOption, SelectValue } from "./Select";
-import { Instance, InstanceQuery, Instances } from "../../models/instance";
-import { useFetch } from "../../hooks/useFetch";
+import { Instance, InstanceQuery } from "../../models/instance";
 import { api } from "../../backend/backend";
 import Progress from "../Progress";
 import ServiceLogo from "../ServiceLogo/ServiceLogo";
+import { useQuery } from "@tanstack/react-query";
+import { APIError } from "../Error/APIError";
 
 type Props = {
     instance?: Instance;
@@ -15,12 +16,18 @@ type Props = {
 export default function InstanceSelect(props: Readonly<Props>) {
     const { instance, onChange, query } = props;
 
-    const search = () =>
-        api.vxInstances.instances.search(query).catch(console.error);
-    const { data: instances, loading } = useFetch<Instances>(search);
+    const queryInstances = useQuery({
+        queryKey: ["instances", query],
+        queryFn: () => api.vxInstances.instances.search(query),
+    });
+    const { data: instances, isLoading, error } = queryInstances;
 
-    if (loading) {
+    if (isLoading) {
         return <Progress infinite />;
+    }
+
+    if (error) {
+        return <APIError error={error} />;
     }
 
     const onInstanceChange = (uuid: any) => {

@@ -1,7 +1,5 @@
 import { Fragment } from "react";
 import { Title } from "../../../components/Text/Text";
-import { useFetch } from "../../../hooks/useFetch";
-import { About } from "../../../models/about";
 import { api } from "../../../backend/backend";
 import {
     KeyValueGroup,
@@ -12,13 +10,21 @@ import styles from "./SettingsAbout.module.sass";
 import { Vertical } from "../../../components/Layouts/Layouts";
 import { APIError } from "../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
+import { useQuery } from "@tanstack/react-query";
 
 export default function SettingsAbout() {
-    const { data: about, loading, error } = useFetch<About>(api.about);
+    const {
+        data: about,
+        isLoading,
+        error,
+    } = useQuery({
+        queryKey: ["about"],
+        queryFn: api.about,
+    });
 
     return (
         <Fragment>
-            <ProgressOverlay show={loading} />
+            <ProgressOverlay show={isLoading} />
             <APIError error={error} />
             <Vertical gap={20}>
                 <Title className={styles.title}>Vertex</Title>
@@ -27,7 +33,7 @@ export default function SettingsAbout() {
                         name="Version"
                         type="code"
                         icon="tag"
-                        loading={loading}
+                        loading={isLoading}
                     >
                         {about?.version}
                     </KeyValueInfo>
@@ -35,7 +41,7 @@ export default function SettingsAbout() {
                         name="Commit"
                         type="code"
                         icon="commit"
-                        loading={loading}
+                        loading={isLoading}
                     >
                         {about?.commit}
                     </KeyValueInfo>
@@ -43,7 +49,7 @@ export default function SettingsAbout() {
                         name="Release date"
                         type="code"
                         icon="calendar_month"
-                        loading={loading}
+                        loading={isLoading}
                     >
                         {about?.date}
                     </KeyValueInfo>
@@ -51,7 +57,7 @@ export default function SettingsAbout() {
                         name="Compiled for"
                         type="code"
                         icon="memory"
-                        loading={loading}
+                        loading={isLoading}
                     >
                         {about?.os}
                         {about?.arch && `/${about?.arch}`}

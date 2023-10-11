@@ -5,8 +5,6 @@ import styles from "./InstanceDocker.module.sass";
 import { useParams } from "react-router-dom";
 import { Horizontal, Vertical } from "../../../../components/Layouts/Layouts";
 import Button from "../../../../components/Button/Button";
-import { useFetch } from "../../../../hooks/useFetch";
-import { DockerContainerInfo } from "../../../../models/docker";
 import { api } from "../../../../backend/backend";
 import {
     KeyValueGroup,
@@ -15,17 +13,19 @@ import {
 import byteSize from "byte-size";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
+import { useQuery } from "@tanstack/react-query";
 
 export default function InstanceDocker() {
     const { uuid } = useParams();
 
     const {
         data: info,
+        isLoading,
         error,
-        loading,
-    } = useFetch<DockerContainerInfo>(() =>
-        api.vxInstances.instance(uuid).docker.get()
-    );
+    } = useQuery({
+        queryKey: ["instance_docker", uuid],
+        queryFn: api.vxInstances.instance(uuid).docker.get,
+    });
 
     const [recreatingContainer, setRecreatingContainer] = useState(false);
     const [recreatingContainerError, setRecreatingContainerError] = useState();
@@ -52,7 +52,7 @@ export default function InstanceDocker() {
 
     return (
         <Vertical gap={30}>
-            <ProgressOverlay show={loading} />
+            <ProgressOverlay show={isLoading} />
             <APIError error={recreatingContainerError} />
 
             <Vertical gap={20}>
@@ -62,7 +62,7 @@ export default function InstanceDocker() {
                         name="ID"
                         type="code"
                         icon="tag"
-                        loading={loading}
+                        loading={isLoading}
                     >
                         {info?.container?.id}
                     </KeyValueInfo>
@@ -70,7 +70,7 @@ export default function InstanceDocker() {
                         name="Container Name"
                         type="code"
                         icon="badge"
-                        loading={loading}
+                        loading={isLoading}
                     >
                         {info?.container?.name}
                     </KeyValueInfo>
@@ -78,7 +78,7 @@ export default function InstanceDocker() {
                         name="Platform"
                         type="code"
                         icon="computer"
-                        loading={loading}
+                        loading={isLoading}
                     >
                         {info?.container?.platform}
                     </KeyValueInfo>
@@ -92,7 +92,7 @@ export default function InstanceDocker() {
                         name="ID"
                         type="code"
                         icon="tag"
-                        loading={loading}
+                        loading={isLoading}
                     >
                         {info?.image?.id}
                     </KeyValueInfo>
@@ -100,7 +100,7 @@ export default function InstanceDocker() {
                         name="Architecture"
                         type="code"
                         icon="memory"
-                        loading={loading}
+                        loading={isLoading}
                     >
                         {info?.image?.architecture}
                     </KeyValueInfo>
@@ -108,7 +108,7 @@ export default function InstanceDocker() {
                         name="OS"
                         type="code"
                         icon="computer"
-                        loading={loading}
+                        loading={isLoading}
                     >
                         {info?.image?.os}
                     </KeyValueInfo>
@@ -116,7 +116,7 @@ export default function InstanceDocker() {
                         name="Size"
                         type="code"
                         icon="straighten"
-                        loading={loading}
+                        loading={isLoading}
                     >
                         {byteSize(info?.image?.size).toString()}
                     </KeyValueInfo>
@@ -124,7 +124,7 @@ export default function InstanceDocker() {
                         name="Tags"
                         type="code"
                         icon="sell"
-                        loading={loading}
+                        loading={isLoading}
                     >
                         {info?.image?.tags?.join(", ")}
                     </KeyValueInfo>
@@ -138,7 +138,7 @@ export default function InstanceDocker() {
                         <Button
                             leftIcon="restart_alt"
                             onClick={recreateContainer}
-                            disabled={recreatingContainer || loading}
+                            disabled={recreatingContainer ?? isLoading}
                         >
                             Recreate container
                         </Button>

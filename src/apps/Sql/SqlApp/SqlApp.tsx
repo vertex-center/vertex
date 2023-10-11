@@ -4,19 +4,18 @@ import Sidebar, {
     SidebarItem,
 } from "../../../components/Sidebar/Sidebar";
 import { api } from "../../../backend/backend";
-import { Instances } from "../../../models/instance";
-import { useFetch } from "../../../hooks/useFetch";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { Fragment } from "react";
 import { SiPostgresql } from "@icons-pack/react-simple-icons";
 import { useServerEvent } from "../../../hooks/useEvent";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function SqlApp() {
-    const {
-        data: instances,
-        loading,
-        reload: reloadInstances,
-    } = useFetch<Instances>(api.vxInstances.instances.all);
+    const queryClient = useQueryClient();
+    const { data: instances, isLoading } = useQuery({
+        queryKey: ["instances"],
+        queryFn: api.vxInstances.instances.all,
+    });
 
     const dbs = Object.values(instances ?? {})?.filter((i) =>
         i?.tags?.some((t) => t.includes("vertex-") && t.includes("-sql"))
@@ -59,13 +58,15 @@ export default function SqlApp() {
 
     useServerEvent("/app/vx-instances/instances/events", {
         change: () => {
-            reloadInstances().finally();
+            queryClient.invalidateQueries({
+                queryKey: ["instances"],
+            });
         },
     });
 
     return (
         <Fragment>
-            <ProgressOverlay show={loading} />
+            <ProgressOverlay show={isLoading} />
             <PageWithSidebar title="SQL databases" sidebar={sidebar} />
         </Fragment>
     );

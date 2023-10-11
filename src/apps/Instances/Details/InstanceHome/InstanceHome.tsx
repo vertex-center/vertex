@@ -9,16 +9,18 @@ import Spacer from "../../../../components/Spacer/Spacer";
 import classNames from "classnames";
 import useInstance from "../../../../hooks/useInstance";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
+import { APIError } from "../../../../components/Error/APIError";
 
 export default function InstanceHome() {
     const { uuid } = useParams();
 
-    const { instance, loading } = useInstance(uuid);
+    const { instance, isLoading, error } = useInstance(uuid);
 
     return (
         <Fragment>
-            <ProgressOverlay show={loading} />
+            <ProgressOverlay show={isLoading} />
             <Title className={styles.title}>URLs</Title>
+            <APIError error={error} />
             <nav className={styles.nav}>
                 {instance?.service?.urls &&
                     instance?.service?.urls

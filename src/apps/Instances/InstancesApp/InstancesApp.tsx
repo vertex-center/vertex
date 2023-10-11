@@ -1,7 +1,5 @@
 import styles from "./InstancesApp.module.sass";
 import Bay from "../../../components/Bay/Bay";
-import { useEffect, useState } from "react";
-import { Instance, Instances } from "../../../models/instance";
 import { BigTitle } from "../../../components/Text/Text";
 import Button from "../../../components/Button/Button";
 import { Horizontal } from "../../../components/Layouts/Layouts";
@@ -9,79 +7,53 @@ import { api } from "../../../backend/backend";
 import { APIError } from "../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useServerEvent } from "../../../hooks/useEvent";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function InstancesApp() {
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState();
-    const [status, setStatus] = useState("Waiting server response...");
-    const [installed, setInstalled] = useState<Instances>({});
+    const queryClient = useQueryClient();
 
-    const [installedGrouped, setInstalledGrouped] = useState<Instance[][]>([]);
+    const queryInstances = useQuery({
+        queryKey: ["instances"],
+        queryFn: api.vxInstances.instances.all,
+    });
+    const { data: instances, isLoading, isError, error } = queryInstances;
 
-    useEffect(() => {
-        const ids = new Set<string>(
-            Object.values(installed).map((i) => i.service?.id)
-        );
-        const final = [];
-        ids.forEach((id) => {
-            final.push(
-                Object.entries(installed)
-                    .filter(([_, i]) => i.service?.id === id)
-                    .map(([_, i]) => i)
-            );
-        });
-        setInstalledGrouped(final);
-    }, [installed]);
-
-    const fetchServices = () => {
-        api.vxInstances.instances
-            .all()
-            .then((res) => {
-                console.log(res.data);
-                setInstalled(res.data);
-                setStatus("running");
-            })
-            .catch((error) => {
-                setInstalled({});
-                setStatus("off");
-                setError(error);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    };
-
-    useServerEvent("/app/vx-instances/instances/events", {
-        change: (e) => {
-            console.log(e);
-            fetchServices();
-        },
-        open: (e) => {
-            console.log(e);
-            fetchServices();
+    const mutationPower = useMutation({
+        mutationFn: async (uuid: string) => {
+            if (
+                instances[uuid].status === "off" ||
+                instances[uuid].status === "error"
+            ) {
+                await api.vxInstances.instance(uuid).start();
+            } else {
+                await api.vxInstances.instance(uuid).stop();
+            }
         },
     });
 
-    const toggleInstance = async (uuid: string) => {
-        if (
-            installed[uuid].status === "off" ||
-            installed[uuid].status === "error"
-        ) {
-            await api.vxInstances.instance(uuid).start();
-        } else {
-            await api.vxInstances.instance(uuid).stop();
-        }
-    };
+    let status = "Waiting server response...";
+    if (queryInstances.isSuccess) {
+        status = "running";
+    } else if (queryInstances.isError) {
+        status = "off";
+    }
 
-    const checkForUpdates = async () => {
-        api.vxInstances.instances.checkForUpdates().then((res) => {
-            setInstalled(res.data);
-        });
-    };
+    useServerEvent("/app/vx-instances/instances/events", {
+        change: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["instances"],
+            });
+        },
+        open: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["instances"],
+            });
+        },
+    });
 
     return (
         <div className={styles.server}>
-            <ProgressOverlay show={loading} />
+            <ProgressOverlay show={isLoading} />
             <div className={styles.title}>
                 <BigTitle>All instances</BigTitle>
             </div>
@@ -92,22 +64,29 @@ export default function InstancesApp() {
                 </div>
             )}
 
-            {!loading && !error && (
+            {!isLoading && !isError && (
                 <div className={styles.bays}>
                     <Bay
                         instances={[
-                            { value: { display_name: "Vertex", status } },
+                            {
+                                value: {
+                                    display_name: "Vertex",
+                                    status,
+                                },
+                            },
                         ]}
                     />
-                    {installedGrouped?.map((instances) => (
+                    {Object.values(instances)?.map((inst) => (
                         <Bay
-                            key={instances[0].service?.id}
-                            instances={instances.map((instance, i) => ({
-                                value: instance,
-                                count: instances.length > 1 ? i + 1 : undefined,
-                                to: `/app/vx-instances/${instance.uuid}/`,
-                                onPower: () => toggleInstance(instance.uuid),
-                            }))}
+                            key={inst.uuid}
+                            instances={[
+                                {
+                                    value: inst,
+                                    to: `/app/vx-instances/${inst.uuid}/`,
+                                    onPower: async () =>
+                                        mutationPower.mutate(inst.uuid),
+                                },
+                            ]}
                         />
                     ))}
                     <Horizontal className={styles.addBay} gap={10}>

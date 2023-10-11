@@ -16,6 +16,8 @@ import Button from "../../../../components/Button/Button";
 import { api } from "../../../../backend/backend";
 import { DatabaseEnvironment } from "../../../../models/service";
 import { APIError } from "../../../../components/Error/APIError";
+import { ProgressOverlay } from "../../../../components/Progress/Progress";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type DatabaseProps = {
     instance?: Instance;
@@ -40,8 +42,8 @@ function Database(props: Readonly<DatabaseProps>) {
         api.vxInstances
             .instance(uuid)
             .get()
-            .then((res) => {
-                setDatabase(res.data);
+            .then((data) => {
+                setDatabase(data);
             })
             .catch(setError);
     }, [instance]);
@@ -93,25 +95,31 @@ function Database(props: Readonly<DatabaseProps>) {
 }
 
 export default function InstanceDetailsDatabase() {
+    const queryClient = useQueryClient();
     const { uuid } = useParams();
-    const { instance } = useInstance(uuid);
+    const { instance, isLoading, error } = useInstance(uuid);
 
     const [saved, setSaved] = useState<boolean>(undefined);
-    const [uploading, setUploading] = useState<boolean>(false);
 
     const [databases, setDatabases] = useState<{
         [name: string]: string;
     }>();
 
-    const save = () => {
-        setUploading(true);
-        api.vxInstances
-            .instance(uuid)
-            .patch({ databases })
-            .then(() => setSaved(true))
-            .catch(console.error)
-            .finally(() => setUploading(false));
-    };
+    const mutationSaveDatabase = useMutation({
+        mutationFn: async () => {
+            await api.vxInstances.instance(uuid).patch({ databases });
+        },
+        onSuccess: () => {
+            setSaved(true);
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["instances", uuid],
+            });
+        },
+    });
+    const { isLoading: isUploading, error: uploadingError } =
+        mutationSaveDatabase;
 
     const onChange = (name: string, dbUUID: string) => {
         console.log({ ...databases, [name]: dbUUID });
@@ -133,12 +141,14 @@ export default function InstanceDetailsDatabase() {
                         />
                     )
                 )}
+            <ProgressOverlay show={isLoading ?? isUploading} />
+            <APIError error={error ?? uploadingError} />
             <Button
                 primary
                 large
-                onClick={save}
+                onClick={async () => mutationSaveDatabase.mutate()}
                 rightIcon="save"
-                loading={uploading}
+                loading={isUploading}
                 disabled={saved || saved === undefined}
             >
                 Save{" "}

@@ -1,40 +1,67 @@
-import { useFetch } from "../../../hooks/useFetch";
 import { BigTitle } from "../../../components/Text/Text";
 import { Service as ServiceModel } from "../../../models/service";
 import { Fragment, useState } from "react";
-
 import styles from "./InstancesStore.module.sass";
 import Service from "../../../components/Service/Service";
 import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
-import { Instances } from "../../../models/instance";
 import { api } from "../../../backend/backend";
-import { Errors } from "../../../components/Error/Errors";
 import { APIError } from "../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import ServiceInstallPopup from "../../../components/ServiceInstallPopup/ServiceInstallPopup";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 type Downloading = {
     service: ServiceModel;
 };
 
 export default function InstancesStore() {
+    const queryClient = useQueryClient();
+
+    const queryServices = useQuery({
+        queryKey: ["services"],
+        queryFn: api.vxInstances.services.all,
+    });
     const {
         data: services,
+        isLoading: isServicesLoading,
         error: servicesError,
-        loading,
-    } = useFetch<ServiceModel[]>(api.vxInstances.services.all);
+    } = queryServices;
+
+    const queryInstances = useQuery({
+        queryKey: ["instances"],
+        queryFn: api.vxInstances.instances.all,
+    });
     const {
         data: instances,
+        isLoading: isInstancesLoading,
         error: instancesError,
-        reload: reloadInstances,
-    } = useFetch<Instances>(api.vxInstances.instances.all);
+    } = queryInstances;
+
+    const mutationInstallService = useMutation({
+        mutationFn: async (serviceId: string) => {
+            await api.vxInstances.service(serviceId).install();
+        },
+        onSettled: (data, error, serviceId) => {
+            setDownloading(
+                downloading.filter(({ service: s }) => s.id !== serviceId)
+            );
+            queryClient.invalidateQueries({
+                queryKey: ["instances"],
+            });
+        },
+    });
+    const { isLoading: isInstalling, error: installError } =
+        mutationInstallService;
+
+    const install = () => {
+        const service = selectedService;
+        setDownloading((prev) => [...prev, { service }]);
+        setShowInstallPopup(false);
+        mutationInstallService.mutate(service.id);
+    };
 
     const [showInstallPopup, setShowInstallPopup] = useState<boolean>(false);
-
     const [selectedService, setSelectedService] = useState<ServiceModel>();
-
-    const [error, setError] = useState();
-
     const [downloading, setDownloading] = useState<Downloading[]>([]);
 
     const openInstallPopup = (service: ServiceModel) => {
@@ -47,27 +74,13 @@ export default function InstancesStore() {
         setShowInstallPopup(false);
     };
 
-    const install = () => {
-        const service = selectedService;
-
-        setDownloading((prev) => [...prev, { service }]);
-        setShowInstallPopup(false);
-
-        api.vxInstances
-            .service(service.id)
-            .install()
-            .catch(setError)
-            .finally(() => {
-                setDownloading(
-                    downloading.filter(({ service: s }) => s.id !== service.id)
-                );
-                reloadInstances().catch(console.error);
-            });
-    };
+    const error = servicesError ?? instancesError ?? installError;
 
     return (
         <Fragment>
-            <ProgressOverlay show={loading} />
+            <ProgressOverlay
+                show={isInstancesLoading ?? isServicesLoading ?? isInstalling}
+            />
             <div className={styles.page}>
                 <Horizontal
                     className={styles.title}
@@ -76,12 +89,8 @@ export default function InstancesStore() {
                 >
                     <BigTitle>Create instance</BigTitle>
                 </Horizontal>
-                <Errors className={styles.errors}>
-                    <APIError error={error} />
-                    <APIError error={servicesError} />
-                    <APIError error={instancesError} />
-                </Errors>
                 <Vertical className={styles.content}>
+                    <APIError error={error} />
                     {services?.map((service) => (
                         <Service
                             key={service.id}

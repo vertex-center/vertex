@@ -5,18 +5,17 @@ import Sidebar, {
 } from "../../../components/Sidebar/Sidebar";
 import { SiCloudflare } from "@icons-pack/react-simple-icons";
 import { Fragment } from "react";
-import { useFetch } from "../../../hooks/useFetch";
-import { Instances } from "../../../models/instance";
 import { api } from "../../../backend/backend";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useServerEvent } from "../../../hooks/useEvent";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function TunnelsApp() {
-    const {
-        data: instances,
-        loading,
-        reload: reloadInstances,
-    } = useFetch<Instances>(api.vxInstances.instances.all);
+    const queryClient = useQueryClient();
+    const { data: instances, isLoading } = useQuery({
+        queryKey: ["instances"],
+        queryFn: api.vxInstances.instances.all,
+    });
 
     const ledCloudflared = Object.values(instances || {}).find((inst) =>
         inst.tags?.includes("vertex-cloudflare-tunnel")
@@ -24,8 +23,9 @@ export default function TunnelsApp() {
 
     useServerEvent("/app/vx-instances/instances/events", {
         change: (e) => {
-            console.log(e);
-            reloadInstances().finally();
+            queryClient.invalidateQueries({
+                queryKey: ["instances"],
+            });
         },
     });
 
@@ -44,7 +44,7 @@ export default function TunnelsApp() {
 
     return (
         <Fragment>
-            <ProgressOverlay show={loading} />
+            <ProgressOverlay show={isLoading} />
             <PageWithSidebar title="Tunnels" sidebar={sidebar} />
         </Fragment>
     );

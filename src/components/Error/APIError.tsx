@@ -3,7 +3,7 @@ import { HTMLProps } from "react";
 import { AxiosError } from "axios";
 
 type APIErrorProps = HTMLProps<HTMLDivElement> & {
-    error?: AxiosError;
+    error?: unknown;
 };
 
 export function APIError(props: Readonly<APIErrorProps>) {
@@ -11,11 +11,15 @@ export function APIError(props: Readonly<APIErrorProps>) {
 
     if (!error) return null;
 
-    if (error.response)
-        return <ErrorBox error={error.response.data} {...others} />;
+    if (error instanceof AxiosError) {
+        if (error.response)
+            return <ErrorBox error={error.response.data} {...others} />;
 
-    if (error.request)
-        return <ErrorBox error="No response from server." {...others} />;
+        if (error.request)
+            return <ErrorBox error="No response from server." {...others} />;
 
-    return <ErrorBox error={error?.message} {...others} />;
+        return <ErrorBox error={error?.message} {...others} />;
+    }
+
+    return <ErrorBox error={error} {...others} />;
 }

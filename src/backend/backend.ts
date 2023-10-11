@@ -21,33 +21,57 @@ const server = axios.create({
 // });
 
 export const api = {
-    about: () => server.get<About>("/about"),
-    hardware: () => server.get<Hardware>("/hardware"),
+    about: async () => {
+        const { data } = await server.get<About>("/about");
+        return data;
+    },
+    hardware: async () => {
+        const { data } = await server.get<Hardware>("/hardware");
+        return data;
+    },
 
     vxInstances: {
         instances: {
-            all: () => server.get<Instances>("/app/vx-instances/instances"),
-            search: (query: InstanceQuery) =>
-                server.get<Instances>("/app/vx-instances/instances/search", {
-                    params: query,
-                }),
-            checkForUpdates: () =>
-                server.get<Instances>(
-                    "/app/vx-instances/instances/checkupdates"
-                ),
+            all: async () => {
+                const { data } = await server.get<Instances>(
+                    "/app/vx-instances/instances"
+                );
+                return data;
+            },
+            search: async (query: InstanceQuery) => {
+                const { data } = await server.get<Instances>(
+                    "/app/vx-instances/instances/search",
+                    { params: query }
+                );
+                return data;
+            },
         },
 
         service: (service_id: string) => ({
-            install: () =>
-                server.post(`/app/vx-instances/service/${service_id}/install`),
+            install: async () => {
+                const { data } = await server.post(
+                    `/app/vx-instances/service/${service_id}/install`
+                );
+                return data;
+            },
         }),
 
         services: {
-            all: () => server.get<Service[]>("/app/vx-instances/services"),
+            all: async () => {
+                const { data } = await server.get<Service[]>(
+                    "/app/vx-instances/services"
+                );
+                return data;
+            },
         },
 
         instance: (id: string) => ({
-            get: () => server.get<Instance>(`/app/vx-instances/instance/${id}`),
+            get: async () => {
+                const { data } = await server.get<Instance>(
+                    `/app/vx-instances/instance/${id}`
+                );
+                return data;
+            },
             delete: () => server.delete(`/app/vx-instances/instance/${id}`),
             start: () => server.post(`/app/vx-instances/instance/${id}/start`),
             stop: () => server.post(`/app/vx-instances/instance/${id}/stop`),
@@ -55,7 +79,12 @@ export const api = {
                 server.patch(`/app/vx-instances/instance/${id}`, params),
 
             logs: {
-                get: () => server.get(`/app/vx-instances/instance/${id}/logs`),
+                get: async () => {
+                    const { data } = await server.get(
+                        `/app/vx-instances/instance/${id}/logs`
+                    );
+                    return data;
+                },
             },
 
             env: {
@@ -67,10 +96,12 @@ export const api = {
             },
 
             docker: {
-                get: () =>
-                    server.get<DockerContainerInfo>(
+                get: async () => {
+                    const { data } = await server.get<DockerContainerInfo>(
                         `/app/vx-instances/instance/${id}/docker`
-                    ),
+                    );
+                    return data;
+                },
                 recreate: () =>
                     server.post(
                         `/app/vx-instances/instance/${id}/docker/recreate`
@@ -85,17 +116,22 @@ export const api = {
             },
 
             versions: {
-                get: (cache?: boolean) =>
-                    server.get<string[]>(
+                get: async (cache?: boolean) => {
+                    const { data } = await server.get<string[]>(
                         `/app/vx-instances/instance/${id}/versions?reload=${!cache}`
-                    ),
+                    );
+                    return data;
+                },
             },
         }),
     },
 
     security: {
         ssh: {
-            get: () => server.get<SSHKeys>("/security/ssh"),
+            get: async () => {
+                const { data } = await server.get<SSHKeys>("/security/ssh");
+                return data;
+            },
             add: (authorized_key: string) =>
                 server.post("/security/ssh", { authorized_key }),
             delete: (fingerprint: string) =>
@@ -111,7 +147,10 @@ export const api = {
     },
 
     vxMonitoring: {
-        metrics: () => server.get<Metric[]>(`/vx-monitoring`),
+        metrics: async () => {
+            const { data } = await server.get<Metric[]>(`/vx-monitoring`);
+            return data;
+        },
         collector: (collector: string) => ({
             install: () =>
                 server.post(
@@ -128,7 +167,12 @@ export const api = {
 
     vxSql: {
         instance: (uuid: string) => ({
-            get: () => server.get(`/app/vx-sql/instance/${uuid}`),
+            get: async () => {
+                const { data } = await server.get(
+                    `/app/vx-sql/instance/${uuid}`
+                );
+                return data;
+            },
         }),
         dbms: (dbms: string) => ({
             install: () => server.post(`/app/vx-sql/dbms/${dbms}/install`),
@@ -136,10 +180,12 @@ export const api = {
     },
 
     dependencies: {
-        get: (reload?: boolean) =>
-            server.get<DependenciesUpdate>(
+        get: async (reload?: boolean) => {
+            const { data } = await server.get<DependenciesUpdate>(
                 `/dependencies${reload ? "?reload=true" : ""}`
-            ),
+            );
+            return data;
+        },
         install: (
             updates: {
                 name: string;
@@ -148,15 +194,22 @@ export const api = {
     },
 
     settings: {
-        get: () => server.get<Settings>("/settings"),
+        get: async () => {
+            const { data } = await server.get<Settings>("/settings");
+            return data;
+        },
         patch: (settings: Partial<Settings>) =>
             server.patch("/settings", settings),
     },
 
     vxReverseProxy: {
         redirects: {
-            get: () =>
-                server.get<ProxyRedirects>("/app/vx-reverse-proxy/redirects"),
+            get: async () => {
+                const { data } = await server.get<ProxyRedirects>(
+                    "/app/vx-reverse-proxy/redirects"
+                );
+                return data;
+            },
             add: (source: string, target: string) =>
                 server.post("/app/vx-reverse-proxy/redirect", {
                     source,

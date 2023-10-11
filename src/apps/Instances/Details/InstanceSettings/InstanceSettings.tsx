@@ -19,13 +19,13 @@ import Select, {
 import VersionTag from "../../../../components/VersionTag/VersionTag";
 import classNames from "classnames";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-type Props = {};
-
-export default function InstanceSettings(props: Readonly<Props>) {
+export default function InstanceSettings() {
     const { uuid } = useParams();
+    const queryClient = useQueryClient();
 
-    const { instance, loading: instanceLoading } = useInstance(uuid);
+    const { instance, isLoading: isLoadingInstance } = useInstance(uuid);
 
     const [displayName, setDisplayName] = useState<string>();
     const [launchOnStartup, setLaunchOnStartup] = useState<boolean>();
@@ -35,7 +35,6 @@ export default function InstanceSettings(props: Readonly<Props>) {
 
     // undefined = not saved AND never modified
     const [saved, setSaved] = useState<boolean>(undefined);
-    const [uploading, setUploading] = useState<boolean>(false);
     const [error, setError] = useState();
 
     useEffect(() => {
@@ -51,8 +50,8 @@ export default function InstanceSettings(props: Readonly<Props>) {
         api.vxInstances
             .instance(instance.uuid)
             .versions.get(cache)
-            .then((res) => {
-                setVersions(res.data?.reverse());
+            .then((data) => {
+                setVersions(data?.reverse());
             })
             .catch(setError)
             .finally(() => {
@@ -60,23 +59,24 @@ export default function InstanceSettings(props: Readonly<Props>) {
             });
     };
 
-    const save = () => {
-        setUploading(true);
-        api.vxInstances
-            .instance(uuid)
-            .patch({
+    const mutationSave = useMutation({
+        mutationFn: async () => {
+            await api.vxInstances.instance(uuid).patch({
                 launch_on_startup: launchOnStartup,
                 display_name: displayName,
                 version: version,
-            })
-            .then(() => {
-                setSaved(true);
-            })
-            .catch(setError)
-            .finally(() => {
-                setUploading(false);
             });
-    };
+        },
+        onSuccess: () => {
+            setSaved(true);
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["instances", uuid],
+            });
+        },
+    });
+    const { isLoading: isUploading } = mutationSave;
 
     const onVersionChange = (v: any) => {
         setVersion(v);
@@ -100,7 +100,7 @@ export default function InstanceSettings(props: Readonly<Props>) {
     return (
         <Fragment>
             <ProgressOverlay
-                show={instanceLoading || versionsLoading || uploading}
+                show={isLoadingInstance || versionsLoading || isUploading}
             />
             <Title className={styles.title}>Settings</Title>
             <APIError error={error} />
@@ -112,13 +112,13 @@ export default function InstanceSettings(props: Readonly<Props>) {
                     setDisplayName(e.target.value);
                     setSaved(false);
                 }}
-                disabled={instanceLoading}
+                disabled={isLoadingInstance}
             />
             <div className={styles.versionSelect}>
                 <Select
                     label="Version"
                     onChange={onVersionChange}
-                    disabled={instanceLoading || versionsLoading}
+                    disabled={isLoadingInstance || versionsLoading}
                     // @ts-ignore
                     value={versionValue}
                 >
@@ -145,7 +145,7 @@ export default function InstanceSettings(props: Readonly<Props>) {
                 <Button
                     rightIcon="refresh"
                     onClick={() => reloadVersions(false)}
-                    disabled={instanceLoading || versionsLoading}
+                    disabled={isLoadingInstance || versionsLoading}
                 >
                     Refresh
                 </Button>
@@ -159,20 +159,20 @@ export default function InstanceSettings(props: Readonly<Props>) {
                         setLaunchOnStartup(v);
                         setSaved(false);
                     }}
-                    disabled={instanceLoading}
+                    disabled={isLoadingInstance}
                 />
             </Horizontal>
             <Button
                 primary
                 large
-                onClick={save}
+                onClick={async () => mutationSave.mutate()}
                 rightIcon="save"
-                loading={uploading}
+                loading={isUploading}
                 disabled={saved || saved === undefined}
             >
                 Save
             </Button>
-            {!uploading && saved && (
+            {!isUploading && saved && (
                 <Horizontal
                     className={styles.saved}
                     alignItems="center"

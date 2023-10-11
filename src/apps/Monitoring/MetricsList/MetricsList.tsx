@@ -1,25 +1,27 @@
 import { Vertical } from "../../../components/Layouts/Layouts";
 import styles from "./MetricsList.module.sass";
 import Metrics from "../Metrics/Metrics";
-import { useFetch } from "../../../hooks/useFetch";
 import { api } from "../../../backend/backend";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { APIError } from "../../../components/Error/APIError";
 import { Title } from "../../../components/Text/Text";
-import { Metric } from "../../../models/metrics";
+import { useQuery } from "@tanstack/react-query";
 
 export default function MetricsList() {
     const {
         data: metrics,
-        loading: loadingMetrics,
-        error: errorMetrics,
-    } = useFetch<Metric[]>(api.vxMonitoring.metrics);
+        isLoading,
+        error,
+    } = useQuery({
+        queryKey: ["metrics"],
+        queryFn: api.vxMonitoring.metrics,
+    });
 
     return (
         <Vertical gap={20}>
-            <ProgressOverlay show={loadingMetrics} />
+            <ProgressOverlay show={isLoading} />
             <Title className={styles.title}>Metrics</Title>
-            <APIError error={errorMetrics} />
+            <APIError error={error} />
             <Metrics metrics={metrics} />
         </Vertical>
     );

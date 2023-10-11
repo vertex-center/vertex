@@ -8,11 +8,13 @@ import Update, { Updates } from "../../../../components/Update/Update";
 import { useState } from "react";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function InstanceUpdate() {
     const { uuid } = useParams();
+    const queryClient = useQueryClient();
 
-    const { instance, reloadInstance, loading } = useInstance(uuid);
+    const { instance, isLoading } = useInstance(uuid);
 
     const [error, setError] = useState();
 
@@ -20,16 +22,20 @@ export default function InstanceUpdate() {
         return api.vxInstances
             .instance(uuid)
             .update.service()
-            .then(reloadInstance)
+            .then(() => {
+                queryClient.invalidateQueries({
+                    queryKey: ["instances", uuid],
+                });
+            })
             .catch(setError);
     };
 
     return (
         <Vertical gap={20}>
-            <ProgressOverlay show={loading} />
+            <ProgressOverlay show={isLoading} />
             <Title className={styles.title}>Update</Title>
             <APIError error={error} />
-            {!error && !loading && (
+            {!error && !isLoading && (
                 <Updates>
                     <Update
                         name="Vertex integration"

@@ -1,25 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
 import { api } from "../backend/backend";
-import { Instance } from "../models/instance";
+import { useQuery } from "@tanstack/react-query";
 
 export default function useInstance(uuid?: string) {
-    const [instance, setInstance] = useState<Instance>();
-    const [loading, setLoading] = useState<boolean>(true);
-
-    const reloadInstance = useCallback(() => {
-        console.log("Fetching instance", uuid);
-        setLoading(true);
-        api.vxInstances
-            .instance(uuid)
-            .get()
-            .then((res) => setInstance(res.data))
-            .catch(console.error)
-            .finally(() => setLoading(false));
-    }, [uuid]);
-
-    useEffect(() => {
-        reloadInstance();
-    }, [uuid]);
-
-    return { instance, setInstance, reloadInstance, loading };
+    const queryInstance = useQuery({
+        queryKey: ["instances", uuid],
+        queryFn: api.vxInstances.instance(uuid).get,
+    });
+    return { instance: queryInstance.data, ...queryInstance };
 }

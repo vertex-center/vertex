@@ -4,19 +4,18 @@ import Sidebar, {
 } from "../../../components/Sidebar/Sidebar";
 import { SiGrafana, SiPrometheus } from "@icons-pack/react-simple-icons";
 import PageWithSidebar from "../../../components/PageWithSidebar/PageWithSidebar";
-import { useFetch } from "../../../hooks/useFetch";
 import { api } from "../../../backend/backend";
-import { Instances } from "../../../models/instance";
 import { Fragment } from "react";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useServerEvent } from "../../../hooks/useEvent";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function MonitoringApp() {
-    const {
-        data: instances,
-        loading,
-        reload: reloadInstances,
-    } = useFetch<Instances>(api.vxInstances.instances.all);
+    const queryClient = useQueryClient();
+    const { data: instances, isLoading } = useQuery({
+        queryKey: ["instances"],
+        queryFn: api.vxInstances.instances.all,
+    });
 
     const ledPrometheus = Object.values(instances || {}).find((inst) =>
         inst.tags?.includes("vertex-prometheus-collector")
@@ -29,7 +28,9 @@ export default function MonitoringApp() {
     useServerEvent("/app/vx-instances/instances/events", {
         change: (e) => {
             console.log(e);
-            reloadInstances().finally();
+            queryClient.invalidateQueries({
+                queryKey: ["instances"],
+            });
         },
     });
 
@@ -63,7 +64,7 @@ export default function MonitoringApp() {
 
     return (
         <Fragment>
-            <ProgressOverlay show={loading} />
+            <ProgressOverlay show={isLoading} />
             <PageWithSidebar title="Monitoring" sidebar={sidebar} />
         </Fragment>
     );

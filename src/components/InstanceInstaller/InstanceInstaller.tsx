@@ -2,10 +2,10 @@ import Bay from "../Bay/Bay";
 import { APIError } from "../Error/APIError";
 import { Fragment, useEffect, useState } from "react";
 import { ProgressOverlay } from "../Progress/Progress";
-import { useFetch } from "../../hooks/useFetch";
-import { Instance, Instances } from "../../models/instance";
+import { Instance } from "../../models/instance";
 import { api } from "../../backend/backend";
 import { useServerEvent } from "../../hooks/useEvent";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 type Props = {
     name: string;
@@ -21,13 +21,16 @@ type Inst = Partial<
 
 export default function InstanceInstaller(props: Readonly<Props>) {
     const { name, tag, install } = props;
+    const queryClient = useQueryClient();
 
     const {
         data: instances,
-        reload: reloadInstances,
-        loading: loadingInstances,
+        isLoading: isLoadingInstances,
         error: errorInstances,
-    } = useFetch<Instances>(api.vxInstances.instances.all);
+    } = useQuery({
+        queryKey: ["instances"],
+        queryFn: api.vxInstances.instances.all,
+    });
 
     const [downloading, setDownloading] = useState(false);
     const [error, setError] = useState();
@@ -60,7 +63,9 @@ export default function InstanceInstaller(props: Readonly<Props>) {
             .catch(setError)
             .finally(() => {
                 setDownloading(false);
-                reloadInstances().catch(setError);
+                queryClient.invalidateQueries({
+                    queryKey: ["instances"],
+                });
             });
     };
 
@@ -88,7 +93,7 @@ export default function InstanceInstaller(props: Readonly<Props>) {
 
     return (
         <Fragment>
-            <ProgressOverlay show={downloading || loadingInstances} />
+            <ProgressOverlay show={downloading || isLoadingInstances} />
             <APIError error={error ?? errorInstances} />
             <Bay
                 instances={[

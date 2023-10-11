@@ -1,4 +1,3 @@
-import { useFetch } from "../../../hooks/useFetch";
 import { api } from "../../../backend/backend";
 import React, { useState } from "react";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
@@ -11,14 +10,43 @@ import Button from "../../../components/Button/Button";
 import Popup from "../../../components/Popup/Popup";
 import Input from "../../../components/Input/Input";
 import Spacer from "../../../components/Spacer/Spacer";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function VertexReverseProxy() {
+    const queryClient = useQueryClient();
     const {
         data: redirects,
         error,
-        reload,
-        loading,
-    } = useFetch<ProxyRedirects>(api.vxReverseProxy.redirects.get);
+        isLoading,
+    } = useQuery({
+        queryKey: ["redirects"],
+        queryFn: api.vxReverseProxy.redirects.get,
+    });
+
+    const mutationDelete = useMutation({
+        mutationFn: api.vxReverseProxy.redirects.delete,
+        onSuccess: () => {
+            closeNewRedirectPopup();
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["redirects"],
+            });
+        },
+    });
+
+    const mutationAdd = useMutation({
+        mutationFn: ({ source, target }: { source: string; target: string }) =>
+            api.vxReverseProxy.redirects.add(source, target),
+        onSuccess: () => {
+            closeNewRedirectPopup();
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["redirects"],
+            });
+        },
+    });
 
     const [showNewRedirectPopup, setShowNewRedirectPopup] = useState(false);
 
@@ -31,24 +59,9 @@ export default function VertexReverseProxy() {
     const openNewRedirectPopup = () => setShowNewRedirectPopup(true);
     const closeNewRedirectPopup = () => setShowNewRedirectPopup(false);
 
-    const addNewRedirection = () => {
-        api.vxReverseProxy.redirects
-            .add(source, target)
-            .then(reload)
-            .catch(console.error)
-            .finally(closeNewRedirectPopup);
-    };
-
-    const onDelete = (uuid: string) => {
-        api.vxReverseProxy.redirects
-            .delete(uuid)
-            .then(reload)
-            .catch(console.error);
-    };
-
     return (
         <Vertical gap={20}>
-            <ProgressOverlay show={loading} />
+            <ProgressOverlay show={isLoading} />
             <Title className={styles.title}>Vertex Reverse Proxy</Title>
 
             <div className={styles.redirects}>
@@ -56,10 +69,11 @@ export default function VertexReverseProxy() {
                 {!error &&
                     Object.entries(redirects ?? {}).map(([uuid, redirect]) => (
                         <ProxyRedirect
+                            key={uuid}
                             enabled={true}
                             source={redirect.source}
                             target={redirect.target}
-                            onDelete={() => onDelete(uuid)}
+                            onDelete={() => mutationDelete.mutate(uuid)}
                         />
                     ))}
             </div>
@@ -89,7 +103,12 @@ export default function VertexReverseProxy() {
                 <Horizontal gap={10}>
                     <Spacer />
                     <Button onClick={closeNewRedirectPopup}>Cancel</Button>
-                    <Button primary onClick={addNewRedirection}>
+                    <Button
+                        primary
+                        onClick={async () =>
+                            mutationAdd.mutate({ source, target })
+                        }
+                    >
                         Send
                     </Button>
                 </Horizontal>

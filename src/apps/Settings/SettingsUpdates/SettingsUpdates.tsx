@@ -35,8 +35,8 @@ export default function SettingsUpdates() {
 
         api.dependencies
             .get(refresh)
-            .then((res) => {
-                setDependencies(res.data);
+            .then((data) => {
+                setDependencies(data);
             })
             .catch(setError)
             .finally(() => setIsLoading(false));
@@ -59,9 +59,9 @@ export default function SettingsUpdates() {
     const getChannel = () => {
         api.settings
             .get()
-            .then((res) => {
-                console.log(res.data);
-                setBeta(res?.data?.updates?.channel === "beta");
+            .then((data) => {
+                console.log(data);
+                setBeta(data?.updates?.channel === "beta");
             })
             .catch(setError);
     };

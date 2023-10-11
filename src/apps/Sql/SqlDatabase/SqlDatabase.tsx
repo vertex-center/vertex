@@ -2,12 +2,10 @@ import { Vertical } from "../../../components/Layouts/Layouts";
 import { useParams } from "react-router-dom";
 import { api } from "../../../backend/backend";
 import { Instance } from "../../../models/instance";
-import { useFetch } from "../../../hooks/useFetch";
 import Bay from "../../../components/Bay/Bay";
 import { v4 as uuidv4 } from "uuid";
 import { useServerEvent } from "../../../hooks/useEvent";
 import { APIError } from "../../../components/Error/APIError";
-import { useEffect } from "react";
 import {
     KeyValueGroup,
     KeyValueInfo,
@@ -21,28 +19,29 @@ import ListTitle from "../../../components/List/ListTitle";
 import Icon from "../../../components/Icon/Icon";
 import { Title } from "../../../components/Text/Text";
 import styles from "./SqlDatabase.module.sass";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-type Props = {};
-
-export default function SqlDatabase(props: Readonly<Props>) {
+export default function SqlDatabase() {
     const { uuid } = useParams();
+    const queryClient = useQueryClient();
 
     const {
         data: instance,
-        loading,
-        reload,
-        error,
-    } = useFetch<Instance>(() => api.vxInstances.instance(uuid).get());
+        isLoading: isLoadingInstance,
+        error: errorInstance,
+    } = useQuery({
+        queryKey: ["instances", uuid],
+        queryFn: api.vxInstances.instance(uuid).get,
+    });
 
     const {
         data: db,
-        loading: dbLoading,
-        error: dbError,
-    } = useFetch<SqlDBMS>(() => api.vxSql.instance(uuid).get());
-
-    useEffect(() => {
-        reload().finally();
-    }, [uuid]);
+        isLoading: isLoadingDatabase,
+        error: errorDatabase,
+    } = useQuery({
+        queryKey: ["sql_instances", uuid],
+        queryFn: api.vxSql.instance(uuid).get,
+    });
 
     const onPower = async (inst: Instance) => {
         if (!inst) {
@@ -60,16 +59,18 @@ export default function SqlDatabase(props: Readonly<Props>) {
 
     useServerEvent(route, {
         status_change: () => {
-            reload().finally();
+            queryClient.invalidateQueries({
+                queryKey: ["instances", uuid],
+            });
         },
     });
 
     return (
         <Vertical gap={30}>
-            <ProgressOverlay show={loading ?? dbLoading} />
+            <ProgressOverlay show={isLoadingInstance ?? isLoadingDatabase} />
 
             <Vertical gap={20}>
-                <APIError error={error ?? dbError} />
+                <APIError error={errorInstance ?? errorDatabase} />
                 <Bay
                     instances={[
                         {
@@ -83,10 +84,10 @@ export default function SqlDatabase(props: Readonly<Props>) {
                 />
 
                 <KeyValueGroup>
-                    <KeyValueInfo name="Username" loading={dbLoading}>
+                    <KeyValueInfo name="Username" loading={isLoadingDatabase}>
                         {db?.username}
                     </KeyValueInfo>
-                    <KeyValueInfo name="Password" loading={dbLoading}>
+                    <KeyValueInfo name="Password" loading={isLoadingDatabase}>
                         {db?.password}
                     </KeyValueInfo>
                 </KeyValueGroup>

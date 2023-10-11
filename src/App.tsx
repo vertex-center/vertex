@@ -32,134 +32,144 @@ import VertexReverseProxy from "./apps/ReverseProxy/VertexReverseProxy/VertexRev
 import SqlApp from "./apps/Sql/SqlApp/SqlApp";
 import SqlInstaller from "./apps/Sql/Installer/SqlInstaller";
 import SqlDatabase from "./apps/Sql/SqlDatabase/SqlDatabase";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
+const queryClient = new QueryClient();
 
 function App() {
     const { theme } = useContext(ThemeContext);
 
     return (
         <div className={classNames("app", theme)}>
-            <HashRouter>
-                <Header />
-                <div className="appContent">
-                    <Routes>
-                        <Route
-                            path="/"
-                            element={<Navigate to="/app/vx-instances" />}
-                            index
-                        />
-                        <Route
-                            path="/app/vx-instances"
-                            element={<InstancesApp />}
-                        />
-                        <Route
-                            path="/app/vx-instances/add"
-                            element={<InstancesStore />}
-                        />
-                        <Route path="/app/vx-sql" element={<SqlApp />}>
+            <QueryClientProvider client={queryClient}>
+                <ReactQueryDevtools initialIsOpen={false} />
+                <HashRouter>
+                    <Header />
+                    <div className="appContent">
+                        <Routes>
                             <Route
-                                path="/app/vx-sql/install"
-                                element={<SqlInstaller />}
+                                path="/"
+                                element={<Navigate to="/app/vx-instances" />}
+                                index
                             />
                             <Route
-                                path="/app/vx-sql/db/:uuid"
-                                element={<SqlDatabase />}
-                            />
-                        </Route>
-                        <Route
-                            path="/app/vx-monitoring"
-                            element={<MonitoringApp />}
-                        >
-                            <Route
-                                path="/app/vx-monitoring/metrics"
-                                element={<MetricsList />}
+                                path="/app/vx-instances"
+                                element={<InstancesApp />}
                             />
                             <Route
-                                path="/app/vx-monitoring/prometheus"
-                                element={<Prometheus />}
+                                path="/app/vx-instances/add"
+                                element={<InstancesStore />}
                             />
+                            <Route path="/app/vx-sql" element={<SqlApp />}>
+                                <Route
+                                    path="/app/vx-sql/install"
+                                    element={<SqlInstaller />}
+                                />
+                                <Route
+                                    path="/app/vx-sql/db/:uuid"
+                                    element={<SqlDatabase />}
+                                />
+                            </Route>
                             <Route
-                                path="/app/vx-monitoring/grafana"
-                                element={<Grafana />}
-                            />
-                        </Route>
-                        <Route path="/app/vx-tunnels" element={<TunnelsApp />}>
+                                path="/app/vx-monitoring"
+                                element={<MonitoringApp />}
+                            >
+                                <Route
+                                    path="/app/vx-monitoring/metrics"
+                                    element={<MetricsList />}
+                                />
+                                <Route
+                                    path="/app/vx-monitoring/prometheus"
+                                    element={<Prometheus />}
+                                />
+                                <Route
+                                    path="/app/vx-monitoring/grafana"
+                                    element={<Grafana />}
+                                />
+                            </Route>
                             <Route
-                                path="/app/vx-tunnels/cloudflare"
-                                element={<CloudflareTunnels />}
-                            />
-                        </Route>
-                        <Route
-                            path="/app/vx-reverse-proxy"
-                            element={<ReverseProxyApp />}
-                        >
+                                path="/app/vx-tunnels"
+                                element={<TunnelsApp />}
+                            >
+                                <Route
+                                    path="/app/vx-tunnels/cloudflare"
+                                    element={<CloudflareTunnels />}
+                                />
+                            </Route>
                             <Route
-                                path="/app/vx-reverse-proxy/vertex"
-                                element={<VertexReverseProxy />}
-                            />
-                        </Route>
-                        <Route
-                            path="/app/vx-instances/:uuid/"
-                            element={<Instance />}
-                        >
+                                path="/app/vx-reverse-proxy"
+                                element={<ReverseProxyApp />}
+                            >
+                                <Route
+                                    path="/app/vx-reverse-proxy/vertex"
+                                    element={<VertexReverseProxy />}
+                                />
+                            </Route>
                             <Route
-                                path="/app/vx-instances/:uuid/home"
-                                element={<InstanceHome />}
-                            />
-                            <Route
-                                path="/app/vx-instances/:uuid/docker"
-                                element={<InstanceDocker />}
-                            />
-                            <Route
-                                path="/app/vx-instances/:uuid/logs"
-                                element={<InstanceLogs />}
-                            />
-                            <Route
-                                path="/app/vx-instances/:uuid/environment"
-                                element={<InstanceEnv />}
-                            />
-                            <Route
-                                path="/app/vx-instances/:uuid/database"
-                                element={<InstanceDetailsDatabase />}
-                            />
-                            <Route
-                                path="/app/vx-instances/:uuid/update"
-                                element={<InstanceUpdate />}
-                            />
-                            <Route
-                                path="/app/vx-instances/:uuid/settings"
-                                element={<InstanceSettings />}
-                            />
-                        </Route>
-                        <Route path="/settings" element={<SettingsApp />}>
-                            <Route
-                                path="/settings/theme"
-                                element={<SettingsTheme />}
-                            />
-                            <Route
-                                path="/settings/notifications"
-                                element={<SettingsNotifications />}
-                            />
-                            <Route
-                                path="/settings/hardware"
-                                element={<SettingsHardware />}
-                            />
-                            <Route
-                                path="/settings/security"
-                                element={<SettingsSecurity />}
-                            />
-                            <Route
-                                path="/settings/updates"
-                                element={<SettingsUpdates />}
-                            />
-                            <Route
-                                path="/settings/about"
-                                element={<SettingsAbout />}
-                            />
-                        </Route>
-                    </Routes>
-                </div>
-                <Dock />
-            </HashRouter>
+                                path="/app/vx-instances/:uuid/"
+                                element={<Instance />}
+                            >
+                                <Route
+                                    path="/app/vx-instances/:uuid/home"
+                                    element={<InstanceHome />}
+                                />
+                                <Route
+                                    path="/app/vx-instances/:uuid/docker"
+                                    element={<InstanceDocker />}
+                                />
+                                <Route
+                                    path="/app/vx-instances/:uuid/logs"
+                                    element={<InstanceLogs />}
+                                />
+                                <Route
+                                    path="/app/vx-instances/:uuid/environment"
+                                    element={<InstanceEnv />}
+                                />
+                                <Route
+                                    path="/app/vx-instances/:uuid/database"
+                                    element={<InstanceDetailsDatabase />}
+                                />
+                                <Route
+                                    path="/app/vx-instances/:uuid/update"
+                                    element={<InstanceUpdate />}
+                                />
+                                <Route
+                                    path="/app/vx-instances/:uuid/settings"
+                                    element={<InstanceSettings />}
+                                />
+                            </Route>
+                            <Route path="/settings" element={<SettingsApp />}>
+                                <Route
+                                    path="/settings/theme"
+                                    element={<SettingsTheme />}
+                                />
+                                <Route
+                                    path="/settings/notifications"
+                                    element={<SettingsNotifications />}
+                                />
+                                <Route
+                                    path="/settings/hardware"
+                                    element={<SettingsHardware />}
+                                />
+                                <Route
+                                    path="/settings/security"
+                                    element={<SettingsSecurity />}
+                                />
+                                <Route
+                                    path="/settings/updates"
+                                    element={<SettingsUpdates />}
+                                />
+                                <Route
+                                    path="/settings/about"
+                                    element={<SettingsAbout />}
+                                />
+                            </Route>
+                        </Routes>
+                    </div>
+                    <Dock />
+                </HashRouter>
+            </QueryClientProvider>
         </div>
     );
 }

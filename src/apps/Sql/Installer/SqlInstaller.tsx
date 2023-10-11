@@ -1,6 +1,5 @@
 import { Title } from "../../../components/Text/Text";
 import { api } from "../../../backend/backend";
-import { useFetch } from "../../../hooks/useFetch";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import Service from "../../../components/Service/Service";
 import { Service as ServiceModel } from "../../../models/service";
@@ -8,25 +7,34 @@ import styles from "./SqlInstaller.module.sass";
 import { Vertical } from "../../../components/Layouts/Layouts";
 import ServiceInstallPopup from "../../../components/ServiceInstallPopup/ServiceInstallPopup";
 import { useState } from "react";
-import { Instances } from "../../../models/instance";
 import { APIError } from "../../../components/Error/APIError";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function SqlInstaller() {
+    const queryClient = useQueryClient();
+
+    const queryServices = useQuery({
+        queryKey: ["services"],
+        queryFn: api.vxInstances.services.all,
+    });
     const {
         data: services,
-        loading,
+        isLoading: isServicesLoading,
         error: servicesError,
-    } = useFetch<ServiceModel[]>(api.vxInstances.services.all);
+    } = queryServices;
+
+    const queryInstances = useQuery({
+        queryKey: ["instances"],
+        queryFn: api.vxInstances.instances.all,
+    });
     const {
         data: instances,
+        isLoading: isInstancesLoading,
         error: instancesError,
-        reload: reloadInstances,
-    } = useFetch<Instances>(api.vxInstances.instances.all);
+    } = queryInstances;
 
     const [selectedService, setSelectedService] = useState<ServiceModel>();
     const [showPopup, setShowPopup] = useState(false);
-
-    const [error, setError] = useState();
     const [downloading, setDownloading] = useState<
         {
             service: ServiceModel;
@@ -43,29 +51,36 @@ export default function SqlInstaller() {
         setShowPopup(false);
     };
 
+    const mutationInstallService = useMutation({
+        mutationFn: async (serviceId: string) => {
+            await api.vxSql.dbms(serviceId).install();
+        },
+        onSettled: (data, error, serviceId) => {
+            setDownloading(
+                downloading.filter(({ service: s }) => s.id !== serviceId)
+            );
+            queryClient.invalidateQueries({
+                queryKey: ["instances"],
+            });
+        },
+    });
+    const { isLoading: isInstalling, error: installError } =
+        mutationInstallService;
+
     const install = () => {
         const service = selectedService;
-
         setDownloading((prev) => [...prev, { service }]);
         setShowPopup(false);
-
-        api.vxSql
-            .dbms(service.id)
-            .install()
-            .catch(setError)
-            .finally(() => {
-                setDownloading((d) =>
-                    d?.filter(({ service: s }) => s.id !== service.id)
-                );
-                reloadInstances().catch(console.error);
-            });
+        mutationInstallService.mutate(service.id);
     };
+
+    const error = servicesError ?? instancesError ?? installError;
 
     return (
         <Vertical gap={20}>
-            <ProgressOverlay show={loading} />
+            <ProgressOverlay show={isInstancesLoading ?? isServicesLoading} />
             <Title className={styles.title}>SQL Database Installer</Title>
-            <APIError error={error ?? servicesError ?? instancesError} />
+            <APIError error={error} />
             <Vertical>
                 {services
                     ?.filter((s) => s?.features?.databases?.length >= 1)

@@ -6,9 +6,7 @@ import SSHKey, { SSHKeys } from "../../../components/SSHKey/SSHKey";
 import { Errors } from "../../../components/Error/Errors";
 import { APIError } from "../../../components/Error/APIError";
 import ListItem from "../../../components/List/ListItem";
-import { useFetch } from "../../../hooks/useFetch";
 import { api } from "../../../backend/backend";
-import { SSHKeys as SSHKeysModel } from "../../../models/security";
 import Button from "../../../components/Button/Button";
 import { ChangeEvent, Fragment, useState } from "react";
 import Popup from "../../../components/Popup/Popup";
@@ -17,14 +15,18 @@ import Code from "../../../components/Code/Code";
 import Input from "../../../components/Input/Input";
 import Progress from "../../../components/Progress";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function SettingsSecurity() {
+    const queryClient = useQueryClient();
     const {
         data: sshKeys,
         error,
-        reload,
-        loading,
-    } = useFetch<SSHKeysModel>(api.security.ssh.get);
+        isLoading,
+    } = useQuery({
+        queryKey: ["ssh_keys"],
+        queryFn: api.security.ssh.get,
+    });
 
     const [showPopup, setShowPopup] = useState(false);
     const [authorizedKey, setAuthorizedKey] = useState("");
@@ -44,14 +46,23 @@ export default function SettingsSecurity() {
             .add(authorizedKey)
             .then(() => {
                 dismissPopup();
-                reload().then();
+                queryClient.invalidateQueries({
+                    queryKey: ["ssh_keys"],
+                });
             })
             .catch(setAddError)
             .finally(() => setAdding(false));
     };
 
     const deleteSSHKey = (fingerprint: string) => {
-        api.security.ssh.delete(fingerprint).then(reload).catch(setDeleteError);
+        api.security.ssh
+            .delete(fingerprint)
+            .then(() => {
+                queryClient.invalidateQueries({
+                    queryKey: ["ssh_keys"],
+                });
+            })
+            .catch(setDeleteError);
     };
 
     const onAuthorizedKeyChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -60,7 +71,7 @@ export default function SettingsSecurity() {
 
     return (
         <Fragment>
-            <ProgressOverlay show={loading} />
+            <ProgressOverlay show={isLoading} />
             <Vertical gap={20}>
                 <Title className={styles.title}>SSH keys</Title>
                 {(error || deleteError) && (

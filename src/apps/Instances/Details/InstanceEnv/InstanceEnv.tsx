@@ -11,11 +11,11 @@ import styles from "./InstanceEnv.module.sass";
 import { api } from "../../../../backend/backend";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-type Props = {};
-
-export default function InstanceEnv(props: Readonly<Props>) {
+export default function InstanceEnv() {
     const { uuid } = useParams();
+    const queryClient = useQueryClient();
 
     const [env, setEnv] = useState<
         {
@@ -24,13 +24,33 @@ export default function InstanceEnv(props: Readonly<Props>) {
         }[]
     >();
 
-    const { instance, loading } = useInstance(uuid);
-
-    const [uploading, setUploading] = useState(false);
-    const [error, setError] = useState();
+    const { instance, isLoading, error } = useInstance(uuid);
 
     // undefined = not saved AND never modified
     const [saved, setSaved] = useState<boolean>(undefined);
+
+    const mutationSaveEnv = useMutation({
+        mutationFn: async (env: Env) => {
+            await api.vxInstances.instance(uuid).env.save(env);
+        },
+        onSuccess: () => {
+            setSaved(true);
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["instances", uuid],
+            });
+        },
+    });
+    const { isLoading: isUploading } = mutationSaveEnv;
+
+    const save = () => {
+        const _env: Env = {};
+        env.forEach((e) => {
+            _env[e.env.name] = e.value;
+        });
+        mutationSaveEnv.mutate(_env);
+    };
 
     useEffect(() => {
         setEnv(
@@ -51,33 +71,17 @@ export default function InstanceEnv(props: Readonly<Props>) {
         setSaved(false);
     };
 
-    const save = () => {
-        const _env: Env = {};
-        env.forEach((e) => {
-            _env[e.env.name] = e.value;
-        });
-        setUploading(true);
-        api.vxInstances
-            .instance(uuid)
-            .env.save(_env)
-            .then(console.log)
-            .catch(setError)
-            .finally(() => {
-                setUploading(false);
-                setSaved(true);
-            });
-    };
-
     return (
         <Fragment>
-            <ProgressOverlay show={loading || uploading} />
+            <ProgressOverlay show={isLoading ?? isUploading} />
             <Title className={styles.title}>Environment</Title>
             {env?.map((env, i) => (
                 <EnvVariableInput
+                    key={env.env.name}
                     env={env.env}
                     value={env.value}
                     onChange={(v) => onChange(i, v)}
-                    disabled={uploading}
+                    disabled={isUploading}
                 />
             ))}
             <Button
@@ -85,7 +89,7 @@ export default function InstanceEnv(props: Readonly<Props>) {
                 large
                 onClick={save}
                 rightIcon="save"
-                loading={uploading}
+                loading={isUploading}
                 disabled={saved || saved === undefined}
             >
                 Save{" "}

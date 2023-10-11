@@ -19,51 +19,52 @@ import useInstance from "../../../../hooks/useInstance";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useServerEvent } from "../../../../hooks/useEvent";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Instance as InstanceModel } from "../../../../models/instance";
 
 export default function Instance() {
     const { uuid } = useParams();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
-    const { instance, setInstance, loading } = useInstance(uuid);
+    const { instance, isLoading } = useInstance(uuid);
 
     const [showDeletePopup, setShowDeletePopup] = useState<boolean>();
-    const [deleting, setDeleting] = useState<boolean>(false);
-    const [error, setError] = useState();
 
     const route = uuid ? `/app/vx-instances/instance/${uuid}/events` : "";
 
     useServerEvent(route, {
         status_change: (e) => {
-            setInstance((instance) => ({ ...instance, status: e.data }));
+            queryClient.setQueryData(
+                ["instances", uuid],
+                (instance: InstanceModel) => ({ ...instance, status: e.data })
+            );
         },
     });
 
-    const toggleInstance = async (uuid: string) => {
-        if (instance.status === "off" || instance.status === "error") {
-            await api.vxInstances.instance(uuid).start();
-        } else {
-            await api.vxInstances.instance(uuid).stop();
-        }
-    };
+    const mutationInstancePower = useMutation({
+        mutationFn: async () => {
+            if (instance.status === "off" || instance.status === "error") {
+                await api.vxInstances.instance(uuid).start();
+            } else {
+                await api.vxInstances.instance(uuid).stop();
+            }
+        },
+    });
 
-    const onDeleteInstance = () => {
-        setDeleting(true);
-        setError(undefined);
-        api.vxInstances
-            .instance(uuid)
-            .delete()
-            .then(() => {
-                navigate("/instances");
-            })
-            .catch((error) => {
-                setError(error);
-                setDeleting(false);
-            });
-    };
+    const mutationDeleteInstance = useMutation({
+        mutationFn: async () => {
+            await api.vxInstances.instance(uuid).delete();
+        },
+        onSuccess: () => {
+            navigate("/app/vx-instances");
+        },
+    });
+    const { isLoading: isDeleting, isError: isDeletingError } =
+        mutationDeleteInstance;
 
     const dismissDeletePopup = () => {
         setShowDeletePopup(false);
-        setError(undefined);
     };
 
     const content = (
@@ -136,18 +137,18 @@ export default function Instance() {
                     {instance?.display_name ?? instance?.service?.name}? All
                     data will be permanently deleted.
                 </Text>
-                {deleting && <Progress infinite />}
-                <APIError style={{ margin: 0 }} error={error} />
+                {isDeleting && <Progress infinite />}
+                <APIError style={{ margin: 0 }} error={isDeletingError} />
                 <Horizontal gap={10}>
                     <Spacer />
-                    <Button onClick={dismissDeletePopup} disabled={deleting}>
+                    <Button onClick={dismissDeletePopup} disabled={isDeleting}>
                         Cancel
                     </Button>
                     <Button
                         primary
                         color="red"
-                        onClick={onDeleteInstance}
-                        disabled={deleting}
+                        onClick={async () => mutationDeleteInstance.mutate()}
+                        disabled={isDeleting}
                         rightIcon="delete"
                     >
                         Confirm
@@ -159,18 +160,18 @@ export default function Instance() {
 
     return (
         <div className={styles.details}>
-            <ProgressOverlay show={loading} />
+            <ProgressOverlay show={isLoading} />
             <div className={styles.bay}>
                 <Bay
                     instances={[
                         {
                             value: instance,
-                            onPower: () => toggleInstance(uuid),
+                            onPower: async () => mutationInstancePower.mutate(),
                         },
                     ]}
                 />
             </div>
-            {!loading && content}
+            {!isLoading && content}
         </div>
     );
 }

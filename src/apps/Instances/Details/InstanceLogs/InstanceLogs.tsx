@@ -1,5 +1,5 @@
-import Logs, { LogLine } from "../../../../components/Logs/Logs";
-import { Fragment, useEffect, useState } from "react";
+import Logs from "../../../../components/Logs/Logs";
+import { Fragment } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../../../../backend/backend";
 import { Title } from "../../../../components/Text/Text";
@@ -7,27 +7,20 @@ import styles from "./InstanceLogs.module.sass";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useServerEvent } from "../../../../hooks/useEvent";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function InstanceLogs() {
     const { uuid } = useParams();
+    const queryClient = useQueryClient();
 
-    const [logs, setLogs] = useState<LogLine[]>([]);
-    const [error, setError] = useState();
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        if (uuid === undefined) return;
-        setLoading(true);
-        api.vxInstances
-            .instance(uuid)
-            .logs.get()
-            .then((res) => setLogs(res.data))
-            .catch(setError)
-            .finally(() => setLoading(false));
-    }, [uuid]);
+    const queryLogs = useQuery({
+        queryKey: ["instance_logs", uuid],
+        queryFn: api.vxInstances.instance(uuid).logs.get,
+    });
+    const { data: logs, isLoading, error } = queryLogs;
 
     const onStdout = (e: MessageEvent) => {
-        setLogs((logs) => [
+        queryClient.setQueryData(["instance_logs", uuid], (logs: any[]) => [
             ...logs,
             {
                 kind: "out",
@@ -37,7 +30,7 @@ export default function InstanceLogs() {
     };
 
     const onStderr = (e: MessageEvent) => {
-        setLogs((logs) => [
+        queryClient.setQueryData(["instance_logs", uuid], (logs: any[]) => [
             ...logs,
             {
                 kind: "err",
@@ -47,7 +40,7 @@ export default function InstanceLogs() {
     };
 
     const onDownload = (e: MessageEvent) => {
-        setLogs((logs) => {
+        queryClient.setQueryData(["instance_logs", uuid], (logs: any[]) => {
             const dl = JSON.parse(e.data);
 
             let downloads = [];
@@ -95,7 +88,7 @@ export default function InstanceLogs() {
 
     return (
         <Fragment>
-            <ProgressOverlay show={loading} />
+            <ProgressOverlay show={isLoading} />
             <Title className={styles.title}>Logs</Title>
             <APIError error={error} />
             <Logs lines={logs} />
