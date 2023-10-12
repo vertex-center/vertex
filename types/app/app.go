@@ -8,9 +8,22 @@ import (
 	"github.com/vertex-center/vertex/types"
 )
 
+type Meta struct {
+	// ID is the unique identifier of the app.
+	ID string `json:"id"`
+
+	// Name is the name of the app visible to the user.
+	Name string `json:"name"`
+
+	// Description is a brief description of the app.
+	Description string `json:"description"`
+
+	// Icon is the material symbol name for the app.
+	Icon string `json:"icon"`
+}
+
 type App struct {
-	id           string
-	name         string
+	meta         Meta
 	ctx          *Context
 	routers      map[string]Router
 	routersMutex *sync.RWMutex
@@ -24,9 +37,8 @@ func New(ctx *types.VertexContext) *App {
 	}
 }
 
-func (app *App) Register(appID, appName string) {
-	app.id = appID
-	app.name = appName
+func (app *App) Register(meta Meta) {
+	app.meta = meta
 }
 
 func (app *App) RegisterRouter(route string, router Router) {
@@ -39,12 +51,20 @@ func (app *App) Routers() map[string]Router {
 	return app.routers
 }
 
+func (app *App) Meta() Meta {
+	return app.meta
+}
+
 func (app *App) ID() string {
-	return app.id
+	return app.meta.ID
 }
 
 func (app *App) Name() string {
-	return app.name
+	return app.meta.Name
+}
+
+func (app *App) Description() string {
+	return app.meta.Description
 }
 
 func (app *App) Context() *Context {

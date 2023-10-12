@@ -2,17 +2,15 @@ package sql
 
 import (
 	"github.com/vertex-center/vertex/apps/sql/router"
-	"github.com/vertex-center/vertex/types/app"
+	apptypes "github.com/vertex-center/vertex/types/app"
 )
 
 const (
-	AppID    = "vx-sql"
-	AppName  = "Vertex SQL"
 	AppRoute = "/vx-sql"
 )
 
 type App struct {
-	*app.App
+	*apptypes.App
 	router *router.AppRouter
 }
 
@@ -20,13 +18,18 @@ func NewApp() *App {
 	return &App{}
 }
 
-func (a *App) Initialize(app *app.App) error {
+func (a *App) Initialize(app *apptypes.App) error {
 	a.App = app
 
 	c := app.Context()
 	a.router = router.NewAppRouter(c)
 
-	app.Register(AppID, AppName)
+	app.Register(apptypes.Meta{
+		ID:          "vx-sql",
+		Name:        "Vertex SQL",
+		Description: "Create and manage SQL databases.",
+		Icon:        "database",
+	})
 	app.RegisterRouter(AppRoute, a.router)
 
 	return nil

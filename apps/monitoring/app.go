@@ -2,17 +2,15 @@ package monitoring
 
 import (
 	"github.com/vertex-center/vertex/apps/monitoring/router"
-	"github.com/vertex-center/vertex/types/app"
+	apptypes "github.com/vertex-center/vertex/types/app"
 )
 
 const (
-	AppID    = "vx-monitoring"
-	AppName  = "Vertex Monitoring"
 	AppRoute = "/vx-monitoring"
 )
 
 type App struct {
-	*app.App
+	*apptypes.App
 	router *router.AppRouter
 }
 
@@ -20,11 +18,16 @@ func NewApp() *App {
 	return &App{}
 }
 
-func (a *App) Initialize(app *app.App) error {
+func (a *App) Initialize(app *apptypes.App) error {
 	a.App = app
 	a.router = router.NewAppRouter(app.Context())
 
-	app.Register(AppID, AppName)
+	app.Register(apptypes.Meta{
+		ID:          "vx-monitoring",
+		Name:        "Vertex Monitoring",
+		Description: "Create and manage instances.",
+		Icon:        "monitoring",
+	})
 	app.RegisterRouter(AppRoute, a.router)
 
 	return nil

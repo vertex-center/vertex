@@ -39,7 +39,7 @@ func (registry *AppsRegistry) RegisterApp(app *App, impl Interface) error {
 	if err != nil {
 		return err
 	}
-	registry.apps[app.id] = AppRegistry{
+	registry.apps[app.ID()] = AppRegistry{
 		Interface: impl,
 		App:       app,
 	}

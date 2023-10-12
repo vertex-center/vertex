@@ -3,17 +3,15 @@ package reverseproxy
 import (
 	"github.com/vertex-center/vertex/apps/reverseproxy/router"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/types/app"
+	apptypes "github.com/vertex-center/vertex/types/app"
 )
 
 const (
-	AppID    = "vx-reverse-proxy"
-	AppName  = "Vertex Reverse Proxy"
 	AppRoute = "/vx-reverse-proxy"
 )
 
 type App struct {
-	*app.App
+	*apptypes.App
 	router *router.AppRouter
 	proxy  *router.ProxyRouter
 }
@@ -22,7 +20,7 @@ func NewApp() *App {
 	return &App{}
 }
 
-func (a *App) Initialize(app *app.App) error {
+func (a *App) Initialize(app *apptypes.App) error {
 	a.App = app
 	a.router = router.NewAppRouter()
 	a.proxy = router.NewProxyRouter(a.router.GetProxyService())
@@ -34,7 +32,12 @@ func (a *App) Initialize(app *app.App) error {
 		}
 	}()
 
-	app.Register(AppID, AppName)
+	app.Register(apptypes.Meta{
+		ID:          "vx-reverse-proxy",
+		Name:        "Vertex Reverse Proxy",
+		Description: "Redirect traffic to your instances.",
+		Icon:        "router",
+	})
 	app.RegisterRouter(AppRoute, a.router)
 
 	return nil

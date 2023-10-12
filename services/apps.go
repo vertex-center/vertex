@@ -75,3 +75,11 @@ func (s *AppsService) startApp(impl app.Interface) error {
 func (s *AppsService) StopApps() {
 	s.registry.Close()
 }
+
+func (s *AppsService) All() []app.Meta {
+	var apps []app.Meta
+	for _, a := range s.registry.Apps() {
+		apps = append(apps, a.App.Meta())
+	}
+	return apps
+}

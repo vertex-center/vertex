@@ -33,6 +33,7 @@ var (
 	settingsFSAdapter   types.SettingsAdapterPort
 	sshKernelApiAdapter types.SshAdapterPort
 
+	appsService          *services.AppsService
 	notificationsService services.NotificationsService
 	dependenciesService  services.DependenciesService
 	settingsService      services.SettingsService
@@ -133,7 +134,7 @@ func (r *Router) initAdapters() {
 }
 
 func (r *Router) initServices(about types.About) {
-	services.NewAppsService(r.ctx, r.Router,
+	appsService = services.NewAppsService(r.ctx, r.Router,
 		[]app.Interface{
 			sql.NewApp(),
 			tunnels.NewApp(),
@@ -170,6 +171,7 @@ func (r *Router) initAPIRoutes(about types.About) {
 		})
 	}
 
+	addAppsRoutes(api.Group("/apps"))
 	addDependenciesRoutes(api.Group("/dependencies"))
 	addSettingsRoutes(api.Group("/settings"))
 	addHardwareRoutes(api.Group("/hardware"))
