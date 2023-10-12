@@ -2,6 +2,7 @@ package migration
 
 import (
 	"os"
+	"path"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -19,9 +20,10 @@ func TestMigrationTestSuite(t *testing.T) {
 
 func (suite *MigrationTestSuite) SetupTest() {
 	dir, err := os.MkdirTemp("", "live_temp-*")
-	if err != nil {
-		return
-	}
+	suite.Require().NoError(err)
+
+	err = os.MkdirAll(path.Join(dir, "instances"), 0755)
+	suite.Require().NoError(err)
 
 	suite.tool = NewMigrationTool(dir)
 }
