@@ -270,7 +270,8 @@ func (a InstanceRunnerDockerAdapter) Start(inst *instancestypes.Instance, setSta
 			}
 		}()
 
-		a.watchForStatusChange(id, inst, setStatus)
+		a.WaitStatus(id, inst, container.WaitConditionNotRunning)
+		setStatus(instancestypes.InstanceStatusOff)
 	}()
 
 	return rOut, rErr, nil
@@ -498,10 +499,10 @@ func (a InstanceRunnerDockerAdapter) createContainer(options types.CreateContain
 	return res.ID, err
 }
 
-func (a InstanceRunnerDockerAdapter) watchForStatusChange(containerID string, inst *instancestypes.Instance, setStatus func(status string)) {
+func (a InstanceRunnerDockerAdapter) WaitStatus(containerID string, inst *instancestypes.Instance, condition container.WaitCondition) {
 	go func() {
 		err := requests.URL(config.Current.KernelURL()).
-			Pathf("/api/docker/container/%s/wait/%s", containerID, container.WaitConditionNotRunning).
+			Pathf("/api/docker/container/%s/wait/%s", containerID, condition).
 			Fetch(context.Background())
 
 		if err != nil {
@@ -510,8 +511,6 @@ func (a InstanceRunnerDockerAdapter) watchForStatusChange(containerID string, in
 			)
 			return
 		}
-
-		setStatus(instancestypes.InstanceStatusOff)
 	}()
 }
 

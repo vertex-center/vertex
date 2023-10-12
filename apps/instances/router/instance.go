@@ -537,3 +537,24 @@ func (r *AppRouter) handleGetVersions(c *router.Context) {
 
 	c.JSON(versions)
 }
+
+func (r *AppRouter) handleWaitInstance(c *router.Context) {
+	cond := c.Param("cond")
+
+	inst := r.getInstance(c)
+	if inst == nil {
+		return
+	}
+
+	err := r.instanceRunnerService.WaitCondition(inst, vtypes.WaitContainerCondition(cond))
+	if err != nil {
+		c.Abort(router.Error{
+			Code:           types.ErrCodeFailedToWaitInstance,
+			PublicMessage:  fmt.Sprintf("Failed to wait the event '%s' for instance %s.", cond, inst.UUID),
+			PrivateMessage: err.Error(),
+		})
+		return
+	}
+
+	c.OK()
+}

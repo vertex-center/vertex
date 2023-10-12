@@ -71,6 +71,7 @@ func (r *AppRouter) AddRoutes(group *router.Group) {
 	instance.GET("/logs", r.handleGetLogs)
 	instance.POST("/update/service", r.handleUpdateService)
 	instance.GET("/versions", r.handleGetVersions)
+	instance.GET("/wait", r.handleWaitInstance)
 
 	instances := group.Group("/instances")
 	instances.GET("", r.handleGetInstances)

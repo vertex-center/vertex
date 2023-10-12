@@ -16,6 +16,7 @@ const (
 	ErrCodeFailedToGetInstanceLogs       router.ErrCode = "failed_to_get_logs"
 	ErrCodeFailedToUpdateServiceInstance router.ErrCode = "failed_to_update_service_instance"
 	ErrCodeFailedToGetVersions           router.ErrCode = "failed_to_get_versions"
+	ErrCodeFailedToWaitInstance          router.ErrCode = "failed_to_wait_instance"
 	ErrCodeFailedToSetLaunchOnStartup    router.ErrCode = "failed_to_set_launch_on_startup"
 	ErrCodeFailedToSetDisplayName        router.ErrCode = "failed_to_set_display_name"
 	ErrCodeFailedToSetDatabase           router.ErrCode = "failed_to_set_database"

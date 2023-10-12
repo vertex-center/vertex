@@ -3,6 +3,7 @@ package instancesapi
 import (
 	"context"
 
+	"github.com/docker/docker/api/types/container"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/instances"
 	"github.com/vertex-center/vertex/apps/instances/types"
@@ -124,6 +125,15 @@ func GetVersions(ctx context.Context, uuid uuid.UUID) ([]string, *api.Error) {
 		ErrorJSON(&apiError).
 		Fetch(ctx)
 	return versions, api.HandleError(err, apiError)
+}
+
+func WaitCondition(ctx context.Context, uuid uuid.UUID, condition container.WaitCondition) *api.Error {
+	var apiError api.Error
+	err := api.AppRequest(instances.AppRoute).
+		Pathf("./instance/%s/wait/%s", uuid, condition).
+		ErrorJSON(&apiError).
+		Fetch(ctx)
+	return api.HandleError(err, apiError)
 }
 
 // Helpers

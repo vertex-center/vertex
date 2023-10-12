@@ -1,14 +1,19 @@
 package types
 
-import "io"
+import (
+	"io"
+
+	"github.com/vertex-center/vertex/types"
+)
 
 type InstanceRunnerAdapterPort interface {
-	Delete(instance *Instance) error
-	Start(instance *Instance, setStatus func(status string)) (stdout io.ReadCloser, stderr io.ReadCloser, err error)
-	Stop(instance *Instance) error
-	Info(instance Instance) (map[string]any, error)
+	Delete(inst *Instance) error
+	Start(inst *Instance, setStatus func(status string)) (stdout io.ReadCloser, stderr io.ReadCloser, err error)
+	Stop(inst *Instance) error
+	Info(inst Instance) (map[string]any, error)
+	WaitCondition(inst *Instance, cond types.WaitContainerCondition) error
 
-	CheckForUpdates(instance *Instance) error
-	HasUpdateAvailable(instance Instance) (bool, error)
-	GetAllVersions(instance Instance) ([]string, error)
+	CheckForUpdates(inst *Instance) error
+	HasUpdateAvailable(inst Instance) (bool, error)
+	GetAllVersions(inst Instance) ([]string, error)
 }

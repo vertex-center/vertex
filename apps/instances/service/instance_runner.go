@@ -14,6 +14,7 @@ import (
 	"github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
+	vtypes "github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/app"
 	"github.com/vertex-center/vlog"
 )
@@ -266,6 +267,10 @@ func (s *InstanceRunnerService) RecreateContainer(inst *types.Instance) error {
 	}()
 
 	return nil
+}
+
+func (s *InstanceRunnerService) WaitCondition(inst *types.Instance, cond vtypes.WaitContainerCondition) error {
+	return s.adapter.WaitCondition(inst, cond)
 }
 
 func (s *InstanceRunnerService) setStatus(inst *types.Instance, status string) {
