@@ -39,6 +39,8 @@ func (t *MigrationTool) Migrate() error {
 		return err
 	}
 
+	log.Info("current live directory version", vlog.Int("version", v.Version))
+
 	for i := v.Version + 1; i < len(t.migrations); i++ {
 		log.Info("running migration", vlog.Int("version", i))
 		err := t.migrations[i].Up(t.livePath)
@@ -59,11 +61,12 @@ func (t *MigrationTool) Migrate() error {
 func (t *MigrationTool) readLiveVersion() (*LiveVersion, error) {
 	b, err := os.ReadFile(t.metadataPath)
 	if err != nil && os.IsNotExist(err) {
-		err := t.writeLiveVersion(&LiveVersion{Version: -1})
+		liveVersion := &LiveVersion{Version: len(t.migrations) - 1}
+		err := t.writeLiveVersion(liveVersion)
 		if err != nil {
 			return nil, err
 		}
-		return &LiveVersion{Version: -1}, nil
+		return liveVersion, nil
 	} else if err != nil {
 		return nil, err
 	}
