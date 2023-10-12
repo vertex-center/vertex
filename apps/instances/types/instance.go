@@ -16,9 +16,7 @@ const (
 )
 
 const (
-	InstanceInstallMethodScript  = "script"
-	InstanceInstallMethodRelease = "release"
-	InstanceInstallMethodDocker  = "docker"
+	InstanceInstallMethodDocker = "docker"
 )
 
 var (
