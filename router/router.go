@@ -37,9 +37,9 @@ var (
 	notificationsService services.NotificationsService
 	dependenciesService  services.DependenciesService
 	settingsService      services.SettingsService
-	//setupService         *services.SetupService
-	hardwareService services.HardwareService
-	sshService      services.SshService
+	setupService         *services.SetupService
+	hardwareService      services.HardwareService
+	sshService           services.SshService
 )
 
 type Router struct {
@@ -84,13 +84,13 @@ func (r *Router) Start(addr string) {
 		log.Error(err)
 	}
 
-	//go func() {
-	//	err = setupService.Setup()
-	//	if err != nil {
-	//		log.Error(err)
-	//		os.Exit(1)
-	//	}
-	//}()
+	go func() {
+		err = setupService.Setup()
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+	}()
 
 	url := config.Current.VertexURL()
 	log.Info("Vertex started", vlog.String("url", url))
@@ -155,7 +155,7 @@ func (r *Router) initServices(about types.About) {
 	notificationsService = services.NewNotificationsService(r.ctx, settingsFSAdapter)
 	dependenciesService = services.NewDependenciesService(r.ctx, about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)
-	//setupService = services.NewSetupService(r.ctx)
+	setupService = services.NewSetupService(r.ctx)
 	hardwareService = services.NewHardwareService()
 	sshService = services.NewSshService(sshKernelApiAdapter)
 }
