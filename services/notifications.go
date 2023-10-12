@@ -3,6 +3,7 @@ package services
 import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/webhook"
+	"github.com/google/uuid"
 	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/types"
 )
@@ -10,6 +11,7 @@ import (
 // TODO: Move webhooks use to a Discord adapter
 
 type NotificationsService struct {
+	uuid            uuid.UUID
 	ctx             *types.VertexContext
 	settingsAdapter types.SettingsAdapterPort
 	client          webhook.Client
@@ -18,6 +20,7 @@ type NotificationsService struct {
 
 func NewNotificationsService(ctx *types.VertexContext, settingsAdapter types.SettingsAdapterPort) NotificationsService {
 	return NotificationsService{
+		uuid:            uuid.New(),
 		ctx:             ctx,
 		settingsAdapter: settingsAdapter,
 	}
@@ -35,22 +38,26 @@ func (s *NotificationsService) StartWebhook() error {
 		return err
 	}
 
-	s.listener = types.NewTempListener(func(e interface{}) {
-		switch e := e.(type) {
-		case instancestypes.EventInstanceStatusChange:
-			if e.Status == instancestypes.InstanceStatusOff || e.Status == instancestypes.InstanceStatusError || e.Status == instancestypes.InstanceStatusRunning {
-				s.sendStatus(e.Name, e.Status)
-			}
-		}
-	})
-
-	s.ctx.AddListener(s.listener)
+	s.ctx.AddListener(s)
 
 	return nil
 }
 
 func (s *NotificationsService) StopWebhook() {
-	s.ctx.RemoveListener(s.listener)
+	s.ctx.RemoveListener(s)
+}
+
+func (s *NotificationsService) GetUUID() uuid.UUID {
+	return s.uuid
+}
+
+func (s *NotificationsService) OnEvent(e interface{}) {
+	switch e := e.(type) {
+	case instancestypes.EventInstanceStatusChange:
+		if e.Status == instancestypes.InstanceStatusOff || e.Status == instancestypes.InstanceStatusError || e.Status == instancestypes.InstanceStatusRunning {
+			s.sendStatus(e.Name, e.Status)
+		}
+	}
 }
 
 func (s *NotificationsService) sendStatus(name string, status string) {
