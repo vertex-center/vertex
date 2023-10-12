@@ -1,13 +1,13 @@
 import styles from "./InstancesApp.module.sass";
 import Bay from "../../../components/Bay/Bay";
 import { BigTitle } from "../../../components/Text/Text";
-import Button from "../../../components/Button/Button";
-import { Horizontal } from "../../../components/Layouts/Layouts";
 import { api } from "../../../backend/api/backend";
 import { APIError } from "../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useServerEvent } from "../../../hooks/useEvent";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Toolbar from "../../../components/Toolbar/Toolbar";
+import Spacer from "../../../components/Spacer/Spacer";
 
 export default function InstancesApp() {
     const queryClient = useQueryClient();
@@ -66,6 +66,16 @@ export default function InstancesApp() {
 
             {!isLoading && !isError && (
                 <div className={styles.bays}>
+                    <Toolbar>
+                        <Spacer />
+                        <Toolbar.Button
+                            primary
+                            to="/app/vx-instances/add"
+                            leftIcon="add"
+                        >
+                            Create instance
+                        </Toolbar.Button>
+                    </Toolbar>
                     <Bay
                         instances={[
                             {
@@ -89,15 +99,6 @@ export default function InstancesApp() {
                             ]}
                         />
                     ))}
-                    <Horizontal className={styles.addBay} gap={10}>
-                        <Button
-                            primary
-                            to="/app/vx-instances/add"
-                            leftIcon="add"
-                        >
-                            Create instance
-                        </Button>
-                    </Horizontal>
                 </div>
             )}
         </div>
