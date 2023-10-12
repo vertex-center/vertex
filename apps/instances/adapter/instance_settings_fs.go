@@ -1,7 +1,6 @@
 package adapter
 
 import (
-	"encoding/json"
 	"errors"
 	"os"
 	"path"
@@ -10,9 +9,10 @@ import (
 	"github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
+	"gopkg.in/yaml.v3"
 )
 
-const InstanceSettingsPath = ".vertex/instance_settings.json"
+const InstanceSettingsPath = ".vertex/settings.yml"
 
 type InstanceSettingsFSAdapter struct {
 	instancesPath string
@@ -40,7 +40,7 @@ func NewInstanceSettingsFSAdapter(params *InstanceSettingsFSAdapterParams) types
 func (a *InstanceSettingsFSAdapter) Save(uuid uuid.UUID, settings types.InstanceSettings) error {
 	settingsPath := path.Join(a.instancesPath, uuid.String(), InstanceSettingsPath)
 
-	settingsBytes, err := json.MarshalIndent(settings, "", "\t")
+	settingsBytes, err := yaml.Marshal(settings)
 	if err != nil {
 		return err
 	}
@@ -65,6 +65,6 @@ func (a *InstanceSettingsFSAdapter) Load(uuid uuid.UUID) (types.InstanceSettings
 	}
 
 	var settings types.InstanceSettings
-	err = json.Unmarshal(settingsBytes, &settings)
+	err = yaml.Unmarshal(settingsBytes, &settings)
 	return settings, err
 }

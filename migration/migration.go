@@ -21,15 +21,14 @@ type LiveVersion struct {
 
 type Migration interface {
 	Up(livePath string) error
-	Down(livePath string) error
 }
 
 func NewMigrationTool(livePath string) *MigrationTool {
 	return &MigrationTool{
 		livePath:     livePath,
 		metadataPath: path.Join(livePath, "metadata.yml"),
-		migrations:   []Migration{
-			// Add migrations here
+		migrations: []Migration{
+			&migration0{},
 		},
 	}
 }
