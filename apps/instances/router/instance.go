@@ -137,11 +137,6 @@ type handlePatchInstanceBody struct {
 //   - failed_to_set_launch_on_startup: failed to set the launch on startup value
 //   - failed_to_set_display_name: failed to set the display name
 func (r *AppRouter) handlePatchInstance(c *router.Context) {
-	uid := r.getParamInstanceUUID(c)
-	if uid == nil {
-		return
-	}
-
 	inst := r.getInstance(c)
 	if inst == nil {
 		return
@@ -165,7 +160,7 @@ func (r *AppRouter) handlePatchInstance(c *router.Context) {
 		}
 	}
 
-	if body.DisplayName != nil {
+	if body.DisplayName != nil && *body.DisplayName != "" {
 		err = r.instanceSettingsService.SetDisplayName(inst, *body.DisplayName)
 		if err != nil {
 			c.Abort(router.Error{
