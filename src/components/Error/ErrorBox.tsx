@@ -18,9 +18,7 @@ export default function ErrorBox(props: Readonly<Props>) {
                 <Icon className={styles.icon} name="error" />
                 <h1>Error</h1>
             </div>
-            <div className={styles.content}>
-                {err ?? "An unknown error has occurred."}
-            </div>
+            <div className={styles.content}>{err}</div>
         </div>
     );
 }

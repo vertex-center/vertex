@@ -53,14 +53,12 @@ export default function Instance() {
     });
 
     const mutationDeleteInstance = useMutation({
-        mutationFn: async () => {
-            await api.vxInstances.instance(uuid).delete();
-        },
+        mutationFn: api.vxInstances.instance(uuid).delete,
         onSuccess: () => {
             navigate("/app/vx-instances");
         },
     });
-    const { isLoading: isDeleting, isError: isDeletingError } =
+    const { isLoading: isDeleting, error: errorDeleting } =
         mutationDeleteInstance;
 
     const dismissDeletePopup = () => {
@@ -138,7 +136,7 @@ export default function Instance() {
                     data will be permanently deleted.
                 </Text>
                 {isDeleting && <Progress infinite />}
-                <APIError style={{ margin: 0 }} error={isDeletingError} />
+                <APIError style={{ margin: 0 }} error={errorDeleting} />
                 <Horizontal gap={10}>
                     <Spacer />
                     <Button onClick={dismissDeletePopup} disabled={isDeleting}>
