@@ -84,13 +84,7 @@ func (r *Router) Start(addr string) {
 		log.Error(err)
 	}
 
-	go func() {
-		err = setupService.Setup()
-		if err != nil {
-			log.Error(err)
-			os.Exit(1)
-		}
-	}()
+	setupService.StartSetup()
 
 	url := config.Current.VertexURL()
 	log.Info("Vertex started", vlog.String("url", url))

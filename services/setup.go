@@ -30,6 +30,16 @@ func NewSetupService(ctx *types.VertexContext) *SetupService {
 	}
 }
 
+func (s *SetupService) StartSetup() {
+	go func() {
+		err := s.Setup()
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+	}()
+}
+
 func (s *SetupService) Setup() error {
 	address := config.Current.VertexURL()
 	address = strings.TrimPrefix(address, "http://")
