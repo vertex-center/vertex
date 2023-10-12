@@ -1,5 +1,5 @@
 import styles from "./InstancesApp.module.sass";
-import Bay from "../../../components/Bay/Bay";
+import Instance, { Instances } from "../../../components/Instance/Instance";
 import { BigTitle } from "../../../components/Text/Text";
 import { api } from "../../../backend/api/backend";
 import { APIError } from "../../../components/Error/APIError";
@@ -8,6 +8,7 @@ import { useServerEvent } from "../../../hooks/useEvent";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Toolbar from "../../../components/Toolbar/Toolbar";
 import Spacer from "../../../components/Spacer/Spacer";
+import Button from "../../../components/Button/Button";
 
 export default function InstancesApp() {
     const queryClient = useQueryClient();
@@ -51,6 +52,15 @@ export default function InstancesApp() {
         },
     });
 
+    const toolbar = (
+        <Toolbar>
+            <Spacer />
+            <Button primary to="/app/vx-instances/add" rightIcon="add">
+                Create instance
+            </Button>
+        </Toolbar>
+    );
+
     return (
         <div className={styles.server}>
             <ProgressOverlay show={isLoading} />
@@ -59,46 +69,35 @@ export default function InstancesApp() {
             </div>
 
             {error && (
-                <div className={styles.bays}>
+                <div className={styles.instances}>
                     <APIError error={error} />
                 </div>
             )}
 
             {!isLoading && !isError && (
-                <div className={styles.bays}>
-                    <Toolbar>
-                        <Spacer />
-                        <Toolbar.Button
-                            primary
-                            to="/app/vx-instances/add"
-                            leftIcon="add"
-                        >
-                            Create instance
-                        </Toolbar.Button>
-                    </Toolbar>
-                    <Bay
-                        instances={[
-                            {
+                <div className={styles.instances}>
+                    {toolbar}
+                    <Instances>
+                        <Instance
+                            instance={{
                                 value: {
                                     display_name: "Vertex",
                                     status,
                                 },
-                            },
-                        ]}
-                    />
-                    {Object.values(instances)?.map((inst) => (
-                        <Bay
-                            key={inst.uuid}
-                            instances={[
-                                {
+                            }}
+                        />
+                        {Object.values(instances)?.map((inst) => (
+                            <Instance
+                                key={inst.uuid}
+                                instance={{
                                     value: inst,
                                     to: `/app/vx-instances/${inst.uuid}/`,
                                     onPower: async () =>
                                         mutationPower.mutate(inst.uuid),
-                                },
-                            ]}
-                        />
-                    ))}
+                                }}
+                            />
+                        ))}
+                    </Instances>
                 </div>
             )}
         </div>

@@ -2,12 +2,15 @@
 @use "../../styles/dimensions"
 @use "../../styles/fonts"
 
-.group
+.instances
     display: flex
     flex-direction: column
-    gap: 2px
+    gap: 5px
 
-.bay
+    @include dimensions.extra-small-or-less
+        padding: 0
+
+.instance
     background-color: colors.$bg-secondary
     display: flex
     flex-direction: row
@@ -24,16 +27,16 @@
         &:hover
             background-color: colors.$bg-secondary-hover
 
-    &:first-of-type
+    &:first-child
         border-top-left-radius: dimensions.$border-radius-lg
         border-top-right-radius: dimensions.$border-radius-lg
 
-    &:not(&:last-of-type)
-        border-bottom: none
-
-    &:last-of-type
+    &:last-child
         border-bottom-left-radius: dimensions.$border-radius-lg
         border-bottom-right-radius: dimensions.$border-radius-lg
+
+    &:not(&:last-of-type)
+        border-bottom: none
 
     &::before
         position: absolute
@@ -74,9 +77,6 @@
         color: colors.$orange
         opacity: 1
 
-    &Count
-        color: colors.$fg-tertiary
-
     &Tag
         display: flex
         flex-direction: row
@@ -103,9 +103,9 @@
     display: flex
     align-items: center
     justify-content: center
-    right: 4px
-    top: 4px
-    bottom: 4px
+    right: 8px
+    top: 8px
+    bottom: 8px
     aspect-ratio: 1
     cursor: pointer
     border-radius: calc(dimensions.$border-radius-lg - 4px)

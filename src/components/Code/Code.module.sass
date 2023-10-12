@@ -1,9 +1,13 @@
+@use "../../styles/colors"
 @use "../../styles/dimensions"
 @use "../../styles/fonts"
 
 .code
     overflow: hidden
-    border-radius: dimensions.$border-radius-lg
-    background-color: rgb(40, 44, 52)
-    padding: 8px 12px
+    border-radius: dimensions.$border-radius
+    background: colors.$bg-secondary
+    padding: 6px 12px
     font-family: fonts.$font-family-code
+
+    & > *
+        background: colors.$bg-secondary !important

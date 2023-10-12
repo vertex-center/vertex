@@ -1,8 +1,8 @@
 import { Vertical } from "../../../components/Layouts/Layouts";
 import { useParams } from "react-router-dom";
 import { api } from "../../../backend/api/backend";
-import { Instance } from "../../../models/instance";
-import Bay from "../../../components/Bay/Bay";
+import { Instance as InstanceModel } from "../../../models/instance";
+import Instance from "../../../components/Instance/Instance";
 import { v4 as uuidv4 } from "uuid";
 import { useServerEvent } from "../../../hooks/useEvent";
 import { APIError } from "../../../components/Error/APIError";
@@ -43,7 +43,7 @@ export default function SqlDatabase() {
         queryFn: api.vxSql.instance(uuid).get,
     });
 
-    const onPower = async (inst: Instance) => {
+    const onPower = async (inst: InstanceModel) => {
         if (!inst) {
             console.error("Instance not found");
             return;
@@ -71,16 +71,14 @@ export default function SqlDatabase() {
 
             <Vertical gap={20}>
                 <APIError error={errorInstance ?? errorDatabase} />
-                <Bay
-                    instances={[
-                        {
-                            value: instance ?? {
-                                uuid: uuidv4(),
-                            },
-                            to: `/app/vx-instances/${instance?.uuid}`,
-                            onPower: () => onPower(instance),
+                <Instance
+                    instance={{
+                        value: instance ?? {
+                            uuid: uuidv4(),
                         },
-                    ]}
+                        to: `/app/vx-instances/${instance?.uuid}`,
+                        onPower: () => onPower(instance),
+                    }}
                 />
 
                 <KeyValueGroup>

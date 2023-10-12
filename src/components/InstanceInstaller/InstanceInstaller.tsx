@@ -1,8 +1,8 @@
-import Bay from "../Bay/Bay";
+import Instance from "../Instance/Instance";
 import { APIError } from "../Error/APIError";
 import { Fragment, useEffect, useState } from "react";
 import { ProgressOverlay } from "../Progress/Progress";
-import { Instance } from "../../models/instance";
+import { Instance as InstanceModel } from "../../models/instance";
 import { api } from "../../backend/api/backend";
 import { useServerEvent } from "../../hooks/useEvent";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,8 +14,8 @@ type Props = {
 };
 
 type Inst = Partial<
-    Instance & {
-        onPower: (inst: Instance) => Promise<void>;
+    InstanceModel & {
+        onPower: (inst: InstanceModel) => Promise<void>;
     }
 >;
 
@@ -95,17 +95,15 @@ export default function InstanceInstaller(props: Readonly<Props>) {
         <Fragment>
             <ProgressOverlay show={downloading || isLoadingInstances} />
             <APIError error={error ?? errorInstances} />
-            <Bay
-                instances={[
-                    {
-                        value: instance,
-                        to: instance?.uuid
-                            ? `/app/vx-instances/${instance?.uuid}`
-                            : undefined,
-                        onInstall: onInstall,
-                        onPower: () => onPower(instance),
-                    },
-                ]}
+            <Instance
+                instance={{
+                    value: instance,
+                    to: instance?.uuid
+                        ? `/app/vx-instances/${instance?.uuid}`
+                        : undefined,
+                    onInstall: onInstall,
+                    onPower: () => onPower(instance),
+                }}
             />
         </Fragment>
     );

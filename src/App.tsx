@@ -1,6 +1,6 @@
 import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import InstancesApp from "./apps/Instances/InstancesApp/InstancesApp";
-import Instance from "./apps/Instances/Details/Instance/Instance";
+import InstanceDetails from "./apps/Instances/Details/Instance/Instance";
 import InstanceLogs from "./apps/Instances/Details/InstanceLogs/InstanceLogs";
 import InstanceEnv from "./apps/Instances/Details/InstanceEnv/InstanceEnv";
 import InstanceHome from "./apps/Instances/Details/InstanceHome/InstanceHome";
@@ -108,7 +108,7 @@ function App() {
                             </Route>
                             <Route
                                 path="/app/vx-instances/:uuid/"
-                                element={<Instance />}
+                                element={<InstanceDetails />}
                             >
                                 <Route
                                     path="/app/vx-instances/:uuid/home"

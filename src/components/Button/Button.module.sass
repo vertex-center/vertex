@@ -1,5 +1,6 @@
 @use "../../styles/colors"
 @use "../../styles/dimensions"
+@use "../../styles/presets"
 
 .button
     display: flex
@@ -7,9 +8,9 @@
     gap: 10px
     align-items: center
     background-color: colors.$bg-secondary
-    padding: 14px 20px
-    border-radius: dimensions.$border-radius-lg
-    border: 1px solid transparent
+    padding: 14px 17px
+    border-radius: dimensions.$border-radius
+    border: 1px solid colors.$bg-tertiary
     cursor: pointer
     font-size: 16px
     color: colors.$fg-primary
@@ -19,18 +20,19 @@
     white-space: nowrap
     height: dimensions.$component-height
     box-sizing: border-box
+    @include presets.control-shadow
 
     &:hover
-        background-color: colors.$bg-secondary-hover
+        filter: brightness(1.3)
 
 .primary
     background-color: colors.$bg-accent
-    border-color: colors.$bg-accent-hover
+    border-color: colors.$bg-accent
     color: colors.$fg-accent
     font-weight: 500
 
     &:hover
-        background-color: colors.$bg-accent-hover
+        filter: brightness(1.2)
 
 .large
     justify-content: center
@@ -61,4 +63,4 @@
     cursor: progress
 
 .icon
-    margin: -4px
+    margin: -5px

@@ -17,7 +17,7 @@ export default function Input(props: Readonly<InputProps>) {
     const { className, label, description, ...others } = props;
 
     return (
-        <Vertical gap={6}>
+        <Vertical gap={10}>
             {label && <label className={styles.label}>{label}</label>}
             <input
                 {...others}

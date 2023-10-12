@@ -1,8 +1,7 @@
-import Bay from "../../../../components/Bay/Bay";
+import Instance from "../../../../components/Instance/Instance";
 import { useState } from "react";
 import { api } from "../../../../backend/api/backend";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
-
 import styles from "./Instance.module.sass";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
 import Spacer from "../../../../components/Spacer/Spacer";
@@ -22,7 +21,7 @@ import { useServerEvent } from "../../../../hooks/useEvent";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Instance as InstanceModel } from "../../../../models/instance";
 
-export default function Instance() {
+export default function InstanceDetails() {
     const { uuid } = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -159,14 +158,12 @@ export default function Instance() {
     return (
         <div className={styles.details}>
             <ProgressOverlay show={isLoading} />
-            <div className={styles.bay}>
-                <Bay
-                    instances={[
-                        {
-                            value: instance,
-                            onPower: async () => mutationInstancePower.mutate(),
-                        },
-                    ]}
+            <div className={styles.instance}>
+                <Instance
+                    instance={{
+                        value: instance,
+                        onPower: async () => mutationInstancePower.mutate(),
+                    }}
                 />
             </div>
             {!isLoading && content}

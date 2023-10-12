@@ -1,12 +1,13 @@
 @use "../../styles/colors"
 @use "../../styles/dimensions"
+@use "../../styles/presets"
 
 .input
     display: flex
     flex-direction: row
     align-items: center
-    padding: 0 20px
-    border-radius: dimensions.$border-radius-lg
+    padding: 0 12px 0 20px
+    border-radius: dimensions.$border-radius
     background-color: colors.$bg-secondary
     color: colors.$fg-primary
     border: 1px solid colors.$bg-tertiary
@@ -15,12 +16,14 @@
     outline: none
     height: dimensions.$component-height
     box-sizing: border-box
+    @include presets.control-shadow
 
     &Port
         letter-spacing: 2px
 
     &:focus
         border-color: colors.$bg-accent
+        background-color: colors.$bg-primary
 
     &::placeholder
         color: colors.$fg-tertiary
@@ -43,6 +46,8 @@
     flex-direction: column
     gap: 6px
     position: relative
+    user-select: none
+    -webkit-user-select: none
 
     & .input
         &:hover
@@ -59,17 +64,19 @@
         flex-direction: row
         gap: 15px
         align-items: center
+        padding-right: 10px
 
     &Items
         background-color: colors.$bg-secondary
-        border-radius: dimensions.$border-radius-lg
+        border-radius: dimensions.$border-radius
         border: 1px solid colors.$bg-tertiary
+        box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.2)
         position: absolute
         left: 0
         right: 0
         top: 100%
         margin-top: 6px
-        padding: 6px
+        padding: 4px
         display: none
         z-index: 2
         max-height: 500px
