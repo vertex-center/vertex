@@ -42,7 +42,7 @@ func NewInstanceServiceFSAdapter(params *InstanceServiceFSAdapterParams) instanc
 func (a *InstanceServiceFSAdapter) Save(uuid uuid.UUID, service instancestypes.Service) error {
 	servicePath := path.Join(a.instancesPath, uuid.String(), InstanceServicePath)
 
-	err := os.MkdirAll(path.Join(a.instancesPath, uuid.String()), os.ModePerm)
+	err := os.MkdirAll(path.Join(a.instancesPath, uuid.String(), ".vertex"), os.ModePerm)
 	if err != nil && !os.IsExist(err) {
 		return err
 	}

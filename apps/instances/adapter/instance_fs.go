@@ -55,6 +55,14 @@ func (a *InstanceFSAdapter) GetPath(uuid uuid.UUID) string {
 	return path.Join(a.instancesPath, uuid.String())
 }
 
+func (a *InstanceFSAdapter) Create(uuid uuid.UUID) error {
+	err := os.MkdirAll(a.GetPath(uuid), os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("failed to create server: %v", err)
+	}
+	return nil
+}
+
 func (a *InstanceFSAdapter) Delete(uuid uuid.UUID) error {
 	err := os.RemoveAll(a.GetPath(uuid))
 	if err != nil {

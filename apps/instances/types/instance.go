@@ -64,7 +64,7 @@ func NewInstance(id uuid.UUID, service Service) Instance {
 }
 
 type InstanceAdapterPort interface {
-	GetPath(uuid uuid.UUID) string
+	Create(uuid uuid.UUID) error
 	Delete(uuid uuid.UUID) error
 
 	GetAll() ([]uuid.UUID, error)

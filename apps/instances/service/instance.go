@@ -2,8 +2,6 @@ package service
 
 import (
 	"errors"
-	"os"
-	"path"
 	"sync"
 	"time"
 
@@ -209,19 +207,12 @@ func (s *InstanceService) StopAll() {
 
 func (s *InstanceService) Install(service types.Service, method string) (*types.Instance, error) {
 	id := uuid.New()
-	dir := s.instanceAdapter.GetPath(id)
-
-	err := os.Mkdir(dir, os.ModePerm)
+	err := s.instanceAdapter.Create(id)
 	if err != nil {
 		return nil, err
 	}
 
 	err = s.instanceRunnerService.Install(id, service)
-	if err != nil {
-		return nil, err
-	}
-
-	err = os.Mkdir(path.Join(dir, ".vertex"), os.ModePerm)
 	if err != nil {
 		return nil, err
 	}
