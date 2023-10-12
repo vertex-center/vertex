@@ -15,7 +15,6 @@ type NotificationsService struct {
 	ctx             *types.VertexContext
 	settingsAdapter types.SettingsAdapterPort
 	client          webhook.Client
-	listener        types.Listener
 }
 
 func NewNotificationsService(ctx *types.VertexContext, settingsAdapter types.SettingsAdapterPort) NotificationsService {
