@@ -396,20 +396,9 @@ func (a InstanceRunnerDockerAdapter) WaitCondition(inst *instancestypes.Instance
 		return err
 	}
 
-	go func() {
-		err := requests.URL(config.Current.KernelURL()).
-			Pathf("/api/docker/container/%s/wait/%s", id, cond).
-			Fetch(context.Background())
-
-		if err != nil {
-			log.Error(err,
-				vlog.String("uuid", inst.UUID.String()),
-			)
-			return
-		}
-	}()
-
-	return nil
+	return requests.URL(config.Current.KernelURL()).
+		Pathf("/api/docker/container/%s/wait/%s", id, cond).
+		Fetch(context.Background())
 }
 
 func (a InstanceRunnerDockerAdapter) getContainer(inst instancestypes.Instance) (types.Container, error) {
