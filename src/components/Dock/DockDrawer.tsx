@@ -3,9 +3,9 @@ import classNames from "classnames";
 import { BigTitle, Caption, Title } from "../Text/Text";
 import { Link } from "react-router-dom";
 import { Vertical } from "../Layouts/Layouts";
-import { apps } from "../../models/app";
 import Icon from "../Icon/Icon";
 import LogoIcon from "../Logo/LogoIcon";
+import { useApps } from "../../hooks/useApps";
 
 type AppProps = {
     to: string;
@@ -38,7 +38,9 @@ type Props = {
 };
 
 export default function DockDrawer(props: Props) {
+    const { apps } = useApps();
     const { show, onClose } = props;
+
     return (
         <div
             className={classNames({
@@ -48,16 +50,16 @@ export default function DockDrawer(props: Props) {
         >
             <BigTitle className={styles.title}>Apps</BigTitle>
             <div className={styles.apps}>
-                {apps.map((app) => (
-                    <DrawerApp
-                        key={app.to}
-                        to={app.to}
-                        icon={app.icon}
-                        name={app.name}
-                        description={app.description}
-                        onClick={onClose}
-                    />
-                ))}
+                {[...(apps ?? [])]
+                    ?.sort((a, b) => (a.name > b.name ? 1 : -1))
+                    ?.map((app) => (
+                        <DrawerApp
+                            key={app.id}
+                            to={`/app/${app.id}`}
+                            {...app}
+                            onClick={onClose}
+                        />
+                    ))}
             </div>
         </div>
     );

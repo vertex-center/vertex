@@ -8,6 +8,7 @@ import { vxTunnelsRoutes } from "./vxTunnels";
 import { vxMonitoringRoutes } from "./vxMonitoring";
 import { vxSqlRoutes } from "./vxSql";
 import { vxReverseProxyRoutes } from "./vxReverseProxy";
+import { VertexApp } from "../../models/app";
 
 export const server = axios.create({
     // @ts-ignore
@@ -40,6 +41,13 @@ export const api = {
     vxMonitoring: vxMonitoringRoutes,
     vxSql: vxSqlRoutes,
     vxReverseProxy: vxReverseProxyRoutes,
+
+    apps: {
+        all: async () => {
+            const { data } = await server.get<VertexApp[]>("/apps");
+            return data;
+        },
+    },
 
     security: {
         ssh: {

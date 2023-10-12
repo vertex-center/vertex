@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 import classNames from "classnames";
 import DockDrawer from "./DockDrawer";
 import { Fragment, useState } from "react";
-import { apps } from "../../models/app";
+import { useApps } from "../../hooks/useApps";
 
 type DockAppProps = {
     to?: string;
@@ -48,6 +48,8 @@ export function DockApp(props: Readonly<DockAppProps>) {
 }
 
 export default function Dock() {
+    const { apps } = useApps();
+
     const [drawerOpen, setDrawerOpen] = useState(false);
 
     return (
@@ -63,14 +65,17 @@ export default function Dock() {
                 })}
             >
                 <div className={styles.dock}>
-                    {apps.map((app) => (
-                        <DockApp
-                            key={app.to}
-                            {...app}
-                            onClick={() => setDrawerOpen(false)}
-                        />
-                    ))}
-                    <div className={styles.separator} />
+                    {[...(apps ?? [])]
+                        ?.sort((a, b) => (a.name > b.name ? 1 : -1))
+                        ?.map((app) => (
+                            <DockApp
+                                key={app.id}
+                                to={`/app/${app.id}`}
+                                {...app}
+                                onClick={() => setDrawerOpen(false)}
+                            />
+                        ))}
+                    {apps?.length > 0 && <div className={styles.separator} />}
                     <DockApp
                         to="/settings"
                         icon="settings"
