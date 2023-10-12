@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { Title } from "../../../components/Text/Text";
-import { api } from "../../../backend/backend";
+import { api } from "../../../backend/api/backend";
 import {
     KeyValueGroup,
     KeyValueInfo,

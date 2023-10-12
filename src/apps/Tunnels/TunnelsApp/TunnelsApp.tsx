@@ -5,7 +5,7 @@ import Sidebar, {
 } from "../../../components/Sidebar/Sidebar";
 import { SiCloudflare } from "@icons-pack/react-simple-icons";
 import { Fragment } from "react";
-import { api } from "../../../backend/backend";
+import { api } from "../../../backend/api/backend";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useServerEvent } from "../../../hooks/useEvent";
 import { useQuery, useQueryClient } from "@tanstack/react-query";

@@ -4,7 +4,7 @@ import { Fragment, useState } from "react";
 import styles from "./InstancesStore.module.sass";
 import Service from "../../../components/Service/Service";
 import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
-import { api } from "../../../backend/backend";
+import { api } from "../../../backend/api/backend";
 import { APIError } from "../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import ServiceInstallPopup from "../../../components/ServiceInstallPopup/ServiceInstallPopup";

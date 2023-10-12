@@ -1,6 +1,6 @@
 import { Vertical } from "../../../components/Layouts/Layouts";
 import { useParams } from "react-router-dom";
-import { api } from "../../../backend/backend";
+import { api } from "../../../backend/api/backend";
 import { Instance } from "../../../models/instance";
 import Bay from "../../../components/Bay/Bay";
 import { v4 as uuidv4 } from "uuid";

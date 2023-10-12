@@ -5,7 +5,7 @@ import styles from "./InstanceDocker.module.sass";
 import { useParams } from "react-router-dom";
 import { Horizontal, Vertical } from "../../../../components/Layouts/Layouts";
 import Button from "../../../../components/Button/Button";
-import { api } from "../../../../backend/backend";
+import { api } from "../../../../backend/api/backend";
 import {
     KeyValueGroup,
     KeyValueInfo,

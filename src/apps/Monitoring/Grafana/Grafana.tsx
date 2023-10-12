@@ -2,7 +2,7 @@ import { Text, Title } from "../../../components/Text/Text";
 import styles from "../Prometheus/Prometheus.module.sass";
 import { Vertical } from "../../../components/Layouts/Layouts";
 import InstanceInstaller from "../../../components/InstanceInstaller/InstanceInstaller";
-import { api } from "../../../backend/backend";
+import { api } from "../../../backend/api/backend";
 
 export default function Grafana() {
     return (

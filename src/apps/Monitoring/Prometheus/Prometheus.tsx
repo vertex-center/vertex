@@ -1,7 +1,7 @@
 import { Text, Title } from "../../../components/Text/Text";
 import styles from "./Prometheus.module.sass";
 import { Vertical } from "../../../components/Layouts/Layouts";
-import { api } from "../../../backend/backend";
+import { api } from "../../../backend/api/backend";
 import InstanceInstaller from "../../../components/InstanceInstaller/InstanceInstaller";
 
 export default function Prometheus() {

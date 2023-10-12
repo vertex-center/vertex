@@ -8,7 +8,7 @@ import Popup from "../../../components/Popup/Popup";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import { Dependencies } from "../../../models/update";
-import { api } from "../../../backend/backend";
+import { api } from "../../../backend/api/backend";
 
 import styles from "./SettingsUpdates.module.sass";
 import Update, { Updates } from "../../../components/Update/Update";

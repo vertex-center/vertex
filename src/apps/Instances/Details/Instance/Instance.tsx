@@ -1,6 +1,6 @@
 import Bay from "../../../../components/Bay/Bay";
 import { useState } from "react";
-import { api } from "../../../../backend/backend";
+import { api } from "../../../../backend/api/backend";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 
 import styles from "./Instance.module.sass";

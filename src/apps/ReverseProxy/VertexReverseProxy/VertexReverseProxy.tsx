@@ -1,4 +1,4 @@
-import { api } from "../../../backend/backend";
+import { api } from "../../../backend/api/backend";
 import React, { useState } from "react";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import styles from "./VertexReverseProxy.module.sass";
@@ -20,7 +20,7 @@ export default function VertexReverseProxy() {
         isLoading,
     } = useQuery({
         queryKey: ["redirects"],
-        queryFn: api.vxReverseProxy.redirects.get,
+        queryFn: api.vxReverseProxy.redirects.all,
     });
 
     const mutationDelete = useMutation({

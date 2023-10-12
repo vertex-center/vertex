@@ -1,5 +1,5 @@
 import { Title } from "../../../components/Text/Text";
-import { api } from "../../../backend/backend";
+import { api } from "../../../backend/api/backend";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import Service from "../../../components/Service/Service";
 import { Service as ServiceModel } from "../../../models/service";

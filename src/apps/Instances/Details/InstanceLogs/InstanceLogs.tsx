@@ -1,7 +1,7 @@
 import Logs from "../../../../components/Logs/Logs";
 import { Fragment } from "react";
 import { useParams } from "react-router-dom";
-import { api } from "../../../../backend/backend";
+import { api } from "../../../../backend/api/backend";
 import { Title } from "../../../../components/Text/Text";
 import styles from "./InstanceLogs.module.sass";
 import { APIError } from "../../../../components/Error/APIError";

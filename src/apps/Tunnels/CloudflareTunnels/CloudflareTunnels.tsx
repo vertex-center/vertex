@@ -2,7 +2,7 @@ import { Vertical } from "../../../components/Layouts/Layouts";
 import { Text, Title } from "../../../components/Text/Text";
 import styles from "./CloudflareTunnels.module.sass";
 import InstanceInstaller from "../../../components/InstanceInstaller/InstanceInstaller";
-import { api } from "../../../backend/backend";
+import { api } from "../../../backend/api/backend";
 
 type Props = {};
 

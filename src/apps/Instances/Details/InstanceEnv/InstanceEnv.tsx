@@ -8,7 +8,7 @@ import { Horizontal } from "../../../../components/Layouts/Layouts";
 import useInstance from "../../../../hooks/useInstance";
 import { Env, EnvVariable } from "../../../../models/service";
 import styles from "./InstanceEnv.module.sass";
-import { api } from "../../../../backend/backend";
+import { api } from "../../../../backend/api/backend";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

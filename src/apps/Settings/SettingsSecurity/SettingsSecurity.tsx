@@ -6,7 +6,7 @@ import SSHKey, { SSHKeys } from "../../../components/SSHKey/SSHKey";
 import { Errors } from "../../../components/Error/Errors";
 import { APIError } from "../../../components/Error/APIError";
 import ListItem from "../../../components/List/ListItem";
-import { api } from "../../../backend/backend";
+import { api } from "../../../backend/api/backend";
 import Button from "../../../components/Button/Button";
 import { ChangeEvent, Fragment, useState } from "react";
 import Popup from "../../../components/Popup/Popup";

@@ -10,7 +10,7 @@ import ToggleButton from "../../../../components/ToggleButton/ToggleButton";
 import Input from "../../../../components/Input/Input";
 
 import styles from "./InstanceSettings.module.sass";
-import { api } from "../../../../backend/backend";
+import { api } from "../../../../backend/api/backend";
 import { APIError } from "../../../../components/Error/APIError";
 import Select, {
     SelectOption,

@@ -1,6 +1,6 @@
 import Select, { SelectOption, SelectValue } from "./Select";
 import { Instance, InstanceQuery } from "../../models/instance";
-import { api } from "../../backend/backend";
+import { api } from "../../backend/api/backend";
 import Progress from "../Progress";
 import ServiceLogo from "../ServiceLogo/ServiceLogo";
 import { useQuery } from "@tanstack/react-query";

@@ -3,7 +3,7 @@ import { APIError } from "../Error/APIError";
 import { Fragment, useEffect, useState } from "react";
 import { ProgressOverlay } from "../Progress/Progress";
 import { Instance } from "../../models/instance";
-import { api } from "../../backend/backend";
+import { api } from "../../backend/api/backend";
 import { useServerEvent } from "../../hooks/useEvent";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 

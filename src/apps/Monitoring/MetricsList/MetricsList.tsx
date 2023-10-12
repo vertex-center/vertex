@@ -1,7 +1,7 @@
 import { Vertical } from "../../../components/Layouts/Layouts";
 import styles from "./MetricsList.module.sass";
 import Metrics from "../Metrics/Metrics";
-import { api } from "../../../backend/backend";
+import { api } from "../../../backend/api/backend";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { APIError } from "../../../components/Error/APIError";
 import { Title } from "../../../components/Text/Text";

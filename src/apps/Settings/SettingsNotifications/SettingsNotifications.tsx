@@ -3,7 +3,7 @@ import Input from "../../../components/Input/Input";
 import { Title } from "../../../components/Text/Text";
 import Button from "../../../components/Button/Button";
 import Loading from "../../../components/Loading/Loading";
-import { api } from "../../../backend/backend";
+import { api } from "../../../backend/api/backend";
 
 import styles from "./SettingsNotifications.module.sass";
 import { Vertical } from "../../../components/Layouts/Layouts";

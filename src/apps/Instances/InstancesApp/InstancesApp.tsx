@@ -3,7 +3,7 @@ import Bay from "../../../components/Bay/Bay";
 import { BigTitle } from "../../../components/Text/Text";
 import Button from "../../../components/Button/Button";
 import { Horizontal } from "../../../components/Layouts/Layouts";
-import { api } from "../../../backend/backend";
+import { api } from "../../../backend/api/backend";
 import { APIError } from "../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useServerEvent } from "../../../hooks/useEvent";

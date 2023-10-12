@@ -4,7 +4,7 @@ import Sidebar, {
 } from "../../../components/Sidebar/Sidebar";
 import { SiGrafana, SiPrometheus } from "@icons-pack/react-simple-icons";
 import PageWithSidebar from "../../../components/PageWithSidebar/PageWithSidebar";
-import { api } from "../../../backend/backend";
+import { api } from "../../../backend/api/backend";
 import { Fragment } from "react";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useServerEvent } from "../../../hooks/useEvent";

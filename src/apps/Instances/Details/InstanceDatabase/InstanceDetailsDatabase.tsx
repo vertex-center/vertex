@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { Instance } from "../../../../models/instance";
 import Progress from "../../../../components/Progress";
 import Button from "../../../../components/Button/Button";
-import { api } from "../../../../backend/backend";
+import { api } from "../../../../backend/api/backend";
 import { DatabaseEnvironment } from "../../../../models/service";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";

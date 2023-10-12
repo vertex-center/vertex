@@ -1,6 +1,6 @@
 import { Title } from "../../../components/Text/Text";
 import Hardware from "../../../components/Hardware/Hardware";
-import { api } from "../../../backend/backend";
+import { api } from "../../../backend/api/backend";
 
 import styles from "./SettingsHardware.module.sass";
 import { Vertical } from "../../../components/Layouts/Layouts";

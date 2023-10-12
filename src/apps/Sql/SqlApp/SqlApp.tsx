@@ -3,7 +3,7 @@ import Sidebar, {
     SidebarGroup,
     SidebarItem,
 } from "../../../components/Sidebar/Sidebar";
-import { api } from "../../../backend/backend";
+import { api } from "../../../backend/api/backend";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { Fragment } from "react";
 import { SiPostgresql } from "@icons-pack/react-simple-icons";
