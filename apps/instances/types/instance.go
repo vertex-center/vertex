@@ -147,3 +147,10 @@ func (i *Instance) GetVersion() string {
 func (i *Instance) GetImageNameWithTag() string {
 	return *i.Service.Methods.Docker.Image + ":" + i.GetVersion()
 }
+
+func (i *Instance) GetDisplayName() string {
+	if i.InstanceSettings.DisplayName != nil {
+		return *i.InstanceSettings.DisplayName
+	}
+	return i.Service.Name
+}

@@ -273,20 +273,13 @@ func (s *InstanceRunnerService) setStatus(inst *types.Instance, status string) {
 		return
 	}
 
-	var name string
-	if inst.DisplayName == nil {
-		name = inst.Service.Name
-	} else {
-		name = *inst.DisplayName
-	}
-
 	inst.Status = status
 	s.ctx.DispatchEvent(types.EventInstancesChange{})
 	s.ctx.DispatchEvent(types.EventInstanceStatusChange{
 		InstanceUUID: inst.UUID,
 		ServiceID:    inst.Service.ID,
 		Instance:     *inst,
-		Name:         name,
+		Name:         inst.GetDisplayName(),
 		Status:       status,
 	})
 }

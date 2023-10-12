@@ -116,36 +116,30 @@ func (s *InstanceService) Exists(uuid uuid.UUID) bool {
 }
 
 // Delete deletes an instance by its UUID.
-// If the instance does not exist, it returns ErrInstanceNotFound.
 // If the instance is still running, it returns ErrInstanceStillRunning.
-func (s *InstanceService) Delete(uuid uuid.UUID) error {
-	instance, err := s.Get(uuid)
-	if err != nil {
-		return err
-	}
+func (s *InstanceService) Delete(inst *types.Instance) error {
+	serviceID := inst.Service.ID
 
-	serviceID := instance.Service.ID
-
-	if instance.IsRunning() {
+	if inst.IsRunning() {
 		return types.ErrInstanceStillRunning
 	}
 
-	err = s.instanceRunnerService.Delete(instance)
+	err := s.instanceRunnerService.Delete(inst)
 	if err != nil && !errors.Is(err, adapter.ErrContainerNotFound) {
 		return err
 	}
 
-	err = s.instanceAdapter.Delete(uuid)
+	err = s.instanceAdapter.Delete(inst.UUID)
 	if err != nil {
 		return err
 	}
 
 	s.instancesMutex.Lock()
 	defer s.instancesMutex.Unlock()
-	delete(s.instances, uuid)
+	delete(s.instances, inst.UUID)
 
 	s.ctx.DispatchEvent(types.EventInstanceDeleted{
-		InstanceUUID: uuid,
+		InstanceUUID: inst.UUID,
 		ServiceID:    serviceID,
 	})
 	s.ctx.DispatchEvent(types.EventInstancesChange{})
@@ -305,7 +299,7 @@ func (s *InstanceService) LoadAll() {
 func (s *InstanceService) DeleteAll() {
 	all := s.GetAll()
 	for _, inst := range all {
-		err := s.Delete(inst.UUID)
+		err := s.Delete(inst)
 		if err != nil {
 			log.Error(err)
 		}

@@ -59,14 +59,14 @@ func (r *AppRouter) getInstance(c *router.Context) *types.Instance {
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
 		c.NotFound(router.Error{
 			Code:           types.ErrCodeInstanceNotFound,
-			PublicMessage:  fmt.Sprintf("Instance %s not found.", instanceUUID),
+			PublicMessage:  fmt.Sprintf("The instance '%s' could not be found.", instanceUUID),
 			PrivateMessage: err.Error(),
 		})
 		return nil
 	} else if err != nil {
 		c.Abort(router.Error{
 			Code:           types.ErrCodeFailedToGetInstance,
-			PublicMessage:  fmt.Sprintf("Failed to retrieve instance %s.", instanceUUID),
+			PublicMessage:  fmt.Sprintf("Failed to retrieve instance '%s'.", instanceUUID),
 			PrivateMessage: err.Error(),
 		})
 		return nil
@@ -95,30 +95,23 @@ func (r *AppRouter) handleGetInstance(c *router.Context) {
 //   - instance_still_running: the instance with the given UUID is still running
 //   - failed_to_delete_instance: failed to delete the instance from the database
 func (r *AppRouter) handleDeleteInstance(c *router.Context) {
-	uid := r.getParamInstanceUUID(c)
-	if uid == nil {
+	inst := r.getInstance(c)
+	if inst == nil {
 		return
 	}
 
-	err := r.instanceService.Delete(*uid)
-	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
-		c.NotFound(router.Error{
-			Code:           types.ErrCodeInstanceNotFound,
-			PublicMessage:  fmt.Sprintf("Instance %s not found.", uid),
-			PrivateMessage: err.Error(),
-		})
-		return
-	} else if err != nil && errors.Is(err, types.ErrInstanceStillRunning) {
+	err := r.instanceService.Delete(inst)
+	if err != nil && errors.Is(err, types.ErrInstanceStillRunning) {
 		c.Conflict(router.Error{
 			Code:           types.ErrCodeInstanceStillRunning,
-			PublicMessage:  fmt.Sprintf("Instance %s is still running.", uid),
+			PublicMessage:  fmt.Sprintf("The instance '%s' is still running. Stop it first before deleting.", inst.GetDisplayName()),
 			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil {
 		c.Abort(router.Error{
 			Code:           types.ErrCodeFailedToDeleteInstance,
-			PublicMessage:  fmt.Sprintf("Failed to delete instance %s.", uid),
+			PublicMessage:  fmt.Sprintf("The instance '%s' could not be deleted.", inst.GetDisplayName()),
 			PrivateMessage: err.Error(),
 		})
 		return
@@ -240,7 +233,7 @@ func (r *AppRouter) handleStartInstance(c *router.Context) {
 	if err != nil && errors.Is(err, types.ErrInstanceNotFound) {
 		c.NotFound(router.Error{
 			Code:           types.ErrCodeInstanceNotFound,
-			PublicMessage:  fmt.Sprintf("Instance %s not found.", inst.UUID),
+			PublicMessage:  fmt.Sprintf("Instance '%s' not found.", inst.UUID),
 			PrivateMessage: err.Error(),
 		})
 		return
