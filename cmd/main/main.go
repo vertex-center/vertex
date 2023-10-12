@@ -119,7 +119,7 @@ func setupDependencies() error {
 }
 
 func setupDependency(dep types.DependencyUpdater) error {
-	err := os.Mkdir(dep.GetPath(), os.ModePerm)
+	err := os.MkdirAll(dep.GetPath(), os.ModePerm)
 	if os.IsExist(err) {
 		// The dependency already exists.
 		return nil

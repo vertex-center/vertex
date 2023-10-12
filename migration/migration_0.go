@@ -48,7 +48,9 @@ func (m *migration0) Up(livePath string) error {
 	instancesPath := path.Join(livePath, "instances")
 
 	dirs, err := os.ReadDir(instancesPath)
-	if err != nil {
+	if err != nil && os.IsNotExist(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 

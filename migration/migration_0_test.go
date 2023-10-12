@@ -54,3 +54,13 @@ func (suite *Migration0TestSuite) TestUp() {
 	_, err = os.Stat(path.Join(suite.dir, "instances", suite.instanceId, ".vertex", "settings.yml"))
 	suite.NoError(err)
 }
+
+func (suite *Migration0TestSuite) TestUpNoLive() {
+	m := &migration0{}
+
+	dir, err := os.MkdirTemp("", "migration_0_test_empty-*")
+	suite.Require().NoError(err)
+
+	err = m.Up(dir)
+	suite.NoError(err)
+}
