@@ -279,7 +279,7 @@ func (s *InstanceRunnerService) setStatus(inst *types.Instance, status string) {
 		InstanceUUID: inst.UUID,
 		ServiceID:    inst.Service.ID,
 		Instance:     *inst,
-		Name:         inst.GetDisplayName(),
+		Name:         inst.DisplayName,
 		Status:       status,
 	})
 }

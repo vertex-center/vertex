@@ -104,14 +104,14 @@ func (r *AppRouter) handleDeleteInstance(c *router.Context) {
 	if err != nil && errors.Is(err, types.ErrInstanceStillRunning) {
 		c.Conflict(router.Error{
 			Code:           types.ErrCodeInstanceStillRunning,
-			PublicMessage:  fmt.Sprintf("The instance '%s' is still running. Stop it first before deleting.", inst.GetDisplayName()),
+			PublicMessage:  fmt.Sprintf("The instance '%s' is still running. Stop it first before deleting.", inst.DisplayName),
 			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil {
 		c.Abort(router.Error{
 			Code:           types.ErrCodeFailedToDeleteInstance,
-			PublicMessage:  fmt.Sprintf("The instance '%s' could not be deleted.", inst.GetDisplayName()),
+			PublicMessage:  fmt.Sprintf("The instance '%s' could not be deleted.", inst.DisplayName),
 			PrivateMessage: err.Error(),
 		})
 		return

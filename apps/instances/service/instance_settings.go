@@ -25,6 +25,9 @@ func (s *InstanceSettingsService) Load(inst *types.Instance) error {
 	if err != nil {
 		return err
 	}
+	if settings.DisplayName == "" {
+		settings.DisplayName = inst.Service.Name
+	}
 	inst.InstanceSettings = settings
 	return nil
 }
@@ -35,7 +38,7 @@ func (s *InstanceSettingsService) SetLaunchOnStartup(inst *types.Instance, value
 }
 
 func (s *InstanceSettingsService) SetDisplayName(inst *types.Instance, value string) error {
-	inst.InstanceSettings.DisplayName = &value
+	inst.InstanceSettings.DisplayName = value
 	return s.adapter.Save(inst.UUID, inst.InstanceSettings)
 }
 

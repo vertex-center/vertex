@@ -12,7 +12,7 @@ type InstanceSettings struct {
 	LaunchOnStartup *bool `json:"launch_on_startup,omitempty"`
 
 	// DisplayName is a custom name for the instance.
-	DisplayName *string `json:"display_name,omitempty"`
+	DisplayName string `json:"display_name"`
 
 	// Databases describes the databases used by the instance.
 	// The key is the database ID, and the value is the database instance UUID.
