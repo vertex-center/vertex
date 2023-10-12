@@ -19,7 +19,7 @@ type AppsRegistry struct {
 	ctx  *types.VertexContext
 
 	apps      map[string]AppRegistry
-	mutexApps *sync.RWMutex
+	appsMutex *sync.RWMutex
 }
 
 func NewAppsRegistry(ctx *types.VertexContext) *AppsRegistry {
@@ -28,17 +28,22 @@ func NewAppsRegistry(ctx *types.VertexContext) *AppsRegistry {
 		ctx:  ctx,
 
 		apps:      map[string]AppRegistry{},
-		mutexApps: &sync.RWMutex{},
+		appsMutex: &sync.RWMutex{},
 	}
 }
 
-func (registry *AppsRegistry) RegisterApp(app *App, impl Interface) {
-	registry.mutexApps.Lock()
-	defer registry.mutexApps.Unlock()
+func (registry *AppsRegistry) RegisterApp(app *App, impl Interface) error {
+	registry.appsMutex.Lock()
+	defer registry.appsMutex.Unlock()
+	err := impl.Initialize(app)
+	if err != nil {
+		return err
+	}
 	registry.apps[app.id] = AppRegistry{
 		Interface: impl,
 		App:       app,
 	}
+	return nil
 }
 
 func (registry *AppsRegistry) Close() {

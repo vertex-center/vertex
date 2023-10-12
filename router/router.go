@@ -34,18 +34,17 @@ var (
 	sshKernelApiAdapter types.SshAdapterPort
 
 	notificationsService services.NotificationsService
-
-	dependenciesService services.DependenciesService
-	settingsService     services.SettingsService
-	hardwareService     services.HardwareService
-	sshService          services.SshService
+	dependenciesService  services.DependenciesService
+	settingsService      services.SettingsService
+	hardwareService      services.HardwareService
+	sshService           services.SshService
 )
 
 type Router struct {
 	*router.Router
 
-	ctx          *types.VertexContext
-	appsRegistry *app.AppsRegistry
+	about types.About
+	ctx   *types.VertexContext
 }
 
 func NewRouter(about types.About) Router {
@@ -54,9 +53,10 @@ func NewRouter(about types.About) Router {
 	ctx := types.NewVertexContext()
 
 	r := Router{
-		Router:       router.New(),
-		ctx:          ctx,
-		appsRegistry: app.NewAppsRegistry(ctx),
+		Router: router.New(),
+
+		about: about,
+		ctx:   ctx,
 	}
 
 	r.Use(cors.Default())
@@ -64,20 +64,18 @@ func NewRouter(about types.About) Router {
 	r.Use(ginutils.Logger("MAIN"))
 	r.Use(gin.Recovery())
 	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
-	r.GET("/ping", handlePing)
-
-	r.initApps()
-	r.initAdapters()
-	r.initServices(about)
-	r.initAPIRoutes(about)
 
 	return r
 }
 
 func (r *Router) Start(addr string) {
-	r.ctx.DispatchEvent(types.EventServerStart{})
-
+	r.GET("/ping", handlePing)
+	r.initAdapters()
+	r.initServices(r.about)
+	r.initAPIRoutes(r.about)
 	r.handleSignals()
+
+	r.ctx.DispatchEvent(types.EventServerStart{})
 
 	err := notificationsService.StartWebhook()
 	if err != nil {
@@ -101,7 +99,6 @@ func (r *Router) Stop() {
 	log.Info("gracefully stopping Vertex")
 
 	r.ctx.DispatchEvent(types.EventServerStop{})
-	r.closeApps()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
@@ -130,36 +127,21 @@ func (r *Router) handleSignals() {
 	}()
 }
 
-func (r *Router) initApps() {
-	apps := []app.Interface{
-		sql.NewApp(),
-		tunnels.NewApp(),
-		monitoring.NewApp(),
-		instances.NewApp(),
-		reverseproxy.NewApp(),
-	}
-	for i := range apps {
-		a := app.New(r.ctx)
-		err := apps[i].Initialize(a)
-		r.appsRegistry.RegisterApp(a, apps[i])
-		if err != nil {
-			log.Error(errors.New("failed to initialize app"), vlog.String("error", err.Error()))
-			continue
-		}
-		log.Info("app initialized", vlog.String("name", a.Name()))
-	}
-}
-
-func (r *Router) closeApps() {
-	r.appsRegistry.Close()
-}
-
 func (r *Router) initAdapters() {
 	settingsFSAdapter = adapter.NewSettingsFSAdapter(nil)
 	sshKernelApiAdapter = adapter.NewSshKernelApiAdapter()
 }
 
 func (r *Router) initServices(about types.About) {
+	services.NewAppsService(r.ctx, r.Router,
+		[]app.Interface{
+			sql.NewApp(),
+			tunnels.NewApp(),
+			monitoring.NewApp(),
+			instances.NewApp(),
+			reverseproxy.NewApp(),
+		},
+	)
 	notificationsService = services.NewNotificationsService(r.ctx, settingsFSAdapter)
 	dependenciesService = services.NewDependenciesService(r.ctx, about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)
@@ -192,10 +174,4 @@ func (r *Router) initAPIRoutes(about types.About) {
 	addSettingsRoutes(api.Group("/settings"))
 	addHardwareRoutes(api.Group("/hardware"))
 	addSecurityRoutes(api.Group("/security"))
-
-	for _, r := range r.appsRegistry.Apps() {
-		for group, rtr := range r.Routers() {
-			rtr.AddRoutes(api.Group("/app" + group))
-		}
-	}
 }

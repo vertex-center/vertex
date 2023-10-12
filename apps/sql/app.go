@@ -22,7 +22,9 @@ func NewApp() *App {
 
 func (a *App) Initialize(app *app.App) error {
 	a.App = app
-	a.router = router.NewAppRouter(app.Context())
+
+	c := app.Context()
+	a.router = router.NewAppRouter(c)
 
 	app.Register(AppID, AppName)
 	app.RegisterRouter(AppRoute, a.router)
