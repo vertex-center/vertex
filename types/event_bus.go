@@ -1,6 +1,7 @@
 package types
 
 import (
+	"errors"
 	"sync"
 
 	"github.com/google/uuid"
@@ -51,10 +52,14 @@ func (b *EventBus) Send(e interface{}) {
 	// notified in the next loop, until all listeners are notified.
 
 	notified := map[uuid.UUID]Listener{}
-	first := true
+	tryCount := 0
 	for len(notified) < len(*b.listeners) {
-		if !first {
+		if tryCount > 0 {
 			log.Debug("some listeners were not notified; retrying...", vlog.Any("count", len(*b.listeners)-len(notified)))
+		}
+		if tryCount > 10 {
+			log.Error(errors.New("after 10 retries to send events, there seems to be an issue with the event bus; the issue is probably caused by some listeners that create new listeners that themselves create new listeners, and so on"))
+			break
 		}
 
 		b.listenersMutex.RLock()
@@ -72,6 +77,6 @@ func (b *EventBus) Send(e interface{}) {
 			l.OnEvent(e)
 			notified[l.GetUUID()] = l
 		}
-		first = false
+		tryCount++
 	}
 }
