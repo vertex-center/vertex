@@ -9,6 +9,7 @@ import { vxMonitoringRoutes } from "./vxMonitoring";
 import { vxSqlRoutes } from "./vxSql";
 import { vxReverseProxyRoutes } from "./vxReverseProxy";
 import { VertexApp } from "../../models/app";
+import { Console } from "../../logging/logging";
 
 export const server = axios.create({
     // @ts-ignore
@@ -21,6 +22,22 @@ export const server = axios.create({
 //
 //     return response;
 // });
+
+server.interceptors.request.use((req) => {
+    if (!req) return;
+
+    const info = {
+        url: req.url,
+        method: req.method,
+    };
+
+    if (req.data) info["data"] = req.data;
+    if (req.params) info["params"] = req.params;
+
+    Console.request("Sending request\n%O", info);
+
+    return req;
+});
 
 const getAbout = async () => {
     const { data } = await server.get<About>("/about");

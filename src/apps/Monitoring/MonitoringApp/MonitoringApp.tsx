@@ -27,7 +27,6 @@ export default function MonitoringApp() {
 
     useServerEvent("/app/vx-instances/instances/events", {
         change: (e) => {
-            console.log(e);
             queryClient.invalidateQueries({
                 queryKey: ["instances"],
             });

@@ -5,6 +5,7 @@ import {
     unregisterSSE,
     unregisterSSEEvent,
 } from "../backend/sse";
+import { Console } from "../logging/logging";
 
 type ServerEvent = (e: MessageEvent) => void;
 
@@ -15,9 +16,9 @@ export function useServerEvent(
     }
 ) {
     useEffect(() => {
-        console.log("useServerEvent", route, events);
-
         const sse = registerSSE(route);
+
+        Console.event("SSE connected\n%O", { id: sse });
 
         Object.entries(events).forEach(([name, event]) => {
             registerSSEEvent(sse, name, event);
@@ -28,6 +29,8 @@ export function useServerEvent(
                 unregisterSSEEvent(sse, name, event);
             });
             unregisterSSE(sse);
+
+            Console.event("SSE disconnected\n%O", { id: sse });
         };
     }, [route]);
 }

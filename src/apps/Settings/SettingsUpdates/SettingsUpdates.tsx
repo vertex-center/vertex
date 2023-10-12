@@ -60,7 +60,6 @@ export default function SettingsUpdates() {
         api.settings
             .get()
             .then((data) => {
-                console.log(data);
                 setBeta(data?.updates?.channel === "beta");
             })
             .catch(setError);

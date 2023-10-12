@@ -122,7 +122,6 @@ export default function InstanceDetailsDatabase() {
         mutationSaveDatabase;
 
     const onChange = (name: string, dbUUID: string) => {
-        console.log({ ...databases, [name]: dbUUID });
         setDatabases((prev) => ({ ...prev, [name]: dbUUID }));
         setSaved(false);
     };

@@ -13,7 +13,6 @@ export function registerSSE(url: string): string {
 
     if (uuid !== undefined) {
         allSSE[uuid].watchers++;
-        console.log(allSSE[uuid].watchers, "registered on", uuid);
         return uuid;
     }
 
@@ -21,17 +20,13 @@ export function registerSSE(url: string): string {
     // @ts-ignore
     const eventSource = new EventSource(`${window.apiURL}/api${url}`);
     allSSE[uuid] = { url, eventSource, watchers: 1 };
-    console.log("SSE", uuid, "opened.");
-    console.log(allSSE[uuid].watchers, "registered on", uuid);
 
     return uuid;
 }
 
 export function unregisterSSE(uuid: string) {
     allSSE[uuid].watchers--;
-    console.log(allSSE[uuid].watchers, "registered on", uuid);
     if (allSSE[uuid].watchers === 0) {
-        console.log("SSE", uuid, "closed.");
         allSSE[uuid].eventSource.close();
         delete allSSE[uuid];
     }
