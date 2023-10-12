@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vlog"
 )
 
 type EventBus struct {
@@ -43,10 +44,34 @@ func (b *EventBus) Send(e interface{}) {
 		log.Warn("hard reset event dispatched.")
 	}
 
-	b.listenersMutex.RLock()
-	defer b.listenersMutex.RUnlock()
+	log.Debug("dispatching event", vlog.Any("count", len(*b.listeners)))
 
-	for _, l := range *b.listeners {
-		l.OnEvent(e)
+	// This code notify all listeners.
+	// If some listeners are added while notifying, they will be
+	// notified in the next loop, until all listeners are notified.
+
+	notified := map[uuid.UUID]Listener{}
+	first := true
+	for len(notified) < len(*b.listeners) {
+		if !first {
+			log.Debug("some listeners were not notified; retrying...", vlog.Any("count", len(*b.listeners)-len(notified)))
+		}
+
+		b.listenersMutex.RLock()
+		var toNotify []Listener
+		for _, l := range *b.listeners {
+			if _, ok := notified[l.GetUUID()]; ok {
+				// already notified
+				continue
+			}
+			toNotify = append(toNotify, l)
+		}
+		b.listenersMutex.RUnlock()
+
+		for _, l := range toNotify {
+			l.OnEvent(e)
+			notified[l.GetUUID()] = l
+		}
+		first = false
 	}
 }
