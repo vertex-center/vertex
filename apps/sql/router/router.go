@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	instancesapi "github.com/vertex-center/vertex/apps/instances/api"
-	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/apps/sql/service"
 	"github.com/vertex-center/vertex/apps/sql/types"
 	"github.com/vertex-center/vertex/pkg/log"
@@ -61,7 +60,7 @@ func (r *AppRouter) handleGetDBMS(c *router.Context) {
 		return
 	}
 
-	db, err := r.sqlService.Get(inst)
+	dbms, err := r.sqlService.Get(inst)
 	if err != nil {
 		c.NotFound(router.Error{
 			Code:           types.ErrCodeSQLDatabaseNotFound,
@@ -71,16 +70,16 @@ func (r *AppRouter) handleGetDBMS(c *router.Context) {
 		return
 	}
 
-	c.JSON(db)
+	c.JSON(dbms)
 }
 
 func (r *AppRouter) handleInstallDBMS(c *router.Context) {
-	db, err := r.getDBMS(c)
+	dbms, err := r.getDBMS(c)
 	if err != nil {
 		return
 	}
 
-	serv, apiError := instancesapi.GetService(c, db)
+	serv, apiError := instancesapi.GetService(c, dbms)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
@@ -92,16 +91,14 @@ func (r *AppRouter) handleInstallDBMS(c *router.Context) {
 		return
 	}
 
-	apiError = instancesapi.PatchInstance(c, inst.UUID, instancestypes.InstanceSettings{
-		Tags: []string{"vertex-postgres-sql"},
-	})
+	inst.InstanceSettings.Tags = []string{"vertex-postgres-sql"}
+	apiError = instancesapi.PatchInstance(c, inst.UUID, inst.InstanceSettings)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
 	}
 
-	var env instancestypes.InstanceEnvVariables
-	env, err = r.sqlService.EnvCredentials(inst, "postgres", "postgres")
+	inst.Env, err = r.sqlService.EnvCredentials(inst, "postgres", "postgres")
 	if err != nil {
 		log.Error(err)
 		c.Abort(router.Error{
@@ -112,11 +109,11 @@ func (r *AppRouter) handleInstallDBMS(c *router.Context) {
 		return
 	}
 
-	apiError = instancesapi.PatchInstanceEnvironment(c, inst.UUID, env)
+	apiError = instancesapi.PatchInstanceEnvironment(c, inst.UUID, inst.Env)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
 	}
 
-	c.OK()
+	c.JSON(inst)
 }

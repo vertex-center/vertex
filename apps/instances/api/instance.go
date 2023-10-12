@@ -47,7 +47,7 @@ func StartInstance(ctx context.Context, uuid uuid.UUID) *api.Error {
 	var apiError api.Error
 	err := api.AppRequest(instances.AppRoute).
 		Pathf("./instance/%s/start", uuid).
-		Patch().
+		Post().
 		ErrorJSON(&apiError).
 		Fetch(ctx)
 	return api.HandleError(err, apiError)
@@ -57,7 +57,7 @@ func StopInstance(ctx context.Context, uuid uuid.UUID) *api.Error {
 	var apiError api.Error
 	err := api.AppRequest(instances.AppRoute).
 		Pathf("./instance/%s/stop", uuid).
-		Patch().
+		Post().
 		ErrorJSON(&apiError).
 		Fetch(ctx)
 	return api.HandleError(err, apiError)

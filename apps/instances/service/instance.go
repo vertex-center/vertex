@@ -3,14 +3,13 @@ package service
 import (
 	"errors"
 	"sync"
-	"time"
 
-	"github.com/antelman107/net-wait-go/wait"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/instances/adapter"
 	"github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/pkg/net"
 	"github.com/vertex-center/vertex/types/app"
 )
 
@@ -152,7 +151,8 @@ func (s *InstanceService) StartAll() {
 	var ids []uuid.UUID
 
 	for _, inst := range s.instances {
-		if inst.LaunchOnStartup() {
+		// vertex instances autostart are managed by the startup service.
+		if inst.LaunchOnStartup() && !inst.HasTag("vertex") {
 			ids = append(ids, inst.UUID)
 		}
 	}
@@ -164,14 +164,10 @@ func (s *InstanceService) StartAll() {
 	log.Info("trying to ping Google...")
 
 	// Wait for internet connection
-	if !wait.New(
-		wait.WithWait(time.Second),
-		wait.WithBreak(500*time.Millisecond),
-	).Do([]string{"google.com:80"}) {
-		log.Error(errors.New("internet connection: Failed to ping google.com"))
+	err := net.Wait("google.com:80")
+	if err != nil {
+		log.Error(err)
 		return
-	} else {
-		log.Info("internet connection: OK")
 	}
 
 	// Start them

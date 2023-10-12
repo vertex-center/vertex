@@ -145,3 +145,15 @@ func (i *Instance) GetVersion() string {
 func (i *Instance) GetImageNameWithTag() string {
 	return *i.Service.Methods.Docker.Image + ":" + i.GetVersion()
 }
+
+func (i *Instance) HasTag(tag string) bool {
+	if i.InstanceSettings.Tags == nil {
+		return false
+	}
+	for _, t := range i.InstanceSettings.Tags {
+		if t == tag {
+			return true
+		}
+	}
+	return false
+}

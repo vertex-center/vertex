@@ -270,8 +270,13 @@ func (a InstanceRunnerDockerAdapter) Start(inst *instancestypes.Instance, setSta
 			}
 		}()
 
-		a.WaitStatus(id, inst, container.WaitConditionNotRunning)
-		setStatus(instancestypes.InstanceStatusOff)
+		err = a.WaitCondition(inst, types.WaitContainerCondition(container.WaitConditionNotRunning))
+		if err != nil {
+			log.Error(err)
+			setStatus(instancestypes.InstanceStatusError)
+		} else {
+			setStatus(instancestypes.InstanceStatusOff)
+		}
 	}()
 
 	return rOut, rErr, nil
@@ -383,6 +388,28 @@ func (a InstanceRunnerDockerAdapter) GetAllVersions(inst instancestypes.Instance
 func (a InstanceRunnerDockerAdapter) HasUpdateAvailable(inst instancestypes.Instance) (bool, error) {
 	//TODO implement me
 	return false, nil
+}
+
+func (a InstanceRunnerDockerAdapter) WaitCondition(inst *instancestypes.Instance, cond types.WaitContainerCondition) error {
+	id, err := a.getContainerID(*inst)
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		err := requests.URL(config.Current.KernelURL()).
+			Pathf("/api/docker/container/%s/wait/%s", id, cond).
+			Fetch(context.Background())
+
+		if err != nil {
+			log.Error(err,
+				vlog.String("uuid", inst.UUID.String()),
+			)
+			return
+		}
+	}()
+
+	return nil
 }
 
 func (a InstanceRunnerDockerAdapter) getContainer(inst instancestypes.Instance) (types.Container, error) {
@@ -497,21 +524,6 @@ func (a InstanceRunnerDockerAdapter) createContainer(options types.CreateContain
 		)
 	}
 	return res.ID, err
-}
-
-func (a InstanceRunnerDockerAdapter) WaitStatus(containerID string, inst *instancestypes.Instance, condition container.WaitCondition) {
-	go func() {
-		err := requests.URL(config.Current.KernelURL()).
-			Pathf("/api/docker/container/%s/wait/%s", containerID, condition).
-			Fetch(context.Background())
-
-		if err != nil {
-			log.Error(err,
-				vlog.String("uuid", inst.UUID.String()),
-			)
-			return
-		}
-	}()
 }
 
 func (a InstanceRunnerDockerAdapter) readLogs(containerID string) (stdout io.ReadCloser, stderr io.ReadCloser, err error) {

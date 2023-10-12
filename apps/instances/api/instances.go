@@ -3,13 +3,14 @@ package instancesapi
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/instances"
 	"github.com/vertex-center/vertex/apps/instances/types"
 	"github.com/vertex-center/vertex/types/api"
 )
 
-func GetInstances(ctx context.Context) ([]types.Instance, *api.Error) {
-	var insts []types.Instance
+func GetInstances(ctx context.Context) (map[uuid.UUID]*types.Instance, *api.Error) {
+	var insts map[uuid.UUID]*types.Instance
 	var apiError api.Error
 	err := api.AppRequest(instances.AppRoute).
 		Path("./instances").

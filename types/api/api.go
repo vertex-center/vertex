@@ -6,7 +6,9 @@ import (
 
 	"github.com/carlmjohnson/requests"
 	"github.com/vertex-center/vertex/config"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vlog"
 )
 
 type Error struct {
@@ -32,6 +34,7 @@ func HandleError(requestError error, apiError Error) *Error {
 		}
 		return &apiError
 	} else if requestError != nil {
+		log.Error(requestError)
 		return &Error{
 			HttpCode: http.StatusInternalServerError,
 			Code:     ErrInternalError,
@@ -43,6 +46,11 @@ func HandleError(requestError error, apiError Error) *Error {
 
 func AppRequest(AppRoute string) *requests.Builder {
 	return requests.New(func(rb *requests.Builder) {
-		rb.BaseURL(config.Current.VertexURL()).Path("/api/app" + AppRoute + "/")
+		path := "/api/app" + AppRoute + "/"
+		rb.BaseURL(config.Current.VertexURL()).Path(path)
+		rb.AddValidator(func(response *http.Response) error {
+			log.Request("request from app", vlog.String("path", response.Request.URL.Path))
+			return nil
+		})
 	})
 }
