@@ -6,6 +6,7 @@ import { Vertical } from "../Layouts/Layouts";
 import Icon from "../Icon/Icon";
 import LogoIcon from "../Logo/LogoIcon";
 import { useApps } from "../../hooks/useApps";
+import Header from "../Header/Header";
 
 type AppProps = {
     to: string;
@@ -48,6 +49,7 @@ export default function DockDrawer(props: Props) {
                 [styles.drawerOpen]: show,
             })}
         >
+            <Header title="Vertex" onClick={onClose} />
             <BigTitle className={styles.title}>Apps</BigTitle>
             <div className={styles.apps}>
                 {[...(apps ?? [])]

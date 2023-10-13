@@ -3,38 +3,38 @@
 
 .drawer
     position: fixed
-    top: 75px
-    left: 20px
-    right: 20px
-    bottom: 30px
+    top: 100px
+    bottom: 0
+    left: 0
+    right: 0
     opacity: 0
+    width: 100vw
     pointer-events: none
-    border: 1px solid colors.$bg-tertiary
-    background-color: colors.$bg-primary-hover
+    background-color: colors.$bg-primary
     z-index: 99
-    border-radius: dimensions.$border-radius-lg
-    transition: all 0.15s ease
+    transition: all 0.15s ease-in
     transform: scale(0.95)
     overflow: hidden
     padding-bottom: 100px
 
-    @include dimensions.extra-small-or-less
-        left: 10px
-        right: 10px
-
     &Open
+        top: 0
         pointer-events: inherit
         transform: scale(1)
         opacity: 1
         overflow: scroll
+        transition: all 0.15s ease-out
 
 .title
-    margin: 20px 30px
+    margin: 20px 50px
+
+    @include dimensions.extra-small-or-less
+        margin: 20px 30px
 
 .apps
     display: grid
     grid-template-columns: repeat(3, 1fr)
-    padding: 0 20px
+    padding: 0 50px
     gap: 10px
     overflow: hidden
 
@@ -43,6 +43,9 @@
 
     @include dimensions.small-or-less
         grid-template-columns: repeat(1, 1fr)
+
+    @include dimensions.extra-small-or-less
+        padding: 0 30px
 
 .app
     display: flex
