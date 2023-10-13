@@ -39,10 +39,12 @@ func (s *SetupService) OnEvent(e interface{}) {
 		if e.AppID != "vx-containers" {
 			return
 		}
-		err := s.setupDatabase()
-		if err != nil {
-			log.Error(err)
-		}
+		go func() {
+			err := s.setupDatabase()
+			if err != nil {
+				log.Error(err)
+			}
+		}()
 	}
 }
 
@@ -124,6 +126,9 @@ func (s *SetupService) startDatabase(inst *containerstypes.Container) error {
 	eventsChan := make(chan interface{})
 	defer close(eventsChan)
 
+	abortChan := make(chan bool)
+	defer close(abortChan)
+
 	l := types.NewTempListener(func(e interface{}) {
 		switch event := e.(type) {
 		case containerstypes.EventContainerStatusChange:
@@ -137,23 +142,29 @@ func (s *SetupService) startDatabase(inst *containerstypes.Container) error {
 	s.ctx.AddListener(l)
 	defer s.ctx.RemoveListener(l)
 
-	apiError := containersapi.StartContainer(context.Background(), inst.UUID)
-	if apiError != nil {
-		return apiError.RouterError()
-	}
+	go func() {
+		apiError := containersapi.StartContainer(context.Background(), inst.UUID)
+		if apiError != nil {
+			log.Error(apiError.RouterError())
+		}
+		abortChan <- true
+	}()
 
 	errFailedToStart := errors.New("failed to start vertex postgres database")
 
-	for event := range eventsChan {
-		switch e := event.(type) {
-		case containerstypes.EventContainerStatusChange:
-			if e.Status == containerstypes.ContainerStatusRunning {
-				return nil
-			} else if e.Status == containerstypes.ContainerStatusOff || e.Status == containerstypes.ContainerStatusError {
-				return errFailedToStart
+	for {
+		select {
+		case e := <-eventsChan:
+			switch e := e.(type) {
+			case containerstypes.EventContainerStatusChange:
+				if e.Status == containerstypes.ContainerStatusRunning {
+					return nil
+				} else if e.Status == containerstypes.ContainerStatusOff || e.Status == containerstypes.ContainerStatusError {
+					return errFailedToStart
+				}
 			}
+		case <-abortChan:
+			return errFailedToStart
 		}
 	}
-
-	return errFailedToStart
 }
