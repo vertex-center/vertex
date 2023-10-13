@@ -114,7 +114,7 @@ const containerRoutes = (id: string) => {
             service: () => updateService(id),
         },
         versions: {
-            get: () => getVersions(id),
+            get: (cache?: boolean) => getVersions(id, cache),
         },
     };
 };

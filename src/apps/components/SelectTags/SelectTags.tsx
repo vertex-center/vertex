@@ -5,26 +5,26 @@ import Select, {
 import { useContainersTags } from "../../hooks/useContainers";
 
 type Props = {
-    values?: string[];
+    selected?: string[];
     onChange: (tags: any) => void;
 };
 
 export default function SelectTags(props: Readonly<Props>) {
-    const { values } = props;
+    const { selected } = props;
     const { tags } = useContainersTags();
 
-    const count = Object.keys(values).length;
+    const count = selected?.length;
 
     let value = (
         <SelectValue>Tags{count !== 0 ? ` (${count})` : undefined}</SelectValue>
     );
 
     const onChange = (value: any) => {
-        let updated = [];
-        if (values.includes(value)) {
-            updated = values.filter((v) => v !== value);
+        let updated: any[];
+        if (selected.includes(value)) {
+            updated = selected.filter((v) => v !== value);
         } else {
-            updated = [...values, value];
+            updated = [...selected, value];
         }
         props.onChange(updated);
     };
@@ -37,7 +37,7 @@ export default function SelectTags(props: Readonly<Props>) {
                     multiple
                     key={tag}
                     value={tag}
-                    selected={values.includes(tag)}
+                    selected={selected.includes(tag)}
                 >
                     {tag}
                 </SelectOption>

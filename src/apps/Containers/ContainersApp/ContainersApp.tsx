@@ -56,22 +56,25 @@ export default function ContainersApp() {
         },
     });
 
-    const onTagsChange = (tags: string[]) => {
-        setTags(tags);
-        queryClient.invalidateQueries({
-            queryKey: ["containers", { tags }],
-        });
-    };
+    const ToolbarContainers = () => {
+        const onTagsChange = (tags: string[]) => {
+            setTags(tags);
+            queryClient.invalidateQueries({
+                queryKey: ["containers", { tags }],
+                exact: true,
+            });
+        };
 
-    const toolbar = (
-        <Toolbar className={styles.toolbar}>
-            <SelectTags values={tags} onChange={onTagsChange} />
-            <Spacer />
-            <Button primary to="/app/vx-containers/add" rightIcon="add">
-                Create container
-            </Button>
-        </Toolbar>
-    );
+        return (
+            <Toolbar className={styles.toolbar}>
+                <SelectTags selected={tags} onChange={onTagsChange} />
+                <Spacer />
+                <Button primary to="/app/vx-containers/add" rightIcon="add">
+                    Create container
+                </Button>
+            </Toolbar>
+        );
+    };
 
     return (
         <div className={styles.server}>
@@ -88,7 +91,7 @@ export default function ContainersApp() {
 
             {!isLoading && !isError && (
                 <div className={styles.containers}>
-                    {toolbar}
+                    <ToolbarContainers />
                     <Containers>
                         <Container
                             container={{

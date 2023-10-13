@@ -10,6 +10,7 @@ import classNames from "classnames";
 import styles from "./Input.module.sass";
 import Spacer from "../Spacer/Spacer";
 import Icon from "../Icon/Icon";
+import Checkbox from "../Checkbox/Checkbox";
 
 type OptionProps = HTMLProps<HTMLDivElement> & {
     onClick?: (value: any) => void;
@@ -34,9 +35,7 @@ export function SelectOption(props: Readonly<OptionProps>) {
                 className={classNames(styles.selectItem, className)}
                 {...others}
             >
-                {multiple === true && (
-                    <input type="checkbox" checked={selected} />
-                )}
+                {multiple === true && <Checkbox checked={selected} />}
                 {children}
             </div>
         </Fragment>
@@ -58,15 +57,13 @@ export function SelectValue(props: Readonly<SelectValueProps>) {
 
 type SelectOptionsProps = HTMLProps<HTMLDivElement> & {
     opened?: boolean;
-    toggle?: () => void;
 };
 
 export function SelectOptions(props: Readonly<SelectOptionsProps>) {
-    const { opened, toggle, className, ...others } = props;
+    const { opened, className, ...others } = props;
 
     return (
         <div
-            onClick={toggle}
             className={classNames({
                 [styles.selectItems]: true,
                 [styles.selectItemsOpened]: opened,
@@ -91,7 +88,9 @@ export default function Select(props: Readonly<Props>) {
     const toggle = () => setOpened(!opened);
 
     const onChange = (value: any) => {
-        toggle();
+        if (!props.multiple) {
+            toggle();
+        }
         props.onChange?.(value);
     };
 
@@ -112,7 +111,7 @@ export default function Select(props: Readonly<Props>) {
                 {opened && <Icon name="expand_less" />}
                 {!opened && <Icon name="expand_more" />}
             </div>
-            <SelectOptions opened={opened} toggle={toggle}>
+            <SelectOptions opened={opened}>
                 {Children.map(children, (child) => {
                     if (!child) return;
                     // @ts-ignore
