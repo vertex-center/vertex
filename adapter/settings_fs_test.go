@@ -49,5 +49,5 @@ func (suite *SettingsFSAdapterTestSuite) TestReadCorruptedSettings() {
 	suite.NoError(err)
 
 	err = suite.adapter.read()
-	suite.ErrorIs(err, errFailedToDecode)
+	suite.ErrorIs(err, errSettingsFailedToDecode)
 }

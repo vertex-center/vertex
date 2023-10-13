@@ -3,6 +3,7 @@ package adapter
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"path"
 	"sync"
@@ -12,6 +13,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"
+)
+
+var (
+	errReverseProxyNotFound       = errors.New("redirects.json doesn't exists or could not be found")
+	errReverseProxyFailedToRead   = errors.New("failed to read redirects.json")
+	errReverseProxyFailedToDecode = errors.New("failed to decode redirects.json")
 )
 
 type ProxyFSAdapter struct {
@@ -48,7 +55,11 @@ func NewProxyFSAdapter(params *ProxyFSAdapterParams) types.ProxyAdapterPort {
 
 		proxyPath: params.proxyPath,
 	}
-	adapter.read()
+
+	err = adapter.read()
+	if errors.Is(err, errReverseProxyFailedToDecode) {
+		log.Error(err)
+	}
 
 	return adapter
 }
@@ -90,15 +101,14 @@ func (a *ProxyFSAdapter) RemoveRedirect(id uuid.UUID) error {
 	return a.write()
 }
 
-func (a *ProxyFSAdapter) read() {
+func (a *ProxyFSAdapter) read() error {
 	p := path.Join(a.proxyPath, "redirects.json")
 	file, err := os.ReadFile(p)
 
 	if errors.Is(err, os.ErrNotExist) {
-		log.Info("redirects.json doesn't exists or could not be found")
+		return errReverseProxyNotFound
 	} else if err != nil {
-		log.Error(err)
-		return
+		return fmt.Errorf("%w: %w", errReverseProxyFailedToRead, err)
 	}
 
 	a.redirectsMutex.Lock()
@@ -106,9 +116,10 @@ func (a *ProxyFSAdapter) read() {
 
 	err = json.Unmarshal(file, &a.redirects)
 	if err != nil {
-		log.Error(err)
-		return
+		return fmt.Errorf("%w: %w", errReverseProxyFailedToDecode, err)
 	}
+
+	return nil
 }
 
 func (a *ProxyFSAdapter) write() error {

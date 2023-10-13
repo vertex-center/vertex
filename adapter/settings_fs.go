@@ -15,9 +15,9 @@ import (
 )
 
 var (
-	errSettingsNotFound = errors.New("settings.json doesn't exists or could not be found")
-	errFailedToRead     = errors.New("failed to read settings.json")
-	errFailedToDecode   = errors.New("failed to decode settings.json")
+	errSettingsNotFound       = errors.New("settings.json doesn't exists or could not be found")
+	errSettingsFailedToRead   = errors.New("failed to read settings.json")
+	errSettingsFailedToDecode = errors.New("failed to decode settings.json")
 )
 
 type SettingsFSAdapter struct {
@@ -51,7 +51,7 @@ func NewSettingsFSAdapter(params *SettingsFSAdapterParams) types.SettingsAdapter
 	}
 
 	err = adapter.read()
-	if errors.Is(err, errFailedToDecode) {
+	if errors.Is(err, errSettingsFailedToDecode) {
 		log.Error(err)
 	}
 
@@ -99,12 +99,12 @@ func (a *SettingsFSAdapter) read() error {
 	if errors.Is(err, fs.ErrNotExist) {
 		return errSettingsNotFound
 	} else if err != nil {
-		return fmt.Errorf("%w: %w", errFailedToRead, err)
+		return fmt.Errorf("%w: %w", errSettingsFailedToRead, err)
 	}
 
 	err = json.Unmarshal(file, &a.settings)
 	if err != nil {
-		return fmt.Errorf("%w: %w", errFailedToDecode, err)
+		return fmt.Errorf("%w: %w", errSettingsFailedToDecode, err)
 	}
 	return nil
 }
