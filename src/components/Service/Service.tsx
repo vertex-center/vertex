@@ -17,9 +17,9 @@ export default function Service(props: Readonly<Props>) {
 
     let installedCountText = "";
     if (installedCount === 1) {
-        installedCountText = "Installed in 1 instance";
+        installedCountText = "Installed in 1 container";
     } else if (installedCount > 1) {
-        installedCountText = `Installed in ${installedCount} instances`;
+        installedCountText = `Installed in ${installedCount} containers`;
     }
 
     return (

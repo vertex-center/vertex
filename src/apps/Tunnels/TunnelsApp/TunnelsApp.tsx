@@ -12,19 +12,19 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function TunnelsApp() {
     const queryClient = useQueryClient();
-    const { data: instances, isLoading } = useQuery({
-        queryKey: ["instances"],
-        queryFn: api.vxInstances.instances.all,
+    const { data: containers, isLoading } = useQuery({
+        queryKey: ["containers"],
+        queryFn: api.vxContainers.containers.all,
     });
 
-    const ledCloudflared = Object.values(instances || {}).find((inst) =>
+    const ledCloudflared = Object.values(containers || {}).find((inst) =>
         inst.tags?.includes("vertex-cloudflare-tunnel")
     );
 
-    useServerEvent("/app/vx-instances/instances/events", {
+    useServerEvent("/app/vx-containers/containers/events", {
         change: (e) => {
             queryClient.invalidateQueries({
-                queryKey: ["instances"],
+                queryKey: ["containers"],
             });
         },
     });

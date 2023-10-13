@@ -1,7 +1,7 @@
 import { Vertical } from "../../../components/Layouts/Layouts";
 import { Text, Title } from "../../../components/Text/Text";
 import styles from "./CloudflareTunnels.module.sass";
-import InstanceInstaller from "../../../components/InstanceInstaller/InstanceInstaller";
+import ContainerInstaller from "../../../components/ContainerInstaller/ContainerInstaller";
 import { api } from "../../../backend/api/backend";
 
 type Props = {};
@@ -15,7 +15,7 @@ export default function CloudflareTunnels(props: Readonly<Props>) {
                     Cloudflare Tunnel allows you to expose your services to the
                     internet, without having to open ports or manage firewalls.
                 </Text>
-                <InstanceInstaller
+                <ContainerInstaller
                     name="Cloudflare Tunnel"
                     tag="vertex-cloudflare-tunnel"
                     install={api.vxTunnels.provider("cloudflared").install}

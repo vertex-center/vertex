@@ -6,13 +6,13 @@ const installDbms = (dbms: string) => {
     return server.post(`${BASE_URL}/dbms/${dbms}/install`);
 };
 
-const getInstance = async (uuid: string) => {
-    const { data } = await server.get(`${BASE_URL}/instance/${uuid}`);
+const getContainer = async (uuid: string) => {
+    const { data } = await server.get(`${BASE_URL}/container/${uuid}`);
     return data;
 };
 
-const instanceRoutes = (uuid: string) => ({
-    get: () => getInstance(uuid),
+const containerRoutes = (uuid: string) => ({
+    get: () => getContainer(uuid),
 });
 
 const dbmsRoutes = (dbms: string) => ({
@@ -20,6 +20,6 @@ const dbmsRoutes = (dbms: string) => ({
 });
 
 export const vxSqlRoutes = {
-    instance: instanceRoutes,
+    container: containerRoutes,
     dbms: dbmsRoutes,
 };

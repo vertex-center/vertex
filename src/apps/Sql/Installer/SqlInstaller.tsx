@@ -15,7 +15,7 @@ export default function SqlInstaller() {
 
     const queryServices = useQuery({
         queryKey: ["services"],
-        queryFn: api.vxInstances.services.all,
+        queryFn: api.vxContainers.services.all,
     });
     const {
         data: services,
@@ -23,15 +23,15 @@ export default function SqlInstaller() {
         error: servicesError,
     } = queryServices;
 
-    const queryInstances = useQuery({
-        queryKey: ["instances"],
-        queryFn: api.vxInstances.instances.all,
+    const queryContainers = useQuery({
+        queryKey: ["containers"],
+        queryFn: api.vxContainers.containers.all,
     });
     const {
-        data: instances,
-        isLoading: isInstancesLoading,
-        error: instancesError,
-    } = queryInstances;
+        data: containers,
+        isLoading: isContainersLoading,
+        error: containersError,
+    } = queryContainers;
 
     const [selectedService, setSelectedService] = useState<ServiceModel>();
     const [showPopup, setShowPopup] = useState(false);
@@ -60,7 +60,7 @@ export default function SqlInstaller() {
                 downloading.filter(({ service: s }) => s.id !== serviceId)
             );
             queryClient.invalidateQueries({
-                queryKey: ["instances"],
+                queryKey: ["containers"],
             });
         },
     });
@@ -74,11 +74,11 @@ export default function SqlInstaller() {
         mutationInstallService.mutate(service.id);
     };
 
-    const error = servicesError ?? instancesError ?? installError;
+    const error = servicesError ?? containersError ?? installError;
 
     return (
         <Vertical gap={20}>
-            <ProgressOverlay show={isInstancesLoading ?? isServicesLoading} />
+            <ProgressOverlay show={isContainersLoading ?? isServicesLoading} />
             <Title className={styles.title}>SQL Database Installer</Title>
             <APIError error={error} />
             <Vertical>
@@ -99,9 +99,9 @@ export default function SqlInstaller() {
                                     ({ service: s }) => s.id === service.id
                                 )}
                                 installedCount={
-                                    instances === undefined
+                                    containers === undefined
                                         ? undefined
-                                        : Object.values(instances)?.filter(
+                                        : Object.values(containers)?.filter(
                                               ({ service: s }) =>
                                                   s.id === service.id
                                           )?.length

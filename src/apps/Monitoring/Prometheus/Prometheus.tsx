@@ -2,7 +2,7 @@ import { Text, Title } from "../../../components/Text/Text";
 import styles from "./Prometheus.module.sass";
 import { Vertical } from "../../../components/Layouts/Layouts";
 import { api } from "../../../backend/api/backend";
-import InstanceInstaller from "../../../components/InstanceInstaller/InstanceInstaller";
+import ContainerInstaller from "../../../components/ContainerInstaller/ContainerInstaller";
 
 export default function Prometheus() {
     return (
@@ -13,7 +13,7 @@ export default function Prometheus() {
                     Prometheus is a Collector that gathers metrics from your
                     Vertex installation.
                 </Text>
-                <InstanceInstaller
+                <ContainerInstaller
                     name="Prometheus"
                     tag="vertex-prometheus-collector"
                     install={api.vxMonitoring.collector("prometheus").install}

@@ -12,12 +12,12 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function SqlApp() {
     const queryClient = useQueryClient();
-    const { data: instances, isLoading } = useQuery({
-        queryKey: ["instances"],
-        queryFn: api.vxInstances.instances.all,
+    const { data: containers, isLoading } = useQuery({
+        queryKey: ["containers"],
+        queryFn: api.vxContainers.containers.all,
     });
 
-    const dbs = Object.values(instances ?? {})?.filter((i) =>
+    const dbs = Object.values(containers ?? {})?.filter((i) =>
         i?.tags?.some((t) => t.includes("vertex-") && t.includes("-sql"))
     );
 
@@ -56,10 +56,10 @@ export default function SqlApp() {
         </Sidebar>
     );
 
-    useServerEvent("/app/vx-instances/instances/events", {
+    useServerEvent("/app/vx-containers/containers/events", {
         change: () => {
             queryClient.invalidateQueries({
-                queryKey: ["instances"],
+                queryKey: ["containers"],
             });
         },
     });

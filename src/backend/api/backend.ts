@@ -3,7 +3,7 @@ import { Dependencies as DependenciesUpdate } from "../../models/update";
 import { About } from "../../models/about";
 import { Hardware } from "../../models/hardware";
 import { SSHKeys } from "../../models/security";
-import { vxInstancesRoutes } from "./vxInstances";
+import { vxContainersRoutes } from "./vxContainers";
 import { vxTunnelsRoutes } from "./vxTunnels";
 import { vxMonitoringRoutes } from "./vxMonitoring";
 import { vxSqlRoutes } from "./vxSql";
@@ -53,7 +53,7 @@ export const api = {
     about: getAbout,
     hardware: getHardware,
 
-    vxInstances: vxInstancesRoutes,
+    vxContainers: vxContainersRoutes,
     vxTunnels: vxTunnelsRoutes,
     vxMonitoring: vxMonitoringRoutes,
     vxSql: vxSqlRoutes,

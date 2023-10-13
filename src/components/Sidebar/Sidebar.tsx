@@ -5,7 +5,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { Fragment, HTMLProps, PropsWithChildren } from "react";
 import { Text } from "../Text/Text";
 import Spacer from "../Spacer/Spacer";
-import { InstanceLed, Status } from "../InstanceLed/InstanceLed";
+import { ContainerLed, Status } from "../ContainerLed/ContainerLed";
 
 function SidebarTitle({ children }: PropsWithChildren) {
     return <Text className={styles.title}>{children}</Text>;
@@ -46,7 +46,7 @@ export function SidebarItem(props: Readonly<ItemProps>) {
                 </div>
             )}
             {led && led.status !== "not-installed" && (
-                <InstanceLed {...led} small />
+                <ContainerLed {...led} small />
             )}
         </Fragment>
     );

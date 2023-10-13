@@ -1,8 +1,8 @@
 import { Vertical } from "../../../components/Layouts/Layouts";
 import { useParams } from "react-router-dom";
 import { api } from "../../../backend/api/backend";
-import { Instance as InstanceModel } from "../../../models/instance";
-import Instance from "../../../components/Instance/Instance";
+import { Container as ContainerModel } from "../../../models/container";
+import Container, { Containers } from "../../../components/Container/Container";
 import { v4 as uuidv4 } from "uuid";
 import { useServerEvent } from "../../../hooks/useEvent";
 import { APIError } from "../../../components/Error/APIError";
@@ -26,12 +26,12 @@ export default function SqlDatabase() {
     const queryClient = useQueryClient();
 
     const {
-        data: instance,
-        isLoading: isLoadingInstance,
-        error: errorInstance,
+        data: container,
+        isLoading: isLoadingContainer,
+        error: errorContainer,
     } = useQuery({
-        queryKey: ["instances", uuid],
-        queryFn: api.vxInstances.instance(uuid).get,
+        queryKey: ["containers", uuid],
+        queryFn: api.vxContainers.container(uuid).get,
     });
 
     const {
@@ -39,47 +39,49 @@ export default function SqlDatabase() {
         isLoading: isLoadingDatabase,
         error: errorDatabase,
     } = useQuery({
-        queryKey: ["sql_instances", uuid],
-        queryFn: api.vxSql.instance(uuid).get,
+        queryKey: ["sql_containers", uuid],
+        queryFn: api.vxSql.container(uuid).get,
     });
 
-    const onPower = async (inst: InstanceModel) => {
+    const onPower = async (inst: ContainerModel) => {
         if (!inst) {
-            console.error("Instance not found");
+            console.error("Container not found");
             return;
         }
         if (inst?.status === "off" || inst?.status === "error") {
-            await api.vxInstances.instance(inst.uuid).start();
+            await api.vxContainers.container(inst.uuid).start();
             return;
         }
-        await api.vxInstances.instance(inst.uuid).stop();
+        await api.vxContainers.container(inst.uuid).stop();
     };
 
-    const route = uuid ? `/app/vx-instances/instance/${uuid}/events` : "";
+    const route = uuid ? `/app/vx-containers/container/${uuid}/events` : "";
 
     useServerEvent(route, {
         status_change: () => {
             queryClient.invalidateQueries({
-                queryKey: ["instances", uuid],
+                queryKey: ["containers", uuid],
             });
         },
     });
 
     return (
         <Vertical gap={30}>
-            <ProgressOverlay show={isLoadingInstance ?? isLoadingDatabase} />
+            <ProgressOverlay show={isLoadingContainer ?? isLoadingDatabase} />
 
             <Vertical gap={20}>
-                <APIError error={errorInstance ?? errorDatabase} />
-                <Instance
-                    instance={{
-                        value: instance ?? {
-                            uuid: uuidv4(),
-                        },
-                        to: `/app/vx-instances/${instance?.uuid}`,
-                        onPower: () => onPower(instance),
-                    }}
-                />
+                <APIError error={errorContainer ?? errorDatabase} />
+                <Containers>
+                    <Container
+                        container={{
+                            value: container ?? {
+                                uuid: uuidv4(),
+                            },
+                            to: `/app/vx-containers/${container?.uuid}`,
+                            onPower: () => onPower(container),
+                        }}
+                    />
+                </Containers>
 
                 <KeyValueGroup>
                     <KeyValueInfo name="Username" loading={isLoadingDatabase}>

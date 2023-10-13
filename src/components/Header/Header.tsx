@@ -9,7 +9,7 @@ export default function Header() {
     const location = useLocation();
 
     let name = "Vertex";
-    let to = "/app/vx-instances";
+    let to = "/app/vx-containers";
     if (location.pathname.startsWith("/app/")) {
         const app = apps?.find((app) =>
             location.pathname.includes(`/app/${app.id}`)

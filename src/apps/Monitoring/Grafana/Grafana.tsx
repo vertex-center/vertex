@@ -1,7 +1,7 @@
 import { Text, Title } from "../../../components/Text/Text";
 import styles from "../Prometheus/Prometheus.module.sass";
 import { Vertical } from "../../../components/Layouts/Layouts";
-import InstanceInstaller from "../../../components/InstanceInstaller/InstanceInstaller";
+import ContainerInstaller from "../../../components/ContainerInstaller/ContainerInstaller";
 import { api } from "../../../backend/api/backend";
 
 export default function Grafana() {
@@ -13,7 +13,7 @@ export default function Grafana() {
                     Grafana allows you to visualize metrics gathered by a
                     Collector.
                 </Text>
-                <InstanceInstaller
+                <ContainerInstaller
                     name="Grafana"
                     tag="vertex-grafana-visualizer"
                     install={api.vxMonitoring.visualizer("grafana").install}

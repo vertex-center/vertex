@@ -47,7 +47,7 @@ export default function ServiceInstallPopup(props: Readonly<Props>) {
                     rightIcon="add"
                     disabled={error !== undefined}
                 >
-                    Create instance
+                    Create container
                 </Button>
             </Horizontal>
         </Popup>

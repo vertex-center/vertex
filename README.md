@@ -13,7 +13,7 @@
 
 ### Vertex
 
-Vertex Web UI allows you to interact with your Vertex instance easily. You can monitor, setup, start and stop services
+Vertex Web UI allows you to interact with your Vertex container easily. You can monitor, setup, start and stop services
 without any technical knowledge.
 
 <img width="1524" alt="image" src="https://github.com/vertex-center/vertex-webui/assets/12123721/36c0a95d-0ff4-416a-9d13-2381f6af88f5">

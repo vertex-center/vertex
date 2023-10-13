@@ -12,23 +12,23 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function MonitoringApp() {
     const queryClient = useQueryClient();
-    const { data: instances, isLoading } = useQuery({
-        queryKey: ["instances"],
-        queryFn: api.vxInstances.instances.all,
+    const { data: containers, isLoading } = useQuery({
+        queryKey: ["containers"],
+        queryFn: api.vxContainers.containers.all,
     });
 
-    const ledPrometheus = Object.values(instances || {}).find((inst) =>
+    const ledPrometheus = Object.values(containers || {}).find((inst) =>
         inst.tags?.includes("vertex-prometheus-collector")
     );
 
-    const ledGrafana = Object.values(instances || {}).find((inst) =>
+    const ledGrafana = Object.values(containers || {}).find((inst) =>
         inst.tags?.includes("vertex-grafana-visualizer")
     );
 
-    useServerEvent("/app/vx-instances/instances/events", {
+    useServerEvent("/app/vx-containers/containers/events", {
         change: (e) => {
             queryClient.invalidateQueries({
-                queryKey: ["instances"],
+                queryKey: ["containers"],
             });
         },
     });
