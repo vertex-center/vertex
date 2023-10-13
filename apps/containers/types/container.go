@@ -87,10 +87,6 @@ func (i *Container) IsBusy() bool {
 	return i.Status == ContainerStatusBuilding || i.Status == ContainerStatusStarting || i.Status == ContainerStatusStopping
 }
 
-func (i *Container) IsDockerized() bool {
-	return i.ContainerSettings.InstallMethod != nil && *i.ContainerSettings.InstallMethod == ContainerInstallMethodDocker
-}
-
 func (i *Container) LaunchOnStartup() bool {
 	launchOnStartup := i.ContainerSettings.LaunchOnStartup
 	if launchOnStartup != nil && !*launchOnStartup {

@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"path"
 	"strings"
 	"sync"
@@ -82,14 +81,7 @@ func (s *ContainerRunnerService) Start(inst *types.Container) error {
 		s.setStatus(inst, status)
 	}
 
-	var runner types.ContainerRunnerAdapterPort
-	if inst.IsDockerized() {
-		runner = s.adapter
-	} else {
-		return fmt.Errorf("container is not dockerized")
-	}
-
-	stdout, stderr, err := runner.Start(inst, setStatus)
+	stdout, stderr, err := s.adapter.Start(inst, setStatus)
 	if err != nil {
 		s.setStatus(inst, types.ContainerStatusError)
 		return err
@@ -185,13 +177,7 @@ func (s *ContainerRunnerService) Stop(inst *types.Container) error {
 
 	s.setStatus(inst, types.ContainerStatusStopping)
 
-	var err error
-	if inst.IsDockerized() {
-		err = s.adapter.Stop(inst)
-	} else {
-		return fmt.Errorf("container is not dockerized")
-	}
-
+	err := s.adapter.Stop(inst)
 	if err == nil {
 		s.ctx.DispatchEvent(types.EventContainerLog{
 			ContainerUUID: inst.UUID,
@@ -212,16 +198,7 @@ func (s *ContainerRunnerService) Stop(inst *types.Container) error {
 }
 
 func (s *ContainerRunnerService) GetDockerContainerInfo(inst types.Container) (map[string]any, error) {
-	if !inst.IsDockerized() {
-		return nil, errors.New("container is not using docker")
-	}
-
-	info, err := s.adapter.Info(inst)
-	if err != nil {
-		return nil, err
-	}
-
-	return info, nil
+	return s.adapter.Info(inst)
 }
 
 func (s *ContainerRunnerService) GetAllVersions(inst *types.Container, useCache bool) ([]string, error) {
@@ -242,10 +219,6 @@ func (s *ContainerRunnerService) CheckForUpdates(inst *types.Container) error {
 
 // RecreateContainer recreates a container by its UUID.
 func (s *ContainerRunnerService) RecreateContainer(inst *types.Container) error {
-	if !inst.IsDockerized() {
-		return nil
-	}
-
 	if inst.IsRunning() {
 		err := s.adapter.Stop(inst)
 		if err != nil {
