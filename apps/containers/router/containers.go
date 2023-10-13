@@ -16,6 +16,11 @@ func (r *AppRouter) handleGetContainers(c *router.Context) {
 	c.JSON(installed)
 }
 
+func (r *AppRouter) handleGetTags(c *router.Context) {
+	tags := r.containerService.GetTags()
+	c.JSON(tags)
+}
+
 // handleSearchContainers returns all installed containers that match the query.
 func (r *AppRouter) handleSearchContainers(c *router.Context) {
 	query := types.ContainerSearchQuery{}

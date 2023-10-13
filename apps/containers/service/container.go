@@ -87,6 +87,30 @@ func (s *ContainerService) GetAll() map[uuid.UUID]*types.Container {
 	return s.containers
 }
 
+func (s *ContainerService) GetTags() []string {
+	var tags []string
+
+	s.containersMutex.RLock()
+	defer s.containersMutex.RUnlock()
+
+	for _, inst := range s.containers {
+		for _, tag := range inst.Tags {
+			found := false
+			for _, t := range tags {
+				if t == tag {
+					found = true
+					break
+				}
+			}
+			if !found {
+				tags = append(tags, tag)
+			}
+		}
+	}
+
+	return tags
+}
+
 // Search returns all containers that match the query.
 func (s *ContainerService) Search(query types.ContainerSearchQuery) map[uuid.UUID]*types.Container {
 	containers := map[uuid.UUID]*types.Container{}

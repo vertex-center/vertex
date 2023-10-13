@@ -13,6 +13,9 @@ import (
 type ContainerServiceTestSuite struct {
 	suite.Suite
 	service *ContainerService
+
+	containerA types.Container
+	containerB types.Container
 }
 
 func TestContainerServiceTestSuite(t *testing.T) {
@@ -23,10 +26,8 @@ func (suite *ContainerServiceTestSuite) SetupTest() {
 	suite.service = NewContainerService(ContainerServiceParams{
 		Ctx: app.NewContext(vtypes.NewVertexContext()),
 	})
-}
 
-func (suite *ContainerServiceTestSuite) TestSearch() {
-	containerA := types.Container{
+	suite.containerA = types.Container{
 		UUID: uuid.New(),
 		Service: types.Service{
 			Name: "service-a",
@@ -36,7 +37,7 @@ func (suite *ContainerServiceTestSuite) TestSearch() {
 		},
 	}
 
-	containerB := types.Container{
+	suite.containerB = types.Container{
 		UUID: uuid.New(),
 		Service: types.Service{
 			Name: "service-b",
@@ -54,10 +55,12 @@ func (suite *ContainerServiceTestSuite) TestSearch() {
 	}
 
 	suite.service.containers = map[uuid.UUID]*types.Container{
-		containerA.UUID: &containerA,
-		containerB.UUID: &containerB,
+		suite.containerA.UUID: &suite.containerA,
+		suite.containerB.UUID: &suite.containerB,
 	}
+}
 
+func (suite *ContainerServiceTestSuite) TestSearch() {
 	tests := []struct {
 		query    types.ContainerSearchQuery
 		expected []uuid.UUID
@@ -66,8 +69,8 @@ func (suite *ContainerServiceTestSuite) TestSearch() {
 		{
 			types.ContainerSearchQuery{},
 			[]uuid.UUID{
-				containerA.UUID,
-				containerB.UUID,
+				suite.containerA.UUID,
+				suite.containerB.UUID,
 			},
 		},
 		// Tags
@@ -87,21 +90,21 @@ func (suite *ContainerServiceTestSuite) TestSearch() {
 			types.ContainerSearchQuery{
 				Tags: &[]string{"service-a-tag-1"},
 			},
-			[]uuid.UUID{containerA.UUID},
+			[]uuid.UUID{suite.containerA.UUID},
 		},
 		{
 			types.ContainerSearchQuery{
 				Tags: &[]string{"service-a-tag-0", "service-a-tag-1"},
 			},
-			[]uuid.UUID{containerA.UUID},
+			[]uuid.UUID{suite.containerA.UUID},
 		},
 		{
 			types.ContainerSearchQuery{
 				Tags: &[]string{"global-tag"},
 			},
 			[]uuid.UUID{
-				containerA.UUID,
-				containerB.UUID,
+				suite.containerA.UUID,
+				suite.containerB.UUID,
 			},
 		},
 		// Features
@@ -115,7 +118,7 @@ func (suite *ContainerServiceTestSuite) TestSearch() {
 			types.ContainerSearchQuery{
 				Features: &[]string{"postgres"},
 			},
-			[]uuid.UUID{containerB.UUID},
+			[]uuid.UUID{suite.containerB.UUID},
 		},
 		// Multiple
 		{
@@ -123,7 +126,7 @@ func (suite *ContainerServiceTestSuite) TestSearch() {
 				Tags:     &[]string{"global-tag"},
 				Features: &[]string{"postgres"},
 			},
-			[]uuid.UUID{containerB.UUID},
+			[]uuid.UUID{suite.containerB.UUID},
 		},
 	}
 
@@ -141,4 +144,13 @@ func (suite *ContainerServiceTestSuite) TestSearch() {
 			suite.Contains(resultUUIDs, expected)
 		}
 	}
+}
+
+func (suite *ContainerServiceTestSuite) TestGetTags() {
+	tags := suite.service.GetTags()
+
+	suite.Len(tags, 3)
+	suite.Contains(tags, "global-tag")
+	suite.Contains(tags, "service-a-tag-0")
+	suite.Contains(tags, "service-a-tag-1")
 }

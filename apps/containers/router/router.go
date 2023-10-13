@@ -75,6 +75,7 @@ func (r *AppRouter) AddRoutes(group *router.Group) {
 
 	containers := group.Group("/containers")
 	containers.GET("", r.handleGetContainers)
+	containers.GET("/tags", r.handleGetTags)
 	containers.GET("/search", r.handleSearchContainers)
 	containers.GET("/checkupdates", r.handleCheckForUpdates)
 	containers.GET("/events", app.HeadersSSE, r.handleContainersEvents)
