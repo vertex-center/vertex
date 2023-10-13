@@ -40,16 +40,18 @@
         display: flex
         flex-direction: row
         gap: 12px
+        height: dimensions.$component-height
+        box-sizing: border-box
         align-items: center
         cursor: pointer
-        padding: 12px 20px
+        padding: 0 20px
         border: 1px solid transparent
         transition: all 0.1s ease
         -webkit-user-select: none
         -ms-user-select: none
         user-select: none
         position: relative
-        border-radius: dimensions.$border-radius-lg
+        border-radius: dimensions.$border-radius
 
         &Red
             color: colors.$red
