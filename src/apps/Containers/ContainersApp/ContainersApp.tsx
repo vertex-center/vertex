@@ -12,6 +12,25 @@ import Button from "../../../components/Button/Button";
 import SelectTags from "../components/SelectTags/SelectTags";
 import { useState } from "react";
 
+type ToolbarProps = {
+    tags?: string[];
+    onTagsChange?: (tags: string[]) => void;
+};
+
+const ToolbarContainers = (props: ToolbarProps) => {
+    const { tags, onTagsChange } = props;
+
+    return (
+        <Toolbar className={styles.toolbar}>
+            <SelectTags selected={tags} onChange={onTagsChange} />
+            <Spacer />
+            <Button primary to="/app/vx-containers/add" rightIcon="add">
+                Create container
+            </Button>
+        </Toolbar>
+    );
+};
+
 export default function ContainersApp() {
     const queryClient = useQueryClient();
 
@@ -56,26 +75,14 @@ export default function ContainersApp() {
         },
     });
 
-    const ToolbarContainers = () => {
-        const onTagsChange = (tags: string[]) => {
-            setTags((prev) => {
-                queryClient.invalidateQueries({
-                    queryKey: ["containers", { tags: prev }],
-                    exact: true,
-                });
-                return tags;
+    const onTagsChange = (tags: string[]) => {
+        setTags((prev) => {
+            queryClient.invalidateQueries({
+                queryKey: ["containers", { tags: prev }],
+                exact: true,
             });
-        };
-
-        return (
-            <Toolbar className={styles.toolbar}>
-                <SelectTags selected={tags} onChange={onTagsChange} />
-                <Spacer />
-                <Button primary to="/app/vx-containers/add" rightIcon="add">
-                    Create container
-                </Button>
-            </Toolbar>
-        );
+            return tags;
+        });
     };
 
     return (
@@ -92,7 +99,7 @@ export default function ContainersApp() {
             )}
 
             <div className={styles.containers}>
-                <ToolbarContainers />
+                <ToolbarContainers tags={tags} onTagsChange={onTagsChange} />
                 {!isLoading && !isError && (
                     <Containers>
                         <Container
