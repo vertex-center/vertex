@@ -3,6 +3,8 @@ package adapter
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io/fs"
 	"os"
 	"path"
 
@@ -12,38 +14,44 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
+var (
+	errSettingsNotFound = errors.New("settings.json doesn't exists or could not be found")
+	errFailedToRead     = errors.New("failed to read settings.json")
+	errFailedToDecode   = errors.New("failed to decode settings.json")
+)
+
 type SettingsFSAdapter struct {
-	settingsPath string
-	settings     types.Settings
+	settingsDir string
+	settings    types.Settings
 }
 
 type SettingsFSAdapterParams struct {
-	settingsPath string
+	settingsDir string
 }
 
 func NewSettingsFSAdapter(params *SettingsFSAdapterParams) types.SettingsAdapterPort {
 	if params == nil {
 		params = &SettingsFSAdapterParams{}
 	}
-	if params.settingsPath == "" {
-		params.settingsPath = path.Join(storage.Path, "settings")
+	if params.settingsDir == "" {
+		params.settingsDir = path.Join(storage.Path, "settings")
 	}
 
-	err := os.MkdirAll(params.settingsPath, os.ModePerm)
+	err := os.MkdirAll(params.settingsDir, os.ModePerm)
 	if err != nil && !os.IsExist(err) {
 		log.Error(err,
 			vlog.String("message", "failed to create directory"),
-			vlog.String("path", params.settingsPath),
+			vlog.String("path", params.settingsDir),
 		)
 		os.Exit(1)
 	}
 
 	adapter := &SettingsFSAdapter{
-		settingsPath: params.settingsPath,
+		settingsDir: params.settingsDir,
 	}
 
 	err = adapter.read()
-	if err != nil {
+	if errors.Is(err, errFailedToDecode) {
 		log.Error(err)
 	}
 
@@ -85,27 +93,24 @@ func (a *SettingsFSAdapter) SetChannel(channel *types.SettingsUpdatesChannel) er
 }
 
 func (a *SettingsFSAdapter) read() error {
-	p := path.Join(a.settingsPath, "settings.json")
+	p := path.Join(a.settingsDir, "settings.json")
 	file, err := os.ReadFile(p)
 
-	if errors.Is(err, os.ErrNotExist) {
-		log.Info("settings.json doesn't exists or could not be found")
-		return nil
+	if errors.Is(err, fs.ErrNotExist) {
+		return errSettingsNotFound
 	} else if err != nil {
-		log.Info("failed to read settings.json")
-		return err
+		return fmt.Errorf("%w: %w", errFailedToRead, err)
 	}
 
 	err = json.Unmarshal(file, &a.settings)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: %w", errFailedToDecode, err)
 	}
-
 	return nil
 }
 
 func (a *SettingsFSAdapter) write() error {
-	p := path.Join(a.settingsPath, "settings.json")
+	p := path.Join(a.settingsDir, "settings.json")
 
 	bytes, err := json.MarshalIndent(a.settings, "", "\t")
 	if err != nil {
