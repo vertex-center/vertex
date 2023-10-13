@@ -66,6 +66,8 @@ func (a ContainerRunnerDockerAdapter) Start(inst *containerstypes.Container, set
 		containerPath := a.getPath(*inst)
 		service := inst.Service
 
+		log.Debug("building image", vlog.String("image", imageName))
+
 		// Build
 		var err error
 		var stdout, stderr io.ReadCloser
@@ -91,15 +93,12 @@ func (a ContainerRunnerDockerAdapter) Start(inst *containerstypes.Container, set
 
 			scanner := bufio.NewScanner(stdout)
 			for scanner.Scan() {
-				if scanner.Err() != nil {
-					log.Error(scanner.Err())
-					return
-				}
-
 				var msg jsonmessage.JSONMessage
 				err := json.Unmarshal(scanner.Bytes(), &msg)
 				if err != nil {
-					log.Error(err)
+					log.Error(err,
+						vlog.String("text", scanner.Text()),
+						vlog.String("uuid", inst.UUID.String()))
 					continue
 				}
 
@@ -115,15 +114,26 @@ func (a ContainerRunnerDockerAdapter) Start(inst *containerstypes.Container, set
 
 				progressJSON, err := json.Marshal(progress)
 				if err != nil {
-					log.Error(err)
+					log.Error(err,
+						vlog.String("text", scanner.Text()),
+						vlog.String("uuid", inst.UUID.String()))
 					continue
 				}
 
 				_, err = fmt.Fprintf(wOut, "%s %s\n", "DOWNLOAD", progressJSON)
 				if err != nil {
-					log.Error(err)
+					log.Error(err,
+						vlog.String("text", scanner.Text()),
+						vlog.String("uuid", inst.UUID.String()))
+					setStatus(containerstypes.ContainerStatusError)
 					return
 				}
+			}
+			if scanner.Err() != nil {
+				log.Error(scanner.Err(),
+					vlog.String("uuid", inst.UUID.String()))
+				setStatus(containerstypes.ContainerStatusError)
+				return
 			}
 		}()
 
