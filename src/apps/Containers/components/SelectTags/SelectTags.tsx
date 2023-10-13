@@ -37,7 +37,7 @@ export default function SelectTags(props: Readonly<Props>) {
             multiple
             value={value}
             onChange={onChange}
-            disabled={isLoading || isError}
+            disabled={isLoading || isError || !tags || tags.length === 0}
         >
             {tags?.map((tag) => (
                 <SelectOption
