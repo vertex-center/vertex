@@ -1,5 +1,5 @@
 import styles from "./Popup.module.sass";
-import { Fragment, PropsWithChildren } from "react";
+import { PropsWithChildren } from "react";
 import classNames from "classnames";
 
 type Props = PropsWithChildren<{
@@ -11,7 +11,7 @@ export default function Popup(props: Readonly<Props>) {
     const { show, onDismiss, children } = props;
 
     return (
-        <Fragment>
+        <div>
             <div
                 className={classNames({
                     [styles.overlay]: true,
@@ -27,6 +27,6 @@ export default function Popup(props: Readonly<Props>) {
             >
                 {children}
             </div>
-        </Fragment>
+        </div>
     );
 }
