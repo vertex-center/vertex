@@ -4,7 +4,9 @@ import (
 	"io"
 
 	dockertypes "github.com/docker/docker/api/types"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vlog"
 )
 
 type DockerKernelService struct {
@@ -58,9 +60,11 @@ func (s DockerKernelService) InfoImage(id string) (types.InfoImageResponse, erro
 }
 
 func (s DockerKernelService) PullImage(options types.PullImageOptions) (io.ReadCloser, error) {
+	log.Info("pulling image", vlog.String("image", options.Image))
 	return s.dockerAdapter.PullImage(options)
 }
 
 func (s DockerKernelService) BuildImage(options types.BuildImageOptions) (dockertypes.ImageBuildResponse, error) {
+	log.Info("building image", vlog.String("dockerfile", options.Dockerfile))
 	return s.dockerAdapter.BuildImage(options)
 }
