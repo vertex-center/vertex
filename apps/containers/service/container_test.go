@@ -150,7 +150,7 @@ func (suite *ContainerServiceTestSuite) TestGetTags() {
 	tags := suite.service.GetTags()
 
 	suite.Len(tags, 3)
-	suite.Contains(tags, "global-tag")
-	suite.Contains(tags, "service-a-tag-0")
-	suite.Contains(tags, "service-a-tag-1")
+	suite.Contains(tags, "Global Tag")
+	suite.Contains(tags, "Service A Tag 0")
+	suite.Contains(tags, "Service A Tag 1")
 }
