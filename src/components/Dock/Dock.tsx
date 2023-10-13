@@ -65,21 +65,23 @@ export default function Dock() {
                 })}
             >
                 <div className={styles.dock}>
-                    <div className={styles.shortcuts}>
-                        {[...(apps ?? [])]
-                            ?.sort((a, b) => (a.name > b.name ? 1 : -1))
-                            ?.map((app) => (
-                                <DockApp
-                                    key={app.id}
-                                    to={`/app/${app.id}`}
-                                    {...app}
-                                    onClick={() => setDrawerOpen(false)}
-                                />
-                            ))}
-                        {apps?.length > 0 && (
-                            <div className={styles.separator} />
-                        )}
-                    </div>
+                    {apps?.length > 0 && (
+                        <div className={styles.shortcuts}>
+                            {[...(apps ?? [])]
+                                ?.sort((a, b) => (a.name > b.name ? 1 : -1))
+                                ?.map((app) => (
+                                    <DockApp
+                                        key={app.id}
+                                        to={`/app/${app.id}`}
+                                        {...app}
+                                        onClick={() => setDrawerOpen(false)}
+                                    />
+                                ))}
+                            {apps?.length > 0 && (
+                                <div className={styles.separator} />
+                            )}
+                        </div>
+                    )}
                     <DockApp
                         to="/settings"
                         icon="settings"
