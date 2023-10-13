@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/vertex-center/vertex/pkg/net"
 	"os"
 	"runtime"
 
@@ -125,6 +126,13 @@ func setupDependency(dep types.DependencyUpdater) error {
 		return nil
 	}
 	if err != nil {
+		return err
+	}
+
+	// Wait for internet connection
+	err = net.Wait("google.com:80")
+	if err != nil {
+		log.Error(err)
 		return err
 	}
 
