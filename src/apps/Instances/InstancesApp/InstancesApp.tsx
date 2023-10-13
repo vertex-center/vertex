@@ -1,6 +1,6 @@
 import styles from "./InstancesApp.module.sass";
 import Instance, { Instances } from "../../../components/Instance/Instance";
-import { BigTitle } from "../../../components/Text/Text";
+import { BigTitle, Text } from "../../../components/Text/Text";
 import { api } from "../../../backend/api/backend";
 import { APIError } from "../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
@@ -9,6 +9,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Toolbar from "../../../components/Toolbar/Toolbar";
 import Spacer from "../../../components/Spacer/Spacer";
 import Button from "../../../components/Button/Button";
+import ToggleButton from "../../../components/ToggleButton/ToggleButton";
+import { Horizontal } from "../../../components/Layouts/Layouts";
 
 export default function InstancesApp() {
     const queryClient = useQueryClient();
@@ -53,7 +55,15 @@ export default function InstancesApp() {
     });
 
     const toolbar = (
-        <Toolbar>
+        <Toolbar className={styles.toolbar}>
+            <Horizontal alignItems="center" gap={15}>
+                <ToggleButton
+                    value={true}
+                    onChange={() => {}}
+                    disabled={true}
+                />
+                <Text>Show all</Text>
+            </Horizontal>
             <Spacer />
             <Button primary to="/app/vx-instances/add" rightIcon="add">
                 Create instance
