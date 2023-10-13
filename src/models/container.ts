@@ -4,6 +4,7 @@ export type InstallMethod = "script" | "release" | "docker";
 
 export type ContainerQuery = {
     features?: string[];
+    tags?: string[];
 };
 
 export type ContainerUpdate = {

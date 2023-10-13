@@ -10,13 +10,16 @@ import Toolbar from "../../../components/Toolbar/Toolbar";
 import Spacer from "../../../components/Spacer/Spacer";
 import Button from "../../../components/Button/Button";
 import SelectTags from "../../components/SelectTags/SelectTags";
+import { useState } from "react";
 
 export default function ContainersApp() {
     const queryClient = useQueryClient();
 
+    const [tags, setTags] = useState<string[]>([]);
+
     const queryContainers = useQuery({
-        queryKey: ["containers"],
-        queryFn: api.vxContainers.containers.all,
+        queryKey: ["containers", { tags }],
+        queryFn: () => api.vxContainers.containers.search({ tags }),
     });
     const { data: containers, isLoading, isError, error } = queryContainers;
 
@@ -53,9 +56,16 @@ export default function ContainersApp() {
         },
     });
 
+    const onTagsChange = (tags: string[]) => {
+        setTags(tags);
+        queryClient.invalidateQueries({
+            queryKey: ["containers", { tags }],
+        });
+    };
+
     const toolbar = (
         <Toolbar className={styles.toolbar}>
-            <SelectTags />
+            <SelectTags values={tags} onChange={onTagsChange} />
             <Spacer />
             <Button primary to="/app/vx-containers/add" rightIcon="add">
                 Create container

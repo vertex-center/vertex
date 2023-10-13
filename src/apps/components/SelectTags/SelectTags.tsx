@@ -4,18 +4,41 @@ import Select, {
 } from "../../../components/Input/Select";
 import { useContainersTags } from "../../hooks/useContainers";
 
-type Props = {};
+type Props = {
+    values?: string[];
+    onChange: (tags: any) => void;
+};
 
 export default function SelectTags(props: Readonly<Props>) {
+    const { values } = props;
     const { tags } = useContainersTags();
 
-    let value = <SelectValue>Tags</SelectValue>;
+    const count = Object.keys(values).length;
+
+    let value = (
+        <SelectValue>Tags{count !== 0 ? ` (${count})` : undefined}</SelectValue>
+    );
+
+    const onChange = (value: any) => {
+        let updated = [];
+        if (values.includes(value)) {
+            updated = values.filter((v) => v !== value);
+        } else {
+            updated = [...values, value];
+        }
+        props.onChange(updated);
+    };
 
     return (
         // @ts-ignore
-        <Select value={value}>
+        <Select multiple value={value} onChange={onChange}>
             {tags?.map((tag) => (
-                <SelectOption key={tag} value={tag}>
+                <SelectOption
+                    multiple
+                    key={tag}
+                    value={tag}
+                    selected={values.includes(tag)}
+                >
                     {tag}
                 </SelectOption>
             ))}

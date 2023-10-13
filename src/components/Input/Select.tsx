@@ -1,4 +1,10 @@
-import React, { Children, cloneElement, HTMLProps, useState } from "react";
+import React, {
+    Children,
+    cloneElement,
+    Fragment,
+    HTMLProps,
+    useState,
+} from "react";
 import classNames from "classnames";
 
 import styles from "./Input.module.sass";
@@ -11,14 +17,29 @@ type OptionProps = HTMLProps<HTMLDivElement> & {
 };
 
 export function SelectOption(props: Readonly<OptionProps>) {
-    const { className, onClick, value, ...others } = props;
+    const {
+        className,
+        selected,
+        multiple,
+        onClick,
+        value,
+        children,
+        ...others
+    } = props;
 
     return (
-        <div
-            onClick={() => onClick(value)}
-            className={classNames(styles.selectItem, className)}
-            {...others}
-        />
+        <Fragment>
+            <div
+                onClick={() => onClick(value)}
+                className={classNames(styles.selectItem, className)}
+                {...others}
+            >
+                {multiple === true && (
+                    <input type="checkbox" checked={selected} />
+                )}
+                {children}
+            </div>
+        </Fragment>
     );
 }
 
@@ -58,6 +79,7 @@ export function SelectOptions(props: Readonly<SelectOptionsProps>) {
 
 type Props = HTMLProps<HTMLDivElement> & {
     value?: Element;
+    multiple?: boolean;
     onChange?: (value: any) => void;
 };
 
