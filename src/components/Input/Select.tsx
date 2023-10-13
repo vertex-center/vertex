@@ -32,7 +32,11 @@ export function SelectOption(props: Readonly<OptionProps>) {
         <Fragment>
             <div
                 onClick={() => onClick(value)}
-                className={classNames(styles.selectItem, className)}
+                className={classNames({
+                    [styles.selectItem]: true,
+                    [styles.selectItemMultiple]: multiple,
+                    [className]: true,
+                })}
                 {...others}
             >
                 {multiple === true && <Checkbox checked={selected} />}

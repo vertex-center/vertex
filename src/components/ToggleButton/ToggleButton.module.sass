@@ -1,10 +1,11 @@
 @use "../../styles/colors"
+@use "../../styles/dimensions"
 
 .toggle
     background-color: colors.$bg-tertiary
     border-radius: 50px
-    height: 32px
-    width: 56px
+    height: dimensions.$component-small-height
+    width: 50px
     position: relative
     cursor: pointer
     user-select: none
@@ -22,16 +23,15 @@
     align-items: center
     justify-content: center
     position: absolute
-    top: 2px
-    left: 2px
     width: 28px
     height: 28px
+    left: 0
     border-radius: 50%
     transition: all 0.15s ease-in-out
     user-select: none
 
 .on .dot
-    left: 26px
+    left: 20px
 
 .icon
     font-size: 16px
