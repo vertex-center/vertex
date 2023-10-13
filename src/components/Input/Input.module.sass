@@ -73,8 +73,9 @@
         box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.2)
         position: absolute
         left: 0
-        right: 0
         top: 100%
+        max-width: 100%
+        box-sizing: border-box
         margin-top: 6px
         padding: 4px
         display: none
@@ -94,6 +95,7 @@
         padding: 0 20px
         cursor: pointer
         border-radius: calc(dimensions.$border-radius-lg - 6px)
+        white-space: nowrap
 
         &:hover
             background-color: colors.$bg-tertiary
