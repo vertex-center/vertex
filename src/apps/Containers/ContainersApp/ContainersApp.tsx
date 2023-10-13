@@ -89,9 +89,9 @@ export default function ContainersApp() {
                 </div>
             )}
 
-            {!isLoading && !isError && (
-                <div className={styles.containers}>
-                    <ToolbarContainers />
+            <div className={styles.containers}>
+                <ToolbarContainers />
+                {!isLoading && !isError && (
                     <Containers>
                         <Container
                             container={{
@@ -113,8 +113,8 @@ export default function ContainersApp() {
                             />
                         ))}
                     </Containers>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }
