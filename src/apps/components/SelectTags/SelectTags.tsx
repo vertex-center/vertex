@@ -13,6 +13,8 @@ export default function SelectTags(props: Readonly<Props>) {
     const { selected } = props;
     const { tags } = useContainersTags();
 
+    tags?.sort((a, b) => a.localeCompare(b));
+
     const count = selected?.length;
 
     let value = (
