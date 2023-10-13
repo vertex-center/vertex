@@ -30,6 +30,11 @@ func (r *AppRouter) handleSearchContainers(c *router.Context) {
 		query.Features = &features
 	}
 
+	tags := c.QueryArray("tags[]")
+	if len(tags) > 0 {
+		query.Tags = &tags
+	}
+
 	installed := r.containerService.Search(query)
 	c.JSON(installed)
 }
