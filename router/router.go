@@ -13,7 +13,7 @@ import (
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/adapter"
-	"github.com/vertex-center/vertex/apps/instances"
+	"github.com/vertex-center/vertex/apps/containers"
 	"github.com/vertex-center/vertex/apps/monitoring"
 	"github.com/vertex-center/vertex/apps/reverseproxy"
 	"github.com/vertex-center/vertex/apps/sql"
@@ -37,7 +37,6 @@ var (
 	notificationsService services.NotificationsService
 	dependenciesService  services.DependenciesService
 	settingsService      services.SettingsService
-	setupService         *services.SetupService
 	hardwareService      services.HardwareService
 	sshService           services.SshService
 )
@@ -47,9 +46,11 @@ type Router struct {
 
 	about types.About
 	ctx   *types.VertexContext
+
+	postMigrationCommands []interface{}
 }
 
-func NewRouter(about types.About) Router {
+func NewRouter(about types.About, postMigrationCommands []interface{}) Router {
 	gin.SetMode(gin.ReleaseMode)
 
 	ctx := types.NewVertexContext()
@@ -59,6 +60,8 @@ func NewRouter(about types.About) Router {
 
 		about: about,
 		ctx:   ctx,
+
+		postMigrationCommands: postMigrationCommands,
 	}
 
 	r.Use(cors.Default())
@@ -77,14 +80,14 @@ func (r *Router) Start(addr string) {
 	r.initAPIRoutes(r.about)
 	r.handleSignals()
 
-	r.ctx.DispatchEvent(types.EventServerStart{})
+	r.ctx.DispatchEvent(types.EventServerStart{
+		PostMigrationCommands: r.postMigrationCommands,
+	})
 
 	err := notificationsService.StartWebhook()
 	if err != nil {
 		log.Error(err)
 	}
-
-	setupService.StartSetup()
 
 	url := config.Current.VertexURL()
 	log.Info("Vertex started", vlog.String("url", url))
@@ -142,14 +145,14 @@ func (r *Router) initServices(about types.About) {
 			sql.NewApp(),
 			tunnels.NewApp(),
 			monitoring.NewApp(),
-			instances.NewApp(),
+			containers.NewApp(),
 			reverseproxy.NewApp(),
 		},
 	)
 	notificationsService = services.NewNotificationsService(r.ctx, settingsFSAdapter)
 	dependenciesService = services.NewDependenciesService(r.ctx, about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)
-	setupService = services.NewSetupService(r.ctx)
+	services.NewSetupService(r.ctx)
 	hardwareService = services.NewHardwareService()
 	sshService = services.NewSshService(sshKernelApiAdapter)
 }

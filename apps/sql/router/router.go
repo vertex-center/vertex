@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	instancesapi "github.com/vertex-center/vertex/apps/instances/api"
+	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	"github.com/vertex-center/vertex/apps/sql/service"
 	"github.com/vertex-center/vertex/apps/sql/types"
 	"github.com/vertex-center/vertex/pkg/log"
@@ -29,7 +29,7 @@ func (r *AppRouter) GetServices() []app.Service {
 }
 
 func (r *AppRouter) AddRoutes(group *router.Group) {
-	group.GET("/instance/:instance_uuid", r.handleGetDBMS)
+	group.GET("/container/:container_uuid", r.handleGetDBMS)
 	group.POST("/dbms/:dbms/install", r.handleInstallDBMS)
 }
 
@@ -48,13 +48,13 @@ func (r *AppRouter) getDBMS(c *router.Context) (string, error) {
 }
 
 func (r *AppRouter) handleGetDBMS(c *router.Context) {
-	uuid, apiError := instancesapi.GetInstanceUUIDParam(c)
+	uuid, apiError := containersapi.GetContainerUUIDParam(c)
 	if apiError != nil {
 		c.BadRequest(apiError.RouterError())
 		return
 	}
 
-	inst, apiError := instancesapi.GetInstance(c, uuid)
+	inst, apiError := containersapi.GetContainer(c, uuid)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
@@ -79,20 +79,20 @@ func (r *AppRouter) handleInstallDBMS(c *router.Context) {
 		return
 	}
 
-	serv, apiError := instancesapi.GetService(c, dbms)
+	serv, apiError := containersapi.GetService(c, dbms)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
 	}
 
-	inst, apiError := instancesapi.InstallService(c, serv.ID)
+	inst, apiError := containersapi.InstallService(c, serv.ID)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
 	}
 
-	inst.InstanceSettings.Tags = []string{"vertex-postgres-sql"}
-	apiError = instancesapi.PatchInstance(c, inst.UUID, inst.InstanceSettings)
+	inst.ContainerSettings.Tags = []string{"vertex-postgres-sql"}
+	apiError = containersapi.PatchContainer(c, inst.UUID, inst.ContainerSettings)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
@@ -102,14 +102,14 @@ func (r *AppRouter) handleInstallDBMS(c *router.Context) {
 	if err != nil {
 		log.Error(err)
 		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToConfigureSQLDatabaseInstance,
+			Code:           types.ErrCodeFailedToConfigureSQLDatabaseContainer,
 			PublicMessage:  fmt.Sprintf("Failed to configure SQL Database '%s'.", serv.Name),
 			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
-	apiError = instancesapi.PatchInstanceEnvironment(c, inst.UUID, inst.Env)
+	apiError = containersapi.PatchContainerEnvironment(c, inst.UUID, inst.Env)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return

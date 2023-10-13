@@ -25,8 +25,8 @@ type Metric struct {
 }
 
 type MetricsAdapterPort interface {
-	// ConfigureInstance configures an instance to monitor the metrics of Vertex.
-	ConfigureInstance(uuid uuid.UUID) error
+	// ConfigureContainer configures an container to monitor the metrics of Vertex.
+	ConfigureContainer(uuid uuid.UUID) error
 
 	// RegisterMetrics registers the metrics that can be monitored.
 	RegisterMetrics(metrics []Metric)

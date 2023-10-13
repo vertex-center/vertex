@@ -35,7 +35,7 @@ func (a *App) Initialize(app *apptypes.App) error {
 	app.Register(apptypes.Meta{
 		ID:          "vx-reverse-proxy",
 		Name:        "Vertex Reverse Proxy",
-		Description: "Redirect traffic to your instances.",
+		Description: "Redirect traffic to your containers.",
 		Icon:        "router",
 	})
 	app.RegisterRouter(AppRoute, a.router)

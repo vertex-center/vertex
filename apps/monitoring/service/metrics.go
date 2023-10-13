@@ -2,15 +2,15 @@ package service
 
 import (
 	"github.com/google/uuid"
-	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
+	containerstypes "github.com/vertex-center/vertex/apps/containers/types"
 	"github.com/vertex-center/vertex/apps/monitoring/adapter"
 	metricstypes "github.com/vertex-center/vertex/apps/monitoring/types"
 	"github.com/vertex-center/vertex/types/app"
 )
 
 const (
-	MetricIDInstanceStatus = "vertex_instance_status"
-	MetricIDInstancesCount = "vertex_instances_count"
+	MetricIDContainerStatus = "vertex_container_status"
+	MetricIDContainersCount = "vertex_containers_count"
 )
 
 type MetricsService struct {
@@ -22,16 +22,16 @@ type MetricsService struct {
 func NewMetricsService(ctx *app.Context) *MetricsService {
 	metrics := []metricstypes.Metric{
 		{
-			ID:          MetricIDInstanceStatus,
-			Name:        "Instance Status",
-			Description: "The status of the instance",
+			ID:          MetricIDContainerStatus,
+			Name:        "Container Status",
+			Description: "The status of the container",
 			Type:        metricstypes.MetricTypeOnOff,
 			Labels:      []string{"uuid", "service_id"},
 		},
 		{
-			ID:          MetricIDInstancesCount,
-			Name:        "Instances Count",
-			Description: "The number of instances installed",
+			ID:          MetricIDContainersCount,
+			Name:        "Containers Count",
+			Description: "The number of containers installed",
 			Type:        metricstypes.MetricTypeInteger,
 		},
 	}
@@ -48,12 +48,12 @@ func NewMetricsService(ctx *app.Context) *MetricsService {
 	return s
 }
 
-// ConfigureCollector will configure an instance to monitor the metrics of Vertex.
-func (s *MetricsService) ConfigureCollector(inst *instancestypes.Instance) error {
-	return s.adapter.ConfigureInstance(inst.UUID)
+// ConfigureCollector will configure an container to monitor the metrics of Vertex.
+func (s *MetricsService) ConfigureCollector(inst *containerstypes.Container) error {
+	return s.adapter.ConfigureContainer(inst.UUID)
 }
 
-func (s *MetricsService) ConfigureVisualizer(inst *instancestypes.Instance) error {
+func (s *MetricsService) ConfigureVisualizer(inst *containerstypes.Container) error {
 	// TODO: Implement
 	return nil
 }

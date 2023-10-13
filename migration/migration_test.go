@@ -34,7 +34,7 @@ func (suite *MigrationTestSuite) TearDownTest() {
 }
 
 func (suite *MigrationTestSuite) TestMigrate() {
-	err := suite.tool.Migrate()
+	_, err := suite.tool.Migrate()
 	suite.NoError(err)
 
 	_, err = os.Stat(suite.tool.metadataPath)

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	instancesapi "github.com/vertex-center/vertex/apps/instances/api"
-	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
+	containersapi "github.com/vertex-center/vertex/apps/containers/api"
+	containerstypes "github.com/vertex-center/vertex/apps/containers/types"
 	"github.com/vertex-center/vertex/apps/monitoring/types"
 	"github.com/vertex-center/vertex/pkg/router"
 )
@@ -26,19 +26,19 @@ func (r *AppRouter) handleInstallTunnelProvider(c *router.Context) {
 		return
 	}
 
-	serv, apiError := instancesapi.GetService(c, provider)
+	serv, apiError := containersapi.GetService(c, provider)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
 	}
 
-	inst, apiError := instancesapi.InstallService(c, serv.ID)
+	inst, apiError := containersapi.InstallService(c, serv.ID)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
 	}
 
-	apiError = instancesapi.PatchInstance(c, inst.UUID, instancestypes.InstanceSettings{
+	apiError = containersapi.PatchContainer(c, inst.UUID, containerstypes.ContainerSettings{
 		Tags: []string{"vertex-cloudflare-tunnel"},
 	})
 	if apiError != nil {

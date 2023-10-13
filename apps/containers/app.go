@@ -1,12 +1,12 @@
-package monitoring
+package containers
 
 import (
-	"github.com/vertex-center/vertex/apps/monitoring/router"
+	"github.com/vertex-center/vertex/apps/containers/router"
 	apptypes "github.com/vertex-center/vertex/types/app"
 )
 
 const (
-	AppRoute = "/vx-monitoring"
+	AppRoute = "/vx-containers"
 )
 
 type App struct {
@@ -23,10 +23,10 @@ func (a *App) Initialize(app *apptypes.App) error {
 	a.router = router.NewAppRouter(app.Context())
 
 	app.Register(apptypes.Meta{
-		ID:          "vx-monitoring",
-		Name:        "Vertex Monitoring",
+		ID:          "vx-containers",
+		Name:        "Vertex Containers",
 		Description: "Create and manage containers.",
-		Icon:        "monitoring",
+		Icon:        "deployed_code",
 	})
 	app.RegisterRouter(AppRoute, a.router)
 

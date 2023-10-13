@@ -4,7 +4,7 @@ import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/webhook"
 	"github.com/google/uuid"
-	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
+	containerstypes "github.com/vertex-center/vertex/apps/containers/types"
 	"github.com/vertex-center/vertex/types"
 )
 
@@ -52,8 +52,8 @@ func (s *NotificationsService) GetUUID() uuid.UUID {
 
 func (s *NotificationsService) OnEvent(e interface{}) {
 	switch e := e.(type) {
-	case instancestypes.EventInstanceStatusChange:
-		if e.Status == instancestypes.InstanceStatusOff || e.Status == instancestypes.InstanceStatusError || e.Status == instancestypes.InstanceStatusRunning {
+	case containerstypes.EventContainerStatusChange:
+		if e.Status == containerstypes.ContainerStatusOff || e.Status == containerstypes.ContainerStatusError || e.Status == containerstypes.ContainerStatusRunning {
 			s.sendStatus(e.Name, e.Status)
 		}
 	}
@@ -63,11 +63,11 @@ func (s *NotificationsService) sendStatus(name string, status string) {
 	var color int
 
 	switch status {
-	case instancestypes.InstanceStatusRunning:
+	case containerstypes.ContainerStatusRunning:
 		color = 5763719
-	case instancestypes.InstanceStatusOff:
+	case containerstypes.ContainerStatusOff:
 		color = 15548997
-	case instancestypes.InstanceStatusError:
+	case containerstypes.ContainerStatusError:
 		color = 10038562
 	}
 

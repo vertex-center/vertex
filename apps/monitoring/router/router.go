@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	instancesapi "github.com/vertex-center/vertex/apps/instances/api"
-	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
+	containersapi "github.com/vertex-center/vertex/apps/containers/api"
+	containerstypes "github.com/vertex-center/vertex/apps/containers/types"
 	"github.com/vertex-center/vertex/apps/monitoring/service"
 	"github.com/vertex-center/vertex/apps/monitoring/types"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -70,13 +70,13 @@ func (r *AppRouter) handleInstallMetricsCollector(c *router.Context) {
 		return
 	}
 
-	serv, apiError := instancesapi.GetService(c, collector)
+	serv, apiError := containersapi.GetService(c, collector)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
 	}
 
-	inst, apiError := instancesapi.InstallService(c, serv.ID)
+	inst, apiError := containersapi.InstallService(c, serv.ID)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
@@ -85,14 +85,14 @@ func (r *AppRouter) handleInstallMetricsCollector(c *router.Context) {
 	err = r.metricsService.ConfigureCollector(inst)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToConfigureMetricsInstance,
-			PublicMessage:  "Failed to configure instance to monitor Vertex.",
+			Code:           types.ErrCodeFailedToConfigureMetricsContainer,
+			PublicMessage:  "Failed to configure container to monitor Vertex.",
 			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
-	apiError = instancesapi.PatchInstance(c, inst.UUID, instancestypes.InstanceSettings{
+	apiError = containersapi.PatchContainer(c, inst.UUID, containerstypes.ContainerSettings{
 		Tags: []string{"vertex-prometheus-collector"},
 	})
 	if apiError != nil {
@@ -109,13 +109,13 @@ func (r *AppRouter) handleInstallMetricsVisualizer(c *router.Context) {
 		return
 	}
 
-	serv, apiError := instancesapi.GetService(c, visualizer)
+	serv, apiError := containersapi.GetService(c, visualizer)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
 	}
 
-	inst, apiError := instancesapi.InstallService(c, serv.ID)
+	inst, apiError := containersapi.InstallService(c, serv.ID)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
@@ -124,14 +124,14 @@ func (r *AppRouter) handleInstallMetricsVisualizer(c *router.Context) {
 	err = r.metricsService.ConfigureVisualizer(inst)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToConfigureMetricsInstance,
-			PublicMessage:  "Failed to configure instance to monitor Vertex.",
+			Code:           types.ErrCodeFailedToConfigureMetricsContainer,
+			PublicMessage:  "Failed to configure container to monitor Vertex.",
 			PrivateMessage: err.Error(),
 		})
 		return
 	}
 
-	apiError = instancesapi.PatchInstance(c, inst.UUID, instancestypes.InstanceSettings{
+	apiError = containersapi.PatchContainer(c, inst.UUID, containerstypes.ContainerSettings{
 		Tags: []string{"vertex-grafana-visualizer"},
 	})
 	if apiError != nil {

@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/apps/instances/types"
+	"github.com/vertex-center/vertex/apps/containers/types"
 	sqladapter "github.com/vertex-center/vertex/apps/sql/adapter"
 	sqltypes "github.com/vertex-center/vertex/apps/sql/types"
 	"github.com/vertex-center/vertex/config"
@@ -31,7 +31,7 @@ func New(ctx *app.Context) *SqlService {
 	return s
 }
 
-func (s *SqlService) getDbFeature(inst *types.Instance) (types.DatabaseFeature, error) {
+func (s *SqlService) getDbFeature(inst *types.Container) (types.DatabaseFeature, error) {
 	if inst.Service.Features == nil || inst.Service.Features.Databases == nil {
 		return types.DatabaseFeature{}, errors.New("no databases found")
 	}
@@ -46,7 +46,7 @@ func (s *SqlService) getDbFeature(inst *types.Instance) (types.DatabaseFeature, 
 	return types.DatabaseFeature{}, errors.New("no sql database found")
 }
 
-func (s *SqlService) Get(inst *types.Instance) (sqltypes.DBMS, error) {
+func (s *SqlService) Get(inst *types.Container) (sqltypes.DBMS, error) {
 	db := sqltypes.DBMS{}
 
 	feature, err := s.getDbFeature(inst)
@@ -74,7 +74,7 @@ func (s *SqlService) Get(inst *types.Instance) (sqltypes.DBMS, error) {
 	return db, nil
 }
 
-func (s *SqlService) EnvCredentials(inst *types.Instance, user string, pass string) (types.InstanceEnvVariables, error) {
+func (s *SqlService) EnvCredentials(inst *types.Container, user string, pass string) (types.ContainerEnvVariables, error) {
 	env := inst.Env
 
 	feature, err := s.getDbFeature(inst)
@@ -92,7 +92,7 @@ func (s *SqlService) EnvCredentials(inst *types.Instance, user string, pass stri
 	return env, nil
 }
 
-func (s *SqlService) createDbmsAdapter(inst *types.Instance) (sqltypes.DBMSAdapterPort, error) {
+func (s *SqlService) createDbmsAdapter(inst *types.Container) (sqltypes.DBMSAdapterPort, error) {
 	feature, err := s.getDbFeature(inst)
 	if err != nil {
 		return nil, err

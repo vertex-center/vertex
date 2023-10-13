@@ -3,7 +3,7 @@ package router
 import (
 	"fmt"
 
-	types2 "github.com/vertex-center/vertex/apps/instances/types"
+	types2 "github.com/vertex-center/vertex/apps/containers/types"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vertex/types/api"

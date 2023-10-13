@@ -45,9 +45,7 @@ func (b *EventBus) Send(e interface{}) {
 		log.Warn("hard reset event dispatched.")
 	}
 
-	log.Debug("dispatching event", vlog.Any("count", len(*b.listeners)))
-
-	// This code notify all listeners.
+	// This code notifies all listeners.
 	// If some listeners are added while notifying, they will be
 	// notified in the next loop, until all listeners are notified.
 

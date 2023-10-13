@@ -4,14 +4,12 @@ import (
 	"context"
 	"errors"
 	"os"
-	"strings"
 
-	instancesapi "github.com/vertex-center/vertex/apps/instances/api"
-	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
+	"github.com/google/uuid"
+	containersapi "github.com/vertex-center/vertex/apps/containers/api"
+	containerstypes "github.com/vertex-center/vertex/apps/containers/types"
 	sqlapi "github.com/vertex-center/vertex/apps/sql/api"
-	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/pkg/net"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 )
@@ -21,77 +19,65 @@ var (
 )
 
 type SetupService struct {
-	ctx *types.VertexContext
+	uuid uuid.UUID
+	ctx  *types.VertexContext
 }
 
 func NewSetupService(ctx *types.VertexContext) *SetupService {
-	return &SetupService{
-		ctx: ctx,
+	s := &SetupService{
+		uuid: uuid.New(),
+		ctx:  ctx,
 	}
+	s.ctx.AddListener(s)
+	return s
 }
 
-func (s *SetupService) StartSetup() {
-	go func() {
-		err := s.Setup()
+func (s *SetupService) OnEvent(e interface{}) {
+	switch e := e.(type) {
+	case types.EventAppReady:
+		// TODO: The SQL app should also be ready!
+		if e.AppID != "vx-containers" {
+			return
+		}
+		err := s.setupDatabase()
 		if err != nil {
 			log.Error(err)
-			os.Exit(1)
 		}
-	}()
+	}
 }
 
-func (s *SetupService) Setup() error {
-	address := config.Current.VertexURL()
-	address = strings.TrimPrefix(address, "http://")
-	address = strings.TrimPrefix(address, "https://")
-
-	err := net.Wait(address)
-	if err != nil {
-		return err
-	}
-
-	inst, err := s.setupDatabase()
-	if err != nil {
-		return err
-	}
-
-	err = s.startDatabase(inst)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (s *SetupService) GetUUID() uuid.UUID {
+	return s.uuid
 }
 
-func (s *SetupService) setupDatabase() (*instancestypes.Instance, error) {
+func (s *SetupService) setupDatabase() error {
 	inst, err := s.getVertexDB()
 	if err != nil && !errors.Is(err, ErrPostgresDatabaseNotFound) {
-		return nil, err
+		return err
 	}
 
-	if inst != nil {
-		log.Info("found vertex postgres instance", vlog.String("uuid", inst.UUID.String()))
-		return inst, nil
+	if inst == nil {
+		err = s.installVertexDB()
+		if err != nil {
+			return err
+		}
+
+		inst, err = s.getVertexDB()
+		if err != nil {
+			return err
+		}
+
+		log.Info("vertex postgres database installed successfully",
+			vlog.String("uuid", inst.UUID.String()))
+	} else {
+		log.Info("found vertex postgres container", vlog.String("uuid", inst.UUID.String()))
 	}
 
-	err = s.installVertexDB()
-	if err != nil {
-		return nil, err
-	}
-
-	inst, err = s.getVertexDB()
-	if err != nil {
-		return nil, err
-	}
-
-	log.Info("vertex postgres database installed successfully",
-		vlog.String("uuid", inst.UUID.String()))
-
-	return inst, nil
+	return s.startDatabase(inst)
 }
 
-func (s *SetupService) getVertexDB() (*instancestypes.Instance, error) {
-	insts, apiError := instancesapi.GetInstances(context.Background())
+func (s *SetupService) getVertexDB() (*containerstypes.Container, error) {
+	insts, apiError := containersapi.GetContainers(context.Background())
 	if apiError != nil {
 		log.Error(apiError.RouterError())
 		os.Exit(1)
@@ -126,7 +112,7 @@ func (s *SetupService) installVertexDB() error {
 	inst.Tags = append(inst.Tags, "vertex")
 	inst.DisplayName = "Vertex Database"
 
-	apiError = instancesapi.PatchInstance(context.Background(), inst.UUID, inst.InstanceSettings)
+	apiError = containersapi.PatchContainer(context.Background(), inst.UUID, inst.ContainerSettings)
 	if apiError != nil {
 		return apiError.RouterError()
 	}
@@ -134,14 +120,14 @@ func (s *SetupService) installVertexDB() error {
 	return nil
 }
 
-func (s *SetupService) startDatabase(inst *instancestypes.Instance) error {
+func (s *SetupService) startDatabase(inst *containerstypes.Container) error {
 	eventsChan := make(chan interface{})
 	defer close(eventsChan)
 
 	l := types.NewTempListener(func(e interface{}) {
 		switch event := e.(type) {
-		case instancestypes.EventInstanceStatusChange:
-			if event.InstanceUUID != inst.UUID {
+		case containerstypes.EventContainerStatusChange:
+			if event.ContainerUUID != inst.UUID {
 				return
 			}
 			eventsChan <- event
@@ -151,7 +137,7 @@ func (s *SetupService) startDatabase(inst *instancestypes.Instance) error {
 	s.ctx.AddListener(l)
 	defer s.ctx.RemoveListener(l)
 
-	apiError := instancesapi.StartInstance(context.Background(), inst.UUID)
+	apiError := containersapi.StartContainer(context.Background(), inst.UUID)
 	if apiError != nil {
 		return apiError.RouterError()
 	}
@@ -160,10 +146,10 @@ func (s *SetupService) startDatabase(inst *instancestypes.Instance) error {
 
 	for event := range eventsChan {
 		switch e := event.(type) {
-		case instancestypes.EventInstanceStatusChange:
-			if e.Status == instancestypes.InstanceStatusRunning {
+		case containerstypes.EventContainerStatusChange:
+			if e.Status == containerstypes.ContainerStatusRunning {
 				return nil
-			} else if e.Status == instancestypes.InstanceStatusOff || e.Status == instancestypes.InstanceStatusError {
+			} else if e.Status == containerstypes.ContainerStatusOff || e.Status == containerstypes.ContainerStatusError {
 				return errFailedToStart
 			}
 		}

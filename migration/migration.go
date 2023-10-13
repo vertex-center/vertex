@@ -29,33 +29,45 @@ func NewMigrationTool(livePath string) *MigrationTool {
 		metadataPath: path.Join(livePath, "metadata.yml"),
 		migrations: []Migration{
 			&migration0{},
+			&migration1{},
 		},
 	}
 }
 
-func (t *MigrationTool) Migrate() error {
+func (t *MigrationTool) Migrate() ([]interface{}, error) {
 	v, err := t.readLiveVersion()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	log.Info("current live directory version", vlog.Int("version", v.Version))
+
+	// migrationCommands is a slice of commands that will be dispatched in
+	// Vertex after all migrations are applied.
+	var migrationCommands []interface{}
 
 	for i := v.Version + 1; i < len(t.migrations); i++ {
 		log.Info("running migration", vlog.Int("version", i))
 		err := t.migrations[i].Up(t.livePath)
 		if err != nil {
-			return err
+			return nil, err
+		}
+
+		// If the migration implements the CommandsDispatcher interface, we
+		// append the commands to the migrationCommands slice.
+		if c, ok := t.migrations[i].(CommandsDispatcher); ok {
+			log.Info("dispatching commands", vlog.Int("version", i))
+			migrationCommands = append(migrationCommands, c.DispatchCommands()...)
 		}
 
 		v.Version = i
 		err = t.writeLiveVersion(v)
 		if err != nil {
-			return err
+			return migrationCommands, err
 		}
 	}
 
-	return nil
+	return migrationCommands, nil
 }
 
 func (t *MigrationTool) readLiveVersion() (*LiveVersion, error) {

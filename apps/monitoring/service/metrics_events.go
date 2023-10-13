@@ -4,7 +4,7 @@ import (
 	"math"
 
 	"github.com/google/uuid"
-	instancestypes "github.com/vertex-center/vertex/apps/instances/types"
+	containerstypes "github.com/vertex-center/vertex/apps/containers/types"
 	metricstypes "github.com/vertex-center/vertex/apps/monitoring/types"
 )
 
@@ -14,23 +14,23 @@ func (s *MetricsService) GetUUID() uuid.UUID {
 
 func (s *MetricsService) OnEvent(e interface{}) {
 	switch e := e.(type) {
-	case instancestypes.EventInstanceStatusChange:
-		s.updateStatus(e.InstanceUUID, e.ServiceID, e.Status)
-	case instancestypes.EventInstanceCreated:
-		s.adapter.Inc(MetricIDInstancesCount)
-	case instancestypes.EventInstanceDeleted:
-		s.adapter.Dec(MetricIDInstancesCount)
-		s.adapter.Set(MetricIDInstanceStatus, math.NaN(), e.InstanceUUID.String(), e.ServiceID)
-	case instancestypes.EventInstancesLoaded:
-		s.adapter.Set(MetricIDInstancesCount, float64(e.Count))
+	case containerstypes.EventContainerStatusChange:
+		s.updateStatus(e.ContainerUUID, e.ServiceID, e.Status)
+	case containerstypes.EventContainerCreated:
+		s.adapter.Inc(MetricIDContainersCount)
+	case containerstypes.EventContainerDeleted:
+		s.adapter.Dec(MetricIDContainersCount)
+		s.adapter.Set(MetricIDContainerStatus, math.NaN(), e.ContainerUUID.String(), e.ServiceID)
+	case containerstypes.EventContainersLoaded:
+		s.adapter.Set(MetricIDContainersCount, float64(e.Count))
 	}
 }
 
 func (s *MetricsService) updateStatus(uuid uuid.UUID, serviceId string, status string) {
 	switch status {
-	case instancestypes.InstanceStatusRunning:
-		s.adapter.Set(MetricIDInstanceStatus, metricstypes.MetricStatusOn, uuid.String(), serviceId)
+	case containerstypes.ContainerStatusRunning:
+		s.adapter.Set(MetricIDContainerStatus, metricstypes.MetricStatusOn, uuid.String(), serviceId)
 	default:
-		s.adapter.Set(MetricIDInstanceStatus, metricstypes.MetricStatusOff, uuid.String(), serviceId)
+		s.adapter.Set(MetricIDContainerStatus, metricstypes.MetricStatusOff, uuid.String(), serviceId)
 	}
 }

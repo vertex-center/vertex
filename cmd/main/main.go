@@ -28,7 +28,7 @@ func main() {
 
 	log.Info("Vertex starting...")
 
-	err := migration.NewMigrationTool(storage.Path).Migrate()
+	postMigrationCommands, err := migration.NewMigrationTool(storage.Path).Migrate()
 	if err != nil {
 		panic(err)
 	}
@@ -56,7 +56,7 @@ func main() {
 
 		OS:   runtime.GOOS,
 		Arch: runtime.GOARCH,
-	})
+	}, postMigrationCommands)
 
 	// Logs
 	url := config.Current.VertexURL()
