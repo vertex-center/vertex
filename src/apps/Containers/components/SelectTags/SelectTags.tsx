@@ -11,7 +11,7 @@ type Props = {
 
 export default function SelectTags(props: Readonly<Props>) {
     const { selected } = props;
-    const { tags } = useContainersTags();
+    const { tags, isLoading, isError } = useContainersTags();
 
     tags?.sort((a, b) => a.localeCompare(b));
 
@@ -33,7 +33,12 @@ export default function SelectTags(props: Readonly<Props>) {
 
     return (
         // @ts-ignore
-        <Select multiple value={value} onChange={onChange}>
+        <Select
+            multiple
+            value={value}
+            onChange={onChange}
+            disabled={isLoading || isError}
+        >
             {tags?.map((tag) => (
                 <SelectOption
                     multiple

@@ -85,11 +85,19 @@ type Props = HTMLProps<HTMLDivElement> & {
 };
 
 export default function Select(props: Readonly<Props>) {
-    const { className, value, label, children, ...others } = props;
+    const { className, value, label, children, disabled, ...others } = props;
 
     const [opened, setOpened] = useState(false);
 
-    const toggle = () => setOpened(!opened);
+    const toggle = () => {
+        setOpened((o) => {
+            if (!o && props.disabled) {
+                // Don't open if the component is disabled
+                return o;
+            }
+            return !o;
+        });
+    };
 
     const onChange = (value: any) => {
         if (!props.multiple) {
@@ -104,7 +112,7 @@ export default function Select(props: Readonly<Props>) {
             <div
                 className={classNames({
                     [styles.input]: true,
-                    [styles.inputDisabled]: others.disabled,
+                    [styles.inputDisabled]: disabled,
                     [className]: true,
                 })}
                 {...others}
