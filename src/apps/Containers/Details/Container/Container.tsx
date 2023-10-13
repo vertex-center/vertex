@@ -14,7 +14,7 @@ import { Text, Title } from "../../../../components/Text/Text";
 import Button from "../../../../components/Button/Button";
 import Progress from "../../../../components/Progress";
 import { SiDocker } from "@icons-pack/react-simple-icons";
-import useContainer from "../../../hooks/useContainer";
+import useContainer from "../../hooks/useContainer";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useServerEvent } from "../../../../hooks/useEvent";

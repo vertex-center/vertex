@@ -6,7 +6,7 @@ import {
     KeyValueGroup,
     KeyValueInfo,
 } from "../../../../components/KeyValueInfo/KeyValueInfo";
-import useContainer from "../../../hooks/useContainer";
+import useContainer from "../../hooks/useContainer";
 import { useParams } from "react-router-dom";
 import ContainerSelect from "../../../../components/Input/ContainerSelect";
 import { useEffect, useState } from "react";

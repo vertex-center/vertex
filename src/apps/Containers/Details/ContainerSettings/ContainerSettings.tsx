@@ -4,7 +4,7 @@ import { Horizontal } from "../../../../components/Layouts/Layouts";
 import Spacer from "../../../../components/Spacer/Spacer";
 import Button from "../../../../components/Button/Button";
 import { useParams } from "react-router-dom";
-import useContainer from "../../../hooks/useContainer";
+import useContainer from "../../hooks/useContainer";
 import Icon from "../../../../components/Icon/Icon";
 import ToggleButton from "../../../../components/ToggleButton/ToggleButton";
 import Input from "../../../../components/Input/Input";

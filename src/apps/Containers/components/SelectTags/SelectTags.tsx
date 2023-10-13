@@ -1,7 +1,7 @@
 import Select, {
     SelectOption,
     SelectValue,
-} from "../../../components/Input/Select";
+} from "../../../../components/Input/Select";
 import { useContainersTags } from "../../hooks/useContainers";
 
 type Props = {

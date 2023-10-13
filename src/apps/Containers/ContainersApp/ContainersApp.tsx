@@ -9,7 +9,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Toolbar from "../../../components/Toolbar/Toolbar";
 import Spacer from "../../../components/Spacer/Spacer";
 import Button from "../../../components/Button/Button";
-import SelectTags from "../../components/SelectTags/SelectTags";
+import SelectTags from "../components/SelectTags/SelectTags";
 import { useState } from "react";
 
 export default function ContainersApp() {
@@ -58,10 +58,12 @@ export default function ContainersApp() {
 
     const ToolbarContainers = () => {
         const onTagsChange = (tags: string[]) => {
-            setTags(tags);
-            queryClient.invalidateQueries({
-                queryKey: ["containers", { tags }],
-                exact: true,
+            setTags((prev) => {
+                queryClient.invalidateQueries({
+                    queryKey: ["containers", { tags: prev }],
+                    exact: true,
+                });
+                return tags;
             });
         };
 

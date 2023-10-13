@@ -5,7 +5,7 @@ import EnvVariableInput from "../../../../components/EnvVariableInput/EnvVariabl
 import Button from "../../../../components/Button/Button";
 import Icon from "../../../../components/Icon/Icon";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
-import useContainer from "../../../hooks/useContainer";
+import useContainer from "../../hooks/useContainer";
 import { Env, EnvVariable } from "../../../../models/service";
 import styles from "./ContainerEnv.module.sass";
 import { api } from "../../../../backend/api/backend";

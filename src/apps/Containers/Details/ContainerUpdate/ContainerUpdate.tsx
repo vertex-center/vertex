@@ -1,6 +1,6 @@
 import { Title } from "../../../../components/Text/Text";
 import { useParams } from "react-router-dom";
-import useContainer from "../../../hooks/useContainer";
+import useContainer from "../../hooks/useContainer";
 import styles from "./ContainerUpdate.module.sass";
 import { Vertical } from "../../../../components/Layouts/Layouts";
 import { api } from "../../../../backend/api/backend";
