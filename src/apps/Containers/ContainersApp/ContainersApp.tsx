@@ -92,14 +92,11 @@ export default function ContainersApp() {
                 <BigTitle>All containers</BigTitle>
             </div>
 
-            {error && (
-                <div className={styles.containers}>
-                    <APIError error={error} />
-                </div>
-            )}
-
             <div className={styles.containers}>
                 <ToolbarContainers tags={tags} onTagsChange={onTagsChange} />
+
+                {error && <APIError error={error} />}
+
                 {!isLoading && !isError && (
                     <Containers>
                         <Container
