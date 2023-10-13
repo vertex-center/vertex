@@ -17,10 +17,6 @@
         gap: 6px
         padding: 8px
 
-    @include dimensions.extra-small-or-less
-        gap: 4px
-        padding: 8px
-
     &Container
         position: fixed
         display: flex
@@ -86,12 +82,18 @@
         & .name
             display: block
 
-    @include dimensions.small-or-less
-        height: 55px
-        width: 55px
-
 .separator
     width: 5px
     height: 15px
     border-radius: 3px
     background-color: colors.$bg-tertiary
+
+.shortcuts
+    display: inline-flex
+    flex-direction: row
+    gap: 8px
+    align-items: center
+    justify-content: center
+
+    @include dimensions.small-or-less
+        display: none
