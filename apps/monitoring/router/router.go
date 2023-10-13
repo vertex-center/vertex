@@ -93,7 +93,7 @@ func (r *AppRouter) handleInstallMetricsCollector(c *router.Context) {
 	}
 
 	apiError = containersapi.PatchContainer(c, inst.UUID, containerstypes.ContainerSettings{
-		Tags: []string{"vertex-prometheus-collector"},
+		Tags: []string{"Vertex Monitoring", "Vertex Monitoring - Prometheus Collector"},
 	})
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
@@ -132,7 +132,7 @@ func (r *AppRouter) handleInstallMetricsVisualizer(c *router.Context) {
 	}
 
 	apiError = containersapi.PatchContainer(c, inst.UUID, containerstypes.ContainerSettings{
-		Tags: []string{"vertex-grafana-visualizer"},
+		Tags: []string{"Vertex Monitoring", "Vertex Monitoring - Grafana Visualizer"},
 	})
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())

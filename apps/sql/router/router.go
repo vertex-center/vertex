@@ -91,7 +91,7 @@ func (r *AppRouter) handleInstallDBMS(c *router.Context) {
 		return
 	}
 
-	inst.ContainerSettings.Tags = []string{"vertex-postgres-sql"}
+	inst.ContainerSettings.Tags = []string{"Vertex SQL", "Vertex SQL - Postgres Database"}
 	apiError = containersapi.PatchContainer(c, inst.UUID, inst.ContainerSettings)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())

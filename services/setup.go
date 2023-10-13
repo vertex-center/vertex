@@ -86,16 +86,23 @@ func (s *SetupService) getVertexDB() (*containerstypes.Container, error) {
 	}
 
 	for _, inst := range insts {
-		isPostgres, isVertex := false, false
-		for _, tag := range inst.Tags {
-			if tag == "vertex-postgres-sql" {
-				isPostgres = true
+		isDatabase, isVertex, isPostgres := false, false, false
+		if inst.Service.Features != nil && inst.Service.Features.Databases != nil {
+			for _, db := range *inst.Service.Features.Databases {
+				if db.Type == "postgres" {
+					isPostgres = true
+				}
 			}
-			if tag == "vertex" {
+		}
+		for _, tag := range inst.Tags {
+			if tag == "Vertex SQL" {
+				isDatabase = true
+			}
+			if tag == "Vertex Internal" {
 				isVertex = true
 			}
 		}
-		if isPostgres && isVertex {
+		if isDatabase && isVertex && isPostgres {
 			return inst, nil
 		}
 	}
@@ -111,7 +118,7 @@ func (s *SetupService) installVertexDB() error {
 		return apiError.RouterError()
 	}
 
-	inst.Tags = append(inst.Tags, "vertex")
+	inst.Tags = append(inst.Tags, "Vertex Internal")
 	inst.DisplayName = "Vertex Database"
 
 	apiError = containersapi.PatchContainer(context.Background(), inst.UUID, inst.ContainerSettings)

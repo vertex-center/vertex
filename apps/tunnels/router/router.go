@@ -39,7 +39,7 @@ func (r *AppRouter) handleInstallTunnelProvider(c *router.Context) {
 	}
 
 	apiError = containersapi.PatchContainer(c, inst.UUID, containerstypes.ContainerSettings{
-		Tags: []string{"vertex-cloudflare-tunnel"},
+		Tags: []string{"Vertex Tunnels", "Vertex Tunnels - Cloudflare"},
 	})
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())

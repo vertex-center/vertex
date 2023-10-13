@@ -33,7 +33,7 @@ func (suite *ContainerServiceTestSuite) SetupTest() {
 			Name: "service-a",
 		},
 		ContainerSettings: types.ContainerSettings{
-			Tags: []string{"global-tag", "service-a-tag-0", "service-a-tag-1"},
+			Tags: []string{"Global Tag", "Service A Tag 0", "Service A Tag 1"},
 		},
 	}
 
@@ -50,7 +50,7 @@ func (suite *ContainerServiceTestSuite) SetupTest() {
 			},
 		},
 		ContainerSettings: types.ContainerSettings{
-			Tags: []string{"global-tag"},
+			Tags: []string{"Global Tag"},
 		},
 	}
 
@@ -82,25 +82,25 @@ func (suite *ContainerServiceTestSuite) TestSearch() {
 		},
 		{
 			types.ContainerSearchQuery{
-				Tags: &[]string{"invalid-tag"},
+				Tags: &[]string{"Invalid Tag"},
 			},
 			[]uuid.UUID{},
 		},
 		{
 			types.ContainerSearchQuery{
-				Tags: &[]string{"service-a-tag-1"},
+				Tags: &[]string{"Service A Tag 1"},
 			},
 			[]uuid.UUID{suite.containerA.UUID},
 		},
 		{
 			types.ContainerSearchQuery{
-				Tags: &[]string{"service-a-tag-0", "service-a-tag-1"},
+				Tags: &[]string{"Service A Tag 0", "Service A Tag 1"},
 			},
 			[]uuid.UUID{suite.containerA.UUID},
 		},
 		{
 			types.ContainerSearchQuery{
-				Tags: &[]string{"global-tag"},
+				Tags: &[]string{"Global Tag"},
 			},
 			[]uuid.UUID{
 				suite.containerA.UUID,
@@ -123,7 +123,7 @@ func (suite *ContainerServiceTestSuite) TestSearch() {
 		// Multiple
 		{
 			types.ContainerSearchQuery{
-				Tags:     &[]string{"global-tag"},
+				Tags:     &[]string{"Global Tag"},
 				Features: &[]string{"postgres"},
 			},
 			[]uuid.UUID{suite.containerB.UUID},
