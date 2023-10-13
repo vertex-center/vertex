@@ -8,6 +8,7 @@ import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useServerEvent } from "../../../../hooks/useEvent";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { produce } from "immer";
 
 export default function ContainerLogs() {
     const { uuid } = useParams();
@@ -41,38 +42,40 @@ export default function ContainerLogs() {
 
     const onDownload = (e: MessageEvent) => {
         queryClient.setQueryData(["container_logs", uuid], (logs: any[]) => {
-            const dl = JSON.parse(e.data);
+            return produce(logs, (draft) => {
+                const dl = JSON.parse(e.data);
 
-            let downloads = [];
-            if (logs.length > 0 && logs[logs.length - 1].kind === "downloads") {
-                downloads = logs[logs.length - 1].message;
-            }
+                let downloads = [];
+                if (
+                    draft.length > 0 &&
+                    draft[draft.length - 1].kind === "downloads"
+                ) {
+                    downloads = draft[draft.length - 1].message;
+                }
 
-            const i = downloads.findIndex((d) => d.id === dl.id);
+                const i = downloads.findIndex((d) => d.id === dl.id);
 
-            if (i === -1) {
-                downloads = [...downloads, dl];
-            } else {
-                downloads[i] = dl;
-            }
+                if (i === -1) {
+                    downloads = [...downloads, dl];
+                } else {
+                    downloads[i] = dl;
+                }
 
-            if (logs.length === 0) return logs;
-            if (logs[logs.length - 1].kind === "downloads") {
-                const lgs = [...logs];
-                lgs[logs.length - 1] = {
-                    kind: "downloads",
-                    message: downloads,
-                };
-                return lgs;
-            } else {
-                return [
-                    ...logs,
-                    {
+                if (draft.length === 0) return draft;
+                if (draft[draft.length - 1].kind === "downloads") {
+                    draft[draft.length - 1] = {
                         kind: "downloads",
                         message: downloads,
-                    },
-                ];
-            }
+                    };
+                    return draft;
+                } else {
+                    draft.push({
+                        kind: "downloads",
+                        message: downloads,
+                    });
+                    return draft;
+                }
+            });
         });
     };
 
