@@ -84,28 +84,29 @@ export default function ContainerEnv() {
                     disabled={isUploading}
                 />
             ))}
-            <Button
-                primary
-                large
-                onClick={save}
-                rightIcon="save"
-                loading={isUploading}
-                disabled={saved || saved === undefined}
-            >
-                Save{" "}
-                {container?.install_method === "docker" &&
-                    "+ Recreate container"}
-            </Button>
-            {saved && (
-                <Horizontal
-                    className={styles.saved}
-                    alignItems="center"
-                    gap={4}
+            <Horizontal justifyContent="flex-end">
+                {saved && (
+                    <Horizontal
+                        className={styles.saved}
+                        alignItems="center"
+                        gap={4}
+                    >
+                        <Icon name="check" />
+                        Saved!
+                    </Horizontal>
+                )}
+                <Button
+                    primary
+                    onClick={save}
+                    rightIcon="save"
+                    loading={isUploading}
+                    disabled={saved || saved === undefined}
                 >
-                    <Icon name="check" />
-                    Saved!
-                </Horizontal>
-            )}
+                    Save{" "}
+                    {container?.install_method === "docker" &&
+                        "+ Recreate container"}
+                </Button>
+            </Horizontal>
             <APIError error={error} />
         </Fragment>
     );

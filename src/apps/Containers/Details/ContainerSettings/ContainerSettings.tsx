@@ -104,6 +104,18 @@ export default function ContainerSettings() {
             />
             <Title className={styles.title}>Settings</Title>
             <APIError error={error} />
+            <Horizontal className={styles.toggle} alignItems="center">
+                <Text>Launch on Startup</Text>
+                <Spacer />
+                <ToggleButton
+                    value={launchOnStartup}
+                    onChange={(v) => {
+                        setLaunchOnStartup(v);
+                        setSaved(false);
+                    }}
+                    disabled={isLoadingContainer}
+                />
+            </Horizontal>
             <Input
                 label="Container name"
                 description="The custom name of your choice for this service"
@@ -150,38 +162,28 @@ export default function ContainerSettings() {
                     Refresh
                 </Button>
             </div>
-            <Horizontal className={styles.toggle} alignItems="center">
-                <Text>Launch on Startup</Text>
-                <Spacer />
-                <ToggleButton
-                    value={launchOnStartup}
-                    onChange={(v) => {
-                        setLaunchOnStartup(v);
-                        setSaved(false);
-                    }}
-                    disabled={isLoadingContainer}
-                />
-            </Horizontal>
-            <Button
-                primary
-                large
-                onClick={async () => mutationSave.mutate()}
-                rightIcon="save"
-                loading={isUploading}
-                disabled={saved || saved === undefined}
-            >
-                Save
-            </Button>
-            {!isUploading && saved && (
-                <Horizontal
-                    className={styles.saved}
-                    alignItems="center"
-                    gap={4}
+            <Horizontal justifyContent="flex-end">
+                {!isUploading && saved && (
+                    <Horizontal
+                        className={styles.saved}
+                        alignItems="center"
+                        gap={4}
+                    >
+                        <Icon name="check" />
+                        Saved!
+                    </Horizontal>
+                )}
+                <Button
+                    primary
+                    large
+                    onClick={async () => mutationSave.mutate()}
+                    rightIcon="save"
+                    loading={isUploading}
+                    disabled={saved || saved === undefined}
                 >
-                    <Icon name="check" />
-                    Saved!
-                </Horizontal>
-            )}
+                    Save
+                </Button>
+            </Horizontal>
         </Fragment>
     );
 }

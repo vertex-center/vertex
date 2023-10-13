@@ -6,7 +6,7 @@ import Loading from "../../../components/Loading/Loading";
 import { api } from "../../../backend/api/backend";
 
 import styles from "./SettingsNotifications.module.sass";
-import { Vertical } from "../../../components/Layouts/Layouts";
+import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
 import { APIError } from "../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useQuery } from "@tanstack/react-query";
@@ -57,15 +57,17 @@ export default function SettingsNotifications() {
                         disabled={isLoading}
                         placeholder={isLoading && "Loading..."}
                     />
-                    <Button
-                        large
-                        rightIcon="save"
-                        onClick={onSave}
-                        disabled={!changed || saving}
-                    >
-                        Save
-                    </Button>
-                    {saving && <Loading />}
+                    <Horizontal gap={20} justifyContent="flex-end">
+                        {saving && <Loading />}
+                        <Button
+                            primary
+                            rightIcon="save"
+                            onClick={onSave}
+                            disabled={!changed || saving}
+                        >
+                            Save
+                        </Button>
+                    </Horizontal>
                 </Fragment>
             )}
         </Vertical>
