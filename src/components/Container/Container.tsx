@@ -112,20 +112,15 @@ export default function Container(props: Readonly<Props>) {
         e.preventDefault();
     };
 
-    const tags = {
-        // Vertex Monitoring
-        "vertex-prometheus-collector": "Vertex Monitoring",
-        "vertex-grafana-visualizer": "Vertex Monitoring",
-
-        // Vertex Tunnels
-        "vertex-cloudflare-tunnel": "Vertex Tunnels",
-
-        // Vertex SQL
-        "vertex-postgres-sql": "Vertex SQL",
-    };
+    const tags = [
+        "Vertex Internal",
+        "Vertex Monitoring",
+        "Vertex SQL",
+        "Vertex Tunnels",
+    ];
 
     const inst = container.value;
-    const tag = inst?.tags?.find((tag) => tag in tags);
+    const tag = tags?.find((t) => inst?.tags?.includes(t));
     // The uuidv4() is used to generate a unique key for containers that are not yet loaded.
     const key = inst?.uuid ?? uuidv4();
 
@@ -137,7 +132,7 @@ export default function Container(props: Readonly<Props>) {
             {tag && (
                 <div className={styles.lcdTag}>
                     <LogoIcon />
-                    <div>{tags[tag]}</div>
+                    <div>{tag}</div>
                 </div>
             )}
 

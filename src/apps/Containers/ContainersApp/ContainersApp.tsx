@@ -1,6 +1,6 @@
 import styles from "./ContainersApp.module.sass";
 import Container, { Containers } from "../../../components/Container/Container";
-import { BigTitle, Text } from "../../../components/Text/Text";
+import { BigTitle } from "../../../components/Text/Text";
 import { api } from "../../../backend/api/backend";
 import { APIError } from "../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
@@ -9,8 +9,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Toolbar from "../../../components/Toolbar/Toolbar";
 import Spacer from "../../../components/Spacer/Spacer";
 import Button from "../../../components/Button/Button";
-import ToggleButton from "../../../components/ToggleButton/ToggleButton";
-import { Horizontal } from "../../../components/Layouts/Layouts";
+import SelectTags from "../../components/SelectTags/SelectTags";
 
 export default function ContainersApp() {
     const queryClient = useQueryClient();
@@ -56,14 +55,7 @@ export default function ContainersApp() {
 
     const toolbar = (
         <Toolbar className={styles.toolbar}>
-            <Horizontal alignItems="center" gap={15}>
-                <ToggleButton
-                    value={true}
-                    onChange={() => {}}
-                    disabled={true}
-                />
-                <Text>Show all</Text>
-            </Horizontal>
+            <SelectTags />
             <Spacer />
             <Button primary to="/app/vx-containers/add" rightIcon="add">
                 Create container

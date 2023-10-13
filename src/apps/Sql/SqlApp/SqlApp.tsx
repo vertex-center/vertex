@@ -18,7 +18,7 @@ export default function SqlApp() {
     });
 
     const dbs = Object.values(containers ?? {})?.filter((i) =>
-        i?.tags?.some((t) => t.includes("vertex-") && t.includes("-sql"))
+        i?.tags?.some((t) => t.includes("Vertex SQL"))
     );
 
     const sidebar = (

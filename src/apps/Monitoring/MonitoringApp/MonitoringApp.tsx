@@ -18,11 +18,11 @@ export default function MonitoringApp() {
     });
 
     const ledPrometheus = Object.values(containers || {}).find((inst) =>
-        inst.tags?.includes("vertex-prometheus-collector")
+        inst.tags?.includes("Vertex Monitoring - Prometheus Collector")
     );
 
     const ledGrafana = Object.values(containers || {}).find((inst) =>
-        inst.tags?.includes("vertex-grafana-visualizer")
+        inst.tags?.includes("Vertex Monitoring - Grafana Visualizer")
     );
 
     useServerEvent("/app/vx-containers/containers/events", {

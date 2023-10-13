@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
 import Spacer from "../../../../components/Spacer/Spacer";
 import classNames from "classnames";
-import useContainer from "../../../../hooks/useContainer";
+import useContainer from "../../../hooks/useContainer";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { APIError } from "../../../../components/Error/APIError";
 

@@ -15,7 +15,7 @@ export default function Grafana() {
                 </Text>
                 <ContainerInstaller
                     name="Grafana"
-                    tag="vertex-grafana-visualizer"
+                    tag="Vertex Monitoring - Grafana Visualizer"
                     install={api.vxMonitoring.visualizer("grafana").install}
                 />
             </Vertical>

@@ -15,7 +15,7 @@ export default function Prometheus() {
                 </Text>
                 <ContainerInstaller
                     name="Prometheus"
-                    tag="vertex-prometheus-collector"
+                    tag="Vertex Monitoring - Prometheus Collector"
                     install={api.vxMonitoring.collector("prometheus").install}
                 />
             </Vertical>

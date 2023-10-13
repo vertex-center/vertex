@@ -18,7 +18,7 @@ export default function TunnelsApp() {
     });
 
     const ledCloudflared = Object.values(containers || {}).find((inst) =>
-        inst.tags?.includes("vertex-cloudflare-tunnel")
+        inst.tags?.includes("Vertex Tunnels - Cloudflare")
     );
 
     useServerEvent("/app/vx-containers/containers/events", {

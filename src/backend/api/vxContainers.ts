@@ -10,6 +10,11 @@ const getAllContainers = async () => {
     return data;
 };
 
+const getAllTags = async () => {
+    const { data } = await server.get<string[]>(`${BASE_URL}/containers/tags`);
+    return data;
+};
+
 const searchContainers = async (query: ContainerQuery) => {
     const { data } = await server.get<Containers>(
         `${BASE_URL}/containers/search`,
@@ -84,6 +89,7 @@ const getVersions = async (id: string, cache?: boolean) => {
 
 const containersRoutes = {
     all: getAllContainers,
+    tags: getAllTags,
     search: searchContainers,
 };
 
