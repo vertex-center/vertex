@@ -18,11 +18,11 @@ func (r *AppRouter) handleGetContainers(c *router.Context) {
 
 // handleSearchContainers returns all installed containers that match the query.
 func (r *AppRouter) handleSearchContainers(c *router.Context) {
-	query := types.ContainerQuery{}
+	query := types.ContainerSearchQuery{}
 
 	features := c.QueryArray("features[]")
 	if len(features) > 0 {
-		query.Features = features
+		query.Features = &features
 	}
 
 	installed := r.containerService.Search(query)

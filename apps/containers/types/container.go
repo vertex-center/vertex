@@ -38,8 +38,9 @@ type Container struct {
 	CacheVersions []string `json:"cache_versions,omitempty"`
 }
 
-type ContainerQuery struct {
-	Features []string `json:"features,omitempty"`
+type ContainerSearchQuery struct {
+	Tags     *[]string `json:"tags,omitempty"`
+	Features *[]string `json:"features,omitempty"`
 }
 
 type ContainerUpdate struct {
@@ -121,7 +122,7 @@ func (i *Container) HasFeature(featureType string) bool {
 	return false
 }
 
-func (i *Container) HasOneOfFeatures(featureTypes []string) bool {
+func (i *Container) HasFeatureIn(featureTypes []string) bool {
 	if featureTypes == nil {
 		return true
 	}
@@ -152,6 +153,18 @@ func (i *Container) HasTag(tag string) bool {
 	}
 	for _, t := range i.ContainerSettings.Tags {
 		if t == tag {
+			return true
+		}
+	}
+	return false
+}
+
+func (i *Container) HasTagIn(tags []string) bool {
+	if tags == nil {
+		return true
+	}
+	for _, tag := range tags {
+		if i.HasTag(tag) {
 			return true
 		}
 	}

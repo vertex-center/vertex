@@ -88,17 +88,23 @@ func (s *ContainerService) GetAll() map[uuid.UUID]*types.Container {
 }
 
 // Search returns all containers that match the query.
-func (s *ContainerService) Search(query types.ContainerQuery) map[uuid.UUID]*types.Container {
+func (s *ContainerService) Search(query types.ContainerSearchQuery) map[uuid.UUID]*types.Container {
 	containers := map[uuid.UUID]*types.Container{}
 
 	s.containersMutex.RLock()
 	defer s.containersMutex.RUnlock()
 
 	for _, inst := range s.containers {
-		if !inst.HasOneOfFeatures(query.Features) {
-			continue
+		if query.Features != nil {
+			if !inst.HasFeatureIn(*query.Features) {
+				continue
+			}
 		}
-
+		if query.Tags != nil {
+			if !inst.HasTagIn(*query.Tags) {
+				continue
+			}
+		}
 		containers[inst.UUID] = inst
 	}
 
