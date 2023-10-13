@@ -152,7 +152,7 @@ func (r *Router) initServices(about types.About) {
 	notificationsService = services.NewNotificationsService(r.ctx, settingsFSAdapter)
 	dependenciesService = services.NewDependenciesService(r.ctx, about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)
-	services.NewSetupService(r.ctx)
+	//services.NewSetupService(r.ctx)
 	hardwareService = services.NewHardwareService()
 	sshService = services.NewSshService(sshKernelApiAdapter)
 }
