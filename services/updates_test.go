@@ -42,7 +42,7 @@ func (suite *UpdatesServiceTestSuite) SetupTest() {
 	adapter := &MockBaselineAdapter{}
 	adapter.On("GetLatest", context.Background(), types.SettingsUpdatesChannelStable).Return(suite.latestBaseline, nil)
 
-	suite.service = NewUpdateService(adapter, updaters)
+	suite.service = NewUpdateService(types.NewVertexContext(), adapter, updaters)
 }
 
 func (suite *UpdatesServiceTestSuite) TestGetUpdate() {
@@ -85,6 +85,11 @@ func (u *MockUpdater) CurrentVersion() (string, error) {
 func (u *MockUpdater) Install(version string) error {
 	args := u.Called(version)
 	return args.Error(0)
+}
+
+func (u *MockUpdater) IsInstalled() bool {
+	args := u.Called()
+	return args.Bool(0)
 }
 
 func (u *MockUpdater) ID() string {
