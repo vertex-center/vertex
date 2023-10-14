@@ -9,21 +9,35 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-type BaselinesApiAdapter struct{}
+type BaselinesApiAdapter struct {
+	config requests.Config
+}
 
-func NewBaselinesApiAdapter() *BaselinesApiAdapter {
-	return &BaselinesApiAdapter{}
+func NewBaselinesApiAdapter() types.BaselinesAdapterPort {
+	return &BaselinesApiAdapter{
+		config: func(rb *requests.Builder) {
+			rb.BaseURL("https://bl.vx.quentinguidee.dev/")
+		},
+	}
 }
 
 func (a *BaselinesApiAdapter) GetLatest(ctx context.Context, channel types.SettingsUpdatesChannel) (types.Baseline, error) {
-	url := fmt.Sprintf("https://bl.vx.quentinguidee.dev/%s.json", channel)
-
-	log.Info("fetching latest baseline", vlog.String("url", url))
-
 	var baseline types.Baseline
-	err := requests.URL(url).
-		ToJSON(&baseline).
-		Fetch(ctx)
+	builder := requests.New(a.config).
+		Pathf("%s.json", channel).
+		ToJSON(&baseline)
+
+	url, err := builder.URL()
+	if err != nil {
+		return baseline, err
+	}
+
+	log.Info("fetching latest baseline", vlog.String("url", url.String()))
+
+	err = builder.Fetch(ctx)
+	if err == nil {
+		return baseline, nil
+	}
 
 	return baseline, fmt.Errorf("%w: %w", types.ErrFailedToFetchBaseline, err)
 }
