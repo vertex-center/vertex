@@ -3,6 +3,7 @@ package updates
 import (
 	fixtures "github.com/go-git/go-git-fixtures/v4"
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
@@ -40,6 +41,10 @@ func (suite *RepositoryUpdaterTestSuite) TestCurrentVersion() {
 	hash, err := worktree.Commit("test", &git.CommitOptions{
 		All:               true,
 		AllowEmptyCommits: true,
+		Author: &object.Signature{
+			Name:  "test",
+			Email: "test@test.test",
+		},
 	})
 	suite.NoError(err)
 
