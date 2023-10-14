@@ -7,7 +7,9 @@ const (
 
 	ErrFailedToParseBody router.ErrCode = "failed_to_parse_body"
 
-	ErrFailedToInstallUpdates router.ErrCode = "failed_to_install_updates"
+	ErrFailedToInstallUpdates     router.ErrCode = "failed_to_install_updates"
+	ErrFailedToFetchLatestVersion router.ErrCode = "failed_to_fetch_latest_version"
+	ErrFailedToGetUpdates         router.ErrCode = "failed_to_get_updates"
 
 	ErrFailedToListContainers    router.ErrCode = "failed_to_list_containers"
 	ErrFailedToDeleteContainer   router.ErrCode = "failed_to_delete_container"

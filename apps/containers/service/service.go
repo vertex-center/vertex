@@ -38,7 +38,7 @@ func (s *ServiceService) GetUUID() uuid.UUID {
 
 func (s *ServiceService) OnEvent(e interface{}) {
 	switch e.(type) {
-	case vtypes.EventDependenciesUpdated:
+	case vtypes.EventVertexUpdated:
 		err := s.Reload()
 		if err != nil {
 			log.Error(err)

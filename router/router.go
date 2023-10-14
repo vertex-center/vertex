@@ -3,6 +3,8 @@ package router
 import (
 	"context"
 	"errors"
+	"github.com/vertex-center/vertex/pkg/net"
+	"github.com/vertex-center/vertex/updates"
 	"net/http"
 	"os"
 	"os/signal"
@@ -32,13 +34,14 @@ import (
 var (
 	settingsFSAdapter   types.SettingsAdapterPort
 	sshKernelApiAdapter types.SshAdapterPort
+	baselinesApiAdapter types.BaselinesAdapterPort
 
 	appsService          *services.AppsService
 	notificationsService services.NotificationsService
-	dependenciesService  services.DependenciesService
 	settingsService      services.SettingsService
 	hardwareService      services.HardwareService
 	sshService           services.SshService
+	updateService        *services.UpdateService
 )
 
 type Router struct {
@@ -68,8 +71,6 @@ func NewRouter(about types.About, postMigrationCommands []interface{}) Router {
 	r.Use(ginutils.ErrorHandler())
 	r.Use(ginutils.Logger("MAIN"))
 	r.Use(gin.Recovery())
-	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
-
 	return r
 }
 
@@ -80,11 +81,19 @@ func (r *Router) Start(addr string) {
 	r.initAPIRoutes(r.about)
 	r.handleSignals()
 
+	err := net.Wait("google.com:80")
+	if err != nil {
+		log.Error(err)
+		os.Exit(1)
+	}
+
 	r.ctx.DispatchEvent(types.EventServerStart{
 		PostMigrationCommands: r.postMigrationCommands,
 	})
 
-	err := notificationsService.StartWebhook()
+	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
+
+	err = notificationsService.StartWebhook()
 	if err != nil {
 		log.Error(err)
 	}
@@ -137,9 +146,17 @@ func (r *Router) handleSignals() {
 func (r *Router) initAdapters() {
 	settingsFSAdapter = adapter.NewSettingsFSAdapter(nil)
 	sshKernelApiAdapter = adapter.NewSshKernelApiAdapter()
+	baselinesApiAdapter = adapter.NewBaselinesApiAdapter()
 }
 
 func (r *Router) initServices(about types.About) {
+	// Update service must be initialized before all other services, because it
+	// is responsible for downloading dependencies for other services.
+	updateService = services.NewUpdateService(r.ctx, baselinesApiAdapter, []types.Updater{
+		updates.NewVertexUpdater(about),
+		updates.NewVertexClientUpdater(path.Join(storage.Path, "client")),
+		updates.NewRepositoryUpdater("vertex-services", path.Join(storage.Path, "services"), "vertex-center", "vertex-services"),
+	})
 	appsService = services.NewAppsService(r.ctx, r.Router,
 		[]app.Interface{
 			sql.NewApp(),
@@ -150,7 +167,6 @@ func (r *Router) initServices(about types.About) {
 		},
 	)
 	notificationsService = services.NewNotificationsService(r.ctx, settingsFSAdapter)
-	dependenciesService = services.NewDependenciesService(r.ctx, about.Version)
 	settingsService = services.NewSettingsService(settingsFSAdapter)
 	//services.NewSetupService(r.ctx)
 	hardwareService = services.NewHardwareService()
@@ -179,7 +195,7 @@ func (r *Router) initAPIRoutes(about types.About) {
 	}
 
 	addAppsRoutes(api.Group("/apps"))
-	addDependenciesRoutes(api.Group("/dependencies"))
+	addUpdatesRoutes(api.Group("/updates"))
 	addSettingsRoutes(api.Group("/settings"))
 	addHardwareRoutes(api.Group("/hardware"))
 	addSecurityRoutes(api.Group("/security"))
