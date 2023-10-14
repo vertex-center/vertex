@@ -7,7 +7,7 @@ import (
 	"github.com/vertex-center/vertex/types/api"
 )
 
-func addUpdatesRoutes(r *router.Group) {
+func addUpdateRoutes(r *router.Group) {
 	r.GET("", handleGetLatestUpdate)
 	r.POST("", handleInstallLatestUpdate)
 }
