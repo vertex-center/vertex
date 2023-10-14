@@ -8,25 +8,34 @@ import (
 	"testing"
 )
 
-type UpdatesServiceTestSuite struct {
+type UpdateServiceTestSuite struct {
 	suite.Suite
 	service *UpdateService
 
 	latestBaseline types.Baseline
+	betaBaseline   types.Baseline
 	updaterA       *MockUpdater
 	updaterB       *MockUpdater
+	adapter        *MockBaselineAdapter
 }
 
 func TestUpdatesServiceTestSuite(t *testing.T) {
-	suite.Run(t, new(UpdatesServiceTestSuite))
+	suite.Run(t, new(UpdateServiceTestSuite))
 }
 
-func (suite *UpdatesServiceTestSuite) SetupTest() {
+func (suite *UpdateServiceTestSuite) SetupTest() {
 	suite.latestBaseline = types.Baseline{
 		Date:         "2023-10-13",
 		Version:      "v0.12.0",
 		Vertex:       "v0.12.1",
 		VertexClient: "v0.12.0",
+	}
+
+	suite.betaBaseline = types.Baseline{
+		Date:         "2023-10-15",
+		Version:      "v0.13.0-beta",
+		Vertex:       "v0.13.5-beta",
+		VertexClient: "v0.13.3-beta",
 	}
 
 	suite.updaterA = &MockUpdater{}
@@ -39,13 +48,14 @@ func (suite *UpdatesServiceTestSuite) SetupTest() {
 		suite.updaterB,
 	}
 
-	adapter := &MockBaselineAdapter{}
-	adapter.On("GetLatest", context.Background(), types.SettingsUpdatesChannelStable).Return(suite.latestBaseline, nil)
+	suite.adapter = &MockBaselineAdapter{}
+	suite.adapter.On("GetLatest", context.Background(), types.SettingsUpdatesChannelStable).Return(suite.latestBaseline, nil)
+	suite.adapter.On("GetLatest", context.Background(), types.SettingsUpdatesChannelBeta).Return(suite.betaBaseline, nil)
 
-	suite.service = NewUpdateService(types.NewVertexContext(), adapter, updaters)
+	suite.service = NewUpdateService(types.NewVertexContext(), suite.adapter, updaters)
 }
 
-func (suite *UpdatesServiceTestSuite) TestGetUpdate() {
+func (suite *UpdateServiceTestSuite) TestGetUpdate() {
 	suite.updaterA.On("CurrentVersion").Return("v0.11.0", nil)
 	suite.updaterB.On("CurrentVersion").Return("v0.11.0", nil)
 
@@ -55,13 +65,23 @@ func (suite *UpdatesServiceTestSuite) TestGetUpdate() {
 	suite.Equal(suite.latestBaseline, update.Baseline)
 }
 
-func (suite *UpdatesServiceTestSuite) TestGetUpdateNoUpdate() {
+func (suite *UpdateServiceTestSuite) TestGetUpdateNoUpdate() {
 	suite.updaterA.On("CurrentVersion").Return("v0.12.1", nil)
 	suite.updaterB.On("CurrentVersion").Return("v0.12.0", nil)
 
 	update, err := suite.service.GetUpdate(types.SettingsUpdatesChannelStable)
 	suite.NoError(err)
 	suite.Nil(update)
+}
+
+func (suite *UpdateServiceTestSuite) TestGetUpdateBeta() {
+	suite.updaterA.On("CurrentVersion").Return("v0.12.0", nil)
+	suite.updaterB.On("CurrentVersion").Return("v0.12.0", nil)
+
+	update, err := suite.service.GetUpdate(types.SettingsUpdatesChannelBeta)
+	suite.NoError(err)
+	suite.NotNil(update)
+	suite.Equal(suite.betaBaseline, update.Baseline)
 }
 
 type MockBaselineAdapter struct {
