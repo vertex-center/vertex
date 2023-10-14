@@ -58,7 +58,7 @@ func (u VertexClientUpdater) IsInstalled() bool {
 }
 
 func (u VertexClientUpdater) ID() string {
-	return "vertex-client"
+	return "vertex_client"
 }
 
 func install(dir string, releaseUrl string) error {

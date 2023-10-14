@@ -155,7 +155,7 @@ func (r *Router) initServices(about types.About) {
 	updateService = services.NewUpdateService(r.ctx, baselinesApiAdapter, []types.Updater{
 		updates.NewVertexUpdater(about),
 		updates.NewVertexClientUpdater(path.Join(storage.Path, "client")),
-		updates.NewRepositoryUpdater("vertex-services", path.Join(storage.Path, "services"), "vertex-center", "vertex-services"),
+		updates.NewRepositoryUpdater("vertex_services", path.Join(storage.Path, "services"), "vertex-center", "vertex-services"),
 	})
 	appsService = services.NewAppsService(r.ctx, r.Router,
 		[]app.Interface{

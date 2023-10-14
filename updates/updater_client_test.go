@@ -35,5 +35,5 @@ func (suite *VertexClientUpdaterTestSuite) TestCurrentVersion() {
 }
 
 func (suite *VertexClientUpdaterTestSuite) TestID() {
-	suite.Equal("vertex-client", suite.updater.ID())
+	suite.Equal("vertex_client", suite.updater.ID())
 }

@@ -33,8 +33,8 @@ func (suite *BaselinesApiAdapterTestSuite) TestGetLatest() {
 			"date":            "2023-10-13",
 			"version":         "v0.12.0",
 			"vertex":          "v0.12.1",
-			"vertex-client":   "v0.12.0",
-			"vertex-services": "071bcdc8162664fb9b6c489c00277f0cce15ad87",
+			"vertex_client":   "v0.12.0",
+			"vertex_services": "071bcdc8162664fb9b6c489c00277f0cce15ad87",
 		})
 
 	baseline, err := suite.adapter.GetLatest(context.Background(), "stable")
@@ -57,8 +57,8 @@ func (suite *BaselinesApiAdapterTestSuite) TestGetLatestBeta() {
 			"date":            "2023-10-15",
 			"version":         "v0.13.0-beta",
 			"vertex":          "v0.13.5-beta",
-			"vertex-client":   "v0.13.3-beta",
-			"vertex-services": "071bcdc8162664fb9b6c489c00277f0cce15ad87",
+			"vertex_client":   "v0.13.3-beta",
+			"vertex_services": "071bcdc8162664fb9b6c489c00277f0cce15ad87",
 		})
 
 	baseline, err := suite.adapter.GetLatest(context.Background(), "beta")

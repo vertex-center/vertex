@@ -24,9 +24,9 @@ func (suite *BaselineTestSuite) TestGetVersionByID() {
 
 	vertex, err := baseline.GetVersionByID("vertex")
 	suite.NoError(err)
-	vertexClient, err := baseline.GetVersionByID("vertex-client")
+	vertexClient, err := baseline.GetVersionByID("vertex_client")
 	suite.NoError(err)
-	vertexServices, err := baseline.GetVersionByID("vertex-services")
+	vertexServices, err := baseline.GetVersionByID("vertex_services")
 	suite.NoError(err)
 
 	suite.Equal("v0.12.1", vertex)

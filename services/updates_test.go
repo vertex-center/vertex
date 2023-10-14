@@ -41,7 +41,7 @@ func (suite *UpdateServiceTestSuite) SetupTest() {
 	suite.updaterA = &MockUpdater{}
 	suite.updaterA.On("ID").Return("vertex")
 	suite.updaterB = &MockUpdater{}
-	suite.updaterB.On("ID").Return("vertex-client")
+	suite.updaterB.On("ID").Return("vertex_client")
 
 	updaters := []types.Updater{
 		suite.updaterA,
