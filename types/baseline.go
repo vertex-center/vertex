@@ -11,6 +11,7 @@ var ErrFailedToFetchBaseline = errors.New("failed to fetch baseline")
 type Baseline struct {
 	Date           string `json:"date"`            // Date of this release.
 	Version        string `json:"version"`         // Public Version of the release.
+	Description    string `json:"description"`     // Condensed Description of the release.
 	Vertex         string `json:"vertex"`          // Vertex version for this baseline Version.
 	VertexClient   string `json:"vertex_client"`   // VertexClient version for this baseline Version.
 	VertexServices string `json:"vertex_services"` // VertexServices version for this baseline Version.
