@@ -36,7 +36,9 @@ func handleGetLatestUpdate(c *router.Context) {
 }
 
 func handleInstallLatestUpdate(c *router.Context) {
-	err := updateService.InstallLatest()
+	channel := settingsService.GetChannel()
+
+	err := updateService.InstallLatest(channel)
 	if errors.Is(err, types.ErrFailedToFetchBaseline) {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToFetchLatestVersion,

@@ -65,8 +65,8 @@ func (s *UpdateService) GetUpdate(channel types.SettingsUpdatesChannel) (*types.
 	return &update, nil
 }
 
-func (s *UpdateService) InstallLatest() error {
-	latest, err := s.adapter.GetLatest(context.Background(), types.SettingsUpdatesChannelStable)
+func (s *UpdateService) InstallLatest(channel types.SettingsUpdatesChannel) error {
+	latest, err := s.adapter.GetLatest(context.Background(), channel)
 	if err != nil {
 		return err
 	}
