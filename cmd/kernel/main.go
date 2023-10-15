@@ -1,17 +1,37 @@
 package main
 
 import (
+	"context"
 	"flag"
+	"fmt"
+	"github.com/gin-gonic/gin"
+	adapter2 "github.com/vertex-center/vertex/adapter"
+	"github.com/vertex-center/vertex/core/port"
+	service2 "github.com/vertex-center/vertex/core/service"
+	"github.com/vertex-center/vertex/handler"
+	"github.com/vertex-center/vertex/pkg/ginutils"
+	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vlog"
 	"os"
 	"os/exec"
 	"os/signal"
 	"os/user"
 	"strconv"
 	"syscall"
+	"time"
 
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/router"
+)
+
+var (
+	r *router.Router
+
+	dockerCliAdapter port.DockerAdapter
+	sshAdapter       port.SshAdapter
+
+	dockerKernelService service2.DockerKernelService
+	sshKernelService    service2.SshKernelService
 )
 
 func main() {
@@ -30,13 +50,18 @@ func main() {
 	shutdownChan := make(chan os.Signal, 1)
 
 	// Vertex-Kernel
-	var r router.KernelRouter
+	gin.SetMode(gin.ReleaseMode)
+	r = router.New()
+	r.Use(ginutils.ErrorHandler())
+	r.Use(ginutils.Logger("KERNEL"))
+	r.Use(gin.Recovery())
+
+	initAdapters()
+	initServices()
+	initRoutes()
+
 	go func() {
-		r = router.NewKernelRouter()
-		err := r.Start()
-		if err != nil {
-			log.Error(err)
-		}
+		startRouter()
 		shutdownChan <- syscall.SIGINT
 	}()
 
@@ -72,7 +97,7 @@ func main() {
 		_ = vertex.Process.Signal(os.Interrupt)
 		_, _ = vertex.Process.Wait()
 	}
-	_ = r.Stop()
+	stopRouter()
 }
 
 func ensureRoot() {
@@ -137,6 +162,62 @@ func buildVertex() {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
+	if err != nil {
+		log.Error(err)
+		os.Exit(1)
+	}
+}
+
+func initAdapters() {
+	dockerCliAdapter = adapter2.NewDockerCliAdapter()
+	sshAdapter = adapter2.NewSshFsAdapter(nil)
+}
+
+func initServices() {
+	dockerKernelService = service2.NewDockerKernelService(dockerCliAdapter)
+	sshKernelService = service2.NewSshKernelService(sshAdapter)
+}
+
+func initRoutes() {
+	api := r.Group("/api")
+
+	dockerHandler := handler.NewDockerKernelHandler(&dockerKernelService)
+	docker := api.Group("/docker")
+	docker.GET("/containers", dockerHandler.GetContainers)
+	docker.POST("/container", dockerHandler.CreateContainer)
+	docker.DELETE("/container/:id", dockerHandler.DeleteContainer)
+	docker.POST("/container/:id/start", dockerHandler.StartContainer)
+	docker.POST("/container/:id/stop", dockerHandler.StopContainer)
+	docker.GET("/container/:id/info", dockerHandler.InfoContainer)
+	docker.GET("/container/:id/logs/stdout", dockerHandler.LogsStdoutContainer)
+	docker.GET("/container/:id/logs/stderr", dockerHandler.LogsStderrContainer)
+	docker.GET("/container/:id/wait/:cond", dockerHandler.WaitContainer)
+	docker.GET("/image/:id/info", dockerHandler.InfoImage)
+	docker.POST("/image/pull", dockerHandler.PullImage)
+	docker.POST("/image/build", dockerHandler.BuildImage)
+
+	sshHandler := handler.NewSshKernelHandler(&sshKernelService)
+	ssh := api.Group("/security/ssh")
+	ssh.GET("", sshHandler.Get)
+	ssh.POST("", sshHandler.Add)
+	ssh.DELETE("/:fingerprint", sshHandler.Delete)
+}
+
+func startRouter() {
+	log.Info("vertex-kernel started", vlog.String("url", config.KernelCurrent.KernelURL()))
+	addr := fmt.Sprintf(":%s", config.KernelCurrent.PortKernel)
+
+	err := r.Start(addr)
+	if err != nil {
+		log.Error(err)
+		os.Exit(1)
+	}
+}
+
+func stopRouter() {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	err := r.Stop(ctx)
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)

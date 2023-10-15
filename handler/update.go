@@ -1,21 +1,30 @@
-package router
+package handler
 
 import (
 	"errors"
+	"github.com/vertex-center/vertex/core/port"
+	"github.com/vertex-center/vertex/core/service"
 	types2 "github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-func addUpdateRoutes(r *router.Group) {
-	r.GET("", handleGetLatestUpdate)
-	r.POST("", handleInstallLatestUpdate)
+type UpdateHandler struct {
+	updateService   *service.UpdateService
+	settingsService *service.SettingsService
 }
 
-func handleGetLatestUpdate(c *router.Context) {
-	channel := settingsService.GetChannel()
+func NewUpdateHandler(updateService *service.UpdateService, settingsService *service.SettingsService) port.UpdateHandler {
+	return &UpdateHandler{
+		updateService:   updateService,
+		settingsService: settingsService,
+	}
+}
 
-	update, err := updateService.GetUpdate(channel)
+func (h *UpdateHandler) Get(c *router.Context) {
+	channel := h.settingsService.GetChannel()
+
+	update, err := h.updateService.GetUpdate(channel)
 	if errors.Is(err, types2.ErrFailedToFetchBaseline) {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToFetchLatestVersion,
@@ -35,10 +44,10 @@ func handleGetLatestUpdate(c *router.Context) {
 	c.JSON(update)
 }
 
-func handleInstallLatestUpdate(c *router.Context) {
-	channel := settingsService.GetChannel()
+func (h *UpdateHandler) Install(c *router.Context) {
+	channel := h.settingsService.GetChannel()
 
-	err := updateService.InstallLatest(channel)
+	err := h.updateService.InstallLatest(channel)
 	if errors.Is(err, types2.ErrAlreadyUpdating) {
 		c.Abort(router.Error{
 			Code:           api.ErrAlreadyUpdating,

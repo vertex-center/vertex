@@ -1,9 +1,9 @@
-package router
+package handler
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
+	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/service"
 	"github.com/vertex-center/vertex/core/types/api"
 	"net/http"
@@ -11,17 +11,18 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-func addSecurityKernelRoutes(r *router.Group) {
-	r.GET("/ssh", handleGetSSHKeyKernel)
-	r.POST("/ssh", handleAddSSHKeyKernel)
-	r.DELETE("/ssh/:fingerprint", handleDeleteSSHKeyKernel)
+type SshHandler struct {
+	sshService *service.SshService
 }
 
-// handleGetSSHKey handles the retrieval of the SSH key.
-// Errors can be:
-//   - failed_to_get_ssh_keys: failed to get the SSH keys.
-func handleGetSSHKeyKernel(c *router.Context) {
-	keys, err := sshKernelService.GetAll()
+func NewSshHandler(sshService *service.SshService) port.SshHandler {
+	return &SshHandler{
+		sshService: sshService,
+	}
+}
+
+func (h *SshHandler) Get(c *router.Context) {
+	keys, err := h.sshService.GetAll()
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToGetSSHKeys,
@@ -34,24 +35,18 @@ func handleGetSSHKeyKernel(c *router.Context) {
 	c.JSON(keys)
 }
 
-// handleAddSSHKey handles the addition of an SSH key.
-// Errors can be:
-//   - failed_to_parse_body: failed to parse the request body.
-//   - failed_to_add_ssh_key: failed to add the SSH key.
-func handleAddSSHKeyKernel(c *router.Context) {
-	buf := new(bytes.Buffer)
-	_, err := buf.ReadFrom(c.Request.Body)
+type AddSSHKeyBody struct {
+	AuthorizedKey string `json:"authorized_key"`
+}
+
+func (h *SshHandler) Add(c *router.Context) {
+	var body AddSSHKeyBody
+	err := c.ParseBody(&body)
 	if err != nil {
-		c.BadRequest(router.Error{
-			Code:           api.ErrFailedToParseBody,
-			PublicMessage:  "Failed to parse request body.",
-			PrivateMessage: err.Error(),
-		})
 		return
 	}
-	key := buf.String()
 
-	err = sshKernelService.Add(key)
+	err = h.sshService.Add(body.AuthorizedKey)
 	if err != nil && errors.Is(err, service.ErrInvalidPublicKey) {
 		c.BadRequest(router.Error{
 			Code:           api.ErrInvalidPublicKey,
@@ -71,11 +66,7 @@ func handleAddSSHKeyKernel(c *router.Context) {
 	c.Status(http.StatusCreated)
 }
 
-// handleDeleteSSHKey handles the deletion of an SSH key.
-// Errors can be:
-//   - failed_to_parse_body: failed to parse the request body.
-//   - failed_to_delete_ssh_key: failed to delete the SSH key.
-func handleDeleteSSHKeyKernel(c *router.Context) {
+func (h *SshHandler) Delete(c *router.Context) {
 	fingerprint := c.Param("fingerprint")
 	if fingerprint == "" {
 		c.BadRequest(router.Error{
@@ -86,7 +77,7 @@ func handleDeleteSSHKeyKernel(c *router.Context) {
 		return
 	}
 
-	err := sshKernelService.Delete(fingerprint)
+	err := h.sshService.Delete(fingerprint)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToDeleteSSHKey,

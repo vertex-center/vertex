@@ -9,11 +9,10 @@ type SshService struct {
 	adapter port.SshAdapter
 }
 
-func NewSshService(sshAdapter port.SshAdapter) SshService {
-	s := SshService{
+func NewSshService(sshAdapter port.SshAdapter) *SshService {
+	return &SshService{
 		adapter: sshAdapter,
 	}
-	return s
 }
 
 func (s *SshService) GetAll() ([]types.PublicKey, error) {

@@ -10,8 +10,8 @@ import (
 
 type HardwareService struct{}
 
-func NewHardwareService() HardwareService {
-	return HardwareService{}
+func NewHardwareService() *HardwareService {
+	return &HardwareService{}
 }
 
 func (s HardwareService) GetHardware() types.Hardware {

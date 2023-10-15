@@ -1,8 +1,10 @@
-package router
+package handler
 
 import (
 	"bufio"
 	"fmt"
+	"github.com/vertex-center/vertex/core/port"
+	"github.com/vertex-center/vertex/core/service"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
 	"io"
@@ -12,23 +14,18 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-func addDockerKernelRoutes(r *router.Group) {
-	r.GET("/containers", handleListDockerContainers)
-	r.POST("/container", handleCreateDockerContainer)
-	r.DELETE("/container/:id", handleDeleteDockerContainer)
-	r.POST("/container/:id/start", handleStartDockerContainer)
-	r.POST("/container/:id/stop", handleStopDockerContainer)
-	r.GET("/container/:id/info", handleInfoDockerContainer)
-	r.GET("/container/:id/logs/stdout", handleLogsStdoutDockerContainer)
-	r.GET("/container/:id/logs/stderr", handleLogsStderrDockerContainer)
-	r.GET("/container/:id/wait/:cond", handleWaitDockerContainer)
-	r.GET("/image/:id/info", handleInfoDockerImage)
-	r.POST("/image/pull", handlePullDockerImage)
-	r.POST("/image/build", handleBuildDockerImage)
+type DockerKernelHandler struct {
+	dockerKernelService *service.DockerKernelService
 }
 
-func handleListDockerContainers(c *router.Context) {
-	containers, err := dockerKernelService.ListContainers()
+func NewDockerKernelHandler(dockerKernelService *service.DockerKernelService) port.DockerKernelHandler {
+	return &DockerKernelHandler{
+		dockerKernelService: dockerKernelService,
+	}
+}
+
+func (h *DockerKernelHandler) GetContainers(c *router.Context) {
+	containers, err := h.dockerKernelService.ListContainers()
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToListContainers,
@@ -41,10 +38,30 @@ func handleListDockerContainers(c *router.Context) {
 	c.JSON(containers)
 }
 
-func handleDeleteDockerContainer(c *router.Context) {
+func (h *DockerKernelHandler) CreateContainer(c *router.Context) {
+	var options types.CreateContainerOptions
+	err := c.ParseBody(&options)
+	if err != nil {
+		return
+	}
+
+	res, err := h.dockerKernelService.CreateContainer(options)
+	if err != nil {
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToCreateContainer,
+			PublicMessage:  "Failed to create container.",
+			PrivateMessage: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(res)
+}
+
+func (h *DockerKernelHandler) DeleteContainer(c *router.Context) {
 	id := c.Param("id")
 
-	err := dockerKernelService.DeleteContainer(id)
+	err := h.dockerKernelService.DeleteContainer(id)
 	if err != nil && client.IsErrNotFound(err) {
 		c.NotFound(router.Error{
 			Code:           api.ErrContainerNotFound,
@@ -64,30 +81,10 @@ func handleDeleteDockerContainer(c *router.Context) {
 	c.OK()
 }
 
-func handleCreateDockerContainer(c *router.Context) {
-	var options types.CreateContainerOptions
-	err := c.ParseBody(&options)
-	if err != nil {
-		return
-	}
-
-	res, err := dockerKernelService.CreateContainer(options)
-	if err != nil {
-		c.Abort(router.Error{
-			Code:           api.ErrFailedToCreateContainer,
-			PublicMessage:  "Failed to create container.",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(res)
-}
-
-func handleStartDockerContainer(c *router.Context) {
+func (h *DockerKernelHandler) StartContainer(c *router.Context) {
 	id := c.Param("id")
 
-	err := dockerKernelService.StartContainer(id)
+	err := h.dockerKernelService.StartContainer(id)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToStartContainer,
@@ -100,10 +97,10 @@ func handleStartDockerContainer(c *router.Context) {
 	c.OK()
 }
 
-func handleStopDockerContainer(c *router.Context) {
+func (h *DockerKernelHandler) StopContainer(c *router.Context) {
 	id := c.Param("id")
 
-	err := dockerKernelService.StopContainer(id)
+	err := h.dockerKernelService.StopContainer(id)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToStopContainer,
@@ -116,10 +113,10 @@ func handleStopDockerContainer(c *router.Context) {
 	c.OK()
 }
 
-func handleInfoDockerContainer(c *router.Context) {
+func (h *DockerKernelHandler) InfoContainer(c *router.Context) {
 	id := c.Param("id")
 
-	info, err := dockerKernelService.InfoContainer(id)
+	info, err := h.dockerKernelService.InfoContainer(id)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToGetContainerInfo,
@@ -132,10 +129,10 @@ func handleInfoDockerContainer(c *router.Context) {
 	c.JSON(info)
 }
 
-func handleLogsStdoutDockerContainer(c *router.Context) {
+func (h *DockerKernelHandler) LogsStdoutContainer(c *router.Context) {
 	id := c.Param("id")
 
-	stdout, err := dockerKernelService.LogsStdoutContainer(id)
+	stdout, err := h.dockerKernelService.LogsStdoutContainer(id)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToGetContainerLogs,
@@ -165,10 +162,10 @@ func handleLogsStdoutDockerContainer(c *router.Context) {
 	})
 }
 
-func handleLogsStderrDockerContainer(c *router.Context) {
+func (h *DockerKernelHandler) LogsStderrContainer(c *router.Context) {
 	id := c.Param("id")
 
-	stderr, err := dockerKernelService.LogsStderrContainer(id)
+	stderr, err := h.dockerKernelService.LogsStderrContainer(id)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToGetContainerLogs,
@@ -198,11 +195,11 @@ func handleLogsStderrDockerContainer(c *router.Context) {
 	})
 }
 
-func handleWaitDockerContainer(c *router.Context) {
+func (h *DockerKernelHandler) WaitContainer(c *router.Context) {
 	id := c.Param("id")
 	cond := c.Param("cond")
 
-	err := dockerKernelService.WaitContainer(id, types.WaitContainerCondition(cond))
+	err := h.dockerKernelService.WaitContainer(id, types.WaitContainerCondition(cond))
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToWaitContainer,
@@ -215,10 +212,10 @@ func handleWaitDockerContainer(c *router.Context) {
 	c.OK()
 }
 
-func handleInfoDockerImage(c *router.Context) {
+func (h *DockerKernelHandler) InfoImage(c *router.Context) {
 	id := c.Param("id")
 
-	info, err := dockerKernelService.InfoImage(id)
+	info, err := h.dockerKernelService.InfoImage(id)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToGetImageInfo,
@@ -231,14 +228,14 @@ func handleInfoDockerImage(c *router.Context) {
 	c.JSON(info)
 }
 
-func handlePullDockerImage(c *router.Context) {
+func (h *DockerKernelHandler) PullImage(c *router.Context) {
 	var options types.PullImageOptions
 	err := c.ParseBody(&options)
 	if err != nil {
 		return
 	}
 
-	r, err := dockerKernelService.PullImage(options)
+	r, err := h.dockerKernelService.PullImage(options)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToPullImage,
@@ -268,14 +265,14 @@ func handlePullDockerImage(c *router.Context) {
 	})
 }
 
-func handleBuildDockerImage(c *router.Context) {
+func (h *DockerKernelHandler) BuildImage(c *router.Context) {
 	var options types.BuildImageOptions
 	err := c.ParseBody(&options)
 	if err != nil {
 		return
 	}
 
-	res, err := dockerKernelService.BuildImage(options)
+	res, err := h.dockerKernelService.BuildImage(options)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToBuildImage,

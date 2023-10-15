@@ -9,10 +9,14 @@ type SettingsService struct {
 	settingsAdapter port.SettingsAdapter
 }
 
-func NewSettingsService(settingsAdapter port.SettingsAdapter) SettingsService {
-	return SettingsService{
+func NewSettingsService(settingsAdapter port.SettingsAdapter) *SettingsService {
+	return &SettingsService{
 		settingsAdapter: settingsAdapter,
 	}
+}
+
+func (s *SettingsService) Get() types.Settings {
+	return s.settingsAdapter.GetSettings()
 }
 
 func (s *SettingsService) Update(settings types.Settings) error {
