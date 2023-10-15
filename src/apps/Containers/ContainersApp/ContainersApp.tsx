@@ -11,6 +11,7 @@ import Spacer from "../../../components/Spacer/Spacer";
 import Button from "../../../components/Button/Button";
 import SelectTags from "../components/SelectTags/SelectTags";
 import { useState } from "react";
+import NoItems from "../../../components/NoItems/NoItems";
 
 type ToolbarProps = {
     tags?: string[];
@@ -110,6 +111,12 @@ export default function ContainersApp() {
                                 }}
                             />
                         ))}
+                        {Object.values(containers)?.length === 0 && (
+                            <NoItems
+                                text="No containers found."
+                                icon="deployed_code"
+                            />
+                        )}
                     </Containers>
                 )}
             </div>

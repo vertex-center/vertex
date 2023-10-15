@@ -20,6 +20,7 @@ import Icon from "../../../components/Icon/Icon";
 import { Title } from "../../../components/Text/Text";
 import styles from "./SqlDatabase.module.sass";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import NoItems from "../../../components/NoItems/NoItems";
 
 export default function SqlDatabase() {
     const { uuid } = useParams();
@@ -65,6 +66,26 @@ export default function SqlDatabase() {
         },
     });
 
+    let databases;
+    if (db?.databases?.length === 0) {
+        databases = <NoItems text="No databases yet." icon="database" />;
+    } else {
+        databases = (
+            <List>
+                {db?.databases?.map((db) => (
+                    <ListItem key={db.name}>
+                        <ListIcon>
+                            <Icon name="database" />
+                        </ListIcon>
+                        <ListInfo>
+                            <ListTitle>{db.name}</ListTitle>
+                        </ListInfo>
+                    </ListItem>
+                ))}
+            </List>
+        );
+    }
+
     return (
         <Vertical gap={30}>
             <ProgressOverlay show={isLoadingContainer ?? isLoadingDatabase} />
@@ -95,18 +116,7 @@ export default function SqlDatabase() {
 
             <Vertical gap={20}>
                 <Title className={styles.title}>Databases</Title>
-                <List>
-                    {db?.databases?.map((db) => (
-                        <ListItem key={db.name}>
-                            <ListIcon>
-                                <Icon name="database" />
-                            </ListIcon>
-                            <ListInfo>
-                                <ListTitle>{db.name}</ListTitle>
-                            </ListInfo>
-                        </ListItem>
-                    ))}
-                </List>
+                {databases}
             </Vertical>
         </Vertical>
     );

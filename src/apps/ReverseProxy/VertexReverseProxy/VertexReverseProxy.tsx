@@ -11,6 +11,7 @@ import Popup from "../../../components/Popup/Popup";
 import Input from "../../../components/Input/Input";
 import Spacer from "../../../components/Spacer/Spacer";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import NoItems from "../../../components/NoItems/NoItems";
 
 export default function VertexReverseProxy() {
     const queryClient = useQueryClient();
@@ -76,6 +77,12 @@ export default function VertexReverseProxy() {
                             onDelete={() => mutationDelete.mutate(uuid)}
                         />
                     ))}
+                {!error && redirects && Object.keys(redirects).length === 0 && (
+                    <NoItems
+                        text="No redirections found."
+                        icon="settings_ethernet"
+                    />
+                )}
             </div>
             <Horizontal className={styles.addRedirect} gap={10}>
                 <Button primary onClick={openNewRedirectPopup} leftIcon="add">
