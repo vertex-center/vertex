@@ -99,14 +99,6 @@ export default function ContainersApp() {
 
                 {!isLoading && !isError && (
                     <Containers>
-                        <Container
-                            container={{
-                                value: {
-                                    display_name: "Vertex",
-                                    status,
-                                },
-                            }}
-                        />
                         {Object.values(containers)?.map((inst) => (
                             <Container
                                 key={inst.uuid}
