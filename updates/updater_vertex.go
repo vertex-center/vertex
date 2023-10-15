@@ -2,12 +2,14 @@ package updates
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/google/go-github/v50/github"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
+	"io/fs"
 	"os"
 	"path"
 )
@@ -45,12 +47,12 @@ func (u VertexUpdater) Install(tag string) error {
 	}
 
 	err = os.Rename("vertex", "vertex-old")
-	if err != nil {
+	if err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return fmt.Errorf("failed to rename old executable: %w", err)
 	}
 
 	err = os.Rename("vertex-kernel", "vertex-kernel-old")
-	if err != nil {
+	if err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return fmt.Errorf("failed to rename old executable: %w", err)
 	}
 
