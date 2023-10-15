@@ -4,8 +4,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/adapter"
 	"github.com/vertex-center/vertex/apps/containers/types"
+	vtypes "github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
-	vtypes "github.com/vertex-center/vertex/types"
 )
 
 type ServiceService struct {

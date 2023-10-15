@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/core/types/api"
 	"io"
 	"net/http"
 	"path"
@@ -24,8 +26,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/pkg/vdocker"
-	"github.com/vertex-center/vertex/types"
-	"github.com/vertex-center/vertex/types/api"
 	"github.com/vertex-center/vlog"
 )
 

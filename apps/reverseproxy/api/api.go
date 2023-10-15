@@ -2,10 +2,9 @@ package api
 
 import (
 	"context"
-
 	"github.com/vertex-center/vertex/apps/reverseproxy"
 	"github.com/vertex-center/vertex/apps/reverseproxy/types"
-	"github.com/vertex-center/vertex/types/api"
+	"github.com/vertex-center/vertex/core/types/api"
 )
 
 func GetRedirects(ctx context.Context) ([]types.ProxyRedirect, *api.Error) {

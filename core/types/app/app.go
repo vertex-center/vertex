@@ -1,11 +1,11 @@
 package app
 
 import (
+	"github.com/vertex-center/vertex/core/types"
 	"sync"
 
 	"github.com/gin-contrib/sse"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types"
 )
 
 type Meta struct {

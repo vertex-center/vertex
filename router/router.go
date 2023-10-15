@@ -3,6 +3,11 @@ package router
 import (
 	"context"
 	"errors"
+	adapter2 "github.com/vertex-center/vertex/adapter"
+	"github.com/vertex-center/vertex/core/port"
+	service2 "github.com/vertex-center/vertex/core/service"
+	types2 "github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/net"
 	"github.com/vertex-center/vertex/updates"
 	"net/http"
@@ -14,7 +19,6 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/adapter"
 	"github.com/vertex-center/vertex/apps/containers"
 	"github.com/vertex-center/vertex/apps/monitoring"
 	"github.com/vertex-center/vertex/apps/reverseproxy"
@@ -25,38 +29,35 @@ import (
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/pkg/storage"
-	"github.com/vertex-center/vertex/services"
-	"github.com/vertex-center/vertex/types"
-	"github.com/vertex-center/vertex/types/app"
 	"github.com/vertex-center/vlog"
 )
 
 var (
-	settingsFSAdapter   types.SettingsAdapterPort
-	sshKernelApiAdapter types.SshAdapterPort
-	baselinesApiAdapter types.BaselinesAdapterPort
+	settingsFSAdapter   port.SettingsAdapter
+	sshKernelApiAdapter port.SshAdapter
+	baselinesApiAdapter port.BaselinesAdapter
 
-	appsService          *services.AppsService
-	notificationsService services.NotificationsService
-	settingsService      services.SettingsService
-	hardwareService      services.HardwareService
-	sshService           services.SshService
-	updateService        *services.UpdateService
+	appsService          *service2.AppsService
+	notificationsService service2.NotificationsService
+	settingsService      service2.SettingsService
+	hardwareService      service2.HardwareService
+	sshService           service2.SshService
+	updateService        *service2.UpdateService
 )
 
 type Router struct {
 	*router.Router
 
-	about types.About
-	ctx   *types.VertexContext
+	about types2.About
+	ctx   *types2.VertexContext
 
 	postMigrationCommands []interface{}
 }
 
-func NewRouter(about types.About, postMigrationCommands []interface{}) Router {
+func NewRouter(about types2.About, postMigrationCommands []interface{}) Router {
 	gin.SetMode(gin.ReleaseMode)
 
-	ctx := types.NewVertexContext()
+	ctx := types2.NewVertexContext()
 
 	r := Router{
 		Router: router.New(),
@@ -87,7 +88,7 @@ func (r *Router) Start(addr string) {
 		os.Exit(1)
 	}
 
-	r.ctx.DispatchEvent(types.EventServerStart{
+	r.ctx.DispatchEvent(types2.EventServerStart{
 		PostMigrationCommands: r.postMigrationCommands,
 	})
 
@@ -114,7 +115,7 @@ func (r *Router) Stop() {
 
 	log.Info("gracefully stopping Vertex")
 
-	r.ctx.DispatchEvent(types.EventServerStop{})
+	r.ctx.DispatchEvent(types2.EventServerStop{})
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
@@ -144,20 +145,20 @@ func (r *Router) handleSignals() {
 }
 
 func (r *Router) initAdapters() {
-	settingsFSAdapter = adapter.NewSettingsFSAdapter(nil)
-	sshKernelApiAdapter = adapter.NewSshKernelApiAdapter()
-	baselinesApiAdapter = adapter.NewBaselinesApiAdapter()
+	settingsFSAdapter = adapter2.NewSettingsFSAdapter(nil)
+	sshKernelApiAdapter = adapter2.NewSshKernelApiAdapter()
+	baselinesApiAdapter = adapter2.NewBaselinesApiAdapter()
 }
 
-func (r *Router) initServices(about types.About) {
+func (r *Router) initServices(about types2.About) {
 	// Update service must be initialized before all other services, because it
 	// is responsible for downloading dependencies for other services.
-	updateService = services.NewUpdateService(r.ctx, baselinesApiAdapter, []types.Updater{
+	updateService = service2.NewUpdateService(r.ctx, baselinesApiAdapter, []types2.Updater{
 		updates.NewVertexUpdater(about),
 		updates.NewVertexClientUpdater(path.Join(storage.Path, "client")),
 		updates.NewRepositoryUpdater("vertex_services", path.Join(storage.Path, "services"), "vertex-center", "vertex-services"),
 	})
-	appsService = services.NewAppsService(r.ctx, r.Router,
+	appsService = service2.NewAppsService(r.ctx, r.Router,
 		[]app.Interface{
 			sql.NewApp(),
 			tunnels.NewApp(),
@@ -166,14 +167,14 @@ func (r *Router) initServices(about types.About) {
 			reverseproxy.NewApp(),
 		},
 	)
-	notificationsService = services.NewNotificationsService(r.ctx, settingsFSAdapter)
-	settingsService = services.NewSettingsService(settingsFSAdapter)
+	notificationsService = service2.NewNotificationsService(r.ctx, settingsFSAdapter)
+	settingsService = service2.NewSettingsService(settingsFSAdapter)
 	//services.NewSetupService(r.ctx)
-	hardwareService = services.NewHardwareService()
-	sshService = services.NewSshService(sshKernelApiAdapter)
+	hardwareService = service2.NewHardwareService()
+	sshService = service2.NewSshService(sshKernelApiAdapter)
 }
 
-func (r *Router) initAPIRoutes(about types.About) {
+func (r *Router) initAPIRoutes(about types2.About) {
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, router.Error{
 			Code:          "resource_not_found",
@@ -189,7 +190,7 @@ func (r *Router) initAPIRoutes(about types.About) {
 
 	if config.Current.Debug() {
 		api.POST("/hard-reset", func(c *router.Context) {
-			r.ctx.DispatchEvent(types.EventServerHardReset{})
+			r.ctx.DispatchEvent(types2.EventServerHardReset{})
 			c.OK()
 		})
 	}

@@ -2,8 +2,8 @@ package reverseproxy
 
 import (
 	"github.com/vertex-center/vertex/apps/reverseproxy/router"
+	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/log"
-	apptypes "github.com/vertex-center/vertex/types/app"
 )
 
 const (

@@ -3,25 +3,25 @@ package router
 import (
 	"context"
 	"fmt"
+	adapter2 "github.com/vertex-center/vertex/adapter"
+	"github.com/vertex-center/vertex/core/port"
+	service2 "github.com/vertex-center/vertex/core/service"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/adapter"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/services"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 )
 
 var (
-	dockerCliAdapter types.DockerAdapterPort
-	sshAdapter       types.SshAdapterPort
+	dockerCliAdapter port.DockerAdapter
+	sshAdapter       port.SshAdapter
 
-	dockerKernelService services.DockerKernelService
-	sshKernelService    services.SshKernelService
+	dockerKernelService service2.DockerKernelService
+	sshKernelService    service2.SshKernelService
 )
 
 type KernelRouter struct {
@@ -60,13 +60,13 @@ func (r *KernelRouter) Stop() error {
 }
 
 func (r *KernelRouter) initAdapters() {
-	dockerCliAdapter = adapter.NewDockerCliAdapter()
-	sshAdapter = adapter.NewSshFsAdapter(nil)
+	dockerCliAdapter = adapter2.NewDockerCliAdapter()
+	sshAdapter = adapter2.NewSshFsAdapter(nil)
 }
 
 func (r *KernelRouter) initServices() {
-	dockerKernelService = services.NewDockerKernelService(dockerCliAdapter)
-	sshKernelService = services.NewSshKernelService(sshAdapter)
+	dockerKernelService = service2.NewDockerKernelService(dockerCliAdapter)
+	sshKernelService = service2.NewSshKernelService(sshAdapter)
 }
 
 func (r *KernelRouter) initAPIRoutes() {

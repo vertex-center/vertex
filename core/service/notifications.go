@@ -1,23 +1,24 @@
-package services
+package service
 
 import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/webhook"
 	"github.com/google/uuid"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/types"
-	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/core/port"
+	types2 "github.com/vertex-center/vertex/core/types"
 )
 
 // TODO: Move webhooks use to a Discord adapter
 
 type NotificationsService struct {
 	uuid            uuid.UUID
-	ctx             *types.VertexContext
-	settingsAdapter types.SettingsAdapterPort
+	ctx             *types2.VertexContext
+	settingsAdapter port.SettingsAdapter
 	client          webhook.Client
 }
 
-func NewNotificationsService(ctx *types.VertexContext, settingsAdapter types.SettingsAdapterPort) NotificationsService {
+func NewNotificationsService(ctx *types2.VertexContext, settingsAdapter port.SettingsAdapter) NotificationsService {
 	return NotificationsService{
 		uuid:            uuid.New(),
 		ctx:             ctx,

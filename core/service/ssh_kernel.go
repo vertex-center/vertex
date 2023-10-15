@@ -1,9 +1,9 @@
-package services
+package service
 
 import (
 	"errors"
-
-	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/core/port"
+	"github.com/vertex-center/vertex/core/types"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -12,10 +12,10 @@ var (
 )
 
 type SshKernelService struct {
-	sshAdapter types.SshAdapterPort
+	sshAdapter port.SshAdapter
 }
 
-func NewSshKernelService(sshAdapter types.SshAdapterPort) SshKernelService {
+func NewSshKernelService(sshAdapter port.SshAdapter) SshKernelService {
 	return SshKernelService{
 		sshAdapter: sshAdapter,
 	}

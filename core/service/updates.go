@@ -1,4 +1,4 @@
-package services
+package service
 
 import (
 	"context"
@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/config"
+	"github.com/vertex-center/vertex/core/port"
+	types2 "github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 	"os"
 	"sync/atomic"
@@ -15,13 +16,13 @@ import (
 
 type UpdateService struct {
 	uuid     uuid.UUID
-	ctx      *types.VertexContext
-	adapter  types.BaselinesAdapterPort
-	updaters []types.Updater // updaters containers update logic for each dependency.
-	updating atomic.Bool     // updating is true if an update is currently in progress.
+	ctx      *types2.VertexContext
+	adapter  port.BaselinesAdapter
+	updaters []types2.Updater // updaters containers update logic for each dependency.
+	updating atomic.Bool      // updating is true if an update is currently in progress.
 }
 
-func NewUpdateService(ctx *types.VertexContext, adapter types.BaselinesAdapterPort, updaters []types.Updater) *UpdateService {
+func NewUpdateService(ctx *types2.VertexContext, adapter port.BaselinesAdapter, updaters []types2.Updater) *UpdateService {
 	s := &UpdateService{
 		uuid:     uuid.New(),
 		ctx:      ctx,
@@ -32,9 +33,9 @@ func NewUpdateService(ctx *types.VertexContext, adapter types.BaselinesAdapterPo
 	return s
 }
 
-func (s *UpdateService) GetUpdate(channel types.SettingsUpdatesChannel) (*types.Update, error) {
+func (s *UpdateService) GetUpdate(channel types2.SettingsUpdatesChannel) (*types2.Update, error) {
 	available := false
-	update := types.Update{}
+	update := types2.Update{}
 
 	latest, err := s.adapter.GetLatest(context.Background(), channel)
 	if err != nil {
@@ -69,9 +70,9 @@ func (s *UpdateService) GetUpdate(channel types.SettingsUpdatesChannel) (*types.
 	return &update, nil
 }
 
-func (s *UpdateService) InstallLatest(channel types.SettingsUpdatesChannel) error {
+func (s *UpdateService) InstallLatest(channel types2.SettingsUpdatesChannel) error {
 	if !s.updating.CompareAndSwap(false, true) {
-		return types.ErrAlreadyUpdating
+		return types2.ErrAlreadyUpdating
 	}
 	defer s.updating.Store(false)
 
@@ -92,12 +93,12 @@ func (s *UpdateService) InstallLatest(channel types.SettingsUpdatesChannel) erro
 		}
 	}
 
-	s.ctx.DispatchEvent(types.EventVertexUpdated{})
+	s.ctx.DispatchEvent(types2.EventVertexUpdated{})
 	return nil
 }
 
 func (s *UpdateService) firstSetup() error {
-	var missingDeps []types.Updater
+	var missingDeps []types2.Updater
 	for _, updater := range s.updaters {
 		if !updater.IsInstalled() {
 			missingDeps = append(missingDeps, updater)
@@ -111,7 +112,7 @@ func (s *UpdateService) firstSetup() error {
 
 	log.Info("installing missing dependencies", vlog.Any("count", len(missingDeps)))
 
-	latest, err := s.adapter.GetLatest(context.Background(), types.SettingsUpdatesChannelStable)
+	latest, err := s.adapter.GetLatest(context.Background(), types2.SettingsUpdatesChannelStable)
 	if err != nil {
 		return err
 	}
@@ -133,7 +134,7 @@ func (s *UpdateService) firstSetup() error {
 
 func (s *UpdateService) OnEvent(e interface{}) {
 	switch e.(type) {
-	case types.EventServerStart:
+	case types2.EventServerStart:
 		err := s.firstSetup()
 		if err != nil {
 			log.Error(err)

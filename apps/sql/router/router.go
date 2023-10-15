@@ -3,27 +3,26 @@ package router
 import (
 	"errors"
 	"fmt"
-
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	"github.com/vertex-center/vertex/apps/sql/service"
 	"github.com/vertex-center/vertex/apps/sql/types"
+	app2 "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types/app"
 )
 
 type AppRouter struct {
 	sqlService *service.SqlService
 }
 
-func NewAppRouter(ctx *app.Context) *AppRouter {
+func NewAppRouter(ctx *app2.Context) *AppRouter {
 	return &AppRouter{
 		sqlService: service.New(ctx),
 	}
 }
 
-func (r *AppRouter) GetServices() []app.Service {
-	return []app.Service{
+func (r *AppRouter) GetServices() []app2.Service {
+	return []app2.Service{
 		r.sqlService,
 	}
 }

@@ -1,13 +1,13 @@
-package services
+package service
 
 import (
+	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/core/types/app"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types"
-	"github.com/vertex-center/vertex/types/app"
 )
 
 type AppsServiceTestSuite struct {

@@ -1,14 +1,15 @@
-package services
+package service
 
 import (
-	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/core/port"
+	"github.com/vertex-center/vertex/core/types"
 )
 
 type SshService struct {
-	adapter types.SshAdapterPort
+	adapter port.SshAdapter
 }
 
-func NewSshService(sshAdapter types.SshAdapterPort) SshService {
+func NewSshService(sshAdapter port.SshAdapter) SshService {
 	s := SshService{
 		adapter: sshAdapter,
 	}

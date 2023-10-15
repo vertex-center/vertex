@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/vertex-center/vertex/core/port"
+	"github.com/vertex-center/vertex/core/types"
 	"io/fs"
 	"os"
 	"path"
 
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 )
 
@@ -29,7 +30,7 @@ type SettingsFSAdapterParams struct {
 	settingsDir string
 }
 
-func NewSettingsFSAdapter(params *SettingsFSAdapterParams) types.SettingsAdapterPort {
+func NewSettingsFSAdapter(params *SettingsFSAdapterParams) port.SettingsAdapter {
 	if params == nil {
 		params = &SettingsFSAdapterParams{}
 	}

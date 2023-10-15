@@ -1,13 +1,13 @@
 package service
 
 import (
+	vtypes "github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/core/types/app"
 	"testing"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/apps/containers/types"
-	vtypes "github.com/vertex-center/vertex/types"
-	"github.com/vertex-center/vertex/types/app"
 )
 
 type ContainerServiceTestSuite struct {

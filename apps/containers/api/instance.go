@@ -2,13 +2,12 @@ package containersapi
 
 import (
 	"context"
-
 	"github.com/docker/docker/api/types/container"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers"
 	"github.com/vertex-center/vertex/apps/containers/types"
+	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types/api"
 )
 
 func GetContainer(ctx context.Context, uuid uuid.UUID) (*types.Container, *api.Error) {

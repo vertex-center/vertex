@@ -1,9 +1,8 @@
 package types
 
 import (
+	"github.com/vertex-center/vertex/core/types"
 	"io"
-
-	"github.com/vertex-center/vertex/types"
 )
 
 type ContainerRunnerAdapterPort interface {

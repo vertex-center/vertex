@@ -2,6 +2,7 @@ package adapter
 
 import (
 	"context"
+	"github.com/vertex-center/vertex/core/types"
 	"io"
 
 	dockertypes "github.com/docker/docker/api/types"
@@ -9,7 +10,6 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 )
 

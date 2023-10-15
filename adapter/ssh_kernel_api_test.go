@@ -1,13 +1,13 @@
 package adapter
 
 import (
+	"github.com/vertex-center/vertex/core/types"
 	"net/http"
 	"testing"
 
 	"github.com/h2non/gock"
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/types"
 )
 
 type SshKernelApiAdapterTestSuite struct {

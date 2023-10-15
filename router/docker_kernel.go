@@ -3,14 +3,13 @@ package router
 import (
 	"bufio"
 	"fmt"
+	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/core/types/api"
 	"io"
 
 	"github.com/docker/docker/client"
-	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types/api"
-
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/pkg/router"
 )
 
 func addDockerKernelRoutes(r *router.Group) {

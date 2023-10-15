@@ -1,8 +1,9 @@
-package services
+package service
 
 import (
 	"context"
 	"errors"
+	types2 "github.com/vertex-center/vertex/core/types"
 	"os"
 
 	"github.com/google/uuid"
@@ -10,7 +11,6 @@ import (
 	containerstypes "github.com/vertex-center/vertex/apps/containers/types"
 	sqlapi "github.com/vertex-center/vertex/apps/sql/api"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 )
 
@@ -20,10 +20,10 @@ var (
 
 type SetupService struct {
 	uuid uuid.UUID
-	ctx  *types.VertexContext
+	ctx  *types2.VertexContext
 }
 
-func NewSetupService(ctx *types.VertexContext) *SetupService {
+func NewSetupService(ctx *types2.VertexContext) *SetupService {
 	s := &SetupService{
 		uuid: uuid.New(),
 		ctx:  ctx,
@@ -34,7 +34,7 @@ func NewSetupService(ctx *types.VertexContext) *SetupService {
 
 func (s *SetupService) OnEvent(e interface{}) {
 	switch e := e.(type) {
-	case types.EventAppReady:
+	case types2.EventAppReady:
 		// TODO: The SQL app should also be ready!
 		if e.AppID != "vx-containers" {
 			return
@@ -136,7 +136,7 @@ func (s *SetupService) startDatabase(inst *containerstypes.Container) error {
 	abortChan := make(chan bool)
 	defer close(abortChan)
 
-	l := types.NewTempListener(func(e interface{}) {
+	l := types2.NewTempListener(func(e interface{}) {
 		switch event := e.(type) {
 		case containerstypes.EventContainerStatusChange:
 			if event.ContainerUUID != inst.UUID {

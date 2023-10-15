@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/vertex-center/vertex/core/service"
+	"github.com/vertex-center/vertex/core/types/api"
 	"net/http"
 
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/services"
-	"github.com/vertex-center/vertex/types/api"
 )
 
 func addSecurityKernelRoutes(r *router.Group) {
@@ -52,7 +52,7 @@ func handleAddSSHKeyKernel(c *router.Context) {
 	key := buf.String()
 
 	err = sshKernelService.Add(key)
-	if err != nil && errors.Is(err, services.ErrInvalidPublicKey) {
+	if err != nil && errors.Is(err, service.ErrInvalidPublicKey) {
 		c.BadRequest(router.Error{
 			Code:           api.ErrInvalidPublicKey,
 			PublicMessage:  "Invalid public key.",

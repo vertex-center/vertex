@@ -2,9 +2,9 @@ package service
 
 import (
 	"github.com/google/uuid"
+	vtypes "github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/migration"
 	"github.com/vertex-center/vertex/pkg/log"
-	vtypes "github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 )
 

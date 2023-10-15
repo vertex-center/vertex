@@ -1,11 +1,11 @@
 package app
 
 import (
+	"github.com/vertex-center/vertex/core/types"
 	"sync"
 
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 )
 

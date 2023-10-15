@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"github.com/vertex-center/vertex/core/types/app"
 	"sync"
 
 	"github.com/google/uuid"
@@ -10,7 +11,6 @@ import (
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/net"
-	"github.com/vertex-center/vertex/types/app"
 )
 
 var (

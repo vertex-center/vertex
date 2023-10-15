@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/vertex-center/vertex/core/types"
 	"os"
 	"runtime"
 
@@ -11,7 +12,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/router"
-	"github.com/vertex-center/vertex/types"
 )
 
 // version, commit and date will be overridden by goreleaser

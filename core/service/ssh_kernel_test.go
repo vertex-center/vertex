@@ -1,11 +1,11 @@
-package services
+package service
 
 import (
+	"github.com/vertex-center/vertex/core/types"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"github.com/vertex-center/vertex/types"
 )
 
 const (

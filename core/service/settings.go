@@ -1,14 +1,15 @@
-package services
+package service
 
 import (
-	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/core/port"
+	"github.com/vertex-center/vertex/core/types"
 )
 
 type SettingsService struct {
-	settingsAdapter types.SettingsAdapterPort
+	settingsAdapter port.SettingsAdapter
 }
 
-func NewSettingsService(settingsAdapter types.SettingsAdapterPort) SettingsService {
+func NewSettingsService(settingsAdapter port.SettingsAdapter) SettingsService {
 	return SettingsService{
 		settingsAdapter: settingsAdapter,
 	}

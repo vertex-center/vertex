@@ -1,7 +1,6 @@
 package types
 
 import (
-	"context"
 	"errors"
 	"reflect"
 )
@@ -27,10 +26,4 @@ func (b Baseline) GetVersionByID(id string) (string, error) {
 		}
 	}
 	return "", errors.New("field not found")
-}
-
-type BaselinesAdapterPort interface {
-	// GetLatest returns the latest available Baseline. This
-	// will typically fetch the latest Baseline from a remote source.
-	GetLatest(ctx context.Context, channel SettingsUpdatesChannel) (Baseline, error)
 }

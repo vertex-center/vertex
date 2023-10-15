@@ -2,7 +2,7 @@ package updates
 
 import (
 	"github.com/stretchr/testify/suite"
-	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/core/types"
 	"testing"
 )
 

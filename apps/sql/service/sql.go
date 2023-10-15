@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"github.com/vertex-center/vertex/core/types/app"
 	"strconv"
 	"sync"
 
@@ -11,7 +12,6 @@ import (
 	sqltypes "github.com/vertex-center/vertex/apps/sql/types"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/types/app"
 	"github.com/vertex-center/vlog"
 )
 

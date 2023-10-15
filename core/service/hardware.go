@@ -1,11 +1,11 @@
-package services
+package service
 
 import (
+	"github.com/vertex-center/vertex/core/types"
 	"runtime"
 
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/vertex-center/vertex/pkg/vdocker"
-	"github.com/vertex-center/vertex/types"
 )
 
 type HardwareService struct{}

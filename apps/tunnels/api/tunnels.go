@@ -2,8 +2,8 @@ package api
 
 import (
 	"github.com/vertex-center/vertex/apps/tunnels"
+	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types/api"
 )
 
 func InstallTunnel(c *router.Context, provider string) *api.Error {

@@ -4,12 +4,12 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/adapter"
 	"github.com/vertex-center/vertex/apps/containers/service"
 	"github.com/vertex-center/vertex/apps/containers/types"
+	app2 "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types/app"
 )
 
 type AppRouter struct {
-	ctx *app.Context
+	ctx *app2.Context
 
 	containerAdapter         types.ContainerAdapterPort
 	containerEnvAdapter      types.ContainerEnvAdapterPort
@@ -28,7 +28,7 @@ type AppRouter struct {
 	serviceService *service.ServiceService
 }
 
-func NewAppRouter(ctx *app.Context) *AppRouter {
+func NewAppRouter(ctx *app2.Context) *AppRouter {
 	r := &AppRouter{
 		ctx:                      ctx,
 		containerAdapter:         adapter.NewContainerFSAdapter(nil),
@@ -65,7 +65,7 @@ func (r *AppRouter) AddRoutes(group *router.Group) {
 	container.POST("/start", r.handleStartContainer)
 	container.POST("/stop", r.handleStopContainer)
 	container.PATCH("/environment", r.handlePatchEnvironment)
-	container.GET("/events", app.HeadersSSE, r.handleContainerEvents)
+	container.GET("/events", app2.HeadersSSE, r.handleContainerEvents)
 	container.GET("/docker", r.handleGetDocker)
 	container.POST("/docker/recreate", r.handleRecreateDockerContainer)
 	container.GET("/logs", r.handleGetLogs)
@@ -78,7 +78,7 @@ func (r *AppRouter) AddRoutes(group *router.Group) {
 	containers.GET("/tags", r.handleGetTags)
 	containers.GET("/search", r.handleSearchContainers)
 	containers.GET("/checkupdates", r.handleCheckForUpdates)
-	containers.GET("/events", app.HeadersSSE, r.handleContainersEvents)
+	containers.GET("/events", app2.HeadersSSE, r.handleContainersEvents)
 
 	serv := group.Group("/service/:service_id")
 	serv.GET("", r.handleGetService)

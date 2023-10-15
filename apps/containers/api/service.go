@@ -2,10 +2,9 @@ package containersapi
 
 import (
 	"context"
-
 	"github.com/vertex-center/vertex/apps/containers"
 	"github.com/vertex-center/vertex/apps/containers/types"
-	"github.com/vertex-center/vertex/types/api"
+	"github.com/vertex-center/vertex/core/types/api"
 )
 
 func GetService(ctx context.Context, serviceId string) (types.Service, *api.Error) {

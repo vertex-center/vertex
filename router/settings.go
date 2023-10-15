@@ -1,9 +1,9 @@
 package router
 
 import (
+	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types"
-	"github.com/vertex-center/vertex/types/api"
 )
 
 func addSettingsRoutes(r *router.Group) {

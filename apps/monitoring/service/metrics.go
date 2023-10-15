@@ -5,7 +5,7 @@ import (
 	containerstypes "github.com/vertex-center/vertex/apps/containers/types"
 	"github.com/vertex-center/vertex/apps/monitoring/adapter"
 	metricstypes "github.com/vertex-center/vertex/apps/monitoring/types"
-	"github.com/vertex-center/vertex/types/app"
+	"github.com/vertex-center/vertex/core/types/app"
 )
 
 const (

@@ -2,7 +2,7 @@ package sql
 
 import (
 	"github.com/vertex-center/vertex/apps/sql/router"
-	apptypes "github.com/vertex-center/vertex/types/app"
+	apptypes "github.com/vertex-center/vertex/core/types/app"
 )
 
 const (

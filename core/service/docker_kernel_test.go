@@ -1,6 +1,7 @@
-package services
+package service
 
 import (
+	"github.com/vertex-center/vertex/core/types"
 	"io"
 	"testing"
 
@@ -8,7 +9,6 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"github.com/vertex-center/vertex/types"
 )
 
 type DockerKernelServiceTestSuite struct {

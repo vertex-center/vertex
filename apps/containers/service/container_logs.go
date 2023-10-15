@@ -3,7 +3,7 @@ package service
 import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/types"
-	"github.com/vertex-center/vertex/types/app"
+	"github.com/vertex-center/vertex/core/types/app"
 )
 
 type ContainerLogsService struct {

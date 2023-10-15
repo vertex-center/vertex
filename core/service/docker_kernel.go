@@ -1,19 +1,20 @@
-package services
+package service
 
 import (
+	"github.com/vertex-center/vertex/core/port"
+	"github.com/vertex-center/vertex/core/types"
 	"io"
 
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 )
 
 type DockerKernelService struct {
-	dockerAdapter types.DockerAdapterPort
+	dockerAdapter port.DockerAdapter
 }
 
-func NewDockerKernelService(dockerAdapter types.DockerAdapterPort) DockerKernelService {
+func NewDockerKernelService(dockerAdapter port.DockerAdapter) DockerKernelService {
 	return DockerKernelService{
 		dockerAdapter: dockerAdapter,
 	}

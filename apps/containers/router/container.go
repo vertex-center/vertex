@@ -3,6 +3,8 @@ package router
 import (
 	"errors"
 	"fmt"
+	types2 "github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/core/types/api"
 	"io"
 
 	"github.com/gin-contrib/sse"
@@ -11,8 +13,6 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
-	vtypes "github.com/vertex-center/vertex/types"
-	"github.com/vertex-center/vertex/types/api"
 )
 
 // getParamContainerUUID returns the UUID of the container in the URL.
@@ -342,7 +342,7 @@ func (r *AppRouter) handleContainerEvents(c *router.Context) {
 
 	done := c.Request.Context().Done()
 
-	listener := vtypes.NewTempListener(func(e interface{}) {
+	listener := types2.NewTempListener(func(e interface{}) {
 		switch e := e.(type) {
 		case types.EventContainerLog:
 			if inst.UUID != e.ContainerUUID {
@@ -546,7 +546,7 @@ func (r *AppRouter) handleWaitContainer(c *router.Context) {
 		return
 	}
 
-	err := r.containerRunnerService.WaitCondition(inst, vtypes.WaitContainerCondition(cond))
+	err := r.containerRunnerService.WaitCondition(inst, types2.WaitContainerCondition(cond))
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           types.ErrCodeFailedToWaitContainer,

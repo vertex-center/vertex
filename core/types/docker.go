@@ -1,8 +1,6 @@
 package types
 
 import (
-	"io"
-
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/go-connections/nat"
@@ -63,21 +61,6 @@ type InfoImageResponse struct {
 }
 
 type WaitContainerCondition container.WaitCondition
-
-type DockerAdapterPort interface {
-	ListContainers() ([]Container, error)
-	DeleteContainer(id string) error
-	CreateContainer(options CreateContainerOptions) (CreateContainerResponse, error)
-	StartContainer(id string) error
-	StopContainer(id string) error
-	InfoContainer(id string) (InfoContainerResponse, error)
-	LogsStdoutContainer(id string) (io.ReadCloser, error)
-	LogsStderrContainer(id string) (io.ReadCloser, error)
-	WaitContainer(id string, cond WaitContainerCondition) error
-	InfoImage(id string) (InfoImageResponse, error)
-	PullImage(options PullImageOptions) (io.ReadCloser, error)
-	BuildImage(options BuildImageOptions) (dockertypes.ImageBuildResponse, error)
-}
 
 func NewContainer(c dockertypes.Container) Container {
 	return Container{
