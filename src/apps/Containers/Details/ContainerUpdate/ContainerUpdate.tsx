@@ -1,14 +1,19 @@
-import { Title } from "../../../../components/Text/Text";
+import { Caption, Title } from "../../../../components/Text/Text";
 import { useParams } from "react-router-dom";
 import useContainer from "../../hooks/useContainer";
 import styles from "./ContainerUpdate.module.sass";
 import { Vertical } from "../../../../components/Layouts/Layouts";
 import { api } from "../../../../backend/api/backend";
-import VertexUpdate from "../../../Settings/components/VertexUpdate/VertexUpdate";
 import { useState } from "react";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useQueryClient } from "@tanstack/react-query";
+import List from "../../../../components/List/List";
+import ListItem from "../../../../components/List/ListItem";
+import ListInfo from "../../../../components/List/ListInfo";
+import ListTitle from "../../../../components/List/ListTitle";
+import ListActions from "../../../../components/List/ListActions";
+import Button from "../../../../components/Button/Button";
 
 export default function ContainerUpdate() {
     const { uuid } = useParams();
@@ -30,20 +35,34 @@ export default function ContainerUpdate() {
             .catch(setError);
     };
 
+    let content;
+    if (container?.service_update?.available) {
+        content = (
+            <List>
+                <ListItem>
+                    <ListInfo onClick={updateVertexIntegration}>
+                        <ListTitle>Vertex integration</ListTitle>
+                    </ListInfo>
+                    <ListActions>
+                        <Button rightIcon="download">Update</Button>
+                    </ListActions>
+                </ListItem>
+            </List>
+        );
+    } else {
+        content = (
+            <Caption className={styles.content}>
+                There are no updates available.
+            </Caption>
+        );
+    }
+
     return (
         <Vertical gap={20}>
             <ProgressOverlay show={isLoading} />
             <Title className={styles.title}>Update</Title>
             <APIError error={error} />
-            {!error && !isLoading && (
-                <Updates>
-                    <VertexUpdate
-                        name="Vertex integration"
-                        onUpdate={updateVertexIntegration}
-                        available={container?.service_update?.available}
-                    />
-                </Updates>
-            )}
+            {!error && !isLoading && content}
         </Vertical>
     );
 }
