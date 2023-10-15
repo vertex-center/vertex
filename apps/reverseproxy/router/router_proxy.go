@@ -3,11 +3,11 @@ package router
 import (
 	"context"
 	"fmt"
+	"github.com/vertex-center/vertex/apps/reverseproxy/core/service"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/apps/reverseproxy/service"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"

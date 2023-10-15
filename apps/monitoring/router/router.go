@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
-	containerstypes "github.com/vertex-center/vertex/apps/containers/types"
-	"github.com/vertex-center/vertex/apps/monitoring/service"
-	"github.com/vertex-center/vertex/apps/monitoring/types"
+	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/apps/monitoring/core/service"
+	"github.com/vertex-center/vertex/apps/monitoring/core/types"
 	app2 "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/router"
 )

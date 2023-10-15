@@ -3,6 +3,7 @@ package adapter
 import (
 	"errors"
 	"fmt"
+	metricstypes "github.com/vertex-center/vertex/apps/monitoring/core/types"
 	"net/http"
 	"os"
 	"path"
@@ -11,7 +12,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	metricstypes "github.com/vertex-center/vertex/apps/monitoring/types"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"

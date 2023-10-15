@@ -3,12 +3,12 @@ package service
 import (
 	"context"
 	"errors"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
 	types2 "github.com/vertex-center/vertex/core/types"
 	"os"
 
 	"github.com/google/uuid"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
-	containerstypes "github.com/vertex-center/vertex/apps/containers/types"
 	sqlapi "github.com/vertex-center/vertex/apps/sql/api"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
@@ -78,7 +78,7 @@ func (s *SetupService) setupDatabase() error {
 	return s.startDatabase(inst)
 }
 
-func (s *SetupService) getVertexDB() (*containerstypes.Container, error) {
+func (s *SetupService) getVertexDB() (*types.Container, error) {
 	insts, apiError := containersapi.GetContainers(context.Background())
 	if apiError != nil {
 		log.Error(apiError.RouterError())
@@ -129,7 +129,7 @@ func (s *SetupService) installVertexDB() error {
 	return nil
 }
 
-func (s *SetupService) startDatabase(inst *containerstypes.Container) error {
+func (s *SetupService) startDatabase(inst *types.Container) error {
 	eventsChan := make(chan interface{})
 	defer close(eventsChan)
 
@@ -138,7 +138,7 @@ func (s *SetupService) startDatabase(inst *containerstypes.Container) error {
 
 	l := types2.NewTempListener(func(e interface{}) {
 		switch event := e.(type) {
-		case containerstypes.EventContainerStatusChange:
+		case types.EventContainerStatusChange:
 			if event.ContainerUUID != inst.UUID {
 				return
 			}
@@ -163,10 +163,10 @@ func (s *SetupService) startDatabase(inst *containerstypes.Container) error {
 		select {
 		case e := <-eventsChan:
 			switch e := e.(type) {
-			case containerstypes.EventContainerStatusChange:
-				if e.Status == containerstypes.ContainerStatusRunning {
+			case types.EventContainerStatusChange:
+				if e.Status == types.ContainerStatusRunning {
 					return nil
-				} else if e.Status == containerstypes.ContainerStatusOff || e.Status == containerstypes.ContainerStatusError {
+				} else if e.Status == types.ContainerStatusOff || e.Status == types.ContainerStatusError {
 					return errFailedToStart
 				}
 			}

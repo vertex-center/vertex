@@ -3,14 +3,14 @@ package router
 import (
 	"errors"
 	"fmt"
+	"github.com/vertex-center/vertex/apps/containers/core/service"
+	types3 "github.com/vertex-center/vertex/apps/containers/core/types"
 	types2 "github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
 	"io"
 
 	"github.com/gin-contrib/sse"
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/apps/containers/service"
-	"github.com/vertex-center/vertex/apps/containers/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 )
@@ -23,7 +23,7 @@ func (r *AppRouter) getParamContainerUUID(c *router.Context) *uuid.UUID {
 	p := c.Param("container_uuid")
 	if p == "" {
 		c.BadRequest(router.Error{
-			Code:           types.ErrCodeContainerUuidMissing,
+			Code:           types3.ErrCodeContainerUuidMissing,
 			PublicMessage:  "The request was missing the container UUID.",
 			PrivateMessage: "Field 'container_uuid' is required.",
 		})
@@ -33,7 +33,7 @@ func (r *AppRouter) getParamContainerUUID(c *router.Context) *uuid.UUID {
 	uid, err := uuid.Parse(p)
 	if err != nil {
 		c.BadRequest(router.Error{
-			Code:           types.ErrCodeContainerUuidInvalid,
+			Code:           types3.ErrCodeContainerUuidInvalid,
 			PublicMessage:  "The container UUID is invalid.",
 			PrivateMessage: err.Error(),
 		})
@@ -49,23 +49,23 @@ func (r *AppRouter) getParamContainerUUID(c *router.Context) *uuid.UUID {
 //   - invalid_container_uuid: the container_uuid parameter was not a valid UUID
 //   - container_not_found: the container with the given UUID was not found
 //   - failed_to_retrieve_container: failed to retrieve the container from the database
-func (r *AppRouter) getContainer(c *router.Context) *types.Container {
+func (r *AppRouter) getContainer(c *router.Context) *types3.Container {
 	containerUUID := r.getParamContainerUUID(c)
 	if containerUUID == nil {
 		return nil
 	}
 
 	container, err := r.containerService.Get(*containerUUID)
-	if err != nil && errors.Is(err, types.ErrContainerNotFound) {
+	if err != nil && errors.Is(err, types3.ErrContainerNotFound) {
 		c.NotFound(router.Error{
-			Code:           types.ErrCodeContainerNotFound,
+			Code:           types3.ErrCodeContainerNotFound,
 			PublicMessage:  fmt.Sprintf("The container '%s' could not be found.", containerUUID),
 			PrivateMessage: err.Error(),
 		})
 		return nil
 	} else if err != nil {
 		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToGetContainer,
+			Code:           types3.ErrCodeFailedToGetContainer,
 			PublicMessage:  fmt.Sprintf("Failed to retrieve container '%s'.", containerUUID),
 			PrivateMessage: err.Error(),
 		})
@@ -101,16 +101,16 @@ func (r *AppRouter) handleDeleteContainer(c *router.Context) {
 	}
 
 	err := r.containerService.Delete(inst)
-	if err != nil && errors.Is(err, types.ErrContainerStillRunning) {
+	if err != nil && errors.Is(err, types3.ErrContainerStillRunning) {
 		c.Conflict(router.Error{
-			Code:           types.ErrCodeContainerStillRunning,
+			Code:           types3.ErrCodeContainerStillRunning,
 			PublicMessage:  fmt.Sprintf("The container '%s' is still running. Stop it first before deleting.", inst.DisplayName),
 			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil {
 		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToDeleteContainer,
+			Code:           types3.ErrCodeFailedToDeleteContainer,
 			PublicMessage:  fmt.Sprintf("The container '%s' could not be deleted.", inst.DisplayName),
 			PrivateMessage: err.Error(),
 		})
@@ -152,7 +152,7 @@ func (r *AppRouter) handlePatchContainer(c *router.Context) {
 		err = r.containerSettingsService.SetLaunchOnStartup(inst, *body.LaunchOnStartup)
 		if err != nil {
 			c.Abort(router.Error{
-				Code:           types.ErrCodeFailedToSetLaunchOnStartup,
+				Code:           types3.ErrCodeFailedToSetLaunchOnStartup,
 				PublicMessage:  "Failed to change launch on startup.",
 				PrivateMessage: err.Error(),
 			})
@@ -164,7 +164,7 @@ func (r *AppRouter) handlePatchContainer(c *router.Context) {
 		err = r.containerSettingsService.SetDisplayName(inst, *body.DisplayName)
 		if err != nil {
 			c.Abort(router.Error{
-				Code:           types.ErrCodeFailedToSetDisplayName,
+				Code:           types3.ErrCodeFailedToSetDisplayName,
 				PublicMessage:  "Failed to change display name.",
 				PrivateMessage: err.Error(),
 			})
@@ -176,7 +176,7 @@ func (r *AppRouter) handlePatchContainer(c *router.Context) {
 		err = r.containerService.SetDatabases(inst, body.Databases)
 		if err != nil {
 			c.Abort(router.Error{
-				Code:           types.ErrCodeFailedToSetDatabase,
+				Code:           types3.ErrCodeFailedToSetDatabase,
 				PublicMessage:  "Failed to change databases.",
 				PrivateMessage: err.Error(),
 			})
@@ -188,7 +188,7 @@ func (r *AppRouter) handlePatchContainer(c *router.Context) {
 		err = r.containerSettingsService.SetVersion(inst, *body.Version)
 		if err != nil {
 			c.Abort(router.Error{
-				Code:           types.ErrCodeFailedToSetVersion,
+				Code:           types3.ErrCodeFailedToSetVersion,
 				PublicMessage:  "Failed to change version.",
 				PrivateMessage: err.Error(),
 			})
@@ -200,7 +200,7 @@ func (r *AppRouter) handlePatchContainer(c *router.Context) {
 		err = r.containerSettingsService.SetTags(inst, body.Tags)
 		if err != nil {
 			c.Abort(router.Error{
-				Code:           types.ErrCodeFailedToSetTags,
+				Code:           types3.ErrCodeFailedToSetTags,
 				PublicMessage:  "Failed to change tags.",
 				PrivateMessage: err.Error(),
 			})
@@ -225,23 +225,23 @@ func (r *AppRouter) handleStartContainer(c *router.Context) {
 	}
 
 	err := r.containerRunnerService.Start(inst)
-	if err != nil && errors.Is(err, types.ErrContainerNotFound) {
+	if err != nil && errors.Is(err, types3.ErrContainerNotFound) {
 		c.NotFound(router.Error{
-			Code:           types.ErrCodeContainerNotFound,
+			Code:           types3.ErrCodeContainerNotFound,
 			PublicMessage:  fmt.Sprintf("Container '%s' not found.", inst.UUID),
 			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil && errors.Is(err, service.ErrContainerAlreadyRunning) {
 		c.Conflict(router.Error{
-			Code:           types.ErrCodeContainerAlreadyRunning,
+			Code:           types3.ErrCodeContainerAlreadyRunning,
 			PublicMessage:  fmt.Sprintf("Container %s is already running.", inst.UUID),
 			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil {
 		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToStartContainer,
+			Code:           types3.ErrCodeFailedToStartContainer,
 			PublicMessage:  fmt.Sprintf("Failed to start container %s.", inst.UUID),
 			PrivateMessage: err.Error(),
 		})
@@ -267,14 +267,14 @@ func (r *AppRouter) handleStopContainer(c *router.Context) {
 	err := r.containerRunnerService.Stop(inst)
 	if err != nil && errors.Is(err, service.ErrContainerNotRunning) {
 		c.Conflict(router.Error{
-			Code:           types.ErrCodeContainerNotRunning,
+			Code:           types3.ErrCodeContainerNotRunning,
 			PublicMessage:  fmt.Sprintf("Container %s is not running.", inst.UUID),
 			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil {
 		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToStopContainer,
+			Code:           types3.ErrCodeFailedToStopContainer,
 			PublicMessage:  fmt.Sprintf("Failed to stop container %s.", inst.UUID),
 			PrivateMessage: err.Error(),
 		})
@@ -307,7 +307,7 @@ func (r *AppRouter) handlePatchEnvironment(c *router.Context) {
 	err = r.containerEnvService.Save(inst, environment)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToSetEnv,
+			Code:           types3.ErrCodeFailedToSetEnv,
 			PublicMessage:  "failed to set environment",
 			PrivateMessage: err.Error(),
 		})
@@ -344,35 +344,35 @@ func (r *AppRouter) handleContainerEvents(c *router.Context) {
 
 	listener := types2.NewTempListener(func(e interface{}) {
 		switch e := e.(type) {
-		case types.EventContainerLog:
+		case types3.EventContainerLog:
 			if inst.UUID != e.ContainerUUID {
 				break
 			}
 
-			if e.Kind == types.LogKindOut || e.Kind == types.LogKindVertexOut {
+			if e.Kind == types3.LogKindOut || e.Kind == types3.LogKindVertexOut {
 				eventsChan <- sse.Event{
-					Event: types.EventNameContainerStdout,
+					Event: types3.EventNameContainerStdout,
 					Data:  e.Message,
 				}
-			} else if e.Kind == types.LogKindErr || e.Kind == types.LogKindVertexErr {
+			} else if e.Kind == types3.LogKindErr || e.Kind == types3.LogKindVertexErr {
 				eventsChan <- sse.Event{
-					Event: types.EventNameContainerStderr,
+					Event: types3.EventNameContainerStderr,
 					Data:  e.Message,
 				}
-			} else if e.Kind == types.LogKindDownload {
+			} else if e.Kind == types3.LogKindDownload {
 				eventsChan <- sse.Event{
-					Event: types.EventNameContainerDownload,
+					Event: types3.EventNameContainerDownload,
 					Data:  e.Message,
 				}
 			}
 
-		case types.EventContainerStatusChange:
+		case types3.EventContainerStatusChange:
 			if inst.UUID != e.ContainerUUID {
 				break
 			}
 
 			eventsChan <- sse.Event{
-				Event: types.EventNameContainerStatusChange,
+				Event: types3.EventNameContainerStatusChange,
 				Data:  e.Status,
 			}
 		}
@@ -472,7 +472,7 @@ func (r *AppRouter) handleGetLogs(c *router.Context) {
 	logs, err := r.containerLogsService.GetLatestLogs(*uid)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToGetContainerLogs,
+			Code:           types3.ErrCodeFailedToGetContainerLogs,
 			PublicMessage:  fmt.Sprintf("Failed to get logs for container %s.", uid),
 			PrivateMessage: err.Error(),
 		})
@@ -494,7 +494,7 @@ func (r *AppRouter) handleUpdateService(c *router.Context) {
 	serv, err := r.serviceService.GetById(inst.Service.ID)
 	if err != nil {
 		c.NotFound(router.Error{
-			Code:           types.ErrCodeServiceNotFound,
+			Code:           types3.ErrCodeServiceNotFound,
 			PublicMessage:  fmt.Sprintf("Service %s not found.", inst.Service.ID),
 			PrivateMessage: err.Error(),
 		})
@@ -504,7 +504,7 @@ func (r *AppRouter) handleUpdateService(c *router.Context) {
 	err = r.containerServiceService.Update(inst, serv)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToUpdateServiceContainer,
+			Code:           types3.ErrCodeFailedToUpdateServiceContainer,
 			PublicMessage:  fmt.Sprintf("Failed to update service for container %s.", inst.UUID),
 			PrivateMessage: err.Error(),
 		})
@@ -528,7 +528,7 @@ func (r *AppRouter) handleGetVersions(c *router.Context) {
 	versions, err := r.containerRunnerService.GetAllVersions(inst, useCache)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToGetVersions,
+			Code:           types3.ErrCodeFailedToGetVersions,
 			PublicMessage:  fmt.Sprintf("Failed to get versions for container %s.", inst.UUID),
 			PrivateMessage: err.Error(),
 		})
@@ -549,7 +549,7 @@ func (r *AppRouter) handleWaitContainer(c *router.Context) {
 	err := r.containerRunnerService.WaitCondition(inst, types2.WaitContainerCondition(cond))
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToWaitContainer,
+			Code:           types3.ErrCodeFailedToWaitContainer,
 			PublicMessage:  fmt.Sprintf("Failed to wait the event '%s' for container %s.", cond, inst.UUID),
 			PrivateMessage: err.Error(),
 		})

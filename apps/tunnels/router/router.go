@@ -3,10 +3,10 @@ package router
 import (
 	"errors"
 	"fmt"
+	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/apps/monitoring/core/types"
 
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
-	containerstypes "github.com/vertex-center/vertex/apps/containers/types"
-	"github.com/vertex-center/vertex/apps/monitoring/types"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 

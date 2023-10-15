@@ -3,12 +3,13 @@ package adapter
 import (
 	"bufio"
 	"errors"
+	"github.com/vertex-center/vertex/apps/containers/core/port"
+	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"os"
 	"path"
 	"strings"
 
 	"github.com/google/uuid"
-	containerstypes "github.com/vertex-center/vertex/apps/containers/types"
 	"github.com/vertex-center/vertex/pkg/storage"
 )
 
@@ -22,7 +23,7 @@ type ContainerEnvFSAdapterParams struct {
 	containersPath string
 }
 
-func NewContainerEnvFSAdapter(params *ContainerEnvFSAdapterParams) containerstypes.ContainerEnvAdapterPort {
+func NewContainerEnvFSAdapter(params *ContainerEnvFSAdapterParams) port.ContainerEnvAdapter {
 	if params == nil {
 		params = &ContainerEnvFSAdapterParams{}
 	}

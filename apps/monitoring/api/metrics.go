@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 	"github.com/vertex-center/vertex/apps/monitoring"
-	metricstypes "github.com/vertex-center/vertex/apps/monitoring/types"
+	metricstypes "github.com/vertex-center/vertex/apps/monitoring/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
 )
 

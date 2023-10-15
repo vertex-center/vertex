@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 	"github.com/vertex-center/vertex/apps/reverseproxy"
-	"github.com/vertex-center/vertex/apps/reverseproxy/types"
+	"github.com/vertex-center/vertex/apps/reverseproxy/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
 )
 

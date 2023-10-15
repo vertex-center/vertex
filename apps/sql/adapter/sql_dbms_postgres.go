@@ -2,9 +2,10 @@ package adapter
 
 import (
 	"errors"
+	"github.com/vertex-center/vertex/apps/sql/core/port"
+	types2 "github.com/vertex-center/vertex/apps/sql/core/types"
 	"strconv"
 
-	"github.com/vertex-center/vertex/apps/sql/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 	"gorm.io/driver/postgres"
@@ -24,7 +25,7 @@ type SqlDBMSPostgresAdapterParams struct {
 	Password string
 }
 
-func NewSqlDBMSPostgresAdapter(params *SqlDBMSPostgresAdapterParams) types.DBMSAdapterPort {
+func NewSqlDBMSPostgresAdapter(params *SqlDBMSPostgresAdapterParams) port.DBMSAdapter {
 	adapter := &SqlDBMSPostgresAdapter{
 		SqlDBMSAdapter: NewSqlDBMSAdapter().(*SqlDBMSAdapter),
 	}
@@ -56,7 +57,7 @@ func NewSqlDBMSPostgresAdapter(params *SqlDBMSPostgresAdapterParams) types.DBMSA
 	return adapter
 }
 
-func (a *SqlDBMSPostgresAdapter) GetDatabases() (*[]types.DB, error) {
+func (a *SqlDBMSPostgresAdapter) GetDatabases() (*[]types2.DB, error) {
 	if a.db == nil {
 		return nil, errors.New("connection not established")
 	}
@@ -67,9 +68,9 @@ func (a *SqlDBMSPostgresAdapter) GetDatabases() (*[]types.DB, error) {
 	}
 	defer rows.Close()
 
-	var databases []types.DB
+	var databases []types2.DB
 	for rows.Next() {
-		var database types.DB
+		var database types2.DB
 		err := rows.Scan(&database.Name)
 		if err != nil {
 			return nil, err

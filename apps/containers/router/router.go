@@ -2,8 +2,8 @@ package router
 
 import (
 	"github.com/vertex-center/vertex/apps/containers/adapter"
-	"github.com/vertex-center/vertex/apps/containers/service"
-	"github.com/vertex-center/vertex/apps/containers/types"
+	"github.com/vertex-center/vertex/apps/containers/core/port"
+	service2 "github.com/vertex-center/vertex/apps/containers/core/service"
 	app2 "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/router"
 )
@@ -11,21 +11,21 @@ import (
 type AppRouter struct {
 	ctx *app2.Context
 
-	containerAdapter         types.ContainerAdapterPort
-	containerEnvAdapter      types.ContainerEnvAdapterPort
-	containerLogsAdapter     types.ContainerLogsAdapterPort
-	containerRunnerAdapter   types.ContainerRunnerAdapterPort
-	containerServiceAdapter  types.ContainerServiceAdapterPort
-	containerSettingsAdapter types.ContainerSettingsAdapterPort
+	containerAdapter         port.ContainerAdapter
+	containerEnvAdapter      port.ContainerEnvAdapter
+	containerLogsAdapter     port.ContainerLogsAdapter
+	containerRunnerAdapter   port.ContainerRunnerAdapter
+	containerServiceAdapter  port.ContainerServiceAdapter
+	containerSettingsAdapter port.ContainerSettingsAdapter
 
-	containerService         *service.ContainerService
-	containerEnvService      *service.ContainerEnvService
-	containerLogsService     *service.ContainerLogsService
-	containerRunnerService   *service.ContainerRunnerService
-	containerServiceService  *service.ContainerServiceService
-	containerSettingsService *service.ContainerSettingsService
+	containerService         *service2.ContainerService
+	containerEnvService      *service2.ContainerEnvService
+	containerLogsService     *service2.ContainerLogsService
+	containerRunnerService   *service2.ContainerRunnerService
+	containerServiceService  *service2.ContainerServiceService
+	containerSettingsService *service2.ContainerSettingsService
 
-	serviceService *service.ServiceService
+	serviceService *service2.ServiceService
 }
 
 func NewAppRouter(ctx *app2.Context) *AppRouter {
@@ -39,13 +39,13 @@ func NewAppRouter(ctx *app2.Context) *AppRouter {
 		containerSettingsAdapter: adapter.NewContainerSettingsFSAdapter(nil),
 	}
 
-	r.serviceService = service.NewServiceService()
-	r.containerEnvService = service.NewContainerEnvService(r.containerEnvAdapter)
-	r.containerLogsService = service.NewContainerLogsService(ctx, r.containerLogsAdapter)
-	r.containerRunnerService = service.NewContainerRunnerService(ctx, r.containerRunnerAdapter)
-	r.containerServiceService = service.NewContainerServiceService(r.containerServiceAdapter)
-	r.containerSettingsService = service.NewContainerSettingsService(r.containerSettingsAdapter)
-	r.containerService = service.NewContainerService(service.ContainerServiceParams{
+	r.serviceService = service2.NewServiceService()
+	r.containerEnvService = service2.NewContainerEnvService(r.containerEnvAdapter)
+	r.containerLogsService = service2.NewContainerLogsService(ctx, r.containerLogsAdapter)
+	r.containerRunnerService = service2.NewContainerRunnerService(ctx, r.containerRunnerAdapter)
+	r.containerServiceService = service2.NewContainerServiceService(r.containerServiceAdapter)
+	r.containerSettingsService = service2.NewContainerSettingsService(r.containerSettingsAdapter)
+	r.containerService = service2.NewContainerService(service2.ContainerServiceParams{
 		Ctx:                      ctx,
 		ContainerAdapter:         r.containerAdapter,
 		ContainerRunnerService:   r.containerRunnerService,

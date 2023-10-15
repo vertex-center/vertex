@@ -1,11 +1,11 @@
 package router
 
 import (
+	types2 "github.com/vertex-center/vertex/apps/containers/core/types"
 	vtypes "github.com/vertex-center/vertex/core/types"
 	"io"
 
 	"github.com/gin-contrib/sse"
-	"github.com/vertex-center/vertex/apps/containers/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 )
@@ -23,7 +23,7 @@ func (r *AppRouter) handleGetTags(c *router.Context) {
 
 // handleSearchContainers returns all installed containers that match the query.
 func (r *AppRouter) handleSearchContainers(c *router.Context) {
-	query := types.ContainerSearchQuery{}
+	query := types2.ContainerSearchQuery{}
 
 	features := c.QueryArray("features[]")
 	if len(features) > 0 {
@@ -46,7 +46,7 @@ func (r *AppRouter) handleCheckForUpdates(c *router.Context) {
 	containers, err := r.containerService.CheckForUpdates()
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToCheckForUpdates,
+			Code:           types2.ErrCodeFailedToCheckForUpdates,
 			PublicMessage:  "Failed to check for updates.",
 			PrivateMessage: err.Error(),
 		})
@@ -65,9 +65,9 @@ func (r *AppRouter) handleContainersEvents(c *router.Context) {
 
 	listener := vtypes.NewTempListener(func(e interface{}) {
 		switch e.(type) {
-		case types.EventContainersChange:
+		case types2.EventContainersChange:
 			eventsChan <- sse.Event{
-				Event: types.EventNameContainersChange,
+				Event: types2.EventNameContainersChange,
 			}
 		}
 	})

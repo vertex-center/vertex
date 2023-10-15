@@ -2,16 +2,17 @@ package router
 
 import (
 	"fmt"
+	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
+	"github.com/vertex-center/vertex/apps/reverseproxy/core/service"
+	types2 "github.com/vertex-center/vertex/apps/reverseproxy/core/types"
 
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/reverseproxy/adapter"
-	"github.com/vertex-center/vertex/apps/reverseproxy/service"
-	"github.com/vertex-center/vertex/apps/reverseproxy/types"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
 type AppRouter struct {
-	proxyFSAdapter types.ProxyAdapterPort
+	proxyFSAdapter port.ProxyAdapter
 
 	proxyService *service.ProxyService
 }
@@ -57,7 +58,7 @@ func (r *AppRouter) handleAddRedirect(c *router.Context) {
 		return
 	}
 
-	redirect := types.ProxyRedirect{
+	redirect := types2.ProxyRedirect{
 		Source: body.Source,
 		Target: body.Target,
 	}
@@ -65,7 +66,7 @@ func (r *AppRouter) handleAddRedirect(c *router.Context) {
 	err = r.proxyService.AddRedirect(redirect)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToAddRedirect,
+			Code:           types2.ErrCodeFailedToAddRedirect,
 			PublicMessage:  fmt.Sprintf("Failed to add redirect '%s' to '%s'.", redirect.Source, redirect.Target),
 			PrivateMessage: err.Error(),
 		})
@@ -84,7 +85,7 @@ func (r *AppRouter) handleRemoveRedirect(c *router.Context) {
 	idString := c.Param("id")
 	if idString == "" {
 		c.BadRequest(router.Error{
-			Code:           types.ErrCodeRedirectUuidMissing,
+			Code:           types2.ErrCodeRedirectUuidMissing,
 			PublicMessage:  "The request is missing the redirect UUID.",
 			PrivateMessage: "Field 'id' is required.",
 		})
@@ -94,7 +95,7 @@ func (r *AppRouter) handleRemoveRedirect(c *router.Context) {
 	id, err := uuid.Parse(idString)
 	if err != nil {
 		c.BadRequest(router.Error{
-			Code:           types.ErrCodeRedirectUuidInvalid,
+			Code:           types2.ErrCodeRedirectUuidInvalid,
 			PublicMessage:  "The redirect UUID is invalid.",
 			PrivateMessage: err.Error(),
 		})
@@ -104,7 +105,7 @@ func (r *AppRouter) handleRemoveRedirect(c *router.Context) {
 	err = r.proxyService.RemoveRedirect(id)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToRemoveRedirect,
+			Code:           types2.ErrCodeFailedToRemoveRedirect,
 			PublicMessage:  fmt.Sprintf("Failed to remove redirect '%s'.", id),
 			PrivateMessage: err.Error(),
 		})
