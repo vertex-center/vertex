@@ -47,10 +47,12 @@ export default function SettingsUpdates() {
         setShowMessage(false);
     };
 
+    const isInstalling = update?.updating === true || isInstallingUpdate;
+
     const isLoading =
         isLoadingUpdate ||
         isLoadingSettings ||
-        isInstallingUpdate ||
+        isInstalling ||
         isSettingChannel;
 
     const error =
@@ -85,7 +87,7 @@ export default function SettingsUpdates() {
                         version={update?.baseline.version}
                         description={update?.baseline.description}
                         install={installUpdate}
-                        isInstalling={isInstallingUpdate}
+                        isInstalling={isInstalling}
                     />
                 </List>
             )}
