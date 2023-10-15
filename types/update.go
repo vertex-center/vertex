@@ -1,5 +1,11 @@
 package types
 
+import "errors"
+
+var (
+	ErrAlreadyUpdating = errors.New("an update is already in progress, cannot start another")
+)
+
 type Update struct {
 	Baseline Baseline `json:"baseline"`
 }

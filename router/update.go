@@ -39,7 +39,14 @@ func handleInstallLatestUpdate(c *router.Context) {
 	channel := settingsService.GetChannel()
 
 	err := updateService.InstallLatest(channel)
-	if errors.Is(err, types.ErrFailedToFetchBaseline) {
+	if errors.Is(err, types.ErrAlreadyUpdating) {
+		c.Abort(router.Error{
+			Code:           api.ErrAlreadyUpdating,
+			PublicMessage:  "Vertex is already Updating. Please wait for the update to finish.",
+			PrivateMessage: err.Error(),
+		})
+		return
+	} else if errors.Is(err, types.ErrFailedToFetchBaseline) {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToFetchLatestVersion,
 			PublicMessage:  "Failed to retrieve latest version information.",

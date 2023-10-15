@@ -10,13 +10,15 @@ import (
 	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 	"os"
+	"sync"
 )
 
 type UpdateService struct {
 	uuid     uuid.UUID
 	ctx      *types.VertexContext
 	adapter  types.BaselinesAdapterPort
-	updaters []types.Updater
+	updaters []types.Updater // updaters containers update logic for each dependency.
+	updateMu sync.Mutex      // updateMu is used to prevent multiple updates at the same time.
 }
 
 func NewUpdateService(ctx *types.VertexContext, adapter types.BaselinesAdapterPort, updaters []types.Updater) *UpdateService {
@@ -25,6 +27,7 @@ func NewUpdateService(ctx *types.VertexContext, adapter types.BaselinesAdapterPo
 		ctx:      ctx,
 		adapter:  adapter,
 		updaters: updaters,
+		updateMu: sync.Mutex{},
 	}
 	s.ctx.AddListener(s)
 	return s
@@ -66,6 +69,11 @@ func (s *UpdateService) GetUpdate(channel types.SettingsUpdatesChannel) (*types.
 }
 
 func (s *UpdateService) InstallLatest(channel types.SettingsUpdatesChannel) error {
+	if !s.updateMu.TryLock() {
+		return types.ErrAlreadyUpdating
+	}
+	defer s.updateMu.Unlock()
+
 	latest, err := s.adapter.GetLatest(context.Background(), channel)
 	if err != nil {
 		return err
