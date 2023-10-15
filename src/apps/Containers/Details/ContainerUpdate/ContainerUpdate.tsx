@@ -4,7 +4,7 @@ import useContainer from "../../hooks/useContainer";
 import styles from "./ContainerUpdate.module.sass";
 import { Vertical } from "../../../../components/Layouts/Layouts";
 import { api } from "../../../../backend/api/backend";
-import Update, { Updates } from "../../../../components/Update/Update";
+import VertexUpdate from "../../../Settings/components/VertexUpdate/VertexUpdate";
 import { useState } from "react";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
@@ -37,7 +37,7 @@ export default function ContainerUpdate() {
             <APIError error={error} />
             {!error && !isLoading && (
                 <Updates>
-                    <Update
+                    <VertexUpdate
                         name="Vertex integration"
                         onUpdate={updateVertexIntegration}
                         available={container?.service_update?.available}

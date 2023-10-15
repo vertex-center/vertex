@@ -1,5 +1,4 @@
 import axios from "axios";
-import { Dependencies as DependenciesUpdate } from "../../models/update";
 import { About } from "../../models/about";
 import { Hardware } from "../../models/hardware";
 import { SSHKeys } from "../../models/security";
@@ -10,6 +9,7 @@ import { vxSqlRoutes } from "./vxSql";
 import { vxReverseProxyRoutes } from "./vxReverseProxy";
 import { VertexApp } from "../../models/app";
 import { Console } from "../../logging/logging";
+import { Update } from "../../models/update";
 
 export const server = axios.create({
     // @ts-ignore
@@ -49,6 +49,16 @@ const getHardware = async () => {
     return data;
 };
 
+const getUpdate = async () => {
+    const { data } = await server.get<Update>("/update");
+    return data;
+};
+
+const installUpdate = async () => {
+    const { data } = await server.post("/update");
+    return data;
+};
+
 export const api = {
     about: getAbout,
     hardware: getHardware,
@@ -79,18 +89,9 @@ export const api = {
         },
     },
 
-    dependencies: {
-        get: async (reload?: boolean) => {
-            const { data } = await server.get<DependenciesUpdate>(
-                `/dependencies${reload ? "?reload=true" : ""}`
-            );
-            return data;
-        },
-        install: (
-            updates: {
-                name: string;
-            }[]
-        ) => server.post(`/dependencies/update`, { updates }),
+    update: {
+        get: getUpdate,
+        install: installUpdate,
     },
 
     settings: {
