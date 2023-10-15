@@ -1,10 +1,8 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
-	"github.com/vertex-center/vertex/pkg/net"
 	"os"
 	"runtime"
 
@@ -13,7 +11,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/router"
-	"github.com/vertex-center/vertex/services"
 	"github.com/vertex-center/vertex/types"
 )
 
@@ -37,18 +34,6 @@ func main() {
 	parseArgs()
 
 	checkNotRoot()
-
-	err = setupDependencies()
-	if err != nil {
-		log.Error(fmt.Errorf("failed to setup dependencies: %v", err))
-		return
-	}
-
-	err = config.Current.Apply()
-	if err != nil {
-		log.Error(fmt.Errorf("failed to apply the current configuration: %v", err))
-		return
-	}
 
 	r := router.NewRouter(types.About{
 		Version: version,
@@ -106,40 +91,4 @@ func checkNotRoot() {
 	if os.Getuid() == 0 {
 		log.Warn("while vertex-kernel must be run as root, the vertex user should not be root")
 	}
-}
-
-func setupDependencies() error {
-	for _, dep := range services.Dependencies {
-		err := setupDependency(dep.Updater)
-		if err != nil {
-			log.Error(err)
-			os.Exit(1)
-		}
-	}
-	return nil
-}
-
-func setupDependency(dep types.DependencyUpdater) error {
-	err := os.MkdirAll(dep.GetPath(), os.ModePerm)
-	if os.IsExist(err) {
-		// The dependency already exists.
-		return nil
-	}
-	if err != nil {
-		return err
-	}
-
-	// Wait for internet connection
-	err = net.Wait("google.com:80")
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-
-	// download
-	_, err = dep.CheckForUpdate(types.SettingsUpdatesChannelStable)
-	if err != nil && !errors.Is(err, services.ErrDependencyNotInstalled) {
-		return err
-	}
-	return dep.InstallUpdate()
 }

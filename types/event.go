@@ -40,7 +40,7 @@ type (
 		AppID string
 	}
 
-	EventServerStop          struct{}
-	EventServerHardReset     struct{}
-	EventDependenciesUpdated struct{}
+	EventServerStop      struct{}
+	EventServerHardReset struct{}
+	EventVertexUpdated   struct{}
 )
