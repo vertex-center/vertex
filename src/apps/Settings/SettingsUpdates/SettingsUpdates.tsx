@@ -1,139 +1,96 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { Caption, Text, Title } from "../../../components/Text/Text";
 import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
 import Button from "../../../components/Button/Button";
 import Spacer from "../../../components/Spacer/Spacer";
-import Icon from "../../../components/Icon/Icon";
 import Popup from "../../../components/Popup/Popup";
-import TimeAgo from "javascript-time-ago";
-import en from "javascript-time-ago/locale/en";
-import { Dependencies } from "../../../models/update";
-import { api } from "../../../backend/api/backend";
-
 import styles from "./SettingsUpdates.module.sass";
-import Update, { Updates } from "../../../components/Update/Update";
+import VertexUpdate from "../components/VertexUpdate/VertexUpdate";
 import { APIError } from "../../../components/Error/APIError";
 import ToggleButton from "../../../components/ToggleButton/ToggleButton";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
-
-TimeAgo.addDefaultLocale(en);
-
-const timeAgo = new TimeAgo("en-US");
+import { useQueryClient } from "@tanstack/react-query";
+import List from "../../../components/List/List";
+import { useSettings } from "../hooks/useSettings";
+import { useUpdate } from "../hooks/useUpdate";
+import { useUpdateMutation } from "../hooks/useUpdateMutation";
+import { useSettingsChannelMutation } from "../hooks/useSettingsMutation";
+import Icon from "../../../components/Icon/Icon";
 
 export default function SettingsUpdates() {
-    const [dependencies, setDependencies] = useState<Dependencies>();
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState();
-    const [updateError, setUpdateError] = useState();
+    const queryClient = useQueryClient();
     const [showMessage, setShowMessage] = useState<boolean>(false);
 
-    const [beta, setBeta] = useState<boolean>(false);
+    const { update, isLoadingUpdate, errorUpdate } = useUpdate();
+    const { settings, isLoadingSettings, errorSettings } = useSettings();
 
-    const reload = useCallback((refresh?: boolean) => {
-        setIsLoading(true);
-        setError(undefined);
+    const { installUpdate, isInstallingUpdate, errorInstallUpdate } =
+        useUpdateMutation({
+            onSuccess: () => {
+                setShowMessage(true);
+                queryClient.invalidateQueries({
+                    queryKey: ["updates"],
+                });
+            },
+        });
 
-        api.dependencies
-            .get(refresh)
-            .then((data) => {
-                setDependencies(data);
-            })
-            .catch(setError)
-            .finally(() => setIsLoading(false));
-    }, []);
-
-    useEffect(() => {
-        getChannel();
-    }, []);
-
-    const updateService = (name: string) => {
-        return api.dependencies
-            .install([{ name }])
-            .then(() => {
-                if (name === "vertex") setShowMessage(true);
-            })
-            .catch(setUpdateError)
-            .finally(reload);
-    };
-
-    const getChannel = () => {
-        api.settings
-            .get()
-            .then((data) => {
-                setBeta(data?.updates?.channel === "beta");
-            })
-            .catch(setError);
-    };
-
-    const onEnableBetaChange = (beta: boolean) => {
-        setBeta(beta);
-        setIsLoading(true);
-
-        const channel = beta ? "beta" : "stable";
-
-        api.settings
-            .patch({ updates: { channel } })
-            .then(() => {
-                reload(true);
-            })
-            .catch(setError)
-            .finally(() => setIsLoading(false));
-    };
-
-    useEffect(reload, []);
+    const { setChannel, isSettingChannel, errorSetChannel } =
+        useSettingsChannelMutation({
+            onSuccess: () => {
+                queryClient.invalidateQueries({
+                    queryKey: ["settings"],
+                });
+            },
+        });
 
     const dismissPopup = () => {
         setShowMessage(false);
     };
 
+    const isInstalling = update?.updating === true || isInstallingUpdate;
+
+    const isLoading =
+        isLoadingUpdate ||
+        isLoadingSettings ||
+        isInstalling ||
+        isSettingChannel;
+
+    const error =
+        errorUpdate || errorSettings || errorInstallUpdate || errorSetChannel;
+
     return (
         <Vertical gap={20}>
             <ProgressOverlay show={isLoading} />
             <Title className={styles.title}>Updates</Title>
-            {!isLoading && !error && (
-                <Horizontal className={styles.toggle} alignItems="center">
-                    <Text>Enable Beta channel</Text>
-                    <Spacer />
-                    <ToggleButton value={beta} onChange={onEnableBetaChange} />
-                </Horizontal>
-            )}
-            {!isLoading && !error && (
-                <Horizontal alignItems="center" gap={20}>
-                    <Button onClick={() => reload(true)} rightIcon="refresh">
-                        Check for updates
-                    </Button>
-                    {dependencies?.last_updates_check && (
-                        <Caption>
-                            Last refresh:{" "}
-                            {timeAgo.format(
-                                new Date(dependencies?.last_updates_check),
-                                "round"
-                            )}
-                        </Caption>
-                    )}
-                </Horizontal>
-            )}
-            {!error && !isLoading && dependencies?.items?.length === 0 && (
-                <Horizontal alignItems="center">
-                    <Icon name="check" />
-                    <Text>Everything is up-to-date.</Text>
-                </Horizontal>
-            )}
-            <APIError error={updateError} />
-            <Updates>
-                {dependencies?.items?.map((dep) => (
-                    <Update
-                        key={dep?.id}
-                        name={dep?.name}
-                        version={dep?.version}
-                        onUpdate={() => updateService(dep?.id)}
-                        current_version={dep?.update?.current_version}
-                        latest_version={dep?.update?.latest_version}
-                        available={dep?.update !== undefined}
-                    />
-                ))}
-            </Updates>
+            <Horizontal className={styles.toggle} alignItems="center">
+                <Text>Enable Beta channel</Text>
+                <Spacer />
+                <ToggleButton
+                    value={settings?.updates?.channel === "beta"}
+                    onChange={(beta: boolean) => setChannel(beta)}
+                    disabled={isLoading}
+                />
+            </Horizontal>
             <APIError error={error} />
+            {update === undefined && !isLoadingUpdate && (
+                <Caption className={styles.content}>
+                    <Horizontal alignItems="center" gap={6}>
+                        <Icon name="check" />
+                        Vertex is up to date. You are running the latest
+                        version.
+                    </Horizontal>
+                </Caption>
+            )}
+            {update !== undefined && (
+                <List>
+                    <VertexUpdate
+                        version={update?.baseline.version}
+                        description={update?.baseline.description}
+                        install={installUpdate}
+                        isInstalling={isInstalling}
+                    />
+                </List>
+            )}
             <Popup show={showMessage} onDismiss={dismissPopup}>
                 <Text>
                     Updates are installed. You can now restart your Vertex

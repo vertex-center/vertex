@@ -1,17 +1,13 @@
-export type Dependencies = {
-    last_updates_check: string;
-    items: Dependency[];
+export type Update = {
+    baseline: Baseline;
+    updating: boolean;
 };
 
-export type Dependency = {
-    id: string;
-    name: string;
+export type Baseline = {
+    date: string;
     version: string;
-    update?: DependencyUpdate;
-};
-
-export type DependencyUpdate = {
-    current_version: string;
-    latest_version: string;
-    needs_restart?: boolean;
+    description: string;
+    vertex: string;
+    vertex_client: string;
+    vertex_server: string;
 };
