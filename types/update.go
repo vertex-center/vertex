@@ -7,7 +7,8 @@ var (
 )
 
 type Update struct {
-	Baseline Baseline `json:"baseline"`
+	Baseline Baseline `json:"baseline"` // Baseline is the set of versions that are available to update to.
+	Updating bool     `json:"updating"` // Updating is true if an update is currently in progress.
 }
 
 type Updater interface {
