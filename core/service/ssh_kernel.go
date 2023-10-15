@@ -15,8 +15,8 @@ type SshKernelService struct {
 	sshAdapter port.SshAdapter
 }
 
-func NewSshKernelService(sshAdapter port.SshAdapter) SshKernelService {
-	return SshKernelService{
+func NewSshKernelService(sshAdapter port.SshAdapter) port.SshService {
+	return &SshKernelService{
 		sshAdapter: sshAdapter,
 	}
 }

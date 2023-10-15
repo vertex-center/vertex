@@ -1,20 +1,18 @@
 package port
 
 import (
-	"context"
-	types2 "github.com/docker/docker/api/types"
+	dockertypes "github.com/docker/docker/api/types"
 	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/core/types/app"
 	"io"
 )
 
 type (
-	BaselinesAdapter interface {
-		// GetLatest returns the latest available Baseline. This
-		// will typically fetch the latest Baseline from a remote source.
-		GetLatest(ctx context.Context, channel types.SettingsUpdatesChannel) (types.Baseline, error)
+	AppsService interface {
+		All() []app.Meta
 	}
 
-	DockerAdapter interface {
+	DockerService interface {
 		ListContainers() ([]types.Container, error)
 		DeleteContainer(id string) error
 		CreateContainer(options types.CreateContainerOptions) (types.CreateContainerResponse, error)
@@ -26,20 +24,30 @@ type (
 		WaitContainer(id string, cond types.WaitContainerCondition) error
 		InfoImage(id string) (types.InfoImageResponse, error)
 		PullImage(options types.PullImageOptions) (io.ReadCloser, error)
-		BuildImage(options types.BuildImageOptions) (types2.ImageBuildResponse, error)
+		BuildImage(options types.BuildImageOptions) (dockertypes.ImageBuildResponse, error)
 	}
 
-	SettingsAdapter interface {
-		GetSettings() types.Settings
+	HardwareService interface {
+		Get() types.Hardware
+	}
+
+	SettingsService interface {
+		Get() types.Settings
+		Update(settings types.Settings) error
 		GetNotificationsWebhook() *string
 		SetNotificationsWebhook(webhook string) error
-		GetChannel() *types.SettingsUpdatesChannel
+		GetChannel() types.SettingsUpdatesChannel
 		SetChannel(channel types.SettingsUpdatesChannel) error
 	}
 
-	SshAdapter interface {
+	SshService interface {
 		GetAll() ([]types.PublicKey, error)
 		Add(key string) error
-		Remove(fingerprint string) error
+		Delete(fingerprint string) error
+	}
+
+	UpdateService interface {
+		GetUpdate(channel types.SettingsUpdatesChannel) (*types.Update, error)
+		InstallLatest(channel types.SettingsUpdatesChannel) error
 	}
 )

@@ -2,17 +2,16 @@ package handler
 
 import (
 	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/core/service"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
 type SettingsHandler struct {
-	settingsService *service.SettingsService
+	settingsService port.SettingsService
 }
 
-func NewSettingsHandler(settingsService *service.SettingsService) port.SettingsHandler {
+func NewSettingsHandler(settingsService port.SettingsService) port.SettingsHandler {
 	return &SettingsHandler{
 		settingsService: settingsService,
 	}

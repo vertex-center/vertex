@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	types2 "github.com/vertex-center/vertex/core/types"
+	vtypes "github.com/vertex-center/vertex/core/types"
 	"os"
 
 	"github.com/google/uuid"
@@ -20,10 +20,10 @@ var (
 
 type SetupService struct {
 	uuid uuid.UUID
-	ctx  *types2.VertexContext
+	ctx  *vtypes.VertexContext
 }
 
-func NewSetupService(ctx *types2.VertexContext) *SetupService {
+func NewSetupService(ctx *vtypes.VertexContext) *SetupService {
 	s := &SetupService{
 		uuid: uuid.New(),
 		ctx:  ctx,
@@ -34,7 +34,7 @@ func NewSetupService(ctx *types2.VertexContext) *SetupService {
 
 func (s *SetupService) OnEvent(e interface{}) {
 	switch e := e.(type) {
-	case types2.EventAppReady:
+	case vtypes.EventAppReady:
 		// TODO: The SQL app should also be ready!
 		if e.AppID != "vx-containers" {
 			return
@@ -136,7 +136,7 @@ func (s *SetupService) startDatabase(inst *types.Container) error {
 	abortChan := make(chan bool)
 	defer close(abortChan)
 
-	l := types2.NewTempListener(func(e interface{}) {
+	l := vtypes.NewTempListener(func(e interface{}) {
 		switch event := e.(type) {
 		case types.EventContainerStatusChange:
 			if event.ContainerUUID != inst.UUID {

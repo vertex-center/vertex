@@ -3,18 +3,17 @@ package handler
 import (
 	"errors"
 	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/core/service"
 	types2 "github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
 type UpdateHandler struct {
-	updateService   *service.UpdateService
-	settingsService *service.SettingsService
+	updateService   port.UpdateService
+	settingsService port.SettingsService
 }
 
-func NewUpdateHandler(updateService *service.UpdateService, settingsService *service.SettingsService) port.UpdateHandler {
+func NewUpdateHandler(updateService port.UpdateService, settingsService port.SettingsService) port.UpdateHandler {
 	return &UpdateHandler{
 		updateService:   updateService,
 		settingsService: settingsService,

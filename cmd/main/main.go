@@ -15,7 +15,7 @@ import (
 	"github.com/vertex-center/vertex/apps/sql"
 	"github.com/vertex-center/vertex/apps/tunnels"
 	"github.com/vertex-center/vertex/core/port"
-	service2 "github.com/vertex-center/vertex/core/service"
+	service "github.com/vertex-center/vertex/core/service"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/handler"
@@ -52,12 +52,12 @@ var (
 	sshKernelApiAdapter port.SshAdapter
 	baselinesApiAdapter port.BaselinesAdapter
 
-	appsService          *service2.AppsService
-	notificationsService service2.NotificationsService
-	settingsService      *service2.SettingsService
-	hardwareService      *service2.HardwareService
-	sshService           *service2.SshService
-	updateService        *service2.UpdateService
+	appsService          port.AppsService
+	notificationsService service.NotificationsService
+	hardwareService      port.HardwareService
+	settingsService      port.SettingsService
+	sshService           port.SshService
+	updateService        port.UpdateService
 )
 
 func main() {
@@ -177,12 +177,12 @@ func initAdapters() {
 func initServices(about types.About) {
 	// Update service must be initialized before all other services, because it
 	// is responsible for downloading dependencies for other services.
-	updateService = service2.NewUpdateService(ctx, baselinesApiAdapter, []types.Updater{
+	updateService = service.NewUpdateService(ctx, baselinesApiAdapter, []types.Updater{
 		updates.NewVertexUpdater(about),
 		updates.NewVertexClientUpdater(path.Join(storage.Path, "client")),
 		updates.NewRepositoryUpdater("vertex_services", path.Join(storage.Path, "services"), "vertex-center", "vertex-services"),
 	})
-	appsService = service2.NewAppsService(ctx, r,
+	appsService = service.NewAppsService(ctx, r,
 		[]app.Interface{
 			sql.NewApp(),
 			tunnels.NewApp(),
@@ -191,11 +191,11 @@ func initServices(about types.About) {
 			reverseproxy.NewApp(),
 		},
 	)
-	notificationsService = service2.NewNotificationsService(ctx, settingsFSAdapter)
-	settingsService = service2.NewSettingsService(settingsFSAdapter)
+	notificationsService = service.NewNotificationsService(ctx, settingsFSAdapter)
+	settingsService = service.NewSettingsService(settingsFSAdapter)
 	//services.NewSetupService(r.ctx)
-	hardwareService = service2.NewHardwareService()
-	sshService = service2.NewSshService(sshKernelApiAdapter)
+	hardwareService = service.NewHardwareService()
+	sshService = service.NewSshService(sshKernelApiAdapter)
 }
 
 func initRoutes(about types.About) {

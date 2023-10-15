@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	adapter2 "github.com/vertex-center/vertex/adapter"
 	"github.com/vertex-center/vertex/core/port"
-	service2 "github.com/vertex-center/vertex/core/service"
+	service "github.com/vertex-center/vertex/core/service"
 	"github.com/vertex-center/vertex/handler"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -30,8 +30,8 @@ var (
 	dockerCliAdapter port.DockerAdapter
 	sshAdapter       port.SshAdapter
 
-	dockerKernelService service2.DockerKernelService
-	sshKernelService    service2.SshKernelService
+	dockerService port.DockerService
+	sshService    port.SshService
 )
 
 func main() {
@@ -174,14 +174,14 @@ func initAdapters() {
 }
 
 func initServices() {
-	dockerKernelService = service2.NewDockerKernelService(dockerCliAdapter)
-	sshKernelService = service2.NewSshKernelService(sshAdapter)
+	dockerService = service.NewDockerKernelService(dockerCliAdapter)
+	sshService = service.NewSshKernelService(sshAdapter)
 }
 
 func initRoutes() {
 	api := r.Group("/api")
 
-	dockerHandler := handler.NewDockerKernelHandler(&dockerKernelService)
+	dockerHandler := handler.NewDockerKernelHandler(dockerService)
 	docker := api.Group("/docker")
 	docker.GET("/containers", dockerHandler.GetContainers)
 	docker.POST("/container", dockerHandler.CreateContainer)
@@ -196,7 +196,7 @@ func initRoutes() {
 	docker.POST("/image/pull", dockerHandler.PullImage)
 	docker.POST("/image/build", dockerHandler.BuildImage)
 
-	sshHandler := handler.NewSshKernelHandler(&sshKernelService)
+	sshHandler := handler.NewSshKernelHandler(sshService)
 	ssh := api.Group("/security/ssh")
 	ssh.GET("", sshHandler.Get)
 	ssh.POST("", sshHandler.Add)

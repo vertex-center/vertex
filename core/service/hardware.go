@@ -1,20 +1,20 @@
 package service
 
 import (
-	"github.com/vertex-center/vertex/core/types"
-	"runtime"
-
 	"github.com/shirou/gopsutil/v3/host"
+	"github.com/vertex-center/vertex/core/port"
+	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/vdocker"
+	"runtime"
 )
 
 type HardwareService struct{}
 
-func NewHardwareService() *HardwareService {
+func NewHardwareService() port.HardwareService {
 	return &HardwareService{}
 }
 
-func (s HardwareService) GetHardware() types.Hardware {
+func (s HardwareService) Get() types.Hardware {
 	stats, err := host.Info()
 	if err != nil {
 		// fallback to runtime.GOOS and runtime.GOARCH

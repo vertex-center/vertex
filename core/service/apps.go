@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/log"
@@ -18,7 +19,7 @@ type AppsService struct {
 	router   *router.Router
 }
 
-func NewAppsService(ctx *types.VertexContext, router *router.Router, apps []app.Interface) *AppsService {
+func NewAppsService(ctx *types.VertexContext, router *router.Router, apps []app.Interface) port.AppsService {
 	s := &AppsService{
 		uuid:     uuid.New(),
 		ctx:      ctx,

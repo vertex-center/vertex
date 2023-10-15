@@ -14,8 +14,8 @@ type DockerKernelService struct {
 	dockerAdapter port.DockerAdapter
 }
 
-func NewDockerKernelService(dockerAdapter port.DockerAdapter) DockerKernelService {
-	return DockerKernelService{
+func NewDockerKernelService(dockerAdapter port.DockerAdapter) port.DockerService {
+	return &DockerKernelService{
 		dockerAdapter: dockerAdapter,
 	}
 }

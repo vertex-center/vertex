@@ -52,7 +52,7 @@ func (suite *UpdateServiceTestSuite) SetupTest() {
 	suite.adapter.On("GetLatest", context.Background(), types2.SettingsUpdatesChannelStable).Return(suite.latestBaseline, nil)
 	suite.adapter.On("GetLatest", context.Background(), types2.SettingsUpdatesChannelBeta).Return(suite.betaBaseline, nil)
 
-	suite.service = NewUpdateService(types2.NewVertexContext(), suite.adapter, updaters)
+	suite.service = NewUpdateService(types2.NewVertexContext(), suite.adapter, updaters).(*UpdateService)
 }
 
 func (suite *UpdateServiceTestSuite) TestGetUpdate() {

@@ -12,10 +12,10 @@ import (
 )
 
 type SshHandler struct {
-	sshService *service.SshService
+	sshService port.SshService
 }
 
-func NewSshHandler(sshService *service.SshService) port.SshHandler {
+func NewSshHandler(sshService port.SshService) port.SshHandler {
 	return &SshHandler{
 		sshService: sshService,
 	}

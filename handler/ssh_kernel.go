@@ -13,17 +13,17 @@ import (
 )
 
 type SshKernelHandler struct {
-	sshKernelService *service.SshKernelService
+	sshService port.SshService
 }
 
-func NewSshKernelHandler(sshKernelService *service.SshKernelService) port.SshKernelHandler {
+func NewSshKernelHandler(sshKernelService port.SshService) port.SshKernelHandler {
 	return &SshKernelHandler{
-		sshKernelService: sshKernelService,
+		sshService: sshKernelService,
 	}
 }
 
 func (h *SshKernelHandler) Get(c *router.Context) {
-	keys, err := h.sshKernelService.GetAll()
+	keys, err := h.sshService.GetAll()
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToGetSSHKeys,
@@ -49,7 +49,7 @@ func (h *SshKernelHandler) Add(c *router.Context) {
 	}
 	key := buf.String()
 
-	err = h.sshKernelService.Add(key)
+	err = h.sshService.Add(key)
 	if err != nil && errors.Is(err, service.ErrInvalidPublicKey) {
 		c.BadRequest(router.Error{
 			Code:           api.ErrInvalidPublicKey,
@@ -80,7 +80,7 @@ func (h *SshKernelHandler) Delete(c *router.Context) {
 		return
 	}
 
-	err := h.sshKernelService.Delete(fingerprint)
+	err := h.sshService.Delete(fingerprint)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToDeleteSSHKey,

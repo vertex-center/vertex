@@ -9,7 +9,7 @@ type SshService struct {
 	adapter port.SshAdapter
 }
 
-func NewSshService(sshAdapter port.SshAdapter) *SshService {
+func NewSshService(sshAdapter port.SshAdapter) port.SshService {
 	return &SshService{
 		adapter: sshAdapter,
 	}

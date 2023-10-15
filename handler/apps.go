@@ -2,15 +2,14 @@ package handler
 
 import (
 	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/core/service"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
 type AppsHandler struct {
-	appsService *service.AppsService
+	appsService port.AppsService
 }
 
-func NewAppsHandler(appsService *service.AppsService) port.AppsHandler {
+func NewAppsHandler(appsService port.AppsService) port.AppsHandler {
 	return &AppsHandler{
 		appsService: appsService,
 	}

@@ -9,7 +9,7 @@ type SettingsService struct {
 	settingsAdapter port.SettingsAdapter
 }
 
-func NewSettingsService(settingsAdapter port.SettingsAdapter) *SettingsService {
+func NewSettingsService(settingsAdapter port.SettingsAdapter) port.SettingsService {
 	return &SettingsService{
 		settingsAdapter: settingsAdapter,
 	}
@@ -23,7 +23,7 @@ func (s *SettingsService) Update(settings types.Settings) error {
 	if settings.Notifications != nil {
 		notifs := settings.Notifications
 		if notifs.Webhook != nil {
-			err := s.settingsAdapter.SetNotificationsWebhook(notifs.Webhook)
+			err := s.settingsAdapter.SetNotificationsWebhook(*notifs.Webhook)
 			if err != nil {
 				return err
 			}
@@ -33,7 +33,7 @@ func (s *SettingsService) Update(settings types.Settings) error {
 	if settings.Updates != nil {
 		updates := settings.Updates
 		if updates.Channel != nil {
-			err := s.settingsAdapter.SetChannel(updates.Channel)
+			err := s.settingsAdapter.SetChannel(*updates.Channel)
 			if err != nil {
 				return err
 			}
@@ -47,7 +47,7 @@ func (s *SettingsService) GetNotificationsWebhook() *string {
 	return s.settingsAdapter.GetNotificationsWebhook()
 }
 
-func (s *SettingsService) SetNotificationsWebhook(webhook *string) error {
+func (s *SettingsService) SetNotificationsWebhook(webhook string) error {
 	return s.settingsAdapter.SetNotificationsWebhook(webhook)
 }
 
@@ -59,6 +59,6 @@ func (s *SettingsService) GetChannel() types.SettingsUpdatesChannel {
 	return *channel
 }
 
-func (s *SettingsService) SetChannel(channel *types.SettingsUpdatesChannel) error {
+func (s *SettingsService) SetChannel(channel types.SettingsUpdatesChannel) error {
 	return s.settingsAdapter.SetChannel(channel)
 }

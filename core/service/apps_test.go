@@ -25,7 +25,7 @@ func (suite *AppsServiceTestSuite) SetupTest() {
 	suite.app = &MockApp{}
 	suite.service = NewAppsService(ctx, router.New(), []app.Interface{
 		suite.app,
-	})
+	}).(*AppsService)
 }
 
 func (suite *AppsServiceTestSuite) TestStartApps() {
