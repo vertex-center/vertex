@@ -37,5 +37,5 @@ func handlePatchSettings(c *router.Context) {
 		return
 	}
 
-	c.JSON(settings)
+	c.OK()
 }
