@@ -27,7 +27,6 @@ var (
 	containerRunnerService   port.ContainerRunnerService
 	containerServiceService  port.ContainerServiceService
 	containerSettingsService port.ContainerSettingsService
-	metricsService           port.MetricsService
 	serviceService           port.ServiceService
 )
 
@@ -62,8 +61,8 @@ func (a *App) Initialize(app *apptypes.App) error {
 		ContainerEnvService:      containerEnvService,
 		ContainerSettingsService: containerSettingsService,
 	})
-	metricsService = service.NewMetricsService(app.Context())
 	serviceService = service.NewServiceService()
+	service.NewMetricsService(app.Context())
 
 	app.Register(apptypes.Meta{
 		ID:          "vx-containers",
