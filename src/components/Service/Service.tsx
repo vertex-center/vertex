@@ -4,6 +4,11 @@ import styles from "./Service.module.sass";
 import { Caption } from "../Text/Text";
 import Progress from "../Progress";
 import ServiceLogo from "../ServiceLogo/ServiceLogo";
+import ListItem from "../List/ListItem";
+import ListIcon from "../List/ListIcon";
+import ListInfo from "../List/ListInfo";
+import ListTitle from "../List/ListTitle";
+import ListActions from "../List/ListActions";
 
 type Props = {
     service: ServiceModel;
@@ -23,18 +28,22 @@ export default function Service(props: Readonly<Props>) {
     }
 
     return (
-        <div className={styles.service} onClick={onInstall}>
-            <div className={styles.logo}>
+        <ListItem onClick={onInstall}>
+            <ListIcon>
                 <ServiceLogo service={service} />
-            </div>
-            <div className={styles.info}>
-                <div>{service?.name}</div>
+            </ListIcon>
+            <ListInfo>
+                <ListTitle>{service?.name}</ListTitle>
                 <Caption>{service?.description}</Caption>
-            </div>
-            {installedCountText && (
-                <Caption className={styles.count}>{installedCountText}</Caption>
-            )}
-            {downloading && <Progress infinite />}
-        </div>
+            </ListInfo>
+            <ListActions>
+                {installedCountText && (
+                    <Caption className={styles.count}>
+                        {installedCountText}
+                    </Caption>
+                )}
+                {downloading && <Progress infinite />}
+            </ListActions>
+        </ListItem>
     );
 }

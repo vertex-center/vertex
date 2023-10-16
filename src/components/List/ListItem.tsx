@@ -5,6 +5,17 @@ import { HTMLProps } from "react";
 export type ListItemProps = HTMLProps<HTMLDivElement>;
 
 export default function ListItem(props: Readonly<ListItemProps>) {
-    const { className, ...others } = props;
-    return <div className={classNames(styles.item, className)} {...others} />;
+    const { className, onClick, ...others } = props;
+
+    return (
+        <div
+            className={classNames({
+                [styles.item]: true,
+                [styles.itemClickable]: !!onClick,
+                [className]: true,
+            })}
+            onClick={onClick}
+            {...others}
+        />
+    );
 }
