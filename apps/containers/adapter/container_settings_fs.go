@@ -2,11 +2,12 @@ package adapter
 
 import (
 	"errors"
+	"github.com/vertex-center/vertex/apps/containers/core/port"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"os"
 	"path"
 
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/apps/containers/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"gopkg.in/yaml.v3"
@@ -22,7 +23,7 @@ type ContainerSettingsFSAdapterParams struct {
 	containersPath string
 }
 
-func NewContainerSettingsFSAdapter(params *ContainerSettingsFSAdapterParams) types.ContainerSettingsAdapterPort {
+func NewContainerSettingsFSAdapter(params *ContainerSettingsFSAdapterParams) port.ContainerSettingsAdapter {
 	if params == nil {
 		params = &ContainerSettingsFSAdapterParams{}
 	}

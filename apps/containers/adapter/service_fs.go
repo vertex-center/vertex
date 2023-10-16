@@ -3,10 +3,11 @@ package adapter
 import (
 	"errors"
 	"fmt"
+	"github.com/vertex-center/vertex/apps/containers/core/port"
+	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"os"
 	"path"
 
-	containerstypes "github.com/vertex-center/vertex/apps/containers/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"gopkg.in/yaml.v3"
@@ -21,7 +22,7 @@ type ServiceFSAdapterParams struct {
 	servicesPath string
 }
 
-func NewServiceFSAdapter(params *ServiceFSAdapterParams) containerstypes.ServiceAdapterPort {
+func NewServiceFSAdapter(params *ServiceFSAdapterParams) port.ServiceAdapter {
 	if params == nil {
 		params = &ServiceFSAdapterParams{}
 	}

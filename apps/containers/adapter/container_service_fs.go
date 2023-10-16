@@ -1,11 +1,12 @@
 package adapter
 
 import (
+	"github.com/vertex-center/vertex/apps/containers/core/port"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"os"
 	"path"
 
 	"github.com/google/uuid"
-	containerstypes "github.com/vertex-center/vertex/apps/containers/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"
@@ -24,7 +25,7 @@ type ContainerServiceFSAdapterParams struct {
 	containersPath string
 }
 
-func NewContainerServiceFSAdapter(params *ContainerServiceFSAdapterParams) containerstypes.ContainerServiceAdapterPort {
+func NewContainerServiceFSAdapter(params *ContainerServiceFSAdapterParams) port.ContainerServiceAdapter {
 	if params == nil {
 		params = &ContainerServiceFSAdapterParams{}
 	}
@@ -39,7 +40,7 @@ func NewContainerServiceFSAdapter(params *ContainerServiceFSAdapterParams) conta
 	return adapter
 }
 
-func (a *ContainerServiceFSAdapter) Save(uuid uuid.UUID, service containerstypes.Service) error {
+func (a *ContainerServiceFSAdapter) Save(uuid uuid.UUID, service types.Service) error {
 	servicePath := path.Join(a.containersPath, uuid.String(), ContainerServicePath)
 
 	err := os.MkdirAll(path.Join(a.containersPath, uuid.String(), ".vertex"), os.ModePerm)
@@ -60,16 +61,16 @@ func (a *ContainerServiceFSAdapter) Save(uuid uuid.UUID, service containerstypes
 	return nil
 }
 
-func (a *ContainerServiceFSAdapter) Load(uuid uuid.UUID) (containerstypes.Service, error) {
+func (a *ContainerServiceFSAdapter) Load(uuid uuid.UUID) (types.Service, error) {
 	servicePath := path.Join(a.containersPath, uuid.String(), ContainerServicePath)
 
 	data, err := os.ReadFile(servicePath)
 	if err != nil {
 		log.Warn("file not found", vlog.String("path", servicePath))
-		return containerstypes.Service{}, err
+		return types.Service{}, err
 	}
 
-	var service containerstypes.Service
+	var service types.Service
 	err = yaml.Unmarshal(data, &service)
 	return service, err
 }

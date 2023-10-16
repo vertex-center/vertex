@@ -2,17 +2,17 @@ package adapter
 
 import (
 	"context"
-
 	"github.com/carlmjohnson/requests"
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/types"
+	"github.com/vertex-center/vertex/core/port"
+	"github.com/vertex-center/vertex/core/types"
 )
 
 type SshKernelApiAdapter struct {
 	config requests.Config
 }
 
-func NewSshKernelApiAdapter() types.SshAdapterPort {
+func NewSshKernelApiAdapter() port.SshAdapter {
 	return &SshKernelApiAdapter{
 		config: func(rb *requests.Builder) {
 			rb.BaseURL(config.Current.KernelURL())

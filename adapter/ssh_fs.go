@@ -2,12 +2,13 @@ package adapter
 
 import (
 	"errors"
+	"github.com/vertex-center/vertex/core/port"
+	"github.com/vertex-center/vertex/core/types"
 	"os"
 	"path"
 	"strings"
 
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/types"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -19,7 +20,7 @@ type SshFsAdapterParams struct {
 	AuthorizedKeysPath string
 }
 
-func NewSshFsAdapter(params *SshFsAdapterParams) types.SshAdapterPort {
+func NewSshFsAdapter(params *SshFsAdapterParams) port.SshAdapter {
 	s := &SshFsAdapter{}
 
 	if params == nil {

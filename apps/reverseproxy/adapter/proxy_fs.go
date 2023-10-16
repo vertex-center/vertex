@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
+	"github.com/vertex-center/vertex/apps/reverseproxy/core/types"
 	"os"
 	"path"
 	"sync"
 
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/apps/reverseproxy/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"
@@ -32,7 +33,7 @@ type ProxyFSAdapterParams struct {
 	proxyPath string
 }
 
-func NewProxyFSAdapter(params *ProxyFSAdapterParams) types.ProxyAdapterPort {
+func NewProxyFSAdapter(params *ProxyFSAdapterParams) port.ProxyAdapter {
 	if params == nil {
 		params = &ProxyFSAdapterParams{}
 	}

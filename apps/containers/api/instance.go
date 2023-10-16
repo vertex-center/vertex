@@ -2,17 +2,16 @@ package containersapi
 
 import (
 	"context"
-
 	"github.com/docker/docker/api/types/container"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers"
-	"github.com/vertex-center/vertex/apps/containers/types"
+	types2 "github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/types/api"
 )
 
-func GetContainer(ctx context.Context, uuid uuid.UUID) (*types.Container, *api.Error) {
-	var inst types.Container
+func GetContainer(ctx context.Context, uuid uuid.UUID) (*types2.Container, *api.Error) {
+	var inst types2.Container
 	var apiError api.Error
 	err := api.AppRequest(containers.AppRoute).
 		Pathf("./container/%s", uuid).
@@ -32,7 +31,7 @@ func DeleteContainer(ctx context.Context, uuid uuid.UUID) *api.Error {
 	return api.HandleError(err, apiError)
 }
 
-func PatchContainer(ctx context.Context, uuid uuid.UUID, settings types.ContainerSettings) *api.Error {
+func PatchContainer(ctx context.Context, uuid uuid.UUID, settings types2.ContainerSettings) *api.Error {
 	var apiError api.Error
 	err := api.AppRequest(containers.AppRoute).
 		Pathf("./container/%s", uuid).
@@ -142,7 +141,7 @@ func GetContainerUUIDParam(c *router.Context) (uuid.UUID, *api.Error) {
 	p := c.Param("container_uuid")
 	if p == "" {
 		return uuid.UUID{}, &api.Error{
-			Code:    types.ErrCodeContainerUuidMissing,
+			Code:    types2.ErrCodeContainerUuidMissing,
 			Message: "The request was missing the container UUID.",
 		}
 	}
@@ -150,7 +149,7 @@ func GetContainerUUIDParam(c *router.Context) (uuid.UUID, *api.Error) {
 	uid, err := uuid.Parse(p)
 	if err != nil {
 		return uuid.UUID{}, &api.Error{
-			Code:    types.ErrCodeContainerUuidInvalid,
+			Code:    types2.ErrCodeContainerUuidInvalid,
 			Message: "The container UUID is invalid.",
 		}
 	}

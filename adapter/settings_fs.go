@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/vertex-center/vertex/core/port"
+	"github.com/vertex-center/vertex/core/types"
 	"io/fs"
 	"os"
 	"path"
 
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
-	"github.com/vertex-center/vertex/types"
 	"github.com/vertex-center/vlog"
 )
 
@@ -29,7 +30,7 @@ type SettingsFSAdapterParams struct {
 	settingsDir string
 }
 
-func NewSettingsFSAdapter(params *SettingsFSAdapterParams) types.SettingsAdapterPort {
+func NewSettingsFSAdapter(params *SettingsFSAdapterParams) port.SettingsAdapter {
 	if params == nil {
 		params = &SettingsFSAdapterParams{}
 	}
@@ -69,11 +70,11 @@ func (a *SettingsFSAdapter) GetNotificationsWebhook() *string {
 	return a.settings.Notifications.Webhook
 }
 
-func (a *SettingsFSAdapter) SetNotificationsWebhook(webhook *string) error {
+func (a *SettingsFSAdapter) SetNotificationsWebhook(webhook string) error {
 	if a.settings.Notifications == nil {
 		a.settings.Notifications = &types.SettingsNotifications{}
 	}
-	a.settings.Notifications.Webhook = webhook
+	a.settings.Notifications.Webhook = &webhook
 	return a.write()
 }
 
@@ -84,11 +85,11 @@ func (a *SettingsFSAdapter) GetChannel() *types.SettingsUpdatesChannel {
 	return a.settings.Updates.Channel
 }
 
-func (a *SettingsFSAdapter) SetChannel(channel *types.SettingsUpdatesChannel) error {
+func (a *SettingsFSAdapter) SetChannel(channel types.SettingsUpdatesChannel) error {
 	if a.settings.Updates == nil {
 		a.settings.Updates = &types.SettingsUpdates{}
 	}
-	a.settings.Updates.Channel = channel
+	a.settings.Updates.Channel = &channel
 	return a.write()
 }
 

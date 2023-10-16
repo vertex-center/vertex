@@ -1,12 +1,12 @@
 package adapter
 
 import (
+	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"os"
 	"testing"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
-	containerstypes "github.com/vertex-center/vertex/apps/containers/types"
 )
 
 type ContainerLoggerTestSuite struct {

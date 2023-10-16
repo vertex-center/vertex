@@ -2,11 +2,10 @@ package containersapi
 
 import (
 	"context"
-
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers"
-	"github.com/vertex-center/vertex/apps/containers/types"
-	"github.com/vertex-center/vertex/types/api"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/core/types/api"
 )
 
 func GetContainers(ctx context.Context) (map[uuid.UUID]*types.Container, *api.Error) {

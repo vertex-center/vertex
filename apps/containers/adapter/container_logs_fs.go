@@ -3,6 +3,8 @@ package adapter
 import (
 	"errors"
 	"fmt"
+	"github.com/vertex-center/vertex/apps/containers/core/port"
+	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"os"
 	"path"
 	"sync"
@@ -10,7 +12,6 @@ import (
 
 	"github.com/go-co-op/gocron"
 	"github.com/google/uuid"
-	containerstypes "github.com/vertex-center/vertex/apps/containers/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"
@@ -44,7 +45,7 @@ type ContainerLogsFSAdapterParams struct {
 	ContainersPath string
 }
 
-func NewContainerLogsFSAdapter(params *ContainerLogsFSAdapterParams) containerstypes.ContainerLogsAdapterPort {
+func NewContainerLogsFSAdapter(params *ContainerLogsFSAdapterParams) port.ContainerLogsAdapter {
 	if params == nil {
 		params = &ContainerLogsFSAdapterParams{}
 	}
