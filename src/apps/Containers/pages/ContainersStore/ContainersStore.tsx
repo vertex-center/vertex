@@ -103,7 +103,7 @@ export default function ContainersStore() {
                             disabled
                         />
                         <Spacer />
-                        <Button to="/app/vx-containers/add" rightIcon="add">
+                        <Button to="/app/vx-containers/create" rightIcon="add">
                             Create manually
                         </Button>
                     </Toolbar>

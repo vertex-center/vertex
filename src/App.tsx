@@ -34,6 +34,7 @@ import SqlInstaller from "./apps/Sql/Installer/SqlInstaller";
 import SqlDatabase from "./apps/Sql/SqlDatabase/SqlDatabase";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import ContainersCreate from "./apps/Containers/pages/ContainersCreate/ContainersCreate";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,10 @@ function App() {
                             <Route
                                 path="/app/vx-containers/add"
                                 element={<ContainersStore />}
+                            />
+                            <Route
+                                path="/app/vx-containers/create"
+                                element={<ContainersCreate />}
                             />
                             <Route path="/app/vx-sql" element={<SqlApp />}>
                                 <Route
