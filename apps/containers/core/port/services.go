@@ -61,6 +61,8 @@ type (
 		SetTags(inst *types.Container, tags []string) error
 	}
 
+	MetricsService interface{}
+
 	ServiceService interface {
 		GetAll() []types.Service
 		GetById(id string) (types.Service, error)
