@@ -85,7 +85,8 @@ type Props = HTMLProps<HTMLDivElement> & {
 };
 
 export default function Select(props: Readonly<Props>) {
-    const { className, value, label, children, disabled, ...others } = props;
+    const { className, value, label, children, disabled, required, ...others } =
+        props;
 
     const [opened, setOpened] = useState(false);
 
@@ -108,7 +109,15 @@ export default function Select(props: Readonly<Props>) {
 
     return (
         <div className={styles.select}>
-            {label && <label className={styles.label}>{label}</label>}
+            {label && (
+                <label className={styles.label}>
+                    {label}
+                    {required && <span className={styles.required}>*</span>}
+                    {!required && (
+                        <span className={styles.optional}>(optional)</span>
+                    )}
+                </label>
+            )}
             <div
                 className={classNames({
                     [styles.input]: true,

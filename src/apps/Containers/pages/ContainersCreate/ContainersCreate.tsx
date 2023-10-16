@@ -6,39 +6,272 @@ import NoItems from "../../../../components/NoItems/NoItems";
 import Button from "../../../../components/Button/Button";
 import classNames from "classnames";
 import Spacer from "../../../../components/Spacer/Spacer";
+import {
+    Controller,
+    SubmitHandler,
+    useFieldArray,
+    useForm,
+} from "react-hook-form";
+import * as yup from "yup";
+import { object } from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import List from "../../../../components/List/List";
+import ListItem from "../../../../components/List/ListItem";
+import Select, {
+    SelectOption,
+    SelectValue,
+} from "../../../../components/Input/Select";
+import { Fragment } from "react";
 
-type Props = {};
+function EnvironmentInputs({ control, register, errors, i }) {
+    return (
+        <Fragment>
+            <Controller
+                render={({ field }) => {
+                    const value = (
+                        <SelectValue>
+                            {
+                                environmentTypes.find(
+                                    (e) => e.value === field.value
+                                )?.label
+                            }
+                        </SelectValue>
+                    );
+                    return (
+                        <Select
+                            label="Type"
+                            {...register(`environment.${i}.type`)}
+                            // @ts-ignore
+                            value={value}
+                            onChange={field.onChange}
+                            required
+                        >
+                            {environmentTypes.map((e) => (
+                                <SelectOption key={e.value} value={e.value}>
+                                    {e.label}
+                                </SelectOption>
+                            ))}
+                        </Select>
+                    );
+                }}
+                name={`environment.${i}.type`}
+                control={control}
+            />
+            <Input
+                label="Name"
+                {...register(`environment.${i}.name`)}
+                aria-invalid={errors?.name ? "true" : "false"}
+                error={errors?.name?.message}
+                required
+            />
+            <Input
+                label="Display name"
+                {...register(`environment.${i}.display_name`)}
+                aria-invalid={errors?.display_name ? "true" : "false"}
+                error={errors?.display_name?.message}
+                required
+            />
+            <Input
+                label="Default value"
+                {...register(`environment.${i}.default`)}
+                aria-invalid={errors?.default ? "true" : "false"}
+                error={errors?.default?.message}
+            />
+            <Input
+                label="Description"
+                {...register(`environment.${i}.description`)}
+                aria-invalid={errors?.description ? "true" : "false"}
+                error={errors?.description?.message}
+            />
+        </Fragment>
+    );
+}
 
-export default function ContainersCreate(props: Readonly<Props>) {
+const environmentTypes = [
+    { value: "string", label: "String" },
+    { value: "port", label: "Port" },
+    { value: "timezone", label: "Timezone" },
+    { value: "url", label: "URL" },
+];
+
+const schema = object({
+    id: yup
+        .string()
+        .label("Service ID")
+        .required()
+        .matches(
+            /^[a-z0-9-]+$/,
+            "Can only have lowercase letters, numbers and dashes."
+        ),
+    name: yup.string().label("Service name").required(),
+    repository: yup.string().label("Repository").url(),
+    description: yup.string().label("Description").required().max(100),
+    color: yup
+        .string()
+        .label("Color")
+        .matches(/^#[0-9a-f]{6}$/i, {
+            message: "Must be a valid hex color.",
+            excludeEmptyString: true,
+        }),
+
+    environment: yup.array().of(
+        yup.object().shape({
+            type: yup
+                .string()
+                .label("Type")
+                .oneOf(environmentTypes.map((e) => e.value))
+                .required(),
+            name: yup
+                .string()
+                .label("Name")
+                .matches(
+                    /^[A-Z0-9_]+$/,
+                    "Can only have uppercase letters, numbers and underscores."
+                )
+                .required(),
+            display_name: yup.string().label("Display name").required(),
+            default: yup.string().label("Default value"),
+            description: yup.string().label("Description").max(100),
+        })
+    ),
+});
+
+type FormData = yup.InferType<typeof schema>;
+
+export default function ContainersCreate() {
+    const resolver = yupResolver(schema);
+    const {
+        control,
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<FormData>({ resolver });
+    const onSubmit: SubmitHandler<FormData> = (data) => console.log(data);
+
+    const {
+        fields: environment,
+        append: appendEnvironment,
+        remove: removeEnvironment,
+    } = useFieldArray({
+        control,
+        name: "environment",
+    });
+
     return (
         <Vertical gap={30}>
             <BigTitle className={styles.bigTitle}>Create container</BigTitle>
-            <Vertical gap={25}>
+
+            <Vertical gap={25} className={styles.content}>
                 <Title className={styles.title}>Info</Title>
-                <div className={classNames(styles.content, styles.inputs)}>
-                    <Input label="Service ID" />
-                    <Input label="Service name" />
-                    <Input label="Repository" />
-                    <Input label="Description" />
-                    <Input label="Color" />
+                <div className={classNames(styles.inputs)}>
+                    <Input
+                        label="Service ID"
+                        {...register("id", { required: true })}
+                        aria-invalid={errors.id ? "true" : "false"}
+                        error={errors.id?.message}
+                        placeholder="my-service"
+                        description="Lowercase identifier for the service."
+                        required
+                    />
+                    <Input
+                        label="Service name"
+                        {...register("name")}
+                        aria-invalid={errors.name ? "true" : "false"}
+                        error={errors.name?.message}
+                        placeholder="My service"
+                        description="Human-readable name for the service."
+                        required
+                    />
+                    <Input
+                        label="Repository"
+                        type="url"
+                        {...register("repository")}
+                        aria-invalid={errors.repository ? "true" : "false"}
+                        error={errors.repository?.message}
+                        placeholder="https://github.com/username/repo"
+                        description="URL of the repository."
+                    />
+                    <Input
+                        label="Description"
+                        {...register("description")}
+                        aria-invalid={errors.description ? "true" : "false"}
+                        error={errors.description?.message}
+                        placeholder="A simple database watcher."
+                        description="Short description of the service."
+                        required
+                    />
+                    <Input
+                        label="Color"
+                        {...register("color")}
+                        aria-invalid={errors.color ? "true" : "false"}
+                        error={errors.color?.message}
+                        placeholder="#d73d3d"
+                        description="Color of the service used in the UI."
+                    />
                 </div>
             </Vertical>
 
-            <Vertical gap={10}>
+            <Vertical className={styles.content} gap={10}>
                 <Horizontal className={styles.title} alignItems="center">
                     <Title>Environment</Title>
                     <Spacer />
-                    <Button primary rightIcon="add">
+                    <Button
+                        primary
+                        rightIcon="add"
+                        onClick={() =>
+                            appendEnvironment({
+                                type: "string",
+                            })
+                        }
+                    >
                         Add ENV variable
                     </Button>
                 </Horizontal>
-                <Vertical className={styles.content} gap={10}>
-                    <NoItems icon="list" text="No environment variables" />
-                    <div></div>
+                <Vertical gap={10}>
+                    {environment.length === 0 && (
+                        <NoItems icon="list" text="No environment variables" />
+                    )}
+                    <List>
+                        {environment.map((field, i) => {
+                            return (
+                                <ListItem key={field.id}>
+                                    <Vertical
+                                        alignItems="stretch"
+                                        style={{ width: "100%" }}
+                                        gap={5}
+                                    >
+                                        <Horizontal>
+                                            <Title className={styles.title}>
+                                                Environment variable #{i + 1}
+                                            </Title>
+                                            <Spacer />
+                                            <Button
+                                                rightIcon="delete"
+                                                onClick={() =>
+                                                    removeEnvironment(i)
+                                                }
+                                            >
+                                                Remove
+                                            </Button>
+                                        </Horizontal>
+                                        <div className={styles.inputs}>
+                                            <EnvironmentInputs
+                                                key={field.id}
+                                                control={control}
+                                                register={register}
+                                                i={i}
+                                                errors={errors.environment?.[i]}
+                                            />
+                                        </div>
+                                    </Vertical>
+                                </ListItem>
+                            );
+                        })}
+                    </List>
                 </Vertical>
             </Vertical>
 
-            <Vertical gap={10}>
+            <Vertical className={styles.content} gap={10}>
                 <Horizontal className={styles.title} alignItems="center">
                     <Title>URLs</Title>
                     <Spacer />
@@ -46,18 +279,15 @@ export default function ContainersCreate(props: Readonly<Props>) {
                         Add URL
                     </Button>
                 </Horizontal>
-                <Vertical className={styles.content} gap={10}>
+                <Vertical gap={10}>
                     <NoItems icon="public" text="No URLs." />
                 </Vertical>
             </Vertical>
 
-            <Vertical gap={25}>
+            <Vertical className={styles.content} gap={25}>
                 <Title className={styles.title}>Docker installation</Title>
-                <Vertical
-                    className={classNames(styles.content, styles.inputs)}
-                    gap={15}
-                >
-                    <Input label="Docker image" required />
+                <Vertical className={classNames(styles.inputs)} gap={15}>
+                    <Input label="Docker image" />
                     <Input label="Command" />
                     <Input label="Ports" />
                     <Input label="Volumes" />
@@ -65,6 +295,17 @@ export default function ContainersCreate(props: Readonly<Props>) {
                     <Input label="Capabilities" />
                     <Input label="Sysctls" />
                 </Vertical>
+
+                <Horizontal>
+                    <Spacer />
+                    <Button
+                        primary
+                        rightIcon="send"
+                        onClick={handleSubmit(onSubmit)}
+                    >
+                        Validate
+                    </Button>
+                </Horizontal>
             </Vertical>
         </Vertical>
     );

@@ -33,18 +33,30 @@
         cursor: not-allowed
 
 .label
+    display: flex
     opacity: 0.7
     margin-left: 20px
+    gap: 5px
 
-.description
+.required
+    color: colors.$red
+
+.optional
+    color: colors.$fg-tertiary
+
+.description, .error
     margin-left: 20px
-    opacity: 0.5
+    color: colors.$fg-tertiary
     font-size: 14px
+
+.error
+    opacity: 1
+    color: colors.$red
 
 .select
     display: flex
     flex-direction: column
-    gap: 6px
+    gap: 10px
     position: relative
     user-select: none
     -webkit-user-select: none

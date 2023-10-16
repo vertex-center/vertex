@@ -8,10 +8,7 @@
         margin: 20px 30px
 
 .title
-    margin: 0 50px
-
-    @include dimensions.extra-small-or-less
-        margin: 0 30px
+    margin: 0 20px
 
 .content
     display: flex
@@ -23,5 +20,12 @@
 
 .inputs
     display: grid
-    grid-template-columns: repeat(2, 1fr)
-    gap: 15px
+    flex-grow: 1
+    grid-template-columns: repeat(3, 1fr)
+    gap: 20px
+
+    @include dimensions.medium-or-less
+        grid-template-columns: repeat(2, 1fr)
+
+    @include dimensions.small-or-less
+        grid-template-columns: 1fr
