@@ -4,51 +4,29 @@ import (
 	"github.com/google/uuid"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
-	metricstypes "github.com/vertex-center/vertex/apps/monitoring/core/types"
+	"github.com/vertex-center/vertex/apps/monitoring/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
-)
-
-const (
-	MetricIDContainerStatus = "vertex_container_status"
-	MetricIDContainersCount = "vertex_containers_count"
+	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vlog"
 )
 
 type MetricsService struct {
 	uuid    uuid.UUID
 	adapter port.MetricsAdapter
-	metrics []metricstypes.Metric
+	metrics []types.Metric
 }
 
 func NewMetricsService(ctx *app.Context, metricsAdapter port.MetricsAdapter) port.MetricsService {
-	metrics := []metricstypes.Metric{
-		{
-			ID:          MetricIDContainerStatus,
-			Name:        "Container Status",
-			Description: "The status of the container",
-			Type:        metricstypes.MetricTypeOnOff,
-			Labels:      []string{"uuid", "service_id"},
-		},
-		{
-			ID:          MetricIDContainersCount,
-			Name:        "Containers Count",
-			Description: "The number of containers installed",
-			Type:        metricstypes.MetricTypeInteger,
-		},
-	}
-
 	s := &MetricsService{
 		uuid:    uuid.New(),
 		adapter: metricsAdapter,
-		metrics: metrics,
+		metrics: []types.Metric{},
 	}
-
-	s.adapter.RegisterMetrics(metrics)
 	ctx.AddListener(s)
-
 	return s
 }
 
-func (s *MetricsService) GetMetrics() []metricstypes.Metric {
+func (s *MetricsService) GetMetrics() []types.Metric {
 	return s.metrics
 }
 
@@ -60,4 +38,23 @@ func (s *MetricsService) ConfigureCollector(inst *containerstypes.Container) err
 func (s *MetricsService) ConfigureVisualizer(inst *containerstypes.Container) error {
 	// TODO: Implement
 	return nil
+}
+
+func (s *MetricsService) GetUUID() uuid.UUID {
+	return s.uuid
+}
+
+func (s *MetricsService) OnEvent(e interface{}) {
+	switch e := e.(type) {
+	case types.EventRegisterMetrics:
+		log.Info("registering metrics", vlog.Int("count", len(e.Metrics)))
+		s.metrics = append(s.metrics, e.Metrics...)
+		s.adapter.RegisterMetrics(e.Metrics)
+	case types.EventSetMetric:
+		s.adapter.Set(e.MetricID, e.Value, e.Labels...)
+	case types.EventIncrementMetric:
+		s.adapter.Inc(e.MetricID, e.Labels...)
+	case types.EventDecrementMetric:
+		s.adapter.Dec(e.MetricID, e.Labels...)
+	}
 }
