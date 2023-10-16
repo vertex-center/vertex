@@ -3,13 +3,17 @@ import { Service as ServiceModel } from "../../../../models/service";
 import { Fragment, useState } from "react";
 import styles from "./ContainersStore.module.sass";
 import Service from "../../../../components/Service/Service";
-import { Horizontal } from "../../../../components/Layouts/Layouts";
+import { Horizontal, Vertical } from "../../../../components/Layouts/Layouts";
 import { api } from "../../../../backend/api/backend";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import ServiceInstallPopup from "../../../../components/ServiceInstallPopup/ServiceInstallPopup";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import List from "../../../../components/List/List";
+import Toolbar from "../../../../components/Toolbar/Toolbar";
+import Spacer from "../../../../components/Spacer/Spacer";
+import Button from "../../../../components/Button/Button";
+import Select, { SelectValue } from "../../../../components/Input/Select";
 
 type Downloading = {
     service: ServiceModel;
@@ -90,27 +94,40 @@ export default function ContainersStore() {
                 >
                     <BigTitle>Create container</BigTitle>
                 </Horizontal>
-                <List className={styles.content}>
+                <Vertical gap={10}>
                     <APIError error={error} />
-                    {services?.map((service) => (
-                        <Service
-                            key={service.id}
-                            service={service}
-                            onInstall={() => openInstallPopup(service)}
-                            downloading={downloading.some(
-                                ({ service: s }) => s.id === service.id
-                            )}
-                            installedCount={
-                                containers === undefined
-                                    ? undefined
-                                    : Object.values(containers)?.filter(
-                                          ({ service: s }) =>
-                                              s.id === service.id
-                                      )?.length
-                            }
+                    <Toolbar className={styles.toolbar}>
+                        <Select
+                            // @ts-ignore
+                            value={<SelectValue>Category</SelectValue>}
+                            disabled
                         />
-                    ))}
-                </List>
+                        <Spacer />
+                        <Button to="/app/vx-containers/add" rightIcon="add">
+                            Create manually
+                        </Button>
+                    </Toolbar>
+                    <List className={styles.content}>
+                        {services?.map((service) => (
+                            <Service
+                                key={service.id}
+                                service={service}
+                                onInstall={() => openInstallPopup(service)}
+                                downloading={downloading.some(
+                                    ({ service: s }) => s.id === service.id
+                                )}
+                                installedCount={
+                                    containers === undefined
+                                        ? undefined
+                                        : Object.values(containers)?.filter(
+                                              ({ service: s }) =>
+                                                  s.id === service.id
+                                          )?.length
+                                }
+                            />
+                        ))}
+                    </List>
+                </Vertical>
             </div>
             <ServiceInstallPopup
                 service={selectedService}
