@@ -12,7 +12,7 @@ type ContainerLogsService struct {
 	adapter port.ContainerLogsAdapter
 }
 
-func NewContainerLogsService(ctx *app.Context, adapter port.ContainerLogsAdapter) *ContainerLogsService {
+func NewContainerLogsService(ctx *app.Context, adapter port.ContainerLogsAdapter) port.ContainerLogsService {
 	s := &ContainerLogsService{
 		uuid:    uuid.New(),
 		adapter: adapter,

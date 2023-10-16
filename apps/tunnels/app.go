@@ -1,8 +1,9 @@
 package tunnels
 
 import (
-	"github.com/vertex-center/vertex/apps/tunnels/router"
+	"github.com/vertex-center/vertex/apps/tunnels/handler"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/pkg/router"
 )
 
 const (
@@ -11,7 +12,6 @@ const (
 
 type App struct {
 	*apptypes.App
-	router *router.AppRouter
 }
 
 func NewApp() *App {
@@ -20,7 +20,6 @@ func NewApp() *App {
 
 func (a *App) Initialize(app *apptypes.App) error {
 	a.App = app
-	a.router = router.NewAppRouter()
 
 	app.Register(apptypes.Meta{
 		ID:          "vx-tunnels",
@@ -28,7 +27,11 @@ func (a *App) Initialize(app *apptypes.App) error {
 		Description: "Create and manage tunnels.",
 		Icon:        "subway",
 	})
-	app.RegisterRouter(AppRoute, a.router)
+
+	app.RegisterRoutes(AppRoute, func(r *router.Group) {
+		providerHandler := handler.NewProviderHandler()
+		r.POST("/provider/:provider/install", providerHandler.Install)
+	})
 
 	return nil
 }

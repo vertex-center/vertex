@@ -2,16 +2,16 @@ package service
 
 import (
 	"errors"
-	types2 "github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/apps/sql/core/port"
-	sqltypes "github.com/vertex-center/vertex/apps/sql/core/types"
-	"github.com/vertex-center/vertex/core/types/app"
 	"strconv"
 	"sync"
 
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
 	sqladapter "github.com/vertex-center/vertex/apps/sql/adapter"
+	"github.com/vertex-center/vertex/apps/sql/core/port"
+	sqltypes "github.com/vertex-center/vertex/apps/sql/core/types"
 	"github.com/vertex-center/vertex/config"
+	"github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 )
@@ -22,7 +22,7 @@ type SqlService struct {
 	dbmsMutex *sync.RWMutex
 }
 
-func New(ctx *app.Context) *SqlService {
+func New(ctx *app.Context) port.SqlService {
 	s := &SqlService{
 		uuid:      uuid.New(),
 		dbms:      map[uuid.UUID]port.DBMSAdapter{},
@@ -32,9 +32,9 @@ func New(ctx *app.Context) *SqlService {
 	return s
 }
 
-func (s *SqlService) getDbFeature(inst *types2.Container) (types2.DatabaseFeature, error) {
+func (s *SqlService) getDbFeature(inst *types.Container) (types.DatabaseFeature, error) {
 	if inst.Service.Features == nil || inst.Service.Features.Databases == nil {
-		return types2.DatabaseFeature{}, errors.New("no databases found")
+		return types.DatabaseFeature{}, errors.New("no databases found")
 	}
 
 	dbFeatures := *inst.Service.Features.Databases
@@ -44,10 +44,10 @@ func (s *SqlService) getDbFeature(inst *types2.Container) (types2.DatabaseFeatur
 		}
 	}
 
-	return types2.DatabaseFeature{}, errors.New("no sql database found")
+	return types.DatabaseFeature{}, errors.New("no sql database found")
 }
 
-func (s *SqlService) Get(inst *types2.Container) (sqltypes.DBMS, error) {
+func (s *SqlService) Get(inst *types.Container) (sqltypes.DBMS, error) {
 	db := sqltypes.DBMS{}
 
 	feature, err := s.getDbFeature(inst)
@@ -75,7 +75,7 @@ func (s *SqlService) Get(inst *types2.Container) (sqltypes.DBMS, error) {
 	return db, nil
 }
 
-func (s *SqlService) EnvCredentials(inst *types2.Container, user string, pass string) (types2.ContainerEnvVariables, error) {
+func (s *SqlService) EnvCredentials(inst *types.Container, user string, pass string) (types.ContainerEnvVariables, error) {
 	env := inst.Env
 
 	feature, err := s.getDbFeature(inst)
@@ -93,7 +93,7 @@ func (s *SqlService) EnvCredentials(inst *types2.Container, user string, pass st
 	return env, nil
 }
 
-func (s *SqlService) createDbmsAdapter(inst *types2.Container) (port.DBMSAdapter, error) {
+func (s *SqlService) createDbmsAdapter(inst *types.Container) (port.DBMSAdapter, error) {
 	feature, err := s.getDbFeature(inst)
 	if err != nil {
 		return nil, err

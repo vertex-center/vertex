@@ -1,8 +1,9 @@
 package service
 
 import (
-	types2 "github.com/vertex-center/vertex/apps/containers/core/types"
 	"testing"
+
+	types2 "github.com/vertex-center/vertex/apps/containers/core/types"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
@@ -22,7 +23,7 @@ func TestContainerEnvServiceTestSuite(t *testing.T) {
 
 func (suite *ContainerEnvServiceTestSuite) SetupSuite() {
 	suite.adapter = MockContainerEnvAdapter{}
-	suite.service = NewContainerEnvService(&suite.adapter)
+	suite.service = NewContainerEnvService(&suite.adapter).(*ContainerEnvService)
 }
 
 func (suite *ContainerEnvServiceTestSuite) TestSave() {

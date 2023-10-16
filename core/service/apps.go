@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
@@ -55,8 +56,8 @@ func (s *AppsService) StartApps() {
 	}
 
 	for _, a := range s.registry.Apps() {
-		for group, rtr := range a.Routers() {
-			rtr.AddRoutes(s.router.Group("/api/app" + group))
+		for route, handle := range a.HttpHandlers() {
+			handle(s.router.Group("/api/app" + route))
 		}
 	}
 }

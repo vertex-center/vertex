@@ -1,17 +1,26 @@
 package monitoring
 
 import (
-	"github.com/vertex-center/vertex/apps/monitoring/router"
+	"github.com/vertex-center/vertex/apps/monitoring/adapter"
+	"github.com/vertex-center/vertex/apps/monitoring/core/port"
+	"github.com/vertex-center/vertex/apps/monitoring/core/service"
+	"github.com/vertex-center/vertex/apps/monitoring/handler"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/pkg/router"
 )
 
 const (
 	AppRoute = "/vx-monitoring"
 )
 
+var (
+	prometheusAdapter port.MetricsAdapter
+
+	metricsService port.MetricsService
+)
+
 type App struct {
 	*apptypes.App
-	router *router.AppRouter
 }
 
 func NewApp() *App {
@@ -20,7 +29,10 @@ func NewApp() *App {
 
 func (a *App) Initialize(app *apptypes.App) error {
 	a.App = app
-	a.router = router.NewAppRouter(app.Context())
+
+	prometheusAdapter = adapter.NewMetricsPrometheusAdapter()
+
+	metricsService = service.NewMetricsService(app.Context(), prometheusAdapter)
 
 	app.Register(apptypes.Meta{
 		ID:          "vx-monitoring",
@@ -28,7 +40,14 @@ func (a *App) Initialize(app *apptypes.App) error {
 		Description: "Create and manage containers.",
 		Icon:        "monitoring",
 	})
-	app.RegisterRouter(AppRoute, a.router)
+
+	app.RegisterRoutes(AppRoute, func(r *router.Group) {
+		metricsHandler := handler.NewMetricsHandler(metricsService)
+
+		r.GET("/metrics", metricsHandler.Get)
+		r.POST("/collector/:collector/install", metricsHandler.InstallCollector)
+		r.POST("/visualizer/:visualizer/install", metricsHandler.InstallVisualizer)
+	})
 
 	return nil
 }

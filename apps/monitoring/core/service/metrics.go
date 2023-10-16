@@ -3,7 +3,6 @@ package service
 import (
 	"github.com/google/uuid"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/apps/monitoring/adapter"
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	metricstypes "github.com/vertex-center/vertex/apps/monitoring/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
@@ -20,7 +19,7 @@ type MetricsService struct {
 	metrics []metricstypes.Metric
 }
 
-func NewMetricsService(ctx *app.Context) *MetricsService {
+func NewMetricsService(ctx *app.Context, metricsAdapter port.MetricsAdapter) port.MetricsService {
 	metrics := []metricstypes.Metric{
 		{
 			ID:          MetricIDContainerStatus,
@@ -39,7 +38,7 @@ func NewMetricsService(ctx *app.Context) *MetricsService {
 
 	s := &MetricsService{
 		uuid:    uuid.New(),
-		adapter: adapter.NewMetricsPrometheusAdapter(),
+		adapter: metricsAdapter,
 		metrics: metrics,
 	}
 
@@ -49,7 +48,11 @@ func NewMetricsService(ctx *app.Context) *MetricsService {
 	return s
 }
 
-// ConfigureCollector will configure an container to monitor the metrics of Vertex.
+func (s *MetricsService) GetMetrics() []metricstypes.Metric {
+	return s.metrics
+}
+
+// ConfigureCollector will configure a container to monitor the metrics of Vertex.
 func (s *MetricsService) ConfigureCollector(inst *containerstypes.Container) error {
 	return s.adapter.ConfigureContainer(inst.UUID)
 }
@@ -57,8 +60,4 @@ func (s *MetricsService) ConfigureCollector(inst *containerstypes.Container) err
 func (s *MetricsService) ConfigureVisualizer(inst *containerstypes.Container) error {
 	// TODO: Implement
 	return nil
-}
-
-func (s *MetricsService) GetMetrics() []metricstypes.Metric {
-	return s.metrics
 }

@@ -29,7 +29,7 @@ func (s *ServiceService) GetAll() []types.Service {
 	return s.serviceAdapter.GetAll()
 }
 
-func (s *ServiceService) Reload() error {
+func (s *ServiceService) reload() error {
 	return s.serviceAdapter.Reload()
 }
 
@@ -40,7 +40,7 @@ func (s *ServiceService) GetUUID() uuid.UUID {
 func (s *ServiceService) OnEvent(e interface{}) {
 	switch e.(type) {
 	case vtypes.EventVertexUpdated:
-		err := s.Reload()
+		err := s.reload()
 		if err != nil {
 			log.Error(err)
 			return

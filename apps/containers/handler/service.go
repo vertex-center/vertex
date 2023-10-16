@@ -1,15 +1,28 @@
-package router
+package handler
 
 import (
 	"errors"
 	"fmt"
+
+	"github.com/vertex-center/vertex/apps/containers/core/port"
 	types2 "github.com/vertex-center/vertex/apps/containers/core/types"
 
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-// handleGetService handles the retrieval of a service.
-func (r *AppRouter) handleGetService(c *router.Context) {
+type ServiceHandler struct {
+	serviceService   port.ServiceService
+	containerService port.ContainerService
+}
+
+func NewServiceHandler(serviceService port.ServiceService, containerService port.ContainerService) port.ServiceHandler {
+	return &ServiceHandler{
+		serviceService:   serviceService,
+		containerService: containerService,
+	}
+}
+
+func (h *ServiceHandler) Get(c *router.Context) {
 	serviceID := c.Param("service_id")
 	if serviceID == "" {
 		c.BadRequest(router.Error{
@@ -20,7 +33,7 @@ func (r *AppRouter) handleGetService(c *router.Context) {
 		return
 	}
 
-	service, err := r.serviceService.GetById(serviceID)
+	service, err := h.serviceService.GetById(serviceID)
 	if err != nil {
 		c.NotFound(router.Error{
 			Code:           types2.ErrCodeServiceNotFound,
@@ -33,12 +46,7 @@ func (r *AppRouter) handleGetService(c *router.Context) {
 	c.JSON(service)
 }
 
-// handleServiceInstall handles the installation of a service.
-// Errors can be:
-//   - failed_to_parse_body: failed to parse the request body.
-//   - service_not_found: the service was not found.
-//   - failed_to_install_service: failed to install the service.
-func (r *AppRouter) handleServiceInstall(c *router.Context) {
+func (h *ServiceHandler) Install(c *router.Context) {
 	serviceID := c.Param("service_id")
 	if serviceID == "" {
 		c.BadRequest(router.Error{
@@ -49,7 +57,7 @@ func (r *AppRouter) handleServiceInstall(c *router.Context) {
 		return
 	}
 
-	service, err := r.serviceService.GetById(serviceID)
+	service, err := h.serviceService.GetById(serviceID)
 	if err != nil {
 		c.NotFound(router.Error{
 			Code:           types2.ErrCodeServiceNotFound,
@@ -59,7 +67,7 @@ func (r *AppRouter) handleServiceInstall(c *router.Context) {
 		return
 	}
 
-	inst, err := r.containerService.Install(service, "docker")
+	inst, err := h.containerService.Install(service, "docker")
 	if err != nil && errors.Is(err, types2.ErrServiceNotFound) {
 		c.NotFound(router.Error{
 			Code:           types2.ErrCodeServiceNotFound,

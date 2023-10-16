@@ -1,8 +1,9 @@
 package app
 
 import (
-	"github.com/vertex-center/vertex/core/types"
 	"sync"
+
+	"github.com/vertex-center/vertex/core/types"
 
 	"github.com/gin-contrib/sse"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -25,14 +26,14 @@ type Meta struct {
 type App struct {
 	meta         Meta
 	ctx          *Context
-	routers      map[string]Router
+	httpHandlers map[string]HttpHandler
 	routersMutex *sync.RWMutex
 }
 
 func New(ctx *types.VertexContext) *App {
 	return &App{
 		ctx:          NewContext(ctx),
-		routers:      map[string]Router{},
+		httpHandlers: map[string]HttpHandler{},
 		routersMutex: &sync.RWMutex{},
 	}
 }
@@ -41,14 +42,14 @@ func (app *App) Register(meta Meta) {
 	app.meta = meta
 }
 
-func (app *App) RegisterRouter(route string, router Router) {
+func (app *App) RegisterRoutes(route string, handler HttpHandler) {
 	app.routersMutex.Lock()
 	defer app.routersMutex.Unlock()
-	app.routers[route] = router
+	app.httpHandlers[route] = handler
 }
 
-func (app *App) Routers() map[string]Router {
-	return app.routers
+func (app *App) HttpHandlers() map[string]HttpHandler {
+	return app.httpHandlers
 }
 
 func (app *App) Meta() Meta {
@@ -79,9 +80,7 @@ type Uninitializable interface {
 	Uninitialize() error
 }
 
-type Router interface {
-	AddRoutes(r *router.Group)
-}
+type HttpHandler func(r *router.Group)
 
 type Service interface {
 	OnEvent(e interface{})

@@ -4,13 +4,14 @@ import (
 	"bufio"
 	"encoding/json"
 	"errors"
+	"path"
+	"strings"
+	"sync"
+
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	types2 "github.com/vertex-center/vertex/apps/containers/core/types"
 	vtypes "github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
-	"path"
-	"strings"
-	"sync"
 
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/adapter"
@@ -24,7 +25,7 @@ type ContainerRunnerService struct {
 	adapter port.ContainerRunnerAdapter
 }
 
-func NewContainerRunnerService(ctx *app.Context, adapter port.ContainerRunnerAdapter) *ContainerRunnerService {
+func NewContainerRunnerService(ctx *app.Context, adapter port.ContainerRunnerAdapter) port.ContainerRunnerService {
 	return &ContainerRunnerService{
 		ctx:     ctx,
 		adapter: adapter,

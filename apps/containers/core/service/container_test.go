@@ -1,10 +1,11 @@
 package service
 
 import (
+	"testing"
+
 	types2 "github.com/vertex-center/vertex/apps/containers/core/types"
 	vtypes "github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
-	"testing"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
@@ -25,7 +26,7 @@ func TestContainerServiceTestSuite(t *testing.T) {
 func (suite *ContainerServiceTestSuite) SetupTest() {
 	suite.service = NewContainerService(ContainerServiceParams{
 		Ctx: app.NewContext(vtypes.NewVertexContext()),
-	})
+	}).(*ContainerService)
 
 	suite.containerA = types2.Container{
 		UUID: uuid.New(),

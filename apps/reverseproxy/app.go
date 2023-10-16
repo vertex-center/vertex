@@ -1,19 +1,28 @@
 package reverseproxy
 
 import (
-	"github.com/vertex-center/vertex/apps/reverseproxy/router"
+	"github.com/vertex-center/vertex/apps/reverseproxy/adapter"
+	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
+	"github.com/vertex-center/vertex/apps/reverseproxy/core/service"
+	"github.com/vertex-center/vertex/apps/reverseproxy/handler"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/pkg/router"
 )
 
 const (
 	AppRoute = "/vx-reverse-proxy"
 )
 
+var (
+	proxyFSAdapter port.ProxyAdapter
+
+	proxyService port.ProxyService
+)
+
 type App struct {
 	*apptypes.App
-	router *router.AppRouter
-	proxy  *router.ProxyRouter
+	proxy *ProxyRouter
 }
 
 func NewApp() *App {
@@ -22,8 +31,12 @@ func NewApp() *App {
 
 func (a *App) Initialize(app *apptypes.App) error {
 	a.App = app
-	a.router = router.NewAppRouter()
-	a.proxy = router.NewProxyRouter(a.router.GetProxyService())
+
+	proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
+
+	proxyService = service.NewProxyService(proxyFSAdapter)
+
+	a.proxy = NewProxyRouter(proxyService)
 
 	go func() {
 		err := a.proxy.Start()
@@ -38,7 +51,13 @@ func (a *App) Initialize(app *apptypes.App) error {
 		Description: "Redirect traffic to your containers.",
 		Icon:        "router",
 	})
-	app.RegisterRouter(AppRoute, a.router)
+
+	app.RegisterRoutes(AppRoute, func(r *router.Group) {
+		proxyHandler := handler.NewProxyHandler(proxyService)
+		r.GET("/redirects", proxyHandler.GetRedirects)
+		r.POST("/redirect", proxyHandler.AddRedirect)
+		r.DELETE("/redirect/:id", proxyHandler.RemoveRedirect)
+	})
 
 	return nil
 }

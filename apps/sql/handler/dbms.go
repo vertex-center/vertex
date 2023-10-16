@@ -1,52 +1,27 @@
-package router
+package handler
 
 import (
 	"errors"
 	"fmt"
+
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
-	"github.com/vertex-center/vertex/apps/sql/core/service"
+	"github.com/vertex-center/vertex/apps/sql/core/port"
 	"github.com/vertex-center/vertex/apps/sql/core/types"
-	app2 "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type AppRouter struct {
-	sqlService *service.SqlService
+type DBMSHandler struct {
+	sqlService port.SqlService
 }
 
-func NewAppRouter(ctx *app2.Context) *AppRouter {
-	return &AppRouter{
-		sqlService: service.New(ctx),
+func NewDBMSHandler(sqlService port.SqlService) port.DBMSHandler {
+	return &DBMSHandler{
+		sqlService: sqlService,
 	}
 }
 
-func (r *AppRouter) GetServices() []app2.Service {
-	return []app2.Service{
-		r.sqlService,
-	}
-}
-
-func (r *AppRouter) AddRoutes(group *router.Group) {
-	group.GET("/container/:container_uuid", r.handleGetDBMS)
-	group.POST("/dbms/:dbms/install", r.handleInstallDBMS)
-}
-
-func (r *AppRouter) getDBMS(c *router.Context) (string, error) {
-	db := c.Param("dbms")
-	if db != "postgres" {
-		c.NotFound(router.Error{
-			Code:           types.ErrCodeSQLDatabaseNotFound,
-			PublicMessage:  fmt.Sprintf("SQL DBMS not found: %s.", db),
-			PrivateMessage: "This SQL DBMS is not supported.",
-		})
-		return "", errors.New("DBMS not found")
-	}
-
-	return db, nil
-}
-
-func (r *AppRouter) handleGetDBMS(c *router.Context) {
+func (r *DBMSHandler) Get(c *router.Context) {
 	uuid, apiError := containersapi.GetContainerUUIDParam(c)
 	if apiError != nil {
 		c.BadRequest(apiError.RouterError())
@@ -72,7 +47,7 @@ func (r *AppRouter) handleGetDBMS(c *router.Context) {
 	c.JSON(dbms)
 }
 
-func (r *AppRouter) handleInstallDBMS(c *router.Context) {
+func (r *DBMSHandler) Install(c *router.Context) {
 	dbms, err := r.getDBMS(c)
 	if err != nil {
 		return
@@ -115,4 +90,18 @@ func (r *AppRouter) handleInstallDBMS(c *router.Context) {
 	}
 
 	c.JSON(inst)
+}
+
+func (r *DBMSHandler) getDBMS(c *router.Context) (string, error) {
+	db := c.Param("dbms")
+	if db != "postgres" {
+		c.NotFound(router.Error{
+			Code:           types.ErrCodeSQLDatabaseNotFound,
+			PublicMessage:  fmt.Sprintf("SQL DBMS not found: %s.", db),
+			PrivateMessage: "This SQL DBMS is not supported.",
+		})
+		return "", errors.New("DBMS not found")
+	}
+
+	return db, nil
 }

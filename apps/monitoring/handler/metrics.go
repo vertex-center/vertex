@@ -1,36 +1,24 @@
-package router
+package handler
 
 import (
 	"errors"
 	"fmt"
+
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/apps/monitoring/core/service"
+	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types"
-	app2 "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type AppRouter struct {
-	metricsService *service.MetricsService
+type MetricsHandler struct {
+	metricsService port.MetricsService
 }
 
-func NewAppRouter(ctx *app2.Context) *AppRouter {
-	return &AppRouter{
-		metricsService: service.NewMetricsService(ctx),
+func NewMetricsHandler(metricsService port.MetricsService) *MetricsHandler {
+	return &MetricsHandler{
+		metricsService: metricsService,
 	}
-}
-
-func (r *AppRouter) GetServices() []app2.Service {
-	return []app2.Service{
-		r.metricsService,
-	}
-}
-
-func (r *AppRouter) AddRoutes(group *router.Group) {
-	group.GET("/metrics", r.handleGetMetrics)
-	group.POST("/collector/:collector/install", r.handleInstallMetricsCollector)
-	group.POST("/visualizer/:visualizer/install", r.handleInstallMetricsVisualizer)
 }
 
 func getCollector(c *router.Context) (string, error) {
@@ -59,11 +47,11 @@ func getVisualizer(c *router.Context) (string, error) {
 	return visualizer, nil
 }
 
-func (r *AppRouter) handleGetMetrics(c *router.Context) {
+func (r *MetricsHandler) Get(c *router.Context) {
 	c.JSON(r.metricsService.GetMetrics())
 }
 
-func (r *AppRouter) handleInstallMetricsCollector(c *router.Context) {
+func (r *MetricsHandler) InstallCollector(c *router.Context) {
 	collector, err := getCollector(c)
 	if err != nil {
 		return
@@ -102,7 +90,7 @@ func (r *AppRouter) handleInstallMetricsCollector(c *router.Context) {
 	c.OK()
 }
 
-func (r *AppRouter) handleInstallMetricsVisualizer(c *router.Context) {
+func (r *MetricsHandler) InstallVisualizer(c *router.Context) {
 	visualizer, err := getVisualizer(c)
 	if err != nil {
 		return

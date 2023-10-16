@@ -1,26 +1,24 @@
-package router
+package handler
 
 import (
 	"errors"
 	"fmt"
+
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types"
+	"github.com/vertex-center/vertex/apps/tunnels/core/port"
 
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type AppRouter struct{}
+type ProviderHandler struct{}
 
-func NewAppRouter() *AppRouter {
-	return &AppRouter{}
+func NewProviderHandler() port.ProviderHandler {
+	return &ProviderHandler{}
 }
 
-func (r *AppRouter) AddRoutes(group *router.Group) {
-	group.POST("/provider/:provider/install", r.handleInstallTunnelProvider)
-}
-
-func (r *AppRouter) handleInstallTunnelProvider(c *router.Context) {
+func (r *ProviderHandler) Install(c *router.Context) {
 	provider, err := getTunnelProvider(c)
 	if err != nil {
 		return

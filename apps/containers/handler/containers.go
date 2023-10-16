@@ -1,28 +1,41 @@
-package router
+package handler
 
 import (
+	"io"
+
+	"github.com/vertex-center/vertex/apps/containers/core/port"
 	types2 "github.com/vertex-center/vertex/apps/containers/core/types"
 	vtypes "github.com/vertex-center/vertex/core/types"
-	"io"
+	apptypes "github.com/vertex-center/vertex/core/types/app"
 
 	"github.com/gin-contrib/sse"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-// handleGetContainers returns all installed containers.
-func (r *AppRouter) handleGetContainers(c *router.Context) {
-	installed := r.containerService.GetAll()
+type ContainersHandler struct {
+	ctx              *apptypes.Context
+	containerService port.ContainerService
+}
+
+func NewContainersHandler(ctx *apptypes.Context, containerService port.ContainerService) port.ContainersHandler {
+	return &ContainersHandler{
+		ctx:              ctx,
+		containerService: containerService,
+	}
+}
+
+func (h *ContainersHandler) Get(c *router.Context) {
+	installed := h.containerService.GetAll()
 	c.JSON(installed)
 }
 
-func (r *AppRouter) handleGetTags(c *router.Context) {
-	tags := r.containerService.GetTags()
+func (h *ContainersHandler) GetTags(c *router.Context) {
+	tags := h.containerService.GetTags()
 	c.JSON(tags)
 }
 
-// handleSearchContainers returns all installed containers that match the query.
-func (r *AppRouter) handleSearchContainers(c *router.Context) {
+func (h *ContainersHandler) Search(c *router.Context) {
 	query := types2.ContainerSearchQuery{}
 
 	features := c.QueryArray("features[]")
@@ -35,15 +48,12 @@ func (r *AppRouter) handleSearchContainers(c *router.Context) {
 		query.Tags = &tags
 	}
 
-	installed := r.containerService.Search(query)
+	installed := h.containerService.Search(query)
 	c.JSON(installed)
 }
 
-// handleCheckForUpdates checks for updates for all installed containers.
-// Errors can be:
-//   - check_for_updates_failed
-func (r *AppRouter) handleCheckForUpdates(c *router.Context) {
-	containers, err := r.containerService.CheckForUpdates()
+func (h *ContainersHandler) CheckForUpdates(c *router.Context) {
+	containers, err := h.containerService.CheckForUpdates()
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           types2.ErrCodeFailedToCheckForUpdates,
@@ -56,8 +66,7 @@ func (r *AppRouter) handleCheckForUpdates(c *router.Context) {
 	c.JSON(containers)
 }
 
-// handleContainersEvents returns a stream of events related to containers.
-func (r *AppRouter) handleContainersEvents(c *router.Context) {
+func (h *ContainersHandler) Events(c *router.Context) {
 	eventsChan := make(chan sse.Event)
 	defer close(eventsChan)
 
@@ -72,8 +81,8 @@ func (r *AppRouter) handleContainersEvents(c *router.Context) {
 		}
 	})
 
-	r.ctx.AddListener(listener)
-	defer r.ctx.RemoveListener(listener)
+	h.ctx.AddListener(listener)
+	defer h.ctx.RemoveListener(listener)
 
 	first := true
 

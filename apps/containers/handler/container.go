@@ -1,13 +1,16 @@
-package router
+package handler
 
 import (
 	"errors"
 	"fmt"
+	"io"
+
+	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/service"
 	types3 "github.com/vertex-center/vertex/apps/containers/core/types"
 	types2 "github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
-	"io"
+	apptypes "github.com/vertex-center/vertex/core/types/app"
 
 	"github.com/gin-contrib/sse"
 	"github.com/google/uuid"
@@ -15,11 +18,42 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-// getParamContainerUUID returns the UUID of the container in the URL.
-// Errors can be:
-//   - missing_container_uuid: the container_uuid parameter was missing in the URL
-//   - invalid_container_uuid: the container_uuid parameter was not a valid UUID
-func (r *AppRouter) getParamContainerUUID(c *router.Context) *uuid.UUID {
+type ContainerHandler struct {
+	ctx                      *apptypes.Context
+	containerService         port.ContainerService
+	containerSettingsService port.ContainerSettingsService
+	containerRunnerService   port.ContainerRunnerService
+	containerEnvService      port.ContainerEnvService
+	containerServiceService  port.ContainerServiceService
+	containerLogsService     port.ContainerLogsService
+	serviceService           port.ServiceService
+}
+
+type ContainerHandlerParams struct {
+	Ctx                      *apptypes.Context
+	ContainerService         port.ContainerService
+	ContainerSettingsService port.ContainerSettingsService
+	ContainerRunnerService   port.ContainerRunnerService
+	ContainerEnvService      port.ContainerEnvService
+	ContainerServiceService  port.ContainerServiceService
+	ContainerLogsService     port.ContainerLogsService
+	ServiceService           port.ServiceService
+}
+
+func NewContainerHandler(params ContainerHandlerParams) port.ContainerHandler {
+	return &ContainerHandler{
+		ctx:                      params.Ctx,
+		containerService:         params.ContainerService,
+		containerSettingsService: params.ContainerSettingsService,
+		containerRunnerService:   params.ContainerRunnerService,
+		containerEnvService:      params.ContainerEnvService,
+		containerServiceService:  params.ContainerServiceService,
+		containerLogsService:     params.ContainerLogsService,
+		serviceService:           params.ServiceService,
+	}
+}
+
+func (h *ContainerHandler) getParamContainerUUID(c *router.Context) *uuid.UUID {
 	p := c.Param("container_uuid")
 	if p == "" {
 		c.BadRequest(router.Error{
@@ -43,19 +77,13 @@ func (r *AppRouter) getParamContainerUUID(c *router.Context) *uuid.UUID {
 	return &uid
 }
 
-// getContainer returns the container with the UUID in the URL.
-// Errors can be:
-//   - missing_container_uuid: the container_uuid parameter was missing in the URL
-//   - invalid_container_uuid: the container_uuid parameter was not a valid UUID
-//   - container_not_found: the container with the given UUID was not found
-//   - failed_to_retrieve_container: failed to retrieve the container from the database
-func (r *AppRouter) getContainer(c *router.Context) *types3.Container {
-	containerUUID := r.getParamContainerUUID(c)
+func (h *ContainerHandler) getContainer(c *router.Context) *types3.Container {
+	containerUUID := h.getParamContainerUUID(c)
 	if containerUUID == nil {
 		return nil
 	}
 
-	container, err := r.containerService.Get(*containerUUID)
+	container, err := h.containerService.Get(*containerUUID)
 	if err != nil && errors.Is(err, types3.ErrContainerNotFound) {
 		c.NotFound(router.Error{
 			Code:           types3.ErrCodeContainerNotFound,
@@ -75,32 +103,21 @@ func (r *AppRouter) getContainer(c *router.Context) *types3.Container {
 	return container
 }
 
-// handleGetContainer returns the container with the UUID in the URL.
-// Errors can be:
-//   - missing_container_uuid: the container_uuid parameter was missing in the URL
-//   - invalid_container_uuid: the container_uuid parameter was not a valid UUID
-func (r *AppRouter) handleGetContainer(c *router.Context) {
-	inst := r.getContainer(c)
+func (h *ContainerHandler) Get(c *router.Context) {
+	inst := h.getContainer(c)
 	if inst == nil {
 		return
 	}
 	c.JSON(inst)
 }
 
-// handleDeleteContainer deletes the container with the UUID in the URL.
-// Errors can be:
-//   - missing_container_uuid: the container_uuid parameter was missing in the URL
-//   - invalid_container_uuid: the container_uuid parameter was not a valid UUID
-//   - container_not_found: the container with the given UUID was not found
-//   - container_still_running: the container with the given UUID is still running
-//   - failed_to_delete_container: failed to delete the container from the database
-func (r *AppRouter) handleDeleteContainer(c *router.Context) {
-	inst := r.getContainer(c)
+func (h *ContainerHandler) Delete(c *router.Context) {
+	inst := h.getContainer(c)
 	if inst == nil {
 		return
 	}
 
-	err := r.containerService.Delete(inst)
+	err := h.containerService.Delete(inst)
 	if err != nil && errors.Is(err, types3.ErrContainerStillRunning) {
 		c.Conflict(router.Error{
 			Code:           types3.ErrCodeContainerStillRunning,
@@ -120,7 +137,7 @@ func (r *AppRouter) handleDeleteContainer(c *router.Context) {
 	c.OK()
 }
 
-type handlePatchContainerBody struct {
+type PatchBody struct {
 	LaunchOnStartup *bool                `json:"launch_on_startup,omitempty"`
 	DisplayName     *string              `json:"display_name,omitempty"`
 	Databases       map[string]uuid.UUID `json:"databases,omitempty"`
@@ -128,28 +145,20 @@ type handlePatchContainerBody struct {
 	Tags            []string             `json:"tags,omitempty"`
 }
 
-// handlePatchContainer updates the container with the UUID in the URL.
-// Errors can be:
-//   - missing_container_uuid: the container_uuid parameter was missing in the URL
-//   - invalid_container_uuid: the container_uuid parameter was not a valid UUID
-//   - failed_to_parse_body: failed to parse the request body
-//   - container_not_found: the container with the given UUID was not found
-//   - failed_to_set_launch_on_startup: failed to set the launch on startup value
-//   - failed_to_set_display_name: failed to set the display name
-func (r *AppRouter) handlePatchContainer(c *router.Context) {
-	inst := r.getContainer(c)
+func (h *ContainerHandler) Patch(c *router.Context) {
+	inst := h.getContainer(c)
 	if inst == nil {
 		return
 	}
 
-	var body handlePatchContainerBody
+	var body PatchBody
 	err := c.ParseBody(&body)
 	if err != nil {
 		return
 	}
 
 	if body.LaunchOnStartup != nil {
-		err = r.containerSettingsService.SetLaunchOnStartup(inst, *body.LaunchOnStartup)
+		err = h.containerSettingsService.SetLaunchOnStartup(inst, *body.LaunchOnStartup)
 		if err != nil {
 			c.Abort(router.Error{
 				Code:           types3.ErrCodeFailedToSetLaunchOnStartup,
@@ -161,7 +170,7 @@ func (r *AppRouter) handlePatchContainer(c *router.Context) {
 	}
 
 	if body.DisplayName != nil && *body.DisplayName != "" {
-		err = r.containerSettingsService.SetDisplayName(inst, *body.DisplayName)
+		err = h.containerSettingsService.SetDisplayName(inst, *body.DisplayName)
 		if err != nil {
 			c.Abort(router.Error{
 				Code:           types3.ErrCodeFailedToSetDisplayName,
@@ -173,7 +182,7 @@ func (r *AppRouter) handlePatchContainer(c *router.Context) {
 	}
 
 	if body.Databases != nil {
-		err = r.containerService.SetDatabases(inst, body.Databases)
+		err = h.containerService.SetDatabases(inst, body.Databases)
 		if err != nil {
 			c.Abort(router.Error{
 				Code:           types3.ErrCodeFailedToSetDatabase,
@@ -185,7 +194,7 @@ func (r *AppRouter) handlePatchContainer(c *router.Context) {
 	}
 
 	if body.Version != nil {
-		err = r.containerSettingsService.SetVersion(inst, *body.Version)
+		err = h.containerSettingsService.SetVersion(inst, *body.Version)
 		if err != nil {
 			c.Abort(router.Error{
 				Code:           types3.ErrCodeFailedToSetVersion,
@@ -197,7 +206,7 @@ func (r *AppRouter) handlePatchContainer(c *router.Context) {
 	}
 
 	if body.Tags != nil {
-		err = r.containerSettingsService.SetTags(inst, body.Tags)
+		err = h.containerSettingsService.SetTags(inst, body.Tags)
 		if err != nil {
 			c.Abort(router.Error{
 				Code:           types3.ErrCodeFailedToSetTags,
@@ -211,20 +220,13 @@ func (r *AppRouter) handlePatchContainer(c *router.Context) {
 	c.OK()
 }
 
-// handleStartContainer starts the container with the UUID in the URL.
-// Errors can be:
-//   - missing_container_uuid: the container_uuid parameter was missing in the URL
-//   - invalid_container_uuid: the container_uuid parameter was not a valid UUID
-//   - container_not_found: the container with the given UUID was not found
-//   - container_already_running: the container with the given UUID is already running
-//   - failed_to_start_container: failed to start the container
-func (r *AppRouter) handleStartContainer(c *router.Context) {
-	inst := r.getContainer(c)
+func (h *ContainerHandler) Start(c *router.Context) {
+	inst := h.getContainer(c)
 	if inst == nil {
 		return
 	}
 
-	err := r.containerRunnerService.Start(inst)
+	err := h.containerRunnerService.Start(inst)
 	if err != nil && errors.Is(err, types3.ErrContainerNotFound) {
 		c.NotFound(router.Error{
 			Code:           types3.ErrCodeContainerNotFound,
@@ -251,20 +253,13 @@ func (r *AppRouter) handleStartContainer(c *router.Context) {
 	c.OK()
 }
 
-// handleStopContainer stops the container with the UUID in the URL.
-// Errors can be:
-//   - missing_container_uuid: the container_uuid parameter was missing in the URL
-//   - invalid_container_uuid: the container_uuid parameter was not a valid UUID
-//   - container_not_found: the container with the given UUID was not found
-//   - container_not_running: the container with the given UUID is not running
-//   - failed_to_stop_container: failed to stop the container
-func (r *AppRouter) handleStopContainer(c *router.Context) {
-	inst := r.getContainer(c)
+func (h *ContainerHandler) Stop(c *router.Context) {
+	inst := h.getContainer(c)
 	if inst == nil {
 		return
 	}
 
-	err := r.containerRunnerService.Stop(inst)
+	err := h.containerRunnerService.Stop(inst)
 	if err != nil && errors.Is(err, service.ErrContainerNotRunning) {
 		c.Conflict(router.Error{
 			Code:           types3.ErrCodeContainerNotRunning,
@@ -284,27 +279,19 @@ func (r *AppRouter) handleStopContainer(c *router.Context) {
 	c.OK()
 }
 
-// handlePatchEnvironment updates the environment of the container with the UUID in the URL.
-// Errors can be:
-//   - missing_container_uuid: the container_uuid parameter was missing in the URL
-//   - invalid_container_uuid: the container_uuid parameter was not a valid UUID
-//   - failed_to_parse_body: failed to parse the request body
-//   - container_not_found: the container with the given UUID was not found
-//   - failed_to_save_environment: failed to save the environment
-//   - failed_to_recreate_container: failed to recreate the Docker container
-func (r *AppRouter) handlePatchEnvironment(c *router.Context) {
+func (h *ContainerHandler) PatchEnvironment(c *router.Context) {
 	var environment map[string]string
 	err := c.ParseBody(&environment)
 	if err != nil {
 		return
 	}
 
-	inst := r.getContainer(c)
+	inst := h.getContainer(c)
 	if inst == nil {
 		return
 	}
 
-	err = r.containerEnvService.Save(inst, environment)
+	err = h.containerEnvService.Save(inst, environment)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           types3.ErrCodeFailedToSetEnv,
@@ -314,7 +301,7 @@ func (r *AppRouter) handlePatchEnvironment(c *router.Context) {
 		return
 	}
 
-	err = r.containerRunnerService.RecreateContainer(inst)
+	err = h.containerRunnerService.RecreateContainer(inst)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToRecreateContainer,
@@ -327,12 +314,8 @@ func (r *AppRouter) handlePatchEnvironment(c *router.Context) {
 	c.OK()
 }
 
-// handleContainerEvents returns a stream of events for the container with the UUID in the URL.
-// Errors can be:
-//   - missing_container_uuid: the container_uuid parameter was missing in the URL
-//   - invalid_container_uuid: the container_uuid parameter was not a valid UUID
-func (r *AppRouter) handleContainerEvents(c *router.Context) {
-	inst := r.getContainer(c)
+func (h *ContainerHandler) Events(c *router.Context) {
+	inst := h.getContainer(c)
 	if inst == nil {
 		return
 	}
@@ -378,8 +361,8 @@ func (r *AppRouter) handleContainerEvents(c *router.Context) {
 		}
 	})
 
-	r.ctx.AddListener(listener)
-	defer r.ctx.RemoveListener(listener)
+	h.ctx.AddListener(listener)
+	defer h.ctx.RemoveListener(listener)
 
 	first := true
 
@@ -410,18 +393,13 @@ func (r *AppRouter) handleContainerEvents(c *router.Context) {
 	})
 }
 
-// handleGetDocker returns the Docker container info of the container with the UUID in the URL.
-// Errors can be:
-//   - missing_container_uuid: the container_uuid parameter was missing in the URL
-//   - invalid_container_uuid: the container_uuid parameter was not a valid UUID
-//   - failed_to_get_docker_container_info: failed to get the Docker container info
-func (r *AppRouter) handleGetDocker(c *router.Context) {
-	inst := r.getContainer(c)
+func (h *ContainerHandler) GetDocker(c *router.Context) {
+	inst := h.getContainer(c)
 	if inst == nil {
 		return
 	}
 
-	info, err := r.containerRunnerService.GetDockerContainerInfo(*inst)
+	info, err := h.containerRunnerService.GetDockerContainerInfo(*inst)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToGetContainerInfo,
@@ -434,18 +412,13 @@ func (r *AppRouter) handleGetDocker(c *router.Context) {
 	c.JSON(info)
 }
 
-// handleRecreateDockerContainer recreates the Docker container of the container with the UUID in the URL.
-// Errors can be:
-//   - missing_container_uuid: the container_uuid parameter was missing in the URL
-//   - invalid_container_uuid: the container_uuid parameter was not a valid UUID
-//   - failed_to_recreate_container: failed to recreate the Docker container
-func (r *AppRouter) handleRecreateDockerContainer(c *router.Context) {
-	inst := r.getContainer(c)
+func (h *ContainerHandler) RecreateDocker(c *router.Context) {
+	inst := h.getContainer(c)
 	if inst == nil {
 		return
 	}
 
-	err := r.containerRunnerService.RecreateContainer(inst)
+	err := h.containerRunnerService.RecreateContainer(inst)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToRecreateContainer,
@@ -458,18 +431,13 @@ func (r *AppRouter) handleRecreateDockerContainer(c *router.Context) {
 	c.OK()
 }
 
-// handleGetLogs returns the latest logs of the container with the UUID in the URL.
-// Errors can be:
-//   - missing_container_uuid: the container_uuid parameter was missing in the URL
-//   - invalid_container_uuid: the container_uuid parameter was not a valid UUID
-//   - failed_to_get_logs: failed to get the logs
-func (r *AppRouter) handleGetLogs(c *router.Context) {
-	uid := r.getParamContainerUUID(c)
+func (h *ContainerHandler) GetLogs(c *router.Context) {
+	uid := h.getParamContainerUUID(c)
 	if uid == nil {
 		return
 	}
 
-	logs, err := r.containerLogsService.GetLatestLogs(*uid)
+	logs, err := h.containerLogsService.GetLatestLogs(*uid)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           types3.ErrCodeFailedToGetContainerLogs,
@@ -482,16 +450,13 @@ func (r *AppRouter) handleGetLogs(c *router.Context) {
 	c.JSON(logs)
 }
 
-// handleUpdateService updates the service of the container with the UUID in the URL.
-// Errors can be:
-//   - missing_container_uuid: the container_uuid parameter was missing in the URL
-func (r *AppRouter) handleUpdateService(c *router.Context) {
-	inst := r.getContainer(c)
+func (h *ContainerHandler) UpdateService(c *router.Context) {
+	inst := h.getContainer(c)
 	if inst == nil {
 		return
 	}
 
-	serv, err := r.serviceService.GetById(inst.Service.ID)
+	serv, err := h.serviceService.GetById(inst.Service.ID)
 	if err != nil {
 		c.NotFound(router.Error{
 			Code:           types3.ErrCodeServiceNotFound,
@@ -501,7 +466,7 @@ func (r *AppRouter) handleUpdateService(c *router.Context) {
 		return
 	}
 
-	err = r.containerServiceService.Update(inst, serv)
+	err = h.containerServiceService.Update(inst, serv)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           types3.ErrCodeFailedToUpdateServiceContainer,
@@ -514,18 +479,15 @@ func (r *AppRouter) handleUpdateService(c *router.Context) {
 	c.OK()
 }
 
-// handleGetVersions returns the versions of the container with the UUID in the URL.
-// Errors can be:
-//   - missing_container_uuid: the container_uuid parameter was missing in the URL
-func (r *AppRouter) handleGetVersions(c *router.Context) {
-	inst := r.getContainer(c)
+func (h *ContainerHandler) GetVersions(c *router.Context) {
+	inst := h.getContainer(c)
 	if inst == nil {
 		return
 	}
 
 	useCache := c.Query("reload") != "true"
 
-	versions, err := r.containerRunnerService.GetAllVersions(inst, useCache)
+	versions, err := h.containerRunnerService.GetAllVersions(inst, useCache)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           types3.ErrCodeFailedToGetVersions,
@@ -538,15 +500,15 @@ func (r *AppRouter) handleGetVersions(c *router.Context) {
 	c.JSON(versions)
 }
 
-func (r *AppRouter) handleWaitContainer(c *router.Context) {
+func (h *ContainerHandler) Wait(c *router.Context) {
 	cond := c.Param("cond")
 
-	inst := r.getContainer(c)
+	inst := h.getContainer(c)
 	if inst == nil {
 		return
 	}
 
-	err := r.containerRunnerService.WaitCondition(inst, types2.WaitContainerCondition(cond))
+	err := h.containerRunnerService.WaitCondition(inst, types2.WaitContainerCondition(cond))
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           types3.ErrCodeFailedToWaitContainer,

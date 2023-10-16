@@ -2,10 +2,11 @@ package service
 
 import (
 	"errors"
-	"github.com/vertex-center/vertex/apps/containers/core/port"
-	types2 "github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/core/types/app"
 	"sync"
+
+	"github.com/vertex-center/vertex/apps/containers/core/port"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/core/types/app"
 
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/adapter"
@@ -27,12 +28,12 @@ type ContainerService struct {
 
 	containerAdapter port.ContainerAdapter
 
-	containerRunnerService   *ContainerRunnerService
-	containerServiceService  *ContainerServiceService
-	containerEnvService      *ContainerEnvService
-	containerSettingsService *ContainerSettingsService
+	containerRunnerService   port.ContainerRunnerService
+	containerServiceService  port.ContainerServiceService
+	containerEnvService      port.ContainerEnvService
+	containerSettingsService port.ContainerSettingsService
 
-	containers      map[uuid.UUID]*types2.Container
+	containers      map[uuid.UUID]*types.Container
 	containersMutex *sync.RWMutex
 }
 
@@ -41,13 +42,13 @@ type ContainerServiceParams struct {
 
 	ContainerAdapter port.ContainerAdapter
 
-	ContainerRunnerService   *ContainerRunnerService
-	ContainerServiceService  *ContainerServiceService
-	ContainerEnvService      *ContainerEnvService
-	ContainerSettingsService *ContainerSettingsService
+	ContainerRunnerService   port.ContainerRunnerService
+	ContainerServiceService  port.ContainerServiceService
+	ContainerEnvService      port.ContainerEnvService
+	ContainerSettingsService port.ContainerSettingsService
 }
 
-func NewContainerService(params ContainerServiceParams) *ContainerService {
+func NewContainerService(params ContainerServiceParams) port.ContainerService {
 	s := &ContainerService{
 		uuid: uuid.New(),
 		ctx:  params.Ctx,
@@ -59,7 +60,7 @@ func NewContainerService(params ContainerServiceParams) *ContainerService {
 		containerEnvService:      params.ContainerEnvService,
 		containerSettingsService: params.ContainerSettingsService,
 
-		containers:      make(map[uuid.UUID]*types2.Container),
+		containers:      make(map[uuid.UUID]*types.Container),
 		containersMutex: &sync.RWMutex{},
 	}
 
@@ -68,20 +69,18 @@ func NewContainerService(params ContainerServiceParams) *ContainerService {
 	return s
 }
 
-// Get returns an container by its UUID. If the container does not exist,
-// it returns ErrContainerNotFound.
-func (s *ContainerService) Get(uuid uuid.UUID) (*types2.Container, error) {
+func (s *ContainerService) Get(uuid uuid.UUID) (*types.Container, error) {
 	s.containersMutex.RLock()
 	defer s.containersMutex.RUnlock()
 
 	container, ok := s.containers[uuid]
 	if !ok {
-		return nil, types2.ErrContainerNotFound
+		return nil, types.ErrContainerNotFound
 	}
 	return container, nil
 }
 
-func (s *ContainerService) GetAll() map[uuid.UUID]*types2.Container {
+func (s *ContainerService) GetAll() map[uuid.UUID]*types.Container {
 	s.containersMutex.RLock()
 	defer s.containersMutex.RUnlock()
 
@@ -113,8 +112,8 @@ func (s *ContainerService) GetTags() []string {
 }
 
 // Search returns all containers that match the query.
-func (s *ContainerService) Search(query types2.ContainerSearchQuery) map[uuid.UUID]*types2.Container {
-	containers := map[uuid.UUID]*types2.Container{}
+func (s *ContainerService) Search(query types.ContainerSearchQuery) map[uuid.UUID]*types.Container {
+	containers := map[uuid.UUID]*types.Container{}
 
 	s.containersMutex.RLock()
 	defer s.containersMutex.RUnlock()
@@ -145,11 +144,11 @@ func (s *ContainerService) Exists(uuid uuid.UUID) bool {
 
 // Delete deletes an container by its UUID.
 // If the container is still running, it returns ErrContainerStillRunning.
-func (s *ContainerService) Delete(inst *types2.Container) error {
+func (s *ContainerService) Delete(inst *types.Container) error {
 	serviceID := inst.Service.ID
 
 	if inst.IsRunning() {
-		return types2.ErrContainerStillRunning
+		return types.ErrContainerStillRunning
 	}
 
 	err := s.containerRunnerService.Delete(inst)
@@ -166,11 +165,11 @@ func (s *ContainerService) Delete(inst *types2.Container) error {
 	defer s.containersMutex.Unlock()
 	delete(s.containers, inst.UUID)
 
-	s.ctx.DispatchEvent(types2.EventContainerDeleted{
+	s.ctx.DispatchEvent(types.EventContainerDeleted{
 		ContainerUUID: inst.UUID,
 		ServiceID:     serviceID,
 	})
-	s.ctx.DispatchEvent(types2.EventContainersChange{})
+	s.ctx.DispatchEvent(types.EventContainersChange{})
 
 	return nil
 }
@@ -229,10 +228,41 @@ func (s *ContainerService) StopAll() {
 		}
 	}
 
-	s.ctx.DispatchEvent(types2.EventContainersStopped{})
+	s.ctx.DispatchEvent(types.EventContainersStopped{})
 }
 
-func (s *ContainerService) Install(service types2.Service, method string) (*types2.Container, error) {
+func (s *ContainerService) LoadAll() {
+	uuids, err := s.containerAdapter.GetAll()
+	if err != nil {
+		return
+	}
+
+	loaded := 0
+	for _, id := range uuids {
+		err := s.load(id)
+		if err != nil {
+			log.Error(err)
+			continue
+		}
+		loaded += 1
+	}
+
+	s.ctx.DispatchEvent(types.EventContainersLoaded{
+		Count: loaded,
+	})
+}
+
+func (s *ContainerService) DeleteAll() {
+	all := s.GetAll()
+	for _, inst := range all {
+		err := s.Delete(inst)
+		if err != nil {
+			log.Error(err)
+		}
+	}
+}
+
+func (s *ContainerService) Install(service types.Service, method string) (*types.Container, error) {
 	id := uuid.New()
 	err := s.containerAdapter.Create(id)
 	if err != nil {
@@ -244,7 +274,7 @@ func (s *ContainerService) Install(service types2.Service, method string) (*type
 		return nil, err
 	}
 
-	tempContainer := &types2.Container{
+	tempContainer := &types.Container{
 		UUID:    id,
 		Service: service,
 	}
@@ -276,13 +306,13 @@ func (s *ContainerService) Install(service types2.Service, method string) (*type
 		return nil, err
 	}
 
-	s.ctx.DispatchEvent(types2.EventContainerCreated{})
-	s.ctx.DispatchEvent(types2.EventContainersChange{})
+	s.ctx.DispatchEvent(types.EventContainerCreated{})
+	s.ctx.DispatchEvent(types.EventContainersChange{})
 
 	return inst, nil
 }
 
-func (s *ContainerService) CheckForUpdates() (map[uuid.UUID]*types2.Container, error) {
+func (s *ContainerService) CheckForUpdates() (map[uuid.UUID]*types.Container, error) {
 	for _, inst := range s.GetAll() {
 		err := s.containerRunnerService.CheckForUpdates(inst)
 		if err != nil {
@@ -293,44 +323,13 @@ func (s *ContainerService) CheckForUpdates() (map[uuid.UUID]*types2.Container, e
 	return s.GetAll(), nil
 }
 
-func (s *ContainerService) LoadAll() {
-	uuids, err := s.containerAdapter.GetAll()
-	if err != nil {
-		return
-	}
-
-	loaded := 0
-	for _, id := range uuids {
-		err := s.load(id)
-		if err != nil {
-			log.Error(err)
-			continue
-		}
-		loaded += 1
-	}
-
-	s.ctx.DispatchEvent(types2.EventContainersLoaded{
-		Count: loaded,
-	})
-}
-
-func (s *ContainerService) DeleteAll() {
-	all := s.GetAll()
-	for _, inst := range all {
-		err := s.Delete(inst)
-		if err != nil {
-			log.Error(err)
-		}
-	}
-}
-
 func (s *ContainerService) load(uuid uuid.UUID) error {
 	service, err := s.containerServiceService.Load(uuid)
 	if err != nil {
 		return err
 	}
 
-	inst := types2.NewContainer(uuid, service)
+	inst := types.NewContainer(uuid, service)
 
 	err = s.containerSettingsService.Load(&inst)
 	if err != nil {
@@ -355,14 +354,14 @@ func (s *ContainerService) load(uuid uuid.UUID) error {
 		return ErrContainerAlreadyExists
 	}
 
-	s.ctx.DispatchEvent(types2.EventContainerLoaded{
+	s.ctx.DispatchEvent(types.EventContainerLoaded{
 		Container: &inst,
 	})
 
 	return nil
 }
 
-func (s *ContainerService) SetDatabases(inst *types2.Container, databases map[string]uuid.UUID) error {
+func (s *ContainerService) SetDatabases(inst *types.Container, databases map[string]uuid.UUID) error {
 	inst.Databases = databases
 	err := s.containerSettingsService.Save(inst, inst.ContainerSettings)
 	if err != nil {
@@ -372,7 +371,7 @@ func (s *ContainerService) SetDatabases(inst *types2.Container, databases map[st
 }
 
 // remapDatabaseEnv remaps the environment variables of an container.
-func (s *ContainerService) remapDatabaseEnv(inst *types2.Container) error {
+func (s *ContainerService) remapDatabaseEnv(inst *types.Container) error {
 	for databaseID, databaseContainerUUID := range inst.Databases {
 		db, err := s.Get(databaseContainerUUID)
 		if err != nil {
