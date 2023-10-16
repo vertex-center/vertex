@@ -1,13 +1,13 @@
-import { BigTitle } from "../../../components/Text/Text";
-import { Service as ServiceModel } from "../../../models/service";
+import { BigTitle } from "../../../../components/Text/Text";
+import { Service as ServiceModel } from "../../../../models/service";
 import { Fragment, useState } from "react";
 import styles from "./ContainersStore.module.sass";
-import Service from "../../../components/Service/Service";
-import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
-import { api } from "../../../backend/api/backend";
-import { APIError } from "../../../components/Error/APIError";
-import { ProgressOverlay } from "../../../components/Progress/Progress";
-import ServiceInstallPopup from "../../../components/ServiceInstallPopup/ServiceInstallPopup";
+import Service from "../../../../components/Service/Service";
+import { Horizontal, Vertical } from "../../../../components/Layouts/Layouts";
+import { api } from "../../../../backend/api/backend";
+import { APIError } from "../../../../components/Error/APIError";
+import { ProgressOverlay } from "../../../../components/Progress/Progress";
+import ServiceInstallPopup from "../../../../components/ServiceInstallPopup/ServiceInstallPopup";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 type Downloading = {
