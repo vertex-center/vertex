@@ -28,10 +28,27 @@
     @include dimensions.small-or-less
         grid-template-columns: 1fr
 
+.inputsRow
+    display: flex
+    flex-direction: row
+    gap: 10px
+    width: 100%
+
+    @include dimensions.small-or-less
+        flex-direction: column
+        width: 100%
+        align-items: flex-end
+
+    &:not(&First)
+        @include dimensions.medium-or-greater
+            label
+                display: none
+
 .volume
     display: grid
     grid-template-columns: 1fr 2fr
     gap: 15px
+    width: 100%
 
     @include dimensions.small-or-less
         grid-template-columns: 1fr
@@ -40,6 +57,7 @@
     display: grid
     grid-template-columns: repeat(2, 1fr)
     gap: 15px
+    width: 100%
 
     @include dimensions.small-or-less
         grid-template-columns: 1fr
@@ -48,6 +66,13 @@
     display: grid
     grid-template-columns: repeat(2, 1fr)
     gap: 15px
+    width: 100%
 
     @include dimensions.small-or-less
         grid-template-columns: 1fr
+
+.deleteOffset
+    margin-top: 26px
+
+    @include dimensions.small-or-less
+        margin-top: 0

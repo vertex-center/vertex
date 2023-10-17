@@ -22,6 +22,7 @@ import Select, {
     SelectValue,
 } from "../../../../components/Input/Select";
 import { Fragment } from "react";
+import Card from "../../../../components/Card/Card";
 
 function EnvironmentInputs({ control, register, errors, i }) {
     return (
@@ -561,30 +562,19 @@ export default function ServiceEditor() {
                         Add volume
                     </Button>
                 </Horizontal>
-                {volumes.length === 0 && (
+                {volumes.length === 0 ? (
                     <NoItems icon="storage" text="No Docker volumes." />
-                )}
-                <List>
-                    {volumes.map((field, i) => {
-                        return (
-                            <ListItem key={field.id}>
-                                <Vertical
-                                    alignItems="stretch"
-                                    style={{ width: "100%" }}
-                                    gap={5}
+                ) : (
+                    <Card>
+                        {volumes.map((field, i) => {
+                            return (
+                                <div
+                                    key={field.id}
+                                    className={classNames({
+                                        [styles.inputsRow]: true,
+                                        [styles.inputsRowFirst]: i === 0,
+                                    })}
                                 >
-                                    <Horizontal>
-                                        <Title className={styles.title}>
-                                            Volume #{i + 1}
-                                        </Title>
-                                        <Spacer />
-                                        <Button
-                                            rightIcon="delete"
-                                            onClick={() => removeVolume(i)}
-                                        >
-                                            Remove
-                                        </Button>
-                                    </Horizontal>
                                     <VolumeInputs
                                         key={field.id}
                                         register={register}
@@ -595,11 +585,20 @@ export default function ServiceEditor() {
                                             ]
                                         }
                                     />
-                                </Vertical>
-                            </ListItem>
-                        );
-                    })}
-                </List>
+                                    <Button
+                                        className={
+                                            i === 0 && styles.deleteOffset
+                                        }
+                                        rightIcon="delete"
+                                        onClick={() => removeVolume(i)}
+                                    >
+                                        Remove
+                                    </Button>
+                                </div>
+                            );
+                        })}
+                    </Card>
+                )}
             </Vertical>
 
             <Vertical className={styles.content} gap={10}>
@@ -614,30 +613,19 @@ export default function ServiceEditor() {
                         Add port
                     </Button>
                 </Horizontal>
-                {ports.length === 0 && (
+                {ports.length === 0 ? (
                     <NoItems icon="hub" text="No Docker ports." />
-                )}
-                <List>
-                    {ports.map((field, i) => {
-                        return (
-                            <ListItem key={field.id}>
-                                <Vertical
-                                    alignItems="stretch"
-                                    style={{ width: "100%" }}
-                                    gap={5}
+                ) : (
+                    <Card>
+                        {ports.map((field, i) => {
+                            return (
+                                <div
+                                    key={field.id}
+                                    className={classNames({
+                                        [styles.inputsRow]: true,
+                                        [styles.inputsRowFirst]: i === 0,
+                                    })}
                                 >
-                                    <Horizontal>
-                                        <Title className={styles.title}>
-                                            Port #{i + 1}
-                                        </Title>
-                                        <Spacer />
-                                        <Button
-                                            rightIcon="delete"
-                                            onClick={() => removePort(i)}
-                                        >
-                                            Remove
-                                        </Button>
-                                    </Horizontal>
                                     <PortInputs
                                         key={field.id}
                                         register={register}
@@ -646,11 +634,20 @@ export default function ServiceEditor() {
                                             errors?.methods?.docker?.ports?.[i]
                                         }
                                     />
-                                </Vertical>
-                            </ListItem>
-                        );
-                    })}
-                </List>
+                                    <Button
+                                        className={
+                                            i === 0 && styles.deleteOffset
+                                        }
+                                        rightIcon="delete"
+                                        onClick={() => removePort(i)}
+                                    >
+                                        Remove
+                                    </Button>
+                                </div>
+                            );
+                        })}
+                    </Card>
+                )}
             </Vertical>
 
             <Vertical className={styles.content} gap={10}>
@@ -665,35 +662,22 @@ export default function ServiceEditor() {
                         Add port
                     </Button>
                 </Horizontal>
-                {containerEnvironment.length === 0 && (
+                {containerEnvironment.length === 0 ? (
                     <NoItems
                         icon="list"
                         text="No Docker environment variables."
                     />
-                )}
-                <List>
-                    {containerEnvironment.map((field, i) => {
-                        return (
-                            <ListItem key={field.id}>
-                                <Vertical
-                                    alignItems="stretch"
-                                    style={{ width: "100%" }}
-                                    gap={5}
+                ) : (
+                    <Card>
+                        {containerEnvironment.map((field, i) => {
+                            return (
+                                <div
+                                    key={field.id}
+                                    className={classNames({
+                                        [styles.inputsRow]: true,
+                                        [styles.inputsRowFirst]: i === 0,
+                                    })}
                                 >
-                                    <Horizontal>
-                                        <Title className={styles.title}>
-                                            Docker environment variable #{i + 1}
-                                        </Title>
-                                        <Spacer />
-                                        <Button
-                                            rightIcon="delete"
-                                            onClick={() =>
-                                                removeContainerEnvironment(i)
-                                            }
-                                        >
-                                            Remove
-                                        </Button>
-                                    </Horizontal>
                                     <ContainerEnvironmentInputs
                                         key={field.id}
                                         register={register}
@@ -703,11 +687,22 @@ export default function ServiceEditor() {
                                                 ?.environment?.[i]
                                         }
                                     />
-                                </Vertical>
-                            </ListItem>
-                        );
-                    })}
-                </List>
+                                    <Button
+                                        className={
+                                            i === 0 && styles.deleteOffset
+                                        }
+                                        rightIcon="delete"
+                                        onClick={() =>
+                                            removeContainerEnvironment(i)
+                                        }
+                                    >
+                                        Remove
+                                    </Button>
+                                </div>
+                            );
+                        })}
+                    </Card>
+                )}
             </Vertical>
 
             <Horizontal className={styles.content}>
