@@ -5,6 +5,13 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"path"
+	"runtime"
+	"time"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
@@ -12,6 +19,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers"
 	"github.com/vertex-center/vertex/apps/monitoring"
 	"github.com/vertex-center/vertex/apps/reverseproxy"
+	"github.com/vertex-center/vertex/apps/serviceeditor"
 	"github.com/vertex-center/vertex/apps/sql"
 	"github.com/vertex-center/vertex/apps/tunnels"
 	"github.com/vertex-center/vertex/core/port"
@@ -24,12 +32,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/updates"
 	"github.com/vertex-center/vlog"
-	"net/http"
-	"os"
-	"os/signal"
-	"path"
-	"runtime"
-	"time"
 
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/migration"
@@ -189,6 +191,7 @@ func initServices(about types.About) {
 			monitoring.NewApp(),
 			containers.NewApp(),
 			reverseproxy.NewApp(),
+			serviceeditor.NewApp(),
 		},
 	)
 	notificationsService = service.NewNotificationsService(ctx, settingsFSAdapter)
