@@ -363,6 +363,8 @@ export default function ServiceEditor() {
         name: "methods.docker.environment",
     });
 
+    const download = () => {};
+
     return (
         <Vertical gap={30}>
             <BigTitle className={styles.bigTitle}>Service Editor</BigTitle>
@@ -705,14 +707,13 @@ export default function ServiceEditor() {
                 )}
             </Vertical>
 
-            <Horizontal className={styles.content}>
+            <Horizontal gap={10} className={styles.content}>
                 <Spacer />
-                <Button
-                    primary
-                    rightIcon="send"
-                    onClick={handleSubmit(onSubmit)}
-                >
+                <Button rightIcon="check" onClick={handleSubmit(onSubmit)}>
                     Validate
+                </Button>
+                <Button primary rightIcon="download" onClick={download}>
+                    Download
                 </Button>
             </Horizontal>
         </Vertical>
