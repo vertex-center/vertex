@@ -103,8 +103,11 @@ export default function ContainersStore() {
                             disabled
                         />
                         <Spacer />
-                        <Button to="/app/vx-containers/create" rightIcon="add">
-                            Create manually
+                        <Button
+                            to="/app/vx-containers/editor"
+                            rightIcon="frame_source"
+                        >
+                            Service Editor
                         </Button>
                     </Toolbar>
                     <List className={styles.content}>

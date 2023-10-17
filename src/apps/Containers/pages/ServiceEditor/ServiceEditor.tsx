@@ -1,4 +1,4 @@
-import styles from "./ContainersCreate.module.sass";
+import styles from "./ServiceEditor.module.sass";
 import { BigTitle, Title } from "../../../../components/Text/Text";
 import Input from "../../../../components/Input/Input";
 import { Horizontal, Vertical } from "../../../../components/Layouts/Layouts";
@@ -307,7 +307,7 @@ const schema = object({
 
 type FormData = yup.InferType<typeof schema>;
 
-export default function ContainersCreate() {
+export default function ServiceEditor() {
     const resolver = yupResolver(schema);
     const {
         control,
@@ -364,7 +364,7 @@ export default function ContainersCreate() {
 
     return (
         <Vertical gap={30}>
-            <BigTitle className={styles.bigTitle}>Create container</BigTitle>
+            <BigTitle className={styles.bigTitle}>Service Editor</BigTitle>
 
             <Vertical gap={25} className={styles.content}>
                 <Title className={styles.title}>Info</Title>
