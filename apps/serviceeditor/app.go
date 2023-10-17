@@ -29,6 +29,7 @@ func (a *App) Initialize(app *apptypes.App) error {
 		Name:        "Vertex Service Editor",
 		Description: "Create services for publishing.",
 		Icon:        "frame_source",
+		Category:    "devtools",
 	})
 
 	app.RegisterRoutes(AppRoute, func(r *router.Group) {
