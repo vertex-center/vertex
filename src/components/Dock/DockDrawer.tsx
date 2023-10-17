@@ -53,6 +53,7 @@ export default function DockDrawer(props: Props) {
             <BigTitle className={styles.title}>Apps</BigTitle>
             <div className={styles.apps}>
                 {[...(apps ?? [])]
+                    ?.filter((app) => app.category !== "devtools")
                     ?.sort((a, b) => (a.name > b.name ? 1 : -1))
                     ?.map((app) => (
                         <DrawerApp

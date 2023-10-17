@@ -1,11 +1,11 @@
 import styles from "./ServiceEditor.module.sass";
-import { BigTitle, Title } from "../../../../components/Text/Text";
-import Input from "../../../../components/Input/Input";
-import { Horizontal, Vertical } from "../../../../components/Layouts/Layouts";
-import NoItems from "../../../../components/NoItems/NoItems";
-import Button from "../../../../components/Button/Button";
+import { BigTitle, Title } from "../../../components/Text/Text";
+import Input from "../../../components/Input/Input";
+import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
+import NoItems from "../../../components/NoItems/NoItems";
+import Button from "../../../components/Button/Button";
 import classNames from "classnames";
-import Spacer from "../../../../components/Spacer/Spacer";
+import Spacer from "../../../components/Spacer/Spacer";
 import {
     Controller,
     SubmitHandler,
@@ -15,17 +15,17 @@ import {
 import * as yup from "yup";
 import { object } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import List from "../../../../components/List/List";
-import ListItem from "../../../../components/List/ListItem";
+import List from "../../../components/List/List";
+import ListItem from "../../../components/List/ListItem";
 import Select, {
     SelectOption,
     SelectValue,
-} from "../../../../components/Input/Select";
+} from "../../../components/Input/Select";
 import { Fragment, useState } from "react";
-import Card from "../../../../components/Card/Card";
-import { api } from "../../../../backend/api/backend";
+import Card from "../../../components/Card/Card";
+import { api } from "../../../backend/api/backend";
 import { produce } from "immer";
-import Code from "../../../../components/Code/Code";
+import Code from "../../../components/Code/Code";
 
 function EnvironmentInputs({ control, register, errors, i }) {
     return (

@@ -1,6 +1,9 @@
 import styles from "./Card.module.sass";
-import { PropsWithChildren } from "react";
+import { HTMLProps } from "react";
+import classNames from "classnames";
 
-export default function Card({ children }: PropsWithChildren) {
-    return <div className={styles.card}>{children}</div>;
+type Props = HTMLProps<HTMLDivElement>;
+
+export default function Card({ className, ...others }: Props) {
+    return <div className={classNames(styles.card, className)} {...others} />;
 }

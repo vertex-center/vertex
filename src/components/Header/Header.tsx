@@ -16,6 +16,7 @@ export default function Header(props: Readonly<Props>) {
 
     let name = title;
     let to = "/";
+    let devtools = false;
 
     if (!title) {
         to = "/app/vx-containers";
@@ -26,6 +27,7 @@ export default function Header(props: Readonly<Props>) {
             if (app) {
                 name = app.name;
                 to = `/app/${app.id}`;
+                devtools = app.category === "devtools";
             }
         }
     }
@@ -33,7 +35,7 @@ export default function Header(props: Readonly<Props>) {
     return (
         <header className={styles.header} onClick={onClick}>
             <Link to={to} className={styles.logo}>
-                <Logo name={name} />
+                <Logo name={name} devtools={devtools} />
             </Link>
         </header>
     );

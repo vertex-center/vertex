@@ -34,7 +34,7 @@ import SqlInstaller from "./apps/Sql/Installer/SqlInstaller";
 import SqlDatabase from "./apps/Sql/SqlDatabase/SqlDatabase";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import ServiceEditor from "./apps/Containers/pages/ServiceEditor/ServiceEditor";
+import ServiceEditor from "./apps/DevToolsServiceEditor/ServiceEditor/ServiceEditor";
 
 const queryClient = new QueryClient();
 
@@ -63,7 +63,7 @@ function App() {
                                 element={<ContainersStore />}
                             />
                             <Route
-                                path="/app/vx-containers/editor"
+                                path="/app/vx-devtools-service-editor"
                                 element={<ServiceEditor />}
                             />
                             <Route path="/app/vx-sql" element={<SqlApp />}>

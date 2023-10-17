@@ -1,6 +1,6 @@
 import styles from "./Dock.module.sass";
 import Icon from "../Icon/Icon";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import classNames from "classnames";
 import DockDrawer from "./DockDrawer";
 import { Fragment, useState } from "react";
@@ -50,6 +50,10 @@ export function DockApp(props: Readonly<DockAppProps>) {
 export default function Dock() {
     const { apps } = useApps();
 
+    const location = useLocation();
+
+    let showDevtools = location.pathname.includes("devtools");
+
     const [drawerOpen, setDrawerOpen] = useState(false);
 
     return (
@@ -68,6 +72,11 @@ export default function Dock() {
                     {apps?.length > 0 && (
                         <div className={styles.shortcuts}>
                             {[...(apps ?? [])]
+                                ?.filter(
+                                    (app) =>
+                                        showDevtools ||
+                                        app.category !== "devtools"
+                                )
                                 ?.sort((a, b) => (a.name > b.name ? 1 : -1))
                                 ?.map((app) => (
                                     <DockApp

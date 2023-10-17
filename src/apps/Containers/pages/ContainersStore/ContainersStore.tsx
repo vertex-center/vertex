@@ -10,10 +10,6 @@ import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import ServiceInstallPopup from "../../../../components/ServiceInstallPopup/ServiceInstallPopup";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import List from "../../../../components/List/List";
-import Toolbar from "../../../../components/Toolbar/Toolbar";
-import Spacer from "../../../../components/Spacer/Spacer";
-import Button from "../../../../components/Button/Button";
-import Select, { SelectValue } from "../../../../components/Input/Select";
 
 type Downloading = {
     service: ServiceModel;
@@ -96,20 +92,20 @@ export default function ContainersStore() {
                 </Horizontal>
                 <Vertical gap={10}>
                     <APIError error={error} />
-                    <Toolbar className={styles.toolbar}>
-                        <Select
-                            // @ts-ignore
-                            value={<SelectValue>Category</SelectValue>}
-                            disabled
-                        />
-                        <Spacer />
-                        <Button
-                            to="/app/vx-containers/editor"
-                            rightIcon="frame_source"
-                        >
-                            Service Editor
-                        </Button>
-                    </Toolbar>
+                    {/*<Toolbar className={styles.toolbar}>*/}
+                    {/*    <Select*/}
+                    {/*        // @ts-ignore*/}
+                    {/*        value={<SelectValue>Category</SelectValue>}*/}
+                    {/*        disabled*/}
+                    {/*    />*/}
+                    {/*    <Spacer />*/}
+                    {/*    <Button*/}
+                    {/*        to="/app/vx-devtools-service-editor"*/}
+                    {/*        leftIcon="frame_source"*/}
+                    {/*    >*/}
+                    {/*        Service Editor*/}
+                    {/*    </Button>*/}
+                    {/*</Toolbar>*/}
                     <List className={styles.content}>
                         {services?.map((service) => (
                             <Service
