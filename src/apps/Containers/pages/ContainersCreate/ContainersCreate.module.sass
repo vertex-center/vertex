@@ -11,8 +11,6 @@
     margin: 0 20px
 
 .content
-    display: flex
-    flex-direction: column
     margin: 0 30px
 
     @include dimensions.extra-small-or-less
@@ -26,6 +24,30 @@
 
     @include dimensions.medium-or-less
         grid-template-columns: repeat(2, 1fr)
+
+    @include dimensions.small-or-less
+        grid-template-columns: 1fr
+
+.volume
+    display: grid
+    grid-template-columns: 1fr 2fr
+    gap: 15px
+
+    @include dimensions.small-or-less
+        grid-template-columns: 1fr
+
+.port
+    display: grid
+    grid-template-columns: repeat(2, 1fr)
+    gap: 15px
+
+    @include dimensions.small-or-less
+        grid-template-columns: 1fr
+
+.containerEnvironment
+    display: grid
+    grid-template-columns: repeat(2, 1fr)
+    gap: 15px
 
     @include dimensions.small-or-less
         grid-template-columns: 1fr

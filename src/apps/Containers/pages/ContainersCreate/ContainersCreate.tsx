@@ -87,11 +87,142 @@ function EnvironmentInputs({ control, register, errors, i }) {
     );
 }
 
+function UrlInputs({ control, register, errors, i }) {
+    return (
+        <Fragment>
+            <Input
+                label="Name"
+                {...register(`urls.${i}.name`)}
+                aria-invalid={errors?.name ? "true" : "false"}
+                error={errors?.name?.message}
+                required
+            />
+            <Input
+                label="Port"
+                {...register(`urls.${i}.port`)}
+                aria-invalid={errors?.port ? "true" : "false"}
+                error={errors?.port?.message}
+                required
+            />
+            <Controller
+                render={({ field }) => {
+                    const value = (
+                        <SelectValue>
+                            {
+                                urlKinds.find((e) => e.value === field.value)
+                                    ?.label
+                            }
+                        </SelectValue>
+                    );
+                    return (
+                        <Select
+                            label="Kind"
+                            {...register(`urls.${i}.kind`)}
+                            // @ts-ignore
+                            value={value}
+                            onChange={field.onChange}
+                            required
+                        >
+                            {urlKinds.map((e) => (
+                                <SelectOption key={e.value} value={e.value}>
+                                    {e.label}
+                                </SelectOption>
+                            ))}
+                        </Select>
+                    );
+                }}
+                name={`urls.${i}.kind`}
+                control={control}
+            />
+            <Input
+                label="Ping"
+                {...register(`urls.${i}.ping`)}
+                aria-invalid={errors?.ping ? "true" : "false"}
+                error={errors?.ping?.message}
+            />
+        </Fragment>
+    );
+}
+
+function VolumeInputs({ register, errors, i }) {
+    return (
+        <div className={styles.volume}>
+            <Input
+                label="Name of the volume"
+                {...register(`methods.docker.volumes.${i}.key`)}
+                aria-invalid={errors?.key ? "true" : "false"}
+                error={errors?.key?.message}
+                placeholder="data"
+                required
+            />
+            <Input
+                label="Path in the container"
+                {...register(`methods.docker.volumes.${i}.value`)}
+                aria-invalid={errors?.value ? "true" : "false"}
+                error={errors?.value?.message}
+                placeholder="/var/lib/data"
+                required
+            />
+        </div>
+    );
+}
+
+function PortInputs({ register, errors, i }) {
+    return (
+        <div className={styles.port}>
+            <Input
+                label="Port in the container"
+                {...register(`methods.docker.ports.${i}.key`)}
+                aria-invalid={errors?.key ? "true" : "false"}
+                error={errors?.key?.message}
+                placeholder="3000"
+                required
+            />
+            <Input
+                label="Port out of the container"
+                {...register(`methods.docker.ports.${i}.value`)}
+                aria-invalid={errors?.value ? "true" : "false"}
+                error={errors?.value?.message}
+                placeholder="3000"
+                required
+            />
+        </div>
+    );
+}
+
+function ContainerEnvironmentInputs({ register, errors, i }) {
+    return (
+        <div className={styles.containerEnvironment}>
+            <Input
+                label="Name in Docker"
+                {...register(`methods.docker.environment.${i}.key`)}
+                aria-invalid={errors?.key ? "true" : "false"}
+                error={errors?.key?.message}
+                placeholder="TOKEN"
+                required
+            />
+            <Input
+                label="Name in Vertex"
+                {...register(`methods.docker.environment.${i}.value`)}
+                aria-invalid={errors?.value ? "true" : "false"}
+                error={errors?.value?.message}
+                placeholder="TOKEN"
+                required
+            />
+        </div>
+    );
+}
+
 const environmentTypes = [
     { value: "string", label: "String" },
     { value: "port", label: "Port" },
     { value: "timezone", label: "Timezone" },
     { value: "url", label: "URL" },
+];
+
+const urlKinds = [
+    { value: "client", label: "Client" },
+    { value: "server", label: "Server" },
 ];
 
 const schema = object({
@@ -134,6 +265,44 @@ const schema = object({
             description: yup.string().label("Description").max(100),
         })
     ),
+
+    urls: yup.array().of(
+        yup.object().shape({
+            name: yup.string().label("Name").required(),
+            port: yup.number().label("Port").required(),
+            ping: yup.string().label("Ping"),
+            kind: yup
+                .string()
+                .label("Kind")
+                .oneOf(urlKinds.map((e) => e.value))
+                .required(),
+        })
+    ),
+
+    methods: yup.object().shape({
+        docker: yup.object().shape({
+            image: yup.string().label("Docker image").required(),
+            command: yup.string().label("Command"),
+            volumes: yup.array().of(
+                yup.object().shape({
+                    key: yup.string().label("Name").required(),
+                    value: yup.string().label("Path").required(),
+                })
+            ),
+            ports: yup.array().of(
+                yup.object().shape({
+                    key: yup.number().label("Port input").required(),
+                    value: yup.number().label("Port output").required(),
+                })
+            ),
+            environment: yup.array().of(
+                yup.object().shape({
+                    key: yup.string().label("Name").required(),
+                    value: yup.string().label("Name").required(),
+                })
+            ),
+        }),
+    }),
 });
 
 type FormData = yup.InferType<typeof schema>;
@@ -155,6 +324,42 @@ export default function ContainersCreate() {
     } = useFieldArray({
         control,
         name: "environment",
+    });
+
+    const {
+        fields: urls,
+        append: appendUrl,
+        remove: removeUrl,
+    } = useFieldArray({
+        control,
+        name: "urls",
+    });
+
+    const {
+        fields: volumes,
+        append: appendVolume,
+        remove: removeVolume,
+    } = useFieldArray({
+        control,
+        name: "methods.docker.volumes",
+    });
+
+    const {
+        fields: ports,
+        append: appendPort,
+        remove: removePort,
+    } = useFieldArray({
+        control,
+        name: "methods.docker.ports",
+    });
+
+    const {
+        fields: containerEnvironment,
+        append: appendContainerEnvironment,
+        remove: removeContainerEnvironment,
+    } = useFieldArray({
+        control,
+        name: "methods.docker.environment",
     });
 
     return (
@@ -224,89 +429,297 @@ export default function ContainersCreate() {
                             })
                         }
                     >
-                        Add ENV variable
+                        Add variable
                     </Button>
                 </Horizontal>
-                <Vertical gap={10}>
-                    {environment.length === 0 && (
-                        <NoItems icon="list" text="No environment variables" />
-                    )}
-                    <List>
-                        {environment.map((field, i) => {
-                            return (
-                                <ListItem key={field.id}>
-                                    <Vertical
-                                        alignItems="stretch"
-                                        style={{ width: "100%" }}
-                                        gap={5}
-                                    >
-                                        <Horizontal>
-                                            <Title className={styles.title}>
-                                                Environment variable #{i + 1}
-                                            </Title>
-                                            <Spacer />
-                                            <Button
-                                                rightIcon="delete"
-                                                onClick={() =>
-                                                    removeEnvironment(i)
-                                                }
-                                            >
-                                                Remove
-                                            </Button>
-                                        </Horizontal>
-                                        <div className={styles.inputs}>
-                                            <EnvironmentInputs
-                                                key={field.id}
-                                                control={control}
-                                                register={register}
-                                                i={i}
-                                                errors={errors.environment?.[i]}
-                                            />
-                                        </div>
-                                    </Vertical>
-                                </ListItem>
-                            );
-                        })}
-                    </List>
-                </Vertical>
+                {environment.length === 0 && (
+                    <NoItems icon="list" text="No environment variables" />
+                )}
+                <List>
+                    {environment.map((field, i) => {
+                        return (
+                            <ListItem key={field.id}>
+                                <Vertical
+                                    alignItems="stretch"
+                                    style={{ width: "100%" }}
+                                    gap={5}
+                                >
+                                    <Horizontal>
+                                        <Title className={styles.title}>
+                                            Environment variable #{i + 1}
+                                        </Title>
+                                        <Spacer />
+                                        <Button
+                                            rightIcon="delete"
+                                            onClick={() => removeEnvironment(i)}
+                                        >
+                                            Remove
+                                        </Button>
+                                    </Horizontal>
+                                    <div className={styles.inputs}>
+                                        <EnvironmentInputs
+                                            key={field.id}
+                                            control={control}
+                                            register={register}
+                                            i={i}
+                                            errors={errors.environment?.[i]}
+                                        />
+                                    </div>
+                                </Vertical>
+                            </ListItem>
+                        );
+                    })}
+                </List>
             </Vertical>
 
             <Vertical className={styles.content} gap={10}>
                 <Horizontal className={styles.title} alignItems="center">
                     <Title>URLs</Title>
                     <Spacer />
-                    <Button primary rightIcon="add">
+                    <Button
+                        primary
+                        rightIcon="add"
+                        onClick={() => appendUrl({ kind: "client" })}
+                    >
                         Add URL
                     </Button>
                 </Horizontal>
-                <Vertical gap={10}>
-                    <NoItems icon="public" text="No URLs." />
-                </Vertical>
+                {urls.length === 0 && <NoItems icon="public" text="No URLs." />}
+                <List>
+                    {urls.map((field, i) => {
+                        return (
+                            <ListItem key={field.id}>
+                                <Vertical
+                                    alignItems="stretch"
+                                    style={{ width: "100%" }}
+                                    gap={5}
+                                >
+                                    <Horizontal>
+                                        <Title className={styles.title}>
+                                            URL #{i + 1}
+                                        </Title>
+                                        <Spacer />
+                                        <Button
+                                            rightIcon="delete"
+                                            onClick={() => removeUrl(i)}
+                                        >
+                                            Remove
+                                        </Button>
+                                    </Horizontal>
+                                    <div className={styles.inputs}>
+                                        <UrlInputs
+                                            key={field.id}
+                                            control={control}
+                                            register={register}
+                                            i={i}
+                                            errors={errors.urls?.[i]}
+                                        />
+                                    </div>
+                                </Vertical>
+                            </ListItem>
+                        );
+                    })}
+                </List>
             </Vertical>
 
             <Vertical className={styles.content} gap={25}>
-                <Title className={styles.title}>Docker installation</Title>
+                <Title className={styles.title}>Docker</Title>
                 <Vertical className={classNames(styles.inputs)} gap={15}>
-                    <Input label="Docker image" />
-                    <Input label="Command" />
-                    <Input label="Ports" />
-                    <Input label="Volumes" />
-                    <Input label="Environment" />
-                    <Input label="Capabilities" />
-                    <Input label="Sysctls" />
+                    <Input
+                        label="Docker image"
+                        {...register("methods.docker.image")}
+                        aria-invalid={
+                            errors.methods?.docker?.image ? "true" : "false"
+                        }
+                        error={errors.methods?.docker?.image?.message}
+                        placeholder="org/repo, ghcr.io/org/repo, etc."
+                        description="The image to pull from a registry."
+                        required
+                    />
+                    <Input
+                        label="Command"
+                        {...register("methods.docker.command")}
+                        aria-invalid={
+                            errors.methods?.docker?.command ? "true" : "false"
+                        }
+                        error={errors.methods?.docker?.command?.message}
+                        placeholder="npm start"
+                        description="A command to run on startup."
+                    />
                 </Vertical>
+            </Vertical>
 
-                <Horizontal>
+            <Vertical className={styles.content} gap={10}>
+                <Horizontal className={styles.title} alignItems="center">
+                    <Title>Docker Volumes</Title>
                     <Spacer />
                     <Button
                         primary
-                        rightIcon="send"
-                        onClick={handleSubmit(onSubmit)}
+                        rightIcon="add"
+                        onClick={() => appendVolume({})}
                     >
-                        Validate
+                        Add volume
                     </Button>
                 </Horizontal>
+                {volumes.length === 0 && (
+                    <NoItems icon="storage" text="No Docker volumes." />
+                )}
+                <List>
+                    {volumes.map((field, i) => {
+                        return (
+                            <ListItem key={field.id}>
+                                <Vertical
+                                    alignItems="stretch"
+                                    style={{ width: "100%" }}
+                                    gap={5}
+                                >
+                                    <Horizontal>
+                                        <Title className={styles.title}>
+                                            Volume #{i + 1}
+                                        </Title>
+                                        <Spacer />
+                                        <Button
+                                            rightIcon="delete"
+                                            onClick={() => removeVolume(i)}
+                                        >
+                                            Remove
+                                        </Button>
+                                    </Horizontal>
+                                    <VolumeInputs
+                                        key={field.id}
+                                        register={register}
+                                        i={i}
+                                        errors={
+                                            errors?.methods?.docker?.volumes?.[
+                                                i
+                                            ]
+                                        }
+                                    />
+                                </Vertical>
+                            </ListItem>
+                        );
+                    })}
+                </List>
             </Vertical>
+
+            <Vertical className={styles.content} gap={10}>
+                <Horizontal className={styles.title} alignItems="center">
+                    <Title>Docker Ports</Title>
+                    <Spacer />
+                    <Button
+                        primary
+                        rightIcon="add"
+                        onClick={() => appendPort({})}
+                    >
+                        Add port
+                    </Button>
+                </Horizontal>
+                {ports.length === 0 && (
+                    <NoItems icon="hub" text="No Docker ports." />
+                )}
+                <List>
+                    {ports.map((field, i) => {
+                        return (
+                            <ListItem key={field.id}>
+                                <Vertical
+                                    alignItems="stretch"
+                                    style={{ width: "100%" }}
+                                    gap={5}
+                                >
+                                    <Horizontal>
+                                        <Title className={styles.title}>
+                                            Port #{i + 1}
+                                        </Title>
+                                        <Spacer />
+                                        <Button
+                                            rightIcon="delete"
+                                            onClick={() => removePort(i)}
+                                        >
+                                            Remove
+                                        </Button>
+                                    </Horizontal>
+                                    <PortInputs
+                                        key={field.id}
+                                        register={register}
+                                        i={i}
+                                        errors={
+                                            errors?.methods?.docker?.ports?.[i]
+                                        }
+                                    />
+                                </Vertical>
+                            </ListItem>
+                        );
+                    })}
+                </List>
+            </Vertical>
+
+            <Vertical className={styles.content} gap={10}>
+                <Horizontal className={styles.title} alignItems="center">
+                    <Title>Docker Environments</Title>
+                    <Spacer />
+                    <Button
+                        primary
+                        rightIcon="add"
+                        onClick={() => appendContainerEnvironment({})}
+                    >
+                        Add port
+                    </Button>
+                </Horizontal>
+                {containerEnvironment.length === 0 && (
+                    <NoItems
+                        icon="list"
+                        text="No Docker environment variables."
+                    />
+                )}
+                <List>
+                    {containerEnvironment.map((field, i) => {
+                        return (
+                            <ListItem key={field.id}>
+                                <Vertical
+                                    alignItems="stretch"
+                                    style={{ width: "100%" }}
+                                    gap={5}
+                                >
+                                    <Horizontal>
+                                        <Title className={styles.title}>
+                                            Docker environment variable #{i + 1}
+                                        </Title>
+                                        <Spacer />
+                                        <Button
+                                            rightIcon="delete"
+                                            onClick={() =>
+                                                removeContainerEnvironment(i)
+                                            }
+                                        >
+                                            Remove
+                                        </Button>
+                                    </Horizontal>
+                                    <ContainerEnvironmentInputs
+                                        key={field.id}
+                                        register={register}
+                                        i={i}
+                                        errors={
+                                            errors?.methods?.docker
+                                                ?.environment?.[i]
+                                        }
+                                    />
+                                </Vertical>
+                            </ListItem>
+                        );
+                    })}
+                </List>
+            </Vertical>
+
+            <Horizontal className={styles.content}>
+                <Spacer />
+                <Button
+                    primary
+                    rightIcon="send"
+                    onClick={handleSubmit(onSubmit)}
+                >
+                    Validate
+                </Button>
+            </Horizontal>
         </Vertical>
     );
 }
