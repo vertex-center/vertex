@@ -21,8 +21,11 @@ import Select, {
     SelectOption,
     SelectValue,
 } from "../../../../components/Input/Select";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import Card from "../../../../components/Card/Card";
+import { api } from "../../../../backend/api/backend";
+import { produce } from "immer";
+import Code from "../../../../components/Code/Code";
 
 function EnvironmentInputs({ control, register, errors, i }) {
     return (
@@ -314,6 +317,7 @@ export default function ServiceEditor() {
         control,
         register,
         handleSubmit,
+        getValues: getService,
         formState: { errors },
     } = useForm<FormData>({ resolver });
     const onSubmit: SubmitHandler<FormData> = (data) => console.log(data);
@@ -363,7 +367,47 @@ export default function ServiceEditor() {
         name: "methods.docker.environment",
     });
 
-    const download = () => {};
+    const [yaml, setYaml] = useState();
+
+    const download = () => {
+        const service = getService();
+        console.log(service);
+
+        const s: any = produce(service, (draft: any) => {
+            const volumes = draft.methods.docker.volumes;
+            const newVolumes = Object.assign(
+                {},
+                ...volumes.map((x: any) => ({ [x.key]: x.value }))
+            );
+
+            const ports = draft.methods.docker.ports;
+            const newPorts = Object.assign(
+                {},
+                ...ports.map((x: any) => ({ [x.key]: x.value }))
+            );
+
+            const environment = draft.methods.docker.environment;
+            const newEnvironment = Object.assign(
+                {},
+                ...environment.map((x: any) => ({ [x.key]: x.value }))
+            );
+
+            return {
+                ...draft,
+                methods: {
+                    docker: {
+                        volumes: newVolumes,
+                        ports: newPorts,
+                        environment: newEnvironment,
+                    },
+                },
+            };
+        });
+
+        console.log(s);
+
+        api.vxServiceEditor.editor.toYaml(s).then((data) => setYaml(data));
+    };
 
     return (
         <Vertical gap={30}>
@@ -707,13 +751,18 @@ export default function ServiceEditor() {
                 )}
             </Vertical>
 
+            <Vertical className={styles.content} gap={20}>
+                <Title className={styles.title}>Service.yml</Title>
+                <Code code={yaml} language="yaml" />
+            </Vertical>
+
             <Horizontal gap={10} className={styles.content}>
                 <Spacer />
                 <Button rightIcon="check" onClick={handleSubmit(onSubmit)}>
                     Validate
                 </Button>
                 <Button primary rightIcon="download" onClick={download}>
-                    Download
+                    service.yml
                 </Button>
             </Horizontal>
         </Vertical>

@@ -10,6 +10,7 @@ import { vxReverseProxyRoutes } from "./vxReverseProxy";
 import { VertexApp } from "../../models/app";
 import { Console } from "../../logging/logging";
 import { Update } from "../../models/update";
+import { vxServiceEditorRoutes } from "./vxServiceEditor";
 
 export const server = axios.create({
     // @ts-ignore
@@ -68,6 +69,7 @@ export const api = {
     vxMonitoring: vxMonitoringRoutes,
     vxSql: vxSqlRoutes,
     vxReverseProxy: vxReverseProxyRoutes,
+    vxServiceEditor: vxServiceEditorRoutes,
 
     apps: {
         all: async () => {
