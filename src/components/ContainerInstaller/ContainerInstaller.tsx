@@ -5,7 +5,8 @@ import { ProgressOverlay } from "../Progress/Progress";
 import { Container as ContainerModel } from "../../models/container";
 import { api } from "../../backend/api/backend";
 import { useServerEvent } from "../../hooks/useEvent";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { useContainers } from "../../apps/Containers/hooks/useContainers";
 
 type Props = {
     name: string;
@@ -24,12 +25,11 @@ export default function ContainerInstaller(props: Readonly<Props>) {
     const queryClient = useQueryClient();
 
     const {
-        data: containers,
+        containers,
         isLoading: isLoadingContainers,
         error: errorContainers,
-    } = useQuery({
-        queryKey: ["containers"],
-        queryFn: api.vxContainers.containers.all,
+    } = useContainers({
+        tags: [tag],
     });
 
     const [downloading, setDownloading] = useState(false);
@@ -39,9 +39,7 @@ export default function ContainerInstaller(props: Readonly<Props>) {
 
     useEffect(() => {
         if (!containers) return;
-        const inst = Object.entries(containers).find(
-            ([_, container]) => container?.tags?.includes(tag) ?? false
-        );
+        const inst = Object.values(containers ?? {})?.[0];
         if (!inst) {
             setContainer({
                 display_name: name,
@@ -50,7 +48,7 @@ export default function ContainerInstaller(props: Readonly<Props>) {
             return;
         }
         setContainer({
-            ...inst[1],
+            ...inst,
             onPower: onPower,
         });
     }, [containers]);

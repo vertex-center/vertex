@@ -4,9 +4,7 @@ import styles from "./CloudflareTunnels.module.sass";
 import ContainerInstaller from "../../../components/ContainerInstaller/ContainerInstaller";
 import { api } from "../../../backend/api/backend";
 
-type Props = {};
-
-export default function CloudflareTunnels(props: Readonly<Props>) {
+export default function CloudflareTunnels() {
     return (
         <Vertical gap={30}>
             <Vertical gap={20}>

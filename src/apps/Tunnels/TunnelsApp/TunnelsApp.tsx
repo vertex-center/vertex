@@ -5,21 +5,19 @@ import Sidebar, {
 } from "../../../components/Sidebar/Sidebar";
 import { SiCloudflare } from "@icons-pack/react-simple-icons";
 import { Fragment } from "react";
-import { api } from "../../../backend/api/backend";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useServerEvent } from "../../../hooks/useEvent";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { useContainers } from "../../Containers/hooks/useContainers";
 
 export default function TunnelsApp() {
     const queryClient = useQueryClient();
-    const { data: containers, isLoading } = useQuery({
-        queryKey: ["containers"],
-        queryFn: api.vxContainers.containers.all,
+
+    const { containers, isLoading } = useContainers({
+        tags: ["Vertex Tunnels - Cloudflare"],
     });
 
-    const ledCloudflared = Object.values(containers || {}).find((inst) =>
-        inst.tags?.includes("Vertex Tunnels - Cloudflare")
-    );
+    const container = Object.values(containers || {})?.[0];
 
     useServerEvent("/app/vx-containers/containers/events", {
         change: (e) => {
@@ -36,7 +34,7 @@ export default function TunnelsApp() {
                     icon={<SiCloudflare size={20} />}
                     to="/app/vx-tunnels/cloudflare"
                     name="Cloudflare Tunnel"
-                    led={ledCloudflared && { status: ledCloudflared?.status }}
+                    led={container && { status: container?.status }}
                 />
             </SidebarGroup>
         </Sidebar>

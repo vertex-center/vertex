@@ -3,29 +3,24 @@ import Sidebar, {
     SidebarGroup,
     SidebarItem,
 } from "../../../components/Sidebar/Sidebar";
-import { api } from "../../../backend/api/backend";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { Fragment } from "react";
 import { SiPostgresql } from "@icons-pack/react-simple-icons";
 import { useServerEvent } from "../../../hooks/useEvent";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { useContainers } from "../../Containers/hooks/useContainers";
 
 export default function SqlApp() {
     const queryClient = useQueryClient();
-    const { data: containers, isLoading } = useQuery({
-        queryKey: ["containers"],
-        queryFn: api.vxContainers.containers.all,
+    const { containers, isLoading } = useContainers({
+        tags: ["Vertex SQL"],
     });
-
-    const dbs = Object.values(containers ?? {})?.filter((i) =>
-        i?.tags?.some((t) => t.includes("Vertex SQL"))
-    );
 
     const sidebar = (
         <Sidebar root="/app/vx-sql">
-            {Object.values(dbs).length > 0 && (
+            {Object.values(containers ?? {}).length > 0 && (
                 <SidebarGroup title="DBMS">
-                    {dbs?.map((inst) => {
+                    {Object.values(containers ?? {})?.map((inst) => {
                         let icon: string | JSX.Element = "database";
                         const type = inst?.service?.features?.databases?.find(
                             (d) => d.category === "sql"
