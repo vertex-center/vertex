@@ -7,13 +7,14 @@ import { api } from "../../../../backend/api/backend";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useServerEvent } from "../../../../hooks/useEvent";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Toolbar from "../../../../components/Toolbar/Toolbar";
 import Spacer from "../../../../components/Spacer/Spacer";
 import Button from "../../../../components/Button/Button";
 import SelectTags from "../../components/SelectTags/SelectTags";
 import { useState } from "react";
 import NoItems from "../../../../components/NoItems/NoItems";
+import { useContainers } from "../../hooks/useContainers";
 
 type ToolbarProps = {
     tags?: string[];
@@ -39,11 +40,12 @@ export default function ContainersApp() {
 
     const [tags, setTags] = useState<string[]>([]);
 
-    const queryContainers = useQuery({
-        queryKey: ["containers", { tags }],
-        queryFn: () => api.vxContainers.containers.search({ tags }),
-    });
-    const { data: containers, isLoading, isError, error } = queryContainers;
+    const {
+        data: containers,
+        isLoading,
+        isError,
+        error,
+    } = useContainers({ tags });
 
     const mutationPower = useMutation({
         mutationFn: async (uuid: string) => {
@@ -57,13 +59,6 @@ export default function ContainersApp() {
             }
         },
     });
-
-    let status = "Waiting server response...";
-    if (queryContainers.isSuccess) {
-        status = "running";
-    } else if (queryContainers.isError) {
-        status = "off";
-    }
 
     useServerEvent("/app/vx-containers/containers/events", {
         change: () => {

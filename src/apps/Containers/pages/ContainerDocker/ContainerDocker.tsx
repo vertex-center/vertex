@@ -13,19 +13,12 @@ import {
 import byteSize from "byte-size";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
-import { useQuery } from "@tanstack/react-query";
+import { useDockerInfo } from "../../hooks/useContainer";
 
 export default function ContainerDocker() {
     const { uuid } = useParams();
 
-    const {
-        data: info,
-        isLoading,
-        error,
-    } = useQuery({
-        queryKey: ["container_docker", uuid],
-        queryFn: api.vxContainers.container(uuid).docker.get,
-    });
+    const { dockerInfo: info, isLoading, error } = useDockerInfo(uuid);
 
     const [recreatingContainer, setRecreatingContainer] = useState(false);
     const [recreatingContainerError, setRecreatingContainerError] = useState();

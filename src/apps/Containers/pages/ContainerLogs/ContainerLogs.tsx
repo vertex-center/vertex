@@ -1,24 +1,20 @@
 import Logs from "../../../../components/Logs/Logs";
 import { Fragment } from "react";
 import { useParams } from "react-router-dom";
-import { api } from "../../../../backend/api/backend";
 import { Title } from "../../../../components/Text/Text";
 import styles from "./ContainerLogs.module.sass";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useServerEvent } from "../../../../hooks/useEvent";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { produce } from "immer";
+import { useContainerLogs } from "../../hooks/useContainer";
 
 export default function ContainerLogs() {
     const { uuid } = useParams();
     const queryClient = useQueryClient();
 
-    const queryLogs = useQuery({
-        queryKey: ["container_logs", uuid],
-        queryFn: api.vxContainers.container(uuid).logs.get,
-    });
-    const { data: logs, isLoading, error } = queryLogs;
+    const { data: logs, isLoading, error } = useContainerLogs(uuid);
 
     const onStdout = (e: MessageEvent) => {
         queryClient.setQueryData(["container_logs", uuid], (logs: any[]) => [
