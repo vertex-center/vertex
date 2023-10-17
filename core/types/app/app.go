@@ -21,6 +21,9 @@ type Meta struct {
 
 	// Icon is the material symbol name for the app.
 	Icon string `json:"icon"`
+
+	// Category is the category of the app.
+	Category string `json:"category"`
 }
 
 type App struct {
