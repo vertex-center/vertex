@@ -2,8 +2,9 @@ import { Meta, StoryObj } from "@storybook/react";
 import { MaterialIcon } from "./MaterialIcon";
 
 const meta: Meta<typeof MaterialIcon> = {
-    title: "Material Icon",
     component: MaterialIcon,
+    tags: ["autodocs"],
+    title: "Material Icon",
 };
 
 type Story = StoryObj<typeof MaterialIcon>;
