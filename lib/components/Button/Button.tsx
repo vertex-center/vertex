@@ -8,7 +8,7 @@ export type ButtonProps = HTMLProps<HTMLButtonElement> & {
     type: ButtonType;
 };
 
-export function Button(props: Readonly<ButtonProps>) {
+function Button(props: Readonly<ButtonProps>) {
     const { type, disabled, className, ...others } = props;
     return (
         <button
@@ -20,3 +20,9 @@ export function Button(props: Readonly<ButtonProps>) {
         />
     );
 }
+
+Button.defaultProps = {
+    type: "outlined",
+};
+
+export default Button;
