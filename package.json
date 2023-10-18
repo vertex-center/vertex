@@ -9,7 +9,8 @@
         "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
         "preview": "vite preview",
         "storybook": "storybook dev -p 6006",
-        "build-storybook": "storybook build",
+        "storybook:build": "storybook build",
+        "storybook:test": "test-storybook",
         "test": "jest"
     },
     "main": "dist/vertex-components.es.js",
