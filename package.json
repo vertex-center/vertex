@@ -30,6 +30,7 @@
         "@storybook/blocks": "^7.5.0",
         "@storybook/react": "^7.5.0",
         "@storybook/react-vite": "^7.5.0",
+        "@storybook/test-runner": "^0.13.0",
         "@storybook/testing-library": "^0.2.2",
         "@testing-library/jest-dom": "^6.1.4",
         "@testing-library/react": "^14.0.0",
