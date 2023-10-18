@@ -1,7 +1,16 @@
 import { HTMLProps } from "react";
+import classNames from "classnames";
 
 type Props = HTMLProps<HTMLSpanElement>;
 
 export function MaterialIcon(props: Readonly<Props>) {
-    return <span className="material-symbols-rounded">{props.name}</span>;
+    const { className, ...others } = props;
+    return (
+        <span
+            className={classNames("material-symbols-rounded", className)}
+            {...others}
+        >
+            {props.name}
+        </span>
+    );
 }
