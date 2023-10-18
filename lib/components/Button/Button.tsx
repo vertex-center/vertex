@@ -5,11 +5,12 @@ import classNames from "classnames";
 export type ButtonType = "colored" | "outlined";
 
 export type ButtonProps = HTMLProps<HTMLButtonElement> & {
-    type: ButtonType;
+    type?: ButtonType;
 };
 
-function Button(props: Readonly<ButtonProps>) {
-    const { type, disabled, className, ...others } = props;
+export function Button(props: Readonly<ButtonProps>) {
+    const { type = "outlined", disabled, className, ...others } = props;
+
     return (
         <button
             disabled={disabled}
@@ -20,9 +21,3 @@ function Button(props: Readonly<ButtonProps>) {
         />
     );
 }
-
-Button.defaultProps = {
-    type: "outlined",
-};
-
-export default Button;
