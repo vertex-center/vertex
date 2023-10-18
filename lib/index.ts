@@ -1,3 +1,6 @@
 import Button from "./components/Button";
+import MaterialIcon from "./components/MaterialIcon";
 
-export { Button };
+import "./index.sass";
+
+export { Button, MaterialIcon };
