@@ -2,7 +2,7 @@ import { HTMLProps } from "react";
 import "./Button.sass";
 import classNames from "classnames";
 
-export type ButtonType = "colored" | "outlined";
+export type ButtonType = "colored" | "outlined" | "danger";
 
 export type ButtonProps = HTMLProps<HTMLButtonElement> & {
     type?: ButtonType;

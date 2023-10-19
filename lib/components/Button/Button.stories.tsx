@@ -16,7 +16,7 @@ const Default: Story = {
     argTypes: {
         type: {
             control: "select",
-            options: ["colored", "outlined", "text"],
+            options: ["colored", "outlined", "danger"],
         },
         disabled: {
             control: "boolean",
@@ -42,6 +42,14 @@ export const Outlined: Story = {
     args: {
         ...Default.args,
         type: "outlined",
+    },
+};
+
+export const Danger: Story = {
+    ...Default,
+    args: {
+        ...Default.args,
+        type: "danger",
     },
 };
 

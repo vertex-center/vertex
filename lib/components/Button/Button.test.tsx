@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import Button from "./index.tsx";
+import { ButtonType } from "./Button.tsx";
 
 test("it renders", () => {
     render(<Button>Button</Button>);
@@ -36,15 +37,10 @@ test("it is outlined by default", () => {
 });
 
 describe("it can be of type", () => {
-    test("colored", () => {
-        render(<Button type="colored">Button</Button>);
+    const cases: ButtonType[] = ["colored", "outlined", "danger"];
+    test.each(cases)("%p", (type) => {
+        render(<Button type={type}>Button</Button>);
         const button = screen.getByRole("button");
-        expect(button).toHaveClass("button-colored");
-    });
-
-    test("outlined", () => {
-        render(<Button type="outlined">Button</Button>);
-        const button = screen.getByRole("button");
-        expect(button).toHaveClass("button-outlined");
+        expect(button).toHaveClass(`button-${type}`);
     });
 });

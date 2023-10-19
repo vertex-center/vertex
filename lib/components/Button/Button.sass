@@ -16,6 +16,7 @@
     font-size: fonts.$size-normal
     color: colors.$fg-primary
     cursor: pointer
+    @include presets.control-shadow
 
     &:hover
         filter: brightness(1.3)
@@ -25,9 +26,6 @@
         user-select: none
         opacity: 0.5
 
-    &:not(&-disabled)
-        @include presets.control-shadow
-
     &-colored
         background-color: colors.$bg-accent
         border: 1px solid colors.$bg-accent
@@ -36,6 +34,13 @@
     &-outlined
         background-color: transparent
         border: 1px solid colors.$bg-tertiary
+        color: colors.$fg-primary
+
+    &-danger
+        background-color: transparent
+        border: 1px solid colors.$red
+        color: colors.$red
+        @include presets.control-shadow(colors.$red-hover)
 
     &-text
         background-color: transparent
