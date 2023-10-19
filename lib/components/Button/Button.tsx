@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes, ReactElement } from "react";
+import React, { ButtonHTMLAttributes } from "react";
 import "./Button.sass";
 import classNames from "classnames";
 
@@ -6,8 +6,8 @@ export type ButtonType = "colored" | "outlined" | "danger";
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
     variant?: ButtonType;
-    leftIcon?: ReactElement;
-    rightIcon?: ReactElement;
+    leftIcon?: React.JSX.Element;
+    rightIcon?: React.JSX.Element;
 };
 
 export function Button(props: Readonly<ButtonProps>) {
