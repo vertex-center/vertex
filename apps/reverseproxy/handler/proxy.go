@@ -5,6 +5,7 @@ import (
 
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
 	types2 "github.com/vertex-center/vertex/apps/reverseproxy/core/types"
+	"github.com/vertex-center/vertex/config"
 
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -34,6 +35,24 @@ func (r *ProxyHandler) AddRedirect(c *router.Context) {
 	var body AddRedirectBody
 	err := c.ParseBody(&body)
 	if err != nil {
+		return
+	}
+
+	if body.Source == config.EmptyStr {
+		c.Abort(router.Error{
+			Code:           types2.ErrCodeInvalidAddRedirectUuid,
+			PublicMessage:  fmt.Sprintf("Failed to add redirect as source is empty."),
+			PrivateMessage: err.Error(),
+		})
+		return
+	}
+
+	if body.Target == config.EmptyStr {
+		c.Abort(router.Error{
+			Code:           types2.ErrCodeInvalidAddRedirectUuid,
+			PublicMessage:  fmt.Sprintf("Failed to add redirect as target is empty."),
+			PrivateMessage: err.Error(),
+		})
 		return
 	}
 
