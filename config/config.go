@@ -19,7 +19,6 @@ type Mode string
 const (
 	ProductionMode Mode = "production"
 	DebugMode      Mode = "debug"
-	EmptyStr            = ""
 )
 
 type Config struct {
