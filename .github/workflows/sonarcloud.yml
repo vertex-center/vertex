@@ -15,9 +15,17 @@ jobs:
     runs-on: ubuntu-latest
     permissions: read-all
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout (PR)
+        if: github.event_name == 'pull_request_target'
+        uses: actions/checkout@v3
         with:
-          ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.ref }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Checkout (Push)
+        if: github.event_name == 'push'
+        uses: actions/checkout@v3
+        with:
           fetch-depth: 0
 
       - name: Set up Go
