@@ -47,14 +47,14 @@ func (r *ProxyHandler) AddRedirect(c *router.Context) {
 	if errors.Is(err, types2.ErrSourceInvalid) {
 		c.Abort(router.Error{
 			Code:           types2.ErrCodeSourceInvalid,
-			PublicMessage:  fmt.Sprint("Failed to add redirect as source is empty."),
+			PublicMessage:  "Failed to add redirect as source is empty.",
 			PrivateMessage: err.Error(),
 		})
 		return
 	} else if errors.Is(err, types2.ErrTargetInvalid) {
 		c.Abort(router.Error{
 			Code:           types2.ErrCodeTargetInvalid,
-			PublicMessage:  fmt.Sprint("Failed to add redirect as target is empty."),
+			PublicMessage:  "Failed to add redirect as target is empty.",
 			PrivateMessage: err.Error(),
 		})
 		return
