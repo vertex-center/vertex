@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
@@ -43,7 +44,21 @@ func (r *ProxyHandler) AddRedirect(c *router.Context) {
 	}
 
 	err = r.proxyService.AddRedirect(redirect)
-	if err != nil {
+	if errors.Is(err, types2.ErrSourceInvalid) {
+		c.Abort(router.Error{
+			Code:           types2.ErrCodeSourceInvalid,
+			PublicMessage:  "Failed to add redirect as source is empty.",
+			PrivateMessage: err.Error(),
+		})
+		return
+	} else if errors.Is(err, types2.ErrTargetInvalid) {
+		c.Abort(router.Error{
+			Code:           types2.ErrCodeTargetInvalid,
+			PublicMessage:  "Failed to add redirect as target is empty.",
+			PrivateMessage: err.Error(),
+		})
+		return
+	} else if err != nil {
 		c.Abort(router.Error{
 			Code:           types2.ErrCodeFailedToAddRedirect,
 			PublicMessage:  fmt.Sprintf("Failed to add redirect '%s' to '%s'.", redirect.Source, redirect.Target),

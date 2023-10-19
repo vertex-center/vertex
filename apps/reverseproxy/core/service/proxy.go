@@ -27,6 +27,15 @@ func (s *ProxyService) GetRedirectByHost(host string) *types.ProxyRedirect {
 
 func (s *ProxyService) AddRedirect(redirect types.ProxyRedirect) error {
 	id := uuid.New()
+
+	if redirect.Source == "" {
+		return types.ErrSourceInvalid
+	}
+
+	if redirect.Target == "" {
+		return types.ErrTargetInvalid
+	}
+
 	return s.proxyAdapter.AddRedirect(id, redirect)
 }
 
