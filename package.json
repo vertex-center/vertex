@@ -4,14 +4,12 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "vite",
         "build": "tsc && vite build",
         "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-        "preview": "vite preview",
+        "test": "jest",
         "storybook": "storybook dev -p 6006",
         "storybook:build": "storybook build",
-        "storybook:test": "test-storybook",
-        "test": "jest"
+        "storybook:test": "test-storybook"
     },
     "main": "dist/vertex-components.es.js",
     "types": "dist/vertex-components.d.ts",
