@@ -46,14 +46,17 @@ describe("it can be of variants", () => {
     });
 });
 
-describe("it can have an icon", () => {
-    const icon = <MaterialIcon icon="deployed_code_update" />;
+test("it can have an icon", () => {
     render(
-        <Button leftIcon={icon} rightIcon={icon}>
+        <Button
+            leftIcon={<MaterialIcon icon="deployed_code_update" />}
+            rightIcon={<MaterialIcon icon="arrow_forward" />}
+        >
             Button
         </Button>,
     );
-    const buttons = screen.getByRole("button");
-    expect(buttons).toHaveLength(2);
-    expect(buttons).toContainElement(screen.getByText("deployed_code_update"));
+    const button = screen.getByRole("button");
+    expect(button.children).toHaveLength(3);
+    expect(button).toContainElement(screen.getByText("deployed_code_update"));
+    expect(button).toContainElement(screen.getByText("arrow_forward"));
 });

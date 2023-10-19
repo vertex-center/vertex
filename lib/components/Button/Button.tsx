@@ -16,6 +16,8 @@ export function Button(props: Readonly<ButtonProps>) {
         disabled,
         className,
         children,
+        leftIcon,
+        rightIcon,
         ...others
     } = props;
 
@@ -27,12 +29,10 @@ export function Button(props: Readonly<ButtonProps>) {
             })}
             {...others}
         >
-            {props.leftIcon && (
-                <span className="button-icon-left">{props.leftIcon}</span>
-            )}
+            {leftIcon && <span className="button-icon-left">{leftIcon}</span>}
             <span className="button-content">{children}</span>
-            {props.rightIcon && (
-                <span className="button-icon-right">{props.rightIcon}</span>
+            {rightIcon && (
+                <span className="button-icon-right">{rightIcon}</span>
             )}
         </button>
     );
