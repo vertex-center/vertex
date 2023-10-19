@@ -21,6 +21,10 @@ func (c *Context) JSON(data interface{}) {
 	c.Context.JSON(http.StatusOK, data)
 }
 
+func (c *Context) Created() {
+	c.Context.Status(http.StatusCreated)
+}
+
 func (c *Context) OK() {
 	c.Context.Status(http.StatusNoContent)
 }
@@ -37,6 +41,10 @@ func (c *Context) NotFound(err Error) {
 
 func (c *Context) Conflict(err Error) {
 	c.AbortWithError(http.StatusConflict, err)
+}
+
+func (c *Context) Unprocessable(err Error) {
+	c.AbortWithError(http.StatusUnprocessableEntity, err)
 }
 
 // 500
