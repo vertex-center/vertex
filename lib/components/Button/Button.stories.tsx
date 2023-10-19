@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Button } from "./Button";
+import { MaterialIcon } from "../MaterialIcon/MaterialIcon";
 
 const meta: Meta<typeof Button> = {
     title: "Components/Button",
@@ -9,9 +10,20 @@ const meta: Meta<typeof Button> = {
 
 type Story = StoryObj<typeof Button>;
 
+const icon = {
+    control: "select",
+    options: ["", "deployed_code_update", "arrow_back", "arrow_forward"],
+    mapping: {
+        "": null,
+        deployed_code_update: <MaterialIcon icon="deployed_code_update" />,
+        arrow_back: <MaterialIcon icon="arrow_back" />,
+        arrow_forward: <MaterialIcon icon="arrow_forward" />,
+    },
+};
+
 const Default: Story = {
     args: {
-        type: "colored",
+        variant: "colored",
         children: "Button",
     },
     argTypes: {
@@ -23,6 +35,8 @@ const Default: Story = {
             control: "boolean",
             defaultValue: false,
         },
+        leftIcon: icon,
+        rightIcon: icon,
         onClick: {
             action: "clicked",
         },
@@ -34,7 +48,7 @@ export const Colored: Story = {
     ...Default,
     args: {
         ...Default.args,
-        type: "colored",
+        variant: "colored",
     },
 };
 
@@ -42,7 +56,7 @@ export const Outlined: Story = {
     ...Default,
     args: {
         ...Default.args,
-        type: "outlined",
+        variant: "outlined",
     },
 };
 
@@ -50,7 +64,23 @@ export const Danger: Story = {
     ...Default,
     args: {
         ...Default.args,
-        type: "danger",
+        variant: "danger",
+    },
+};
+
+export const WithLeftIcon: Story = {
+    ...Default,
+    args: {
+        ...Default.args,
+        leftIcon: <MaterialIcon icon="deployed_code_update" />,
+    },
+};
+
+export const WithRightIcon: Story = {
+    ...Default,
+    args: {
+        ...Default.args,
+        rightIcon: <MaterialIcon icon="deployed_code_update" />,
     },
 };
 

@@ -2,6 +2,7 @@ import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import Button from "./index.tsx";
 import { ButtonType } from "./Button.tsx";
+import { MaterialIcon } from "../../index.ts";
 
 test("it renders", () => {
     render(<Button>Button</Button>);
@@ -36,11 +37,23 @@ test("it is outlined by default", () => {
     expect(button).toHaveClass("button-outlined");
 });
 
-describe("it can be of type", () => {
+describe("it can be of variants", () => {
     const cases: ButtonType[] = ["colored", "outlined", "danger"];
     test.each(cases)("%p", (type) => {
-        render(<Button type={type}>Button</Button>);
+        render(<Button variant={type}>Button</Button>);
         const button = screen.getByRole("button");
         expect(button).toHaveClass(`button-${type}`);
     });
+});
+
+describe("it can have an icon", () => {
+    const icon = <MaterialIcon icon="deployed_code_update" />;
+    render(
+        <Button leftIcon={icon} rightIcon={icon}>
+            Button
+        </Button>,
+    );
+    const buttons = screen.getByRole("button");
+    expect(buttons).toHaveLength(2);
+    expect(buttons).toContainElement(screen.getByText("deployed_code_update"));
 });

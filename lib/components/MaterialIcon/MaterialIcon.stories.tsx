@@ -12,7 +12,7 @@ type Story = StoryObj<typeof MaterialIcon>;
 export const Icon: Story = {
     name: "Normal",
     args: {
-        name: "deployed_code_update",
+        icon: "deployed_code_update",
     },
     render: (props) => <MaterialIcon {...props} />,
 };
