@@ -12,6 +12,9 @@
         "storybook:test": "test-storybook",
         "storybook:test-ci": "concurrently -k -s first -n \"SB,TEST\" -c \"magenta,blue\" \"npm run storybook:build --quiet && npx http-server storybook-static --port 6006 --silent\" \"wait-on tcp:6006 && npm run storybook:test\""
     },
+    "files": [
+        "dist/**"
+    ],
     "main": "dist/vertex-components.es.js",
     "types": "dist/vertex-components.d.ts",
     "dependencies": {
