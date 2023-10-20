@@ -1,4 +1,4 @@
-import { Vertical } from "../../../../components/Layouts/Layouts";
+import { Horizontal, Vertical } from "../../../../components/Layouts/Layouts";
 
 import styles from "./ContainerDetailsDatabase.module.sass";
 import { Title } from "../../../../components/Text/Text";
@@ -9,7 +9,7 @@ import {
 import useContainer from "../../hooks/useContainer";
 import { useParams } from "react-router-dom";
 import ContainerSelect from "../../../../components/Input/ContainerSelect";
-import { useEffect, useState } from "react";
+import { ChangeEvent, Fragment, useEffect, useState } from "react";
 import { Container } from "../../../../models/container";
 import Progress from "../../../../components/Progress";
 import { Button, MaterialIcon } from "@vertex-center/components";
@@ -18,6 +18,8 @@ import { DatabaseEnvironment } from "../../../../models/service";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Spacer from "../../../../components/Spacer/Spacer";
+import Input from "../../../../components/Input/Input";
 
 type DatabaseProps = {
     container?: Container;
@@ -102,7 +104,10 @@ export default function ContainerDetailsDatabase() {
     const [saved, setSaved] = useState<boolean>(undefined);
 
     const [databases, setDatabases] = useState<{
-        [name: string]: string;
+        [name: string]: {
+            container_id: string;
+            db_name?: string;
+        };
     }>();
 
     const mutationSaveDatabase = useMutation({
@@ -122,7 +127,26 @@ export default function ContainerDetailsDatabase() {
         mutationSaveDatabase;
 
     const onChange = (name: string, dbUUID: string) => {
-        setDatabases((prev) => ({ ...prev, [name]: dbUUID }));
+        setDatabases((prev) => ({
+            ...prev,
+            [name]: {
+                container_id: dbUUID,
+            },
+        }));
+        setSaved(false);
+    };
+
+    const onChangeDbName = (
+        e: ChangeEvent<HTMLInputElement>,
+        db_name: string
+    ) => {
+        setDatabases((prev) => ({
+            ...prev,
+            [db_name]: {
+                ...prev?.[db_name],
+                db_name: e.target.value,
+            },
+        }));
         setSaved(false);
     };
 
@@ -131,27 +155,39 @@ export default function ContainerDetailsDatabase() {
             {container &&
                 Object.entries(container?.service?.databases ?? {}).map(
                     ([dbID, db]) => (
-                        <Database
-                            key={dbID}
-                            dbID={dbID}
-                            dbDefinition={db}
-                            container={container}
-                            onChange={onChange}
-                        />
+                        <Fragment key={dbID}>
+                            <Database
+                                dbID={dbID}
+                                dbDefinition={db}
+                                container={container}
+                                onChange={onChange}
+                            />
+                            {databases?.[dbID]?.container_id && (
+                                <Input
+                                    label="Database name"
+                                    onChange={(e: any) =>
+                                        onChangeDbName(e, dbID)
+                                    }
+                                />
+                            )}
+                        </Fragment>
                     )
                 )}
             <ProgressOverlay show={isLoading ?? isUploading} />
             <APIError error={error ?? uploadingError} />
-            <Button
-                variant="colored"
-                onClick={async () => mutationSaveDatabase.mutate()}
-                rightIcon={<MaterialIcon icon="save" />}
-                disabled={isUploading || saved || saved === undefined}
-            >
-                Save{" "}
-                {container?.install_method === "docker" &&
-                    "+ Recreate container"}
-            </Button>
+            <Horizontal>
+                <Spacer />
+                <Button
+                    variant="colored"
+                    onClick={async () => mutationSaveDatabase.mutate()}
+                    rightIcon={<MaterialIcon icon="save" />}
+                    disabled={isUploading || saved || saved === undefined}
+                >
+                    Save{" "}
+                    {container?.install_method === "docker" &&
+                        "+ Recreate container"}
+                </Button>
+            </Horizontal>
         </Vertical>
     );
 }
