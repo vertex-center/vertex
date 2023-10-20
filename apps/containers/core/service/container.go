@@ -361,17 +361,23 @@ func (s *ContainerService) load(uuid uuid.UUID) error {
 	return nil
 }
 
-func (s *ContainerService) SetDatabases(inst *types.Container, databases map[string]uuid.UUID) error {
+func (s *ContainerService) SetDatabases(inst *types.Container, databases map[string]uuid.UUID, options map[string]*types.SetDatabasesOptions) error {
+	for db := range databases {
+		if _, ok := inst.Service.Databases[db]; !ok {
+			return types.ErrDatabaseIDNotFound
+		}
+	}
+
 	inst.Databases = databases
 	err := s.containerSettingsService.Save(inst, inst.ContainerSettings)
 	if err != nil {
 		return err
 	}
-	return s.remapDatabaseEnv(inst)
+	return s.remapDatabaseEnv(inst, options)
 }
 
 // remapDatabaseEnv remaps the environment variables of an container.
-func (s *ContainerService) remapDatabaseEnv(inst *types.Container) error {
+func (s *ContainerService) remapDatabaseEnv(inst *types.Container, options map[string]*types.SetDatabasesOptions) error {
 	for databaseID, databaseContainerUUID := range inst.Databases {
 		db, err := s.Get(databaseContainerUUID)
 		if err != nil {
@@ -391,6 +397,23 @@ func (s *ContainerService) remapDatabaseEnv(inst *types.Container) error {
 		if dbEnvNames.Password != nil {
 			inst.Env[iEnvNames.Password] = db.Env[*dbEnvNames.Password]
 		}
+
+		if options != nil {
+			if modifiedFeature, ok := options[databaseID]; ok {
+				if modifiedFeature != nil && modifiedFeature.DatabaseName != nil {
+					inst.Env[iEnvNames.Database] = *modifiedFeature.DatabaseName
+					continue
+				}
+			}
+		}
+
+		if dbEnvNames.DefaultDatabase != nil {
+			inst.Env[iEnvNames.Database] = db.Env[*dbEnvNames.DefaultDatabase]
+			continue
+		}
+
+		delete(inst.Env, iEnvNames.Database)
+
 	}
 
 	return s.containerEnvService.Save(inst, inst.Env)
