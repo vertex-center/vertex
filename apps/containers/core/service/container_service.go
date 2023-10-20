@@ -21,7 +21,7 @@ func NewContainerServiceService(adapter port.ContainerServiceAdapter) port.Conta
 	}
 }
 
-// CheckForUpdate checks if the service of an container has an update.
+// CheckForUpdate checks if the service of a container has an update.
 // If it has, it sets the container's ServiceUpdate field.
 func (s *ContainerServiceService) CheckForUpdate(inst *types.Container, latest types.Service) error {
 	current := inst.Service
@@ -31,7 +31,7 @@ func (s *ContainerServiceService) CheckForUpdate(inst *types.Container, latest t
 	return nil
 }
 
-// Update updates the service of an container.
+// Update updates the service of a container.
 // The service passed is the latest version of the service.
 func (s *ContainerServiceService) Update(inst *types.Container, service types.Service) error {
 	if service.Version <= types.MaxSupportedVersion {

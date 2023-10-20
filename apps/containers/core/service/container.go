@@ -142,7 +142,7 @@ func (s *ContainerService) Exists(uuid uuid.UUID) bool {
 	return s.containers[uuid] != nil
 }
 
-// Delete deletes an container by its UUID.
+// Delete deletes a container by its UUID.
 // If the container is still running, it returns ErrContainerStillRunning.
 func (s *ContainerService) Delete(inst *types.Container) error {
 	serviceID := inst.Service.ID
@@ -376,7 +376,7 @@ func (s *ContainerService) SetDatabases(inst *types.Container, databases map[str
 	return s.remapDatabaseEnv(inst, options)
 }
 
-// remapDatabaseEnv remaps the environment variables of an container.
+// remapDatabaseEnv remaps the environment variables of a container.
 func (s *ContainerService) remapDatabaseEnv(inst *types.Container, options map[string]*types.SetDatabasesOptions) error {
 	for databaseID, databaseContainerUUID := range inst.Databases {
 		db, err := s.Get(databaseContainerUUID)

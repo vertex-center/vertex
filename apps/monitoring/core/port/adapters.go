@@ -6,7 +6,7 @@ import (
 )
 
 type MetricsAdapter interface {
-	// ConfigureContainer configures an container to monitor the metrics of Vertex.
+	// ConfigureContainer configures a container to monitor the metrics of Vertex.
 	ConfigureContainer(uuid uuid.UUID) error
 
 	// RegisterMetrics registers the metrics that can be monitored.

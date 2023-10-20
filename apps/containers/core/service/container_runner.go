@@ -160,7 +160,7 @@ func (s *ContainerRunnerService) Start(inst *types2.Container) error {
 	return nil
 }
 
-// Stop stops an container by its UUID.
+// Stop stops a container by its UUID.
 // If the container does not exist, it returns ErrContainerNotFound.
 // If the container is not running, it returns ErrContainerNotRunning.
 func (s *ContainerRunnerService) Stop(inst *types2.Container) error {
