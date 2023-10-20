@@ -134,6 +134,10 @@ type DatabaseFeature struct {
 	// The Password to connect to the database. Must be the name
 	// of an environment variable.
 	Password *string `yaml:"password" json:"password"`
+
+	// The DefaultDatabase to connect to the database. Must be the name
+	// of an environment variable.
+	DefaultDatabase *string `yaml:"default-database" json:"database_default"`
 }
 
 type Features struct {

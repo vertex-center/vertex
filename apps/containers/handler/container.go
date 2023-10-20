@@ -138,11 +138,17 @@ func (h *ContainerHandler) Delete(c *router.Context) {
 }
 
 type PatchBody struct {
-	LaunchOnStartup *bool                `json:"launch_on_startup,omitempty"`
-	DisplayName     *string              `json:"display_name,omitempty"`
-	Databases       map[string]uuid.UUID `json:"databases,omitempty"`
-	Version         *string              `json:"version,omitempty"`
-	Tags            []string             `json:"tags,omitempty"`
+	LaunchOnStartup *bool                        `json:"launch_on_startup,omitempty"`
+	DisplayName     *string                      `json:"display_name,omitempty"`
+	Databases       map[string]PatchBodyDatabase `json:"databases,omitempty"`
+	Version         *string                      `json:"version,omitempty"`
+	Tags            []string                     `json:"tags,omitempty"`
+}
+
+// User can also add alternate username,password
+type PatchBodyDatabase struct {
+	ContainerID  uuid.UUID `json:"container_id"`
+	DatabaseName *string   `json:"db_name"`
 }
 
 func (h *ContainerHandler) Patch(c *router.Context) {
@@ -182,7 +188,18 @@ func (h *ContainerHandler) Patch(c *router.Context) {
 	}
 
 	if body.Databases != nil {
-		err = h.containerService.SetDatabases(inst, body.Databases)
+
+		databases := map[string]uuid.UUID{}
+		modifiedFeatures := map[string]*types3.DatabaseFeature{}
+
+		for databaseID, container := range body.Databases {
+			databases[databaseID] = container.ContainerID
+			modifiedFeatures[databaseID] = &types3.DatabaseFeature{
+				DefaultDatabase: container.DatabaseName,
+			}
+		}
+
+		err = h.containerService.SetDatabases(inst, databases, modifiedFeatures)
 		if err != nil {
 			c.Abort(router.Error{
 				Code:           types3.ErrCodeFailedToSetDatabase,
