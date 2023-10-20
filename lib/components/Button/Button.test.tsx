@@ -18,10 +18,18 @@ test("it can be clicked", () => {
 });
 
 test("it can be disabled", () => {
-    render(<Button disabled>Button</Button>);
+    const onClick = jest.fn();
+    render(
+        <Button onClick={onClick} disabled>
+            Button
+        </Button>,
+    );
     const button = screen.getByRole("button");
+    button.click();
     expect(button).toBeDisabled();
+    expect(button).toHaveAttribute("disabled");
     expect(button).toHaveClass("button-disabled");
+    expect(onClick).not.toHaveBeenCalled();
 });
 
 test("it can have a custom class", () => {
