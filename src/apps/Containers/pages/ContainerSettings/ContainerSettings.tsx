@@ -2,10 +2,9 @@ import { Fragment, useEffect, useState } from "react";
 import { Text, Title } from "../../../../components/Text/Text";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
 import Spacer from "../../../../components/Spacer/Spacer";
-import Button from "../../../../components/Button/Button";
+import { Button, MaterialIcon } from "@vertex-center/components";
 import { useParams } from "react-router-dom";
 import useContainer from "../../hooks/useContainer";
-import Icon from "../../../../components/Icon/Icon";
 import ToggleButton from "../../../../components/ToggleButton/ToggleButton";
 import Input from "../../../../components/Input/Input";
 
@@ -155,7 +154,7 @@ export default function ContainerSettings() {
                     })}
                 </Select>
                 <Button
-                    rightIcon="refresh"
+                    rightIcon={<MaterialIcon icon="refresh" />}
                     onClick={() => reloadVersions(false)}
                     disabled={isLoadingContainer || versionsLoading}
                 >
@@ -169,17 +168,15 @@ export default function ContainerSettings() {
                         alignItems="center"
                         gap={4}
                     >
-                        <Icon name="check" />
+                        <MaterialIcon icon="check" />
                         Saved!
                     </Horizontal>
                 )}
                 <Button
-                    primary
-                    large
+                    variant="colored"
                     onClick={async () => mutationSave.mutate()}
-                    rightIcon="save"
-                    loading={isUploading}
-                    disabled={saved || saved === undefined}
+                    rightIcon={<MaterialIcon icon="save" />}
+                    disabled={isUploading || saved || saved === undefined}
                 >
                     Save
                 </Button>

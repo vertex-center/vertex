@@ -11,7 +11,7 @@ import Sidebar, {
 } from "../../../../components/Sidebar/Sidebar";
 import Popup from "../../../../components/Popup/Popup";
 import { Text, Title } from "../../../../components/Text/Text";
-import Button from "../../../../components/Button/Button";
+import { Button, MaterialIcon } from "@vertex-center/components";
 import Progress from "../../../../components/Progress";
 import { SiDocker } from "@icons-pack/react-simple-icons";
 import useContainer from "../../hooks/useContainer";
@@ -146,11 +146,10 @@ export default function ContainerDetails() {
                         Cancel
                     </Button>
                     <Button
-                        primary
-                        color="red"
+                        variant="danger"
                         onClick={async () => mutationDeleteContainer.mutate()}
                         disabled={isDeleting}
-                        rightIcon="delete"
+                        rightIcon={<MaterialIcon icon="delete" />}
                     >
                         Confirm
                     </Button>

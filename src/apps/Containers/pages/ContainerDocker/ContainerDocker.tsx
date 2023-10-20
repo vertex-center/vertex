@@ -4,7 +4,7 @@ import { Title } from "../../../../components/Text/Text";
 import styles from "./ContainerDocker.module.sass";
 import { useParams } from "react-router-dom";
 import { Horizontal, Vertical } from "../../../../components/Layouts/Layouts";
-import Button from "../../../../components/Button/Button";
+import { Button, MaterialIcon } from "@vertex-center/components";
 import { api } from "../../../../backend/api/backend";
 import {
     KeyValueGroup,
@@ -129,7 +129,7 @@ export default function ContainerDocker() {
                 <Vertical gap={8}>
                     <Horizontal alignItems="center" gap={20}>
                         <Button
-                            leftIcon="restart_alt"
+                            leftIcon={<MaterialIcon icon="restart_alt" />}
                             onClick={recreateContainer}
                             disabled={recreatingContainer ?? isLoading}
                         >

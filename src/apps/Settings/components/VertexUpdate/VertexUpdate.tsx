@@ -1,4 +1,4 @@
-import Button from "../../../../components/Button/Button";
+import { Button, MaterialIcon } from "@vertex-center/components";
 import Logo from "../../../../components/Logo/Logo";
 import Card from "../../../../components/Card/Card";
 import { Horizontal, Vertical } from "../../../../components/Layouts/Layouts";
@@ -24,7 +24,8 @@ export default function VertexUpdate(props: Readonly<Props>) {
                     <Spacer />
                     <div>
                         <Button
-                            rightIcon="download"
+                            variant="colored"
+                            rightIcon={<MaterialIcon icon="download" />}
                             onClick={install}
                             disabled={isInstalling}
                         >

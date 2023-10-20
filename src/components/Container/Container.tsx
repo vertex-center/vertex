@@ -1,5 +1,4 @@
 import styles from "./Container.module.sass";
-import Icon from "../Icon/Icon";
 import classNames from "classnames";
 import { Horizontal, Vertical } from "../Layouts/Layouts";
 import { Link } from "react-router-dom";
@@ -9,6 +8,7 @@ import { Container as ContainerModel } from "../../models/container";
 import LogoIcon from "../Logo/LogoIcon";
 import { ContainerLed } from "../ContainerLed/ContainerLed";
 import { v4 as uuidv4 } from "uuid";
+import { MaterialIcon } from "@vertex-center/components";
 
 type ButtonProps = {
     icon: string;
@@ -18,13 +18,12 @@ type ButtonProps = {
 
 function Button({ icon, onClick, disabled }: Readonly<ButtonProps>) {
     return (
-        <Icon
-            disabled={disabled}
+        <MaterialIcon
             className={classNames({
                 [styles.button]: true,
                 [styles.buttonDisabled]: disabled,
             })}
-            name={icon}
+            icon={icon}
             onClick={onClick}
         />
     );

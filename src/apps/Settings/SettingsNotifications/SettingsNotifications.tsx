@@ -1,8 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import Input from "../../../components/Input/Input";
 import { Title } from "../../../components/Text/Text";
-import Button from "../../../components/Button/Button";
-import Loading from "../../../components/Loading/Loading";
+import { Button, MaterialIcon } from "@vertex-center/components";
 import { api } from "../../../backend/api/backend";
 
 import styles from "./SettingsNotifications.module.sass";
@@ -45,7 +44,7 @@ export default function SettingsNotifications() {
 
     return (
         <Vertical gap={20}>
-            <ProgressOverlay show={isLoading} />
+            <ProgressOverlay show={isLoading || saving} />
             <Title className={styles.title}>Notifications</Title>
             <APIError error={error} />
             {!error && (
@@ -58,10 +57,9 @@ export default function SettingsNotifications() {
                         placeholder={isLoading && "Loading..."}
                     />
                     <Horizontal gap={20} justifyContent="flex-end">
-                        {saving && <Loading />}
                         <Button
-                            primary
-                            rightIcon="save"
+                            variant="colored"
+                            rightIcon={<MaterialIcon icon="save" />}
                             onClick={onSave}
                             disabled={!changed || saving}
                         >

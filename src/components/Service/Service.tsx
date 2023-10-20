@@ -9,7 +9,7 @@ import ListIcon from "../List/ListIcon";
 import ListInfo from "../List/ListInfo";
 import ListTitle from "../List/ListTitle";
 import ListActions from "../List/ListActions";
-import Icon from "../Icon/Icon";
+import { MaterialIcon } from "@vertex-center/components";
 
 type Props = {
     service: ServiceModel;
@@ -44,7 +44,7 @@ export default function Service(props: Readonly<Props>) {
                     </Caption>
                 )}
                 {downloading && <Progress infinite />}
-                <Icon name="download" />
+                <MaterialIcon icon="download" />
             </ListActions>
         </ListItem>
     );

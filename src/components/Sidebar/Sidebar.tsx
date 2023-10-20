@@ -1,11 +1,11 @@
 import styles from "./Sidebar.module.sass";
-import Icon from "../Icon/Icon";
 import classNames from "classnames";
 import { NavLink, useLocation } from "react-router-dom";
 import { Fragment, HTMLProps, PropsWithChildren } from "react";
 import { Text } from "../Text/Text";
 import Spacer from "../Spacer/Spacer";
 import { ContainerLed, Status } from "../ContainerLed/ContainerLed";
+import { MaterialIcon } from "@vertex-center/components";
 
 function SidebarTitle({ children }: PropsWithChildren) {
     return <Text className={styles.title}>{children}</Text>;
@@ -30,7 +30,7 @@ export function SidebarItem(props: Readonly<ItemProps>) {
 
     let icon: any;
     if (typeof props.icon === "string") {
-        icon = <Icon name={props.icon} />;
+        icon = <MaterialIcon icon={props.icon} />;
     } else {
         icon = props.icon;
     }

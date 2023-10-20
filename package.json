@@ -12,6 +12,7 @@
         "@testing-library/user-event": "^13.5.0",
         "@types/byte-size": "^8.1.0",
         "@types/uuid": "^9.0.1",
+        "@vertex-center/components": "^0.2.0",
         "axios": "^1.3.4",
         "byte-size": "^8.1.1",
         "immer": "^10.0.3",

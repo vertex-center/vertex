@@ -7,7 +7,7 @@ import { Errors } from "../../../components/Error/Errors";
 import { APIError } from "../../../components/Error/APIError";
 import ListItem from "../../../components/List/ListItem";
 import { api } from "../../../backend/api/backend";
-import Button from "../../../components/Button/Button";
+import { Button, MaterialIcon } from "@vertex-center/components";
 import { ChangeEvent, Fragment, useState } from "react";
 import Popup from "../../../components/Popup/Popup";
 import Spacer from "../../../components/Spacer/Spacer";
@@ -99,8 +99,8 @@ export default function SettingsSecurity() {
                 )}
                 <div>
                     <Button
-                        primary
-                        leftIcon="add"
+                        variant="colored"
+                        leftIcon={<MaterialIcon icon="add" />}
                         onClick={() => setShowPopup(true)}
                     >
                         Create an SSH key
@@ -138,8 +138,8 @@ export default function SettingsSecurity() {
                     <Spacer />
                     <Button onClick={dismissPopup}>Cancel</Button>
                     <Button
+                        variant="colored"
                         disabled={authorizedKey === ""}
-                        primary
                         onClick={createSSHKey}
                     >
                         Create

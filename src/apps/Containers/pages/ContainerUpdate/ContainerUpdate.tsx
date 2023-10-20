@@ -13,7 +13,7 @@ import ListItem from "../../../../components/List/ListItem";
 import ListInfo from "../../../../components/List/ListInfo";
 import ListTitle from "../../../../components/List/ListTitle";
 import ListActions from "../../../../components/List/ListActions";
-import Button from "../../../../components/Button/Button";
+import { Button, MaterialIcon } from "@vertex-center/components";
 
 export default function ContainerUpdate() {
     const { uuid } = useParams();
@@ -44,7 +44,9 @@ export default function ContainerUpdate() {
                         <ListTitle>Vertex integration</ListTitle>
                     </ListInfo>
                     <ListActions>
-                        <Button rightIcon="download">Update</Button>
+                        <Button rightIcon={<MaterialIcon icon="download" />}>
+                            Update
+                        </Button>
                     </ListActions>
                 </ListItem>
             </List>

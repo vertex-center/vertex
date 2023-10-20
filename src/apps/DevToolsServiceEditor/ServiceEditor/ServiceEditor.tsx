@@ -3,7 +3,7 @@ import { BigTitle, Title } from "../../../components/Text/Text";
 import Input from "../../../components/Input/Input";
 import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
 import NoItems from "../../../components/NoItems/NoItems";
-import Button from "../../../components/Button/Button";
+import { Button, MaterialIcon } from "@vertex-center/components";
 import classNames from "classnames";
 import Spacer from "../../../components/Spacer/Spacer";
 import {
@@ -468,8 +468,8 @@ export default function ServiceEditor() {
                     <Title>Environment</Title>
                     <Spacer />
                     <Button
-                        primary
-                        rightIcon="add"
+                        variant="colored"
+                        rightIcon={<MaterialIcon icon="add" />}
                         onClick={() =>
                             appendEnvironment({
                                 type: "string",
@@ -497,7 +497,10 @@ export default function ServiceEditor() {
                                         </Title>
                                         <Spacer />
                                         <Button
-                                            rightIcon="delete"
+                                            variant="danger"
+                                            rightIcon={
+                                                <MaterialIcon icon="delete" />
+                                            }
                                             onClick={() => removeEnvironment(i)}
                                         >
                                             Remove
@@ -524,8 +527,8 @@ export default function ServiceEditor() {
                     <Title>URLs</Title>
                     <Spacer />
                     <Button
-                        primary
-                        rightIcon="add"
+                        variant="colored"
+                        rightIcon={<MaterialIcon icon="add" />}
                         onClick={() => appendUrl({ kind: "client" })}
                     >
                         Add URL
@@ -547,7 +550,10 @@ export default function ServiceEditor() {
                                         </Title>
                                         <Spacer />
                                         <Button
-                                            rightIcon="delete"
+                                            variant="danger"
+                                            rightIcon={
+                                                <MaterialIcon icon="delete" />
+                                            }
                                             onClick={() => removeUrl(i)}
                                         >
                                             Remove
@@ -601,8 +607,8 @@ export default function ServiceEditor() {
                     <Title>Docker Volumes</Title>
                     <Spacer />
                     <Button
-                        primary
-                        rightIcon="add"
+                        variant="colored"
+                        rightIcon={<MaterialIcon icon="add" />}
                         onClick={() => appendVolume({})}
                     >
                         Add volume
@@ -632,10 +638,13 @@ export default function ServiceEditor() {
                                         }
                                     />
                                     <Button
+                                        variant="danger"
                                         className={
                                             i === 0 && styles.deleteOffset
                                         }
-                                        rightIcon="delete"
+                                        rightIcon={
+                                            <MaterialIcon icon="delete" />
+                                        }
                                         onClick={() => removeVolume(i)}
                                     >
                                         Remove
@@ -652,8 +661,8 @@ export default function ServiceEditor() {
                     <Title>Docker Ports</Title>
                     <Spacer />
                     <Button
-                        primary
-                        rightIcon="add"
+                        variant="colored"
+                        rightIcon={<MaterialIcon icon="add" />}
                         onClick={() => appendPort({})}
                     >
                         Add port
@@ -681,10 +690,13 @@ export default function ServiceEditor() {
                                         }
                                     />
                                     <Button
+                                        variant="danger"
                                         className={
                                             i === 0 && styles.deleteOffset
                                         }
-                                        rightIcon="delete"
+                                        rightIcon={
+                                            <MaterialIcon icon="delete" />
+                                        }
                                         onClick={() => removePort(i)}
                                     >
                                         Remove
@@ -701,8 +713,8 @@ export default function ServiceEditor() {
                     <Title>Docker Environments</Title>
                     <Spacer />
                     <Button
-                        primary
-                        rightIcon="add"
+                        variant="colored"
+                        rightIcon={<MaterialIcon icon="add" />}
                         onClick={() => appendContainerEnvironment({})}
                     >
                         Add port
@@ -734,10 +746,13 @@ export default function ServiceEditor() {
                                         }
                                     />
                                     <Button
+                                        variant="danger"
                                         className={
                                             i === 0 && styles.deleteOffset
                                         }
-                                        rightIcon="delete"
+                                        rightIcon={
+                                            <MaterialIcon icon="delete" />
+                                        }
                                         onClick={() =>
                                             removeContainerEnvironment(i)
                                         }
@@ -758,10 +773,17 @@ export default function ServiceEditor() {
 
             <Horizontal gap={10} className={styles.content}>
                 <Spacer />
-                <Button rightIcon="check" onClick={handleSubmit(onSubmit)}>
+                <Button
+                    rightIcon={<MaterialIcon icon="check" />}
+                    onClick={handleSubmit(onSubmit)}
+                >
                     Validate
                 </Button>
-                <Button primary rightIcon="download" onClick={download}>
+                <Button
+                    variant="colored"
+                    rightIcon={<MaterialIcon icon="download" />}
+                    onClick={download}
+                >
                     service.yml
                 </Button>
             </Horizontal>

@@ -3,7 +3,7 @@ import ServiceLogo from "../ServiceLogo/ServiceLogo";
 import { Text, Title } from "../Text/Text";
 import { APIError } from "../Error/APIError";
 import Spacer from "../Spacer/Spacer";
-import Button from "../Button/Button";
+import { Button, MaterialIcon } from "@vertex-center/components";
 import Popup from "../Popup/Popup";
 import { Service as ServiceModel } from "../../models/service";
 import { useState } from "react";
@@ -42,9 +42,9 @@ export default function ServiceInstallPopup(props: Readonly<Props>) {
                 <Spacer />
                 <Button onClick={dismiss}>Cancel</Button>
                 <Button
+                    variant="colored"
                     onClick={install}
-                    primary
-                    rightIcon="add"
+                    rightIcon={<MaterialIcon icon="add" />}
                     disabled={error !== undefined}
                 >
                     Create container

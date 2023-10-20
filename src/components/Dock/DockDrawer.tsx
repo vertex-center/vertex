@@ -3,10 +3,10 @@ import classNames from "classnames";
 import { BigTitle, Caption, Title } from "../Text/Text";
 import { Link } from "react-router-dom";
 import { Vertical } from "../Layouts/Layouts";
-import Icon from "../Icon/Icon";
 import LogoIcon from "../Logo/LogoIcon";
 import { useApps } from "../../hooks/useApps";
 import Header from "../Header/Header";
+import { MaterialIcon } from "@vertex-center/components";
 
 type AppProps = {
     to: string;
@@ -21,7 +21,7 @@ function DrawerApp(props: AppProps) {
 
     return (
         <Link to={to} className={styles.app} onClick={onClick}>
-            <Icon name={icon} className={styles.appIcon} />
+            <MaterialIcon icon={icon} className={styles.appIcon} />
             <Vertical gap={8}>
                 <Title className={styles.appName}>
                     <LogoIcon />

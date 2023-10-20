@@ -1,10 +1,10 @@
 import styles from "./Dock.module.sass";
-import Icon from "../Icon/Icon";
 import { NavLink, useLocation } from "react-router-dom";
 import classNames from "classnames";
 import DockDrawer from "./DockDrawer";
 import { Fragment, useState } from "react";
 import { useApps } from "../../hooks/useApps";
+import { MaterialIcon } from "@vertex-center/components";
 
 type DockAppProps = {
     to?: string;
@@ -18,7 +18,7 @@ export function DockApp(props: Readonly<DockAppProps>) {
 
     const content = (
         <Fragment>
-            <Icon className={styles.icon} name={icon} />
+            <MaterialIcon icon={icon} className={styles.icon} />
             <span className={styles.name}>{name}</span>
         </Fragment>
     );

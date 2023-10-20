@@ -1,6 +1,6 @@
 import styles from "./ProxyRedirect.module.sass";
-import Icon from "../Icon/Icon";
 import classNames from "classnames";
+import { MaterialIcon } from "@vertex-center/components";
 
 type Props = {
     source: string;
@@ -21,19 +21,19 @@ export default function ProxyRedirect(props: Readonly<Props>) {
         >
             <div className={styles.wrapper}>
                 <div className={styles.url}>
-                    <Icon name="link" />
+                    <MaterialIcon icon="link" />
                     {source}
                 </div>
                 <div className={styles.line} />
-                <Icon className={styles.arrow} name="double_arrow" />
+                <MaterialIcon icon="double_arrow" className={styles.arrow} />
                 <div className={styles.line} />
                 <div className={styles.url}>
-                    <Icon name="subdirectory_arrow_right" />
+                    <MaterialIcon icon="subdirectory_arrow_right" />
                     {target}
                 </div>
             </div>
             <div className={styles.delete} onClick={onDelete}>
-                <Icon name="close" />
+                <MaterialIcon icon="close" />
             </div>
         </div>
     );

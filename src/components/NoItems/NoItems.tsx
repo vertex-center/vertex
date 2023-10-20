@@ -1,6 +1,6 @@
 import styles from "./NoItems.module.sass";
-import Icon from "../Icon/Icon";
 import { Text } from "../Text/Text";
+import { MaterialIcon } from "@vertex-center/components";
 
 type Props = {
     icon?: string;
@@ -12,7 +12,7 @@ export default function NoItems(props: Readonly<Props>) {
 
     return (
         <div className={styles.card}>
-            <Icon className={styles.icon} name={icon} />
+            <MaterialIcon className={styles.icon} icon={icon} />
             <Text className={styles.text}>{text}</Text>
         </div>
     );

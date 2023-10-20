@@ -12,7 +12,7 @@ import ContainerSelect from "../../../../components/Input/ContainerSelect";
 import { useEffect, useState } from "react";
 import { Container } from "../../../../models/container";
 import Progress from "../../../../components/Progress";
-import Button from "../../../../components/Button/Button";
+import { Button, MaterialIcon } from "@vertex-center/components";
 import { api } from "../../../../backend/api/backend";
 import { DatabaseEnvironment } from "../../../../models/service";
 import { APIError } from "../../../../components/Error/APIError";
@@ -143,12 +143,10 @@ export default function ContainerDetailsDatabase() {
             <ProgressOverlay show={isLoading ?? isUploading} />
             <APIError error={error ?? uploadingError} />
             <Button
-                primary
-                large
+                variant="colored"
                 onClick={async () => mutationSaveDatabase.mutate()}
-                rightIcon="save"
-                loading={isUploading}
-                disabled={saved || saved === undefined}
+                rightIcon={<MaterialIcon icon="save" />}
+                disabled={isUploading || saved || saved === undefined}
             >
                 Save{" "}
                 {container?.install_method === "docker" &&

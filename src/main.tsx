@@ -8,11 +8,13 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./reset.css";
 import "./index.sass";
+import "@vertex-center/components/dist/style.css";
 import { useCookies } from "react-cookie";
+import { themes } from "./models/theme";
 
 export type Theme =
-    | "vertex-dark"
-    | "vertex-light"
+    | "theme-vertex-dark"
+    | "theme-vertex-light"
     | "catppuccin-mocha"
     | "catppuccin-macchiato"
     | "catppuccin-frappe"
@@ -33,6 +35,13 @@ function ThemeProvider({ children }: PropsWithChildren) {
     useEffect(() => {
         if (cookies.theme !== theme) setCookie("theme", theme);
     }, [cookies.theme, setCookie, theme]);
+
+    useEffect(() => {
+        const t = themes.find((t) => t.key === theme);
+        if (t === undefined) {
+            setTheme("theme-vertex-dark");
+        }
+    }, [theme]);
 
     return (
         <ThemeContext.Provider value={{ theme, setTheme }}>

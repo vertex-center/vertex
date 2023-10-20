@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Caption, Text, Title } from "../../../components/Text/Text";
 import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
-import Button from "../../../components/Button/Button";
+import { Button, MaterialIcon } from "@vertex-center/components";
 import Spacer from "../../../components/Spacer/Spacer";
 import Popup from "../../../components/Popup/Popup";
 import styles from "./SettingsUpdates.module.sass";
@@ -15,7 +15,6 @@ import { useSettings } from "../hooks/useSettings";
 import { useUpdate } from "../hooks/useUpdate";
 import { useUpdateMutation } from "../hooks/useUpdateMutation";
 import { useSettingsChannelMutation } from "../hooks/useSettingsMutation";
-import Icon from "../../../components/Icon/Icon";
 
 export default function SettingsUpdates() {
     const queryClient = useQueryClient();
@@ -75,7 +74,7 @@ export default function SettingsUpdates() {
             {update === undefined && !isLoadingUpdate && (
                 <Caption className={styles.content}>
                     <Horizontal alignItems="center" gap={6}>
-                        <Icon name="check" />
+                        <MaterialIcon icon="check" />
                         Vertex is up to date. You are running the latest
                         version.
                     </Horizontal>
@@ -98,7 +97,11 @@ export default function SettingsUpdates() {
                 </Text>
                 <Horizontal>
                     <Spacer />
-                    <Button primary onClick={dismissPopup} rightIcon="check">
+                    <Button
+                        variant="colored"
+                        onClick={dismissPopup}
+                        rightIcon={<MaterialIcon icon="check" />}
+                    >
                         OK
                     </Button>
                 </Horizontal>

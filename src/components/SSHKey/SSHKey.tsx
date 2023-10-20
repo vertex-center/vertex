@@ -1,11 +1,10 @@
-import Icon from "../Icon/Icon";
 import ListItem from "../List/ListItem";
 import ListIcon from "../List/ListIcon";
 import ListInfo from "../List/ListInfo";
 import ListTitle from "../List/ListTitle";
 import ListDescription from "../List/ListDescription";
 import List, { ListProps } from "../List/List";
-import Button from "../Button/Button";
+import { Button, MaterialIcon } from "@vertex-center/components";
 import ListActions from "../List/ListActions";
 
 export function SSHKeys(props: Readonly<ListProps>) {
@@ -24,7 +23,7 @@ export default function SSHKey(props: Readonly<SSHKeyProps>) {
     return (
         <ListItem>
             <ListIcon>
-                <Icon name="key" />
+                <MaterialIcon icon="key" />
             </ListIcon>
             <ListInfo>
                 <ListTitle>SSH Key</ListTitle>
@@ -33,7 +32,11 @@ export default function SSHKey(props: Readonly<SSHKeyProps>) {
                 </ListDescription>
             </ListInfo>
             <ListActions>
-                <Button rightIcon="delete" onClick={onDelete}>
+                <Button
+                    variant="danger"
+                    rightIcon={<MaterialIcon icon="delete" />}
+                    onClick={onDelete}
+                >
                     Delete
                 </Button>
             </ListActions>

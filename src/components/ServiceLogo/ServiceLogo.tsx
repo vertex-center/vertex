@@ -1,5 +1,5 @@
-import Icon from "../Icon/Icon";
 import { Service } from "../../models/service";
+import { MaterialIcon } from "@vertex-center/components";
 
 type Props = {
     service?: Service;
@@ -13,7 +13,7 @@ export default function ServiceLogo(props: Readonly<Props>) {
     iconURL.pathname = `/api/app/vx-containers/services/icons/${service?.icon}`;
 
     if (!service?.icon) {
-        return <Icon name="extension" style={{ opacity: 0.8 }} />;
+        return <MaterialIcon icon="extension" style={{ opacity: 0.8 }} />;
     }
 
     if (service?.icon.endsWith(".svg")) {

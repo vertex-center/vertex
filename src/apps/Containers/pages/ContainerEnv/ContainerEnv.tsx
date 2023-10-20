@@ -2,8 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { Title } from "../../../../components/Text/Text";
 import { useParams } from "react-router-dom";
 import EnvVariableInput from "../../../../components/EnvVariableInput/EnvVariableInput";
-import Button from "../../../../components/Button/Button";
-import Icon from "../../../../components/Icon/Icon";
+import { Button, MaterialIcon } from "@vertex-center/components";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
 import useContainer from "../../hooks/useContainer";
 import { Env, EnvVariable } from "../../../../models/service";
@@ -91,16 +90,15 @@ export default function ContainerEnv() {
                         alignItems="center"
                         gap={4}
                     >
-                        <Icon name="check" />
+                        <MaterialIcon icon="check" />
                         Saved!
                     </Horizontal>
                 )}
                 <Button
-                    primary
+                    variant="colored"
                     onClick={save}
-                    rightIcon="save"
-                    loading={isUploading}
-                    disabled={saved || saved === undefined}
+                    rightIcon={<MaterialIcon icon="save" />}
+                    disabled={isUploading || saved || saved === undefined}
                 >
                     Save{" "}
                     {container?.install_method === "docker" &&

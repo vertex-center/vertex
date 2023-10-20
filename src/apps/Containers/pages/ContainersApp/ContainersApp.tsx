@@ -10,11 +10,12 @@ import { useServerEvent } from "../../../../hooks/useEvent";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Toolbar from "../../../../components/Toolbar/Toolbar";
 import Spacer from "../../../../components/Spacer/Spacer";
-import Button from "../../../../components/Button/Button";
+import { Button, MaterialIcon } from "@vertex-center/components";
 import SelectTags from "../../components/SelectTags/SelectTags";
 import { useState } from "react";
 import NoItems from "../../../../components/NoItems/NoItems";
 import { useContainers } from "../../hooks/useContainers";
+import { useNavigate } from "react-router-dom";
 
 type ToolbarProps = {
     tags?: string[];
@@ -22,13 +23,19 @@ type ToolbarProps = {
 };
 
 const ToolbarContainers = (props: ToolbarProps) => {
+    const navigate = useNavigate();
+
     const { tags, onTagsChange } = props;
 
     return (
         <Toolbar className={styles.toolbar}>
             <SelectTags selected={tags} onChange={onTagsChange} />
             <Spacer />
-            <Button primary to="/app/vx-containers/add" rightIcon="add">
+            <Button
+                variant="colored"
+                onClick={() => navigate("/app/vx-containers/add")}
+                rightIcon={<MaterialIcon icon="add" />}
+            >
                 Create container
             </Button>
         </Toolbar>

@@ -1,6 +1,6 @@
 import styles from "./Checkbox.module.sass";
-import Icon from "../Icon/Icon";
 import classNames from "classnames";
+import { MaterialIcon } from "@vertex-center/components";
 
 type Props = {
     checked?: boolean;
@@ -17,7 +17,7 @@ export default function Checkbox(props: Readonly<Props>) {
             })}
         >
             <input type="checkbox" />
-            <Icon className={styles.icon} name="check" />
+            <MaterialIcon icon="check" className={styles.icon} />
         </div>
     );
 }

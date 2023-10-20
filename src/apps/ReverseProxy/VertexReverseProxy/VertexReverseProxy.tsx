@@ -6,7 +6,7 @@ import { Title } from "../../../components/Text/Text";
 import { APIError } from "../../../components/Error/APIError";
 import ProxyRedirect from "../../../components/ProxyRedirect/ProxyRedirect";
 import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
-import Button from "../../../components/Button/Button";
+import { Button, MaterialIcon } from "@vertex-center/components";
 import Popup from "../../../components/Popup/Popup";
 import Input from "../../../components/Input/Input";
 import Spacer from "../../../components/Spacer/Spacer";
@@ -85,7 +85,11 @@ export default function VertexReverseProxy() {
                 )}
             </div>
             <Horizontal className={styles.addRedirect} gap={10}>
-                <Button primary onClick={openNewRedirectPopup} leftIcon="add">
+                <Button
+                    variant="colored"
+                    onClick={openNewRedirectPopup}
+                    leftIcon={<MaterialIcon icon="add" />}
+                >
                     Add redirection
                 </Button>
             </Horizontal>
@@ -111,10 +115,11 @@ export default function VertexReverseProxy() {
                     <Spacer />
                     <Button onClick={closeNewRedirectPopup}>Cancel</Button>
                     <Button
-                        primary
+                        variant="colored"
                         onClick={async () =>
                             mutationAdd.mutate({ source, target })
                         }
+                        rightIcon={<MaterialIcon icon="send" />}
                     >
                         Send
                     </Button>

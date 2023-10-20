@@ -9,8 +9,8 @@ import classNames from "classnames";
 
 import styles from "./Input.module.sass";
 import Spacer from "../Spacer/Spacer";
-import Icon from "../Icon/Icon";
 import Checkbox from "../Checkbox/Checkbox";
+import { MaterialIcon } from "@vertex-center/components";
 
 type OptionProps = HTMLProps<HTMLDivElement> & {
     onClick?: (value: any) => void;
@@ -129,8 +129,8 @@ export default function Select(props: Readonly<Props>) {
             >
                 {value}
                 <Spacer />
-                {opened && <Icon name="expand_less" />}
-                {!opened && <Icon name="expand_more" />}
+                {opened && <MaterialIcon icon="expand_less" />}
+                {!opened && <MaterialIcon icon="expand_more" />}
             </div>
             <SelectOptions opened={opened}>
                 {Children.map(children, (child) => {

@@ -1,19 +1,10 @@
 import { useContext } from "react";
-import Button from "../../../components/Button/Button";
+import { Button, MaterialIcon } from "@vertex-center/components";
 import { Vertical } from "../../../components/Layouts/Layouts";
 import { Title } from "../../../components/Text/Text";
 import { ThemeContext } from "../../../main";
-
 import styles from "./SettingsTheme.module.sass";
-
-const themes = [
-    { key: "vertex-dark", label: "Vertex Dark" },
-    { key: "vertex-light", label: "Vertex Light" },
-    { key: "catppuccin-mocha", label: "Catppuccin Mocha" },
-    { key: "catppuccin-macchiato", label: "Catppuccin Macchiato" },
-    { key: "catppuccin-frappe", label: "Catppuccin Frappé" },
-    { key: "catppuccin-latte", label: "Catppuccin Latte" },
-];
+import { themes } from "../../../models/theme";
 
 export default function SettingsTheme() {
     const { theme, setTheme } = useContext(ThemeContext);
@@ -22,15 +13,29 @@ export default function SettingsTheme() {
         <Vertical gap={20}>
             <Title className={styles.title}>Theme</Title>
             <Vertical gap={6}>
-                {themes.map((t) => (
-                    <Button
-                        onClick={() => setTheme(t.key)}
-                        selectable
-                        selected={theme === t.key}
-                    >
-                        {t.label}
-                    </Button>
-                ))}
+                {themes.map((t) => {
+                    let icon = "";
+                    if (t.key === theme) {
+                        icon = "radio_button_checked";
+                    } else {
+                        icon = "radio_button_unchecked";
+                    }
+
+                    return (
+                        <Button
+                            key={t.key}
+                            onClick={() => setTheme(t.key)}
+                            leftIcon={
+                                <MaterialIcon
+                                    style={{ opacity: 0.7 }}
+                                    icon={icon}
+                                />
+                            }
+                        >
+                            {t.label}
+                        </Button>
+                    );
+                })}
             </Vertical>
         </Vertical>
     );

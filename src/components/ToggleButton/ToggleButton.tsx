@@ -1,6 +1,6 @@
 import styles from "./ToggleButton.module.sass";
 import classNames from "classnames";
-import Icon from "../Icon/Icon";
+import { MaterialIcon } from "@vertex-center/components";
 
 type Props = {
     value: boolean;
@@ -23,9 +23,9 @@ export default function ToggleButton(props: Readonly<Props>) {
             onClick={onChange}
         >
             <div className={styles.dot}>
-                <Icon
+                <MaterialIcon
+                    icon={value ? "check" : "close"}
                     className={styles.icon}
-                    name={value ? "check" : "close"}
                 />
             </div>
         </div>

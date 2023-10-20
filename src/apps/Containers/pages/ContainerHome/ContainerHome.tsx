@@ -1,7 +1,6 @@
 import { Fragment } from "react";
 import { Title } from "../../../../components/Text/Text";
-import Icon from "../../../../components/Icon/Icon";
-
+import { MaterialIcon } from "@vertex-center/components";
 import styles from "./ContainerHome.module.sass";
 import { useParams } from "react-router-dom";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
@@ -51,9 +50,9 @@ export default function ContainerHome() {
                                     })}
                                 >
                                     <Horizontal>
-                                        <Icon name="public" />
+                                        <MaterialIcon icon="public" />
                                         <Spacer />
-                                        <Icon name="open_in_new" />
+                                        <MaterialIcon icon="open_in_new" />
                                     </Horizontal>
                                     <div>{url.href}</div>
                                 </a>
