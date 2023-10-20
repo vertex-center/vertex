@@ -34,12 +34,10 @@ jobs:
     needs: build
     strategy:
       matrix:
-        registry: [ https://registry.npmjs.org/, https://npm.pkg.github.com/ ]
-        token: [ NPM_TOKEN, GITHUB_TOKEN ]
         include:
-          - registry: https://registry.npmjs.org/
+          - registry: "https://registry.npmjs.org/"
             token: NPM_TOKEN
-          - registry: https://npm.pkg.github.com/
+          - registry: "https://npm.pkg.github.com/"
             token: GITHUB_TOKEN
 
     runs-on: ubuntu-latest
