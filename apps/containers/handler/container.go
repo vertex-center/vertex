@@ -190,16 +190,16 @@ func (h *ContainerHandler) Patch(c *router.Context) {
 	if body.Databases != nil {
 
 		databases := map[string]uuid.UUID{}
-		modifiedFeatures := map[string]*types3.DatabaseFeature{}
+		options := map[string]*types3.SetDatabasesOptions{}
 
 		for databaseID, container := range body.Databases {
 			databases[databaseID] = container.ContainerID
-			modifiedFeatures[databaseID] = &types3.DatabaseFeature{
-				DefaultDatabase: container.DatabaseName,
+			options[databaseID] = &types3.SetDatabasesOptions{
+				DatabaseName: container.DatabaseName,
 			}
 		}
 
-		err = h.containerService.SetDatabases(inst, databases, modifiedFeatures)
+		err = h.containerService.SetDatabases(inst, databases, options)
 		if err != nil {
 			c.Abort(router.Error{
 				Code:           types3.ErrCodeFailedToSetDatabase,

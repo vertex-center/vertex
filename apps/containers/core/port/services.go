@@ -20,7 +20,7 @@ type (
 		DeleteAll()
 		Install(service types.Service, method string) (*types.Container, error)
 		CheckForUpdates() (map[uuid.UUID]*types.Container, error)
-		SetDatabases(inst *types.Container, databases map[string]uuid.UUID, modifiedFeature map[string]*types.DatabaseFeature) error
+		SetDatabases(inst *types.Container, databases map[string]uuid.UUID, options map[string]*types.SetDatabasesOptions) error
 	}
 
 	ContainerEnvService interface {

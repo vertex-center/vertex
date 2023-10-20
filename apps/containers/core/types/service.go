@@ -252,3 +252,9 @@ type URL struct {
 	// It can be: client, server.
 	Kind string `yaml:"kind" json:"kind"`
 }
+
+type SetDatabasesOptions struct {
+	// The database name to connect to the database. Must be the name
+	// of an environment variable.
+	DatabaseName *string
+}
