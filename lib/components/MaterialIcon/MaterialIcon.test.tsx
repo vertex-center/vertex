@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
-import MaterialIcon from "./index.tsx";
+import { MaterialIcon } from "./MaterialIcon";
 
 test("it renders", () => {
     render(<MaterialIcon icon="deployed_code_update" />);

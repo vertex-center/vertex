@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
-import Logo from "./index";
+import { Logo } from "./Logo";
 
 test("it renders", () => {
     render(<Logo />);

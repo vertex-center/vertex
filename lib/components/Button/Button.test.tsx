@@ -1,8 +1,7 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
-import Button from "./index.tsx";
-import { ButtonType } from "./Button.tsx";
-import { MaterialIcon } from "../../index.ts";
+import { Button, ButtonType } from "./Button";
+import { MaterialIcon } from "../../index";
 
 test("it renders", () => {
     render(<Button>Button</Button>);
