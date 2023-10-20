@@ -362,7 +362,7 @@ func (s *ContainerService) load(uuid uuid.UUID) error {
 }
 
 func (s *ContainerService) SetDatabases(inst *types.Container, databases map[string]uuid.UUID, modifiedFeature map[string]*types.DatabaseFeature) error {
-	for db, _ := range databases {
+	for db := range databases {
 		if _, ok := inst.Service.Databases[db]; !ok {
 			return types.ErrDatabaseIDNotFound
 		}
