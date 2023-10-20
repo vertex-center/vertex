@@ -58,6 +58,6 @@ jobs:
 
       - name: Publish
         run: |
-          npm publish
+          npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets[matrix.token] }}
