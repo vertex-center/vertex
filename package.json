@@ -2,6 +2,17 @@
     "name": "@vertex-center/components",
     "private": false,
     "version": "0.1.0",
+    "homepage": "https://github.com/vertex-center/vertex-components",
+    "description": "React components shared for all Vertex projects.",
+    "license": "MIT",
+    "author": {
+        "name": "Quentin Guidée",
+        "email": "contact@quentinguidee.dev",
+        "url": "https://quentinguidee.dev/"
+    },
+    "bugs": {
+        "url": "https://github.com/vertex-center/vertex-components/issues"
+    },
     "type": "module",
     "scripts": {
         "build": "tsc && vite build",
