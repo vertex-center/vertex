@@ -39,8 +39,18 @@ jobs:
       - name: Run test json
         run: go test -json ./... > report.json
 
-      - name: Run Scan
+      - name: Run Scan (Push)
+        if: github.event_name == 'push'
         uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Run Scan (PR)
+        if: github.event_name == 'pull_request_target'
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          args: -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
