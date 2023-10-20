@@ -46,6 +46,11 @@ func (a *ContainerEnvFSAdapter) Save(uuid uuid.UUID, env containerstypes.Contain
 		return err
 	}
 
+	err = file.Truncate(0)
+	if err != nil {
+		return err
+	}
+
 	for key, value := range env {
 		_, err := file.WriteString(strings.Join([]string{key, value}, "=") + "\n")
 		if err != nil {
