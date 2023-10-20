@@ -1,7 +1,7 @@
 import type { Preview } from "@storybook/react";
 
 import "../lib/index.sass";
-import { withThemeProvider } from "./theme";
+import { withTheme } from "./theme";
 
 const preview: Preview = {
     parameters: {
@@ -27,7 +27,7 @@ const preview: Preview = {
             ],
         },
     },
-    decorators: [withThemeProvider],
+    decorators: [withTheme],
 };
 
 export default preview;
