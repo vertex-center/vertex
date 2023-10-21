@@ -17,6 +17,9 @@ function Line(props: LogLine) {
         return <Downloads downloads={message} />;
     }
 
+    if (message.value === undefined) return null;
+    if (message.value === "") return null;
+
     return (
         <div
             className={classNames({
