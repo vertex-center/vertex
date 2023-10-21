@@ -34,23 +34,25 @@ func (s *ContainerServiceService) CheckForUpdate(inst *types.Container, latest t
 // Update updates the service of a container.
 // The service passed is the latest version of the service.
 func (s *ContainerServiceService) Update(inst *types.Container, service types.Service) error {
-	if service.Version <= types.MaxSupportedVersion {
-		log.Info("service version is outdated, upgrading.",
-			vlog.String("uuid", inst.UUID.String()),
-			vlog.Int("old_version", int(inst.Service.Version)),
-			vlog.Int("new_version", int(service.Version)),
-		)
-		err := s.Save(inst, service)
-		if err != nil {
-			return err
-		}
-	} else {
-		log.Info("service version is not supported, skipping.",
+	if service.Version > types.MaxSupportedVersion {
+		log.Info("service version is not supported, skipping",
 			vlog.String("uuid", inst.UUID.String()),
 			vlog.Int("version", int(service.Version)),
 		)
 	}
 
+	log.Info("upgrading service",
+		vlog.String("uuid", inst.UUID.String()),
+		vlog.Int("old_version", int(inst.Service.Version)),
+		vlog.Int("new_version", int(service.Version)),
+	)
+
+	err := s.Save(inst, service)
+	if err != nil {
+		return err
+	}
+
+	inst.ServiceUpdate.Available = false
 	return nil
 }
 
