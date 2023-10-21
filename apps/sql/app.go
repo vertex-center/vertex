@@ -17,32 +17,32 @@ var (
 )
 
 type App struct {
-	*apptypes.App
+	ctx *apptypes.Context
 }
 
 func NewApp() *App {
 	return &App{}
 }
 
-func (a *App) Initialize(app *apptypes.App) error {
-	a.App = app
+func (a *App) Load(ctx *apptypes.Context) {
+	a.ctx = ctx
+}
 
-	c := app.Context()
-
-	sqlService = service.New(c)
-
-	app.Register(apptypes.Meta{
+func (a *App) Meta() apptypes.Meta {
+	return apptypes.Meta{
 		ID:          "vx-sql",
 		Name:        "Vertex SQL",
 		Description: "Create and manage SQL databases.",
 		Icon:        "database",
-	})
+	}
+}
 
-	app.RegisterRoutes(AppRoute, func(r *router.Group) {
-		dbmsHandler := handler.NewDBMSHandler(sqlService)
-		r.GET("/container/:container_uuid", dbmsHandler.Get)
-		r.POST("/dbms/:dbms/install", dbmsHandler.Install)
-	})
+func (a *App) Initialize(r *router.Group) error {
+	sqlService = service.New(a.ctx)
+
+	dbmsHandler := handler.NewDBMSHandler(sqlService)
+	r.GET("/container/:container_uuid", dbmsHandler.Get)
+	r.POST("/dbms/:dbms/install", dbmsHandler.Install)
 
 	return nil
 }

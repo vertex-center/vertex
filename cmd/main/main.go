@@ -184,7 +184,7 @@ func initServices(about types.About) {
 		updates.NewVertexClientUpdater(path.Join(storage.Path, "client")),
 		updates.NewRepositoryUpdater("vertex_services", path.Join(storage.Path, "services"), "vertex-center", "vertex-services"),
 	})
-	appsService = service.NewAppsService(ctx, r,
+	appsService = service.NewAppsService(ctx, false, r,
 		[]app.Interface{
 			sql.NewApp(),
 			tunnels.NewApp(),

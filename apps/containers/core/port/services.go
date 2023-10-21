@@ -1,9 +1,11 @@
 package port
 
 import (
+	"io"
+
+	types2 "github.com/docker/docker/api/types"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	vtypes "github.com/vertex-center/vertex/core/types"
 )
 
 type (
@@ -41,7 +43,7 @@ type (
 		GetAllVersions(inst *types.Container, useCache bool) ([]string, error)
 		CheckForUpdates(inst *types.Container) error
 		RecreateContainer(inst *types.Container) error
-		WaitCondition(inst *types.Container, condition vtypes.WaitContainerCondition) error
+		WaitCondition(inst *types.Container, condition types.WaitContainerCondition) error
 	}
 
 	ContainerServiceService interface {
@@ -66,5 +68,20 @@ type (
 	ServiceService interface {
 		GetAll() []types.Service
 		GetById(id string) (types.Service, error)
+	}
+
+	DockerService interface {
+		ListContainers() ([]types.DockerContainer, error)
+		DeleteContainer(id string) error
+		CreateContainer(options types.CreateContainerOptions) (types.CreateContainerResponse, error)
+		StartContainer(id string) error
+		StopContainer(id string) error
+		InfoContainer(id string) (types.InfoContainerResponse, error)
+		LogsStdoutContainer(id string) (io.ReadCloser, error)
+		LogsStderrContainer(id string) (io.ReadCloser, error)
+		WaitContainer(id string, cond types.WaitContainerCondition) error
+		InfoImage(id string) (types.InfoImageResponse, error)
+		PullImage(options types.PullImageOptions) (io.ReadCloser, error)
+		BuildImage(options types.BuildImageOptions) (types2.ImageBuildResponse, error)
 	}
 )

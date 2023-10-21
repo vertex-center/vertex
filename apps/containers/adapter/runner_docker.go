@@ -6,9 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/core/types"
-	"github.com/vertex-center/vertex/core/types/api"
 	"io"
 	"net/http"
 	"path"
@@ -21,6 +18,7 @@ import (
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/go-connections/nat"
 	"github.com/google/go-containerregistry/pkg/crane"
+	types "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -35,7 +33,7 @@ func NewContainerRunnerFSAdapter() ContainerRunnerDockerAdapter {
 	return ContainerRunnerDockerAdapter{}
 }
 
-func (a ContainerRunnerDockerAdapter) Delete(inst *containerstypes.Container) error {
+func (a ContainerRunnerDockerAdapter) Delete(inst *types.Container) error {
 	id, err := a.getContainerID(*inst)
 	if err != nil {
 		return err
@@ -43,25 +41,25 @@ func (a ContainerRunnerDockerAdapter) Delete(inst *containerstypes.Container) er
 
 	apiError := router.Error{}
 	err = requests.URL(config.Current.KernelURL()).
-		Pathf("/api/docker/container/%s", id).
+		Pathf("/api/app/vx-containers/docker/container/%s", id).
 		Delete().
 		ErrorJSON(&apiError).
 		Fetch(context.Background())
 
-	if apiError.Code == api.ErrContainerNotFound {
+	if apiError.Code == types.ErrCodeContainerNotFound {
 		return ErrContainerNotFound
 	}
 	return err
 }
 
-func (a ContainerRunnerDockerAdapter) Start(inst *containerstypes.Container, setStatus func(status string)) (io.ReadCloser, io.ReadCloser, error) {
+func (a ContainerRunnerDockerAdapter) Start(inst *types.Container, setStatus func(status string)) (io.ReadCloser, io.ReadCloser, error) {
 	rErr, wErr := io.Pipe()
 	rOut, wOut := io.Pipe()
 
 	go func() {
 		imageName := inst.DockerImageVertexName()
 
-		setStatus(containerstypes.ContainerStatusBuilding)
+		setStatus(types.ContainerStatusBuilding)
 
 		containerPath := a.getPath(*inst)
 		service := inst.Service
@@ -80,7 +78,7 @@ func (a ContainerRunnerDockerAdapter) Start(inst *containerstypes.Container, set
 		}
 		if err != nil {
 			log.Error(err)
-			setStatus(containerstypes.ContainerStatusError)
+			setStatus(types.ContainerStatusError)
 			return
 		}
 
@@ -102,7 +100,7 @@ func (a ContainerRunnerDockerAdapter) Start(inst *containerstypes.Container, set
 					continue
 				}
 
-				progress := containerstypes.DownloadProgress{
+				progress := types.DownloadProgress{
 					ID:     msg.ID,
 					Status: msg.Status,
 				}
@@ -125,14 +123,14 @@ func (a ContainerRunnerDockerAdapter) Start(inst *containerstypes.Container, set
 					log.Error(err,
 						vlog.String("text", scanner.Text()),
 						vlog.String("uuid", inst.UUID.String()))
-					setStatus(containerstypes.ContainerStatusError)
+					setStatus(types.ContainerStatusError)
 					return
 				}
 			}
 			if scanner.Err() != nil {
 				log.Error(scanner.Err(),
 					vlog.String("uuid", inst.UUID.String()))
-				setStatus(containerstypes.ContainerStatusError)
+				setStatus(types.ContainerStatusError)
 				return
 			}
 		}()
@@ -244,14 +242,14 @@ func (a ContainerRunnerDockerAdapter) Start(inst *containerstypes.Container, set
 
 		// Start
 		err = requests.URL(config.Current.KernelURL()).
-			Pathf("/api/docker/container/%s/start", id).
+			Pathf("/api/app/vx-containers/docker/container/%s/start", id).
 			Post().
 			Fetch(context.Background())
 		if err != nil {
-			setStatus(containerstypes.ContainerStatusError)
+			setStatus(types.ContainerStatusError)
 			return
 		}
-		setStatus(containerstypes.ContainerStatusRunning)
+		setStatus(types.ContainerStatusRunning)
 
 		stdout, stderr, err = a.readLogs(id)
 		if err != nil {
@@ -283,28 +281,28 @@ func (a ContainerRunnerDockerAdapter) Start(inst *containerstypes.Container, set
 		err = a.WaitCondition(inst, types.WaitContainerCondition(container.WaitConditionNotRunning))
 		if err != nil {
 			log.Error(err)
-			setStatus(containerstypes.ContainerStatusError)
+			setStatus(types.ContainerStatusError)
 		} else {
-			setStatus(containerstypes.ContainerStatusOff)
+			setStatus(types.ContainerStatusOff)
 		}
 	}()
 
 	return rOut, rErr, nil
 }
 
-func (a ContainerRunnerDockerAdapter) Stop(inst *containerstypes.Container) error {
+func (a ContainerRunnerDockerAdapter) Stop(inst *types.Container) error {
 	id, err := a.getContainerID(*inst)
 	if err != nil {
 		return err
 	}
 
 	return requests.URL(config.Current.KernelURL()).
-		Pathf("/api/docker/container/%s/stop", id).
+		Pathf("/api/app/vx-containers/docker/container/%s/stop", id).
 		Post().
 		Fetch(context.Background())
 }
 
-func (a ContainerRunnerDockerAdapter) Info(inst containerstypes.Container) (map[string]any, error) {
+func (a ContainerRunnerDockerAdapter) Info(inst types.Container) (map[string]any, error) {
 	id, err := a.getContainerID(inst)
 	if err != nil {
 		return nil, err
@@ -312,7 +310,7 @@ func (a ContainerRunnerDockerAdapter) Info(inst containerstypes.Container) (map[
 
 	var info types.InfoContainerResponse
 	err = requests.URL(config.Current.KernelURL()).
-		Pathf("/api/docker/container/%s/info", id).
+		Pathf("/api/app/vx-containers/docker/container/%s/info", id).
 		ToJSON(&info).
 		Fetch(context.Background())
 	if err != nil {
@@ -321,7 +319,7 @@ func (a ContainerRunnerDockerAdapter) Info(inst containerstypes.Container) (map[
 
 	var imageInfo types.InfoImageResponse
 	err = requests.URL(config.Current.KernelURL()).
-		Pathf("/api/docker/image/%s/info", info.Image).
+		Pathf("/api/app/vx-containers/docker/image/%s/info", info.Image).
 		ToJSON(&imageInfo).
 		Fetch(context.Background())
 	if err != nil {
@@ -334,7 +332,7 @@ func (a ContainerRunnerDockerAdapter) Info(inst containerstypes.Container) (map[
 	}, nil
 }
 
-func (a ContainerRunnerDockerAdapter) CheckForUpdates(inst *containerstypes.Container) error {
+func (a ContainerRunnerDockerAdapter) CheckForUpdates(inst *types.Container) error {
 	service := inst.Service
 
 	if service.Methods.Docker.Image == nil {
@@ -352,7 +350,7 @@ func (a ContainerRunnerDockerAdapter) CheckForUpdates(inst *containerstypes.Cont
 
 	var imageInfo types.InfoImageResponse
 	err = requests.URL(config.Current.KernelURL()).
-		Pathf("/api/docker/%s/info", imageName).
+		Pathf("/api/app/vx-containers/docker/%s/info", imageName).
 		ToJSON(&imageInfo).
 		Fetch(context.Background())
 	if err != nil {
@@ -375,7 +373,7 @@ func (a ContainerRunnerDockerAdapter) CheckForUpdates(inst *containerstypes.Cont
 		log.Info("a new update is available",
 			vlog.String("uuid", inst.UUID.String()),
 		)
-		inst.Update = &containerstypes.ContainerUpdate{
+		inst.Update = &types.ContainerUpdate{
 			CurrentVersion: currentImageID,
 			LatestVersion:  latestImageID,
 		}
@@ -384,7 +382,7 @@ func (a ContainerRunnerDockerAdapter) CheckForUpdates(inst *containerstypes.Cont
 	return nil
 }
 
-func (a ContainerRunnerDockerAdapter) GetAllVersions(inst containerstypes.Container) ([]string, error) {
+func (a ContainerRunnerDockerAdapter) GetAllVersions(inst types.Container) ([]string, error) {
 	if inst.Service.Methods.Docker == nil {
 		return nil, errors.New("no Docker methods found")
 	}
@@ -395,33 +393,33 @@ func (a ContainerRunnerDockerAdapter) GetAllVersions(inst containerstypes.Contai
 	return crane.ListTags(image)
 }
 
-func (a ContainerRunnerDockerAdapter) HasUpdateAvailable(inst containerstypes.Container) (bool, error) {
+func (a ContainerRunnerDockerAdapter) HasUpdateAvailable(inst types.Container) (bool, error) {
 	//TODO implement me
 	return false, nil
 }
 
-func (a ContainerRunnerDockerAdapter) WaitCondition(inst *containerstypes.Container, cond types.WaitContainerCondition) error {
+func (a ContainerRunnerDockerAdapter) WaitCondition(inst *types.Container, cond types.WaitContainerCondition) error {
 	id, err := a.getContainerID(*inst)
 	if err != nil {
 		return err
 	}
 
 	return requests.URL(config.Current.KernelURL()).
-		Pathf("/api/docker/container/%s/wait/%s", id, cond).
+		Pathf("/api/app/vx-containers/docker/container/%s/wait/%s", id, cond).
 		Fetch(context.Background())
 }
 
-func (a ContainerRunnerDockerAdapter) getContainer(inst containerstypes.Container) (types.Container, error) {
-	var containers []types.Container
+func (a ContainerRunnerDockerAdapter) getContainer(inst types.Container) (types.DockerContainer, error) {
+	var containers []types.DockerContainer
 	err := requests.URL(config.Current.KernelURL()).
-		Path("/api/docker/containers").
+		Path("/api/app/vx-containers/docker/containers").
 		ToJSON(&containers).
 		Fetch(context.Background())
 	if err != nil {
-		return types.Container{}, err
+		return types.DockerContainer{}, err
 	}
 
-	var dockerContainer *types.Container
+	var dockerContainer *types.DockerContainer
 	for _, c := range containers {
 		name := c.Names[0]
 		if name == "/"+inst.DockerContainerName() {
@@ -431,13 +429,13 @@ func (a ContainerRunnerDockerAdapter) getContainer(inst containerstypes.Containe
 	}
 
 	if dockerContainer == nil {
-		return types.Container{}, ErrContainerNotFound
+		return types.DockerContainer{}, ErrContainerNotFound
 	}
 
 	return *dockerContainer, nil
 }
 
-func (a ContainerRunnerDockerAdapter) getContainerID(inst containerstypes.Container) (string, error) {
+func (a ContainerRunnerDockerAdapter) getContainerID(inst types.Container) (string, error) {
 	c, err := a.getContainer(inst)
 	if err != nil {
 		return "", err
@@ -445,7 +443,7 @@ func (a ContainerRunnerDockerAdapter) getContainerID(inst containerstypes.Contai
 	return c.ID, nil
 }
 
-func (a ContainerRunnerDockerAdapter) getImageID(inst containerstypes.Container) (string, error) {
+func (a ContainerRunnerDockerAdapter) getImageID(inst types.Container) (string, error) {
 	c, err := a.getContainer(inst)
 	if err != nil {
 		return "", err
@@ -457,7 +455,7 @@ func (a ContainerRunnerDockerAdapter) pullImage(imageName string) (io.ReadCloser
 	options := types.PullImageOptions{Image: imageName}
 
 	req, err := requests.URL(config.Current.KernelURL()).
-		Path("/api/docker/image/pull").
+		Path("/api/app/vx-containers/docker/image/pull").
 		Post().
 		BodyJSON(options).
 		Request(context.Background())
@@ -490,7 +488,7 @@ func (a ContainerRunnerDockerAdapter) buildImageFromDockerfile(containerPath str
 	}
 
 	req, err := requests.URL(config.Current.KernelURL()).
-		Pathf("/api/docker/image/build").
+		Pathf("/api/app/vx-containers/docker/image/build").
 		Post().
 		BodyJSON(options).
 		Request(context.Background())
@@ -508,7 +506,7 @@ func (a ContainerRunnerDockerAdapter) buildImageFromDockerfile(containerPath str
 func (a ContainerRunnerDockerAdapter) createContainer(options types.CreateContainerOptions) (string, error) {
 	var res types.CreateContainerResponse
 	err := requests.URL(config.Current.KernelURL()).
-		Pathf("/api/docker/container").
+		Pathf("/api/app/vx-containers/docker/container").
 		Post().
 		BodyJSON(options).
 		ToJSON(&res).
@@ -528,14 +526,14 @@ func (a ContainerRunnerDockerAdapter) createContainer(options types.CreateContai
 func (a ContainerRunnerDockerAdapter) readLogs(containerID string) (stdout io.ReadCloser, stderr io.ReadCloser, err error) {
 	var reqStdout, reqStderr *http.Request
 	reqStdout, err = requests.URL(config.Current.KernelURL()).
-		Pathf("/api/docker/container/%s/logs/stdout", containerID).
+		Pathf("/api/app/vx-containers/docker/container/%s/logs/stdout", containerID).
 		Request(context.Background())
 	if err != nil {
 		return
 	}
 
 	reqStderr, err = requests.URL(config.Current.KernelURL()).
-		Pathf("/api/docker/container/%s/logs/stderr", containerID).
+		Pathf("/api/app/vx-containers/docker/container/%s/logs/stderr", containerID).
 		Request(context.Background())
 	if err != nil {
 		return
@@ -573,14 +571,14 @@ func (a ContainerRunnerDockerAdapter) readLogs(containerID string) (stdout io.Re
 	return rOut, rErr, nil
 }
 
-func (a ContainerRunnerDockerAdapter) getPath(inst containerstypes.Container) string {
+func (a ContainerRunnerDockerAdapter) getPath(inst types.Container) string {
 	base := storage.Path
 
 	// If Vertex is running itself inside Docker, the containers are stored in the Vertex container volume.
 	if vdocker.RunningInDocker() {
-		var containers []types.Container
+		var containers []types.DockerContainer
 		err := requests.URL(config.Current.KernelURL()).
-			Path("/api/docker/containers").
+			Path("/api/app/vx-containers/docker/containers").
 			ToJSON(&containers).
 			Fetch(context.Background())
 		if err != nil {

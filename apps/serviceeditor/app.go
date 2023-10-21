@@ -12,31 +12,33 @@ const (
 )
 
 type App struct {
-	*apptypes.App
+	ctx *apptypes.Context
 }
 
 func NewApp() *App {
 	return &App{}
 }
 
-func (a *App) Initialize(app *apptypes.App) error {
-	a.App = app
+func (a *App) Load(ctx *apptypes.Context) {
+	a.ctx = ctx
+}
 
-	editorService := service.NewEditorService()
-
-	app.Register(apptypes.Meta{
+func (a *App) Meta() apptypes.Meta {
+	return apptypes.Meta{
 		ID:          "vx-devtools-service-editor",
 		Name:        "Vertex Service Editor",
 		Description: "Create services for publishing.",
 		Icon:        "frame_source",
 		Category:    "devtools",
-	})
+	}
+}
 
-	app.RegisterRoutes(AppRoute, func(r *router.Group) {
-		editorHandler := handler.NewEditorHandler(editorService)
-		editor := r.Group("/editor")
-		editor.POST("/to-yaml", editorHandler.ToYaml)
-	})
+func (a *App) Initialize(r *router.Group) error {
+	editorService := service.NewEditorService()
+
+	editorHandler := handler.NewEditorHandler(editorService)
+	editor := r.Group("/editor")
+	editor.POST("/to-yaml", editorHandler.ToYaml)
 
 	return nil
 }

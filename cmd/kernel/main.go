@@ -4,14 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	adapter2 "github.com/vertex-center/vertex/adapter"
-	"github.com/vertex-center/vertex/core/port"
-	service "github.com/vertex-center/vertex/core/service"
-	"github.com/vertex-center/vertex/handler"
-	"github.com/vertex-center/vertex/pkg/ginutils"
-	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vlog"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -20,18 +12,34 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gin-gonic/gin"
+	adapter2 "github.com/vertex-center/vertex/adapter"
+	"github.com/vertex-center/vertex/apps/containers"
+	"github.com/vertex-center/vertex/apps/monitoring"
+	"github.com/vertex-center/vertex/apps/reverseproxy"
+	"github.com/vertex-center/vertex/apps/serviceeditor"
+	"github.com/vertex-center/vertex/apps/sql"
+	"github.com/vertex-center/vertex/apps/tunnels"
+	"github.com/vertex-center/vertex/core/port"
+	service "github.com/vertex-center/vertex/core/service"
+	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/handler"
+	"github.com/vertex-center/vertex/pkg/ginutils"
+	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vlog"
+
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 )
 
 var (
-	r *router.Router
+	r   *router.Router
+	ctx *types.VertexContext
 
-	dockerCliAdapter port.DockerAdapter
-	sshAdapter       port.SshAdapter
+	sshAdapter port.SshAdapter
 
-	dockerService port.DockerService
-	sshService    port.SshService
+	sshService port.SshService
 )
 
 func main() {
@@ -51,6 +59,7 @@ func main() {
 
 	// Vertex-Kernel
 	gin.SetMode(gin.ReleaseMode)
+	ctx = types.NewVertexContext()
 	r = router.New()
 	r.Use(ginutils.ErrorHandler())
 	r.Use(ginutils.Logger("KERNEL"))
@@ -59,6 +68,8 @@ func main() {
 	initAdapters()
 	initServices()
 	initRoutes()
+
+	ctx.DispatchEvent(types.EventServerStart{})
 
 	go func() {
 		startRouter()
@@ -169,32 +180,26 @@ func buildVertex() {
 }
 
 func initAdapters() {
-	dockerCliAdapter = adapter2.NewDockerCliAdapter()
 	sshAdapter = adapter2.NewSshFsAdapter(nil)
 }
 
 func initServices() {
-	dockerService = service.NewDockerKernelService(dockerCliAdapter)
 	sshService = service.NewSshKernelService(sshAdapter)
+
+	service.NewAppsService(ctx, true, r,
+		[]app.Interface{
+			sql.NewApp(),
+			tunnels.NewApp(),
+			monitoring.NewApp(),
+			containers.NewApp(),
+			reverseproxy.NewApp(),
+			serviceeditor.NewApp(),
+		},
+	)
 }
 
 func initRoutes() {
 	api := r.Group("/api")
-
-	dockerHandler := handler.NewDockerKernelHandler(dockerService)
-	docker := api.Group("/docker")
-	docker.GET("/containers", dockerHandler.GetContainers)
-	docker.POST("/container", dockerHandler.CreateContainer)
-	docker.DELETE("/container/:id", dockerHandler.DeleteContainer)
-	docker.POST("/container/:id/start", dockerHandler.StartContainer)
-	docker.POST("/container/:id/stop", dockerHandler.StopContainer)
-	docker.GET("/container/:id/info", dockerHandler.InfoContainer)
-	docker.GET("/container/:id/logs/stdout", dockerHandler.LogsStdoutContainer)
-	docker.GET("/container/:id/logs/stderr", dockerHandler.LogsStderrContainer)
-	docker.GET("/container/:id/wait/:cond", dockerHandler.WaitContainer)
-	docker.GET("/image/:id/info", dockerHandler.InfoImage)
-	docker.POST("/image/pull", dockerHandler.PullImage)
-	docker.POST("/image/build", dockerHandler.BuildImage)
 
 	sshHandler := handler.NewSshKernelHandler(sshService)
 	ssh := api.Group("/security/ssh")
@@ -215,6 +220,8 @@ func startRouter() {
 }
 
 func stopRouter() {
+	ctx.DispatchEvent(types.EventServerStop{})
+
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	err := r.Stop(ctx)

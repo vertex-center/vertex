@@ -14,15 +14,17 @@ import (
 
 type AppsService struct {
 	uuid     uuid.UUID
+	kernel   bool
 	ctx      *types.VertexContext
 	apps     []app.Interface
 	registry *app.AppsRegistry
 	router   *router.Router
 }
 
-func NewAppsService(ctx *types.VertexContext, router *router.Router, apps []app.Interface) port.AppsService {
+func NewAppsService(ctx *types.VertexContext, kernel bool, router *router.Router, apps []app.Interface) port.AppsService {
 	s := &AppsService{
 		uuid:     uuid.New(),
+		kernel:   kernel,
 		ctx:      ctx,
 		apps:     apps,
 		registry: app.NewAppsRegistry(ctx),
@@ -46,41 +48,74 @@ func (s *AppsService) OnEvent(e interface{}) {
 }
 
 func (s *AppsService) StartApps() {
-	log.Info("starting apps")
+	log.Info("initializing apps")
 
 	for i := range s.apps {
-		err := s.startApp(s.apps[i])
-		if err != nil {
-			log.Error(errors.New("failed to initialize app"), vlog.String("error", err.Error()))
-		}
+		ctx := app.NewContext(s.ctx)
+		s.apps[i].Load(ctx)
+		s.registry.RegisterApp(s.apps[i])
 	}
 
 	for _, a := range s.registry.Apps() {
-		for route, handle := range a.HttpHandlers() {
-			handle(s.router.Group("/api/app" + route))
+		id := a.Meta().ID
+		group := s.router.Group("/api/app/" + id)
+
+		var err error
+		if s.kernel {
+			if a, ok := a.(app.KernelInitializable); ok {
+				log.Info("initializing kernel app", vlog.String("id", id))
+				err = a.InitializeKernel(group)
+			}
+		} else {
+			if a, ok := a.(app.Initializable); ok {
+				log.Info("initializing app", vlog.String("id", id))
+				err = a.Initialize(group)
+			}
+		}
+
+		if err != nil {
+			log.Error(err)
+			log.Error(errors.New("failed to initialize app"),
+				vlog.String("id", id))
 		}
 	}
-}
 
-func (s *AppsService) startApp(impl app.Interface) error {
-	a := app.New(s.ctx)
-	err := s.registry.RegisterApp(a, impl)
-	if err != nil {
-		log.Error(errors.New("failed to initialize app"), vlog.String("error", err.Error()))
-		return err
-	}
-	log.Info("app initialized", vlog.String("name", a.Name()))
-	return nil
+	log.Info("apps initialized")
 }
 
 func (s *AppsService) StopApps() {
-	s.registry.Close()
+	log.Info("uninitializing apps")
+
+	for _, a := range s.registry.Apps() {
+		id := a.Meta().ID
+
+		var err error
+		if s.kernel {
+			if a, ok := a.(app.KernelUninitializable); ok {
+				log.Info("uninitializing kernel app", vlog.String("id", id))
+				err = a.UninitializeKernel()
+			}
+		} else {
+			if a, ok := a.(app.Uninitializable); ok {
+				log.Info("uninitializing app", vlog.String("id", id))
+				err = a.Uninitialize()
+			}
+		}
+
+		if err != nil {
+			log.Error(err)
+			log.Error(errors.New("failed to uninitialize app"),
+				vlog.String("id", id))
+		}
+	}
+
+	log.Info("apps uninitialized")
 }
 
 func (s *AppsService) All() []app.Meta {
 	var apps []app.Meta
 	for _, a := range s.registry.Apps() {
-		apps = append(apps, a.App.Meta())
+		apps = append(apps, a.Meta())
 	}
 	return apps
 }

@@ -3,12 +3,11 @@ package handler
 import (
 	"bufio"
 	"fmt"
-	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/core/types"
-	"github.com/vertex-center/vertex/core/types/api"
 	"io"
 
 	"github.com/docker/docker/client"
+	"github.com/vertex-center/vertex/apps/containers/core/port"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 )
@@ -27,7 +26,7 @@ func (h *DockerKernelHandler) GetContainers(c *router.Context) {
 	containers, err := h.dockerService.ListContainers()
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToListContainers,
+			Code:           types.ErrCodeFailedToListContainers,
 			PublicMessage:  "Failed to list containers.",
 			PrivateMessage: err.Error(),
 		})
@@ -47,7 +46,7 @@ func (h *DockerKernelHandler) CreateContainer(c *router.Context) {
 	res, err := h.dockerService.CreateContainer(options)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToCreateContainer,
+			Code:           types.ErrCodeFailedToCreateContainer,
 			PublicMessage:  "Failed to create container.",
 			PrivateMessage: err.Error(),
 		})
@@ -63,14 +62,14 @@ func (h *DockerKernelHandler) DeleteContainer(c *router.Context) {
 	err := h.dockerService.DeleteContainer(id)
 	if err != nil && client.IsErrNotFound(err) {
 		c.NotFound(router.Error{
-			Code:           api.ErrContainerNotFound,
+			Code:           types.ErrCodeContainerNotFound,
 			PublicMessage:  fmt.Sprintf("Container %s not found.", id),
 			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToDeleteContainer,
+			Code:           types.ErrCodeFailedToDeleteContainer,
 			PublicMessage:  fmt.Sprintf("Failed to delete container %s.", id),
 			PrivateMessage: err.Error(),
 		})
@@ -86,7 +85,7 @@ func (h *DockerKernelHandler) StartContainer(c *router.Context) {
 	err := h.dockerService.StartContainer(id)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToStartContainer,
+			Code:           types.ErrCodeFailedToStartContainer,
 			PublicMessage:  fmt.Sprintf("Failed to start container %s.", id),
 			PrivateMessage: err.Error(),
 		})
@@ -102,7 +101,7 @@ func (h *DockerKernelHandler) StopContainer(c *router.Context) {
 	err := h.dockerService.StopContainer(id)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToStopContainer,
+			Code:           types.ErrCodeFailedToStopContainer,
 			PublicMessage:  fmt.Sprintf("Failed to stop container %s.", id),
 			PrivateMessage: err.Error(),
 		})
@@ -118,7 +117,7 @@ func (h *DockerKernelHandler) InfoContainer(c *router.Context) {
 	info, err := h.dockerService.InfoContainer(id)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToGetContainerInfo,
+			Code:           types.ErrCodeFailedToGetContainerInfo,
 			PublicMessage:  fmt.Sprintf("Failed to get info for container %s.", id),
 			PrivateMessage: err.Error(),
 		})
@@ -134,7 +133,7 @@ func (h *DockerKernelHandler) LogsStdoutContainer(c *router.Context) {
 	stdout, err := h.dockerService.LogsStdoutContainer(id)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToGetContainerLogs,
+			Code:           types.ErrCodeFailedToGetContainerLogs,
 			PublicMessage:  fmt.Sprintf("Failed to get logs for container %s.", id),
 			PrivateMessage: err.Error(),
 		})
@@ -167,7 +166,7 @@ func (h *DockerKernelHandler) LogsStderrContainer(c *router.Context) {
 	stderr, err := h.dockerService.LogsStderrContainer(id)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToGetContainerLogs,
+			Code:           types.ErrCodeFailedToGetContainerLogs,
 			PublicMessage:  fmt.Sprintf("Failed to get logs for container %s.", id),
 			PrivateMessage: err.Error(),
 		})
@@ -201,7 +200,7 @@ func (h *DockerKernelHandler) WaitContainer(c *router.Context) {
 	err := h.dockerService.WaitContainer(id, types.WaitContainerCondition(cond))
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToWaitContainer,
+			Code:           types.ErrCodeFailedToWaitContainer,
 			PublicMessage:  fmt.Sprintf("Failed to wait the event '%s' for container %s.", cond, id),
 			PrivateMessage: err.Error(),
 		})
@@ -217,7 +216,7 @@ func (h *DockerKernelHandler) InfoImage(c *router.Context) {
 	info, err := h.dockerService.InfoImage(id)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToGetImageInfo,
+			Code:           types.ErrCodeFailedToGetImageInfo,
 			PublicMessage:  fmt.Sprintf("Failed to get info for image %s.", id),
 			PrivateMessage: err.Error(),
 		})
@@ -237,7 +236,7 @@ func (h *DockerKernelHandler) PullImage(c *router.Context) {
 	r, err := h.dockerService.PullImage(options)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToPullImage,
+			Code:           types.ErrCodeFailedToPullImage,
 			PublicMessage:  "Failed to pull image.",
 			PrivateMessage: err.Error(),
 		})
@@ -274,7 +273,7 @@ func (h *DockerKernelHandler) BuildImage(c *router.Context) {
 	res, err := h.dockerService.BuildImage(options)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToBuildImage,
+			Code:           types.ErrCodeFailedToBuildImage,
 			PublicMessage:  "Failed to build image.",
 			PrivateMessage: err.Error(),
 		})

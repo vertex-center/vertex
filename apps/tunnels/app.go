@@ -11,27 +11,29 @@ const (
 )
 
 type App struct {
-	*apptypes.App
+	ctx *apptypes.Context
 }
 
 func NewApp() *App {
 	return &App{}
 }
 
-func (a *App) Initialize(app *apptypes.App) error {
-	a.App = app
+func (a *App) Load(ctx *apptypes.Context) {
+	a.ctx = ctx
+}
 
-	app.Register(apptypes.Meta{
+func (a *App) Meta() apptypes.Meta {
+	return apptypes.Meta{
 		ID:          "vx-tunnels",
 		Name:        "Vertex Tunnels",
 		Description: "Create and manage tunnels.",
 		Icon:        "subway",
-	})
+	}
+}
 
-	app.RegisterRoutes(AppRoute, func(r *router.Group) {
-		providerHandler := handler.NewProviderHandler()
-		r.POST("/provider/:provider/install", providerHandler.Install)
-	})
+func (a *App) Initialize(r *router.Group) error {
+	providerHandler := handler.NewProviderHandler()
+	r.POST("/provider/:provider/install", providerHandler.Install)
 
 	return nil
 }

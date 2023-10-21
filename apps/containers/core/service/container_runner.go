@@ -10,7 +10,6 @@ import (
 
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	types2 "github.com/vertex-center/vertex/apps/containers/core/types"
-	vtypes "github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
 
 	"github.com/google/uuid"
@@ -244,7 +243,7 @@ func (s *ContainerRunnerService) RecreateContainer(inst *types2.Container) error
 	return nil
 }
 
-func (s *ContainerRunnerService) WaitCondition(inst *types2.Container, cond vtypes.WaitContainerCondition) error {
+func (s *ContainerRunnerService) WaitCondition(inst *types2.Container, cond types2.WaitContainerCondition) error {
 	return s.adapter.WaitCondition(inst, cond)
 }
 

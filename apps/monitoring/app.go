@@ -20,34 +20,35 @@ var (
 )
 
 type App struct {
-	*apptypes.App
+	ctx *apptypes.Context
 }
 
 func NewApp() *App {
 	return &App{}
 }
 
-func (a *App) Initialize(app *apptypes.App) error {
-	a.App = app
+func (a *App) Load(ctx *apptypes.Context) {
+	a.ctx = ctx
+}
 
-	prometheusAdapter = adapter.NewMetricsPrometheusAdapter()
-
-	metricsService = service.NewMetricsService(app.Context(), prometheusAdapter)
-
-	app.Register(apptypes.Meta{
+func (a *App) Meta() apptypes.Meta {
+	return apptypes.Meta{
 		ID:          "vx-monitoring",
 		Name:        "Vertex Monitoring",
 		Description: "Create and manage containers.",
 		Icon:        "monitoring",
-	})
+	}
+}
 
-	app.RegisterRoutes(AppRoute, func(r *router.Group) {
-		metricsHandler := handler.NewMetricsHandler(metricsService)
+func (a *App) Initialize(r *router.Group) error {
+	prometheusAdapter = adapter.NewMetricsPrometheusAdapter()
 
-		r.GET("/metrics", metricsHandler.Get)
-		r.POST("/collector/:collector/install", metricsHandler.InstallCollector)
-		r.POST("/visualizer/:visualizer/install", metricsHandler.InstallVisualizer)
-	})
+	metricsService = service.NewMetricsService(a.ctx, prometheusAdapter)
+
+	metricsHandler := handler.NewMetricsHandler(metricsService)
+	r.GET("/metrics", metricsHandler.Get)
+	r.POST("/collector/:collector/install", metricsHandler.InstallCollector)
+	r.POST("/visualizer/:visualizer/install", metricsHandler.InstallVisualizer)
 
 	return nil
 }

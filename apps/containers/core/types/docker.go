@@ -6,7 +6,7 @@ import (
 	"github.com/docker/go-connections/nat"
 )
 
-type Container struct {
+type DockerContainer struct {
 	ID      string   `json:"id,omitempty"`
 	ImageID string   `json:"image_id,omitempty"`
 	Names   []string `json:"names,omitempty"`
@@ -62,8 +62,8 @@ type InfoImageResponse struct {
 
 type WaitContainerCondition container.WaitCondition
 
-func NewContainer(c dockertypes.Container) Container {
-	return Container{
+func NewDockerContainer(c dockertypes.Container) DockerContainer {
+	return DockerContainer{
 		ID:      c.ID,
 		ImageID: c.ImageID,
 		Names:   c.Names,

@@ -2,13 +2,14 @@ package adapter
 
 import (
 	"context"
-	"github.com/vertex-center/vertex/core/types"
 	"io"
 
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
+	"github.com/vertex-center/vertex/apps/containers/core/port"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 )
@@ -17,7 +18,7 @@ type DockerCliAdapter struct {
 	cli *client.Client
 }
 
-func NewDockerCliAdapter() DockerCliAdapter {
+func NewDockerCliAdapter() port.DockerAdapter {
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		log.Warn("couldn't connect with the Docker cli.",
@@ -32,15 +33,15 @@ func NewDockerCliAdapter() DockerCliAdapter {
 	}
 }
 
-func (a DockerCliAdapter) ListContainers() ([]types.Container, error) {
+func (a DockerCliAdapter) ListContainers() ([]types.DockerContainer, error) {
 	res, err := a.cli.ContainerList(context.Background(), dockertypes.ContainerListOptions{All: true})
 	if err != nil {
 		return nil, err
 	}
 
-	var containers []types.Container
+	var containers []types.DockerContainer
 	for _, c := range res {
-		containers = append(containers, types.NewContainer(c))
+		containers = append(containers, types.NewDockerContainer(c))
 	}
 	return containers, nil
 }

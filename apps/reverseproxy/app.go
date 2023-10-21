@@ -21,7 +21,7 @@ var (
 )
 
 type App struct {
-	*apptypes.App
+	ctx   *apptypes.Context
 	proxy *ProxyRouter
 }
 
@@ -29,9 +29,20 @@ func NewApp() *App {
 	return &App{}
 }
 
-func (a *App) Initialize(app *apptypes.App) error {
-	a.App = app
+func (a *App) Load(ctx *apptypes.Context) {
+	a.ctx = ctx
+}
 
+func (a *App) Meta() apptypes.Meta {
+	return apptypes.Meta{
+		ID:          "vx-reverse-proxy",
+		Name:        "Vertex Reverse Proxy",
+		Description: "Redirect traffic to your containers.",
+		Icon:        "router",
+	}
+}
+
+func (a *App) Initialize(r *router.Group) error {
 	proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
 
 	proxyService = service.NewProxyService(proxyFSAdapter)
@@ -45,19 +56,10 @@ func (a *App) Initialize(app *apptypes.App) error {
 		}
 	}()
 
-	app.Register(apptypes.Meta{
-		ID:          "vx-reverse-proxy",
-		Name:        "Vertex Reverse Proxy",
-		Description: "Redirect traffic to your containers.",
-		Icon:        "router",
-	})
-
-	app.RegisterRoutes(AppRoute, func(r *router.Group) {
-		proxyHandler := handler.NewProxyHandler(proxyService)
-		r.GET("/redirects", proxyHandler.GetRedirects)
-		r.POST("/redirect", proxyHandler.AddRedirect)
-		r.DELETE("/redirect/:id", proxyHandler.RemoveRedirect)
-	})
+	proxyHandler := handler.NewProxyHandler(proxyService)
+	r.GET("/redirects", proxyHandler.GetRedirects)
+	r.POST("/redirect", proxyHandler.AddRedirect)
+	r.DELETE("/redirect/:id", proxyHandler.RemoveRedirect)
 
 	return nil
 }

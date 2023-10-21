@@ -1,11 +1,11 @@
 package service
 
 import (
-	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/core/types"
 	"io"
 
 	dockertypes "github.com/docker/docker/api/types"
+	"github.com/vertex-center/vertex/apps/containers/core/port"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 )
@@ -20,7 +20,7 @@ func NewDockerKernelService(dockerAdapter port.DockerAdapter) port.DockerService
 	}
 }
 
-func (s DockerKernelService) ListContainers() ([]types.Container, error) {
+func (s DockerKernelService) ListContainers() ([]types.DockerContainer, error) {
 	return s.dockerAdapter.ListContainers()
 }
 

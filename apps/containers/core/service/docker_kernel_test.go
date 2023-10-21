@@ -1,7 +1,6 @@
 package service
 
 import (
-	"github.com/vertex-center/vertex/core/types"
 	"io"
 	"testing"
 
@@ -9,6 +8,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
 )
 
 type DockerKernelServiceTestSuite struct {
@@ -28,12 +28,12 @@ func (suite *DockerKernelServiceTestSuite) SetupSuite() {
 }
 
 func (suite *DockerKernelServiceTestSuite) TestListContainers() {
-	suite.adapter.On("ListContainers").Return([]types.Container{}, nil)
+	suite.adapter.On("ListContainers").Return([]types.DockerContainer{}, nil)
 
 	containers, err := suite.service.ListContainers()
 
 	suite.NoError(err)
-	suite.Equal([]types.Container{}, containers)
+	suite.Equal([]types.DockerContainer{}, containers)
 	suite.adapter.AssertExpectations(suite.T())
 }
 
@@ -49,10 +49,10 @@ func (suite *DockerKernelServiceTestSuite) TestDeleteContainer() {
 func (suite *DockerKernelServiceTestSuite) TestCreateContainer() {
 	suite.adapter.On("CreateContainer", mock.Anything).Return(types.CreateContainerResponse{}, nil)
 
-	container, err := suite.service.CreateContainer(types.CreateContainerOptions{})
+	cont, err := suite.service.CreateContainer(types.CreateContainerOptions{})
 
 	suite.NoError(err)
-	suite.Equal(types.CreateContainerResponse{}, container)
+	suite.Equal(types.CreateContainerResponse{}, cont)
 	suite.adapter.AssertExpectations(suite.T())
 }
 
@@ -147,9 +147,9 @@ type MockDockerAdapter struct {
 	mock.Mock
 }
 
-func (m *MockDockerAdapter) ListContainers() ([]types.Container, error) {
+func (m *MockDockerAdapter) ListContainers() ([]types.DockerContainer, error) {
 	args := m.Called()
-	return args.Get(0).([]types.Container), args.Error(1)
+	return args.Get(0).([]types.DockerContainer), args.Error(1)
 }
 
 func (m *MockDockerAdapter) DeleteContainer(id string) error {
