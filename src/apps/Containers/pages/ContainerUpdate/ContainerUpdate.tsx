@@ -40,11 +40,14 @@ export default function ContainerUpdate() {
         content = (
             <List>
                 <ListItem>
-                    <ListInfo onClick={updateVertexIntegration}>
+                    <ListInfo>
                         <ListTitle>Vertex integration</ListTitle>
                     </ListInfo>
                     <ListActions>
-                        <Button rightIcon={<MaterialIcon icon="download" />}>
+                        <Button
+                            onClick={updateVertexIntegration}
+                            rightIcon={<MaterialIcon icon="download" />}
+                        >
                             Update
                         </Button>
                     </ListActions>
