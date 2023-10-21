@@ -48,6 +48,7 @@ func (a *App) Initialize(app *apptypes.App) error {
 	containerServiceAdapter = adapter.NewContainerServiceFSAdapter(nil)
 	containerSettingsAdapter = adapter.NewContainerSettingsFSAdapter(nil)
 
+	serviceService = service.NewServiceService()
 	containerEnvService = service.NewContainerEnvService(containerEnvAdapter)
 	containerLogsService = service.NewContainerLogsService(app.Context(), containerLogsAdapter)
 	containerRunnerService = service.NewContainerRunnerService(app.Context(), containerRunnerAdapter)
@@ -60,8 +61,8 @@ func (a *App) Initialize(app *apptypes.App) error {
 		ContainerServiceService:  containerServiceService,
 		ContainerEnvService:      containerEnvService,
 		ContainerSettingsService: containerSettingsService,
+		ServiceService:           serviceService,
 	})
-	serviceService = service.NewServiceService()
 	service.NewMetricsService(app.Context())
 
 	app.Register(apptypes.Meta{

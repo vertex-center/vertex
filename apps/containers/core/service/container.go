@@ -32,6 +32,7 @@ type ContainerService struct {
 	containerServiceService  port.ContainerServiceService
 	containerEnvService      port.ContainerEnvService
 	containerSettingsService port.ContainerSettingsService
+	serviceService           port.ServiceService
 
 	containers      map[uuid.UUID]*types.Container
 	containersMutex *sync.RWMutex
@@ -46,6 +47,7 @@ type ContainerServiceParams struct {
 	ContainerServiceService  port.ContainerServiceService
 	ContainerEnvService      port.ContainerEnvService
 	ContainerSettingsService port.ContainerSettingsService
+	ServiceService           port.ServiceService
 }
 
 func NewContainerService(params ContainerServiceParams) port.ContainerService {
@@ -59,6 +61,7 @@ func NewContainerService(params ContainerServiceParams) port.ContainerService {
 		containerServiceService:  params.ContainerServiceService,
 		containerEnvService:      params.ContainerEnvService,
 		containerSettingsService: params.ContainerSettingsService,
+		serviceService:           params.ServiceService,
 
 		containers:      make(map[uuid.UUID]*types.Container),
 		containersMutex: &sync.RWMutex{},
@@ -341,9 +344,14 @@ func (s *ContainerService) load(uuid uuid.UUID) error {
 		return err
 	}
 
-	err = s.containerServiceService.CheckForUpdate(&inst, service)
+	latestService, err := s.serviceService.GetById(service.ID)
 	if err != nil {
-		return err
+		log.Error(err)
+	} else {
+		err = s.containerServiceService.CheckForUpdate(&inst, latestService)
+		if err != nil {
+			log.Error(err)
+		}
 	}
 
 	if !s.Exists(uuid) {
