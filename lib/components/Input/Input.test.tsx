@@ -1,21 +1,29 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
-import Input from "./Input.tsx";
+import { Input } from "./Input.tsx";
+import { createRef } from "react";
 
 test("it renders", () => {
     render(<Input placeholder="Placeholder" />);
-    const button = screen.getByPlaceholderText("Placeholder");
-    expect(button).toBeInTheDocument();
+    const input = screen.getByPlaceholderText("Placeholder");
+    expect(input).toBeInTheDocument();
 });
 
 test("it can have a custom class", () => {
     render(<Input placeholder="Placeholder" className="custom-class" />);
-    const button = screen.getByPlaceholderText("Placeholder");
-    expect(button).toHaveClass("custom-class", "input");
+    const input = screen.getByPlaceholderText("Placeholder");
+    expect(input).toHaveClass("custom-class", "input");
 });
 
 test("it can be disabled", () => {
     render(<Input placeholder="Placeholder" disabled />);
-    const button = screen.getByPlaceholderText("Placeholder");
-    expect(button).toBeDisabled();
+    const input = screen.getByPlaceholderText("Placeholder");
+    expect(input).toBeDisabled();
+});
+
+test("it can be referenced", () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<Input ref={ref} placeholder="Placeholder" />);
+    const input = screen.getByPlaceholderText("Placeholder");
+    expect(ref.current).toBe(input);
 });
