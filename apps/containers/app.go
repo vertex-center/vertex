@@ -140,9 +140,13 @@ func (a *App) InitializeKernel(r *router.Group) error {
 	docker.GET("/container/:id/logs/stdout", dockerHandler.LogsStdoutContainer)
 	docker.GET("/container/:id/logs/stderr", dockerHandler.LogsStderrContainer)
 	docker.GET("/container/:id/wait/:cond", dockerHandler.WaitContainer)
+
 	docker.GET("/image/:id/info", dockerHandler.InfoImage)
 	docker.POST("/image/pull", dockerHandler.PullImage)
 	docker.POST("/image/build", dockerHandler.BuildImage)
+
+	docker.POST("/volume", dockerHandler.CreateVolume)
+	docker.DELETE("/volume/:name", dockerHandler.DeleteVolume)
 
 	return nil
 }

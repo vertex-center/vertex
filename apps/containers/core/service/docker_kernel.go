@@ -69,3 +69,11 @@ func (s DockerKernelService) BuildImage(options types.BuildImageOptions) (docker
 	log.Info("building image", vlog.String("dockerfile", options.Dockerfile))
 	return s.dockerAdapter.BuildImage(options)
 }
+
+func (s DockerKernelService) CreateVolume(options types.CreateVolumeOptions) (types.Volume, error) {
+	return s.dockerAdapter.CreateVolume(options)
+}
+
+func (s DockerKernelService) DeleteVolume(name string) error {
+	return s.dockerAdapter.DeleteVolume(name)
+}

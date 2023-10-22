@@ -301,3 +301,39 @@ func (h *DockerKernelHandler) BuildImage(c *router.Context) {
 		return true
 	})
 }
+
+func (h *DockerKernelHandler) CreateVolume(c *router.Context) {
+	var options types.CreateVolumeOptions
+	err := c.ParseBody(&options)
+	if err != nil {
+		return
+	}
+
+	vol, err := h.dockerService.CreateVolume(options)
+	if err != nil {
+		c.Abort(router.Error{
+			Code:           types.ErrCodeFailedToCreateVolume,
+			PublicMessage:  fmt.Sprintf("Failed to create volume %s.", options.Name),
+			PrivateMessage: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(vol)
+}
+
+func (h *DockerKernelHandler) DeleteVolume(c *router.Context) {
+	name := c.Param("name")
+
+	err := h.dockerService.DeleteVolume(name)
+	if err != nil {
+		c.Abort(router.Error{
+			Code:           types.ErrCodeFailedToDeleteVolume,
+			PublicMessage:  fmt.Sprintf("Failed to delete volume %s.", name),
+			PrivateMessage: err.Error(),
+		})
+		return
+	}
+
+	c.OK()
+}

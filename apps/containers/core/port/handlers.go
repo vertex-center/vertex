@@ -55,11 +55,17 @@ type (
 		LogsStderrContainer(c *router.Context)
 		// WaitContainer handles the waiting for a Docker container to reach a certain condition.
 		WaitContainer(c *router.Context)
+
 		// InfoImage handles the retrieval of information about a Docker image.
 		InfoImage(c *router.Context)
 		// PullImage handles the pulling of a Docker image.
 		PullImage(c *router.Context)
 		// BuildImage handles the building of a Docker image.
 		BuildImage(c *router.Context)
+
+		// CreateVolume handles the creation of a Docker volume.
+		CreateVolume(c *router.Context)
+		// DeleteVolume handles the deletion of a Docker volume.
+		DeleteVolume(c *router.Context)
 	}
 )

@@ -18,6 +18,10 @@ type Mount struct {
 	Destination string `json:"destination,omitempty"`
 }
 
+type Volume struct {
+	Name string `json:"name,omitempty"`
+}
+
 type CreateContainerOptions struct {
 	ImageName     string            `json:"image_name,omitempty"`
 	ContainerName string            `json:"container_name,omitempty"`
@@ -38,6 +42,10 @@ type BuildImageOptions struct {
 
 type PullImageOptions struct {
 	Image string `json:"image,omitempty"`
+}
+
+type CreateVolumeOptions struct {
+	Name string `json:"name,omitempty"`
 }
 
 type CreateContainerResponse struct {
