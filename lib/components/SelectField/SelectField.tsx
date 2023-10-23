@@ -54,6 +54,7 @@ export function SelectField(props: Readonly<SelectFieldProps>) {
             <div className="select-field-values">
                 {Children.map(children, (child) => {
                     if (!child) return;
+                    // @ts-ignore
                     return cloneElement(child, {
                         onClick: onChange,
                     });
