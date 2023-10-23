@@ -1,5 +1,6 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { TextField } from "./TextField.tsx";
+import { Normal as NormalInput } from "../Input/Input.stories.tsx";
 
 const meta: Meta<typeof TextField> = {
     title: "Components/Text Field",
@@ -10,20 +11,7 @@ const meta: Meta<typeof TextField> = {
 type Story = StoryObj<typeof TextField>;
 
 export const Normal: Story = {
-    args: {
-        label: "Label",
-        required: true,
-        description: "A short description",
-        error: "",
-    },
-    argTypes: {
-        label: {
-            control: "text",
-        },
-        required: {
-            control: "boolean",
-        },
-    },
+    ...NormalInput,
     render: (props) => <TextField {...props} />,
 };
 

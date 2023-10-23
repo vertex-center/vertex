@@ -13,12 +13,19 @@ export const Normal: Story = {
     args: {
         placeholder: "Placeholder",
         disabled: false,
+        label: "Label",
+        required: true,
+        description: "A short description",
+        error: "",
     },
     argTypes: {
         placeholder: {
             control: "text",
         },
         disabled: {
+            control: "boolean",
+        },
+        required: {
             control: "boolean",
         },
         onChange: { action: "onChange" },
