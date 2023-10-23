@@ -12,6 +12,15 @@ type Story = StoryObj<typeof TextField>;
 export const Normal: Story = {
     args: {
         label: "Label",
+        required: true,
+    },
+    argTypes: {
+        label: {
+            control: "text",
+        },
+        required: {
+            control: "boolean",
+        },
     },
     render: (props) => <TextField {...props} />,
 };
