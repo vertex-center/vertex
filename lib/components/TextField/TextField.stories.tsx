@@ -13,6 +13,8 @@ export const Normal: Story = {
     args: {
         label: "Label",
         required: true,
+        description: "A short description",
+        error: "",
     },
     argTypes: {
         label: {

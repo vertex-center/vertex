@@ -6,12 +6,22 @@ import "./TextField.sass";
 type TextFieldProps = HTMLProps<HTMLDivElement> & {
     inputProps?: InputProps;
 
-    label?: string;
     required?: boolean;
+    label?: string;
+    description?: string;
+    error?: string;
 };
 
 export function TextField(props: Readonly<TextFieldProps>) {
-    const { inputProps, className, label, required, ...others } = props;
+    const {
+        inputProps,
+        className,
+        required,
+        label,
+        description,
+        error,
+        ...others
+    } = props;
 
     let indicator;
     if (required) {
@@ -22,10 +32,16 @@ export function TextField(props: Readonly<TextFieldProps>) {
 
     return (
         <div className={cx("text-field", className)} {...others}>
-            <label className="text-field-label">
-                {label} {indicator}
-            </label>
+            {label && (
+                <label className="text-field-label">
+                    {label} {indicator}
+                </label>
+            )}
             <Input type="text" {...inputProps} />
+            {description && !error && (
+                <div className="text-field-description">{description}</div>
+            )}
+            {error && <div className="text-field-error">{error}</div>}
         </div>
     );
 }

@@ -3,14 +3,23 @@
 .text-field
     display: flex
     flex-direction: column
-    gap: 8px
 
     &-label
         color: colors.$fg-secondary
         margin-left: 20px
+        margin-bottom: 8px
 
     &-required
         color: colors.$red
 
     &-optional
         color: colors.$fg-tertiary
+
+    &-description, &-error
+        margin-left: 20px
+        margin-top: 7px
+        color: colors.$fg-tertiary
+        font-size: 14px
+
+    &-error
+        color: colors.$red
