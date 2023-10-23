@@ -1,0 +1,64 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+@use "../../styles/fonts"
+
+.select-field
+    position: relative
+
+    &-input
+        padding-right: 12px
+        cursor: pointer
+
+    &-values
+        background-color: colors.$bg-secondary
+        border-radius: dimensions.$border-radius
+        border: 1px solid colors.$bg-tertiary
+        box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.2)
+        position: absolute
+        left: 0
+        top: 70px
+        max-width: 100%
+        min-width: min(85vw, 400px)
+        box-sizing: border-box
+        margin-top: 6px
+        padding: 4px
+        display: none
+        z-index: 2
+        max-height: 500px
+        overflow: scroll
+
+    &-opened &-values
+        display: block
+
+    &-icon
+        margin-left: auto
+        transition: transform 0.2s ease-in-out
+
+    &-opened &-icon
+        transform: scaleY(-1)
+
+    &-option
+        display: flex
+        flex-direction: row
+        gap: 15px
+        align-items: center
+        height: 40px
+        padding: 0 20px
+        cursor: pointer
+        border-radius: calc(dimensions.$border-radius-lg - 6px)
+        white-space: nowrap
+
+        &:hover
+            background-color: colors.$bg-tertiary
+
+    &-overlay
+        position: fixed
+        left: 0
+        right: 0
+        top: 0
+        bottom: 0
+        z-index: 1
+        display: none
+
+    &-opened &-overlay
+        display: block

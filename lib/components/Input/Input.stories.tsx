@@ -11,6 +11,7 @@ type Story = StoryObj<typeof Input>;
 
 export const Normal: Story = {
     args: {
+        id: "input",
         placeholder: "Placeholder",
         disabled: false,
         label: "Label",

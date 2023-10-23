@@ -30,7 +30,7 @@ test("it can be disabled", () => {
 
 test("it can be referenced", () => {
     const ref = createRef<HTMLInputElement>();
-    render(<Input id="id" ref={ref} placeholder="Placeholder" />);
+    render(<Input id="id" inputProps={{ ref }} placeholder="Placeholder" />);
     const input = screen.getByPlaceholderText("Placeholder");
     expect(ref.current).toBe(input);
 });
