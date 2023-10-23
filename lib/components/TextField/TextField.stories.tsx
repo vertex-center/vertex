@@ -3,7 +3,7 @@ import { TextField } from "./TextField.tsx";
 import { Normal as NormalInput } from "../Input/Input.stories.tsx";
 
 const meta: Meta<typeof TextField> = {
-    title: "Components/Text Field",
+    title: "Components/Fields/Text Field",
     component: TextField,
     tags: ["autodocs"],
 };
