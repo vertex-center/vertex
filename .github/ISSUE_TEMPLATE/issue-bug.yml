@@ -1,0 +1,43 @@
+name: Issue/Bug
+description: Create a bug report to help us improve Vertex
+labels: ['status: Triage', 'type: Bug']
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report an issue!
+
+  - type: textarea
+    attributes:
+      label: Current behavior
+      description: Describe the current behavior
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: Describe the expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      description: Describe the steps to reproduce the bug
+      placeholder: Describe the steps to reproduce the bug
+      value: |
+        1. 
+        2. 
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here
+      placeholder: Logs, screenshots, environment, etc.
+    validations:
+      required: false
