@@ -1,0 +1,23 @@
+name: Feature or Change request
+description: Suggest an idea for this project
+labels: ['status: Triage', 'type: Enhancement']
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to suggest an idea for Vertex!
+
+  - type: textarea
+    attributes:
+      label: Request
+      description: Describe the feature or change you'd like to see
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Why is this needed?
+      description: Add any other context about the request here
+    validations:
+      required: false
