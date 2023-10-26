@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
-	"github.com/vertex-center/vertex/apps/reverseproxy/core/types"
 	"os"
 	"path"
 	"sync"
+
+	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
+	"github.com/vertex-center/vertex/apps/reverseproxy/core/types"
 
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/pkg/log"

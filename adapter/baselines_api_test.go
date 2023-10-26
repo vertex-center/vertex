@@ -2,11 +2,12 @@ package adapter
 
 import (
 	"context"
-	"github.com/h2non/gock"
-	"github.com/stretchr/testify/suite"
 	"log"
 	"net/http"
 	"testing"
+
+	"github.com/h2non/gock"
+	"github.com/stretchr/testify/suite"
 )
 
 const baseURL = "https://bl.vx.quentinguidee.dev/"

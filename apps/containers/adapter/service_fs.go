@@ -3,10 +3,11 @@ package adapter
 import (
 	"errors"
 	"fmt"
-	"github.com/vertex-center/vertex/apps/containers/core/port"
-	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"os"
 	"path"
+
+	"github.com/vertex-center/vertex/apps/containers/core/port"
+	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"

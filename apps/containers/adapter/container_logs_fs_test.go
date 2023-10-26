@@ -1,9 +1,10 @@
 package adapter
 
 import (
-	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"os"
 	"testing"
+
+	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"

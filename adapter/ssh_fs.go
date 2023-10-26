@@ -2,11 +2,12 @@ package adapter
 
 import (
 	"errors"
-	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/core/types"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/vertex-center/vertex/core/port"
+	"github.com/vertex-center/vertex/core/types"
 
 	"github.com/vertex-center/vertex/pkg/log"
 	"golang.org/x/crypto/ssh"

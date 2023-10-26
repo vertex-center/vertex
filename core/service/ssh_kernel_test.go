@@ -1,8 +1,9 @@
 package service
 
 import (
-	"github.com/vertex-center/vertex/core/types"
 	"testing"
+
+	"github.com/vertex-center/vertex/core/types"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"

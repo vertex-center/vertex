@@ -2,6 +2,7 @@ package adapter
 
 import (
 	"context"
+
 	"github.com/carlmjohnson/requests"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/core/port"

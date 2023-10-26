@@ -1,9 +1,10 @@
 package updates
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/core/types"
-	"testing"
 )
 
 type VertexUpdaterTestSuite struct {

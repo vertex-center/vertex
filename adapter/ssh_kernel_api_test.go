@@ -1,9 +1,10 @@
 package adapter
 
 import (
-	"github.com/vertex-center/vertex/core/types"
 	"net/http"
 	"testing"
+
+	"github.com/vertex-center/vertex/core/types"
 
 	"github.com/h2non/gock"
 	"github.com/stretchr/testify/suite"

@@ -3,13 +3,14 @@ package updates
 import (
 	"errors"
 	"fmt"
+	"os"
+	"path"
+
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"
-	"os"
-	"path"
 )
 
 type RepositoryUpdater struct {

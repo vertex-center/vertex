@@ -2,16 +2,17 @@ package updates
 
 import (
 	"context"
-	"github.com/google/go-github/v50/github"
-	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/pkg/varchiver"
-	"github.com/vertex-center/vlog"
 	"io"
 	"net/http"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/google/go-github/v50/github"
+	"github.com/vertex-center/vertex/config"
+	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/pkg/varchiver"
+	"github.com/vertex-center/vlog"
 )
 
 type VertexClientUpdater struct {

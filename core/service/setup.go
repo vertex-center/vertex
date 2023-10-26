@@ -3,9 +3,10 @@ package service
 import (
 	"context"
 	"errors"
+	"os"
+
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	vtypes "github.com/vertex-center/vertex/core/types"
-	"os"
 
 	"github.com/google/uuid"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
