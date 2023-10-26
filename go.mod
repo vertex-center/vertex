@@ -1,6 +1,6 @@
 module github.com/vertex-center/vertex
 
-go 1.20
+go 1.21
 
 require (
 	github.com/antelman107/net-wait-go v0.0.0-20220211074630-12d8a944b87d
