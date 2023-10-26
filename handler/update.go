@@ -2,8 +2,9 @@ package handler
 
 import (
 	"errors"
+
 	"github.com/vertex-center/vertex/core/port"
-	types2 "github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
 )
@@ -24,7 +25,7 @@ func (h *UpdateHandler) Get(c *router.Context) {
 	channel := h.settingsService.GetChannel()
 
 	update, err := h.updateService.GetUpdate(channel)
-	if errors.Is(err, types2.ErrFailedToFetchBaseline) {
+	if errors.Is(err, types.ErrFailedToFetchBaseline) {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToFetchLatestVersion,
 			PublicMessage:  "Failed to retrieve latest version information.",
@@ -47,14 +48,14 @@ func (h *UpdateHandler) Install(c *router.Context) {
 	channel := h.settingsService.GetChannel()
 
 	err := h.updateService.InstallLatest(channel)
-	if errors.Is(err, types2.ErrAlreadyUpdating) {
+	if errors.Is(err, types.ErrAlreadyUpdating) {
 		c.Abort(router.Error{
 			Code:           api.ErrAlreadyUpdating,
 			PublicMessage:  "Vertex is already Updating. Please wait for the update to finish.",
 			PrivateMessage: err.Error(),
 		})
 		return
-	} else if errors.Is(err, types2.ErrFailedToFetchBaseline) {
+	} else if errors.Is(err, types.ErrFailedToFetchBaseline) {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToFetchLatestVersion,
 			PublicMessage:  "Failed to retrieve latest version information.",

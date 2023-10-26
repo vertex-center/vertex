@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/vertex-center/vertex/apps/containers/core/port"
-	types2 "github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
 	vtypes "github.com/vertex-center/vertex/core/types"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
 
@@ -36,7 +36,7 @@ func (h *ContainersHandler) GetTags(c *router.Context) {
 }
 
 func (h *ContainersHandler) Search(c *router.Context) {
-	query := types2.ContainerSearchQuery{}
+	query := types.ContainerSearchQuery{}
 
 	features := c.QueryArray("features[]")
 	if len(features) > 0 {
@@ -56,7 +56,7 @@ func (h *ContainersHandler) CheckForUpdates(c *router.Context) {
 	containers, err := h.containerService.CheckForUpdates()
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           types2.ErrCodeFailedToCheckForUpdates,
+			Code:           types.ErrCodeFailedToCheckForUpdates,
 			PublicMessage:  "Failed to check for updates.",
 			PrivateMessage: err.Error(),
 		})
@@ -74,9 +74,9 @@ func (h *ContainersHandler) Events(c *router.Context) {
 
 	listener := vtypes.NewTempListener(func(e interface{}) {
 		switch e.(type) {
-		case types2.EventContainersChange:
+		case types.EventContainersChange:
 			eventsChan <- sse.Event{
-				Event: types2.EventNameContainersChange,
+				Event: types.EventNameContainersChange,
 			}
 		}
 	})

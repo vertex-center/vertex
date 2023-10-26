@@ -8,7 +8,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/service"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	types2 "github.com/vertex-center/vertex/core/types"
+	vtypes "github.com/vertex-center/vertex/core/types"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
 
 	"github.com/gin-contrib/sse"
@@ -341,7 +341,7 @@ func (h *ContainerHandler) Events(c *router.Context) {
 
 	done := c.Request.Context().Done()
 
-	listener := types2.NewTempListener(func(e interface{}) {
+	listener := vtypes.NewTempListener(func(e interface{}) {
 		switch e := e.(type) {
 		case types.EventContainerLog:
 			if inst.UUID != e.ContainerUUID {

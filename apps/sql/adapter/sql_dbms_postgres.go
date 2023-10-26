@@ -2,10 +2,10 @@ package adapter
 
 import (
 	"errors"
-	"github.com/vertex-center/vertex/apps/sql/core/port"
-	types2 "github.com/vertex-center/vertex/apps/sql/core/types"
 	"strconv"
 
+	"github.com/vertex-center/vertex/apps/sql/core/port"
+	"github.com/vertex-center/vertex/apps/sql/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 	"gorm.io/driver/postgres"
@@ -57,7 +57,7 @@ func NewSqlDBMSPostgresAdapter(params *SqlDBMSPostgresAdapterParams) port.DBMSAd
 	return adapter
 }
 
-func (a *SqlDBMSPostgresAdapter) GetDatabases() (*[]types2.DB, error) {
+func (a *SqlDBMSPostgresAdapter) GetDatabases() (*[]types.DB, error) {
 	if a.db == nil {
 		return nil, errors.New("connection not established")
 	}
@@ -68,9 +68,9 @@ func (a *SqlDBMSPostgresAdapter) GetDatabases() (*[]types2.DB, error) {
 	}
 	defer rows.Close()
 
-	var databases []types2.DB
+	var databases []types.DB
 	for rows.Next() {
-		var database types2.DB
+		var database types.DB
 		err := rows.Scan(&database.Name)
 		if err != nil {
 			return nil, err

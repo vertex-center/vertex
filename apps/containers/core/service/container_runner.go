@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	"github.com/vertex-center/vertex/apps/containers/core/port"
-	types2 "github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
 
 	"github.com/google/uuid"
@@ -31,7 +31,7 @@ func NewContainerRunnerService(ctx *app.Context, adapter port.ContainerRunnerAda
 	}
 }
 
-func (s *ContainerRunnerService) Install(uuid uuid.UUID, service types2.Service) error {
+func (s *ContainerRunnerService) Install(uuid uuid.UUID, service types.Service) error {
 	if service.Methods.Docker == nil {
 		return ErrInstallMethodDoesNotExists
 	}
@@ -47,22 +47,22 @@ func (s *ContainerRunnerService) Install(uuid uuid.UUID, service types2.Service)
 	return nil
 }
 
-func (s *ContainerRunnerService) Delete(inst *types2.Container) error {
+func (s *ContainerRunnerService) Delete(inst *types.Container) error {
 	return s.adapter.Delete(inst)
 }
 
 // Start starts a container by its UUID.
 // If the container does not exist, it returns ErrContainerNotFound.
 // If the container is already running, it returns ErrContainerAlreadyRunning.
-func (s *ContainerRunnerService) Start(inst *types2.Container) error {
+func (s *ContainerRunnerService) Start(inst *types.Container) error {
 	if inst.IsBusy() {
 		return nil
 	}
 
-	s.ctx.DispatchEvent(types2.EventContainerLog{
+	s.ctx.DispatchEvent(types.EventContainerLog{
 		ContainerUUID: inst.UUID,
-		Kind:          types2.LogKindOut,
-		Message:       types2.NewLogLineMessageString("Starting container..."),
+		Kind:          types.LogKindOut,
+		Message:       types.NewLogLineMessageString("Starting container..."),
 	})
 
 	log.Info("starting container",
@@ -70,10 +70,10 @@ func (s *ContainerRunnerService) Start(inst *types2.Container) error {
 	)
 
 	if inst.IsRunning() {
-		s.ctx.DispatchEvent(types2.EventContainerLog{
+		s.ctx.DispatchEvent(types.EventContainerLog{
 			ContainerUUID: inst.UUID,
-			Kind:          types2.LogKindVertexErr,
-			Message:       types2.NewLogLineMessageString(ErrContainerAlreadyRunning.Error()),
+			Kind:          types.LogKindVertexErr,
+			Message:       types.NewLogLineMessageString(ErrContainerAlreadyRunning.Error()),
 		})
 		return ErrContainerAlreadyRunning
 	}
@@ -84,7 +84,7 @@ func (s *ContainerRunnerService) Start(inst *types2.Container) error {
 
 	stdout, stderr, err := s.adapter.Start(inst, setStatus)
 	if err != nil {
-		s.setStatus(inst, types2.ContainerStatusError)
+		s.setStatus(inst, types.ContainerStatusError)
 		return err
 	}
 
@@ -103,25 +103,25 @@ func (s *ContainerRunnerService) Start(inst *types2.Container) error {
 			if strings.HasPrefix(scanner.Text(), "DOWNLOAD") {
 				msg := strings.TrimPrefix(scanner.Text(), "DOWNLOAD")
 
-				var downloadProgress types2.DownloadProgress
+				var downloadProgress types.DownloadProgress
 				err := json.Unmarshal([]byte(msg), &downloadProgress)
 				if err != nil {
 					log.Error(err)
 					continue
 				}
 
-				s.ctx.DispatchEvent(types2.EventContainerLog{
+				s.ctx.DispatchEvent(types.EventContainerLog{
 					ContainerUUID: inst.UUID,
-					Kind:          types2.LogKindDownload,
-					Message:       types2.NewLogLineMessageDownload(&downloadProgress),
+					Kind:          types.LogKindDownload,
+					Message:       types.NewLogLineMessageDownload(&downloadProgress),
 				})
 				continue
 			}
 
-			s.ctx.DispatchEvent(types2.EventContainerLog{
+			s.ctx.DispatchEvent(types.EventContainerLog{
 				ContainerUUID: inst.UUID,
-				Kind:          types2.LogKindOut,
-				Message:       types2.NewLogLineMessageString(scanner.Text()),
+				Kind:          types.LogKindOut,
+				Message:       types.NewLogLineMessageString(scanner.Text()),
 			})
 		}
 	}()
@@ -135,10 +135,10 @@ func (s *ContainerRunnerService) Start(inst *types2.Container) error {
 			if scanner.Err() != nil {
 				break
 			}
-			s.ctx.DispatchEvent(types2.EventContainerLog{
+			s.ctx.DispatchEvent(types.EventContainerLog{
 				ContainerUUID: inst.UUID,
-				Kind:          types2.LogKindErr,
-				Message:       types2.NewLogLineMessageString(scanner.Text()),
+				Kind:          types.LogKindErr,
+				Message:       types.NewLogLineMessageString(scanner.Text()),
 			})
 		}
 	}()
@@ -147,10 +147,10 @@ func (s *ContainerRunnerService) Start(inst *types2.Container) error {
 	wg.Wait()
 
 	// Log stopped
-	s.ctx.DispatchEvent(types2.EventContainerLog{
+	s.ctx.DispatchEvent(types.EventContainerLog{
 		ContainerUUID: inst.UUID,
-		Kind:          types2.LogKindVertexOut,
-		Message:       types2.NewLogLineMessageString("Stopping container..."),
+		Kind:          types.LogKindVertexOut,
+		Message:       types.NewLogLineMessageString("Stopping container..."),
 	})
 	log.Info("stopping container",
 		vlog.String("uuid", inst.UUID.String()),
@@ -162,47 +162,47 @@ func (s *ContainerRunnerService) Start(inst *types2.Container) error {
 // Stop stops a container by its UUID.
 // If the container does not exist, it returns ErrContainerNotFound.
 // If the container is not running, it returns ErrContainerNotRunning.
-func (s *ContainerRunnerService) Stop(inst *types2.Container) error {
+func (s *ContainerRunnerService) Stop(inst *types.Container) error {
 	if inst.IsBusy() {
 		return nil
 	}
 
 	if !inst.IsRunning() {
-		s.ctx.DispatchEvent(types2.EventContainerLog{
+		s.ctx.DispatchEvent(types.EventContainerLog{
 			ContainerUUID: inst.UUID,
-			Kind:          types2.LogKindVertexErr,
-			Message:       types2.NewLogLineMessageString(ErrContainerNotRunning.Error()),
+			Kind:          types.LogKindVertexErr,
+			Message:       types.NewLogLineMessageString(ErrContainerNotRunning.Error()),
 		})
 		return ErrContainerNotRunning
 	}
 
-	s.setStatus(inst, types2.ContainerStatusStopping)
+	s.setStatus(inst, types.ContainerStatusStopping)
 
 	err := s.adapter.Stop(inst)
 	if err == nil {
-		s.ctx.DispatchEvent(types2.EventContainerLog{
+		s.ctx.DispatchEvent(types.EventContainerLog{
 			ContainerUUID: inst.UUID,
-			Kind:          types2.LogKindVertexOut,
-			Message:       types2.NewLogLineMessageString("Container stopped."),
+			Kind:          types.LogKindVertexOut,
+			Message:       types.NewLogLineMessageString("Container stopped."),
 		})
 
 		log.Info("container stopped",
 			vlog.String("uuid", inst.UUID.String()),
 		)
 
-		s.setStatus(inst, types2.ContainerStatusOff)
+		s.setStatus(inst, types.ContainerStatusOff)
 	} else {
-		s.setStatus(inst, types2.ContainerStatusRunning)
+		s.setStatus(inst, types.ContainerStatusRunning)
 	}
 
 	return err
 }
 
-func (s *ContainerRunnerService) GetDockerContainerInfo(inst types2.Container) (map[string]any, error) {
+func (s *ContainerRunnerService) GetDockerContainerInfo(inst types.Container) (map[string]any, error) {
 	return s.adapter.Info(inst)
 }
 
-func (s *ContainerRunnerService) GetAllVersions(inst *types2.Container, useCache bool) ([]string, error) {
+func (s *ContainerRunnerService) GetAllVersions(inst *types.Container, useCache bool) ([]string, error) {
 	if !useCache || len(inst.CacheVersions) == 0 {
 		versions, err := s.adapter.GetAllVersions(*inst)
 		if err != nil {
@@ -214,12 +214,12 @@ func (s *ContainerRunnerService) GetAllVersions(inst *types2.Container, useCache
 	return inst.CacheVersions, nil
 }
 
-func (s *ContainerRunnerService) CheckForUpdates(inst *types2.Container) error {
+func (s *ContainerRunnerService) CheckForUpdates(inst *types.Container) error {
 	return s.adapter.CheckForUpdates(inst)
 }
 
 // RecreateContainer recreates a container by its UUID.
-func (s *ContainerRunnerService) RecreateContainer(inst *types2.Container) error {
+func (s *ContainerRunnerService) RecreateContainer(inst *types.Container) error {
 	if inst.IsRunning() {
 		err := s.adapter.Stop(inst)
 		if err != nil {
@@ -243,18 +243,18 @@ func (s *ContainerRunnerService) RecreateContainer(inst *types2.Container) error
 	return nil
 }
 
-func (s *ContainerRunnerService) WaitCondition(inst *types2.Container, cond types2.WaitContainerCondition) error {
+func (s *ContainerRunnerService) WaitCondition(inst *types.Container, cond types.WaitContainerCondition) error {
 	return s.adapter.WaitCondition(inst, cond)
 }
 
-func (s *ContainerRunnerService) setStatus(inst *types2.Container, status string) {
+func (s *ContainerRunnerService) setStatus(inst *types.Container, status string) {
 	if inst.Status == status {
 		return
 	}
 
 	inst.Status = status
-	s.ctx.DispatchEvent(types2.EventContainersChange{})
-	s.ctx.DispatchEvent(types2.EventContainerStatusChange{
+	s.ctx.DispatchEvent(types.EventContainersChange{})
+	s.ctx.DispatchEvent(types.EventContainerStatusChange{
 		ContainerUUID: inst.UUID,
 		ServiceID:     inst.Service.ID,
 		Container:     *inst,

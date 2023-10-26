@@ -3,7 +3,7 @@ package service
 import (
 	"testing"
 
-	types2 "github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
 	vtypes "github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
 
@@ -15,8 +15,8 @@ type ContainerServiceTestSuite struct {
 	suite.Suite
 	service *ContainerService
 
-	containerA types2.Container
-	containerB types2.Container
+	containerA types.Container
+	containerB types.Container
 }
 
 func TestContainerServiceTestSuite(t *testing.T) {
@@ -28,34 +28,34 @@ func (suite *ContainerServiceTestSuite) SetupTest() {
 		Ctx: app.NewContext(vtypes.NewVertexContext()),
 	}).(*ContainerService)
 
-	suite.containerA = types2.Container{
+	suite.containerA = types.Container{
 		UUID: uuid.New(),
-		Service: types2.Service{
+		Service: types.Service{
 			Name: "service-a",
 		},
-		ContainerSettings: types2.ContainerSettings{
+		ContainerSettings: types.ContainerSettings{
 			Tags: []string{"Global Tag", "Service A Tag 0", "Service A Tag 1"},
 		},
 	}
 
-	suite.containerB = types2.Container{
+	suite.containerB = types.Container{
 		UUID: uuid.New(),
-		Service: types2.Service{
+		Service: types.Service{
 			Name: "service-b",
-			Features: &types2.Features{
-				Databases: &[]types2.DatabaseFeature{
+			Features: &types.Features{
+				Databases: &[]types.DatabaseFeature{
 					{
 						Type: "postgres",
 					},
 				},
 			},
 		},
-		ContainerSettings: types2.ContainerSettings{
+		ContainerSettings: types.ContainerSettings{
 			Tags: []string{"Global Tag"},
 		},
 	}
 
-	suite.service.containers = map[uuid.UUID]*types2.Container{
+	suite.service.containers = map[uuid.UUID]*types.Container{
 		suite.containerA.UUID: &suite.containerA,
 		suite.containerB.UUID: &suite.containerB,
 	}
@@ -63,12 +63,12 @@ func (suite *ContainerServiceTestSuite) SetupTest() {
 
 func (suite *ContainerServiceTestSuite) TestSearch() {
 	tests := []struct {
-		query    types2.ContainerSearchQuery
+		query    types.ContainerSearchQuery
 		expected []uuid.UUID
 	}{
 		// Empty query
 		{
-			types2.ContainerSearchQuery{},
+			types.ContainerSearchQuery{},
 			[]uuid.UUID{
 				suite.containerA.UUID,
 				suite.containerB.UUID,
@@ -76,31 +76,31 @@ func (suite *ContainerServiceTestSuite) TestSearch() {
 		},
 		// Tags
 		{
-			types2.ContainerSearchQuery{
+			types.ContainerSearchQuery{
 				Tags: &[]string{},
 			},
 			[]uuid.UUID{},
 		},
 		{
-			types2.ContainerSearchQuery{
+			types.ContainerSearchQuery{
 				Tags: &[]string{"Invalid Tag"},
 			},
 			[]uuid.UUID{},
 		},
 		{
-			types2.ContainerSearchQuery{
+			types.ContainerSearchQuery{
 				Tags: &[]string{"Service A Tag 1"},
 			},
 			[]uuid.UUID{suite.containerA.UUID},
 		},
 		{
-			types2.ContainerSearchQuery{
+			types.ContainerSearchQuery{
 				Tags: &[]string{"Service A Tag 0", "Service A Tag 1"},
 			},
 			[]uuid.UUID{suite.containerA.UUID},
 		},
 		{
-			types2.ContainerSearchQuery{
+			types.ContainerSearchQuery{
 				Tags: &[]string{"Global Tag"},
 			},
 			[]uuid.UUID{
@@ -110,20 +110,20 @@ func (suite *ContainerServiceTestSuite) TestSearch() {
 		},
 		// Features
 		{
-			types2.ContainerSearchQuery{
+			types.ContainerSearchQuery{
 				Features: &[]string{"invalid-feature"},
 			},
 			[]uuid.UUID{},
 		},
 		{
-			types2.ContainerSearchQuery{
+			types.ContainerSearchQuery{
 				Features: &[]string{"postgres"},
 			},
 			[]uuid.UUID{suite.containerB.UUID},
 		},
 		// Multiple
 		{
-			types2.ContainerSearchQuery{
+			types.ContainerSearchQuery{
 				Tags:     &[]string{"Global Tag"},
 				Features: &[]string{"postgres"},
 			},

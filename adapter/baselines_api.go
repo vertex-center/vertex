@@ -3,9 +3,10 @@ package adapter
 import (
 	"context"
 	"fmt"
+
 	"github.com/carlmjohnson/requests"
 	"github.com/vertex-center/vertex/core/port"
-	types2 "github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 )
@@ -22,8 +23,8 @@ func NewBaselinesApiAdapter() port.BaselinesAdapter {
 	}
 }
 
-func (a *BaselinesApiAdapter) GetLatest(ctx context.Context, channel types2.SettingsUpdatesChannel) (types2.Baseline, error) {
-	var baseline types2.Baseline
+func (a *BaselinesApiAdapter) GetLatest(ctx context.Context, channel types.SettingsUpdatesChannel) (types.Baseline, error) {
+	var baseline types.Baseline
 	builder := requests.New(a.config).
 		Pathf("%s.json", channel).
 		ToJSON(&baseline)
@@ -40,5 +41,5 @@ func (a *BaselinesApiAdapter) GetLatest(ctx context.Context, channel types2.Sett
 		return baseline, nil
 	}
 
-	return baseline, fmt.Errorf("%w: %w", types2.ErrFailedToFetchBaseline, err)
+	return baseline, fmt.Errorf("%w: %w", types.ErrFailedToFetchBaseline, err)
 }

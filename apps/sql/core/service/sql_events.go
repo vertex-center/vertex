@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/google/uuid"
-	types2 "github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
 )
 
 func (s *SqlService) GetUUID() uuid.UUID {
@@ -11,16 +11,16 @@ func (s *SqlService) GetUUID() uuid.UUID {
 
 func (s *SqlService) OnEvent(e interface{}) {
 	switch e := e.(type) {
-	case types2.EventContainerStatusChange:
-		if e.Status == types2.ContainerStatusRunning {
+	case types.EventContainerStatusChange:
+		if e.Status == types.ContainerStatusRunning {
 			s.onContainerStart(&e.Container)
-		} else if e.Status == types2.ContainerStatusOff {
+		} else if e.Status == types.ContainerStatusOff {
 			s.onContainerStop(e.ContainerUUID)
 		}
 	}
 }
 
-func (s *SqlService) onContainerStart(inst *types2.Container) {
+func (s *SqlService) onContainerStart(inst *types.Container) {
 	_, err := s.getDbFeature(inst)
 	if err != nil {
 		// Not a SQL database

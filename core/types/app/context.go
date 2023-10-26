@@ -1,24 +1,24 @@
 package app
 
 import (
-	types2 "github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/core/types"
 )
 
 type Context struct {
-	vertexCtx *types2.VertexContext
+	vertexCtx *types.VertexContext
 }
 
-func NewContext(vertexCtx *types2.VertexContext) *Context {
+func NewContext(vertexCtx *types.VertexContext) *Context {
 	return &Context{
 		vertexCtx: vertexCtx,
 	}
 }
 
-func (ctx *Context) AddListener(listener types2.Listener) {
+func (ctx *Context) AddListener(listener types.Listener) {
 	ctx.vertexCtx.AddListener(listener)
 }
 
-func (ctx *Context) RemoveListener(listener types2.Listener) {
+func (ctx *Context) RemoveListener(listener types.Listener) {
 	ctx.vertexCtx.RemoveListener(listener)
 }
 

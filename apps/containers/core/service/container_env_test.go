@@ -3,11 +3,10 @@ package service
 import (
 	"testing"
 
-	types2 "github.com/vertex-center/vertex/apps/containers/core/types"
-
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
 )
 
 type ContainerEnvServiceTestSuite struct {
@@ -29,8 +28,8 @@ func (suite *ContainerEnvServiceTestSuite) SetupSuite() {
 func (suite *ContainerEnvServiceTestSuite) TestSave() {
 	suite.adapter.On("Save", mock.Anything, mock.Anything).Return(nil)
 
-	inst := &types2.Container{}
-	env := types2.ContainerEnvVariables{"a": "b"}
+	inst := &types.Container{}
+	env := types.ContainerEnvVariables{"a": "b"}
 	err := suite.service.Save(inst, env)
 
 	suite.NoError(err)
@@ -39,13 +38,13 @@ func (suite *ContainerEnvServiceTestSuite) TestSave() {
 }
 
 func (suite *ContainerEnvServiceTestSuite) TestLoad() {
-	suite.adapter.On("Load", mock.Anything).Return(types2.ContainerEnvVariables{}, nil)
+	suite.adapter.On("Load", mock.Anything).Return(types.ContainerEnvVariables{}, nil)
 
-	inst := &types2.Container{}
+	inst := &types.Container{}
 	err := suite.service.Load(inst)
 
 	suite.NoError(err)
-	suite.Equal(inst.Env, types2.ContainerEnvVariables{"a": "b"})
+	suite.Equal(inst.Env, types.ContainerEnvVariables{"a": "b"})
 	suite.adapter.AssertExpectations(suite.T())
 }
 
@@ -53,12 +52,12 @@ type MockContainerEnvAdapter struct {
 	mock.Mock
 }
 
-func (m *MockContainerEnvAdapter) Save(uuid uuid.UUID, env types2.ContainerEnvVariables) error {
+func (m *MockContainerEnvAdapter) Save(uuid uuid.UUID, env types.ContainerEnvVariables) error {
 	args := m.Called(uuid, env)
 	return args.Error(0)
 }
 
-func (m *MockContainerEnvAdapter) Load(uuid uuid.UUID) (types2.ContainerEnvVariables, error) {
+func (m *MockContainerEnvAdapter) Load(uuid uuid.UUID) (types.ContainerEnvVariables, error) {
 	args := m.Called(uuid)
-	return types2.ContainerEnvVariables{"a": "b"}, args.Error(1)
+	return types.ContainerEnvVariables{"a": "b"}, args.Error(1)
 }

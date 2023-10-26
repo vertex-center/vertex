@@ -3,7 +3,7 @@ package port
 import (
 	"io"
 
-	types2 "github.com/docker/docker/api/types"
+	vtypes "github.com/docker/docker/api/types"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 )
@@ -83,7 +83,7 @@ type (
 
 		InfoImage(id string) (types.InfoImageResponse, error)
 		PullImage(options types.PullImageOptions) (io.ReadCloser, error)
-		BuildImage(options types.BuildImageOptions) (types2.ImageBuildResponse, error)
+		BuildImage(options types.BuildImageOptions) (vtypes.ImageBuildResponse, error)
 
 		CreateVolume(options types.CreateVolumeOptions) (types.Volume, error)
 		DeleteVolume(name string) error
