@@ -9,8 +9,13 @@ permissions:
   contents: write
 
 jobs:
+  pre-checks:
+    name: Run pre-checks
+    uses: ./.github/workflows/development.yml
+
   release:
     name: Release
+    needs: pre-checks
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

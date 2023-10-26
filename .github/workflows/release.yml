@@ -10,8 +10,13 @@ permissions:
   contents: write
 
 jobs:
+  pre-checks:
+    name: Run pre-checks
+    uses: ./.github/workflows/development.yml
+
   release:
     name: Release
+    needs: pre-checks
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -39,6 +44,7 @@ jobs:
 
   release-docker:
     name: Release Docker images
+    needs: pre-checks
     runs-on: ubuntu-latest
     permissions:
       contents: read
