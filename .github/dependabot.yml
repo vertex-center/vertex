@@ -11,4 +11,4 @@ updates:
         patterns:
           - "*"
     labels:
-      - "dependencies"
+      - "type: Dependencies"
