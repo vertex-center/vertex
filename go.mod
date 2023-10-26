@@ -13,8 +13,8 @@ require (
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-co-op/gocron v1.35.2
-	github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20230305113008-0c11038e723f
-	github.com/go-git/go-git/v5 v5.9.0
+	github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20231010084843-55a94097c399
+	github.com/go-git/go-git/v5 v5.10.0
 	github.com/google/go-containerregistry v0.16.1
 	github.com/google/go-github/v50 v50.2.0
 	github.com/google/uuid v1.3.1
@@ -24,7 +24,6 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/vertex-center/vlog v1.0.2
 	golang.org/x/crypto v0.14.0
-	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/postgres v1.5.3
 	gorm.io/gorm v1.25.5
@@ -119,6 +118,7 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
+	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/oauth2 v0.8.0 // indirect
