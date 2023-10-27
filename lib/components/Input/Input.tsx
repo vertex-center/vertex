@@ -13,7 +13,7 @@ import cx from "classnames";
 
 export type InputProps<T> = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
     value?: T;
-    onChange?: (value: T) => void;
+    onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
     ref?: Ref<HTMLDivElement>;
     label?: string;
     description?: string;
@@ -53,10 +53,10 @@ export function Input<T>(props: Readonly<InputProps<T>>) {
 
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
         setValue(e.target.value as T);
-        props.onChange?.(e.target.value as T);
+        props.onChange?.(e);
     };
 
-    const Component = as || "input";
+    const Component = as ?? "input";
 
     if (!id) {
         console.warn("Input is missing an id", { label, description });
