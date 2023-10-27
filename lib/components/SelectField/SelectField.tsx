@@ -98,17 +98,17 @@ function _SelectField<T>(
                     className="select-field-icon"
                     icon="expand_more"
                 />
+                <div className="select-field-values">
+                    {Children.map(children, (child) => {
+                        if (!child) return;
+                        // @ts-ignore
+                        return cloneElement(child, {
+                            onClick: onChange,
+                            multiple: multiple,
+                        });
+                    })}
+                </div>
             </Input>
-            <div className="select-field-values">
-                {Children.map(children, (child) => {
-                    if (!child) return;
-                    // @ts-ignore
-                    return cloneElement(child, {
-                        onClick: onChange,
-                        multiple: multiple,
-                    });
-                })}
-            </div>
             <div className="select-field-overlay" onClick={toggle} />
         </div>
     );
