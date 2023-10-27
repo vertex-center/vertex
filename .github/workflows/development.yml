@@ -1,0 +1,12 @@
+name: Test
+
+on: [ push, pull_request ]
+
+jobs:
+  build:
+    name: Build
+    uses: ./.github/workflows/call-build.yml
+
+  test:
+    name: Test
+    uses: ./.github/workflows/call-test.yml

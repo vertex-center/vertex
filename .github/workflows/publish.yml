@@ -7,32 +7,14 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install Dependencies
-        run: |
-          npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: dist
-          path: dist
-          retention-days: 1
+    name: Build
+    uses: ./.github/workflows/call-build.yml
+  test:
+    name: Test
+    uses: ./.github/workflows/call-test.yml
 
   publish:
-    needs: build
+    needs: [ build, test ]
     strategy:
       matrix:
         include:

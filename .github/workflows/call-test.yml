@@ -1,26 +1,10 @@
 name: Test
 
-on: push
+on: [ workflow_call ]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
   test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -38,6 +22,7 @@ jobs:
         run: npm run test
 
   test-storybook:
+    name: Test Storybook
     timeout-minutes: 20
     runs-on: ubuntu-latest
     steps:
@@ -60,3 +45,4 @@ jobs:
 
       - name: Run tests
         run: npm run storybook:test-ci
+
