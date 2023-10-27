@@ -1,21 +1,20 @@
 import { Input, InputProps } from "../Input/Input.tsx";
-import { forwardRef, Ref } from "react";
+import { Ref } from "react";
 
-type TextFieldProps = Omit<InputProps, "ref"> & {
+type TextFieldProps = InputProps & {
+    ref?: Ref<HTMLInputElement>;
     containerRef?: Ref<HTMLDivElement>;
 };
 
-export const TextField = forwardRef(
-    (props: Readonly<TextFieldProps>, inputRef: Ref<HTMLInputElement>) => {
-        const { containerRef, ...others } = props;
-        return (
-            <Input
-                ref={inputRef}
-                containerRef={containerRef}
-                id="id"
-                type="text"
-                {...others}
-            />
-        );
-    },
-);
+export function TextField(props: Readonly<TextFieldProps>) {
+    const { containerRef, ref, ...others } = props;
+    return (
+        <Input
+            inputProps={{ ref }}
+            containerRef={containerRef}
+            id="id"
+            type="text"
+            {...others}
+        />
+    );
+}
