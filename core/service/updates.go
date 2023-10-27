@@ -57,6 +57,10 @@ func (s *UpdateService) GetUpdate(channel types.SettingsUpdatesChannel) (*types.
 		}
 
 		if currentVersion != latestVersion {
+			log.Info("update available",
+				vlog.String("id", updater.ID()),
+				vlog.String("current", currentVersion),
+				vlog.String("latest", latestVersion))
 			available = true
 			update.Baseline = latest
 		}
