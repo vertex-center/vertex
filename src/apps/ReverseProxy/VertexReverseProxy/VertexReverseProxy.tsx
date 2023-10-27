@@ -6,9 +6,8 @@ import { Title } from "../../../components/Text/Text";
 import { APIError } from "../../../components/Error/APIError";
 import ProxyRedirect from "../../../components/ProxyRedirect/ProxyRedirect";
 import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
-import { Button, MaterialIcon } from "@vertex-center/components";
+import { Button, MaterialIcon, TextField } from "@vertex-center/components";
 import Popup from "../../../components/Popup/Popup";
-import Input from "../../../components/Input/Input";
 import Spacer from "../../../components/Spacer/Spacer";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import NoItems from "../../../components/NoItems/NoItems";
@@ -99,13 +98,15 @@ export default function VertexReverseProxy() {
             >
                 <Title>New redirection</Title>
                 <Vertical gap={20} className={styles.input}>
-                    <Input
+                    <TextField
+                        id="source"
                         className={styles.input}
                         label="Source"
                         value={source}
                         onChange={onSourceChange}
                     />
-                    <Input
+                    <TextField
+                        id="target"
                         label="Target"
                         value={target}
                         onChange={onTargetChange}

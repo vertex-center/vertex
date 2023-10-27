@@ -1,10 +1,9 @@
-import PortInput from "../Input/PortInput";
-import Input from "../Input/Input";
-import { Vertical } from "../Layouts/Layouts";
-import TimezoneInput from "../Input/TimezoneInput";
-import { EnvVariable } from "../../models/service";
+import { TextField } from "@vertex-center/components";
+import TimezoneField from "../../../../components/TimezoneField/TimezoneField";
+import { EnvVariable } from "../../../../models/service";
 
 type Props = {
+    id: string;
     env: EnvVariable;
     value: any;
     onChange: (value: any) => void;
@@ -12,9 +11,10 @@ type Props = {
 };
 
 export default function EnvVariableInput(props: Readonly<Props>) {
-    const { env, value, onChange, disabled } = props;
+    const { id, env, value, onChange, disabled } = props;
 
     const inputProps = {
+        id,
         value,
         label: env.display_name,
         name: env.name,
@@ -25,18 +25,16 @@ export default function EnvVariableInput(props: Readonly<Props>) {
     };
 
     let input: any;
-    if (env.type === "port") {
-        input = <PortInput {...inputProps} />;
-    } else if (env.type === "timezone") {
+    if (env.type === "timezone") {
         input = (
-            <TimezoneInput
+            <TimezoneField
                 {...inputProps}
                 onChange={(value: any) => onChange(value)}
             />
         );
     } else {
-        input = <Input {...inputProps} />;
+        input = <TextField {...inputProps} />;
     }
 
-    return <Vertical gap={6}>{input}</Vertical>;
+    return input;
 }

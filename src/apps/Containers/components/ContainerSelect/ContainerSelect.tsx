@@ -1,10 +1,11 @@
-import Select, { SelectOption, SelectValue } from "./Select";
-import { Container, ContainerQuery } from "../../models/container";
-import { api } from "../../backend/api/backend";
-import Progress from "../Progress";
-import ServiceLogo from "../ServiceLogo/ServiceLogo";
+import { SelectField, SelectOption } from "@vertex-center/components";
+import { Container, ContainerQuery } from "../../../../models/container";
+import { api } from "../../../../backend/api/backend";
+import Progress from "../../../../components/Progress";
+import ServiceLogo from "../../../../components/ServiceLogo/ServiceLogo";
 import { useQuery } from "@tanstack/react-query";
-import { APIError } from "../Error/APIError";
+import { APIError } from "../../../../components/Error/APIError";
+import { Fragment } from "react";
 
 type Props = {
     container?: Container;
@@ -36,17 +37,17 @@ export default function ContainerSelect(props: Readonly<Props>) {
     };
 
     const value = (
-        <SelectValue>
+        <Fragment>
             {container && <ServiceLogo service={container?.service} />}
             {container?.display_name ??
                 container?.service?.name ??
                 "Select an container"}
-        </SelectValue>
+        </Fragment>
     );
 
     return (
         // @ts-ignore
-        <Select onChange={onContainerChange} value={value}>
+        <SelectField onChange={onContainerChange} value={value}>
             <SelectOption value="">None</SelectOption>
             {Object.entries(containers ?? [])?.map(([, container]) => (
                 <SelectOption key={container.uuid} value={container.uuid}>
@@ -54,6 +55,6 @@ export default function ContainerSelect(props: Readonly<Props>) {
                     {container?.display_name ?? container?.service?.name}
                 </SelectOption>
             ))}
-        </Select>
+        </SelectField>
     );
 }

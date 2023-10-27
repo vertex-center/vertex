@@ -2,19 +2,19 @@ import { Fragment, useEffect, useState } from "react";
 import { Text, Title } from "../../../../components/Text/Text";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
 import Spacer from "../../../../components/Spacer/Spacer";
-import { Button, MaterialIcon } from "@vertex-center/components";
+import {
+    Button,
+    MaterialIcon,
+    SelectField,
+    SelectOption,
+    TextField,
+} from "@vertex-center/components";
 import { useParams } from "react-router-dom";
 import useContainer from "../../hooks/useContainer";
 import ToggleButton from "../../../../components/ToggleButton/ToggleButton";
-import Input from "../../../../components/Input/Input";
-
 import styles from "./ContainerSettings.module.sass";
 import { api } from "../../../../backend/api/backend";
 import { APIError } from "../../../../components/Error/APIError";
-import Select, {
-    SelectOption,
-    SelectValue,
-} from "../../../../components/Input/Select";
 import VersionTag from "../../../../components/VersionTag/VersionTag";
 import classNames from "classnames";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
@@ -83,7 +83,7 @@ export default function ContainerSettings() {
     };
 
     const versionValue = (
-        <SelectValue
+        <div
             className={classNames({
                 [styles.versionValue]: version !== "latest",
             })}
@@ -93,7 +93,7 @@ export default function ContainerSettings() {
             ) : (
                 <VersionTag>{version}</VersionTag>
             )}
-        </SelectValue>
+        </div>
     );
 
     return (
@@ -115,7 +115,8 @@ export default function ContainerSettings() {
                     disabled={isLoadingContainer}
                 />
             </Horizontal>
-            <Input
+            <TextField
+                id="container-name"
                 label="Container name"
                 description="The custom name of your choice for this service"
                 value={displayName}
@@ -126,7 +127,8 @@ export default function ContainerSettings() {
                 disabled={isLoadingContainer}
             />
             <div className={styles.versionSelect}>
-                <Select
+                <SelectField
+                    id="container-version"
                     label="Version"
                     onChange={onVersionChange}
                     disabled={isLoadingContainer || versionsLoading}
@@ -143,16 +145,12 @@ export default function ContainerSettings() {
                             return null;
                         }
                         return (
-                            <SelectOption
-                                key={v}
-                                value={v}
-                                className={styles.versionOption}
-                            >
+                            <SelectOption key={v} value={v}>
                                 <VersionTag>{v}</VersionTag>
                             </SelectOption>
                         );
                     })}
-                </Select>
+                </SelectField>
                 <Button
                     rightIcon={<MaterialIcon icon="refresh" />}
                     onClick={() => reloadVersions(false)}

@@ -1,7 +1,4 @@
-import Select, {
-    SelectOption,
-    SelectValue,
-} from "../../../../components/Input/Select";
+import { SelectField, SelectOption } from "@vertex-center/components";
 import { useContainersTags } from "../../hooks/useContainers";
 
 type Props = {
@@ -17,10 +14,6 @@ export default function SelectTags(props: Readonly<Props>) {
 
     const count = selected?.length;
 
-    let value = (
-        <SelectValue>Tags{count !== 0 ? ` (${count})` : undefined}</SelectValue>
-    );
-
     const onChange = (value: any) => {
         let updated: any[];
         if (selected.includes(value)) {
@@ -32,16 +25,14 @@ export default function SelectTags(props: Readonly<Props>) {
     };
 
     return (
-        // @ts-ignore
-        <Select
+        <SelectField
             multiple
-            value={value}
+            value={`Tags${count !== 0 ? ` (${count})` : ""}`}
             onChange={onChange}
             disabled={isLoading || isError || !tags || tags.length === 0}
         >
             {tags?.map((tag) => (
                 <SelectOption
-                    multiple
                     key={tag}
                     value={tag}
                     selected={selected.includes(tag)}
@@ -49,6 +40,6 @@ export default function SelectTags(props: Readonly<Props>) {
                     {tag}
                 </SelectOption>
             ))}
-        </Select>
+        </SelectField>
     );
 }

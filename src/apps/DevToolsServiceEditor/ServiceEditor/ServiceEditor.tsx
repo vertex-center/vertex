@@ -1,9 +1,14 @@
 import styles from "./ServiceEditor.module.sass";
 import { BigTitle, Title } from "../../../components/Text/Text";
-import Input from "../../../components/Input/Input";
 import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
 import NoItems from "../../../components/NoItems/NoItems";
-import { Button, MaterialIcon } from "@vertex-center/components";
+import {
+    Button,
+    MaterialIcon,
+    SelectField,
+    SelectOption,
+    TextField,
+} from "@vertex-center/components";
 import classNames from "classnames";
 import Spacer from "../../../components/Spacer/Spacer";
 import {
@@ -17,10 +22,6 @@ import { object } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import List from "../../../components/List/List";
 import ListItem from "../../../components/List/ListItem";
-import Select, {
-    SelectOption,
-    SelectValue,
-} from "../../../components/Input/Select";
 import { Fragment, useState } from "react";
 import Card from "../../../components/Card/Card";
 import { api } from "../../../backend/api/backend";
@@ -32,17 +33,12 @@ function EnvironmentInputs({ control, register, errors, i }) {
         <Fragment>
             <Controller
                 render={({ field }) => {
-                    const value = (
-                        <SelectValue>
-                            {
-                                environmentTypes.find(
-                                    (e) => e.value === field.value
-                                )?.label
-                            }
-                        </SelectValue>
-                    );
+                    const value = environmentTypes.find(
+                        (e) => e.value === field.value
+                    )?.label;
                     return (
-                        <Select
+                        <SelectField
+                            id={`environment.${i}.type`}
                             label="Type"
                             {...register(`environment.${i}.type`)}
                             // @ts-ignore
@@ -55,33 +51,37 @@ function EnvironmentInputs({ control, register, errors, i }) {
                                     {e.label}
                                 </SelectOption>
                             ))}
-                        </Select>
+                        </SelectField>
                     );
                 }}
                 name={`environment.${i}.type`}
                 control={control}
             />
-            <Input
+            <TextField
+                id={`environment.${i}.name`}
                 label="Name"
                 {...register(`environment.${i}.name`)}
                 aria-invalid={errors?.name ? "true" : "false"}
                 error={errors?.name?.message}
                 required
             />
-            <Input
+            <TextField
+                id={`environment.${i}.display_name`}
                 label="Display name"
                 {...register(`environment.${i}.display_name`)}
                 aria-invalid={errors?.display_name ? "true" : "false"}
                 error={errors?.display_name?.message}
                 required
             />
-            <Input
+            <TextField
+                id={`environment.${i}.default`}
                 label="Default value"
                 {...register(`environment.${i}.default`)}
                 aria-invalid={errors?.default ? "true" : "false"}
                 error={errors?.default?.message}
             />
-            <Input
+            <TextField
+                id={`environment.${i}.description`}
                 label="Description"
                 {...register(`environment.${i}.description`)}
                 aria-invalid={errors?.description ? "true" : "false"}
@@ -94,14 +94,16 @@ function EnvironmentInputs({ control, register, errors, i }) {
 function UrlInputs({ control, register, errors, i }) {
     return (
         <Fragment>
-            <Input
+            <TextField
+                id={`urls.${i}.name`}
                 label="Name"
                 {...register(`urls.${i}.name`)}
                 aria-invalid={errors?.name ? "true" : "false"}
                 error={errors?.name?.message}
                 required
             />
-            <Input
+            <TextField
+                id={`urls.${i}.port`}
                 label="Port"
                 {...register(`urls.${i}.port`)}
                 aria-invalid={errors?.port ? "true" : "false"}
@@ -110,16 +112,12 @@ function UrlInputs({ control, register, errors, i }) {
             />
             <Controller
                 render={({ field }) => {
-                    const value = (
-                        <SelectValue>
-                            {
-                                urlKinds.find((e) => e.value === field.value)
-                                    ?.label
-                            }
-                        </SelectValue>
-                    );
+                    const value = urlKinds.find(
+                        (e) => e.value === field.value
+                    )?.label;
                     return (
-                        <Select
+                        <SelectField
+                            id={`urls.${i}.kind`}
                             label="Kind"
                             {...register(`urls.${i}.kind`)}
                             // @ts-ignore
@@ -132,13 +130,14 @@ function UrlInputs({ control, register, errors, i }) {
                                     {e.label}
                                 </SelectOption>
                             ))}
-                        </Select>
+                        </SelectField>
                     );
                 }}
                 name={`urls.${i}.kind`}
                 control={control}
             />
-            <Input
+            <TextField
+                id={`urls.${i}.ping`}
                 label="Ping"
                 {...register(`urls.${i}.ping`)}
                 aria-invalid={errors?.ping ? "true" : "false"}
@@ -151,7 +150,8 @@ function UrlInputs({ control, register, errors, i }) {
 function VolumeInputs({ register, errors, i }) {
     return (
         <div className={styles.volume}>
-            <Input
+            <TextField
+                id={`methods.docker.volumes.${i}.key`}
                 label="Name of the volume"
                 {...register(`methods.docker.volumes.${i}.key`)}
                 aria-invalid={errors?.key ? "true" : "false"}
@@ -159,7 +159,8 @@ function VolumeInputs({ register, errors, i }) {
                 placeholder="data"
                 required
             />
-            <Input
+            <TextField
+                id={`methods.docker.volumes.${i}.value`}
                 label="Path in the container"
                 {...register(`methods.docker.volumes.${i}.value`)}
                 aria-invalid={errors?.value ? "true" : "false"}
@@ -174,7 +175,8 @@ function VolumeInputs({ register, errors, i }) {
 function PortInputs({ register, errors, i }) {
     return (
         <div className={styles.port}>
-            <Input
+            <TextField
+                id={`methods.docker.ports.${i}.key`}
                 label="Port in the container"
                 {...register(`methods.docker.ports.${i}.key`)}
                 aria-invalid={errors?.key ? "true" : "false"}
@@ -182,7 +184,8 @@ function PortInputs({ register, errors, i }) {
                 placeholder="3000"
                 required
             />
-            <Input
+            <TextField
+                id={`methods.docker.ports.${i}.value`}
                 label="Port out of the container"
                 {...register(`methods.docker.ports.${i}.value`)}
                 aria-invalid={errors?.value ? "true" : "false"}
@@ -197,7 +200,8 @@ function PortInputs({ register, errors, i }) {
 function ContainerEnvironmentInputs({ register, errors, i }) {
     return (
         <div className={styles.containerEnvironment}>
-            <Input
+            <TextField
+                id={`methods.docker.environment.${i}.key`}
                 label="Name in Docker"
                 {...register(`methods.docker.environment.${i}.key`)}
                 aria-invalid={errors?.key ? "true" : "false"}
@@ -205,7 +209,8 @@ function ContainerEnvironmentInputs({ register, errors, i }) {
                 placeholder="TOKEN"
                 required
             />
-            <Input
+            <TextField
+                id={`methods.docker.environment.${i}.value`}
                 label="Name in Vertex"
                 {...register(`methods.docker.environment.${i}.value`)}
                 aria-invalid={errors?.value ? "true" : "false"}
@@ -416,7 +421,8 @@ export default function ServiceEditor() {
             <Vertical gap={25} className={styles.content}>
                 <Title className={styles.title}>Info</Title>
                 <div className={classNames(styles.inputs)}>
-                    <Input
+                    <TextField
+                        id="id"
                         label="Service ID"
                         {...register("id", { required: true })}
                         aria-invalid={errors.id ? "true" : "false"}
@@ -425,7 +431,8 @@ export default function ServiceEditor() {
                         description="Lowercase identifier for the service."
                         required
                     />
-                    <Input
+                    <TextField
+                        id="name"
                         label="Service name"
                         {...register("name")}
                         aria-invalid={errors.name ? "true" : "false"}
@@ -434,7 +441,8 @@ export default function ServiceEditor() {
                         description="Human-readable name for the service."
                         required
                     />
-                    <Input
+                    <TextField
+                        id="repository"
                         label="Repository"
                         type="url"
                         {...register("repository")}
@@ -443,7 +451,8 @@ export default function ServiceEditor() {
                         placeholder="https://github.com/username/repo"
                         description="URL of the repository."
                     />
-                    <Input
+                    <TextField
+                        id="description"
                         label="Description"
                         {...register("description")}
                         aria-invalid={errors.description ? "true" : "false"}
@@ -452,7 +461,8 @@ export default function ServiceEditor() {
                         description="Short description of the service."
                         required
                     />
-                    <Input
+                    <TextField
+                        id="color"
                         label="Color"
                         {...register("color")}
                         aria-invalid={errors.color ? "true" : "false"}
@@ -578,7 +588,8 @@ export default function ServiceEditor() {
             <Vertical className={styles.content} gap={25}>
                 <Title className={styles.title}>Docker</Title>
                 <Vertical className={classNames(styles.inputs)} gap={15}>
-                    <Input
+                    <TextField
+                        id="methods.docker.image"
                         label="Docker image"
                         {...register("methods.docker.image")}
                         aria-invalid={
@@ -589,7 +600,8 @@ export default function ServiceEditor() {
                         description="The image to pull from a registry."
                         required
                     />
-                    <Input
+                    <TextField
+                        id="methods.docker.command"
                         label="Command"
                         {...register("methods.docker.command")}
                         aria-invalid={

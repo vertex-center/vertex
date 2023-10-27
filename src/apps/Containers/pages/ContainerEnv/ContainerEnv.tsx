@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { Title } from "../../../../components/Text/Text";
 import { useParams } from "react-router-dom";
-import EnvVariableInput from "../../../../components/EnvVariableInput/EnvVariableInput";
+import EnvVariableInput from "../../components/EnvVariableInput/EnvVariableInput";
 import { Button, MaterialIcon } from "@vertex-center/components";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
 import useContainer from "../../hooks/useContainer";
@@ -76,6 +76,7 @@ export default function ContainerEnv() {
             <Title className={styles.title}>Environment</Title>
             {env?.map((env, i) => (
                 <EnvVariableInput
+                    id={env.env.name}
                     key={env.env.name}
                     env={env.env}
                     value={env.value}

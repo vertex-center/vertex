@@ -8,18 +8,17 @@ import {
 } from "../../../../components/KeyValueInfo/KeyValueInfo";
 import useContainer from "../../hooks/useContainer";
 import { useParams } from "react-router-dom";
-import ContainerSelect from "../../../../components/Input/ContainerSelect";
+import ContainerSelect from "../../components/ContainerSelect/ContainerSelect";
 import { ChangeEvent, Fragment, useEffect, useState } from "react";
 import { Container } from "../../../../models/container";
 import Progress from "../../../../components/Progress";
-import { Button, MaterialIcon } from "@vertex-center/components";
+import { Button, MaterialIcon, TextField } from "@vertex-center/components";
 import { api } from "../../../../backend/api/backend";
 import { DatabaseEnvironment } from "../../../../models/service";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Spacer from "../../../../components/Spacer/Spacer";
-import Input from "../../../../components/Input/Input";
 
 type DatabaseProps = {
     container?: Container;
@@ -163,7 +162,7 @@ export default function ContainerDetailsDatabase() {
                                 onChange={onChange}
                             />
                             {databases?.[dbID]?.container_id && (
-                                <Input
+                                <TextField
                                     label="Database name"
                                     onChange={(e: any) =>
                                         onChangeDbName(e, dbID)

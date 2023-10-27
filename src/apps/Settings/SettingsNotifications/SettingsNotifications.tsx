@@ -1,9 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
-import Input from "../../../components/Input/Input";
 import { Title } from "../../../components/Text/Text";
-import { Button, MaterialIcon } from "@vertex-center/components";
+import { Button, MaterialIcon, TextField } from "@vertex-center/components";
 import { api } from "../../../backend/api/backend";
-
 import styles from "./SettingsNotifications.module.sass";
 import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
 import { APIError } from "../../../components/Error/APIError";
@@ -49,7 +47,8 @@ export default function SettingsNotifications() {
             <APIError error={error} />
             {!error && (
                 <Fragment>
-                    <Input
+                    <TextField
+                        id="webhook"
                         label="Webhook"
                         value={webhook}
                         onChange={onWebhookChange}

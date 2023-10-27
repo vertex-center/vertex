@@ -1,12 +1,12 @@
-import { SelectProps } from "./Input";
-import Select, { SelectOption, SelectValue } from "./Select";
 import timezones, { Timezone } from "timezones.json";
 import { Vertical } from "../Layouts/Layouts";
 import { useEffect, useState } from "react";
+import { SelectField, SelectOption } from "@vertex-center/components";
+import { SelectFieldProps } from "@vertex-center/components/dist/components/SelectField/SelectField";
 
-type Props = SelectProps;
+type Props = SelectFieldProps;
 
-export default function TimezoneInput(props: Readonly<Props>) {
+export default function TimezoneField(props: Readonly<Props>) {
     const { className, label, value, ...others } = props;
 
     const [group, setGroup] = useState<string>("none");
@@ -35,17 +35,14 @@ export default function TimezoneInput(props: Readonly<Props>) {
         setTimezoneGroup(tz);
     };
 
-    const groupValue = <SelectValue>{group}</SelectValue>;
-    const timezoneValue = <SelectValue>{timezone}</SelectValue>;
-
     return (
         <Vertical gap={4}>
-            <Select
+            <SelectField
                 className={className}
                 label={label}
                 {...others}
-                // @ts-ignore
-                value={groupValue}
+                description={timezoneGroup ? undefined : others.description}
+                value={group}
                 onChange={onGroupChange}
             >
                 <SelectOption value="">None</SelectOption>
@@ -54,17 +51,16 @@ export default function TimezoneInput(props: Readonly<Props>) {
                         {value.text}
                     </SelectOption>
                 ))}
-            </Select>
+            </SelectField>
 
             {timezoneGroup && (
-                // @ts-ignore
-                <Select className={className} value={timezoneValue} {...others}>
+                <SelectField className={className} value={timezone} {...others}>
                     {timezoneGroup.utc.map((value) => (
                         <SelectOption key={value} value={value}>
                             {value}
                         </SelectOption>
                     ))}
-                </Select>
+                </SelectField>
             )}
         </Vertical>
     );

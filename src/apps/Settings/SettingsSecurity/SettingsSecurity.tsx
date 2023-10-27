@@ -7,12 +7,11 @@ import { Errors } from "../../../components/Error/Errors";
 import { APIError } from "../../../components/Error/APIError";
 import ListItem from "../../../components/List/ListItem";
 import { api } from "../../../backend/api/backend";
-import { Button, MaterialIcon } from "@vertex-center/components";
+import { Button, MaterialIcon, TextField } from "@vertex-center/components";
 import { ChangeEvent, Fragment, useState } from "react";
 import Popup from "../../../components/Popup/Popup";
 import Spacer from "../../../components/Spacer/Spacer";
 import Code from "../../../components/Code/Code";
-import Input from "../../../components/Input/Input";
 import Progress from "../../../components/Progress";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -122,7 +121,8 @@ export default function SettingsSecurity() {
 
                 <SubTitle>Step 2: Paste your public key below</SubTitle>
                 <div className={styles.field}>
-                    <Input
+                    <TextField
+                        id="authorized-key"
                         value={authorizedKey}
                         onChange={onAuthorizedKeyChange}
                         placeholder="ssh-ed25519..."
