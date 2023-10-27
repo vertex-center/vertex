@@ -23,8 +23,8 @@ export const Normal: Story = {
     render: function Render(props) {
         const [value, setValue] = useState<string>();
 
-        const onChange = (value: string) => {
-            setValue(value);
+        const onChange = (value: unknown) => {
+            setValue(value as string);
             props.onChange?.(value);
         };
 
@@ -56,13 +56,13 @@ export const Multiple: Story = {
 
         const allChoices = ["Option 1", "Option 2", "Option 3"];
 
-        const onChange = (value: string) => {
+        const onChange = (value: unknown) => {
             setChoices((choices) => {
                 let c = [];
-                if (choices.includes(value)) {
+                if (choices.includes(value as string)) {
                     c = choices.filter((c) => c !== value);
                 } else {
-                    c = [...choices, value];
+                    c = [...choices, value as string];
                 }
                 props.onChange?.(c);
                 return c;

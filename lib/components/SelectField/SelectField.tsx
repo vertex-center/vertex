@@ -1,8 +1,9 @@
-import { Input, InputProps } from "../Input/Input.tsx";
+import { Input, InputProps, InputRef } from "../Input/Input.tsx";
 import { Checkbox } from "../Checkbox/Checkbox.tsx";
 import {
     Children,
     cloneElement,
+    forwardRef,
     HTMLAttributes,
     PropsWithChildren,
     ReactNode,
@@ -49,14 +50,19 @@ export function SelectOption<T>(props: Readonly<SelectOptionProps<T>>) {
     );
 }
 
+export type SelectFieldRef = InputRef;
+
 export type SelectFieldProps<T> = Omit<InputProps<T>, "onChange" | "value"> &
     PropsWithChildren<{
         multiple?: boolean;
         value?: ReactNode;
-        onChange?: (value: T) => void;
+        onChange?: (value: unknown) => void;
     }>;
 
-export function SelectField<T>(props: Readonly<SelectFieldProps<T>>) {
+function _SelectField<T, U>(
+    props: Readonly<SelectFieldProps<T>>,
+    ref: SelectFieldRef,
+) {
     const {
         children,
         multiple,
@@ -67,7 +73,7 @@ export function SelectField<T>(props: Readonly<SelectFieldProps<T>>) {
 
     const [show, setShow] = useState<boolean>(false);
 
-    const onChange = (value: T) => {
+    const onChange = (value: U) => {
         if (!multiple) setShow(false);
         onChangeProp?.(value);
     };
@@ -82,6 +88,7 @@ export function SelectField<T>(props: Readonly<SelectFieldProps<T>>) {
         >
             <Input
                 {...others}
+                ref={ref}
                 as={"div"}
                 inputProps={{
                     className: "select-field-input",
@@ -108,3 +115,5 @@ export function SelectField<T>(props: Readonly<SelectFieldProps<T>>) {
         </div>
     );
 }
+
+export const SelectField = forwardRef(_SelectField);

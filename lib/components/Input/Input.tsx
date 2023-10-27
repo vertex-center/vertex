@@ -1,6 +1,7 @@
 import {
     ChangeEvent,
     ElementType,
+    forwardRef,
     HTMLAttributes,
     HTMLInputTypeAttribute,
     HTMLProps,
@@ -11,10 +12,12 @@ import {
 import "./Input.sass";
 import cx from "classnames";
 
+export type InputRef = Ref<HTMLInputElement>;
+
 export type InputProps<T> = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
+    divRef?: Ref<HTMLDivElement>;
     value?: T;
     onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
-    ref?: Ref<HTMLDivElement>;
     label?: string;
     description?: string;
     error?: string;
@@ -25,9 +28,9 @@ export type InputProps<T> = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
     type?: HTMLInputTypeAttribute;
 };
 
-export function Input<T>(props: Readonly<InputProps<T>>) {
+function _Input<T>(props: Readonly<InputProps<T>>, ref: InputRef) {
     const {
-        ref,
+        divRef,
         className,
         id,
         as,
@@ -70,7 +73,7 @@ export function Input<T>(props: Readonly<InputProps<T>>) {
     }
 
     return (
-        <div ref={ref} className={cx("input", className)} {...others}>
+        <div ref={divRef} className={cx("input", className)} {...others}>
             {label && (
                 <label htmlFor={id} className="input-label">
                     {label} {indicator}
@@ -85,6 +88,7 @@ export function Input<T>(props: Readonly<InputProps<T>>) {
                 onChange={onChange}
                 type={type}
                 {...inputProps}
+                ref={ref}
                 className={cx("input-field", inputProps?.className)}
                 children={children}
             />
@@ -95,3 +99,5 @@ export function Input<T>(props: Readonly<InputProps<T>>) {
         </div>
     );
 }
+
+export const Input = forwardRef(_Input);
