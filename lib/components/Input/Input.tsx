@@ -73,6 +73,7 @@ function _Input(props: Readonly<InputProps>, ref: InputRef) {
             )}
             <Component
                 ref={ref}
+                id={id}
                 value={value}
                 onChange={onChange}
                 className={cx("input-field", className)}

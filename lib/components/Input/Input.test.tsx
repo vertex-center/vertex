@@ -34,3 +34,9 @@ test("it can be referenced", () => {
     const input = screen.getByPlaceholderText("Placeholder");
     expect(ref.current).toBe(input);
 });
+
+test("it can have an id", () => {
+    render(<Input id="id" placeholder="Placeholder" />);
+    const input = screen.getByPlaceholderText("Placeholder");
+    expect(input).toHaveAttribute("id", "id");
+});
