@@ -9,11 +9,11 @@ import "./Input.sass";
 import cx from "classnames";
 
 export type InputProps = HTMLAttributes<HTMLDivElement> & {
+    ref?: Ref<HTMLDivElement>;
     label?: string;
     description?: string;
     error?: string;
     as?: ElementType;
-    containerRef?: Ref<HTMLDivElement>;
     inputProps?: HTMLProps<HTMLInputElement>;
     required?: boolean;
     disabled?: boolean;
@@ -22,6 +22,7 @@ export type InputProps = HTMLAttributes<HTMLDivElement> & {
 
 export function Input(props: Readonly<InputProps>) {
     const {
+        ref,
         className,
         id,
         as,
@@ -51,7 +52,7 @@ export function Input(props: Readonly<InputProps>) {
     }
 
     return (
-        <div className={cx("input", className)} {...others}>
+        <div ref={ref} className={cx("input", className)} {...others}>
             {label && (
                 <label htmlFor={id} className="input-label">
                     {label} {indicator}

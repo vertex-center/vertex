@@ -10,8 +10,8 @@ export function TextField(props: Readonly<TextFieldProps>) {
     const { containerRef, ref, ...others } = props;
     return (
         <Input
+            ref={containerRef}
             inputProps={{ ref }}
-            containerRef={containerRef}
             id="id"
             type="text"
             {...others}
