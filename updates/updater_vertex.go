@@ -26,7 +26,7 @@ func NewVertexUpdater(about types.About) VertexUpdater {
 }
 
 func (u VertexUpdater) CurrentVersion() (string, error) {
-	return u.about.Version, nil
+	return "v" + u.about.Version, nil
 }
 
 func (u VertexUpdater) Install(tag string) error {
