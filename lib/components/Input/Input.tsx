@@ -1,14 +1,19 @@
 import {
+    ChangeEvent,
     ElementType,
     HTMLAttributes,
     HTMLInputTypeAttribute,
     HTMLProps,
     Ref,
+    useEffect,
+    useState,
 } from "react";
 import "./Input.sass";
 import cx from "classnames";
 
-export type InputProps = HTMLAttributes<HTMLDivElement> & {
+export type InputProps<T> = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
+    value?: T;
+    onChange?: (value: T) => void;
     ref?: Ref<HTMLDivElement>;
     label?: string;
     description?: string;
@@ -20,7 +25,7 @@ export type InputProps = HTMLAttributes<HTMLDivElement> & {
     type?: HTMLInputTypeAttribute;
 };
 
-export function Input(props: Readonly<InputProps>) {
+export function Input<T>(props: Readonly<InputProps<T>>) {
     const {
         ref,
         className,
@@ -29,6 +34,8 @@ export function Input(props: Readonly<InputProps>) {
         required,
         placeholder,
         disabled,
+        value: initialValue,
+        onChange: _,
         type,
         label,
         description,
@@ -37,6 +44,17 @@ export function Input(props: Readonly<InputProps>) {
         children,
         ...others
     } = props;
+
+    const [value, setValue] = useState<T | undefined>(initialValue);
+
+    useEffect(() => {
+        setValue(initialValue);
+    }, [initialValue]);
+
+    const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setValue(e.target.value as T);
+        props.onChange?.(e.target.value as T);
+    };
 
     const Component = as || "input";
 
@@ -63,6 +81,8 @@ export function Input(props: Readonly<InputProps>) {
                 placeholder={placeholder}
                 required={required}
                 disabled={disabled}
+                value={value}
+                onChange={onChange}
                 type={type}
                 {...inputProps}
                 className={cx("input-field", inputProps?.className)}

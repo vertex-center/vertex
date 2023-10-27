@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { TextField } from "./TextField.tsx";
 
 test("it renders", () => {
@@ -32,4 +32,21 @@ test("it can have a custom input class", () => {
     );
     const input = screen.getByTestId("field").children[0];
     expect(input).toHaveClass("input-field");
+});
+
+test("it can react to changes", () => {
+    const onChange = jest.fn();
+    render(
+        <TextField
+            id="id"
+            data-testid="field"
+            placeholder="Placeholder"
+            value="Value"
+            onChange={onChange}
+        />,
+    );
+    const input = screen.getByTestId("field").children[0];
+    fireEvent.input(input, { target: { value: "New value" } });
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(input).toHaveValue("New value");
 });

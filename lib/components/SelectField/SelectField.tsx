@@ -49,9 +49,8 @@ export function SelectOption<T>(props: Readonly<SelectOptionProps<T>>) {
     );
 }
 
-export type SelectFieldProps<T> = Omit<InputProps, "onChange"> &
+export type SelectFieldProps<T> = Omit<InputProps<T>, "value"> &
     PropsWithChildren<{
-        onChange?: (value: T) => void;
         multiple?: boolean;
         value?: ReactNode;
     }>;
