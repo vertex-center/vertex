@@ -18,7 +18,7 @@ func TestVertexUpdaterTestSuite(t *testing.T) {
 
 func (suite *VertexUpdaterTestSuite) SetupTest() {
 	suite.updater = NewVertexUpdater(types.About{
-		Version: "v0.12.0",
+		Version: "0.12.0",
 	})
 }
 
