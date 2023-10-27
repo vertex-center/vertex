@@ -20,7 +20,7 @@ export const Normal: Story = {
     argTypes: {
         onChange: { action: "onChange" },
     },
-    render: (props) => {
+    render: function Render(props) {
         const [value, setValue] = useState<string>();
 
         const onChange = (value: string) => {
@@ -49,7 +49,7 @@ export const Multiple: Story = {
     argTypes: {
         onChange: { action: "onChange" },
     },
-    render: (props) => {
+    render: function Render(props) {
         const { onChange: _, ...others } = props;
 
         const [choices, setChoices] = useState<string[]>([]);

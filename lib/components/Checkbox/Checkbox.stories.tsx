@@ -17,7 +17,7 @@ export const Normal: Story = {
         },
         onClick: { action: "onClick" },
     },
-    render: (props) => {
+    render: function Render(props) {
         const [checked, setChecked] = useState<boolean>(true);
         return (
             <Checkbox
