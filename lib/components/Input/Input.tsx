@@ -1,14 +1,23 @@
-import { ElementType, HTMLProps, Ref } from "react";
+import {
+    ElementType,
+    HTMLAttributes,
+    HTMLInputTypeAttribute,
+    HTMLProps,
+    Ref,
+} from "react";
 import "./Input.sass";
 import cx from "classnames";
 
-export type InputProps = HTMLProps<HTMLDivElement> & {
+export type InputProps = HTMLAttributes<HTMLDivElement> & {
     label?: string;
     description?: string;
     error?: string;
     as?: ElementType;
     containerRef?: Ref<HTMLDivElement>;
     inputProps?: HTMLProps<HTMLInputElement>;
+    required?: boolean;
+    disabled?: boolean;
+    type?: HTMLInputTypeAttribute;
 };
 
 export function Input(props: Readonly<InputProps>) {
@@ -19,6 +28,7 @@ export function Input(props: Readonly<InputProps>) {
         required,
         placeholder,
         disabled,
+        type,
         label,
         description,
         error,
@@ -52,6 +62,7 @@ export function Input(props: Readonly<InputProps>) {
                 placeholder={placeholder}
                 required={required}
                 disabled={disabled}
+                type={type}
                 {...inputProps}
                 className={cx("input-field", inputProps?.className)}
                 children={children}
