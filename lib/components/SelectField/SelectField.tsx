@@ -1,33 +1,75 @@
 import { Input, InputProps } from "../Input/Input.tsx";
-import { Children, cloneElement, HTMLProps, useState } from "react";
+import { Checkbox } from "../Checkbox/Checkbox.tsx";
+import {
+    Children,
+    cloneElement,
+    HTMLAttributes,
+    PropsWithChildren,
+    ReactNode,
+    useState,
+} from "react";
 import { MaterialIcon } from "../MaterialIcon/MaterialIcon.tsx";
 import "./SelectField.sass";
 import cx from "classnames";
 
-type SelectValueProps = HTMLProps<HTMLDivElement>;
+export type SelectOptionProps<T> = HTMLAttributes<HTMLDivElement> &
+    PropsWithChildren<{
+        onClick?: (value: T) => void;
+        value: T;
+        multiple?: boolean;
+        selected?: boolean;
+    }>;
 
-export function SelectValue(props: Readonly<SelectValueProps>) {
-    return <div className="select-field-value" {...props} />;
+export function SelectOption<T>(props: Readonly<SelectOptionProps<T>>) {
+    const {
+        onClick,
+        multiple,
+        className,
+        value,
+        children,
+        selected,
+        ...others
+    } = props;
+
+    return (
+        <div
+            onClick={() => onClick?.(value)}
+            className={cx(
+                "select-field-option",
+                {
+                    "select-field-option-multiple": multiple,
+                },
+                className,
+            )}
+            {...others}
+        >
+            {multiple === true && <Checkbox checked={selected} />}
+            {children}
+        </div>
+    );
 }
 
-type SelectOptionProps = HTMLProps<HTMLDivElement>;
+export type SelectFieldProps<T> = Omit<InputProps, "onChange"> &
+    PropsWithChildren<{
+        onChange?: (value: T) => void;
+        multiple?: boolean;
+        value?: ReactNode;
+    }>;
 
-export function SelectOption(props: Readonly<SelectOptionProps>) {
-    return <div className="select-field-option" {...props} />;
-}
-
-type SelectFieldProps = InputProps & {
-    onChange?: (value: any) => void;
-};
-
-export function SelectField(props: Readonly<SelectFieldProps>) {
-    const { children, ...others } = props;
+export function SelectField<T>(props: Readonly<SelectFieldProps<T>>) {
+    const {
+        children,
+        multiple,
+        onChange: onChangeProp,
+        value,
+        ...others
+    } = props;
 
     const [show, setShow] = useState<boolean>(false);
 
-    const onChange = (value: any) => {
-        setShow(false);
-        props?.onChange?.(value);
+    const onChange = (value: T) => {
+        if (!multiple) setShow(false);
+        onChangeProp?.(value);
     };
 
     const toggle = () => setShow(!show);
@@ -46,6 +88,7 @@ export function SelectField(props: Readonly<SelectFieldProps>) {
                     onClick: toggle,
                 }}
             >
+                {value}
                 <MaterialIcon
                     className="select-field-icon"
                     icon="expand_more"
@@ -57,6 +100,7 @@ export function SelectField(props: Readonly<SelectFieldProps>) {
                     // @ts-ignore
                     return cloneElement(child, {
                         onClick: onChange,
+                        multiple: multiple,
                     });
                 })}
             </div>

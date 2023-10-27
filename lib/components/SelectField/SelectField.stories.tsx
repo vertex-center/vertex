@@ -1,5 +1,6 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { SelectField, SelectOption } from "./SelectField.tsx";
+import { useState } from "react";
 
 const meta: Meta<typeof SelectField> = {
     title: "Components/Fields/Select Field",
@@ -9,24 +10,79 @@ const meta: Meta<typeof SelectField> = {
 
 type Story = StoryObj<typeof SelectField>;
 
-const children = [
-    <SelectOption key="A">Option 1</SelectOption>,
-    <SelectOption key="B">Option 2</SelectOption>,
-    <SelectOption key="C">Option 3</SelectOption>,
-];
-
 export const Normal: Story = {
     args: {
         id: "select-field",
         label: "Label",
         required: true,
         description: "A short description",
-        children,
     },
     argTypes: {
         onChange: { action: "onChange" },
     },
-    render: (props) => <SelectField {...props} />,
+    render: (props) => {
+        const [value, setValue] = useState<string>();
+
+        const onChange = (value: string) => {
+            setValue(value);
+            props.onChange?.(value);
+        };
+
+        return (
+            <SelectField value={value} {...props} onChange={onChange}>
+                <SelectOption value="1">One</SelectOption>
+                <SelectOption value="2">Two</SelectOption>
+                <SelectOption value="3">Three</SelectOption>
+            </SelectField>
+        );
+    },
+};
+
+export const Multiple: Story = {
+    args: {
+        id: "select-field",
+        label: "Label",
+        required: true,
+        description: "A short description",
+        multiple: true,
+    },
+    argTypes: {
+        onChange: { action: "onChange" },
+    },
+    render: (props) => {
+        const { onChange: _, ...others } = props;
+
+        const [choices, setChoices] = useState<string[]>([]);
+
+        const allChoices = ["Option 1", "Option 2", "Option 3"];
+
+        const onChange = (value: string) => {
+            setChoices((choices) => {
+                let c = [];
+                if (choices.includes(value)) {
+                    c = choices.filter((c) => c !== value);
+                } else {
+                    c = [...choices, value];
+                }
+                props.onChange?.(c);
+                return c;
+            });
+        };
+
+        return (
+            <SelectField onChange={onChange} value={choices.length} {...others}>
+                {allChoices.map((choice) => (
+                    <SelectOption
+                        key={choice}
+                        value={choice}
+                        selected={choices.includes(choice)}
+                    >
+                        {choice}
+                    </SelectOption>
+                ))}
+            </SelectField>
+        );
+    },
 };
 
 export default meta;
