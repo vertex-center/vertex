@@ -1,7 +1,7 @@
 {
     "name": "@vertex-center/components",
     "private": false,
-    "version": "0.2.0",
+    "version": "0.3.0",
     "homepage": "https://github.com/vertex-center/vertex-components",
     "description": "React components shared for all Vertex projects.",
     "license": "MIT",
