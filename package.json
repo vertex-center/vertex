@@ -1,6 +1,6 @@
 {
     "name": "vertex-webui",
-    "version": "0.13.0",
+    "version": "0.13.1",
     "private": true,
     "dependencies": {
         "@hookform/resolvers": "^3.3.2",
