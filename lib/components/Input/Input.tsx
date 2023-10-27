@@ -2,11 +2,8 @@ import {
     ChangeEvent,
     ElementType,
     forwardRef,
-    HTMLAttributes,
-    HTMLInputTypeAttribute,
-    HTMLProps,
+    InputHTMLAttributes,
     Ref,
-    useEffect,
     useState,
 } from "react";
 import "./Input.sass";
@@ -14,49 +11,40 @@ import cx from "classnames";
 
 export type InputRef = Ref<HTMLInputElement>;
 
-export type InputProps = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
+export type InputProps = InputHTMLAttributes<HTMLInputElement> & {
     divRef?: Ref<HTMLDivElement>;
-    value?: string;
-    onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+    divProps?: InputHTMLAttributes<HTMLDivElement>;
     label?: string;
     description?: string;
     error?: string;
     as?: ElementType;
-    inputProps?: HTMLProps<HTMLInputElement>;
-    required?: boolean;
-    disabled?: boolean;
-    type?: HTMLInputTypeAttribute;
 };
 
 function _Input(props: Readonly<InputProps>, ref: InputRef) {
     const {
         divRef,
-        className,
         id,
         as,
         required,
-        placeholder,
-        disabled,
+        className,
         value: _,
         onChange: __,
-        type,
         label,
         description,
         error,
-        inputProps,
+        divProps,
         children,
         ...others
     } = props;
 
-    const [value, setValue] = useState<string>(props.value ?? "");
+    const controlled = props.value !== undefined;
+    const [internalValue, setInternalValue] = useState<string>("");
 
-    useEffect(() => {
-        setValue(props.value ?? "");
-    }, [props.value]);
+    const value = controlled ? props.value : internalValue;
 
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setValue(e.target.value);
         props.onChange?.(e);
+        if (!controlled) setInternalValue(e.target.value);
     };
 
     const Component = as ?? "input";
@@ -73,24 +61,23 @@ function _Input(props: Readonly<InputProps>, ref: InputRef) {
     }
 
     return (
-        <div ref={divRef} className={cx("input", className)} {...others}>
+        <div
+            ref={divRef}
+            {...divProps}
+            className={cx("input", divProps?.className)}
+        >
             {label && (
                 <label htmlFor={id} className="input-label">
                     {label} {indicator}
                 </label>
             )}
             <Component
-                id={id}
-                placeholder={placeholder}
-                required={required}
-                disabled={disabled}
+                ref={ref}
                 value={value}
                 onChange={onChange}
-                type={type}
-                {...inputProps}
-                ref={ref}
-                className={cx("input-field", inputProps?.className)}
+                className={cx("input-field", className)}
                 children={children}
+                {...others}
             />
             {description && !error && (
                 <div className="input-description">{description}</div>

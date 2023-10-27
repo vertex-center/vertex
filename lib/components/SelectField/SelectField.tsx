@@ -89,11 +89,9 @@ function _SelectField<T>(
             <Input
                 {...others}
                 ref={ref}
-                as={"div"}
-                inputProps={{
-                    className: "select-field-input",
-                    onClick: toggle,
-                }}
+                as="div"
+                onClick={toggle}
+                className="select-field-input"
             >
                 {value}
                 <MaterialIcon

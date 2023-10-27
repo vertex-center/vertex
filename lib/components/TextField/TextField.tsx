@@ -10,15 +10,7 @@ type TextFieldProps = InputProps & {
 
 function _TextField(props: Readonly<TextFieldProps>, ref: TextFieldRef) {
     const { divRef, ...others } = props;
-    return (
-        <Input
-            divRef={divRef}
-            inputProps={{ ref }}
-            id="id"
-            type="text"
-            {...others}
-        />
-    );
+    return <Input divRef={divRef} ref={ref} id="id" type="text" {...others} />;
 }
 
 export const TextField = forwardRef(_TextField);

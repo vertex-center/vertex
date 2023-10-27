@@ -14,11 +14,11 @@ test("it can have a custom class", () => {
             id="id"
             data-testid="field"
             placeholder="Placeholder"
-            className="field"
+            divProps={{ className: "field" }}
         />,
     );
     const field = screen.getByTestId("field");
-    expect(field).toHaveClass("field", "input");
+    expect(field.parentElement).toHaveClass("field", "input");
 });
 
 test("it can have a custom input class", () => {
@@ -27,11 +27,11 @@ test("it can have a custom input class", () => {
             id="id"
             data-testid="field"
             placeholder="Placeholder"
-            inputProps={{ className: "input" }}
+            className="input-test"
         />,
     );
-    const input = screen.getByTestId("field").children[0];
-    expect(input).toHaveClass("input-field");
+    const input = screen.getByTestId("field");
+    expect(input).toHaveClass("input-field", "input-test");
 });
 
 test("it can react to changes", () => {
@@ -41,11 +41,10 @@ test("it can react to changes", () => {
             id="id"
             data-testid="field"
             placeholder="Placeholder"
-            value="Value"
             onChange={onChange}
         />,
     );
-    const input = screen.getByTestId("field").children[0];
+    const input = screen.getByTestId("field");
     fireEvent.input(input, { target: { value: "New value" } });
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(input).toHaveValue("New value");

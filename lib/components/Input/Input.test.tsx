@@ -15,11 +15,11 @@ test("it can have a custom class", () => {
             id="id"
             data-testid="input"
             placeholder="Placeholder"
-            className="custom-class"
+            divProps={{ className: "custom-class" }}
         />,
     );
     const input = screen.getByTestId("input");
-    expect(input).toHaveClass("custom-class", "input");
+    expect(input.parentElement).toHaveClass("custom-class", "input");
 });
 
 test("it can be disabled", () => {
