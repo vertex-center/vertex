@@ -2,9 +2,9 @@
 
 @use "./colors"
 
-@mixin control-shadow($color: colors.$bg-accent)
+@mixin control-shadow($color: colors.$bg-accent-shadow)
     box-shadow: 0 0 0 0 $color
-    transition: all 0.15s ease
+    transition: box-shadow 0.15s ease
 
     &:focus, &:active:not(:disabled)
         box-shadow: 0 0 0 3px $color
