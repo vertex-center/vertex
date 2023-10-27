@@ -14,9 +14,9 @@ import cx from "classnames";
 
 export type InputRef = Ref<HTMLInputElement>;
 
-export type InputProps<T> = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
+export type InputProps = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
     divRef?: Ref<HTMLDivElement>;
-    value?: T;
+    value?: string;
     onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
     label?: string;
     description?: string;
@@ -28,7 +28,7 @@ export type InputProps<T> = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
     type?: HTMLInputTypeAttribute;
 };
 
-function _Input<T>(props: Readonly<InputProps<T>>, ref: InputRef) {
+function _Input(props: Readonly<InputProps>, ref: InputRef) {
     const {
         divRef,
         className,
@@ -37,8 +37,8 @@ function _Input<T>(props: Readonly<InputProps<T>>, ref: InputRef) {
         required,
         placeholder,
         disabled,
-        value: initialValue,
-        onChange: _,
+        value: _,
+        onChange: __,
         type,
         label,
         description,
@@ -48,14 +48,14 @@ function _Input<T>(props: Readonly<InputProps<T>>, ref: InputRef) {
         ...others
     } = props;
 
-    const [value, setValue] = useState<T | undefined>(initialValue);
+    const [value, setValue] = useState<string>(props.value ?? "");
 
     useEffect(() => {
-        setValue(initialValue);
-    }, [initialValue]);
+        setValue(props.value ?? "");
+    }, [props.value]);
 
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setValue(e.target.value as T);
+        setValue(e.target.value);
         props.onChange?.(e);
     };
 

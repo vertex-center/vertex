@@ -52,15 +52,15 @@ export function SelectOption<T>(props: Readonly<SelectOptionProps<T>>) {
 
 export type SelectFieldRef = InputRef;
 
-export type SelectFieldProps<T> = Omit<InputProps<T>, "onChange" | "value"> &
+export type SelectFieldProps = Omit<InputProps, "onChange" | "value"> &
     PropsWithChildren<{
         multiple?: boolean;
         value?: ReactNode;
         onChange?: (value: unknown) => void;
     }>;
 
-function _SelectField<T, U>(
-    props: Readonly<SelectFieldProps<T>>,
+function _SelectField<T>(
+    props: Readonly<SelectFieldProps>,
     ref: SelectFieldRef,
 ) {
     const {
@@ -73,7 +73,7 @@ function _SelectField<T, U>(
 
     const [show, setShow] = useState<boolean>(false);
 
-    const onChange = (value: U) => {
+    const onChange = (value: T) => {
         if (!multiple) setShow(false);
         onChangeProp?.(value);
     };
