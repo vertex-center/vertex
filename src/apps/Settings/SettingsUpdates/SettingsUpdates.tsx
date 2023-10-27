@@ -71,7 +71,7 @@ export default function SettingsUpdates() {
                 />
             </Horizontal>
             <APIError error={error} />
-            {update === undefined && !isLoadingUpdate && (
+            {update === null && !isLoadingUpdate && (
                 <Caption className={styles.content}>
                     <Horizontal alignItems="center" gap={6}>
                         <MaterialIcon icon="check" />
@@ -80,7 +80,7 @@ export default function SettingsUpdates() {
                     </Horizontal>
                 </Caption>
             )}
-            {update !== undefined && (
+            {update !== null && (
                 <List>
                     <VertexUpdate
                         version={update?.baseline.version}
