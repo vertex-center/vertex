@@ -15,28 +15,27 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-	adapter2 "github.com/vertex-center/vertex/adapter"
+	"github.com/vertex-center/vertex/adapter"
 	"github.com/vertex-center/vertex/apps/containers"
 	"github.com/vertex-center/vertex/apps/monitoring"
 	"github.com/vertex-center/vertex/apps/reverseproxy"
 	"github.com/vertex-center/vertex/apps/serviceeditor"
 	"github.com/vertex-center/vertex/apps/sql"
 	"github.com/vertex-center/vertex/apps/tunnels"
+	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/core/port"
-	service "github.com/vertex-center/vertex/core/service"
+	"github.com/vertex-center/vertex/core/service"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/handler"
+	"github.com/vertex-center/vertex/migration"
 	"github.com/vertex-center/vertex/pkg/ginutils"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/net"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/updates"
 	"github.com/vertex-center/vlog"
-
-	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/migration"
-	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/pkg/storage"
 )
 
 // version, commit and date will be overridden by goreleaser
@@ -171,9 +170,9 @@ func checkNotRoot() {
 }
 
 func initAdapters() {
-	settingsFSAdapter = adapter2.NewSettingsFSAdapter(nil)
-	sshKernelApiAdapter = adapter2.NewSshKernelApiAdapter()
-	baselinesApiAdapter = adapter2.NewBaselinesApiAdapter()
+	settingsFSAdapter = adapter.NewSettingsFSAdapter(nil)
+	sshKernelApiAdapter = adapter.NewSshKernelApiAdapter()
+	baselinesApiAdapter = adapter.NewBaselinesApiAdapter()
 }
 
 func initServices(about types.About) {

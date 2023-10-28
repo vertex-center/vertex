@@ -13,24 +13,23 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	adapter2 "github.com/vertex-center/vertex/adapter"
+	"github.com/vertex-center/vertex/adapter"
 	"github.com/vertex-center/vertex/apps/containers"
 	"github.com/vertex-center/vertex/apps/monitoring"
 	"github.com/vertex-center/vertex/apps/reverseproxy"
 	"github.com/vertex-center/vertex/apps/serviceeditor"
 	"github.com/vertex-center/vertex/apps/sql"
 	"github.com/vertex-center/vertex/apps/tunnels"
+	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/core/port"
-	service "github.com/vertex-center/vertex/core/service"
+	"github.com/vertex-center/vertex/core/service"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/handler"
 	"github.com/vertex-center/vertex/pkg/ginutils"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vlog"
-
-	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/pkg/log"
 )
 
 var (
@@ -185,7 +184,7 @@ func buildVertex() {
 }
 
 func initAdapters() {
-	sshAdapter = adapter2.NewSshFsAdapter(nil)
+	sshAdapter = adapter.NewSshFsAdapter(nil)
 }
 
 func initServices() {
