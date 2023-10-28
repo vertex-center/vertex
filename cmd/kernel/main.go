@@ -139,6 +139,11 @@ func parseArgs() {
 	config.KernelCurrent.PortProxy = *flagPortProxy
 	config.KernelCurrent.PortPrometheus = *flagPortPrometheus
 
+	if *flagUsername == "" {
+		*flagUsername = os.Getenv("USER")
+		log.Warn("no username specified; trying to retrieve username from env", vlog.String("user", *flagUsername))
+	}
+
 	if *flagUsername != "" {
 		u, err := user.Lookup(*flagUsername)
 		if err != nil {
