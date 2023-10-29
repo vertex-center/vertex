@@ -201,6 +201,19 @@ func initServices(about types.About) {
 }
 
 func initRoutes(about types.About) {
+	// docapi:title Vertex
+	// docapi:description A platform to manage your self-hosted server.
+	// docapi:version 0.0.0
+
+	// docapi:code 200 Success.
+	// docapi:code 201 Created.
+	// docapi:code 204 No content.
+	// docapi:code 400 {Error} Bad request.
+	// docapi:code 404 {Error} Resource not found.
+	// docapi:code 409 {Error} Conflict.
+	// docapi:code 422 {Error} Unprocessable entity.
+	// docapi:code 500 {Error} Internal error.
+
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, router.Error{
 			Code:          "resource_not_found",
@@ -240,8 +253,11 @@ func initRoutes(about types.About) {
 
 	sshHandler := handler.NewSshHandler(sshService)
 	ssh := api.Group("/security/ssh")
+	// docapi:route /security/ssh get_ssh_keys
 	ssh.GET("", sshHandler.Get)
+	// docapi:route /security/ssh add_ssh_key
 	ssh.POST("", sshHandler.Add)
+	// docapi:route /security/ssh/{fingerprint} delete_ssh_key
 	ssh.DELETE("/:fingerprint", sshHandler.Delete)
 }
 

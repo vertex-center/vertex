@@ -24,3 +24,7 @@ jobs:
   lint:
     name: Lint
     uses: ./.github/workflows/call-lint.yml
+  docapi:
+    name: Generate DocAPI
+    if: github.ref == 'refs/heads/dev'
+    uses: ./.github/workflows/call-docapi.yml

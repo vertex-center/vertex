@@ -82,3 +82,8 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/arm
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  release-docapi:
+    needs: release
+    name: Generate DocAPI
+    uses: ./.github/workflows/call-docapi.yml
