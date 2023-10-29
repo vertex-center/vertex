@@ -40,3 +40,8 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-docapi:
+    needs: release
+    name: Generate DocAPI
+    uses: ./.github/workflows/call-docapi.yml
