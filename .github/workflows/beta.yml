@@ -45,3 +45,5 @@ jobs:
     needs: release
     name: Generate DocAPI
     uses: ./.github/workflows/call-docapi.yml
+    secrets:
+      token: ${{ secrets.PAT }}

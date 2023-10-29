@@ -11,6 +11,9 @@ on:
       - hotfix
   workflow_call:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build
@@ -28,3 +31,5 @@ jobs:
     name: Generate DocAPI
     if: github.ref == 'refs/heads/dev'
     uses: ./.github/workflows/call-docapi.yml
+    secrets:
+      token: ${{ secrets.PAT }}
