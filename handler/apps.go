@@ -15,6 +15,13 @@ func NewAppsHandler(appsService port.AppsService) port.AppsHandler {
 	}
 }
 
+// docapi:begin get_apps
+// docapi:method GET
+// docapi:summary Get all apps.
+// docapi:tags apps
+// docapi:response 200 {[]Meta} The list of apps.
+// docapi:end
+
 func (h *AppsHandler) Get(c *router.Context) {
 	c.JSON(h.appsService.All())
 }

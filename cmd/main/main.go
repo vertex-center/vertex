@@ -235,6 +235,7 @@ func initRoutes(about types.About) {
 
 	appsHandler := handler.NewAppsHandler(appsService)
 	apps := api.Group("/apps")
+	// docapi:route /apps get_apps
 	apps.GET("", appsHandler.Get)
 
 	hardwareHandler := handler.NewHardwareHandler(hardwareService)
