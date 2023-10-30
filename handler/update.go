@@ -25,7 +25,7 @@ func NewUpdateHandler(updateService port.UpdateService, settingsService port.Set
 // docapi:method GET
 // docapi:summary Get the latest version information.
 // docapi:tags updates
-// docapi:response 200 Update The latest version information.
+// docapi:response 200 {Update} The latest version information.
 // docapi:response 500
 // docapi:end
 
