@@ -12,7 +12,7 @@ permissions:
 jobs:
   pre-checks:
     name: Run pre-checks
-    uses: ./.github/workflows/development.yml
+    uses: ./.github/workflows/call-pre-checks.yml
 
   release:
     name: Release
@@ -83,7 +83,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  release-docapi:
+  trigger-docapi:
     needs: release
     name: Generate DocAPI
     uses: ./.github/workflows/call-docapi.yml

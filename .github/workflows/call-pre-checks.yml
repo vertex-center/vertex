@@ -1,0 +1,20 @@
+name: Pre-checks
+
+on: [workflow_call]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build
+    uses: ./.github/workflows/call-build.yml
+  build-docker:
+    name: Build Docker
+    uses: ./.github/workflows/call-build-docker.yml
+  test:
+    name: Test
+    uses: ./.github/workflows/call-test.yml
+  lint:
+    name: Lint
+    uses: ./.github/workflows/call-lint.yml

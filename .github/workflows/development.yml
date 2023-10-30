@@ -15,20 +15,13 @@ permissions:
   contents: write
 
 jobs:
-  build:
-    name: Build
-    uses: ./.github/workflows/call-build.yml
-  build-docker:
-    name: Build Docker
-    uses: ./.github/workflows/call-build-docker.yml
-  test:
-    name: Test
-    uses: ./.github/workflows/call-test.yml
-  lint:
-    name: Lint
-    uses: ./.github/workflows/call-lint.yml
-  docapi:
-    name: Generate DocAPI
+  pre-checks:
+    name: Run pre-checks
+    uses: ./.github/workflows/call-pre-checks.yml
+
+  trigger-docapi:
+    name: Trigger DocAPI Generation
+    needs: pre-checks
     if: github.ref == 'refs/heads/dev'
     uses: ./.github/workflows/call-docapi.yml
     secrets:
