@@ -21,7 +21,6 @@ jobs:
 
   trigger-docapi:
     name: Trigger DocAPI Generation
-    needs: pre-checks
     if: github.ref == 'refs/heads/dev'
     uses: ./.github/workflows/call-docapi.yml
     secrets:
