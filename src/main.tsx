@@ -4,16 +4,21 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Documentation from "./pages/Documentation/Documentation.tsx";
 import Home from "./pages/Home/Home.tsx";
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+    [
+        {
+            path: "/",
+            element: <Home />,
+        },
+        {
+            path: "/docs",
+            element: <Documentation />,
+        },
+    ],
     {
-        path: "/",
-        element: <Home />,
-    },
-    {
-        path: "/docs",
-        element: <Documentation />,
-    },
-]);
+        basename: "/",
+    }
+);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
