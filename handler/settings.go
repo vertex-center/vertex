@@ -17,26 +17,26 @@ func NewSettingsHandler(settingsService port.SettingsService) port.SettingsHandl
 	}
 }
 
-// docapi:begin get_settings
-// docapi:method GET
-// docapi:summary Get settings.
-// docapi:tags settings
-// docapi:response 200 {Settings} The settings.
-// docapi:end
+// docapi begin get_settings
+// docapi method GET
+// docapi summary Get settings.
+// docapi tags settings
+// docapi response 200 {Settings} The settings.
+// docapi end
 
 func (h *SettingsHandler) Get(c *router.Context) {
 	c.JSON(h.settingsService.Get())
 }
 
-// docapi:begin patch_settings
-// docapi:method PATCH
-// docapi:summary Update settings.
-// docapi:tags settings
-// docapi:body {Settings} The settings to update.
-// docapi:response 200
-// docapi:response 400
-// docapi:response 500
-// docapi:end
+// docapi begin patch_settings
+// docapi method PATCH
+// docapi summary Update settings.
+// docapi tags settings
+// docapi body {Settings} The settings to update.
+// docapi response 200
+// docapi response 400
+// docapi response 500
+// docapi end
 
 func (h *SettingsHandler) Patch(c *router.Context) {
 	var settings types.Settings

@@ -201,18 +201,26 @@ func initServices(about types.About) {
 }
 
 func initRoutes(about types.About) {
-	// docapi:title Vertex
-	// docapi:description A platform to manage your self-hosted server.
-	// docapi:version 0.0.0
+	// docapi title Vertex
+	// docapi description A platform to manage your self-hosted server.
+	// docapi version 0.0.0
 
-	// docapi:code 200 Success.
-	// docapi:code 201 Created.
-	// docapi:code 204 No content.
-	// docapi:code 400 {Error} Bad request.
-	// docapi:code 404 {Error} Resource not found.
-	// docapi:code 409 {Error} Conflict.
-	// docapi:code 422 {Error} Unprocessable entity.
-	// docapi:code 500 {Error} Internal error.
+	// docapi url v http://{ip}:{port}/api
+	// docapi urlvar v ip localhost The IP address of the server.
+	// docapi urlvar v port 6130 The port of the server.
+
+	// docapi url k http://{ip}:{port-kernel}/api
+	// docapi urlvar k ip localhost The IP address of the kernel.
+	// docapi urlvar k port 6131 The port of the server.
+
+	// docapi code 200 Success.
+	// docapi code 201 Created.
+	// docapi code 204 No content.
+	// docapi code 400 {Error} Bad request.
+	// docapi code 404 {Error} Resource not found.
+	// docapi code 409 {Error} Conflict.
+	// docapi code 422 {Error} Unprocessable entity.
+	// docapi code 500 {Error} Internal error.
 
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, router.Error{
@@ -235,35 +243,35 @@ func initRoutes(about types.About) {
 
 	appsHandler := handler.NewAppsHandler(appsService)
 	apps := api.Group("/apps")
-	// docapi:route /apps get_apps
+	// docapi:v route /apps get_apps
 	apps.GET("", appsHandler.Get)
 
 	hardwareHandler := handler.NewHardwareHandler(hardwareService)
 	hardware := api.Group("/hardware")
-	// docapi:route /hardware get_hardware
+	// docapi:v route /hardware get_hardware
 	hardware.GET("", hardwareHandler.Get)
 
 	updateHandler := handler.NewUpdateHandler(updateService, settingsService)
 	update := api.Group("/update")
-	// docapi:route /update get_updates
+	// docapi:v route /update get_updates
 	update.GET("", updateHandler.Get)
-	// docapi:route /update install_update
+	// docapi:v route /update install_update
 	update.POST("", updateHandler.Install)
 
 	settingsHandler := handler.NewSettingsHandler(settingsService)
 	settings := api.Group("/settings")
-	// docapi:route /settings get_settings
+	// docapi:v route /settings get_settings
 	settings.GET("", settingsHandler.Get)
-	// docapi:route /settings patch_settings
+	// docapi:v route /settings patch_settings
 	settings.PATCH("", settingsHandler.Patch)
 
 	sshHandler := handler.NewSshHandler(sshService)
 	ssh := api.Group("/security/ssh")
-	// docapi:route /security/ssh get_ssh_keys
+	// docapi:v route /security/ssh get_ssh_keys
 	ssh.GET("", sshHandler.Get)
-	// docapi:route /security/ssh add_ssh_key
+	// docapi:v route /security/ssh add_ssh_key
 	ssh.POST("", sshHandler.Add)
-	// docapi:route /security/ssh/{fingerprint} delete_ssh_key
+	// docapi:v route /security/ssh/{fingerprint} delete_ssh_key
 	ssh.DELETE("/:fingerprint", sshHandler.Delete)
 }
 

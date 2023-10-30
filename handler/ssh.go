@@ -22,13 +22,13 @@ func NewSshHandler(sshService port.SshService) port.SshHandler {
 	}
 }
 
-// docapi:begin get_ssh_keys
-// docapi:method GET
-// docapi:summary Get all SSH keys.
-// docapi:tags ssh
-// docapi:response 200 {[]PublicKey} The list of SSH keys.
-// docapi:response 500
-// docapi:end
+// docapi begin get_ssh_keys
+// docapi method GET
+// docapi summary Get all SSH keys.
+// docapi tags ssh
+// docapi response 200 {[]PublicKey} The list of SSH keys.
+// docapi response 500
+// docapi end
 
 func (h *SshHandler) Get(c *router.Context) {
 	keys, err := h.sshService.GetAll()
@@ -48,15 +48,15 @@ type AddSSHKeyBody struct {
 	AuthorizedKey string `json:"authorized_key"`
 }
 
-// docapi:begin add_ssh_key
-// docapi:method POST
-// docapi:summary Add an SSH key.
-// docapi:tags ssh
-// docapi:body {AddSSHKeyBody} The SSH key to add.
-// docapi:response 201
-// docapi:response 400
-// docapi:response 500
-// docapi:end
+// docapi begin add_ssh_key
+// docapi method POST
+// docapi summary Add an SSH key.
+// docapi tags ssh
+// docapi body {AddSSHKeyBody} The SSH key to add.
+// docapi response 201
+// docapi response 400
+// docapi response 500
+// docapi end
 
 func (h *SshHandler) Add(c *router.Context) {
 	var body AddSSHKeyBody
@@ -85,15 +85,15 @@ func (h *SshHandler) Add(c *router.Context) {
 	c.Status(http.StatusCreated)
 }
 
-// docapi:begin delete_ssh_key
-// docapi:method DELETE
-// docapi:summary Delete an SSH key.
-// docapi:tags ssh
-// docapi:query fingerprint {string} The fingerprint of the SSH key to delete.
-// docapi:response 204
-// docapi:response 400
-// docapi:response 500
-// docapi:end
+// docapi begin delete_ssh_key
+// docapi method DELETE
+// docapi summary Delete an SSH key.
+// docapi tags ssh
+// docapi query fingerprint {string} The fingerprint of the SSH key to delete.
+// docapi response 204
+// docapi response 400
+// docapi response 500
+// docapi end
 
 func (h *SshHandler) Delete(c *router.Context) {
 	fingerprint := c.Param("fingerprint")

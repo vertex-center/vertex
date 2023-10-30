@@ -21,13 +21,13 @@ func NewUpdateHandler(updateService port.UpdateService, settingsService port.Set
 	}
 }
 
-// docapi:begin get_updates
-// docapi:method GET
-// docapi:summary Get the latest version information.
-// docapi:tags updates
-// docapi:response 200 {Update} The latest version information.
-// docapi:response 500
-// docapi:end
+// docapi begin get_updates
+// docapi method GET
+// docapi summary Get the latest version information.
+// docapi tags updates
+// docapi response 200 {Update} The latest version information.
+// docapi response 500
+// docapi end
 
 func (h *UpdateHandler) Get(c *router.Context) {
 	channel := h.settingsService.GetChannel()
@@ -52,14 +52,14 @@ func (h *UpdateHandler) Get(c *router.Context) {
 	c.JSON(update)
 }
 
-// docapi:begin install_update
-// docapi:method POST
-// docapi:summary Install the latest version.
-// docapi:tags updates
-// docapi:response 204
-// docapi:response 400
-// docapi:response 500
-// docapi:end
+// docapi begin install_update
+// docapi method POST
+// docapi summary Install the latest version.
+// docapi tags updates
+// docapi response 204
+// docapi response 400
+// docapi response 500
+// docapi end
 
 func (h *UpdateHandler) Install(c *router.Context) {
 	channel := h.settingsService.GetChannel()
