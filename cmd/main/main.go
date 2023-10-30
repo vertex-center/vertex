@@ -201,17 +201,14 @@ func initServices(about types.About) {
 }
 
 func initRoutes(about types.About) {
-	// docapi title Vertex
-	// docapi description A platform to manage your self-hosted server.
-	// docapi version 0.0.0
+	// docapi:v title Vertex
+	// docapi:v description A platform to manage your self-hosted server.
+	// docapi:v version 0.0.0
+	// docapi:v filename vertex
 
-	// docapi url v http://{ip}:{port}/api
-	// docapi urlvar v ip localhost The IP address of the server.
-	// docapi urlvar v port 6130 The port of the server.
-
-	// docapi url k http://{ip}:{port-kernel}/api
-	// docapi urlvar k ip localhost The IP address of the kernel.
-	// docapi urlvar k port 6131 The port of the server.
+	// docapi:v url http://{ip}:{port}/api
+	// docapi:v urlvar ip localhost The IP address of the server.
+	// docapi:v urlvar port 6130 The port of the server.
 
 	// docapi code 200 Success.
 	// docapi code 201 Created.

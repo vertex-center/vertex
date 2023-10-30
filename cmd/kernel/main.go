@@ -203,12 +203,24 @@ func initServices() {
 }
 
 func initRoutes() {
+	// docapi:k title Vertex Kernel
+	// docapi:k description A platform to manage your self-hosted server.
+	// docapi:k version 0.0.0
+	// docapi:k filename kernel
+
+	// docapi:k url http://{ip}:{port-kernel}/api
+	// docapi:k urlvar ip localhost The IP address of the kernel.
+	// docapi:k urlvar port 6131 The port of the server.
+
 	api := r.Group("/api")
 
 	sshHandler := handler.NewSshKernelHandler(sshService)
 	ssh := api.Group("/security/ssh")
+	// docapi:k route /security/ssh get_ssh_keys_kernel
 	ssh.GET("", sshHandler.Get)
+	// docapi:k route /security/ssh add_ssh_key_kernel
 	ssh.POST("", sshHandler.Add)
+	// docapi:k route /security/ssh/{fingerprint} delete_ssh_key_kernel
 	ssh.DELETE("/:fingerprint", sshHandler.Delete)
 }
 
