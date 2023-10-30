@@ -240,6 +240,7 @@ func initRoutes(about types.About) {
 
 	hardwareHandler := handler.NewHardwareHandler(hardwareService)
 	hardware := api.Group("/hardware")
+	// docapi:route /hardware get_hardware
 	hardware.GET("", hardwareHandler.Get)
 
 	updateHandler := handler.NewUpdateHandler(updateService, settingsService)
