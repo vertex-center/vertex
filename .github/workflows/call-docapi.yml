@@ -23,5 +23,3 @@ jobs:
           -H "Authorization: Bearer ${{ secrets.token }}" \
           https://api.github.com/repos/vertex-center/openapi/dispatches \
           -d '{"event_type":"docapi","client_payload":{"ref":"${{ github.ref }}"}}'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
