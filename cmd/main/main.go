@@ -243,12 +243,16 @@ func initRoutes(about types.About) {
 
 	updateHandler := handler.NewUpdateHandler(updateService, settingsService)
 	update := api.Group("/update")
+	// docapi:route /update get_updates
 	update.GET("", updateHandler.Get)
+	// docapi:route /update install_update
 	update.POST("", updateHandler.Install)
 
 	settingsHandler := handler.NewSettingsHandler(settingsService)
 	settings := api.Group("/settings")
+	// docapi:route /settings get_settings
 	settings.GET("", settingsHandler.Get)
+	// docapi:route /settings patch_settings
 	settings.PATCH("", settingsHandler.Patch)
 
 	sshHandler := handler.NewSshHandler(sshService)
