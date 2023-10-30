@@ -12,7 +12,9 @@
     },
     "dependencies": {
         "@vertex-center/components": "^0.3.1",
+        "classnames": "^2.3.2",
         "react": "^18.2.0",
+        "react-cookie": "^6.1.1",
         "react-dom": "^18.2.0",
         "react-router-dom": "^6.17.0"
     },
@@ -25,6 +27,7 @@
         "eslint": "^8.45.0",
         "eslint-plugin-react-hooks": "^4.6.0",
         "eslint-plugin-react-refresh": "^0.4.3",
+        "sass": "^1.69.5",
         "typescript": "^5.0.2",
         "vite": "^4.4.5"
     }
