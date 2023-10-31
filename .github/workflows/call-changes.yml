@@ -26,9 +26,9 @@ jobs:
         id: changes
         with:
           filters: |
-            workflows:
+            workflows-changed:
               - '.github/workflows/**.yml'
-            go:
+            go-changed:
               - 'go.mod'
               - 'go.sum'
               - '**.go'
