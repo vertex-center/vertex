@@ -8,6 +8,7 @@ import {
     SelectOption,
 } from "./components/SelectField/SelectField";
 import { TextField } from "./components/TextField/TextField";
+import { Title } from "./components/Title/Title";
 
 import "./index.sass";
 
@@ -20,4 +21,5 @@ export {
     SelectField,
     SelectOption,
     TextField,
+    Title,
 };
