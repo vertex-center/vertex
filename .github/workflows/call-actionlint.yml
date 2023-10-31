@@ -1,0 +1,28 @@
+name: Run Workflow linter
+
+on:
+  workflow_call:
+
+jobs:
+  actionlint:
+    name: Run actionlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Check if workflow files changed
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            workflows:
+              - '.github/workflows/**.yml'
+
+      - name: Run workflow linter
+        if: steps.changes.outputs.workflows == 'true'
+        run: |
+          echo "::add-matcher::.github/actionlint-matcher.json"
+          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          ./actionlint -color
+        shell: bash

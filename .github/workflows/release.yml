@@ -10,13 +10,18 @@ permissions:
   contents: write
 
 jobs:
-  pre-checks:
-    name: Run pre-checks
-    uses: ./.github/workflows/call-pre-checks.yml
+  actionlint:
+    name: Run actionlint
+    uses: ./.github/workflows/call-actionlint.yml
+
+  all-go-tests:
+    name: Run All Go Tests
+    needs: actionlint
+    uses: ./.github/workflows/call-all-go-tests.yml
 
   release:
     name: Release
-    needs: pre-checks
+    needs: all-go-tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -44,7 +49,7 @@ jobs:
 
   release-docker:
     name: Release Docker images
-    needs: pre-checks
+    needs: all-go-tests
     runs-on: ubuntu-latest
     permissions:
       contents: read

@@ -1,0 +1,34 @@
+name: Check changes
+
+on:
+  workflow_call:
+    outputs:
+      workflows-changed:
+        description: 'Workflows modified'
+        value: ${{ jobs.changes.outputs.workflows-changed }}
+      go-changed:
+        description: 'Go files modified'
+        value: ${{ jobs.changes.outputs.go-changed }}
+
+jobs:
+  changes:
+    name: Changes
+    runs-on: ubuntu-latest
+    outputs:
+      workflows-changed: ${{ steps.changes.outputs.workflows-changed }}
+      go-changed: ${{ steps.changes.outputs.go-changed }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Check if workflow files changed
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            workflows:
+              - '.github/workflows/**.yml'
+            go:
+              - 'go.mod'
+              - 'go.sum'
+              - '**.go'

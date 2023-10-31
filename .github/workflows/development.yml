@@ -15,13 +15,26 @@ permissions:
   contents: write
 
 jobs:
+  changes:
+    name: Check for changes
+    uses: ./.github/workflows/call-changes.yml
+
+  actionlint:
+    name: Run actionlint
+    needs: changes
+    if: needs.changes.outputs.workflows-changed == 'true'
+    uses: ./.github/workflows/call-actionlint.yml
+
   pre-checks:
     name: Run pre-checks
-    uses: ./.github/workflows/call-pre-checks.yml
+    needs: changes
+    if: needs.changes.outputs.go-changed == 'true'
+    uses: ./.github/workflows/call-all-go-tests.yml
 
   trigger-docapi:
     name: Trigger DocAPI Generation
-    if: github.ref == 'refs/heads/dev'
+    needs: changes
+    if: github.ref == 'refs/heads/dev' && needs.changes.outputs.go-changed == 'true'
     uses: ./.github/workflows/call-docapi.yml
     secrets:
       token: ${{ secrets.PAT }}
