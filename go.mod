@@ -20,7 +20,7 @@ require (
 	github.com/google/uuid v1.4.0
 	github.com/h2non/gock v1.2.0
 	github.com/prometheus/client_golang v1.17.0
-	github.com/shirou/gopsutil/v3 v3.23.9
+	github.com/shirou/gopsutil/v3 v3.23.10
 	github.com/stretchr/testify v1.8.4
 	github.com/vertex-center/vlog v1.0.2
 	golang.org/x/crypto v0.14.0
