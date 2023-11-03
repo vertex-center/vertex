@@ -10,6 +10,10 @@ type (
 		All() []app.Meta
 	}
 
+	DebugService interface {
+		HardReset()
+	}
+
 	HardwareService interface {
 		Get() types.Hardware
 	}

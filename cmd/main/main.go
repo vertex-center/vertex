@@ -54,6 +54,7 @@ var (
 	baselinesApiAdapter port.BaselinesAdapter
 
 	appsService          port.AppsService
+	debugService         port.DebugService
 	notificationsService service.NotificationsService
 	hardwareService      port.HardwareService
 	settingsService      port.SettingsService
@@ -191,6 +192,7 @@ func initServices(about types.About) {
 			serviceeditor.NewApp(),
 		},
 	)
+	debugService = service.NewDebugService(ctx)
 	notificationsService = service.NewNotificationsService(ctx, settingsFSAdapter)
 	settingsService = service.NewSettingsService(settingsFSAdapter)
 	//services.NewSetupService(r.ctx)
@@ -230,10 +232,10 @@ func initRoutes(about types.About) {
 	})
 
 	if config.Current.Debug() {
-		api.POST("/hard-reset", func(c *router.Context) {
-			ctx.DispatchEvent(types.EventServerHardReset{})
-			c.OK()
-		})
+		debugHandler := handler.NewDebugHandler(debugService)
+		debug := api.Group("/debug")
+		// docapi:v route /hard-reset hard_reset
+		debug.POST("/hard-reset", debugHandler.HardReset)
 	}
 
 	appsHandler := handler.NewAppsHandler(appsService)
