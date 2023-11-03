@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/pkg/event"
 )
 
 type Context struct {
@@ -14,11 +15,11 @@ func NewContext(vertexCtx *types.VertexContext) *Context {
 	}
 }
 
-func (ctx *Context) AddListener(listener types.Listener) {
+func (ctx *Context) AddListener(listener event.Listener) {
 	ctx.vertexCtx.AddListener(listener)
 }
 
-func (ctx *Context) RemoveListener(listener types.Listener) {
+func (ctx *Context) RemoveListener(listener event.Listener) {
 	ctx.vertexCtx.RemoveListener(listener)
 }
 

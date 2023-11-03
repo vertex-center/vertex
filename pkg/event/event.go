@@ -1,4 +1,4 @@
-package types
+package event
 
 import (
 	"github.com/google/uuid"
@@ -28,19 +28,3 @@ func (t TempListener) OnEvent(e interface{}) {
 func (t TempListener) GetUUID() uuid.UUID {
 	return t.uuid
 }
-
-type (
-	EventServerStart struct {
-		// PostMigrationCommands are commands that should be executed after the server has started.
-		// These are migration commands that cannot be executed before the server has started.
-		PostMigrationCommands []interface{}
-	}
-
-	EventAppReady struct {
-		AppID string
-	}
-
-	EventServerStop      struct{}
-	EventServerHardReset struct{}
-	EventVertexUpdated   struct{}
-)

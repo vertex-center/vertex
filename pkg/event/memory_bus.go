@@ -1,50 +1,41 @@
-package types
+package event
 
 import (
 	"errors"
 	"sync"
 
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 )
 
-type EventBus struct {
+type MemoryBus struct {
 	listeners      *map[uuid.UUID]Listener
 	listenersMutex *sync.RWMutex
 }
 
-func NewEventBus() *EventBus {
-	return &EventBus{
+func NewMemoryBus() *MemoryBus {
+	return &MemoryBus{
 		listeners:      &map[uuid.UUID]Listener{},
 		listenersMutex: &sync.RWMutex{},
 	}
 }
 
-func (b *EventBus) AddListener(l Listener) {
+func (b *MemoryBus) AddListener(l Listener) {
 	b.listenersMutex.Lock()
 	defer b.listenersMutex.Unlock()
 
 	(*b.listeners)[l.GetUUID()] = l
 }
 
-func (b *EventBus) RemoveListener(l Listener) {
+func (b *MemoryBus) RemoveListener(l Listener) {
 	b.listenersMutex.Lock()
 	defer b.listenersMutex.Unlock()
 
 	delete(*b.listeners, l.GetUUID())
 }
 
-func (b *EventBus) Send(e interface{}) {
-	if _, ok := e.(EventServerHardReset); ok {
-		if !config.Current.Debug() {
-			log.Warn("hard reset event received but skipped; this can be a malicious application, or you may have forgotten to switch to the development mode.")
-			return
-		}
-		log.Warn("hard reset event dispatched.")
-	}
-
+func (b *MemoryBus) DispatchEvent(e interface{}) {
 	// This code notifies all listeners.
 	// If some listeners are added while notifying, they will be
 	// notified in the next loop, until all listeners are notified.

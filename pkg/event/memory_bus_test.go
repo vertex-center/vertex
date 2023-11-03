@@ -1,4 +1,4 @@
-package types
+package event
 
 import (
 	"testing"
@@ -9,37 +9,37 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type EventInMemoryAdapterTestSuite struct {
+type MemoryBusTestSuite struct {
 	suite.Suite
 
-	adapter EventBus
+	bus MemoryBus
 }
 
 func TestEventInMemoryAdapterTestSuite(t *testing.T) {
-	suite.Run(t, new(EventInMemoryAdapterTestSuite))
+	suite.Run(t, new(MemoryBusTestSuite))
 }
 
-func (suite *EventInMemoryAdapterTestSuite) SetupSuite() {
-	suite.adapter = *NewEventBus()
+func (suite *MemoryBusTestSuite) SetupSuite() {
+	suite.bus = *NewMemoryBus()
 }
 
-func (suite *EventInMemoryAdapterTestSuite) TestEvents() {
+func (suite *MemoryBusTestSuite) TestEvents() {
 	listener := MockListener{
 		uuid: uuid.New(),
 	}
 
 	// Add a listener
-	suite.adapter.AddListener(&listener)
-	assert.Equal(suite.T(), 1, len(*suite.adapter.listeners))
+	suite.bus.AddListener(&listener)
+	assert.Equal(suite.T(), 1, len(*suite.bus.listeners))
 
 	// Fire event
 	listener.On("OnEvent").Return(nil)
-	suite.adapter.Send(MockEvent{})
+	suite.bus.DispatchEvent(MockEvent{})
 	listener.AssertCalled(suite.T(), "OnEvent")
 
 	// Remove listener
-	suite.adapter.RemoveListener(&listener)
-	assert.Equal(suite.T(), 0, len(*suite.adapter.listeners))
+	suite.bus.RemoveListener(&listener)
+	assert.Equal(suite.T(), 0, len(*suite.bus.listeners))
 }
 
 type MockEvent struct{}

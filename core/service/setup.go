@@ -7,6 +7,7 @@ import (
 
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	vtypes "github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/pkg/event"
 
 	"github.com/google/uuid"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
@@ -137,13 +138,13 @@ func (s *SetupService) startDatabase(inst *types.Container) error {
 	abortChan := make(chan bool)
 	defer close(abortChan)
 
-	l := vtypes.NewTempListener(func(e interface{}) {
-		switch event := e.(type) {
+	l := event.NewTempListener(func(e interface{}) {
+		switch e := e.(type) {
 		case types.EventContainerStatusChange:
-			if event.ContainerUUID != inst.UUID {
+			if e.ContainerUUID != inst.UUID {
 				return
 			}
-			eventsChan <- event
+			eventsChan <- e
 		}
 	})
 

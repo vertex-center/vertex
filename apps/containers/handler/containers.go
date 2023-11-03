@@ -5,8 +5,8 @@ import (
 
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	vtypes "github.com/vertex-center/vertex/core/types"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
+	vtypes "github.com/vertex-center/vertex/pkg/event"
 
 	"github.com/gin-contrib/sse"
 	"github.com/vertex-center/vertex/pkg/log"
