@@ -3,7 +3,6 @@ package adapter
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -27,11 +26,10 @@ func (suite *AvailableTestSuite) SetupSuite() {
 	}).(*ServiceFSAdapter)
 
 	err := suite.adapter.Reload()
-	assert.NoError(suite.T(), err)
-
-	assert.NotZero(suite.T(), len(suite.adapter.services))
+	suite.NoError(err)
+	suite.NotZero(len(suite.adapter.services))
 }
 
 func (suite *AvailableTestSuite) TestGetAvailable() {
-	assert.Equal(suite.T(), 1, len(suite.adapter.GetAll()))
+	suite.Equal(1, len(suite.adapter.GetAll()))
 }
