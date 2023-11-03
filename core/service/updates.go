@@ -151,7 +151,7 @@ func (s *UpdateService) OnEvent(e event.Event) {
 
 		err = config.Current.Apply()
 		if err != nil {
-			log.Error(fmt.Errorf("failed to apply the current configuration: %v", err))
+			log.Error(fmt.Errorf("failed to apply the current configuration: %w", err))
 			os.Exit(1)
 		}
 	}

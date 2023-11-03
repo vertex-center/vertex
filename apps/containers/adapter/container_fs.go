@@ -59,7 +59,7 @@ func (a *ContainerFSAdapter) GetPath(uuid uuid.UUID) string {
 func (a *ContainerFSAdapter) Create(uuid uuid.UUID) error {
 	err := os.MkdirAll(a.GetPath(uuid), os.ModePerm)
 	if err != nil {
-		return fmt.Errorf("failed to create server: %v", err)
+		return fmt.Errorf("failed to create server: %w", err)
 	}
 	return nil
 }
@@ -67,7 +67,7 @@ func (a *ContainerFSAdapter) Create(uuid uuid.UUID) error {
 func (a *ContainerFSAdapter) Delete(uuid uuid.UUID) error {
 	err := os.RemoveAll(a.GetPath(uuid))
 	if err != nil {
-		return fmt.Errorf("failed to delete server: %v", err)
+		return fmt.Errorf("failed to delete server: %w", err)
 	}
 	return nil
 }

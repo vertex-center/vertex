@@ -98,7 +98,7 @@ func Untar(src string, dest string) error {
 
 	for {
 		header, err := reader.Next()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 

@@ -36,7 +36,7 @@ func NewServiceFSAdapter(params *ServiceFSAdapterParams) port.ServiceAdapter {
 	}
 	err := adapter.Reload()
 	if err != nil {
-		log.Error(fmt.Errorf("failed to reload services: %v", err))
+		log.Error(fmt.Errorf("failed to reload services: %w", err))
 	}
 	return adapter
 }
