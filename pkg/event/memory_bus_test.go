@@ -14,7 +14,7 @@ type MemoryBusTestSuite struct {
 	bus MemoryBus
 }
 
-func TestEventInMemoryAdapterTestSuite(t *testing.T) {
+func TestMemoryBusTestSuite(t *testing.T) {
 	suite.Run(t, new(MemoryBusTestSuite))
 }
 
