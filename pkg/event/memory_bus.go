@@ -10,25 +10,25 @@ import (
 )
 
 type MemoryBus struct {
-	listeners      *map[uuid.UUID]EventListener
+	listeners      *map[uuid.UUID]Listener
 	listenersMutex *sync.RWMutex
 }
 
 func NewMemoryBus() *MemoryBus {
 	return &MemoryBus{
-		listeners:      &map[uuid.UUID]EventListener{},
+		listeners:      &map[uuid.UUID]Listener{},
 		listenersMutex: &sync.RWMutex{},
 	}
 }
 
-func (b *MemoryBus) AddListener(l EventListener) {
+func (b *MemoryBus) AddListener(l Listener) {
 	b.listenersMutex.Lock()
 	defer b.listenersMutex.Unlock()
 
 	(*b.listeners)[l.GetUUID()] = l
 }
 
-func (b *MemoryBus) RemoveListener(l EventListener) {
+func (b *MemoryBus) RemoveListener(l Listener) {
 	b.listenersMutex.Lock()
 	defer b.listenersMutex.Unlock()
 
@@ -40,11 +40,11 @@ func (b *MemoryBus) DispatchEvent(e Event) {
 	// If some listeners are added while notifying, they will be
 	// notified in the next loop, until all listeners are notified.
 
-	notified := map[uuid.UUID]EventListener{}
+	notified := map[uuid.UUID]Listener{}
 	tryCount := 0
 	for {
 		b.listenersMutex.RLock()
-		var toNotify []EventListener
+		var toNotify []Listener
 		for _, l := range *b.listeners {
 			if _, ok := notified[l.GetUUID()]; ok {
 				// already notified

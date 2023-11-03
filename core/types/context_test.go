@@ -41,7 +41,7 @@ func (suite *VertexContextTestSuite) TestDispatchHardReset() {
 
 func (suite *VertexContextTestSuite) TestAddListener() {
 	bus := &event.MockBus{}
-	bus.AddListenerFunc = func(l event.EventListener) {}
+	bus.AddListenerFunc = func(l event.Listener) {}
 	suite.context.bus = bus
 
 	suite.context.AddListener(&event.MockListener{})
@@ -50,7 +50,7 @@ func (suite *VertexContextTestSuite) TestAddListener() {
 
 func (suite *VertexContextTestSuite) TestRemoveListener() {
 	bus := &event.MockBus{}
-	bus.RemoveListenerFunc = func(l event.EventListener) {}
+	bus.RemoveListenerFunc = func(l event.Listener) {}
 	suite.context.bus = bus
 
 	listener := &event.MockListener{}

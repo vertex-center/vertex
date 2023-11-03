@@ -15,11 +15,11 @@ func NewContext(vertexCtx *types.VertexContext) *Context {
 	}
 }
 
-func (ctx *Context) AddListener(listener event.EventListener) {
+func (ctx *Context) AddListener(listener event.Listener) {
 	ctx.vertexCtx.AddListener(listener)
 }
 
-func (ctx *Context) RemoveListener(listener event.EventListener) {
+func (ctx *Context) RemoveListener(listener event.Listener) {
 	ctx.vertexCtx.RemoveListener(listener)
 }
 

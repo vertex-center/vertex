@@ -7,7 +7,7 @@ import (
 )
 
 type VertexContext struct {
-	bus event.EventBus
+	bus event.Bus
 }
 
 func NewVertexContext() *VertexContext {
@@ -28,10 +28,10 @@ func (c *VertexContext) DispatchEvent(e event.Event) {
 	c.bus.DispatchEvent(e)
 }
 
-func (c *VertexContext) AddListener(l event.EventListener) {
+func (c *VertexContext) AddListener(l event.Listener) {
 	c.bus.AddListener(l)
 }
 
-func (c *VertexContext) RemoveListener(l event.EventListener) {
+func (c *VertexContext) RemoveListener(l event.Listener) {
 	c.bus.RemoveListener(l)
 }

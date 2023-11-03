@@ -4,7 +4,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type EventListener interface {
+type Listener interface {
 	OnEvent(e Event)
 	GetUUID() uuid.UUID
 }
