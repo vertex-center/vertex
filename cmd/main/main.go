@@ -234,7 +234,7 @@ func initRoutes(about types.About) {
 	if config.Current.Debug() {
 		debugHandler := handler.NewDebugHandler(debugService)
 		debug := api.Group("/debug")
-		// docapi:v route /hard-reset hard_reset
+		// docapi:v route /debug/hard-reset hard_reset
 		debug.POST("/hard-reset", debugHandler.HardReset)
 	}
 

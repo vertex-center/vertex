@@ -17,9 +17,9 @@ func NewDebugHandler(debugService port.DebugService) port.DebugHandler {
 
 // docapi begin hard_reset
 // docapi method POST
-// docapi summary Hard reset.
+// docapi summary Hard reset the Vertex server.
 // docapi tags debug
-// docapi response 200
+// docapi response 204
 // docapi end
 
 func (h *DebugHandler) HardReset(c *router.Context) {
