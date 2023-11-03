@@ -5,46 +5,47 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/pkg/event/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 )
 
 type MemoryBus struct {
-	listeners      *map[uuid.UUID]Listener
+	listeners      *map[uuid.UUID]types.EventListener
 	listenersMutex *sync.RWMutex
 }
 
 func NewMemoryBus() *MemoryBus {
 	return &MemoryBus{
-		listeners:      &map[uuid.UUID]Listener{},
+		listeners:      &map[uuid.UUID]types.EventListener{},
 		listenersMutex: &sync.RWMutex{},
 	}
 }
 
-func (b *MemoryBus) AddListener(l Listener) {
+func (b *MemoryBus) AddListener(l types.EventListener) {
 	b.listenersMutex.Lock()
 	defer b.listenersMutex.Unlock()
 
 	(*b.listeners)[l.GetUUID()] = l
 }
 
-func (b *MemoryBus) RemoveListener(l Listener) {
+func (b *MemoryBus) RemoveListener(l types.EventListener) {
 	b.listenersMutex.Lock()
 	defer b.listenersMutex.Unlock()
 
 	delete(*b.listeners, l.GetUUID())
 }
 
-func (b *MemoryBus) DispatchEvent(e Event) {
+func (b *MemoryBus) DispatchEvent(e types.Event) {
 	// This code notifies all listeners.
 	// If some listeners are added while notifying, they will be
 	// notified in the next loop, until all listeners are notified.
 
-	notified := map[uuid.UUID]Listener{}
+	notified := map[uuid.UUID]types.EventListener{}
 	tryCount := 0
 	for {
 		b.listenersMutex.RLock()
-		var toNotify []Listener
+		var toNotify []types.EventListener
 		for _, l := range *b.listeners {
 			if _, ok := notified[l.GetUUID()]; ok {
 				// already notified

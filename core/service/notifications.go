@@ -7,7 +7,7 @@ import (
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
-	"github.com/vertex-center/vertex/pkg/event"
+	evtypes "github.com/vertex-center/vertex/pkg/event/types"
 )
 
 // TODO: Move webhooks use to a Discord adapter
@@ -52,7 +52,7 @@ func (s *NotificationsService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *NotificationsService) OnEvent(e event.Event) {
+func (s *NotificationsService) OnEvent(e evtypes.Event) {
 	switch e := e.(type) {
 	case containerstypes.EventContainerStatusChange:
 		if e.Status == containerstypes.ContainerStatusOff || e.Status == containerstypes.ContainerStatusError || e.Status == containerstypes.ContainerStatusRunning {

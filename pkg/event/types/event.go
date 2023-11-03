@@ -1,3 +1,3 @@
-package event
+package types
 
 type Event interface{}

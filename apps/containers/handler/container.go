@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/gin-contrib/sse"
+	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/service"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/event"
-
-	"github.com/gin-contrib/sse"
-	"github.com/google/uuid"
+	evtypes "github.com/vertex-center/vertex/pkg/event/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 )
@@ -341,7 +341,7 @@ func (h *ContainerHandler) Events(c *router.Context) {
 
 	done := c.Request.Context().Done()
 
-	listener := event.NewTempListener(func(e event.Event) {
+	listener := event.NewTempListener(func(e evtypes.Event) {
 		switch e := e.(type) {
 		case types.EventContainerLog:
 			if inst.UUID != e.ContainerUUID {

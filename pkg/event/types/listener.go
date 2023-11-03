@@ -1,10 +1,10 @@
-package event
+package types
 
 import (
 	"github.com/google/uuid"
 )
 
-type Listener interface {
+type EventListener interface {
 	OnEvent(e Event)
 	GetUUID() uuid.UUID
 }

@@ -3,11 +3,12 @@ package types
 import (
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/event"
+	"github.com/vertex-center/vertex/pkg/event/types"
 	"github.com/vertex-center/vertex/pkg/log"
 )
 
 type VertexContext struct {
-	bus *event.MemoryBus
+	bus types.EventBus
 }
 
 func NewVertexContext() *VertexContext {
@@ -28,10 +29,10 @@ func (c *VertexContext) DispatchEvent(e interface{}) {
 	c.bus.DispatchEvent(e)
 }
 
-func (c *VertexContext) AddListener(l event.Listener) {
+func (c *VertexContext) AddListener(l types.EventListener) {
 	c.bus.AddListener(l)
 }
 
-func (c *VertexContext) RemoveListener(l event.Listener) {
+func (c *VertexContext) RemoveListener(l types.EventListener) {
 	c.bus.RemoveListener(l)
 }

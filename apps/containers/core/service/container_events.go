@@ -4,7 +4,7 @@ import (
 	"github.com/google/uuid"
 	vtypes "github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/migration"
-	"github.com/vertex-center/vertex/pkg/event"
+	"github.com/vertex-center/vertex/pkg/event/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 )
@@ -13,7 +13,7 @@ func (s *ContainerService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *ContainerService) OnEvent(e event.Event) {
+func (s *ContainerService) OnEvent(e types.Event) {
 	switch e := e.(type) {
 	case vtypes.EventServerStart:
 		go func() {
