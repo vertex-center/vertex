@@ -5,8 +5,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
-	"github.com/vertex-center/vertex/pkg/event/mock"
-	"github.com/vertex-center/vertex/pkg/event/types"
 )
 
 type MemoryBusTestSuite struct {
@@ -27,10 +25,10 @@ func (suite *MemoryBusTestSuite) TestEvents() {
 	id := uuid.New()
 
 	called := false
-	listener := &mock.EventListener{}
-	listener.OnEventFunc = func(e types.Event) {
+	listener := &MockListener{}
+	listener.OnEventFunc = func(e Event) {
 		switch e.(type) {
-		case mock.Event:
+		case MockEvent:
 			called = true
 		}
 	}
@@ -43,7 +41,7 @@ func (suite *MemoryBusTestSuite) TestEvents() {
 	suite.Equal(1, len(*suite.bus.listeners))
 
 	// Fire event
-	suite.bus.DispatchEvent(mock.Event{})
+	suite.bus.DispatchEvent(MockEvent{})
 	suite.Equal(1, listener.OnEventCalls)
 	suite.True(called)
 

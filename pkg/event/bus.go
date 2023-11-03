@@ -1,4 +1,4 @@
-package types
+package event
 
 // EventBus is the interface that must be implemented by an event bus.
 type EventBus interface {

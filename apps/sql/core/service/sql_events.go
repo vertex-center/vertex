@@ -3,14 +3,14 @@ package service
 import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	evtypes "github.com/vertex-center/vertex/pkg/event/types"
+	"github.com/vertex-center/vertex/pkg/event"
 )
 
 func (s *SqlService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *SqlService) OnEvent(e evtypes.Event) {
+func (s *SqlService) OnEvent(e event.Event) {
 	switch e := e.(type) {
 	case types.EventContainerStatusChange:
 		if e.Status == types.ContainerStatusRunning {

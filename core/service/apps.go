@@ -7,7 +7,7 @@ import (
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
-	evtypes "github.com/vertex-center/vertex/pkg/event/types"
+	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vlog"
@@ -39,7 +39,7 @@ func (s *AppsService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *AppsService) OnEvent(e evtypes.Event) {
+func (s *AppsService) OnEvent(e event.Event) {
 	switch e.(type) {
 	case types.EventServerStart:
 		s.StartApps()

@@ -6,7 +6,7 @@ import (
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
-	evtypes "github.com/vertex-center/vertex/pkg/event/types"
+	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 )
@@ -45,7 +45,7 @@ func (s *MetricsService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *MetricsService) OnEvent(e evtypes.Event) {
+func (s *MetricsService) OnEvent(e event.Event) {
 	switch e := e.(type) {
 	case types.EventRegisterMetrics:
 		log.Info("registering metrics", vlog.Int("count", len(e.Metrics)))

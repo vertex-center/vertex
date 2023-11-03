@@ -5,8 +5,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
-	"github.com/vertex-center/vertex/pkg/event/mock"
-	"github.com/vertex-center/vertex/pkg/event/types"
 )
 
 type TempListenerTestSuite struct {
@@ -19,19 +17,19 @@ func TestTempListenerTestSuite(t *testing.T) {
 
 func (suite *TempListenerTestSuite) TestOnEvent() {
 	called := false
-	listener := NewTempListener(func(e types.Event) {
+	listener := NewTempListener(func(e Event) {
 		switch e.(type) {
-		case mock.Event:
+		case MockEvent:
 			called = true
 		}
 	})
 	listener.OnEvent(struct{}{})
 	suite.False(called)
-	listener.OnEvent(mock.Event{})
+	listener.OnEvent(MockEvent{})
 	suite.True(called)
 }
 
 func (suite *TempListenerTestSuite) TestGetUUID() {
-	listener := NewTempListener(func(e types.Event) {})
+	listener := NewTempListener(func(e Event) {})
 	suite.NotEqual(uuid.Nil, listener.GetUUID())
 }

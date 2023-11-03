@@ -8,7 +8,6 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/event"
-	evtypes "github.com/vertex-center/vertex/pkg/event/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 )
@@ -72,7 +71,7 @@ func (h *ContainersHandler) Events(c *router.Context) {
 
 	done := c.Request.Context().Done()
 
-	listener := event.NewTempListener(func(e evtypes.Event) {
+	listener := event.NewTempListener(func(e event.Event) {
 		switch e.(type) {
 		case types.EventContainersChange:
 			eventsChan <- sse.Event{

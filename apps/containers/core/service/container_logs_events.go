@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	evtypes "github.com/vertex-center/vertex/pkg/event/types"
+	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 )
@@ -14,7 +14,7 @@ func (s *ContainerLogsService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *ContainerLogsService) OnEvent(e evtypes.Event) {
+func (s *ContainerLogsService) OnEvent(e event.Event) {
 	switch e := e.(type) {
 	case types.EventContainerLog:
 		s.onLogReceived(e)

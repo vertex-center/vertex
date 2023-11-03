@@ -11,7 +11,6 @@ import (
 	sqlapi "github.com/vertex-center/vertex/apps/sql/api"
 	vtypes "github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/event"
-	evtypes "github.com/vertex-center/vertex/pkg/event/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 )
@@ -34,7 +33,7 @@ func NewSetupService(ctx *vtypes.VertexContext) *SetupService {
 	return s
 }
 
-func (s *SetupService) OnEvent(e evtypes.Event) {
+func (s *SetupService) OnEvent(e event.Event) {
 	switch e := e.(type) {
 	case vtypes.EventAppReady:
 		// TODO: The SQL app should also be ready!
@@ -138,7 +137,7 @@ func (s *SetupService) startDatabase(inst *types.Container) error {
 	abortChan := make(chan bool)
 	defer close(abortChan)
 
-	l := event.NewTempListener(func(e evtypes.Event) {
+	l := event.NewTempListener(func(e event.Event) {
 		switch e := e.(type) {
 		case types.EventContainerStatusChange:
 			if e.ContainerUUID != inst.UUID {
