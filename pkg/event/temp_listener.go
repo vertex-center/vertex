@@ -1,13 +1,6 @@
 package event
 
-import (
-	"github.com/google/uuid"
-)
-
-type Listener interface {
-	OnEvent(e interface{})
-	GetUUID() uuid.UUID
-}
+import "github.com/google/uuid"
 
 type TempListener struct {
 	uuid    uuid.UUID

@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -24,8 +23,18 @@ func (suite *MemoryBusTestSuite) SetupSuite() {
 }
 
 func (suite *MemoryBusTestSuite) TestEvents() {
-	listener := MockListener{
-		uuid: uuid.New(),
+	id := uuid.New()
+
+	called := false
+	listener := MockListener{}
+	listener.OnEventFunc = func(e interface{}) {
+		switch e.(type) {
+		case MockEvent:
+			called = true
+		}
+	}
+	listener.GetUUIDFunc = func() uuid.UUID {
+		return id
 	}
 
 	// Add a listener
@@ -33,9 +42,9 @@ func (suite *MemoryBusTestSuite) TestEvents() {
 	assert.Equal(suite.T(), 1, len(*suite.bus.listeners))
 
 	// Fire event
-	listener.On("OnEvent").Return(nil)
 	suite.bus.DispatchEvent(MockEvent{})
-	listener.AssertCalled(suite.T(), "OnEvent")
+	assert.Equal(suite.T(), 1, listener.OnEventCalls)
+	assert.True(suite.T(), called)
 
 	// Remove listener
 	suite.bus.RemoveListener(&listener)
@@ -43,20 +52,3 @@ func (suite *MemoryBusTestSuite) TestEvents() {
 }
 
 type MockEvent struct{}
-
-type MockListener struct {
-	mock.Mock
-
-	uuid uuid.UUID
-}
-
-func (m *MockListener) OnEvent(e interface{}) {
-	switch e.(type) {
-	case MockEvent:
-		m.Called()
-	}
-}
-
-func (m *MockListener) GetUUID() uuid.UUID {
-	return m.uuid
-}
