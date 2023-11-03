@@ -35,8 +35,7 @@ jobs:
 
       - name: Run test coverage
         run: |
-          go test -coverprofile=coverage-full.out ./...
-          cat coverage-full.out | grep -v "_mock.go" > coverage.out
+          go test -coverprofile=coverage.out ./...
 
       - name: Run test json
         run: go test -json ./... > report.json
