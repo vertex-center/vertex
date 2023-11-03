@@ -136,7 +136,7 @@ func (a DockerCliAdapter) WaitContainer(id string, cond types.WaitContainerCondi
 func (a DockerCliAdapter) InfoImage(id string) (types.InfoImageResponse, error) {
 	info, _, err := a.cli.ImageInspectWithRaw(context.Background(), id)
 	if err != nil {
-		return types.InfoImageResponse{}, nil
+		return types.InfoImageResponse{}, err
 	}
 	return types.InfoImageResponse{
 		ID:           info.ID,
