@@ -13,17 +13,17 @@ type EventBus struct {
 	DispatchEventCalls  int
 }
 
-func (m EventBus) AddListener(l types.EventListener) {
+func (m *EventBus) AddListener(l types.EventListener) {
 	m.AddListenerCalls++
 	m.AddListenerFunc(l)
 }
 
-func (m EventBus) RemoveListener(l types.EventListener) {
+func (m *EventBus) RemoveListener(l types.EventListener) {
 	m.RemoveListenerCalls++
 	m.RemoveListenerFunc(l)
 }
 
-func (m EventBus) DispatchEvent(e types.Event) {
+func (m *EventBus) DispatchEvent(e types.Event) {
 	m.DispatchEventCalls++
 	m.DispatchEventFunc(e)
 }
