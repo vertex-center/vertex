@@ -33,12 +33,9 @@ jobs:
         with:
           go-version: '1.21'
 
-      - name: Run test coverage
+      - name: Run test with coverage
         run: |
-          go test -coverprofile=coverage.out ./...
-
-      - name: Run test json
-        run: go test -json ./... > report.json
+          go test -coverprofile=coverage.out -json ./... > report.json
 
       - name: Run Scan (Push)
         if: github.event_name == 'push'
