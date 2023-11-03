@@ -33,8 +33,8 @@ func (suite *SshKernelApiAdapterTestSuite) TestGetAll() {
 		JSON([]types.PublicKey{})
 
 	keys, err := suite.adapter.GetAll()
-	suite.NoError(err)
-	suite.Len(keys, 0)
+	suite.Require().NoError(err)
+	suite.Empty(keys)
 }
 
 func (suite *SshKernelApiAdapterTestSuite) TestAdd() {
@@ -44,7 +44,7 @@ func (suite *SshKernelApiAdapterTestSuite) TestAdd() {
 		Reply(http.StatusOK)
 
 	err := suite.adapter.Add("key")
-	suite.NoError(err)
+	suite.Require().NoError(err)
 }
 
 func (suite *SshKernelApiAdapterTestSuite) TestDelete() {
@@ -54,5 +54,5 @@ func (suite *SshKernelApiAdapterTestSuite) TestDelete() {
 		Reply(http.StatusOK)
 
 	err := suite.adapter.Remove("fingerprint")
-	suite.NoError(err)
+	suite.Require().NoError(err)
 }

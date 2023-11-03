@@ -32,7 +32,7 @@ func (suite *DockerKernelServiceTestSuite) TestListContainers() {
 
 	containers, err := suite.service.ListContainers()
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Equal([]types.DockerContainer{}, containers)
 	suite.adapter.AssertExpectations(suite.T())
 }
@@ -42,7 +42,7 @@ func (suite *DockerKernelServiceTestSuite) TestDeleteContainer() {
 
 	err := suite.service.DeleteContainer("")
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.adapter.AssertExpectations(suite.T())
 }
 
@@ -51,7 +51,7 @@ func (suite *DockerKernelServiceTestSuite) TestCreateContainer() {
 
 	cont, err := suite.service.CreateContainer(types.CreateContainerOptions{})
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Equal(types.CreateContainerResponse{}, cont)
 	suite.adapter.AssertExpectations(suite.T())
 }
@@ -61,7 +61,7 @@ func (suite *DockerKernelServiceTestSuite) TestStartContainer() {
 
 	err := suite.service.StartContainer("")
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.adapter.AssertExpectations(suite.T())
 }
 
@@ -70,7 +70,7 @@ func (suite *DockerKernelServiceTestSuite) TestStopContainer() {
 
 	err := suite.service.StopContainer("")
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.adapter.AssertExpectations(suite.T())
 }
 
@@ -79,7 +79,7 @@ func (suite *DockerKernelServiceTestSuite) TestInfoContainer() {
 
 	info, err := suite.service.InfoContainer("")
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Equal(types.InfoContainerResponse{}, info)
 	suite.adapter.AssertExpectations(suite.T())
 }
@@ -89,7 +89,7 @@ func (suite *DockerKernelServiceTestSuite) TestLogsStdoutContainer() {
 
 	stdout, err := suite.service.LogsStdoutContainer("")
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Nil(stdout)
 	suite.adapter.AssertExpectations(suite.T())
 }
@@ -99,7 +99,7 @@ func (suite *DockerKernelServiceTestSuite) TestLogsStderrContainer() {
 
 	stderr, err := suite.service.LogsStderrContainer("")
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Nil(stderr)
 	suite.adapter.AssertExpectations(suite.T())
 }
@@ -109,7 +109,7 @@ func (suite *DockerKernelServiceTestSuite) TestWaitContainer() {
 
 	err := suite.service.WaitContainer("", types.WaitContainerCondition(container.WaitConditionNotRunning))
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.adapter.AssertExpectations(suite.T())
 }
 
@@ -118,7 +118,7 @@ func (suite *DockerKernelServiceTestSuite) TestInfoImage() {
 
 	info, err := suite.service.InfoImage("")
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Equal(types.InfoImageResponse{}, info)
 	suite.adapter.AssertExpectations(suite.T())
 }
@@ -128,7 +128,7 @@ func (suite *DockerKernelServiceTestSuite) TestPullImage() {
 
 	image, err := suite.service.PullImage(types.PullImageOptions{})
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Nil(image)
 	suite.adapter.AssertExpectations(suite.T())
 }
@@ -138,7 +138,7 @@ func (suite *DockerKernelServiceTestSuite) TestBuildImage() {
 
 	image, err := suite.service.BuildImage(types.BuildImageOptions{})
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Equal(dockertypes.ImageBuildResponse{}, image)
 	suite.adapter.AssertExpectations(suite.T())
 }
@@ -152,7 +152,7 @@ func (suite *DockerKernelServiceTestSuite) TestCreateVolume() {
 
 	volume, err := suite.service.CreateVolume(options)
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Equal(types.Volume{}, volume)
 	suite.adapter.AssertExpectations(suite.T())
 }
@@ -164,7 +164,7 @@ func (suite *DockerKernelServiceTestSuite) TestDeleteVolume() {
 
 	err := suite.service.DeleteVolume(name)
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.adapter.AssertExpectations(suite.T())
 }
 

@@ -30,17 +30,17 @@ func (suite *MigrationTestSuite) SetupTest() {
 
 func (suite *MigrationTestSuite) TearDownTest() {
 	err := os.RemoveAll(suite.tool.livePath)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 }
 
 func (suite *MigrationTestSuite) TestMigrate() {
 	_, err := suite.tool.Migrate()
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	_, err = os.Stat(suite.tool.metadataPath)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	v, err := suite.tool.readLiveVersion()
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Equal(len(suite.tool.migrations)-1, v.Version)
 }

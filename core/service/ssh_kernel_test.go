@@ -48,7 +48,7 @@ func (suite *SshKernelServiceTestSuite) TestGetAll() {
 
 	keys, err := suite.service.GetAll()
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Equal(testDataAuthorizedKeys, keys)
 	suite.adapter.AssertExpectations(suite.T())
 }
@@ -58,7 +58,7 @@ func (suite *SshKernelServiceTestSuite) TestAdd() {
 
 	err := suite.service.Add(testDataAuthorizedKey)
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.adapter.AssertExpectations(suite.T())
 }
 
@@ -67,8 +67,8 @@ func (suite *SshKernelServiceTestSuite) TestAddInvalidKey() {
 
 	err := suite.service.Add("invalid")
 
-	suite.Error(err)
-	suite.ErrorIsf(err, ErrInvalidPublicKey, "invalid key")
+	suite.Require().Error(err)
+	suite.Require().ErrorIsf(err, ErrInvalidPublicKey, "invalid key")
 	suite.adapter.AssertNotCalled(suite.T(), "Add", "invalid")
 }
 
@@ -77,7 +77,7 @@ func (suite *SshKernelServiceTestSuite) TestDelete() {
 
 	err := suite.service.Delete(testDataFingerprint)
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.adapter.AssertExpectations(suite.T())
 }
 

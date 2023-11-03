@@ -26,10 +26,10 @@ func (suite *AvailableTestSuite) SetupSuite() {
 	}).(*ServiceFSAdapter)
 
 	err := suite.adapter.Reload()
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.NotZero(len(suite.adapter.services))
 }
 
 func (suite *AvailableTestSuite) TestGetAvailable() {
-	suite.Equal(1, len(suite.adapter.GetAll()))
+	suite.Len(suite.adapter.GetAll(), 1)
 }

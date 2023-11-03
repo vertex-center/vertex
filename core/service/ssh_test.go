@@ -27,7 +27,7 @@ func (suite *SshServiceTestSuite) TestGetAll() {
 
 	keys, err := suite.service.GetAll()
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Equal(testDataAuthorizedKeys, keys)
 	suite.adapter.AssertExpectations(suite.T())
 }
@@ -37,7 +37,7 @@ func (suite *SshServiceTestSuite) TestAdd() {
 
 	err := suite.service.Add(testDataAuthorizedKey)
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.adapter.AssertExpectations(suite.T())
 }
 
@@ -46,6 +46,6 @@ func (suite *SshServiceTestSuite) TestDelete() {
 
 	err := suite.service.Delete(testDataFingerprint)
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.adapter.AssertExpectations(suite.T())
 }

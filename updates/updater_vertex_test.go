@@ -24,7 +24,7 @@ func (suite *VertexUpdaterTestSuite) SetupTest() {
 
 func (suite *VertexUpdaterTestSuite) TestCurrentVersion() {
 	version, err := suite.updater.CurrentVersion()
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Equal("v0.12.0", version)
 }
 

@@ -21,33 +21,33 @@ func (suite *RepositoryTestSuite) TestCloneRepository() {
 	fs := fixtures.Basic().One().DotGit()
 
 	dir, err := os.MkdirTemp("", "*_live_test")
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	defer os.RemoveAll(dir)
 
 	err = CloneRepository(fs.Root(), dir)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.DirExists(dir)
 
 	err = CloneRepository(fs.Root(), dir)
-	suite.ErrorIs(err, git.ErrRepositoryAlreadyExists)
+	suite.Require().ErrorIs(err, git.ErrRepositoryAlreadyExists)
 }
 
 func (suite *RepositoryTestSuite) TestCloneOrPullRepository() {
 	fs := fixtures.Basic().One().DotGit()
 
 	dir, err := os.MkdirTemp("", "*_live_test")
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	defer os.RemoveAll(dir)
 
 	// reload to test Clone()
 	err = CloneOrPullRepository(fs.Root(), dir)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.DirExists(dir)
 
 	// reload to test Pull()
 	err = CloneOrPullRepository(fs.Root(), dir)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.DirExists(dir)
 }

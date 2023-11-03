@@ -27,27 +27,27 @@ func (suite *SettingsFSAdapterTestSuite) SetupTest() {
 
 func (suite *SettingsFSAdapterTestSuite) TestReadSettings() {
 	data, err := json.Marshal(suite.adapter.settings)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	p := path.Join(suite.adapter.settingsDir, "settings.json")
 	err = os.WriteFile(p, data, 0644)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	err = suite.adapter.read()
-	suite.NoError(err)
+	suite.Require().NoError(err)
 }
 
 func (suite *SettingsFSAdapterTestSuite) TestReadNonExistingSettings() {
 	err := suite.adapter.read()
-	suite.ErrorIs(err, errSettingsNotFound)
+	suite.Require().ErrorIs(err, errSettingsNotFound)
 }
 
 func (suite *SettingsFSAdapterTestSuite) TestReadCorruptedSettings() {
 	p := path.Join(suite.adapter.settingsDir, "settings.json")
 	data := []byte("{{{corrupted:json}")
 	err := os.WriteFile(p, data, 0644)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	err = suite.adapter.read()
-	suite.ErrorIs(err, errSettingsFailedToDecode)
+	suite.Require().ErrorIs(err, errSettingsFailedToDecode)
 }

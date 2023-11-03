@@ -38,7 +38,7 @@ func (suite *MemoryBusTestSuite) TestEvents() {
 
 	// Add a listener
 	suite.bus.AddListener(listener)
-	suite.Equal(1, len(*suite.bus.listeners))
+	suite.Len(*suite.bus.listeners, 1)
 
 	// Fire event
 	suite.bus.DispatchEvent(MockEvent{})
@@ -47,5 +47,5 @@ func (suite *MemoryBusTestSuite) TestEvents() {
 
 	// Remove listener
 	suite.bus.RemoveListener(listener)
-	suite.Equal(0, len(*suite.bus.listeners))
+	suite.Empty(*suite.bus.listeners)
 }

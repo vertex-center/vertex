@@ -39,7 +39,7 @@ func (suite *BaselinesApiAdapterTestSuite) TestGetLatest() {
 		})
 
 	baseline, err := suite.adapter.GetLatest(context.Background(), "stable")
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.NotEmpty(baseline)
 	log.Println(baseline)
 	suite.Equal("2023-10-13", baseline.Date)
@@ -63,7 +63,7 @@ func (suite *BaselinesApiAdapterTestSuite) TestGetLatestBeta() {
 		})
 
 	baseline, err := suite.adapter.GetLatest(context.Background(), "beta")
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.NotEmpty(baseline)
 	suite.Equal("2023-10-15", baseline.Date)
 	suite.Equal("v0.13.0-beta", baseline.Version)

@@ -32,7 +32,7 @@ func (suite *ContainerEnvServiceTestSuite) TestSave() {
 	env := types.ContainerEnvVariables{"a": "b"}
 	err := suite.service.Save(inst, env)
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Equal(env, inst.Env)
 	suite.adapter.AssertExpectations(suite.T())
 }
@@ -43,8 +43,8 @@ func (suite *ContainerEnvServiceTestSuite) TestLoad() {
 	inst := &types.Container{}
 	err := suite.service.Load(inst)
 
-	suite.NoError(err)
-	suite.Equal(inst.Env, types.ContainerEnvVariables{"a": "b"})
+	suite.Require().NoError(err)
+	suite.Equal(types.ContainerEnvVariables{"a": "b"}, inst.Env)
 	suite.adapter.AssertExpectations(suite.T())
 }
 

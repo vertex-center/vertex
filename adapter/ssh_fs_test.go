@@ -57,14 +57,14 @@ func (suite *SshFsAdapterTestSuite) SetupTest() {
 func (suite *SshFsAdapterTestSuite) TearDownTest() {
 	err := os.Remove(suite.authorizedKeysFile.Name())
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		suite.NoError(err)
+		suite.Require().NoError(err)
 	}
 }
 
 func (suite *SshFsAdapterTestSuite) TestGetAll() {
 	keys, err := suite.adapter.GetAll()
-	suite.NoError(err)
-	suite.Equal(2, len(keys))
+	suite.Require().NoError(err)
+	suite.Len(keys, 2)
 	for i, key := range keys {
 		suite.Equal("ssh-rsa", key.Type)
 		suite.Equal(fingerprints[i], key.FingerprintSHA256)
@@ -73,21 +73,21 @@ func (suite *SshFsAdapterTestSuite) TestGetAll() {
 
 func (suite *SshFsAdapterTestSuite) TestGetAllInvalidKey() {
 	_, err := suite.authorizedKeysFile.Write([]byte("invalid"))
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	keys, err := suite.adapter.GetAll()
-	suite.NoError(err)
-	suite.Equal(2, len(keys))
+	suite.Require().NoError(err)
+	suite.Len(keys, 2)
 }
 
 func (suite *SshFsAdapterTestSuite) TestGetAllNoSuchFile() {
 	suite.authorizedKeysFile.Close()
 	err := os.Remove(suite.adapter.authorizedKeysPath)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	keys, err := suite.adapter.GetAll()
-	suite.NoError(err)
-	suite.Equal(0, len(keys))
+	suite.Require().NoError(err)
+	suite.Empty(keys)
 }
 
 func (suite *SshFsAdapterTestSuite) TestAdd() {
@@ -97,21 +97,21 @@ func (suite *SshFsAdapterTestSuite) TestAdd() {
 	}
 
 	err = suite.adapter.Add(string(publicKey))
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	keys, err := suite.adapter.GetAll()
-	suite.NoError(err)
-	suite.Equal(3, len(keys))
+	suite.Require().NoError(err)
+	suite.Len(keys, 3)
 }
 
 func (suite *SshFsAdapterTestSuite) TestDelete() {
 	k, _, _, _, _ := ssh.ParseAuthorizedKey([]byte(keys[0]))
 	err := suite.adapter.Remove(ssh.FingerprintSHA256(k))
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	keys, err := suite.adapter.GetAll()
-	suite.NoError(err)
-	suite.Equal(1, len(keys))
+	suite.Require().NoError(err)
+	suite.Len(keys, 1)
 }
 
 func generatePublicKey() ([]byte, error) {

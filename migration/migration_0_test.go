@@ -40,19 +40,19 @@ func (suite *Migration0TestSuite) SetupSuite() {
 
 func (suite *Migration0TestSuite) TearDownSuite() {
 	err := os.RemoveAll("./migration_0_test-*")
-	suite.NoError(err)
+	suite.Require().NoError(err)
 }
 
 func (suite *Migration0TestSuite) TestUp() {
 	m := &migration0{}
 	err := m.Up(suite.dir)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	_, err = os.Stat(path.Join(suite.dir, "instances", suite.instanceId, ".vertex", "instance_settings.json"))
 	suite.True(os.IsNotExist(err))
 
 	_, err = os.Stat(path.Join(suite.dir, "instances", suite.instanceId, ".vertex", "settings.yml"))
-	suite.NoError(err)
+	suite.Require().NoError(err)
 }
 
 func (suite *Migration0TestSuite) TestUpNoLive() {
@@ -62,5 +62,5 @@ func (suite *Migration0TestSuite) TestUpNoLive() {
 	suite.Require().NoError(err)
 
 	err = m.Up(dir)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 }

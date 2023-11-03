@@ -32,19 +32,19 @@ func (suite *Migration1TestSuite) SetupSuite() {
 
 func (suite *Migration1TestSuite) TearDownSuite() {
 	err := os.RemoveAll("./migration_1_test-*")
-	suite.NoError(err)
+	suite.Require().NoError(err)
 }
 
 func (suite *Migration1TestSuite) TestUp() {
 	m := &migration1{}
 	err := m.Up(suite.dir)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	_, err = os.Stat(path.Join(suite.dir, "instances"))
 	suite.True(os.IsNotExist(err))
 
 	_, err = os.Stat(path.Join(suite.dir, "apps", "vx-containers", suite.containerId))
-	suite.NoError(err)
+	suite.Require().NoError(err)
 }
 
 func (suite *Migration1TestSuite) TestUpNoLive() {
@@ -54,5 +54,5 @@ func (suite *Migration1TestSuite) TestUpNoLive() {
 	suite.Require().NoError(err)
 
 	err = m.Up(dir)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 }

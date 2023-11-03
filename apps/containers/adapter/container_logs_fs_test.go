@@ -22,7 +22,7 @@ func TestContainerLoggerTestSuite(t *testing.T) {
 
 func (suite *ContainerLoggerTestSuite) SetupTest() {
 	dir, err := os.MkdirTemp("", "*_logs_test")
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	suite.logger = &ContainerLogger{
 		uuid:   uuid.New(),
@@ -33,20 +33,20 @@ func (suite *ContainerLoggerTestSuite) SetupTest() {
 
 func (suite *ContainerLoggerTestSuite) TearDownTest() {
 	err := os.RemoveAll(suite.logger.dir)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 }
 
 func (suite *ContainerLoggerTestSuite) TestOpenClose() {
 	// Open
 	err := suite.logger.Open()
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	filename := suite.logger.file.Name()
 	suite.FileExists(filename)
 
 	// Close
 	err = suite.logger.Close()
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	// Check that the file still exists
 	suite.FileExists(filename)
@@ -56,7 +56,7 @@ func (suite *ContainerLoggerTestSuite) TestOpenClose() {
 func (suite *ContainerLoggerTestSuite) TestCron() {
 	// Start cron
 	err := suite.logger.startCron()
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	// Check that the cron is running
 	suite.NotNil(suite.logger.scheduler)
@@ -65,7 +65,7 @@ func (suite *ContainerLoggerTestSuite) TestCron() {
 
 	// Stop cron
 	err = suite.logger.stopCron()
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	// Check that the cron is not running
 	suite.False(suite.logger.scheduler.IsRunning())
@@ -83,7 +83,7 @@ func TestContainerLogsFSAdapterTestSuite(t *testing.T) {
 
 func (suite *ContainerLogsFSAdapterTestSuite) SetupTest() {
 	dir, err := os.MkdirTemp("", "*_logs_test")
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	suite.adapter = NewContainerLogsFSAdapter(&ContainerLogsFSAdapterParams{
 		ContainersPath: dir,
@@ -92,10 +92,10 @@ func (suite *ContainerLogsFSAdapterTestSuite) SetupTest() {
 
 func (suite *ContainerLogsFSAdapterTestSuite) TearDownTest() {
 	err := suite.adapter.UnregisterAll()
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	err = os.RemoveAll(suite.adapter.containersPath)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 }
 
 func (suite *ContainerLogsFSAdapterTestSuite) TestRegisterUnregister() {
@@ -103,15 +103,15 @@ func (suite *ContainerLogsFSAdapterTestSuite) TestRegisterUnregister() {
 
 	// Register
 	err := suite.adapter.Register(instID)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	defer func() {
 		// Unregister
 		err = suite.adapter.Unregister(instID)
-		suite.NoError(err)
+		suite.Require().NoError(err)
 
 		// Check that the logger was unregistered
-		suite.Len(suite.adapter.loggers, 0)
+		suite.Empty(suite.adapter.loggers)
 		suite.NotContains(suite.adapter.loggers, instID)
 	}()
 
@@ -120,10 +120,10 @@ func (suite *ContainerLogsFSAdapterTestSuite) TestRegisterUnregister() {
 	suite.Contains(suite.adapter.loggers, instID)
 
 	l, err := suite.adapter.getLogger(instID)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.NotNil(l)
 	suite.Equal(instID, l.uuid)
-	suite.Equal(l.scheduler.Len(), 1)
+	suite.Len(l.scheduler.Jobs(), 1)
 }
 
 func (suite *ContainerLogsFSAdapterTestSuite) TestUnregisterAll() {
@@ -132,17 +132,17 @@ func (suite *ContainerLogsFSAdapterTestSuite) TestUnregisterAll() {
 
 	// Register
 	err := suite.adapter.Register(instID1)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	err = suite.adapter.Register(instID2)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	// Unregister
 	err = suite.adapter.UnregisterAll()
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	// Check that the loggers were unregistered
-	suite.Len(suite.adapter.loggers, 0)
+	suite.Empty(suite.adapter.loggers)
 	suite.NotContains(suite.adapter.loggers, instID1)
 	suite.NotContains(suite.adapter.loggers, instID2)
 }
@@ -152,10 +152,10 @@ func (suite *ContainerLogsFSAdapterTestSuite) TestPush() {
 
 	// Register
 	err := suite.adapter.Register(instID)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	defer func() {
 		err := suite.adapter.Unregister(instID)
-		suite.NoError(err)
+		suite.Require().NoError(err)
 	}()
 
 	// Push
@@ -168,7 +168,7 @@ func (suite *ContainerLogsFSAdapterTestSuite) TestPush() {
 
 	// Check that the log was pushed
 	l, err := suite.adapter.getLogger(instID)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Len(l.buffer, 1)
 	suite.Equal(containerstypes.LogKindVertexErr, l.buffer[0].Kind)
 	suite.Equal("test", l.buffer[0].Message.(*containerstypes.LogLineMessageString).Value)
@@ -179,10 +179,10 @@ func (suite *ContainerLogsFSAdapterTestSuite) TestPop() {
 
 	// Register
 	err := suite.adapter.Register(instID)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	defer func() {
 		err := suite.adapter.Unregister(instID)
-		suite.NoError(err)
+		suite.Require().NoError(err)
 	}()
 
 	// Push
@@ -195,12 +195,12 @@ func (suite *ContainerLogsFSAdapterTestSuite) TestPop() {
 
 	// Pop
 	line, err := suite.adapter.Pop(instID)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Equal(containerstypes.LogKindVertexErr, line.Kind)
 	suite.Equal("test", line.Message.(*containerstypes.LogLineMessageString).Value)
 
 	// Check that the log was popped
 	l, err := suite.adapter.getLogger(instID)
-	suite.NoError(err)
-	suite.Len(l.buffer, 0)
+	suite.Require().NoError(err)
+	suite.Empty(l.buffer)
 }

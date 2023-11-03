@@ -61,7 +61,7 @@ func (suite *UpdateServiceTestSuite) TestGetUpdate() {
 	suite.updaterB.On("CurrentVersion").Return("v0.11.0", nil)
 
 	update, err := suite.service.GetUpdate(types.SettingsUpdatesChannelStable)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.NotNil(update)
 	suite.Equal(suite.latestBaseline, update.Baseline)
 }
@@ -71,7 +71,7 @@ func (suite *UpdateServiceTestSuite) TestGetUpdateNoUpdate() {
 	suite.updaterB.On("CurrentVersion").Return("v0.12.0", nil)
 
 	update, err := suite.service.GetUpdate(types.SettingsUpdatesChannelStable)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Nil(update)
 }
 
@@ -80,7 +80,7 @@ func (suite *UpdateServiceTestSuite) TestGetUpdateBeta() {
 	suite.updaterB.On("CurrentVersion").Return("v0.12.0", nil)
 
 	update, err := suite.service.GetUpdate(types.SettingsUpdatesChannelBeta)
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.NotNil(update)
 	suite.Equal(suite.betaBaseline, update.Baseline)
 }

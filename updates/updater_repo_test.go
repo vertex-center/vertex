@@ -47,10 +47,10 @@ func (suite *RepositoryUpdaterTestSuite) TestCurrentVersion() {
 			Email: "test@test.test",
 		},
 	})
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	version, err := suite.updater.CurrentVersion()
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Equal(hash.String(), version)
 }
 
