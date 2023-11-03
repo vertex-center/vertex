@@ -28,7 +28,7 @@ func (suite *MemoryBusTestSuite) TestEvents() {
 	id := uuid.New()
 
 	called := false
-	listener := mock.EventListener{}
+	listener := &mock.EventListener{}
 	listener.OnEventFunc = func(e types.Event) {
 		switch e.(type) {
 		case mock.Event:
@@ -40,7 +40,7 @@ func (suite *MemoryBusTestSuite) TestEvents() {
 	}
 
 	// Add a listener
-	suite.bus.AddListener(&listener)
+	suite.bus.AddListener(listener)
 	assert.Equal(suite.T(), 1, len(*suite.bus.listeners))
 
 	// Fire event
@@ -49,6 +49,6 @@ func (suite *MemoryBusTestSuite) TestEvents() {
 	assert.True(suite.T(), called)
 
 	// Remove listener
-	suite.bus.RemoveListener(&listener)
+	suite.bus.RemoveListener(listener)
 	assert.Equal(suite.T(), 0, len(*suite.bus.listeners))
 }

@@ -17,7 +17,7 @@ func NewVertexContext() *VertexContext {
 	}
 }
 
-func (c *VertexContext) DispatchEvent(e interface{}) {
+func (c *VertexContext) DispatchEvent(e types.Event) {
 	if _, ok := e.(EventServerHardReset); ok {
 		if !config.Current.Debug() {
 			log.Warn("hard reset event received but skipped; this can be a malicious application, or you may have forgotten to switch to the development mode.")
