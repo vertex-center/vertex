@@ -8,3 +8,4 @@ linters:
     - unused
     - goimports
     - errorlint
+    - testifylint
