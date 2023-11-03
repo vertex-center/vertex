@@ -128,14 +128,12 @@ func handleSignals() {
 }
 
 func parseArgs() {
-	flagVersion := flag.Bool("version", false, "Print vertex version")
-	flagV := flag.Bool("v", false, "Print vertex version")
-	flagDate := flag.Bool("date", false, "Print the release date")
-	flagCommit := flag.Bool("commit", false, "Print the commit hash")
-
 	var (
-		flagHost = flag.String("host", config.Current.Host, "The Vertex access url")
-
+		flagVersion        = flag.Bool("version", false, "Print vertex version")
+		flagV              = flag.Bool("v", false, "Print vertex version")
+		flagDate           = flag.Bool("date", false, "Print the release date")
+		flagCommit         = flag.Bool("commit", false, "Print the commit hash")
+		flagHost           = flag.String("host", config.Current.Host, "The Vertex access url")
 		flagPort           = flag.String("port", config.Current.Port, "The Vertex port")
 		flagPortKernel     = flag.String("port-kernel", config.Current.PortKernel, "The Vertex Kernel port")
 		flagPortProxy      = flag.String("port-proxy", config.Current.PortProxy, "The Vertex Proxy port")

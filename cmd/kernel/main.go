@@ -122,12 +122,10 @@ func ensureRoot() {
 
 func parseArgs() {
 	var (
-		flagUsername = flag.String("user", "", "username of the unprivileged user")
-		flagUID      = flag.Uint("uid", 0, "uid of the unprivileged user")
-		flagGID      = flag.Uint("gid", 0, "gid of the unprivileged user")
-
-		flagHost = flag.String("host", config.Current.Host, "The Vertex access url")
-
+		flagUsername       = flag.String("user", "", "username of the unprivileged user")
+		flagUID            = flag.Uint("uid", 0, "uid of the unprivileged user")
+		flagGID            = flag.Uint("gid", 0, "gid of the unprivileged user")
+		flagHost           = flag.String("host", config.Current.Host, "The Vertex access url")
 		flagPort           = flag.String("port", config.Current.Port, "The Vertex port")
 		flagPortKernel     = flag.String("port-kernel", config.Current.PortKernel, "The Vertex Kernel port")
 		flagPortProxy      = flag.String("port-proxy", config.Current.PortProxy, "The Vertex Proxy port")
