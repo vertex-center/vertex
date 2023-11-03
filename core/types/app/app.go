@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/gin-contrib/sse"
+	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
@@ -50,7 +51,7 @@ type KernelUninitializable interface {
 type HttpHandler func(r *router.Group)
 
 type Service interface {
-	OnEvent(e interface{})
+	OnEvent(e event.Event)
 }
 
 func HeadersSSE(c *router.Context) {

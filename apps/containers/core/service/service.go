@@ -6,6 +6,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	vtypes "github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 )
 
@@ -37,7 +38,7 @@ func (s *ServiceService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *ServiceService) OnEvent(e interface{}) {
+func (s *ServiceService) OnEvent(e event.Event) {
 	switch e.(type) {
 	case vtypes.EventVertexUpdated:
 		err := s.reload()

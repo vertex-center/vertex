@@ -5,7 +5,7 @@ type MockBus struct {
 	AddListenerCalls    int
 	RemoveListenerFunc  func(l Listener)
 	RemoveListenerCalls int
-	DispatchEventFunc   func(e interface{})
+	DispatchEventFunc   func(e Event)
 	DispatchEventCalls  int
 }
 
@@ -19,7 +19,7 @@ func (m *MockBus) RemoveListener(l Listener) {
 	m.RemoveListenerFunc(l)
 }
 
-func (m *MockBus) DispatchEvent(e interface{}) {
+func (m *MockBus) DispatchEvent(e Event) {
 	m.DispatchEventCalls++
 	m.DispatchEventFunc(e)
 }

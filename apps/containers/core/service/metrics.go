@@ -9,6 +9,7 @@ import (
 	monitoringtypes "github.com/vertex-center/vertex/apps/monitoring/core/types"
 	vtypes "github.com/vertex-center/vertex/core/types"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/pkg/event"
 )
 
 const (
@@ -34,7 +35,7 @@ func (s *MetricsService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *MetricsService) OnEvent(e interface{}) {
+func (s *MetricsService) OnEvent(e event.Event) {
 	switch e := e.(type) {
 	case vtypes.EventServerStart:
 		s.ctx.DispatchEvent(monitoringtypes.EventRegisterMetrics{

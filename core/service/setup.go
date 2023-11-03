@@ -34,7 +34,7 @@ func NewSetupService(ctx *vtypes.VertexContext) *SetupService {
 	return s
 }
 
-func (s *SetupService) OnEvent(e interface{}) {
+func (s *SetupService) OnEvent(e event.Event) {
 	switch e := e.(type) {
 	case vtypes.EventAppReady:
 		// TODO: The SQL app should also be ready!
@@ -138,7 +138,7 @@ func (s *SetupService) startDatabase(inst *types.Container) error {
 	abortChan := make(chan bool)
 	defer close(abortChan)
 
-	l := event.NewTempListener(func(e interface{}) {
+	l := event.NewTempListener(func(e event.Event) {
 		switch e := e.(type) {
 		case types.EventContainerStatusChange:
 			if e.ContainerUUID != inst.UUID {

@@ -35,7 +35,7 @@ func (b *MemoryBus) RemoveListener(l Listener) {
 	delete(*b.listeners, l.GetUUID())
 }
 
-func (b *MemoryBus) DispatchEvent(e interface{}) {
+func (b *MemoryBus) DispatchEvent(e Event) {
 	// This code notifies all listeners.
 	// If some listeners are added while notifying, they will be
 	// notified in the next loop, until all listeners are notified.

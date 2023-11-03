@@ -23,6 +23,6 @@ func (ctx *Context) RemoveListener(listener event.Listener) {
 	ctx.vertexCtx.RemoveListener(listener)
 }
 
-func (ctx *Context) DispatchEvent(event interface{}) {
+func (ctx *Context) DispatchEvent(event event.Event) {
 	ctx.vertexCtx.DispatchEvent(event)
 }

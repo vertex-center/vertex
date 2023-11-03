@@ -27,7 +27,7 @@ func (suite *MemoryBusTestSuite) TestEvents() {
 
 	called := false
 	listener := MockListener{}
-	listener.OnEventFunc = func(e interface{}) {
+	listener.OnEventFunc = func(e Event) {
 		switch e.(type) {
 		case MockEvent:
 			called = true
@@ -50,5 +50,3 @@ func (suite *MemoryBusTestSuite) TestEvents() {
 	suite.bus.RemoveListener(&listener)
 	assert.Equal(suite.T(), 0, len(*suite.bus.listeners))
 }
-
-type MockEvent struct{}

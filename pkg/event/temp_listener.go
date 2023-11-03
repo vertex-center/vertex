@@ -4,17 +4,17 @@ import "github.com/google/uuid"
 
 type TempListener struct {
 	uuid    uuid.UUID
-	onEvent func(e interface{})
+	onEvent func(e Event)
 }
 
-func NewTempListener(onEvent func(e interface{})) TempListener {
+func NewTempListener(onEvent func(e Event)) TempListener {
 	return TempListener{
 		uuid:    uuid.New(),
 		onEvent: onEvent,
 	}
 }
 
-func (t TempListener) OnEvent(e interface{}) {
+func (t TempListener) OnEvent(e Event) {
 	t.onEvent(e)
 }
 

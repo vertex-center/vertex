@@ -9,7 +9,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/service"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
-	vtypes "github.com/vertex-center/vertex/pkg/event"
+	"github.com/vertex-center/vertex/pkg/event"
 
 	"github.com/gin-contrib/sse"
 	"github.com/google/uuid"
@@ -341,7 +341,7 @@ func (h *ContainerHandler) Events(c *router.Context) {
 
 	done := c.Request.Context().Done()
 
-	listener := vtypes.NewTempListener(func(e interface{}) {
+	listener := event.NewTempListener(func(e event.Event) {
 		switch e := e.(type) {
 		case types.EventContainerLog:
 			if inst.UUID != e.ContainerUUID {

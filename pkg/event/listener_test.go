@@ -3,13 +3,13 @@ package event
 import "github.com/google/uuid"
 
 type MockListener struct {
-	OnEventFunc  func(e interface{})
+	OnEventFunc  func(e Event)
 	OnEventCalls int
 	GetUUIDFunc  func() uuid.UUID
 	GetUUIDCalls int
 }
 
-func (m *MockListener) OnEvent(e interface{}) {
+func (m *MockListener) OnEvent(e Event) {
 	m.OnEventCalls++
 	m.OnEventFunc(e)
 }

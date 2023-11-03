@@ -11,6 +11,7 @@ import (
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 )
@@ -137,7 +138,7 @@ func (s *UpdateService) firstSetup() error {
 	return nil
 }
 
-func (s *UpdateService) OnEvent(e interface{}) {
+func (s *UpdateService) OnEvent(e event.Event) {
 	switch e.(type) {
 	case types.EventServerStart:
 		err := s.firstSetup()

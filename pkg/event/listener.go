@@ -5,6 +5,6 @@ import (
 )
 
 type Listener interface {
-	OnEvent(e interface{})
+	OnEvent(e Event)
 	GetUUID() uuid.UUID
 }
