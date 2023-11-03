@@ -28,6 +28,7 @@ import (
 	"github.com/vertex-center/vertex/handler"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/pkg/netcap"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vlog"
 )
@@ -52,7 +53,10 @@ func main() {
 		buildVertex()
 	}
 
-	allowPortsManagement()
+	err = netcap.AllowPortsManagement("vertex")
+	if err != nil {
+		log.Error(err)
+	}
 
 	shutdownChan := make(chan os.Signal, 1)
 
