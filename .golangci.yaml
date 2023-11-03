@@ -7,3 +7,4 @@ linters:
     - staticcheck
     - unused
     - goimports
+    - errorlint
