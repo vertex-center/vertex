@@ -1,21 +1,39 @@
-import { Button } from "./components/Button/Button";
-import { Checkbox } from "./components/Checkbox/Checkbox";
-import { Input } from "./components/Input/Input";
-import { Logo } from "./components/Logo/Logo";
+import { Button, ButtonProps } from "./components/Button/Button";
+import { Checkbox, CheckboxProps } from "./components/Checkbox/Checkbox";
+import { Header, HeaderProps } from "./components/Header/Header";
+import { Input, InputProps } from "./components/Input/Input";
+import { Link, LinkProps } from "./components/Link/Link";
+import { Logo, LogoProps } from "./components/Logo/Logo";
 import { MaterialIcon } from "./components/MaterialIcon/MaterialIcon";
 import {
     SelectField,
+    SelectFieldProps,
     SelectOption,
+    SelectOptionProps,
 } from "./components/SelectField/SelectField";
 import { TextField } from "./components/TextField/TextField";
-import { Title } from "./components/Title/Title";
+import { Title, TitleType } from "./components/Title/Title";
 
 import "./index.sass";
+
+export type {
+    ButtonProps,
+    CheckboxProps,
+    HeaderProps,
+    InputProps,
+    LinkProps,
+    LogoProps,
+    SelectFieldProps,
+    SelectOptionProps,
+    TitleType,
+};
 
 export {
     Button,
     Checkbox,
+    Header,
     Input,
+    Link,
     Logo,
     MaterialIcon,
     SelectField,
