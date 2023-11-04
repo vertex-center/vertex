@@ -13,6 +13,9 @@ import {
 } from "./components/SelectField/SelectField";
 import { TextField } from "./components/TextField/TextField";
 import { Title, TitleType } from "./components/Title/Title";
+import { PageContext, PageProvider } from "./contexts/PageContext";
+import { useNav } from "./hooks/useNav";
+import { useTitle } from "./hooks/useTitle";
 
 import "./index.sass";
 
@@ -32,6 +35,8 @@ export {
     Button,
     Checkbox,
     Header,
+    PageContext,
+    PageProvider,
     Input,
     Link,
     Logo,
@@ -40,4 +45,6 @@ export {
     SelectOption,
     TextField,
     Title,
+    useNav,
+    useTitle,
 };
