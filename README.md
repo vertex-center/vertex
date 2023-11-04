@@ -4,9 +4,9 @@
 <h1 align="center">Vertex Components</h1>
 
 <p align="center">
-<img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/vertex-center/vertex-components?color=DE3C4B&labelColor=1E212B&style=for-the-badge">
-<img alt="GitHub license" src="https://img.shields.io/github/license/vertex-center/vertex-components?color=DE3C4B&labelColor=1E212B&style=for-the-badge">
-<img alt="GitHub contributors" src="https://img.shields.io/github/contributors/vertex-center/vertex-components?color=DE3C4B&labelColor=1E212B&style=for-the-badge">
+<img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/vertex-center/components?color=DE3C4B&labelColor=1E212B&style=for-the-badge">
+<img alt="GitHub license" src="https://img.shields.io/github/license/vertex-center/components?color=DE3C4B&labelColor=1E212B&style=for-the-badge">
+<img alt="GitHub contributors" src="https://img.shields.io/github/contributors/vertex-center/components?color=DE3C4B&labelColor=1E212B&style=for-the-badge">
 </p>
 
 ## About
