@@ -3,8 +3,10 @@ import Sidebar, {
     SidebarItem,
 } from "../../../components/Sidebar/Sidebar";
 import PageWithSidebar from "../../../components/PageWithSidebar/PageWithSidebar";
+import { useTitle } from "../../../hooks/useTitle";
 
 export default function SettingsApp() {
+    useTitle("Settings");
     let sidebar = (
         <Sidebar root="/settings">
             <SidebarGroup title="Settings">
@@ -36,5 +38,5 @@ export default function SettingsApp() {
         </Sidebar>
     );
 
-    return <PageWithSidebar title="Settings" sidebar={sidebar} />;
+    return <PageWithSidebar sidebar={sidebar} />;
 }

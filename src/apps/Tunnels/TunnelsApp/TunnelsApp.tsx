@@ -9,8 +9,11 @@ import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useServerEvent } from "../../../hooks/useEvent";
 import { useQueryClient } from "@tanstack/react-query";
 import { useContainers } from "../../Containers/hooks/useContainers";
+import { useTitle } from "../../../hooks/useTitle";
 
 export default function TunnelsApp() {
+    useTitle("Tunnels");
+
     const queryClient = useQueryClient();
 
     const { containers, isLoading } = useContainers({
@@ -43,7 +46,7 @@ export default function TunnelsApp() {
     return (
         <Fragment>
             <ProgressOverlay show={isLoading} />
-            <PageWithSidebar title="Tunnels" sidebar={sidebar} />
+            <PageWithSidebar sidebar={sidebar} />
         </Fragment>
     );
 }

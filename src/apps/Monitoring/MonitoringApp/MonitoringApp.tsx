@@ -9,8 +9,11 @@ import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useServerEvent } from "../../../hooks/useEvent";
 import { useQueryClient } from "@tanstack/react-query";
 import { useContainers } from "../../Containers/hooks/useContainers";
+import { useTitle } from "../../../hooks/useTitle";
 
 export default function MonitoringApp() {
+    useTitle("Monitoring");
+
     const queryClient = useQueryClient();
 
     const { containers: prometheusContainers, isLoading: isLoadingPrometheus } =
@@ -72,7 +75,7 @@ export default function MonitoringApp() {
     return (
         <Fragment>
             <ProgressOverlay show={isLoadingGrafana || isLoadingPrometheus} />
-            <PageWithSidebar title="Monitoring" sidebar={sidebar} />
+            <PageWithSidebar sidebar={sidebar} />
         </Fragment>
     );
 }

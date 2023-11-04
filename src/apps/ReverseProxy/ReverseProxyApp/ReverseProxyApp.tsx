@@ -3,8 +3,11 @@ import Sidebar, {
     SidebarGroup,
     SidebarItem,
 } from "../../../components/Sidebar/Sidebar";
+import { useTitle } from "../../../hooks/useTitle";
 
 export default function ReverseProxyApp() {
+    useTitle("Reverse Proxy");
+
     const sidebar = (
         <Sidebar root="/app/vx-reverse-proxy">
             <SidebarGroup title="Providers">
@@ -17,5 +20,5 @@ export default function ReverseProxyApp() {
         </Sidebar>
     );
 
-    return <PageWithSidebar title="Reverse Proxy" sidebar={sidebar} />;
+    return <PageWithSidebar sidebar={sidebar} />;
 }

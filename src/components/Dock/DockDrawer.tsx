@@ -1,6 +1,6 @@
 import styles from "./DockDrawer.module.sass";
 import classNames from "classnames";
-import { BigTitle, Caption, Title } from "../Text/Text";
+import { Caption, Title } from "../Text/Text";
 import { Link } from "react-router-dom";
 import { Vertical } from "../Layouts/Layouts";
 import LogoIcon from "../Logo/LogoIcon";
@@ -50,7 +50,6 @@ export default function DockDrawer(props: Props) {
             })}
         >
             <Header title="Vertex" onClick={onClose} />
-            <BigTitle className={styles.title}>Apps</BigTitle>
             <div className={styles.apps}>
                 {[...(apps ?? [])]
                     ?.filter((app) => app.category !== "devtools")

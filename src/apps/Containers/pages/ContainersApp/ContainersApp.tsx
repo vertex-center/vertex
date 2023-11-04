@@ -2,7 +2,6 @@ import styles from "./ContainersApp.module.sass";
 import Container, {
     Containers,
 } from "../../../../components/Container/Container";
-import { BigTitle } from "../../../../components/Text/Text";
 import { api } from "../../../../backend/api/backend";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
@@ -16,6 +15,7 @@ import { useState } from "react";
 import NoItems from "../../../../components/NoItems/NoItems";
 import { useContainers } from "../../hooks/useContainers";
 import { useNavigate } from "react-router-dom";
+import { useTitle } from "../../../../hooks/useTitle";
 
 type ToolbarProps = {
     tags?: string[];
@@ -43,10 +43,11 @@ const ToolbarContainers = (props: ToolbarProps) => {
 };
 
 export default function ContainersApp() {
+    useTitle("All containers");
+
     const queryClient = useQueryClient();
 
     const [tags, setTags] = useState<string[]>([]);
-
     const {
         data: containers,
         isLoading,
@@ -93,10 +94,6 @@ export default function ContainersApp() {
     return (
         <div className={styles.server}>
             <ProgressOverlay show={isLoading} />
-            <div className={styles.title}>
-                <BigTitle>All containers</BigTitle>
-            </div>
-
             <div className={styles.containers}>
                 <ToolbarContainers tags={tags} onTagsChange={onTagsChange} />
 

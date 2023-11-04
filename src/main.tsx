@@ -11,6 +11,7 @@ import "./index.sass";
 import "@vertex-center/components/dist/style.css";
 import { useCookies } from "react-cookie";
 import { themes } from "./models/theme";
+import { HeaderProvider } from "./components/Header/Header";
 
 export type Theme =
     | "theme-vertex-dark"
@@ -55,7 +56,9 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
     <React.StrictMode>
         <ThemeProvider>
-            <App />
+            <HeaderProvider>
+                <App />
+            </HeaderProvider>
         </ThemeProvider>
     </React.StrictMode>
 );

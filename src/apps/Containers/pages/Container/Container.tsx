@@ -20,9 +20,11 @@ import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useServerEvent } from "../../../../hooks/useEvent";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Container as ContainerModel } from "../../../../models/container";
+import { useAppNavigation } from "../../../../hooks/useAppNavigation";
 
 export default function ContainerDetails() {
     const { uuid } = useParams();
+    useAppNavigation(uuid);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 

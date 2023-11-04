@@ -1,21 +1,25 @@
-import { BigTitle } from "../../../../components/Text/Text";
 import { Service as ServiceModel } from "../../../../models/service";
 import { Fragment, useState } from "react";
 import styles from "./ContainersStore.module.sass";
 import Service from "../../../../components/Service/Service";
-import { Horizontal, Vertical } from "../../../../components/Layouts/Layouts";
+import { Vertical } from "../../../../components/Layouts/Layouts";
 import { api } from "../../../../backend/api/backend";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import ServiceInstallPopup from "../../../../components/ServiceInstallPopup/ServiceInstallPopup";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import List from "../../../../components/List/List";
+import { useTitle } from "../../../../hooks/useTitle";
+import { useAppNavigation } from "../../../../hooks/useAppNavigation";
 
 type Downloading = {
     service: ServiceModel;
 };
 
 export default function ContainersStore() {
+    useTitle("Create container");
+    useAppNavigation("add");
+
     const queryClient = useQueryClient();
 
     const queryServices = useQuery({
@@ -83,13 +87,6 @@ export default function ContainersStore() {
                 show={isContainersLoading ?? isServicesLoading ?? isInstalling}
             />
             <div className={styles.page}>
-                <Horizontal
-                    className={styles.title}
-                    gap={10}
-                    alignItems="center"
-                >
-                    <BigTitle>Create container</BigTitle>
-                </Horizontal>
                 <Vertical gap={10}>
                     <APIError error={error} />
                     {/*<Toolbar className={styles.toolbar}>*/}

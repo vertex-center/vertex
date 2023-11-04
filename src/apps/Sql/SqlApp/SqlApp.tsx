@@ -9,8 +9,11 @@ import { SiPostgresql } from "@icons-pack/react-simple-icons";
 import { useServerEvent } from "../../../hooks/useEvent";
 import { useQueryClient } from "@tanstack/react-query";
 import { useContainers } from "../../Containers/hooks/useContainers";
+import { useTitle } from "../../../hooks/useTitle";
 
 export default function SqlApp() {
+    useTitle("SQL databases");
+
     const queryClient = useQueryClient();
     const { containers, isLoading } = useContainers({
         tags: ["Vertex SQL"],
@@ -62,7 +65,7 @@ export default function SqlApp() {
     return (
         <Fragment>
             <ProgressOverlay show={isLoading} />
-            <PageWithSidebar title="SQL databases" sidebar={sidebar} />
+            <PageWithSidebar sidebar={sidebar} />
         </Fragment>
     );
 }
