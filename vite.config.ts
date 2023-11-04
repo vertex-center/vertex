@@ -9,7 +9,6 @@ export default defineConfig({
         react(),
         dts({
             insertTypesEntry: true,
-            rollupTypes: true,
             exclude: ["**/*.stories.tsx", "**/*.test.tsx"],
         }),
     ],
