@@ -1,9 +1,10 @@
 import "./Header.sass";
-import { HTMLProps, ReactNode } from "react";
+import { HTMLProps, ReactNode, useContext } from "react";
 import cx from "classnames";
 import { Logo } from "../Logo/Logo.tsx";
 import { Title } from "../Title/Title.tsx";
 import { Link, LinkProps } from "../Link/Link.tsx";
+import { PageContext } from "../../contexts/PageContext";
 
 interface IHeaderLink {
     className?: string;
@@ -32,6 +33,8 @@ export function Header<T extends IHeaderLink, U extends IHeaderLink>(
     const { className: classNameLinkLogo, ...linkLogoProps } = linkLogo ?? {};
     const { className: classNameLinkBack, ...linkBackProps } = linkBack ?? {};
 
+    const { title } = useContext(PageContext);
+
     const leadingElement = leading && (
         <Link
             className={cx("header-leading-link", classNameLinkBack)}
@@ -54,6 +57,7 @@ export function Header<T extends IHeaderLink, U extends IHeaderLink>(
                 </Link>
             </div>
             {children && <div className="header-bottom">{children}</div>}
+            {!children && title && <Title variant="h1">{title}</Title>}
         </header>
     );
 }
