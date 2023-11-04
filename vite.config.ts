@@ -9,13 +9,15 @@ export default defineConfig({
         react(),
         dts({
             insertTypesEntry: true,
-            exclude: ["**/*.stories.tsx", "**/*.test.tsx"],
+            rollupTypes: true,
+            exclude: ["**/*.test.tsx"],
         }),
     ],
     build: {
         lib: {
             entry: resolve(__dirname, "lib/index.ts"),
             name: "vertex-components",
+            formats: ["es", "umd"],
             fileName: (format) => `vertex-components.${format}.js`,
         },
         copyPublicDir: false,

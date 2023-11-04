@@ -1,7 +1,7 @@
 import { useContext, useEffect } from "react";
 import { PageContext } from "../contexts/PageContext";
 
-export const useTitle = (title: string) => {
+const useTitle = (title: string) => {
     const { setTitle } = useContext(PageContext);
 
     useEffect(() => {
@@ -9,3 +9,5 @@ export const useTitle = (title: string) => {
         return () => setTitle?.(undefined);
     }, [title]);
 };
+
+export { useTitle };
