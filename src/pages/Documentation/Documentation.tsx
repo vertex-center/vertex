@@ -1,3 +1,6 @@
+import { useTitle } from "@vertex-center/components";
+
 export default function Documentation() {
-    return <div>Documentation</div>;
+    useTitle("Documentation");
+    return <div></div>;
 }
