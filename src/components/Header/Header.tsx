@@ -9,7 +9,6 @@ import {
     LinkProps,
     MaterialIcon,
     PageContext,
-    Title,
 } from "@vertex-center/components";
 import { useContext } from "react";
 
@@ -59,8 +58,6 @@ export default function (props: Readonly<Props>) {
             linkLogo={linkLogo}
             linkBack={linkBack}
             leading={leading}
-        >
-            {title && <Title variant="h1">{title}</Title>}
-        </Header>
+        />
     );
 }
