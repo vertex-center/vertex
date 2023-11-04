@@ -8,50 +8,15 @@ import {
     Header,
     LinkProps,
     MaterialIcon,
+    PageContext,
     Title,
 } from "@vertex-center/components";
-import {
-    createContext,
-    PropsWithChildren,
-    useContext,
-    useMemo,
-    useState,
-} from "react";
+import { useContext } from "react";
 
 type Props = {
     title?: string;
     onClick?: () => void;
 };
-
-export const HeaderContext = createContext<{
-    title: string;
-    setTitle: any;
-    navigation: string;
-    setNavigation: any;
-}>({
-    title: undefined,
-    setTitle: undefined,
-    navigation: undefined,
-    setNavigation: undefined,
-});
-
-export function HeaderProvider(props: PropsWithChildren) {
-    const { children } = props;
-
-    const [title, setTitle] = useState<string>(undefined);
-    const [navigation, setNavigation] = useState<string>(undefined);
-
-    const value = useMemo(
-        () => ({ title, setTitle, navigation, setNavigation }),
-        [title, setTitle, navigation, setNavigation]
-    );
-
-    return (
-        <HeaderContext.Provider value={value}>
-            {children}
-        </HeaderContext.Provider>
-    );
-}
 
 export default function (props: Readonly<Props>) {
     const { onClick } = props;
@@ -69,7 +34,7 @@ export default function (props: Readonly<Props>) {
         to = `/app/${app.id}`;
     }
 
-    const { title, navigation } = useContext(HeaderContext);
+    const { title, navigation } = useContext(PageContext);
 
     let leading = undefined;
     const nav = navigation?.split("/") ?? [];

@@ -9,8 +9,7 @@ import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import ServiceInstallPopup from "../../../../components/ServiceInstallPopup/ServiceInstallPopup";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import List from "../../../../components/List/List";
-import { useTitle } from "../../../../hooks/useTitle";
-import { useAppNavigation } from "../../../../hooks/useAppNavigation";
+import { useNav, useTitle } from "@vertex-center/components";
 
 type Downloading = {
     service: ServiceModel;
@@ -18,7 +17,7 @@ type Downloading = {
 
 export default function ContainersStore() {
     useTitle("Create container");
-    useAppNavigation("add");
+    useNav("add");
 
     const queryClient = useQueryClient();
 

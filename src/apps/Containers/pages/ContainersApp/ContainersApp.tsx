@@ -9,13 +9,12 @@ import { useServerEvent } from "../../../../hooks/useEvent";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Toolbar from "../../../../components/Toolbar/Toolbar";
 import Spacer from "../../../../components/Spacer/Spacer";
-import { Button, MaterialIcon } from "@vertex-center/components";
+import { Button, MaterialIcon, useTitle } from "@vertex-center/components";
 import SelectTags from "../../components/SelectTags/SelectTags";
 import { useState } from "react";
 import NoItems from "../../../../components/NoItems/NoItems";
 import { useContainers } from "../../hooks/useContainers";
 import { useNavigate } from "react-router-dom";
-import { useTitle } from "../../../../hooks/useTitle";
 
 type ToolbarProps = {
     tags?: string[];

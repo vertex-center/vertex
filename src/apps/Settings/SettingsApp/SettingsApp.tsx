@@ -3,7 +3,7 @@ import Sidebar, {
     SidebarItem,
 } from "../../../components/Sidebar/Sidebar";
 import PageWithSidebar from "../../../components/PageWithSidebar/PageWithSidebar";
-import { useTitle } from "../../../hooks/useTitle";
+import { useTitle } from "@vertex-center/components";
 
 export default function SettingsApp() {
     useTitle("Settings");

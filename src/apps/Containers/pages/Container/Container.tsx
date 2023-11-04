@@ -11,7 +11,7 @@ import Sidebar, {
 } from "../../../../components/Sidebar/Sidebar";
 import Popup from "../../../../components/Popup/Popup";
 import { Text, Title } from "../../../../components/Text/Text";
-import { Button, MaterialIcon } from "@vertex-center/components";
+import { Button, MaterialIcon, useNav } from "@vertex-center/components";
 import Progress from "../../../../components/Progress";
 import { SiDocker } from "@icons-pack/react-simple-icons";
 import useContainer from "../../hooks/useContainer";
@@ -20,11 +20,10 @@ import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useServerEvent } from "../../../../hooks/useEvent";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Container as ContainerModel } from "../../../../models/container";
-import { useAppNavigation } from "../../../../hooks/useAppNavigation";
 
 export default function ContainerDetails() {
     const { uuid } = useParams();
-    useAppNavigation(uuid);
+    useNav(uuid);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 

@@ -3,7 +3,7 @@ import Sidebar, {
     SidebarGroup,
     SidebarItem,
 } from "../../../components/Sidebar/Sidebar";
-import { useTitle } from "../../../hooks/useTitle";
+import { useTitle } from "@vertex-center/components";
 
 export default function ReverseProxyApp() {
     useTitle("Reverse Proxy");

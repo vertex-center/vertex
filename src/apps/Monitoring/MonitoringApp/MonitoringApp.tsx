@@ -9,7 +9,7 @@ import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useServerEvent } from "../../../hooks/useEvent";
 import { useQueryClient } from "@tanstack/react-query";
 import { useContainers } from "../../Containers/hooks/useContainers";
-import { useTitle } from "../../../hooks/useTitle";
+import { useTitle } from "@vertex-center/components";
 
 export default function MonitoringApp() {
     useTitle("Monitoring");
