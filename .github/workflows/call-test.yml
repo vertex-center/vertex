@@ -40,9 +40,5 @@ jobs:
       - name: Install Playwright
         run: npx playwright install --with-deps
 
-      - name: Build Storybook
-        run: npm run storybook:build --quiet
-
       - name: Run tests
         run: npm run storybook:test-ci
-
