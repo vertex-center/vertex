@@ -1,7 +1,3 @@
-import Sidebar, {
-    SidebarGroup,
-    SidebarItem,
-} from "../../../components/Sidebar/Sidebar";
 import { SiGrafana, SiPrometheus } from "@icons-pack/react-simple-icons";
 import PageWithSidebar from "../../../components/PageWithSidebar/PageWithSidebar";
 import { Fragment } from "react";
@@ -9,11 +5,15 @@ import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useServerEvent } from "../../../hooks/useEvent";
 import { useQueryClient } from "@tanstack/react-query";
 import { useContainers } from "../../Containers/hooks/useContainers";
-import { useTitle } from "@vertex-center/components";
+import { MaterialIcon, Sidebar, useTitle } from "@vertex-center/components";
+import { useLocation } from "react-router-dom";
+import l from "../../../components/NavLink/navlink";
+import { ContainerLed } from "../../../components/ContainerLed/ContainerLed";
 
 export default function MonitoringApp() {
     useTitle("Monitoring");
 
+    const { pathname } = useLocation();
     const queryClient = useQueryClient();
 
     const { containers: prometheusContainers, isLoading: isLoadingPrometheus } =
@@ -37,38 +37,44 @@ export default function MonitoringApp() {
     });
 
     const sidebar = (
-        <Sidebar root="/app/vx-monitoring">
-            <SidebarGroup title="Overview">
-                <SidebarItem
-                    icon="rule"
-                    to="/app/vx-monitoring/metrics"
-                    name="Metrics"
+        <Sidebar rootUrl="/app/vx-monitoring" currentUrl={pathname}>
+            <Sidebar.Group title="Overview">
+                <Sidebar.Item
+                    label="Metrics"
+                    icon={<MaterialIcon icon="rule" />}
+                    link={l("/app/vx-monitoring/metrics")}
                 />
-            </SidebarGroup>
-            <SidebarGroup title="Collectors">
-                <SidebarItem
+            </Sidebar.Group>
+            <Sidebar.Group title="Collectors">
+                <Sidebar.Item
+                    label="Prometheus"
                     icon={<SiPrometheus size={20} />}
-                    to="/app/vx-monitoring/prometheus"
-                    name="Prometheus"
-                    led={
-                        prometheusContainer && {
-                            status: prometheusContainer?.status,
-                        }
+                    link={l("/app/vx-monitoring/prometheus")}
+                    trailing={
+                        prometheusContainer && (
+                            <ContainerLed
+                                small
+                                status={prometheusContainer?.status}
+                            />
+                        )
                     }
                 />
-            </SidebarGroup>
-            <SidebarGroup title="Visualizations">
-                <SidebarItem
+            </Sidebar.Group>
+            <Sidebar.Group title="Visualizations">
+                <Sidebar.Item
+                    label="Grafana"
                     icon={<SiGrafana size={20} />}
-                    to="/app/vx-monitoring/grafana"
-                    name="Grafana"
-                    led={
-                        grafanaContainer && {
-                            status: grafanaContainer?.status,
-                        }
+                    link={l("/app/vx-monitoring/grafana")}
+                    trailing={
+                        grafanaContainer && (
+                            <ContainerLed
+                                small
+                                status={grafanaContainer?.status}
+                            />
+                        )
                     }
                 />
-            </SidebarGroup>
+            </Sidebar.Group>
         </Sidebar>
     );
 

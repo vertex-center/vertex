@@ -1,19 +1,19 @@
 import PageWithSidebar from "../../../components/PageWithSidebar/PageWithSidebar";
-import Sidebar, {
-    SidebarGroup,
-    SidebarItem,
-} from "../../../components/Sidebar/Sidebar";
 import { SiCloudflare } from "@icons-pack/react-simple-icons";
 import { Fragment } from "react";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useServerEvent } from "../../../hooks/useEvent";
 import { useQueryClient } from "@tanstack/react-query";
 import { useContainers } from "../../Containers/hooks/useContainers";
-import { useTitle } from "@vertex-center/components";
+import { Sidebar, useTitle } from "@vertex-center/components";
+import { useLocation } from "react-router-dom";
+import l from "../../../components/NavLink/navlink";
+import { ContainerLed } from "../../../components/ContainerLed/ContainerLed";
 
 export default function TunnelsApp() {
     useTitle("Tunnels");
 
+    const { pathname } = useLocation();
     const queryClient = useQueryClient();
 
     const { containers, isLoading } = useContainers({
@@ -31,15 +31,19 @@ export default function TunnelsApp() {
     });
 
     const sidebar = (
-        <Sidebar root="/app/vx-tunnels">
-            <SidebarGroup title="Providers">
-                <SidebarItem
+        <Sidebar rootUrl="/app/vx-tunnels" currentUrl={pathname}>
+            <Sidebar.Group title="Providers">
+                <Sidebar.Item
+                    label="Cloudflare Tunnel"
                     icon={<SiCloudflare size={20} />}
-                    to="/app/vx-tunnels/cloudflare"
-                    name="Cloudflare Tunnel"
-                    led={container && { status: container?.status }}
+                    link={l("/app/vx-tunnels/cloudflare")}
+                    trailing={
+                        container && (
+                            <ContainerLed small status={container?.status} />
+                        )
+                    }
                 />
-            </SidebarGroup>
+            </Sidebar.Group>
         </Sidebar>
     );
 

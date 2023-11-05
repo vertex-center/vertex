@@ -1,17 +1,18 @@
-import Container from "../../../../components/Container/Container";
 import { useState } from "react";
 import { api } from "../../../../backend/api/backend";
-import { Outlet, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import styles from "./Container.module.sass";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
 import Spacer from "../../../../components/Spacer/Spacer";
-import Sidebar, {
-    SidebarGroup,
-    SidebarItem,
-} from "../../../../components/Sidebar/Sidebar";
 import Popup from "../../../../components/Popup/Popup";
 import { Text, Title } from "../../../../components/Text/Text";
-import { Button, MaterialIcon, useNav } from "@vertex-center/components";
+import {
+    Button,
+    MaterialIcon,
+    Sidebar,
+    useNav,
+} from "@vertex-center/components";
+import l from "../../../../components/NavLink/navlink";
 import Progress from "../../../../components/Progress";
 import { SiDocker } from "@icons-pack/react-simple-icons";
 import useContainer from "../../hooks/useContainer";
@@ -20,14 +21,17 @@ import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useServerEvent } from "../../../../hooks/useEvent";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Container as ContainerModel } from "../../../../models/container";
+import Container from "../../../../components/Container/Container";
 
 export default function ContainerDetails() {
     const { uuid } = useParams();
-    useNav(uuid);
+    const { pathname } = useLocation();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
     const { container, isLoading } = useContainer(uuid);
+
+    useNav(uuid);
 
     const [showDeletePopup, setShowDeletePopup] = useState<boolean>();
 
@@ -70,61 +74,64 @@ export default function ContainerDetails() {
 
     const content = (
         <Horizontal className={styles.content}>
-            <Sidebar root={`/app/vx-containers/${uuid}`}>
-                <SidebarGroup>
-                    <SidebarItem
-                        to={`/app/vx-containers/${uuid}/home`}
-                        icon="home"
-                        name="Home"
+            <Sidebar
+                rootUrl={`/app/vx-containers/${uuid}`}
+                currentUrl={pathname}
+            >
+                <Sidebar.Group>
+                    <Sidebar.Item
+                        label="Home"
+                        icon={<MaterialIcon icon="home" />}
+                        link={l(`/app/vx-containers/${uuid}/home`)}
                     />
-                </SidebarGroup>
-                <SidebarGroup title="Analyze">
-                    <SidebarItem
-                        to={`/app/vx-containers/${uuid}/logs`}
-                        icon="terminal"
-                        name="Logs"
+                </Sidebar.Group>
+                <Sidebar.Group title="Analyze">
+                    <Sidebar.Item
+                        label="Logs"
+                        icon={<MaterialIcon icon="terminal" />}
+                        link={l(`/app/vx-containers/${uuid}/logs`)}
                     />
                     {container?.install_method === "docker" && (
-                        <SidebarItem
-                            to={`/app/vx-containers/${uuid}/docker`}
+                        <Sidebar.Item
+                            label="Docker"
                             icon={<SiDocker size={20} />}
-                            name="Docker"
+                            link={l(`/app/vx-containers/${uuid}/docker`)}
                         />
                     )}
-                </SidebarGroup>
-                <SidebarGroup title="Manage">
-                    <SidebarItem
-                        to={`/app/vx-containers/${uuid}/environment`}
-                        icon="tune"
-                        name="Environment"
+                </Sidebar.Group>
+                <Sidebar.Group title="Manage">
+                    <Sidebar.Item
+                        label="Environment"
+                        icon={<MaterialIcon icon="tune" />}
+                        link={l(`/app/vx-containers/${uuid}/environment`)}
                     />
                     {container?.service?.databases && (
-                        <SidebarItem
-                            to={`/app/vx-containers/${uuid}/database`}
-                            icon="database"
-                            name="Database"
+                        <Sidebar.Item
+                            label="Database"
+                            icon={<MaterialIcon icon="database" />}
+                            link={l(`/app/vx-containers/${uuid}/database`)}
                         />
                     )}
-                    <SidebarItem
-                        to={`/app/vx-containers/${uuid}/update`}
-                        icon="update"
-                        name="Update"
+                    <Sidebar.Item
+                        icon={<MaterialIcon icon="update" />}
+                        label="Update"
+                        link={l(`/app/vx-containers/${uuid}/update`)}
                         notifications={
                             container?.service_update?.available ? 1 : undefined
                         }
                     />
-                    <SidebarItem
-                        to={`/app/vx-containers/${uuid}/settings`}
-                        icon="settings"
-                        name="Settings"
+                    <Sidebar.Item
+                        label="Settings"
+                        icon={<MaterialIcon icon="settings" />}
+                        link={l(`/app/vx-containers/${uuid}/settings`)}
                     />
-                    <SidebarItem
+                    <Sidebar.Item
+                        label="Delete"
+                        icon={<MaterialIcon icon="delete" />}
                         onClick={() => setShowDeletePopup(true)}
-                        icon="delete"
-                        name="Delete"
-                        red
+                        variant="red"
                     />
-                </SidebarGroup>
+                </Sidebar.Group>
             </Sidebar>
             <div className={styles.side}>
                 <Outlet />

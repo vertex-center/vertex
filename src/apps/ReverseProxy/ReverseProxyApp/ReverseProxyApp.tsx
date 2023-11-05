@@ -1,22 +1,23 @@
 import PageWithSidebar from "../../../components/PageWithSidebar/PageWithSidebar";
-import Sidebar, {
-    SidebarGroup,
-    SidebarItem,
-} from "../../../components/Sidebar/Sidebar";
-import { useTitle } from "@vertex-center/components";
+import { MaterialIcon, Sidebar, useTitle } from "@vertex-center/components";
+import { useLocation } from "react-router-dom";
+import l from "../../../components/NavLink/navlink";
+import React from "react";
 
 export default function ReverseProxyApp() {
     useTitle("Reverse Proxy");
 
+    const { pathname } = useLocation();
+
     const sidebar = (
-        <Sidebar root="/app/vx-reverse-proxy">
-            <SidebarGroup title="Providers">
-                <SidebarItem
-                    name="Vertex Reverse Proxy"
-                    icon="router"
-                    to="/app/vx-reverse-proxy/vertex"
+        <Sidebar rootUrl="/app/vx-reverse-proxy" currentUrl={pathname}>
+            <Sidebar.Group title="Providers">
+                <Sidebar.Item
+                    label="Vertex Reverse Proxy"
+                    icon={<MaterialIcon icon="router" />}
+                    link={l("/app/vx-reverse-proxy/vertex")}
                 />
-            </SidebarGroup>
+            </Sidebar.Group>
         </Sidebar>
     );
 
