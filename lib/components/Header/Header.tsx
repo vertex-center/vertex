@@ -56,8 +56,12 @@ export function Header<T extends IHeaderLink, U extends IHeaderLink>(
                     <Title variant="h4">{appName ?? "Vertex"}</Title>
                 </Link>
             </div>
-            {children && <div className="header-bottom">{children}</div>}
-            {!children && title && <Title variant="h1">{title}</Title>}
+            {(children || title) && (
+                <div className="header-bottom">
+                    {children}
+                    {!children && title && <Title variant="h1">{title}</Title>}
+                </div>
+            )}
         </header>
     );
 }
