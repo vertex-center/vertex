@@ -36,9 +36,9 @@ jobs:
         run: echo ${{ github.ref_name }} > ./dist/version.txt
 
       - name: Create .zip
-        run: zip vertex-webui.zip ./dist -r
+        run: zip client.zip ./dist -r
 
       - name: Publish
         uses: softprops/action-gh-release@v1
         with:
-          files: vertex-webui.zip
+          files: client.zip
