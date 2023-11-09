@@ -38,14 +38,14 @@ func (u VertexClientUpdater) Install(tag string) error {
 
 	log.Info("installing vertex client", vlog.String("tag", tag))
 
-	release, res, err := client.Repositories.GetReleaseByTag(context.Background(), "vertex-center", "vertex-webui", tag)
+	release, res, err := client.Repositories.GetReleaseByTag(context.Background(), "vertex-center", "client", tag)
 	if err != nil {
 		return err
 	}
 	defer res.Body.Close()
 
 	for _, asset := range release.Assets {
-		if strings.Contains(*asset.Name, "vertex-webui") {
+		if strings.Contains(*asset.Name, "client") {
 			return install(u.dir, *asset.BrowserDownloadURL)
 		}
 	}
