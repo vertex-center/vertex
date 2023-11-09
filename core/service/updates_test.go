@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
 )
 
@@ -17,7 +18,7 @@ type UpdateServiceTestSuite struct {
 	betaBaseline   types.Baseline
 	updaterA       *MockUpdater
 	updaterB       *MockUpdater
-	adapter        *MockBaselineAdapter
+	adapter        *port.MockBaselinesAdapter
 }
 
 func TestUpdatesServiceTestSuite(t *testing.T) {
@@ -49,10 +50,17 @@ func (suite *UpdateServiceTestSuite) SetupTest() {
 		suite.updaterB,
 	}
 
-	suite.adapter = &MockBaselineAdapter{}
-	suite.adapter.On("GetLatest", context.Background(), types.SettingsUpdatesChannelStable).Return(suite.latestBaseline, nil)
-	suite.adapter.On("GetLatest", context.Background(), types.SettingsUpdatesChannelBeta).Return(suite.betaBaseline, nil)
-
+	suite.adapter = &port.MockBaselinesAdapter{}
+	suite.adapter.GetLatestFunc = func(ctx context.Context, channel types.SettingsUpdatesChannel) (types.Baseline, error) {
+		switch channel {
+		case types.SettingsUpdatesChannelStable:
+			return suite.latestBaseline, nil
+		case types.SettingsUpdatesChannelBeta:
+			return suite.betaBaseline, nil
+		default:
+			return types.Baseline{}, nil
+		}
+	}
 	suite.service = NewUpdateService(types.NewVertexContext(), suite.adapter, updaters).(*UpdateService)
 }
 
@@ -83,15 +91,6 @@ func (suite *UpdateServiceTestSuite) TestGetUpdateBeta() {
 	suite.Require().NoError(err)
 	suite.NotNil(update)
 	suite.Equal(suite.betaBaseline, update.Baseline)
-}
-
-type MockBaselineAdapter struct {
-	mock.Mock
-}
-
-func (a *MockBaselineAdapter) GetLatest(ctx context.Context, channel types.SettingsUpdatesChannel) (types.Baseline, error) {
-	args := a.Called(ctx, channel)
-	return args.Get(0).(types.Baseline), args.Error(1)
 }
 
 type MockUpdater struct {

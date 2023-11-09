@@ -3,9 +3,9 @@ package service
 import (
 	"testing"
 
+	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
 
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -31,71 +31,60 @@ type SshKernelServiceTestSuite struct {
 	suite.Suite
 
 	service *SshKernelService
-	adapter MockSshAdapter
+	adapter *port.MockSshAdapter
 }
 
 func TestSshKernelServiceTestSuite(t *testing.T) {
 	suite.Run(t, new(SshKernelServiceTestSuite))
 }
 
-func (suite *SshKernelServiceTestSuite) SetupSuite() {
-	suite.adapter = MockSshAdapter{}
-	suite.service = NewSshKernelService(&suite.adapter).(*SshKernelService)
+func (suite *SshKernelServiceTestSuite) SetupTest() {
+	suite.adapter = &port.MockSshAdapter{}
+	suite.service = NewSshKernelService(suite.adapter).(*SshKernelService)
 }
 
 func (suite *SshKernelServiceTestSuite) TestGetAll() {
-	suite.adapter.On("GetAll").Return(testDataAuthorizedKeys, nil)
+	suite.adapter.GetAllFunc = func() ([]types.PublicKey, error) {
+		return testDataAuthorizedKeys, nil
+	}
 
 	keys, err := suite.service.GetAll()
 
 	suite.Require().NoError(err)
 	suite.Equal(testDataAuthorizedKeys, keys)
-	suite.adapter.AssertExpectations(suite.T())
+	suite.Equal(1, suite.adapter.GetAllCalls)
 }
 
 func (suite *SshKernelServiceTestSuite) TestAdd() {
-	suite.adapter.On("Add", testDataAuthorizedKey).Return(nil)
+	suite.adapter.AddFunc = func(key string) error {
+		return nil
+	}
 
 	err := suite.service.Add(testDataAuthorizedKey)
 
 	suite.Require().NoError(err)
-	suite.adapter.AssertExpectations(suite.T())
+	suite.Equal(1, suite.adapter.AddCalls)
 }
 
 func (suite *SshKernelServiceTestSuite) TestAddInvalidKey() {
-	suite.adapter.On("Add", testDataAuthorizedKey).Return(nil)
+	suite.adapter.AddFunc = func(key string) error {
+		return nil
+	}
 
 	err := suite.service.Add("invalid")
 
 	suite.Require().Error(err)
 	suite.Require().ErrorIsf(err, ErrInvalidPublicKey, "invalid key")
-	suite.adapter.AssertNotCalled(suite.T(), "Add", "invalid")
+	suite.Equal(0, suite.adapter.AddCalls)
 }
 
 func (suite *SshKernelServiceTestSuite) TestDelete() {
-	suite.adapter.On("Remove", testDataFingerprint).Return(nil)
+	suite.adapter.RemoveFunc = func(fingerprint string) error {
+		return nil
+	}
 
 	err := suite.service.Delete(testDataFingerprint)
 
 	suite.Require().NoError(err)
-	suite.adapter.AssertExpectations(suite.T())
-}
-
-type MockSshAdapter struct {
-	mock.Mock
-}
-
-func (m *MockSshAdapter) GetAll() ([]types.PublicKey, error) {
-	args := m.Called()
-	return args.Get(0).([]types.PublicKey), args.Error(1)
-}
-
-func (m *MockSshAdapter) Add(key string) error {
-	args := m.Called(key)
-	return args.Error(0)
-}
-
-func (m *MockSshAdapter) Remove(fingerprint string) error {
-	args := m.Called(fingerprint)
-	return args.Error(0)
+	suite.Equal(1, suite.adapter.RemoveCalls)
 }
