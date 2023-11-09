@@ -1,40 +1,49 @@
-import Sidebar, {
-    SidebarGroup,
-    SidebarItem,
-} from "../../../components/Sidebar/Sidebar";
 import PageWithSidebar from "../../../components/PageWithSidebar/PageWithSidebar";
+import { MaterialIcon, Sidebar, useTitle } from "@vertex-center/components";
+import l from "../../../components/NavLink/navlink";
+import { useSidebar } from "../../../hooks/useSidebar";
 
 export default function SettingsApp() {
-    let sidebar = (
-        <Sidebar root="/settings">
-            <SidebarGroup title="Settings">
-                <SidebarItem to="/settings/theme" icon="palette" name="Theme" />
-            </SidebarGroup>
-            <SidebarGroup title="Administration">
-                <SidebarItem
-                    to="/settings/notifications"
-                    icon="notifications"
-                    name="Notifications"
+    useTitle("Settings");
+
+    let sidebar = useSidebar(
+        <Sidebar>
+            <Sidebar.Group title="Settings">
+                <Sidebar.Item
+                    label="Theme"
+                    icon={<MaterialIcon icon="palette" />}
+                    link={l("/settings/theme")}
                 />
-                <SidebarItem
-                    to="/settings/hardware"
-                    icon="hard_drive"
-                    name="Hardware"
+            </Sidebar.Group>
+            <Sidebar.Group title="Administration">
+                <Sidebar.Item
+                    label="Notifications"
+                    icon={<MaterialIcon icon="notifications" />}
+                    link={l("/settings/notifications")}
                 />
-                <SidebarItem
-                    to="/settings/security"
-                    icon="key"
-                    name="Security"
+                <Sidebar.Item
+                    label="Hardware"
+                    icon={<MaterialIcon icon="hard_drive" />}
+                    link={l("/settings/hardware")}
                 />
-                <SidebarItem
-                    to="/settings/updates"
-                    icon="update"
-                    name="Updates"
+                <Sidebar.Item
+                    label="Security"
+                    icon={<MaterialIcon icon="key" />}
+                    link={l("/settings/security")}
                 />
-                <SidebarItem to="/settings/about" icon="info" name="About" />
-            </SidebarGroup>
+                <Sidebar.Item
+                    label="Updates"
+                    icon={<MaterialIcon icon="update" />}
+                    link={l("/settings/updates")}
+                />
+                <Sidebar.Item
+                    label="About"
+                    icon={<MaterialIcon icon="info" />}
+                    link={l("/settings/about")}
+                />
+            </Sidebar.Group>
         </Sidebar>
     );
 
-    return <PageWithSidebar title="Settings" sidebar={sidebar} />;
+    return <PageWithSidebar sidebar={sidebar} />;
 }

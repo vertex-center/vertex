@@ -25,16 +25,18 @@
         overflow: scroll
         transition: all 0.15s ease-out
 
-.title
-    margin: 20px 50px
-
-    @include dimensions.extra-small-or-less
-        margin: 20px 30px
+.header
+    display: flex
+    flex-direction: row
+    align-items: center
+    gap: 10px
+    padding: 20px 30px
+    cursor: pointer
 
 .apps
     display: grid
     grid-template-columns: repeat(3, 1fr)
-    padding: 0 50px
+    padding: 10px 25px
     gap: 10px
     overflow: hidden
 
@@ -79,6 +81,7 @@
         align-items: center
         gap: 6px
         font-size: 17px
+        line-height: 1 !important
 
         & > :first-child
             margin-bottom: -2px

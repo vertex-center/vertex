@@ -2,7 +2,6 @@ import styles from "./ContainersApp.module.sass";
 import Container, {
     Containers,
 } from "../../../../components/Container/Container";
-import { BigTitle } from "../../../../components/Text/Text";
 import { api } from "../../../../backend/api/backend";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
@@ -10,7 +9,7 @@ import { useServerEvent } from "../../../../hooks/useEvent";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Toolbar from "../../../../components/Toolbar/Toolbar";
 import Spacer from "../../../../components/Spacer/Spacer";
-import { Button, MaterialIcon } from "@vertex-center/components";
+import { Button, MaterialIcon, useTitle } from "@vertex-center/components";
 import SelectTags from "../../components/SelectTags/SelectTags";
 import { useState } from "react";
 import NoItems from "../../../../components/NoItems/NoItems";
@@ -43,10 +42,11 @@ const ToolbarContainers = (props: ToolbarProps) => {
 };
 
 export default function ContainersApp() {
+    useTitle("All containers");
+
     const queryClient = useQueryClient();
 
     const [tags, setTags] = useState<string[]>([]);
-
     const {
         data: containers,
         isLoading,
@@ -93,10 +93,6 @@ export default function ContainersApp() {
     return (
         <div className={styles.server}>
             <ProgressOverlay show={isLoading} />
-            <div className={styles.title}>
-                <BigTitle>All containers</BigTitle>
-            </div>
-
             <div className={styles.containers}>
                 <ToolbarContainers tags={tags} onTagsChange={onTagsChange} />
 

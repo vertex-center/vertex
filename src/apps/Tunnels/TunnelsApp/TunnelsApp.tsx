@@ -1,16 +1,18 @@
 import PageWithSidebar from "../../../components/PageWithSidebar/PageWithSidebar";
-import Sidebar, {
-    SidebarGroup,
-    SidebarItem,
-} from "../../../components/Sidebar/Sidebar";
 import { SiCloudflare } from "@icons-pack/react-simple-icons";
 import { Fragment } from "react";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useServerEvent } from "../../../hooks/useEvent";
 import { useQueryClient } from "@tanstack/react-query";
 import { useContainers } from "../../Containers/hooks/useContainers";
+import { Sidebar, useTitle } from "@vertex-center/components";
+import l from "../../../components/NavLink/navlink";
+import { ContainerLed } from "../../../components/ContainerLed/ContainerLed";
+import { useSidebar } from "../../../hooks/useSidebar";
 
 export default function TunnelsApp() {
+    useTitle("Tunnels");
+
     const queryClient = useQueryClient();
 
     const { containers, isLoading } = useContainers({
@@ -27,23 +29,27 @@ export default function TunnelsApp() {
         },
     });
 
-    const sidebar = (
-        <Sidebar root="/app/vx-tunnels">
-            <SidebarGroup title="Providers">
-                <SidebarItem
+    const sidebar = useSidebar(
+        <Sidebar>
+            <Sidebar.Group title="Providers">
+                <Sidebar.Item
+                    label="Cloudflare Tunnel"
                     icon={<SiCloudflare size={20} />}
-                    to="/app/vx-tunnels/cloudflare"
-                    name="Cloudflare Tunnel"
-                    led={container && { status: container?.status }}
+                    link={l("/app/vx-tunnels/cloudflare")}
+                    trailing={
+                        container && (
+                            <ContainerLed small status={container?.status} />
+                        )
+                    }
                 />
-            </SidebarGroup>
+            </Sidebar.Group>
         </Sidebar>
     );
 
     return (
         <Fragment>
             <ProgressOverlay show={isLoading} />
-            <PageWithSidebar title="Tunnels" sidebar={sidebar} />
+            <PageWithSidebar sidebar={sidebar} />
         </Fragment>
     );
 }

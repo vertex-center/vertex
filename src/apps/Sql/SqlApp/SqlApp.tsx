@@ -1,27 +1,29 @@
 import PageWithSidebar from "../../../components/PageWithSidebar/PageWithSidebar";
-import Sidebar, {
-    SidebarGroup,
-    SidebarItem,
-} from "../../../components/Sidebar/Sidebar";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { Fragment } from "react";
 import { SiPostgresql } from "@icons-pack/react-simple-icons";
 import { useServerEvent } from "../../../hooks/useEvent";
 import { useQueryClient } from "@tanstack/react-query";
 import { useContainers } from "../../Containers/hooks/useContainers";
+import { MaterialIcon, Sidebar, useTitle } from "@vertex-center/components";
+import l from "../../../components/NavLink/navlink";
+import { ContainerLed } from "../../../components/ContainerLed/ContainerLed";
+import { useSidebar } from "../../../hooks/useSidebar";
 
 export default function SqlApp() {
+    useTitle("SQL databases");
+
     const queryClient = useQueryClient();
     const { containers, isLoading } = useContainers({
         tags: ["Vertex SQL"],
     });
 
-    const sidebar = (
-        <Sidebar root="/app/vx-sql">
+    const sidebar = useSidebar(
+        <Sidebar>
             {Object.values(containers ?? {}).length > 0 && (
-                <SidebarGroup title="DBMS">
+                <Sidebar.Group title="DBMS">
                     {Object.values(containers ?? {})?.map((inst) => {
-                        let icon: string | JSX.Element = "database";
+                        let icon = <MaterialIcon icon="database" />;
                         const type = inst?.service?.features?.databases?.find(
                             (d) => d.category === "sql"
                         )?.type;
@@ -30,24 +32,31 @@ export default function SqlApp() {
                         }
 
                         return (
-                            <SidebarItem
+                            <Sidebar.Item
                                 key={inst.uuid}
+                                label={inst?.display_name ?? inst.service.name}
                                 icon={icon}
-                                name={inst?.display_name ?? inst.service.name}
-                                to={`/app/vx-sql/db/${inst.uuid}`}
-                                led={{ status: inst?.status }}
+                                link={l(`/app/vx-sql/db/${inst.uuid}`)}
+                                trailing={
+                                    inst && (
+                                        <ContainerLed
+                                            small
+                                            status={inst?.status}
+                                        />
+                                    )
+                                }
                             />
                         );
                     })}
-                </SidebarGroup>
+                </Sidebar.Group>
             )}
-            <SidebarGroup title="Create">
-                <SidebarItem
-                    icon="download"
-                    name="Installer"
-                    to="/app/vx-sql/install"
+            <Sidebar.Group title="Create">
+                <Sidebar.Item
+                    label="Installer"
+                    icon={<MaterialIcon icon="download" />}
+                    link={l("/app/vx-sql/install")}
                 />
-            </SidebarGroup>
+            </Sidebar.Group>
         </Sidebar>
     );
 
@@ -62,7 +71,7 @@ export default function SqlApp() {
     return (
         <Fragment>
             <ProgressOverlay show={isLoading} />
-            <PageWithSidebar title="SQL databases" sidebar={sidebar} />
+            <PageWithSidebar sidebar={sidebar} />
         </Fragment>
     );
 }

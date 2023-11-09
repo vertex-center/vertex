@@ -16,12 +16,13 @@
     font-family: fonts.$font-family
     font-size: fonts.$font-size-normal
 
-    &Content
+    &-main
         display: flex
-        flex-direction: column
+        flex-direction: row
         flex-grow: 1
-        overflow: scroll
-        padding-bottom: 130px
+
+    &-content
+        flex-grow: 1
 
 code
     font-family: fonts.$font-family-code
