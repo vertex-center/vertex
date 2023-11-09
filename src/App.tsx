@@ -47,130 +47,138 @@ function App() {
                 <ReactQueryDevtools initialIsOpen={false} />
                 <HashRouter>
                     <Header />
-                    <div className="appContent">
-                        <Routes>
-                            <Route
-                                path="/"
-                                element={<Navigate to="/app/vx-containers" />}
-                                index
-                            />
-                            <Route
-                                path="/app/vx-containers"
-                                element={<ContainersApp />}
-                            />
-                            <Route
-                                path="/app/vx-containers/add"
-                                element={<ContainersStore />}
-                            />
-                            <Route
-                                path="/app/vx-devtools-service-editor"
-                                element={<ServiceEditor />}
-                            />
-                            <Route path="/app/vx-sql" element={<SqlApp />}>
+                    <div className="app-main">
+                        <div className="app-sidebar" />
+                        <div className="app-content">
+                            <Routes>
                                 <Route
-                                    path="/app/vx-sql/install"
-                                    element={<SqlInstaller />}
+                                    path="/"
+                                    element={
+                                        <Navigate to="/app/vx-containers" />
+                                    }
+                                    index
                                 />
                                 <Route
-                                    path="/app/vx-sql/db/:uuid"
-                                    element={<SqlDatabase />}
-                                />
-                            </Route>
-                            <Route
-                                path="/app/vx-monitoring"
-                                element={<MonitoringApp />}
-                            >
-                                <Route
-                                    path="/app/vx-monitoring/metrics"
-                                    element={<MetricsList />}
+                                    path="/app/vx-containers"
+                                    element={<ContainersApp />}
                                 />
                                 <Route
-                                    path="/app/vx-monitoring/prometheus"
-                                    element={<Prometheus />}
+                                    path="/app/vx-containers/add"
+                                    element={<ContainersStore />}
                                 />
                                 <Route
-                                    path="/app/vx-monitoring/grafana"
-                                    element={<Grafana />}
+                                    path="/app/vx-devtools-service-editor"
+                                    element={<ServiceEditor />}
                                 />
-                            </Route>
-                            <Route
-                                path="/app/vx-tunnels"
-                                element={<TunnelsApp />}
-                            >
+                                <Route path="/app/vx-sql" element={<SqlApp />}>
+                                    <Route
+                                        path="/app/vx-sql/install"
+                                        element={<SqlInstaller />}
+                                    />
+                                    <Route
+                                        path="/app/vx-sql/db/:uuid"
+                                        element={<SqlDatabase />}
+                                    />
+                                </Route>
                                 <Route
-                                    path="/app/vx-tunnels/cloudflare"
-                                    element={<CloudflareTunnels />}
-                                />
-                            </Route>
-                            <Route
-                                path="/app/vx-reverse-proxy"
-                                element={<ReverseProxyApp />}
-                            >
+                                    path="/app/vx-monitoring"
+                                    element={<MonitoringApp />}
+                                >
+                                    <Route
+                                        path="/app/vx-monitoring/metrics"
+                                        element={<MetricsList />}
+                                    />
+                                    <Route
+                                        path="/app/vx-monitoring/prometheus"
+                                        element={<Prometheus />}
+                                    />
+                                    <Route
+                                        path="/app/vx-monitoring/grafana"
+                                        element={<Grafana />}
+                                    />
+                                </Route>
                                 <Route
-                                    path="/app/vx-reverse-proxy/vertex"
-                                    element={<VertexReverseProxy />}
-                                />
-                            </Route>
-                            <Route
-                                path="/app/vx-containers/:uuid/"
-                                element={<ContainerDetails />}
-                            >
+                                    path="/app/vx-tunnels"
+                                    element={<TunnelsApp />}
+                                >
+                                    <Route
+                                        path="/app/vx-tunnels/cloudflare"
+                                        element={<CloudflareTunnels />}
+                                    />
+                                </Route>
                                 <Route
-                                    path="/app/vx-containers/:uuid/home"
-                                    element={<ContainerHome />}
-                                />
+                                    path="/app/vx-reverse-proxy"
+                                    element={<ReverseProxyApp />}
+                                >
+                                    <Route
+                                        path="/app/vx-reverse-proxy/vertex"
+                                        element={<VertexReverseProxy />}
+                                    />
+                                </Route>
                                 <Route
-                                    path="/app/vx-containers/:uuid/docker"
-                                    element={<ContainerDocker />}
-                                />
+                                    path="/app/vx-containers/:uuid/"
+                                    element={<ContainerDetails />}
+                                >
+                                    <Route
+                                        path="/app/vx-containers/:uuid/home"
+                                        element={<ContainerHome />}
+                                    />
+                                    <Route
+                                        path="/app/vx-containers/:uuid/docker"
+                                        element={<ContainerDocker />}
+                                    />
+                                    <Route
+                                        path="/app/vx-containers/:uuid/logs"
+                                        element={<ContainerLogs />}
+                                    />
+                                    <Route
+                                        path="/app/vx-containers/:uuid/environment"
+                                        element={<ContainerEnv />}
+                                    />
+                                    <Route
+                                        path="/app/vx-containers/:uuid/database"
+                                        element={<ContainerDetailsDatabase />}
+                                    />
+                                    <Route
+                                        path="/app/vx-containers/:uuid/update"
+                                        element={<ContainerUpdate />}
+                                    />
+                                    <Route
+                                        path="/app/vx-containers/:uuid/settings"
+                                        element={<ContainerSettings />}
+                                    />
+                                </Route>
                                 <Route
-                                    path="/app/vx-containers/:uuid/logs"
-                                    element={<ContainerLogs />}
-                                />
-                                <Route
-                                    path="/app/vx-containers/:uuid/environment"
-                                    element={<ContainerEnv />}
-                                />
-                                <Route
-                                    path="/app/vx-containers/:uuid/database"
-                                    element={<ContainerDetailsDatabase />}
-                                />
-                                <Route
-                                    path="/app/vx-containers/:uuid/update"
-                                    element={<ContainerUpdate />}
-                                />
-                                <Route
-                                    path="/app/vx-containers/:uuid/settings"
-                                    element={<ContainerSettings />}
-                                />
-                            </Route>
-                            <Route path="/settings" element={<SettingsApp />}>
-                                <Route
-                                    path="/settings/theme"
-                                    element={<SettingsTheme />}
-                                />
-                                <Route
-                                    path="/settings/notifications"
-                                    element={<SettingsNotifications />}
-                                />
-                                <Route
-                                    path="/settings/hardware"
-                                    element={<SettingsHardware />}
-                                />
-                                <Route
-                                    path="/settings/security"
-                                    element={<SettingsSecurity />}
-                                />
-                                <Route
-                                    path="/settings/updates"
-                                    element={<SettingsUpdates />}
-                                />
-                                <Route
-                                    path="/settings/about"
-                                    element={<SettingsAbout />}
-                                />
-                            </Route>
-                        </Routes>
+                                    path="/settings"
+                                    element={<SettingsApp />}
+                                >
+                                    <Route
+                                        path="/settings/theme"
+                                        element={<SettingsTheme />}
+                                    />
+                                    <Route
+                                        path="/settings/notifications"
+                                        element={<SettingsNotifications />}
+                                    />
+                                    <Route
+                                        path="/settings/hardware"
+                                        element={<SettingsHardware />}
+                                    />
+                                    <Route
+                                        path="/settings/security"
+                                        element={<SettingsSecurity />}
+                                    />
+                                    <Route
+                                        path="/settings/updates"
+                                        element={<SettingsUpdates />}
+                                    />
+                                    <Route
+                                        path="/settings/about"
+                                        element={<SettingsAbout />}
+                                    />
+                                </Route>
+                            </Routes>
+                        </div>
                     </div>
                     <Dock />
                 </HashRouter>

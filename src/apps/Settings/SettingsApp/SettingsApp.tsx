@@ -1,15 +1,13 @@
 import PageWithSidebar from "../../../components/PageWithSidebar/PageWithSidebar";
 import { MaterialIcon, Sidebar, useTitle } from "@vertex-center/components";
-import { useLocation } from "react-router-dom";
 import l from "../../../components/NavLink/navlink";
+import { useSidebar } from "../../../hooks/useSidebar";
 
 export default function SettingsApp() {
     useTitle("Settings");
 
-    const { pathname } = useLocation();
-
-    let sidebar = (
-        <Sidebar rootUrl="/settings" currentUrl={pathname}>
+    let sidebar = useSidebar(
+        <Sidebar>
             <Sidebar.Group title="Settings">
                 <Sidebar.Item
                     label="Theme"

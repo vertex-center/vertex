@@ -6,14 +6,13 @@ import { useServerEvent } from "../../../hooks/useEvent";
 import { useQueryClient } from "@tanstack/react-query";
 import { useContainers } from "../../Containers/hooks/useContainers";
 import { MaterialIcon, Sidebar, useTitle } from "@vertex-center/components";
-import { useLocation } from "react-router-dom";
 import l from "../../../components/NavLink/navlink";
 import { ContainerLed } from "../../../components/ContainerLed/ContainerLed";
+import { useSidebar } from "../../../hooks/useSidebar";
 
 export default function MonitoringApp() {
     useTitle("Monitoring");
 
-    const { pathname } = useLocation();
     const queryClient = useQueryClient();
 
     const { containers: prometheusContainers, isLoading: isLoadingPrometheus } =
@@ -36,8 +35,8 @@ export default function MonitoringApp() {
         },
     });
 
-    const sidebar = (
-        <Sidebar rootUrl="/app/vx-monitoring" currentUrl={pathname}>
+    const sidebar = useSidebar(
+        <Sidebar>
             <Sidebar.Group title="Overview">
                 <Sidebar.Item
                     label="Metrics"

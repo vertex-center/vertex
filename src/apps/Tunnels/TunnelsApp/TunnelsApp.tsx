@@ -6,14 +6,13 @@ import { useServerEvent } from "../../../hooks/useEvent";
 import { useQueryClient } from "@tanstack/react-query";
 import { useContainers } from "../../Containers/hooks/useContainers";
 import { Sidebar, useTitle } from "@vertex-center/components";
-import { useLocation } from "react-router-dom";
 import l from "../../../components/NavLink/navlink";
 import { ContainerLed } from "../../../components/ContainerLed/ContainerLed";
+import { useSidebar } from "../../../hooks/useSidebar";
 
 export default function TunnelsApp() {
     useTitle("Tunnels");
 
-    const { pathname } = useLocation();
     const queryClient = useQueryClient();
 
     const { containers, isLoading } = useContainers({
@@ -30,8 +29,8 @@ export default function TunnelsApp() {
         },
     });
 
-    const sidebar = (
-        <Sidebar rootUrl="/app/vx-tunnels" currentUrl={pathname}>
+    const sidebar = useSidebar(
+        <Sidebar>
             <Sidebar.Group title="Providers">
                 <Sidebar.Item
                     label="Cloudflare Tunnel"

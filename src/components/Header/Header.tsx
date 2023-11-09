@@ -4,13 +4,7 @@ import {
     useLocation,
 } from "react-router-dom";
 import { useApps } from "../../hooks/useApps";
-import {
-    Header,
-    LinkProps,
-    MaterialIcon,
-    PageContext,
-} from "@vertex-center/components";
-import { useContext } from "react";
+import { Header, LinkProps } from "@vertex-center/components";
 
 type Props = {
     title?: string;
@@ -33,31 +27,10 @@ export default function (props: Readonly<Props>) {
         to = `/app/${app.id}`;
     }
 
-    const { title, navigation } = useContext(PageContext);
-
-    let leading = undefined;
-    const nav = navigation?.split("/") ?? [];
-    let linkBack: LinkProps<RouterLinkProps> = undefined;
-    if (nav.length > 0) {
-        linkBack = {
-            as: Link,
-            to: `/app/${app?.id}/${nav.slice(0, -1).join("/")}`,
-        };
-        leading = <MaterialIcon icon={"arrow_back"} />;
-    }
-
     const linkLogo: LinkProps<RouterLinkProps> = {
         as: Link,
         to,
     };
 
-    return (
-        <Header
-            onClick={onClick}
-            appName={app?.name}
-            linkLogo={linkLogo}
-            linkBack={linkBack}
-            leading={leading}
-        />
-    );
+    return <Header onClick={onClick} appName={app?.name} linkLogo={linkLogo} />;
 }

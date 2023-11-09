@@ -6,22 +6,20 @@ import { useServerEvent } from "../../../hooks/useEvent";
 import { useQueryClient } from "@tanstack/react-query";
 import { useContainers } from "../../Containers/hooks/useContainers";
 import { MaterialIcon, Sidebar, useTitle } from "@vertex-center/components";
-import { useLocation } from "react-router-dom";
 import l from "../../../components/NavLink/navlink";
 import { ContainerLed } from "../../../components/ContainerLed/ContainerLed";
+import { useSidebar } from "../../../hooks/useSidebar";
 
 export default function SqlApp() {
     useTitle("SQL databases");
-
-    const { pathname } = useLocation();
 
     const queryClient = useQueryClient();
     const { containers, isLoading } = useContainers({
         tags: ["Vertex SQL"],
     });
 
-    const sidebar = (
-        <Sidebar rootUrl="/app/vx-sql" currentUrl={pathname}>
+    const sidebar = useSidebar(
+        <Sidebar>
             {Object.values(containers ?? {}).length > 0 && (
                 <Sidebar.Group title="DBMS">
                     {Object.values(containers ?? {})?.map((inst) => {

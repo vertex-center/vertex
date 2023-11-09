@@ -1,4 +1,4 @@
-import { Fragment, PropsWithChildren } from "react";
+import { PropsWithChildren } from "react";
 import styles from "./PageWithSidebar.module.sass";
 import { Outlet } from "react-router-dom";
 
@@ -9,13 +9,11 @@ type Props = PropsWithChildren & {
 export default function PageWithSidebar(props: Readonly<Props>) {
     const { sidebar } = props;
     return (
-        <Fragment>
-            <div className={styles.content}>
-                {sidebar}
-                <div className={styles.side}>
-                    <Outlet />
-                </div>
+        <div className={styles.content}>
+            {sidebar}
+            <div className={styles.side}>
+                <Outlet />
             </div>
-        </Fragment>
+        </div>
     );
 }
