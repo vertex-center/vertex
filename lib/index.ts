@@ -18,7 +18,8 @@ import { SidebarGroupProps } from "./components/Sidebar/SidebarGroup";
 import { TextField } from "./components/TextField/TextField";
 import { Title, TitleType } from "./components/Title/Title";
 import { PageContext, PageProvider } from "./contexts/PageContext";
-import { useNav } from "./hooks/useNav";
+import { useHasSidebar } from "./hooks/useHasSidebar";
+import { useShowSidebar } from "./hooks/useShowSidebar";
 import { useTitle } from "./hooks/useTitle";
 
 import "./index.sass";
@@ -54,6 +55,7 @@ export {
     Sidebar,
     TextField,
     Title,
-    useNav,
+    useHasSidebar,
+    useShowSidebar,
     useTitle,
 };

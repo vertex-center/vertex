@@ -32,6 +32,12 @@
             text-decoration: none
             color: colors.$fg-primary
 
+        &-menu
+            display: none
+
+            @include dimensions.small-or-less
+                display: block
+
         &:hover
             background-color: colors.$bg-secondary-hover
 

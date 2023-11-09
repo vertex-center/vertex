@@ -6,22 +6,58 @@
     display: flex
     flex-direction: column
     min-width: 300px
+    max-width: 300px
     padding: 0 0 10px 10px
     box-sizing: border-box
-    gap: 15px
+    transition: max-width 0.1s ease, min-width 0.1s ease, padding 0.1s ease, padding 0.1s ease
+    overflow: hidden
+
+    &-overlay
+        display: none
+
+    &-groups
+        display: flex
+        flex-direction: column
+        gap: 15px
 
     @include dimensions.small-or-less
-        min-width: 100%
-        max-width: 100%
-        padding: 0 15px 10px 10px
+        position: fixed
+        top: 0
+        left: 0
+        bottom: 0
+        min-width: 0
+        max-width: 0
+        z-index: 50
+        background-color: colors.$bg-primary
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2)
 
-    &-with-item-selected
-        @include dimensions.small-or-less
-            padding: 0
-            background-color: red
-            max-width: 0
-            min-width: 0
-            overflow: hidden
+        &-visible
+            max-width: 300px
+            min-width: 300px
+            padding: 10px 15px 10px 10px
+
+        &-overlay-visible
+            display: block
+            position: absolute
+            top: 0
+            left: 0
+            bottom: 0
+            right: 0
+            z-index: 40
+            background-color: rgba(0, 0, 0, 0.2)
+
+    &-collapse-button
+        background-color: transparent
+        padding: 10px
+        margin-left: 10px
+        border-radius: dimensions.$border-radius
+        cursor: pointer
+        transition: background-color 0.1s ease-in-out
+        max-width: 60px
+        overflow: hidden
+
+        &:hover
+            background-color: colors.$bg-secondary-hover
 
     &-group
         display: flex
@@ -74,17 +110,16 @@
                 top: 12px
                 bottom: 12px
 
-        @include dimensions.medium-or-greater
-            &::after
-                position: absolute
-                content: ''
-                top: 50%
-                bottom: 50%
-                left: 0
-                width: 3px
-                border-radius: 2px
-                background-color: colors.$bg-accent
-                transition: all 0.1s ease-in-out
+        &::after
+            position: absolute
+            content: ''
+            top: 50%
+            bottom: 50%
+            left: 0
+            width: 3px
+            border-radius: 2px
+            background-color: colors.$bg-accent
+            transition: all 0.1s ease-in-out
 
         &-icon
             margin-top: -1px

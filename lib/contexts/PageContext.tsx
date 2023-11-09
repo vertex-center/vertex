@@ -3,24 +3,45 @@ import { createContext, PropsWithChildren, useMemo, useState } from "react";
 export const PageContext = createContext<{
     title?: string;
     setTitle?: (title?: string) => void;
-    navigation?: string;
-    setNavigation?: (url?: string) => void;
+    hasSidebar?: boolean;
+    setHasSidebar?: (has?: boolean) => void;
+    showSidebar?: boolean;
+    setShowSidebar?: (show?: boolean) => void;
+    toggleShowSidebar?: () => void;
 }>({
     title: undefined,
     setTitle: undefined,
-    navigation: undefined,
-    setNavigation: undefined,
+    hasSidebar: undefined,
+    setHasSidebar: undefined,
+    showSidebar: undefined,
+    setShowSidebar: undefined,
 });
 
 export function PageProvider(props: PropsWithChildren) {
     const { children } = props;
 
     const [title, setTitle] = useState<string>();
-    const [navigation, setNavigation] = useState<string>();
+    const [hasSidebar, setHasSidebar] = useState<boolean>();
+    const [showSidebar, setShowSidebar] = useState<boolean>();
 
     const value = useMemo(
-        () => ({ title, setTitle, navigation, setNavigation }),
-        [title, setTitle, navigation, setNavigation],
+        () => ({
+            title,
+            setTitle,
+            hasSidebar,
+            setHasSidebar,
+            showSidebar,
+            setShowSidebar,
+            toggleShowSidebar: () => setShowSidebar((show) => !show),
+        }),
+        [
+            title,
+            setTitle,
+            hasSidebar,
+            setHasSidebar,
+            showSidebar,
+            setShowSidebar,
+        ],
     );
 
     return (

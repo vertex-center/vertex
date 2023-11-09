@@ -1,10 +1,11 @@
 import "./Header.sass";
-import { HTMLProps, ReactNode, useContext } from "react";
+import { HTMLProps, ReactNode, useContext, useEffect, useState } from "react";
 import cx from "classnames";
 import { Logo } from "../Logo/Logo.tsx";
 import { Title } from "../Title/Title.tsx";
 import { Link, LinkProps } from "../Link/Link.tsx";
 import { PageContext } from "../../contexts/PageContext";
+import { MaterialIcon } from "../MaterialIcon/MaterialIcon.tsx";
 
 interface IHeaderLink {
     className?: string;
@@ -33,16 +34,33 @@ export function Header<T extends IHeaderLink, U extends IHeaderLink>(
     const { className: classNameLinkLogo, ...linkLogoProps } = linkLogo ?? {};
     const { className: classNameLinkBack, ...linkBackProps } = linkBack ?? {};
 
-    const { title } = useContext(PageContext);
+    const [leadingElement, setLeadingElement] = useState<ReactNode>(null);
 
-    const leadingElement = leading && (
-        <Link
-            className={cx("header-leading-link", classNameLinkBack)}
-            {...linkBackProps}
-        >
-            <div className="header-leading">{leading}</div>
-        </Link>
-    );
+    const { title, hasSidebar, setShowSidebar } = useContext(PageContext);
+
+    useEffect(() => {
+        if (leading) {
+            setLeadingElement(
+                <Link
+                    className={cx("header-leading-link", classNameLinkBack)}
+                    {...linkBackProps}
+                >
+                    <div className="header-leading">{leading}</div>
+                </Link>,
+            );
+        } else if (hasSidebar) {
+            setLeadingElement(
+                <div
+                    className="header-leading header-leading-menu"
+                    onClick={() => setShowSidebar?.(true)}
+                >
+                    <MaterialIcon icon="menu" />
+                </div>,
+            );
+        } else {
+            setLeadingElement(null);
+        }
+    }, [hasSidebar]);
 
     return (
         <header className={cx("header", className)} {...others}>

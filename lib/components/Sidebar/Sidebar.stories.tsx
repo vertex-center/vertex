@@ -11,10 +11,6 @@ const meta: Meta<typeof Sidebar> = {
 type Story = StoryObj<typeof Sidebar>;
 
 export const Normal: Story = {
-    args: {
-        rootUrl: "/my-app",
-        currentUrl: "/my-app/A",
-    },
     render: function Render(props) {
         return (
             <Sidebar {...props}>
