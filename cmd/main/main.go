@@ -76,14 +76,6 @@ func main() {
 
 	checkNotRoot()
 
-	gin.SetMode(gin.ReleaseMode)
-	ctx = types.NewVertexContext()
-	r = router.New()
-	r.Use(cors.Default())
-	r.Use(ginutils.ErrorHandler())
-	r.Use(ginutils.Logger("MAIN"))
-	r.Use(gin.Recovery())
-
 	about := types.About{
 		Version: version,
 		Commit:  commit,
@@ -92,6 +84,8 @@ func main() {
 		OS:   runtime.GOOS,
 		Arch: runtime.GOARCH,
 	}
+
+	initRouter()
 	initAdapters()
 	initServices(about)
 	initRoutes(about)
@@ -166,6 +160,16 @@ func checkNotRoot() {
 	if os.Getuid() == 0 {
 		log.Warn("while vertex-kernel must be run as root, the vertex user should not be root")
 	}
+}
+
+func initRouter() {
+	gin.SetMode(gin.ReleaseMode)
+	ctx = types.NewVertexContext()
+	r = router.New()
+	r.Use(cors.Default())
+	r.Use(ginutils.ErrorHandler())
+	r.Use(ginutils.Logger("MAIN"))
+	r.Use(gin.Recovery())
 }
 
 func initAdapters() {

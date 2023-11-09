@@ -58,14 +58,7 @@ func main() {
 		log.Error(err)
 	}
 
-	// Vertex-Kernel
-	gin.SetMode(gin.ReleaseMode)
-	ctx = types.NewVertexContext()
-	r = router.New()
-	r.Use(ginutils.ErrorHandler())
-	r.Use(ginutils.Logger("KERNEL"))
-	r.Use(gin.Recovery())
-
+	initRouter()
 	initAdapters()
 	initServices()
 	initRoutes()
@@ -182,6 +175,15 @@ func buildVertex() {
 		log.Error(err)
 		os.Exit(1)
 	}
+}
+
+func initRouter() {
+	gin.SetMode(gin.ReleaseMode)
+	ctx = types.NewVertexContext()
+	r = router.New()
+	r.Use(ginutils.ErrorHandler())
+	r.Use(ginutils.Logger("KERNEL"))
+	r.Use(gin.Recovery())
 }
 
 func initAdapters() {
