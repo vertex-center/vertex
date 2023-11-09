@@ -58,8 +58,6 @@ func main() {
 		log.Error(err)
 	}
 
-	shutdownChan := make(chan os.Signal, 1)
-
 	// Vertex-Kernel
 	gin.SetMode(gin.ReleaseMode)
 	ctx = types.NewVertexContext()
@@ -74,6 +72,7 @@ func main() {
 
 	ctx.DispatchEvent(types.EventServerStart{})
 
+	shutdownChan := make(chan os.Signal, 1)
 	go func() {
 		startRouter()
 		shutdownChan <- syscall.SIGINT
