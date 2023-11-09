@@ -1,12 +1,6 @@
 import { useState } from "react";
 import { api } from "../../../../backend/api/backend";
-import {
-    Outlet,
-    useLocation,
-    useNavigate,
-    useOutlet,
-    useParams,
-} from "react-router-dom";
+import { Outlet, useNavigate, useOutlet, useParams } from "react-router-dom";
 import styles from "./Container.module.sass";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
 import Spacer from "../../../../components/Spacer/Spacer";
@@ -27,7 +21,6 @@ import { useSidebar } from "../../../../hooks/useSidebar";
 
 export default function ContainerDetails() {
     const { uuid } = useParams();
-    const { pathname } = useLocation();
     const outlet = useOutlet();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
