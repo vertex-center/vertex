@@ -3,6 +3,7 @@ package types
 import (
 	"testing"
 
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/pkg/event"
 )
@@ -24,11 +25,11 @@ func (suite *VertexContextTestSuite) SetupSuite() {
 
 func (suite *VertexContextTestSuite) TestDispatchEvent() {
 	bus := &event.MockBus{}
-	bus.DispatchEventFunc = func(e event.Event) {}
+	bus.On("DispatchEvent", event.MockEvent{}).Return()
 	suite.context.bus = bus
 
 	suite.context.DispatchEvent(event.MockEvent{})
-	suite.Equal(1, bus.DispatchEventCalls)
+	bus.AssertExpectations(suite.T())
 }
 
 func (suite *VertexContextTestSuite) TestDispatchHardReset() {
@@ -36,24 +37,24 @@ func (suite *VertexContextTestSuite) TestDispatchHardReset() {
 	suite.context.bus = bus
 
 	suite.context.DispatchEvent(EventServerHardReset{})
-	suite.Equal(0, bus.DispatchEventCalls)
+	bus.AssertNotCalled(suite.T(), "DispatchEvent", mock.Anything)
 }
 
 func (suite *VertexContextTestSuite) TestAddListener() {
 	bus := &event.MockBus{}
-	bus.AddListenerFunc = func(l event.Listener) {}
+	bus.On("AddListener", &event.MockListener{}).Return()
 	suite.context.bus = bus
 
 	suite.context.AddListener(&event.MockListener{})
-	suite.Equal(1, bus.AddListenerCalls)
+	bus.AssertExpectations(suite.T())
 }
 
 func (suite *VertexContextTestSuite) TestRemoveListener() {
 	bus := &event.MockBus{}
-	bus.RemoveListenerFunc = func(l event.Listener) {}
+	bus.On("RemoveListener", &event.MockListener{}).Return()
 	suite.context.bus = bus
 
 	listener := &event.MockListener{}
 	suite.context.RemoveListener(listener)
-	suite.Equal(1, bus.RemoveListenerCalls)
+	bus.AssertExpectations(suite.T())
 }

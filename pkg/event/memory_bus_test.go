@@ -24,17 +24,9 @@ func (suite *MemoryBusTestSuite) SetupSuite() {
 func (suite *MemoryBusTestSuite) TestEvents() {
 	id := uuid.New()
 
-	called := false
 	listener := &MockListener{}
-	listener.OnEventFunc = func(e Event) {
-		switch e.(type) {
-		case MockEvent:
-			called = true
-		}
-	}
-	listener.GetUUIDFunc = func() uuid.UUID {
-		return id
-	}
+	listener.On("OnEvent", MockEvent{}).Return()
+	listener.On("GetUUID").Return(id)
 
 	// Add a listener
 	suite.bus.AddListener(listener)
@@ -42,8 +34,7 @@ func (suite *MemoryBusTestSuite) TestEvents() {
 
 	// Fire event
 	suite.bus.DispatchEvent(MockEvent{})
-	suite.Equal(1, listener.OnEventCalls)
-	suite.True(called)
+	listener.AssertExpectations(suite.T())
 
 	// Remove listener
 	suite.bus.RemoveListener(listener)

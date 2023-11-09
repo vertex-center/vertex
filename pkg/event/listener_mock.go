@@ -2,21 +2,18 @@ package event
 
 import (
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/mock"
 )
 
 type MockListener struct {
-	OnEventFunc  func(e Event)
-	OnEventCalls int
-	GetUUIDFunc  func() uuid.UUID
-	GetUUIDCalls int
+	mock.Mock
 }
 
 func (m *MockListener) OnEvent(e Event) {
-	m.OnEventCalls++
-	m.OnEventFunc(e)
+	m.Called(e)
 }
 
 func (m *MockListener) GetUUID() uuid.UUID {
-	m.GetUUIDCalls++
-	return m.GetUUIDFunc()
+	args := m.Called()
+	return args.Get(0).(uuid.UUID)
 }

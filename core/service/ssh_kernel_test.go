@@ -44,47 +44,39 @@ func (suite *SshKernelServiceTestSuite) SetupTest() {
 }
 
 func (suite *SshKernelServiceTestSuite) TestGetAll() {
-	suite.adapter.GetAllFunc = func() ([]types.PublicKey, error) {
-		return testDataAuthorizedKeys, nil
-	}
+	suite.adapter.On("GetAll").Return(testDataAuthorizedKeys, nil)
 
 	keys, err := suite.service.GetAll()
 
 	suite.Require().NoError(err)
 	suite.Equal(testDataAuthorizedKeys, keys)
-	suite.Equal(1, suite.adapter.GetAllCalls)
+	suite.adapter.AssertExpectations(suite.T())
 }
 
 func (suite *SshKernelServiceTestSuite) TestAdd() {
-	suite.adapter.AddFunc = func(key string) error {
-		return nil
-	}
+	suite.adapter.On("Add", testDataAuthorizedKey).Return(nil)
 
 	err := suite.service.Add(testDataAuthorizedKey)
 
 	suite.Require().NoError(err)
-	suite.Equal(1, suite.adapter.AddCalls)
+	suite.adapter.AssertExpectations(suite.T())
 }
 
 func (suite *SshKernelServiceTestSuite) TestAddInvalidKey() {
-	suite.adapter.AddFunc = func(key string) error {
-		return nil
-	}
+	suite.adapter.On("Add", "invalid").Return(nil)
 
 	err := suite.service.Add("invalid")
 
 	suite.Require().Error(err)
 	suite.Require().ErrorIsf(err, ErrInvalidPublicKey, "invalid key")
-	suite.Equal(0, suite.adapter.AddCalls)
+	suite.adapter.AssertNotCalled(suite.T(), "Add", "invalid")
 }
 
 func (suite *SshKernelServiceTestSuite) TestDelete() {
-	suite.adapter.RemoveFunc = func(fingerprint string) error {
-		return nil
-	}
+	suite.adapter.On("Remove", testDataFingerprint).Return(nil)
 
 	err := suite.service.Delete(testDataFingerprint)
 
 	suite.Require().NoError(err)
-	suite.Equal(1, suite.adapter.RemoveCalls)
+	suite.adapter.AssertExpectations(suite.T())
 }

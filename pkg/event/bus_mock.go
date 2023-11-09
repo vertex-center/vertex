@@ -1,25 +1,19 @@
 package event
 
+import "github.com/stretchr/testify/mock"
+
 type MockBus struct {
-	AddListenerFunc     func(l Listener)
-	AddListenerCalls    int
-	RemoveListenerFunc  func(l Listener)
-	RemoveListenerCalls int
-	DispatchEventFunc   func(e Event)
-	DispatchEventCalls  int
+	mock.Mock
 }
 
 func (m *MockBus) AddListener(l Listener) {
-	m.AddListenerCalls++
-	m.AddListenerFunc(l)
+	m.Called(l)
 }
 
 func (m *MockBus) RemoveListener(l Listener) {
-	m.RemoveListenerCalls++
-	m.RemoveListenerFunc(l)
+	m.Called(l)
 }
 
 func (m *MockBus) DispatchEvent(e Event) {
-	m.DispatchEventCalls++
-	m.DispatchEventFunc(e)
+	m.Called(e)
 }

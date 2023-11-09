@@ -3,79 +3,65 @@ package port
 import (
 	"context"
 
+	"github.com/stretchr/testify/mock"
 	"github.com/vertex-center/vertex/core/types"
 )
 
 type (
 	MockBaselinesAdapter struct {
-		GetLatestFunc  func(ctx context.Context, channel types.SettingsUpdatesChannel) (types.Baseline, error)
-		GetLatestCalls int
+		mock.Mock
 	}
 
 	MockSettingsAdapter struct {
-		GetSettingsFunc              func() types.Settings
-		GetSettingsCalls             int
-		GetNotificationsWebhookFunc  func() *string
-		GetNotificationsWebhookCalls int
-		SetNotificationsWebhookFunc  func(webhook string) error
-		SetNotificationsWebhookCalls int
-		GetChannelFunc               func() *types.SettingsUpdatesChannel
-		GetChannelCalls              int
-		SetChannelFunc               func(channel types.SettingsUpdatesChannel) error
-		SetChannelCalls              int
+		mock.Mock
 	}
 
 	MockSshAdapter struct {
-		GetAllFunc  func() ([]types.PublicKey, error)
-		GetAllCalls int
-		AddFunc     func(key string) error
-		AddCalls    int
-		RemoveFunc  func(fingerprint string) error
-		RemoveCalls int
+		mock.Mock
 	}
 )
 
 func (m *MockBaselinesAdapter) GetLatest(ctx context.Context, channel types.SettingsUpdatesChannel) (types.Baseline, error) {
-	m.GetLatestCalls++
-	return m.GetLatestFunc(ctx, channel)
+	args := m.Called(ctx, channel)
+	return args.Get(0).(types.Baseline), args.Error(1)
 }
 
 func (m *MockSettingsAdapter) GetSettings() types.Settings {
-	m.GetSettingsCalls++
-	return m.GetSettingsFunc()
+	args := m.Called()
+	return args.Get(0).(types.Settings)
 }
 
 func (m *MockSettingsAdapter) GetNotificationsWebhook() *string {
-	m.GetNotificationsWebhookCalls++
-	return m.GetNotificationsWebhookFunc()
+	args := m.Called()
+	return args.Get(0).(*string)
 }
 
 func (m *MockSettingsAdapter) SetNotificationsWebhook(webhook string) error {
-	m.SetNotificationsWebhookCalls++
-	return m.SetNotificationsWebhookFunc(webhook)
+	args := m.Called(webhook)
+	return args.Error(0)
 }
 
 func (m *MockSettingsAdapter) GetChannel() *types.SettingsUpdatesChannel {
-	m.GetChannelCalls++
-	return m.GetChannelFunc()
+	args := m.Called()
+	return args.Get(0).(*types.SettingsUpdatesChannel)
 }
 
 func (m *MockSettingsAdapter) SetChannel(channel types.SettingsUpdatesChannel) error {
-	m.SetChannelCalls++
-	return m.SetChannelFunc(channel)
+	args := m.Called(channel)
+	return args.Error(0)
 }
 
 func (m *MockSshAdapter) GetAll() ([]types.PublicKey, error) {
-	m.GetAllCalls++
-	return m.GetAllFunc()
+	args := m.Called()
+	return args.Get(0).([]types.PublicKey), args.Error(1)
 }
 
 func (m *MockSshAdapter) Add(key string) error {
-	m.AddCalls++
-	return m.AddFunc(key)
+	args := m.Called(key)
+	return args.Error(0)
 }
 
 func (m *MockSshAdapter) Remove(fingerprint string) error {
-	m.RemoveCalls++
-	return m.RemoveFunc(fingerprint)
+	args := m.Called(fingerprint)
+	return args.Error(0)
 }

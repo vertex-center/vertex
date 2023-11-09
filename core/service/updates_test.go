@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
@@ -51,16 +50,8 @@ func (suite *UpdateServiceTestSuite) SetupTest() {
 	}
 
 	suite.adapter = &port.MockBaselinesAdapter{}
-	suite.adapter.GetLatestFunc = func(ctx context.Context, channel types.SettingsUpdatesChannel) (types.Baseline, error) {
-		switch channel {
-		case types.SettingsUpdatesChannelStable:
-			return suite.latestBaseline, nil
-		case types.SettingsUpdatesChannelBeta:
-			return suite.betaBaseline, nil
-		default:
-			return types.Baseline{}, nil
-		}
-	}
+	suite.adapter.On("GetLatest", mock.Anything, types.SettingsUpdatesChannelStable).Return(suite.latestBaseline, nil)
+	suite.adapter.On("GetLatest", mock.Anything, types.SettingsUpdatesChannelBeta).Return(suite.betaBaseline, nil)
 	suite.service = NewUpdateService(types.NewVertexContext(), suite.adapter, updaters).(*UpdateService)
 }
 

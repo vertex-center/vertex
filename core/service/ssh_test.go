@@ -5,7 +5,6 @@ import (
 
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/core/types"
 )
 
 type SshServiceTestSuite struct {
@@ -25,35 +24,29 @@ func (suite *SshServiceTestSuite) SetupTest() {
 }
 
 func (suite *SshServiceTestSuite) TestGetAll() {
-	suite.adapter.GetAllFunc = func() ([]types.PublicKey, error) {
-		return testDataAuthorizedKeys, nil
-	}
+	suite.adapter.On("GetAll").Return(testDataAuthorizedKeys, nil)
 
 	keys, err := suite.service.GetAll()
 
 	suite.Require().NoError(err)
 	suite.Equal(testDataAuthorizedKeys, keys)
-	suite.Equal(1, suite.adapter.GetAllCalls)
+	suite.adapter.AssertExpectations(suite.T())
 }
 
 func (suite *SshServiceTestSuite) TestAdd() {
-	suite.adapter.AddFunc = func(key string) error {
-		return nil
-	}
+	suite.adapter.On("Add", testDataAuthorizedKey).Return(nil)
 
 	err := suite.service.Add(testDataAuthorizedKey)
 
 	suite.Require().NoError(err)
-	suite.Equal(1, suite.adapter.AddCalls)
+	suite.adapter.AssertExpectations(suite.T())
 }
 
 func (suite *SshServiceTestSuite) TestDelete() {
-	suite.adapter.RemoveFunc = func(fingerprint string) error {
-		return nil
-	}
+	suite.adapter.On("Remove", testDataFingerprint).Return(nil)
 
 	err := suite.service.Delete(testDataFingerprint)
 
 	suite.Require().NoError(err)
-	suite.Equal(1, suite.adapter.RemoveCalls)
+	suite.adapter.AssertExpectations(suite.T())
 }
