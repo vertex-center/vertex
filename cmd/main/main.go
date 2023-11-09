@@ -184,7 +184,7 @@ func initServices(about types.About) {
 	updateService = service.NewUpdateService(ctx, baselinesApiAdapter, []types.Updater{
 		updates.NewVertexUpdater(about),
 		updates.NewVertexClientUpdater(path.Join(storage.Path, "client")),
-		updates.NewRepositoryUpdater("vertex_services", path.Join(storage.Path, "services"), "vertex-center", "vertex-services"),
+		updates.NewRepositoryUpdater("vertex_services", path.Join(storage.Path, "services"), "vertex-center", "services"),
 	})
 	appsService = service.NewAppsService(ctx, false, r,
 		[]app.Interface{
