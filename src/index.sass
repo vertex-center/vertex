@@ -10,7 +10,6 @@
     flex-direction: column
     min-height: 100vh
     max-height: 100vh
-    overflow: hidden
     background-color: colors.$bg-primary
     color: colors.$fg-primary
     font-family: fonts.$font-family
@@ -19,10 +18,14 @@
     &-main
         display: flex
         flex-direction: row
+        overflow: auto
         flex-grow: 1
 
     &-content
+        height: 100%
         flex-grow: 1
+        overflow: scroll
+        padding-bottom: 130px
 
 code
     font-family: fonts.$font-family-code
