@@ -7,7 +7,7 @@ export type SidebarItemVariant = "default" | "red";
 export type SidebarItemProps<T> = {
     variant?: SidebarItemVariant;
     label: string;
-    icon: React.JSX.Element;
+    icon?: React.JSX.Element;
     onClick?: () => void;
     notifications?: number;
     trailing?: ReactNode;
@@ -19,7 +19,7 @@ export function SidebarItem<T>(props: Readonly<SidebarItemProps<T>>) {
 
     const content = (
         <Fragment>
-            <div className="sidebar-item-icon">{icon}</div>
+            {icon && <div className="sidebar-item-icon">{icon}</div>}
             {label}
             {props.notifications !== undefined && (
                 <div className="sidebar-item-notification">
