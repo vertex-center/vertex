@@ -1,12 +1,11 @@
 import styles from "./DockDrawer.module.sass";
 import classNames from "classnames";
-import { Caption, Title } from "../Text/Text";
+import { Caption } from "../Text/Text";
 import { Link } from "react-router-dom";
 import { Vertical } from "../Layouts/Layouts";
 import LogoIcon from "../Logo/LogoIcon";
 import { useApps } from "../../hooks/useApps";
-import Header from "../Header/Header";
-import { MaterialIcon } from "@vertex-center/components";
+import { Logo, MaterialIcon, Title } from "@vertex-center/components";
 
 type AppProps = {
     to: string;
@@ -23,7 +22,7 @@ function DrawerApp(props: AppProps) {
         <Link to={to} className={styles.app} onClick={onClick}>
             <MaterialIcon icon={icon} className={styles.appIcon} />
             <Vertical gap={8}>
-                <Title className={styles.appName}>
+                <Title variant="h4" className={styles.appName}>
                     <LogoIcon />
                     {name}
                 </Title>
@@ -49,7 +48,10 @@ export default function DockDrawer(props: Props) {
                 [styles.drawerOpen]: show,
             })}
         >
-            <Header title="Vertex" onClick={onClose} />
+            <div className={styles.header} onClick={onClose}>
+                <Logo />
+                <Title variant="h3">Vertex</Title>
+            </div>
             <div className={styles.apps}>
                 {[...(apps ?? [])]
                     ?.filter((app) => app.category !== "devtools")
