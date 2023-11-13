@@ -5,14 +5,14 @@ go 1.21
 require (
 	github.com/antelman107/net-wait-go v0.0.0-20220211074630-12d8a944b87d
 	github.com/carlmjohnson/requests v0.23.5
-	github.com/disgoorg/disgo v0.16.11
+	github.com/disgoorg/disgo v0.16.12
 	github.com/docker/docker v24.0.7+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/sse v0.1.0
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.9.1
-	github.com/go-co-op/gocron v1.35.3
+	github.com/go-co-op/gocron v1.36.0
 	github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20231010084843-55a94097c399
 	github.com/go-git/go-git/v5 v5.10.0
 	github.com/google/go-containerregistry v0.16.1
