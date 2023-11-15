@@ -12,6 +12,10 @@ import { Logo, LogoProps } from "./components/Logo/Logo";
 import { MaterialIcon } from "./components/MaterialIcon/MaterialIcon";
 import { NavLink } from "./components/NavLink/NavLink.tsx";
 import {
+    Paragraph,
+    ParagraphProps,
+} from "./components/Paragraph/Paragraph.tsx";
+import {
     SelectField,
     SelectFieldProps,
     SelectOption,
@@ -41,6 +45,7 @@ export type {
     InputProps,
     LinkProps,
     LogoProps,
+    ParagraphProps,
     SelectFieldProps,
     SelectOptionProps,
     SidebarProps,
@@ -62,6 +67,7 @@ export {
     Logo,
     MaterialIcon,
     NavLink,
+    Paragraph,
     SelectField,
     SelectOption,
     Sidebar,

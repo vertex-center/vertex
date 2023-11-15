@@ -2,7 +2,7 @@ import { Meta, StoryObj } from "@storybook/react";
 import { Title } from "./Title.tsx";
 
 const meta: Meta<typeof Title> = {
-    title: "Components/Title",
+    title: "Typography/Title",
     component: Title,
     tags: ["autodocs"],
 };
