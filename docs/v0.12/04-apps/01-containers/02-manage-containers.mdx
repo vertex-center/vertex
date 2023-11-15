@@ -1,0 +1,49 @@
+# Manage containers
+
+To manage a container, click on it.
+The page will display multiple settings and management tools.
+
+* **Logs:** See the container logs.
+* **Docker:** Describe the Docker container.
+* **Environment:** Change environment configuration (ports, secret variables...).
+* **Database:** Manage the database associated with the container.
+* **Update:** Update the Vertex integration.
+* **Settings:** Change the containers settings (name, startup...).
+* **Delete:** Delete the container.
+
+## Logs
+
+This page displays the latest logs in real-time.
+Note that these logs are also backup in the `live/apps/vx-containers/{id}/.vertex/logs` directory,
+and are split in one file per day.
+These can be useful to investigate issues long after they appeared.
+
+## Docker
+
+This page displays some info about the Docker container, like its ID, name, image or platform.
+It also allows you to recreate the container.
+
+## Environment
+
+On this page, you can edit the container environment variables.
+
+## Database
+
+:::note
+This page is only visible if the container uses a database.
+:::
+
+This page allows you to manage the database associated with the container.
+To change the database, you can use the dropdown at the top of the page.
+Note that you must create the database before using it.
+
+## Update
+
+Use this page to update the Vertex integration of this container.
+
+## Settings
+
+On this page, you can edit the following settings:
+
+* **Name:** The custom container name.
+* **Launch on startup:** Whether the container should be launched when Vertex starts.

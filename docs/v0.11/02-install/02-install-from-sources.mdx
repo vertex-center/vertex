@@ -1,0 +1,34 @@
+---
+description: Install Vertex by building it manually from sources.
+pagination_prev: about
+pagination_next: security/vertex-kernel
+---
+
+# Install from sources
+
+1. Install Go using the [official documentation](https://go.dev/doc/install).
+
+2. Download the project
+    ```Bash
+    git clone https://github.com/vertex-center/vertex.git
+    cd vertex
+    ```
+
+3. Run **Vertex Kernel as sudo**:
+    ```Bash
+    sudo go run ./cmd/kernel --user $(whoami)
+    ```
+
+    or if you want to use a custom host/port:
+    ```Bash
+    sudo go run ./cmd/kernel \
+        --user $(whoami) \
+        --host localhost \
+        --port 6130
+    ```
+
+4. Open the UI in your browser: [http://localhost:6130](http://localhost:6130)
+
+:::tip About sudo
+To learn more about permissions, read [Security > Vertex Kernel](../security/vertex-kernel).
+:::
