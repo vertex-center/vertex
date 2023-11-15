@@ -2,6 +2,10 @@ import { Button, ButtonProps } from "./components/Button/Button";
 import { Checkbox, CheckboxProps } from "./components/Checkbox/Checkbox";
 import { Code, CodeProps } from "./components/Code/Code";
 import { Header, HeaderProps } from "./components/Header/Header";
+import {
+    InlineCode,
+    InlineCodeProps,
+} from "./components/InlineCode/InlineCode";
 import { Input, InputProps } from "./components/Input/Input";
 import { Link, LinkProps } from "./components/Link/Link";
 import { Logo, LogoProps } from "./components/Logo/Logo";
@@ -33,6 +37,7 @@ export type {
     CheckboxProps,
     CodeProps,
     HeaderProps,
+    InlineCodeProps,
     InputProps,
     LinkProps,
     LogoProps,
@@ -51,6 +56,7 @@ export {
     Header,
     PageContext,
     PageProvider,
+    InlineCode,
     Input,
     Link,
     Logo,
