@@ -21,6 +21,7 @@
         "react-dom": "^18.2.0",
         "react-router-dom": "^6.17.0",
         "remark-frontmatter": "^5.0.0",
+        "remark-gfm": "^4.0.0",
         "remark-mdx-frontmatter": "^4.0.0"
     },
     "devDependencies": {
