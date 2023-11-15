@@ -12,22 +12,22 @@ import { Tabs, TabItem } from "@vertex-center/components";
 
 1. Pull the official image
 
-```bash
-docker pull ghcr.io/vertex-center/vertex
-```
+    ```bash
+    docker pull ghcr.io/vertex-center/vertex
+    ```
 
 2. Run the image
 
-```bash
-docker run -d \
-    -p 6130:6130 \
-    -e PORT=6130 \
-    -e HOST=localhost:6130 \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    -v ~/.ssh:/root/.ssh \
-    -v path_to_live:/live \
-    ghcr.io/vertex-center/vertex
-```
+    ```bash
+    docker run -d \
+        -p 6130:6130 \
+        -e PORT=6130 \
+        -e HOST=localhost:6130 \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        -v ~/.ssh:/root/.ssh \
+        -v path_to_live:/live \
+        ghcr.io/vertex-center/vertex
+    ```
 
 </TabItem>
 
@@ -37,29 +37,29 @@ docker run -d \
 
 2. Add the following to the file:
 
-```yaml
-version: "3.8"
+    ```yaml
+    version: "3.8"
 
-services:
-  vertex:
-    image: ghcr.io/vertex-center/vertex
-    restart: always
-    environment:
-      PORT: 6130
-      HOST: localhost:6130
-    ports:
-      - "6130:6130"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ~/.ssh:/root/.ssh
-      - path_to_live:/live
-```
+    services:
+      vertex:
+        image: ghcr.io/vertex-center/vertex
+        restart: always
+        environment:
+          PORT: 6130
+          HOST: localhost:6130
+        ports:
+          - "6130:6130"
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - ~/.ssh:/root/.ssh
+          - path_to_live:/live
+    ```
 
 3. Run Docker Compose
 
-```bash
-docker-compose up
-```
+    ```bash
+    docker-compose up
+    ```
 
 </TabItem>
 
