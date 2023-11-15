@@ -4,93 +4,87 @@ pagination_prev: about
 pagination_next: security/vertex-kernel
 ---
 
-import {Tabs, TabItem} from "@vertex-center/components"
+import { Tabs, TabItem } from "@vertex-center/components";
 
 # Install with binaries
 
 <Tabs groupId="operating-systems">
 
-    <TabItem value="windows" label="Windows">
+<TabItem value="windows" label="Windows">
 
-        1. Download the precompiled binaries for your system from [GitHub
-        Releases](https://github.com/vertex-center/vertex/releases/latest). You must download **both** and put them in
-        the same folder:
+1. Download the precompiled binaries for your system from [GitHub Releases](https://github.com/vertex-center/vertex/releases/latest). You must download **both** and put them in the same folder:
 
-        - `vertex.exe`
-        - `vertex-kernel.exe`
+    - `vertex.exe`
+    - `vertex-kernel.exe`
 
-        2. Run **Vertex Kernel as administrator**:
-        ```Bash
-        .\vertex-kernel.exe --user YOUR_USERNAME
-        ```
+2. Run **Vertex Kernel as administrator**:
+    ```Bash
+    .\vertex-kernel.exe --user YOUR_USERNAME
+    ```
 
-        or if you want to use a custom host/port:
-        ```Bash
-        .\vertex-kernel.exe \
+    or if you want to use a custom host/port:
+    ```Bash
+    .\vertex-kernel.exe \
         --host localhost:6130 \
         --port 6130 \
         --user YOUR_USERNAME
-        ```
+    ```
 
-        3. Open the UI in your browser: [http://localhost:6130](http://localhost:6130).
+    3. Open the UI in your browser: [http://localhost:6130](http://localhost:6130).
 
-    </TabItem>
+</TabItem>
 
-    <TabItem value="macos" label="macOS">
+<TabItem value="macos" label="macOS">
 
-        1. Download the precompiled binaries for your system from [GitHub
-        Releases](https://github.com/vertex-center/vertex/releases/latest). You must download **both** and put them in
-        the same folder:
+1. Download the precompiled binaries for your system from [GitHub Releases](https://github.com/vertex-center/vertex/releases/latest). You must download **both** and put them in the same folder:
 
-        - `vertex`
-        - `vertex-kernel`
+    - `vertex`
+    - `vertex-kernel`
 
-        :::info Mac M1 or newer
-        Download the <code>arm64</code> version if you have a mac M1 or newer.
-        :::
+:::info Mac M1 or newer
+Download the <code>arm64</code> version if you have a mac M1 or newer.
+:::
 
-        2. Run **Vertex Kernel as sudo**:
-        ```Bash
-        sudo ./vertex-kernel --user $(whoami)
-        ```
+2. Run **Vertex Kernel as sudo**:
+    ```Bash
+    sudo ./vertex-kernel --user $(whoami)
+    ```
 
-        or if you want to use a custom host/port:
-        ```Bash
-        sudo ./vertex-kernel \
+    or if you want to use a custom host/port:
+    ```Bash
+    sudo ./vertex-kernel \
         --host localhost:6130 \
         --port 6130 \
         --user $(whoami)
-        ```
+    ```
 
-        3. Open the UI in your browser: [http://localhost:6130](http://localhost:6130)
+    3. Open the UI in your browser: [http://localhost:6130](http://localhost:6130)
 
-    </TabItem>
+</TabItem>
 
-    <TabItem value="linux" label="Linux">
+<TabItem value="linux" label="Linux">
 
-        1. Download the precompiled binaries for your system from [GitHub
-        Releases](https://github.com/vertex-center/vertex/releases/latest). You must download **both** and put them in
-        the same folder:
+1. Download the precompiled binaries for your system from [GitHub Releases](https://github.com/vertex-center/vertex/releases/latest). You must download **both** and put them in the same folder:
 
-        - `vertex`
-        - `vertex-kernel`
+    - `vertex`
+    - `vertex-kernel`
 
-        2. Run **Vertex Kernel as sudo**:
-        ```Bash
-        sudo ./vertex-kernel --user $(whoami)
-        ```
+2. Run **Vertex Kernel as sudo**:
+    ```Bash
+    sudo ./vertex-kernel --user $(whoami)
+    ```
 
-        or if you want to use a custom host/port:
-        ```Bash
-        sudo ./vertex-kernel \
+    or if you want to use a custom host/port:
+    ```Bash
+    sudo ./vertex-kernel \
         --host localhost:6130 \
         --port 6130 \
         --user $(whoami)
-        ```
+    ```
 
-        3. Open the UI in your browser: [http://localhost:6130](http://localhost:6130)
+3. Open the UI in your browser: [http://localhost:6130](http://localhost:6130)
 
-    </TabItem>
+</TabItem>
 
 </Tabs>
 
