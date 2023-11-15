@@ -24,6 +24,7 @@ import { useHasSidebar } from "./hooks/useHasSidebar";
 import { useShowSidebar } from "./hooks/useShowSidebar";
 import { useTitle } from "./hooks/useTitle";
 
+import "./styles/reset.css";
 import "./index.sass";
 
 export type {
