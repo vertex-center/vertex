@@ -46,19 +46,6 @@
             z-index: 40
             background-color: rgba(0, 0, 0, 0.2)
 
-    &-collapse-button
-        background-color: transparent
-        padding: 10px
-        margin-left: 10px
-        border-radius: dimensions.$border-radius
-        cursor: pointer
-        transition: background-color 0.1s ease-in-out
-        max-width: 60px
-        overflow: hidden
-
-        &:hover
-            background-color: colors.$bg-secondary-hover
-
     &-group
         display: flex
         flex-direction: column
@@ -92,6 +79,18 @@
 
         &-trailing
             margin-left: auto
+
+        &-children
+            display: none
+
+            &-expanded
+                display: block
+
+        &-expand
+            transform: rotate(-90deg)
+
+        &-expanded > &-expand
+            transform: rotate(0)
 
         &-red
             color: colors.$red
@@ -128,6 +127,9 @@
 
             & > *
                 font-size: 20px
+
+        &-children
+            margin-left: 20px
 
 .notifications
     display: flex

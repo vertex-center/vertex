@@ -1,10 +1,11 @@
-import React, { Fragment, ReactNode } from "react";
+import React, { Fragment, PropsWithChildren, ReactNode, useState } from "react";
 import cx from "classnames";
 import { NavLink, NavLinkProps } from "../NavLink/NavLink.tsx";
+import { MaterialIcon } from "../MaterialIcon/MaterialIcon.tsx";
 
 export type SidebarItemVariant = "default" | "red";
 
-export type SidebarItemProps<T> = {
+export type SidebarItemProps<T> = PropsWithChildren<{
     variant?: SidebarItemVariant;
     label: string;
     icon?: React.JSX.Element;
@@ -12,10 +13,16 @@ export type SidebarItemProps<T> = {
     notifications?: number;
     trailing?: ReactNode;
     link?: NavLinkProps<T>;
-};
+    children?: ReactNode;
+}>;
 
 export function SidebarItem<T>(props: Readonly<SidebarItemProps<T>>) {
-    const { variant, label, icon, onClick, trailing, link } = props;
+    const { children, variant, label, icon, trailing, link } = props;
+
+    const hasChildren =
+        children !== undefined && children !== null && children !== false;
+
+    const [expanded, setExpanded] = useState(false);
 
     const content = (
         <Fragment>
@@ -27,23 +34,53 @@ export function SidebarItem<T>(props: Readonly<SidebarItemProps<T>>) {
                 </div>
             )}
             <div className="sidebar-item-trailing">{trailing}</div>
+            {hasChildren && (
+                <MaterialIcon
+                    className="sidebar-item-expand"
+                    icon="expand_more"
+                />
+            )}
         </Fragment>
     );
 
+    const onClick = () => {
+        if (hasChildren) {
+            setExpanded(!expanded);
+        } else {
+            props.onClick?.();
+        }
+    };
+
     const className = cx("sidebar-item", {
         "sidebar-item-red": variant === "red",
+        "sidebar-item-expanded": expanded,
     });
 
-    if (!link)
-        return (
+    let item: React.JSX.Element;
+    if (!link) {
+        item = (
             <div className={className} onClick={onClick}>
                 {content}
             </div>
         );
+    } else {
+        item = (
+            <NavLink {...link} className={className} onClick={onClick}>
+                {content}
+            </NavLink>
+        );
+    }
 
     return (
-        <NavLink {...link} className={className}>
-            {content}
-        </NavLink>
+        <Fragment>
+            {item}
+            <div
+                className={cx("sidebar-item-children", {
+                    "sidebar-item-children-expanded": expanded,
+                })}
+            >
+                {children}
+            </div>
+        </Fragment>
     );
 }
