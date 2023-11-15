@@ -1,5 +1,6 @@
 import { Button, ButtonProps } from "./components/Button/Button";
 import { Checkbox, CheckboxProps } from "./components/Checkbox/Checkbox";
+import { Code, CodeProps } from "./components/Code/Code";
 import { Header, HeaderProps } from "./components/Header/Header";
 import { Input, InputProps } from "./components/Input/Input";
 import { Link, LinkProps } from "./components/Link/Link";
@@ -30,6 +31,7 @@ import "./index.sass";
 export type {
     ButtonProps,
     CheckboxProps,
+    CodeProps,
     HeaderProps,
     InputProps,
     LinkProps,
@@ -45,6 +47,7 @@ export type {
 export {
     Button,
     Checkbox,
+    Code,
     Header,
     PageContext,
     PageProvider,

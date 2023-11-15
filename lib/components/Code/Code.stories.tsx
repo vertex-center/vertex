@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from "@storybook/react";
-import Code from "./Code.tsx";
+import { Code } from "./Code.tsx";
 
 const exampleCode = `import React from "react";
 import { render } from "react-dom";

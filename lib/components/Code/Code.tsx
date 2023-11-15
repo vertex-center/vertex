@@ -4,12 +4,12 @@ import "./Code.sass";
 import { HTMLProps } from "react";
 import cx from "classnames";
 
-type Props = HTMLProps<HTMLDivElement> & {
+export type CodeProps = HTMLProps<HTMLDivElement> & {
     code: string;
     language: string;
 };
 
-export default function Code(props: Readonly<Props>) {
+export function Code(props: Readonly<CodeProps>) {
     const { language, code, className, ...others } = props;
 
     return (
