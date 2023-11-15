@@ -1,5 +1,5 @@
 import SyntaxHighlighter from "react-syntax-highlighter";
-import { atomOneDark as style } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { atomOneDark as style } from "react-syntax-highlighter/dist/cjs/styles/hljs";
 import "./Code.sass";
 import { HTMLProps } from "react";
 import cx from "classnames";
