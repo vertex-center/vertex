@@ -34,7 +34,13 @@ export default function Documentation(props: Props) {
                 if (props.className === undefined)
                     return <InlineCode {...props} />;
                 const language = /language-(\w+)/.exec(props.className || "");
-                return <Code {...props} language={language?.[1]} />;
+                return (
+                    <Code
+                        style={{ marginBottom: 15 }}
+                        {...props}
+                        language={language?.[1]}
+                    />
+                );
             },
             table: (props: any) => <Table {...props} />,
         }),
