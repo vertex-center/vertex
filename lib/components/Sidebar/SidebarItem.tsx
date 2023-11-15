@@ -27,7 +27,7 @@ export function SidebarItem<T>(props: Readonly<SidebarItemProps<T>>) {
     const content = (
         <Fragment>
             {icon && <div className="sidebar-item-icon">{icon}</div>}
-            {label}
+            {label && <div className="sidebar-item-label">{label}</div>}
             {props.notifications !== undefined && (
                 <div className="sidebar-item-notification">
                     {props.notifications}
