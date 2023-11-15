@@ -17,8 +17,8 @@ type Story = StoryObj<typeof Code>;
 
 export const Default: Story = {
     args: {
-        code: exampleCode,
         language: "javascript",
+        children: exampleCode,
     },
     render: function Render(props) {
         return <Code {...props} />;

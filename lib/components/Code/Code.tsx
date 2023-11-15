@@ -5,17 +5,24 @@ import { HTMLProps } from "react";
 import cx from "classnames";
 
 export type CodeProps = HTMLProps<HTMLDivElement> & {
-    code: string;
     language: string;
 };
 
 export function Code(props: Readonly<CodeProps>) {
-    const { language, code, className, ...others } = props;
+    const { language, children, className, ...others } = props;
+
+    if (typeof children !== "string") {
+        console.error(
+            "Code component must receive a string as children, received: ",
+            typeof children,
+        );
+        return null;
+    }
 
     return (
         <div className={cx("code", className)} {...others}>
             <SyntaxHighlighter language={language} style={style}>
-                {code}
+                {children}
             </SyntaxHighlighter>
         </div>
     );
