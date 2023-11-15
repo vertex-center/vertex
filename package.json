@@ -29,7 +29,8 @@
     "main": "dist/vertex-components.es.js",
     "types": "dist/vertex-components.d.ts",
     "dependencies": {
-        "classnames": "^2.3.2"
+        "classnames": "^2.3.2",
+        "react-syntax-highlighter": "^15.5.0"
     },
     "peerDependencies": {
         "react": "^18.2.0",

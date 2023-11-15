@@ -1,0 +1,14 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+@use "../../styles/fonts"
+
+.code
+    overflow: hidden
+    border-radius: dimensions.$border-radius
+    background: colors.$bg-secondary
+    padding: 6px 12px
+    font-family: fonts.$font-family-code
+    line-height: fonts.$line-height-code
+
+    & > *
+        background: colors.$bg-secondary !important
