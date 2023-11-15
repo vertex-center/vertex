@@ -26,7 +26,7 @@ const router = createBrowserRouter(
             children: [
                 {
                     path: "/",
-                    element: <Documentation content={undefined} />,
+                    element: <Documentation content={"div"} />,
                 },
                 ...docs.getRoutes().map((route) => ({
                     path: route.path,
