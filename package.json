@@ -23,7 +23,8 @@
         "remark-directive": "^3.0.0",
         "remark-frontmatter": "^5.0.0",
         "remark-gfm": "^4.0.0",
-        "remark-mdx-frontmatter": "^4.0.0"
+        "remark-mdx-frontmatter": "^4.0.0",
+        "remark-mermaidjs": "^6.0.0"
     },
     "devDependencies": {
         "@types/react": "^18.2.15",

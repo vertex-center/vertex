@@ -4,6 +4,7 @@ import mdx from "@mdx-js/rollup";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
 import remarkDirective from "remark-directive";
+import remarkMermaid from "remark-mermaidjs";
 import yaml from "@rollup/plugin-yaml";
 
 // https://vitejs.dev/config/
@@ -11,7 +12,19 @@ export default defineConfig({
     plugins: [
         react(),
         mdx({
-            remarkPlugins: [remarkFrontmatter, remarkGfm, remarkDirective],
+            remarkPlugins: [
+                remarkFrontmatter,
+                remarkGfm,
+                remarkDirective,
+                [
+                    remarkMermaid,
+                    {
+                        mermaidConfig: {
+                            theme: "dark",
+                        },
+                    },
+                ],
+            ],
         }),
         yaml(),
     ],
