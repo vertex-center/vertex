@@ -26,6 +26,7 @@ import { SidebarItemProps } from "./components/Sidebar/SidebarItem";
 import { SidebarGroupProps } from "./components/Sidebar/SidebarGroup";
 import { Tabs } from "./components/Tabs/Tabs";
 import { TabItem } from "./components/Tabs/TabItem";
+import { Table, TableProps } from "./components/Table/Table";
 import { TextField } from "./components/TextField/TextField";
 import { Title, TitleType } from "./components/Title/Title";
 import { PageContext, PageProvider } from "./contexts/PageContext";
@@ -51,6 +52,7 @@ export type {
     SidebarProps,
     SidebarItemProps,
     SidebarGroupProps,
+    TableProps,
     TitleType,
 };
 
@@ -73,6 +75,7 @@ export {
     Sidebar,
     Tabs,
     TabItem,
+    Table,
     TextField,
     Title,
     useHasSidebar,
