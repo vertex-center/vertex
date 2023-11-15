@@ -5,12 +5,45 @@
     &-row
         display: flex
         flex-direction: row
+        gap: 30px
         margin-bottom: 15px
 
 .tab-item
-    padding: 10px 20px
-    border-radius: dimensions.$border-radius
+    height: dimensions.$component-height
+    padding: 0
+    display: flex
+    align-items: center
     cursor: pointer
+    position: relative
+    z-index: 1
 
-    &:hover
+    &::before
+        content: ''
+        position: absolute
+        top: 0
+        bottom: 0
+        left: -15px
+        right: -15px
+        z-index: -1
+        border-radius: dimensions.$border-radius
+
+    &:hover::before
         background-color: colors.$bg-secondary-hover
+
+    &::after
+        content: ''
+        position: absolute
+        left: 50%
+        right: 50%
+        bottom: -1px
+        height: 2px
+        border-radius: 1px
+        transition: all 0.1s ease
+        opacity: 0
+        background-color: colors.$bg-accent
+
+    &-active::after
+        left: 0
+        right: 0
+        opacity: 1
+        background-color: colors.$bg-accent

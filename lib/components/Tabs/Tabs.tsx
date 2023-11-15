@@ -15,6 +15,7 @@ export function Tabs(props: Readonly<TabsProps>) {
                 {Children.map(children, (child: any, i) => {
                     return React.cloneElement(child, {
                         onClick: () => setActive(i),
+                        active: i === active,
                     });
                 })}
             </div>
