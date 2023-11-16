@@ -1,10 +1,11 @@
 import { Fragment, useEffect, useState } from "react";
-import { Text, Title } from "../../../../components/Text/Text";
+import { Title } from "../../../../components/Text/Text";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
 import Spacer from "../../../../components/Spacer/Spacer";
 import {
     Button,
     MaterialIcon,
+    Paragraph,
     SelectField,
     SelectOption,
     TextField,
@@ -104,7 +105,7 @@ export default function ContainerSettings() {
             <Title className={styles.title}>Settings</Title>
             <APIError error={error} />
             <Horizontal className={styles.toggle} alignItems="center">
-                <Text>Launch on Startup</Text>
+                <Paragraph>Launch on Startup</Paragraph>
                 <Spacer />
                 <ToggleButton
                     value={launchOnStartup}

@@ -42,13 +42,3 @@ export function Caption(props: HTMLProps<HTMLParagraphElement>) {
         </p>
     );
 }
-
-export function Text(props: HTMLProps<HTMLParagraphElement>) {
-    const { children, className, ...others } = props;
-
-    return (
-        <p className={classNames(styles.text, className)} {...others}>
-            {children}
-        </p>
-    );
-}

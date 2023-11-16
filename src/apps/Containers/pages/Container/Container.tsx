@@ -5,8 +5,12 @@ import styles from "./Container.module.sass";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
 import Spacer from "../../../../components/Spacer/Spacer";
 import Popup from "../../../../components/Popup/Popup";
-import { Text, Title } from "../../../../components/Text/Text";
-import { Button, MaterialIcon, Sidebar } from "@vertex-center/components";
+import {
+    Button,
+    MaterialIcon,
+    Paragraph,
+    Sidebar,
+} from "@vertex-center/components";
 import l from "../../../../components/NavLink/navlink";
 import Progress from "../../../../components/Progress";
 import { SiDocker } from "@icons-pack/react-simple-icons";
@@ -134,15 +138,15 @@ export default function ContainerDetails() {
                 </div>
             )}
             <Popup show={showDeletePopup} onDismiss={dismissDeletePopup}>
-                <Title>
+                <Paragraph>
                     Delete {container?.display_name ?? container?.service?.name}
                     ?
-                </Title>
-                <Text>
+                </Paragraph>
+                <Paragraph>
                     Are you sure you want to delete{" "}
                     {container?.display_name ?? container?.service?.name}? All
                     data will be permanently deleted.
-                </Text>
+                </Paragraph>
                 {isDeleting && <Progress infinite />}
                 <APIError style={{ margin: 0 }} error={errorDeleting} />
                 <Horizontal gap={10}>

@@ -1,18 +1,19 @@
 import { Vertical } from "../../../components/Layouts/Layouts";
-import { Text, Title } from "../../../components/Text/Text";
+import { Title } from "../../../components/Text/Text";
 import styles from "./CloudflareTunnels.module.sass";
 import ContainerInstaller from "../../../components/ContainerInstaller/ContainerInstaller";
 import { api } from "../../../backend/api/backend";
+import { Paragraph } from "@vertex-center/components";
 
 export default function CloudflareTunnels() {
     return (
         <Vertical gap={30}>
             <Vertical gap={20}>
                 <Title className={styles.title}>Cloudflare Tunnel</Title>
-                <Text className={styles.content}>
+                <Paragraph className={styles.content}>
                     Cloudflare Tunnel allows you to expose your services to the
                     internet, without having to open ports or manage firewalls.
-                </Text>
+                </Paragraph>
                 <ContainerInstaller
                     name="Cloudflare Tunnel"
                     tag="Vertex Tunnels - Cloudflare"

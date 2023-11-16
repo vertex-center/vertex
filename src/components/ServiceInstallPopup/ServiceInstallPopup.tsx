@@ -1,9 +1,9 @@
 import { Horizontal } from "../Layouts/Layouts";
 import ServiceLogo from "../ServiceLogo/ServiceLogo";
-import { Text, Title } from "../Text/Text";
+import { Title } from "../Text/Text";
 import { APIError } from "../Error/APIError";
 import Spacer from "../Spacer/Spacer";
-import { Button, MaterialIcon } from "@vertex-center/components";
+import { Button, MaterialIcon, Paragraph } from "@vertex-center/components";
 import Popup from "../Popup/Popup";
 import { Service as ServiceModel } from "../../models/service";
 import { useState } from "react";
@@ -36,7 +36,7 @@ export default function ServiceInstallPopup(props: Readonly<Props>) {
                 {service && <ServiceLogo service={service} />}
                 <Title>{service?.name}</Title>
             </Horizontal>
-            <Text>{service?.description}</Text>
+            <Paragraph>{service?.description}</Paragraph>
             <APIError style={{ margin: 0 }} error={error} />
             <Horizontal gap={8}>
                 <Spacer />

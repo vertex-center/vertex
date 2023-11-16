@@ -1,7 +1,12 @@
 import { useState } from "react";
-import { Caption, Text, Title } from "../../../components/Text/Text";
+import { Caption, Title } from "../../../components/Text/Text";
 import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
-import { Button, List, MaterialIcon } from "@vertex-center/components";
+import {
+    Button,
+    List,
+    MaterialIcon,
+    Paragraph,
+} from "@vertex-center/components";
 import Spacer from "../../../components/Spacer/Spacer";
 import Popup from "../../../components/Popup/Popup";
 import styles from "./SettingsUpdates.module.sass";
@@ -61,7 +66,7 @@ export default function SettingsUpdates() {
             <ProgressOverlay show={isLoading} />
             <Title className={styles.title}>Updates</Title>
             <Horizontal className={styles.toggle} alignItems="center">
-                <Text>Enable Beta channel</Text>
+                <Paragraph>Enable Beta channel</Paragraph>
                 <Spacer />
                 <ToggleButton
                     value={settings?.updates?.channel === "beta"}
@@ -90,10 +95,10 @@ export default function SettingsUpdates() {
                 </List>
             )}
             <Popup show={showMessage} onDismiss={dismissPopup}>
-                <Text>
+                <Paragraph>
                     Updates are installed. You can now restart your Vertex
                     server.
-                </Text>
+                </Paragraph>
                 <Horizontal>
                     <Spacer />
                     <Button
