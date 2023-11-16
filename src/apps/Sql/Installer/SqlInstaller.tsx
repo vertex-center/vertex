@@ -9,6 +9,7 @@ import ServiceInstallPopup from "../../../components/ServiceInstallPopup/Service
 import { useState } from "react";
 import { APIError } from "../../../components/Error/APIError";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { List } from "@vertex-center/components";
 
 export default function SqlInstaller() {
     const queryClient = useQueryClient();
@@ -81,7 +82,7 @@ export default function SqlInstaller() {
             <ProgressOverlay show={isContainersLoading ?? isServicesLoading} />
             <Title className={styles.title}>SQL Database Installer</Title>
             <APIError error={error} />
-            <Vertical>
+            <List>
                 {services
                     ?.filter((s) => s?.features?.databases?.length >= 1)
                     ?.filter((s) =>
@@ -109,7 +110,7 @@ export default function SqlInstaller() {
                             />
                         );
                     })}
-            </Vertical>
+            </List>
             <ServiceInstallPopup
                 service={selectedService}
                 show={showPopup}
