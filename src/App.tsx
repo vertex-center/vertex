@@ -25,35 +25,32 @@ import AllDocs from "./pages/All/AllDocs.tsx";
 
 const docs = new Generator("/docs");
 
-const router = createBrowserRouter(
-    [
-        {
-            element: <Root />,
-            children: [
-                {
-                    path: "/",
-                    element: <AllDocs />,
-                },
-                {
-                    element: <Docs />,
-                    children: [
-                        ...docs.getRoutes().map((route) => ({
-                            path: route.path,
-                            element: (
-                                <Documentation content={route.page?.default} />
-                            ),
-                        })),
-                        {
-                            path: "*",
-                            element: <Documentation content={"div"} />,
-                        },
-                    ],
-                },
-            ],
-        },
-    ],
-    { basename: "/" }
-);
+const router = createBrowserRouter([
+    {
+        element: <Root />,
+        children: [
+            {
+                path: "/",
+                element: <AllDocs />,
+            },
+            {
+                element: <Docs />,
+                children: [
+                    ...docs.getRoutes().map((route) => ({
+                        path: route.path,
+                        element: (
+                            <Documentation content={route.page?.default} />
+                        ),
+                    })),
+                    {
+                        path: "*",
+                        element: <Documentation content={"div"} />,
+                    },
+                ],
+            },
+        ],
+    },
+]);
 
 type SidebarItemsProps = {
     root?: boolean;
