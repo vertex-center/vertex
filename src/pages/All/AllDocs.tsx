@@ -19,7 +19,7 @@ export default function AllDocs() {
     return (
         <div className={styles.all}>
             <List>
-                <ListItem onClick={() => navigate("/vertex")}>
+                <ListItem onClick={() => navigate("/vertex/next/about")}>
                     <ListIcon>
                         <Logo />
                     </ListIcon>
