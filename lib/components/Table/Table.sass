@@ -1,5 +1,6 @@
 @use "../../styles/colors"
 @use "../../styles/dimensions"
+@use "../../styles/fonts"
 
 .table
     background-color: colors.$bg-primary-hover
@@ -8,7 +9,8 @@
 
     & th, & td
         border: 1px solid colors.$bg-tertiary
-        padding: 15px 20px
+        padding: 10px 20px
+        line-height: fonts.$line-height-normal
 
     & th:not(:last-child), & td:not(:last-child)
         border-right: none
