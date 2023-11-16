@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { Fragment, HTMLProps, useContext } from "react";
 import { ThemeContext } from "./theme.tsx";
 import cx from "classnames";
 import {
@@ -11,15 +11,17 @@ import {
 } from "react-router-dom";
 import {
     Header,
+    LinkProps,
     SelectField,
     SelectOption,
     Sidebar,
     useHasSidebar,
 } from "@vertex-center/components";
 import Documentation from "./pages/Documentation/Documentation.tsx";
-import Docs from "./documentation.ts";
+import Generator from "./documentation.ts";
+import AllDocs from "./pages/All/AllDocs.tsx";
 
-const docs = new Docs("/docs");
+const docs = new Generator("/docs");
 
 const router = createBrowserRouter(
     [
@@ -28,15 +30,22 @@ const router = createBrowserRouter(
             children: [
                 {
                     path: "/",
-                    element: <Documentation content={"div"} />,
+                    element: <AllDocs />,
                 },
-                ...docs.getRoutes().map((route) => ({
-                    path: route.path,
-                    element: <Documentation content={route.page?.default} />,
-                })),
                 {
-                    path: "*",
-                    element: <Documentation content={"div"} />,
+                    element: <Docs />,
+                    children: [
+                        ...docs.getRoutes().map((route) => ({
+                            path: route.path,
+                            element: (
+                                <Documentation content={route.page?.default} />
+                            ),
+                        })),
+                        {
+                            path: "*",
+                            element: <Documentation content={"div"} />,
+                        },
+                    ],
                 },
             ],
         },
@@ -78,43 +87,53 @@ const SidebarItems = (props: SidebarItemsProps) => {
     );
 };
 
-function Root() {
-    const { theme } = useContext(ThemeContext);
-
+function Docs() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    let version = location.pathname.split("/")?.[1];
-    if (version === "") version = "next";
+    const app = location.pathname.split("/")?.[1];
+    const version = location.pathname.split("/")?.[2];
+    console.log(app, version);
+    if (version === undefined || version === "") navigate(`/${app}/next/`);
+
     const onVersionChange = (v: unknown) => {
-        navigate(`/${v}/`);
+        navigate(`/${app}/${v}/`);
     };
 
     useHasSidebar(true);
 
     return (
+        <Fragment>
+            <Sidebar>
+                <SelectField
+                    label="Version"
+                    onChange={onVersionChange}
+                    value={version}
+                >
+                    {Object.keys(docs.hierarchy).map((version) => (
+                        <SelectOption key={version} value={version}>
+                            {version}
+                        </SelectOption>
+                    ))}
+                </SelectField>
+                <Sidebar.Group title={version}>
+                    <SidebarItems root hierarchy={docs.hierarchy[version]} />
+                </Sidebar.Group>
+            </Sidebar>
+            <Outlet />
+        </Fragment>
+    );
+}
+
+export function Root() {
+    const { theme } = useContext(ThemeContext);
+
+    const linkLogo: LinkProps<HTMLProps<HTMLAnchorElement>> = { href: "/" };
+
+    return (
         <div className={cx("app", theme)}>
-            <Header />
+            <Header appName="Vertex Docs" linkLogo={linkLogo} />
             <div className="app-content">
-                <Sidebar>
-                    <SelectField
-                        label="Version"
-                        onChange={onVersionChange}
-                        value={version}
-                    >
-                        {Object.keys(docs.hierarchy).map((version) => (
-                            <SelectOption key={version} value={version}>
-                                {version}
-                            </SelectOption>
-                        ))}
-                    </SelectField>
-                    <Sidebar.Group title={version}>
-                        <SidebarItems
-                            root
-                            hierarchy={docs.hierarchy[version]}
-                        />
-                    </Sidebar.Group>
-                </Sidebar>
                 <Outlet />
             </div>
         </div>

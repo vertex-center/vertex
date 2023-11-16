@@ -17,7 +17,7 @@ type Props = {
 export default function Documentation(props: Props) {
     const { content } = props;
 
-    useTitle("Documentation");
+    useTitle("Vertex");
 
     if (content === undefined) return null;
 

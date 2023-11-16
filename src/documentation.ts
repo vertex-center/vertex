@@ -82,7 +82,7 @@ export default class Docs {
 
     private createHierarchy() {
         Object.entries(this.pages).forEach(([path]) => {
-            const segments = path.split("/").slice(1);
+            const segments = path.split("/").slice(2);
             let group = this.hierarchy;
             segments.forEach((segment) => {
                 if (!group[segment]) {
