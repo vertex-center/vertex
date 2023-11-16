@@ -9,8 +9,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Build
-        run: npm ci && npm run build
+      - name: Install and Build
+        run: |
+          npx playwright install
+          npm ci && npm run build
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
