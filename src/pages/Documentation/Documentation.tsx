@@ -5,10 +5,10 @@ import {
     Title,
     useTitle,
     InlineCode,
+    Box,
 } from "@vertex-center/components";
 import "./Documentation.sass";
 import { useMemo } from "react";
-import Box from "../../../../vertex-components/lib/components/Box/Box.tsx";
 
 type Props = {
     content: any;
