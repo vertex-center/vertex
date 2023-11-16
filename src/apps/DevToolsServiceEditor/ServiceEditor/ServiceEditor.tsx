@@ -1,5 +1,5 @@
 import styles from "./ServiceEditor.module.sass";
-import { BigTitle, Title } from "../../../components/Text/Text";
+import { Title } from "../../../components/Text/Text";
 import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
 import NoItems from "../../../components/NoItems/NoItems";
 import {
@@ -10,6 +10,7 @@ import {
     SelectField,
     SelectOption,
     TextField,
+    useTitle,
 } from "@vertex-center/components";
 import classNames from "classnames";
 import Spacer from "../../../components/Spacer/Spacer";
@@ -317,6 +318,8 @@ const schema = object({
 type FormData = yup.InferType<typeof schema>;
 
 export default function ServiceEditor() {
+    useTitle("Service Editor");
+
     const resolver = yupResolver(schema);
     const {
         control,
@@ -416,8 +419,6 @@ export default function ServiceEditor() {
 
     return (
         <Vertical gap={30}>
-            <BigTitle className={styles.bigTitle}>Service Editor</BigTitle>
-
             <Vertical gap={25} className={styles.content}>
                 <Title className={styles.title}>Info</Title>
                 <div className={classNames(styles.inputs)}>
