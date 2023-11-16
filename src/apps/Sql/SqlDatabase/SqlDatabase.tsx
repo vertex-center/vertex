@@ -11,16 +11,18 @@ import {
     KeyValueInfo,
 } from "../../../components/KeyValueInfo/KeyValueInfo";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
-import List from "../../../components/List/List";
-import ListItem from "../../../components/List/ListItem";
-import ListIcon from "../../../components/List/ListIcon";
-import ListInfo from "../../../components/List/ListInfo";
-import ListTitle from "../../../components/List/ListTitle";
+import {
+    List,
+    ListIcon,
+    ListInfo,
+    ListItem,
+    ListTitle,
+    MaterialIcon,
+} from "@vertex-center/components";
 import { Title } from "../../../components/Text/Text";
 import styles from "./SqlDatabase.module.sass";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import NoItems from "../../../components/NoItems/NoItems";
-import { MaterialIcon } from "@vertex-center/components";
 
 export default function SqlDatabase() {
     const { uuid } = useParams();

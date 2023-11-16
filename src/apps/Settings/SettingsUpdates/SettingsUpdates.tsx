@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Caption, Text, Title } from "../../../components/Text/Text";
 import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
-import { Button, MaterialIcon } from "@vertex-center/components";
+import { Button, List, MaterialIcon } from "@vertex-center/components";
 import Spacer from "../../../components/Spacer/Spacer";
 import Popup from "../../../components/Popup/Popup";
 import styles from "./SettingsUpdates.module.sass";
@@ -10,7 +10,6 @@ import { APIError } from "../../../components/Error/APIError";
 import ToggleButton from "../../../components/ToggleButton/ToggleButton";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useQueryClient } from "@tanstack/react-query";
-import List from "../../../components/List/List";
 import { useSettings } from "../hooks/useSettings";
 import { useUpdate } from "../hooks/useUpdate";
 import { useUpdateMutation } from "../hooks/useUpdateMutation";

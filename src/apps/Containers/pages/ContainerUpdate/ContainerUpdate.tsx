@@ -8,12 +8,15 @@ import { useState } from "react";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useQueryClient } from "@tanstack/react-query";
-import List from "../../../../components/List/List";
-import ListItem from "../../../../components/List/ListItem";
-import ListInfo from "../../../../components/List/ListInfo";
-import ListTitle from "../../../../components/List/ListTitle";
-import ListActions from "../../../../components/List/ListActions";
-import { Button, MaterialIcon } from "@vertex-center/components";
+import {
+    Button,
+    List,
+    ListActions,
+    ListInfo,
+    ListItem,
+    ListTitle,
+    MaterialIcon,
+} from "@vertex-center/components";
 
 export default function ContainerUpdate() {
     const { uuid } = useParams();

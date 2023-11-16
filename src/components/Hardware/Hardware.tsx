@@ -5,11 +5,13 @@ import {
     SiLinux,
     SiWindows,
 } from "@icons-pack/react-simple-icons";
-import ListItem from "../List/ListItem";
-import ListIcon from "../List/ListIcon";
-import ListInfo from "../List/ListInfo";
-import ListTitle from "../List/ListTitle";
-import ListDescription from "../List/ListDescription";
+import {
+    ListDescription,
+    ListIcon,
+    ListInfo,
+    ListItem,
+    ListTitle,
+} from "@vertex-center/components";
 import { Horizontal } from "../Layouts/Layouts";
 
 type Props = {

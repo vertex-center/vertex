@@ -1,11 +1,15 @@
-import ListItem from "../List/ListItem";
-import ListIcon from "../List/ListIcon";
-import ListInfo from "../List/ListInfo";
-import ListTitle from "../List/ListTitle";
-import ListDescription from "../List/ListDescription";
-import List, { ListProps } from "../List/List";
-import { Button, MaterialIcon } from "@vertex-center/components";
-import ListActions from "../List/ListActions";
+import {
+    Button,
+    List,
+    ListActions,
+    ListDescription,
+    ListIcon,
+    ListInfo,
+    ListItem,
+    ListProps,
+    ListTitle,
+    MaterialIcon,
+} from "@vertex-center/components";
 
 export function SSHKeys(props: Readonly<ListProps>) {
     return <List {...props} />;

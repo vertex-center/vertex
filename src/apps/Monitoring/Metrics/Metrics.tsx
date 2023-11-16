@@ -1,11 +1,13 @@
-import List from "../../../components/List/List";
-import ListItem from "../../../components/List/ListItem";
-import ListIcon from "../../../components/List/ListIcon";
-import ListTitle from "../../../components/List/ListTitle";
-import ListInfo from "../../../components/List/ListInfo";
-import ListDescription from "../../../components/List/ListDescription";
 import { Metric } from "../../../models/metrics";
-import { MaterialIcon } from "@vertex-center/components";
+import {
+    List,
+    ListDescription,
+    ListIcon,
+    ListInfo,
+    ListItem,
+    ListTitle,
+    MaterialIcon,
+} from "@vertex-center/components";
 
 type Props = {
     metrics?: Metric[];

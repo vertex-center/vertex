@@ -8,8 +8,7 @@ import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import ServiceInstallPopup from "../../../../components/ServiceInstallPopup/ServiceInstallPopup";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import List from "../../../../components/List/List";
-import { useTitle } from "@vertex-center/components";
+import { List, useTitle } from "@vertex-center/components";
 
 type Downloading = {
     service: ServiceModel;

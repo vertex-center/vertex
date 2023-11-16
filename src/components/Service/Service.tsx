@@ -4,12 +4,14 @@ import styles from "./Service.module.sass";
 import { Caption } from "../Text/Text";
 import Progress from "../Progress";
 import ServiceLogo from "../ServiceLogo/ServiceLogo";
-import ListItem from "../List/ListItem";
-import ListIcon from "../List/ListIcon";
-import ListInfo from "../List/ListInfo";
-import ListTitle from "../List/ListTitle";
-import ListActions from "../List/ListActions";
-import { MaterialIcon } from "@vertex-center/components";
+import {
+    ListActions,
+    ListIcon,
+    ListInfo,
+    ListItem,
+    ListTitle,
+    MaterialIcon,
+} from "@vertex-center/components";
 
 type Props = {
     service: ServiceModel;

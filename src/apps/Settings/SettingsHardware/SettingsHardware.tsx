@@ -5,7 +5,7 @@ import { api } from "../../../backend/api/backend";
 import styles from "./SettingsHardware.module.sass";
 import { Vertical } from "../../../components/Layouts/Layouts";
 import { APIError } from "../../../components/Error/APIError";
-import List from "../../../components/List/List";
+import { List } from "@vertex-center/components";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useQuery } from "@tanstack/react-query";
 
