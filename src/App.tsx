@@ -1,9 +1,11 @@
-import { Fragment, HTMLProps, useContext } from "react";
+import { Fragment, useContext } from "react";
 import { ThemeContext } from "./theme.tsx";
 import cx from "classnames";
 import {
     createBrowserRouter,
     NavLink,
+    Link as RouterLink,
+    LinkProps as RouterLinkProps,
     Outlet,
     RouterProvider,
     useLocation,
@@ -128,7 +130,7 @@ function Docs() {
 export function Root() {
     const { theme } = useContext(ThemeContext);
 
-    const linkLogo: LinkProps<HTMLProps<HTMLAnchorElement>> = { href: "/" };
+    const linkLogo: LinkProps<RouterLinkProps> = { as: RouterLink, to: "/" };
 
     return (
         <div className={cx("app", theme)}>
