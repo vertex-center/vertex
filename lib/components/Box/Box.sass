@@ -1,0 +1,38 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+@use "../../styles/fonts"
+
+.box
+    display: flex
+    flex-direction: column
+    border-radius: dimensions.$border-radius-lg
+    background-color: colors.$bg-secondary
+    padding: 15px 15px 4px
+    border: 1px solid colors.$bg-tertiary
+
+    &-header
+        display: flex
+        flex-direction: row
+        align-items: center
+        gap: 8px
+
+    &-info
+        border: 1px solid colors.$blue
+
+    &-info &-header
+        color: colors.$blue
+
+    &-tip
+        border: 1px solid colors.$green
+
+    &-tip &-header
+        color: colors.$green
+
+    &-warning
+        border: 1px solid colors.$orange
+
+    &-warning &-header
+        color: colors.$orange
+
+    &-content
+        margin-left: 30px
