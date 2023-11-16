@@ -27,7 +27,10 @@ export default class Docs {
                     res.title = page?.label;
                     res.path = fsPath
                         .replace("/docs/", "/")
-                        .replace("/_category_.yml", "");
+                        .replace("/_category_.yml", "")
+                        .split("/")
+                        .map((segment) => segment.replace(/^\d{2}-/, ""))
+                        .join("/");
                 } else {
                     res.title = page
                         // @ts-ignore
@@ -35,12 +38,16 @@ export default class Docs {
                         ?.props?.children?.find(
                             (child) => child?.type === "h1"
                         )?.props?.children;
-                    res.path = fsPath
+                    let path = fsPath
                         .replace("/docs/", "/")
-                        .replace(".mdx", "");
-                    if (res.path.endsWith("/index")) {
-                        res.path = res.path.replace("/index", "");
+                        .replace(".mdx", "")
+                        .split("/")
+                        .map((segment) => segment.replace(/^\d{2}-/, ""))
+                        .join("/");
+                    if (path.endsWith("/index")) {
+                        path = path.replace("/index", "");
                     }
+                    res.path = path;
                     res.isPage = true;
                 }
 
@@ -71,10 +78,18 @@ export default class Docs {
 
     getRoutes(): Route[] {
         return [
-            ...Object.entries(this.pages).map(([route, page]) => ({
-                path: route.replace("/docs/", "/").replace(".mdx", ""),
-                page: page.page,
-            })),
+            ...Object.entries(this.pages).map(([route, page]) => {
+                let path = route
+                    .replace("/docs/", "/")
+                    .replace(".mdx", "")
+                    .split("/")
+                    .map((segment) => segment.replace(/^\d{2}-/, ""))
+                    .join("/");
+                return {
+                    path: path,
+                    page: page.page,
+                };
+            }),
         ];
     }
 
