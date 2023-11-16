@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { ThemeContext } from "./theme.tsx";
 import cx from "classnames";
 import {
@@ -6,6 +6,8 @@ import {
     NavLink,
     Outlet,
     RouterProvider,
+    useLocation,
+    useNavigate,
 } from "react-router-dom";
 import {
     Header,
@@ -32,6 +34,10 @@ const router = createBrowserRouter(
                     path: route.path,
                     element: <Documentation content={route.page?.default} />,
                 })),
+                {
+                    path: "*",
+                    element: <Documentation content={"div"} />,
+                },
             ],
         },
     ],
@@ -60,7 +66,7 @@ const SidebarItems = (props: SidebarItemsProps) => {
         hasChildren &&
         Object.entries(hierarchy ?? {}).map(([label, hierarchy], i) => {
             if (label === "_path") return null;
-            return <SidebarItems key={i} label={label} hierarchy={hierarchy} />;
+            return <SidebarItems key={label} hierarchy={hierarchy} />;
         });
 
     if (root) return children;
@@ -75,7 +81,14 @@ const SidebarItems = (props: SidebarItemsProps) => {
 function Root() {
     const { theme } = useContext(ThemeContext);
 
-    const [version, setVersion] = useState("next");
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    let version = location.pathname.split("/")?.[1];
+    if (version === "") version = "next";
+    const onVersionChange = (v: unknown) => {
+        navigate(`/${v}/`);
+    };
 
     useHasSidebar(true);
 
@@ -86,7 +99,7 @@ function Root() {
                 <Sidebar>
                     <SelectField
                         label="Version"
-                        onChange={(v) => setVersion(v)}
+                        onChange={onVersionChange}
                         value={version}
                     >
                         {Object.keys(docs.hierarchy).map((version) => (
