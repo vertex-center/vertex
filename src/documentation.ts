@@ -1,3 +1,5 @@
+import { ReactElement } from "react";
+
 type Route = {
     path: string;
     page: any;
@@ -24,6 +26,7 @@ export default class Docs {
             (pages, [fsPath, page]) => {
                 const res = { title: "", path: "", isPage: false };
                 if (fsPath.endsWith(".yml")) {
+                    // @ts-ignore
                     res.title = page?.label;
                     res.path = this.cleanPath(fsPath);
                 } else {
@@ -31,7 +34,7 @@ export default class Docs {
                         // @ts-ignore
                         ?.default()
                         ?.props?.children?.find(
-                            (child) => child?.type === "h1"
+                            (child: ReactElement) => child?.type === "h1"
                         )?.props?.children;
                     let path = this.cleanPath(fsPath);
                     if (path.endsWith("/index")) {

@@ -64,7 +64,7 @@ const SidebarItems = (props: SidebarItemsProps) => {
 
     const children =
         hasChildren &&
-        Object.entries(hierarchy ?? {}).map(([label, hierarchy], i) => {
+        Object.entries(hierarchy ?? {}).map(([label, hierarchy]) => {
             if (label === "_path") return null;
             return <SidebarItems key={label} hierarchy={hierarchy} />;
         });
