@@ -11,7 +11,7 @@
 ## About
 
 This repository holds the documentation for Vertex. This documentation can be accessed
-at https://vertex.quentinguidee.dev/docs/.
+at https://docs.vx.quentinguidee.dev/.
 
 ## License
 
