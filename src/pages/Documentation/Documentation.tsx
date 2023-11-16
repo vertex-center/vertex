@@ -4,10 +4,11 @@ import {
     Table,
     Title,
     useTitle,
+    InlineCode,
 } from "@vertex-center/components";
 import "./Documentation.sass";
 import { useMemo } from "react";
-import { InlineCode } from "../../../../vertex-components/lib";
+import Box from "../../../../vertex-components/lib/components/Box/Box.tsx";
 
 type Props = {
     content: any;
@@ -43,6 +44,9 @@ export default function Documentation(props: Props) {
                 );
             },
             table: (props: any) => <Table {...props} />,
+            info: (props: any) => <Box type="info" {...props} />,
+            tip: (props: any) => <Box type="tip" {...props} />,
+            warning: (props: any) => <Box type="warning" {...props} />,
         }),
         []
     );

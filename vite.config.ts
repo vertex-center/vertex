@@ -6,6 +6,22 @@ import remarkGfm from "remark-gfm";
 import remarkDirective from "remark-directive";
 import remarkMermaid from "remark-mermaidjs";
 import yaml from "@rollup/plugin-yaml";
+import { visit } from "unist-util-visit";
+
+const remarkDirectiveBlocks = () => {
+    return (tree) => {
+        visit(tree, (node) => {
+            if (
+                node.type === "containerDirective" ||
+                node.type === "leafDirective" ||
+                node.type === "textDirective"
+            ) {
+                const data = node.data || (node.data = {});
+                data.hName = node.name;
+            }
+        });
+    };
+};
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -16,6 +32,7 @@ export default defineConfig({
                 remarkFrontmatter,
                 remarkGfm,
                 remarkDirective,
+                remarkDirectiveBlocks,
                 [
                     remarkMermaid,
                     {
