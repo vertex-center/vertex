@@ -25,12 +25,7 @@ export default class Docs {
                 const res = { title: "", path: "", isPage: false };
                 if (fsPath.endsWith(".yml")) {
                     res.title = page?.label;
-                    res.path = fsPath
-                        .replace("/docs/", "/")
-                        .replace("/_category_.yml", "")
-                        .split("/")
-                        .map((segment) => segment.replace(/^\d{2}-/, ""))
-                        .join("/");
+                    res.path = this.cleanPath(fsPath);
                 } else {
                     res.title = page
                         // @ts-ignore
@@ -38,12 +33,7 @@ export default class Docs {
                         ?.props?.children?.find(
                             (child) => child?.type === "h1"
                         )?.props?.children;
-                    let path = fsPath
-                        .replace("/docs/", "/")
-                        .replace(".mdx", "")
-                        .split("/")
-                        .map((segment) => segment.replace(/^\d{2}-/, ""))
-                        .join("/");
+                    let path = this.cleanPath(fsPath);
                     if (path.endsWith("/index")) {
                         path = path.replace("/index", "");
                     }
@@ -62,6 +52,31 @@ export default class Docs {
         this.createHierarchy();
     }
 
+    getRoutes(): Route[] {
+        return [
+            ...Object.entries(this.pages).map(([path, page]) => {
+                return {
+                    path: this.cleanPath(path),
+                    page: page.page,
+                };
+            }),
+        ];
+    }
+
+    getPage(path: string): Page {
+        return this.pages[path];
+    }
+
+    private cleanPath(filePath: string): string {
+        return filePath
+            .replace("/docs/", "/")
+            .replace("/_category_.yml", "")
+            .replace(".mdx", "")
+            .split("/")
+            .map((segment) => segment.replace(/^\d{2}-/, ""))
+            .join("/");
+    }
+
     private createHierarchy() {
         Object.entries(this.pages).forEach(([path]) => {
             const segments = path.split("/").slice(1);
@@ -74,26 +89,5 @@ export default class Docs {
             });
             group._path = path;
         });
-    }
-
-    getRoutes(): Route[] {
-        return [
-            ...Object.entries(this.pages).map(([route, page]) => {
-                let path = route
-                    .replace("/docs/", "/")
-                    .replace(".mdx", "")
-                    .split("/")
-                    .map((segment) => segment.replace(/^\d{2}-/, ""))
-                    .join("/");
-                return {
-                    path: path,
-                    page: page.page,
-                };
-            }),
-        ];
-    }
-
-    getPage(path: string): Page {
-        return this.pages[path];
     }
 }
