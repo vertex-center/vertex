@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from "@storybook/react";
-import Box from "./Box.tsx";
+import { Box } from "./Box.tsx";
 import { Paragraph } from "../Paragraph/Paragraph.tsx";
 
 const meta: Meta = {

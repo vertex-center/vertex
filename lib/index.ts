@@ -1,3 +1,4 @@
+import { Box, BoxProps, BoxType } from "./components/Box/Box";
 import { Button, ButtonProps } from "./components/Button/Button";
 import { Checkbox, CheckboxProps } from "./components/Checkbox/Checkbox";
 import { Code, CodeProps } from "./components/Code/Code";
@@ -54,6 +55,8 @@ import "./styles/reset.css";
 import "./index.sass";
 
 export type {
+    BoxProps,
+    BoxType,
     ButtonProps,
     CheckboxProps,
     CodeProps,
@@ -80,6 +83,7 @@ export type {
 };
 
 export {
+    Box,
     Button,
     Checkbox,
     Code,

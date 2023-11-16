@@ -3,13 +3,13 @@ import { HTMLProps } from "react";
 import "./Box.sass";
 import { MaterialIcon } from "../MaterialIcon/MaterialIcon";
 
-type BoxType = "info" | "tip" | "warning";
+export type BoxType = "info" | "tip" | "warning";
 
-type BoxProps = HTMLProps<HTMLDivElement> & {
+export type BoxProps = HTMLProps<HTMLDivElement> & {
     type: BoxType;
 };
 
-export default function Box(props: Readonly<BoxProps>) {
+export function Box(props: Readonly<BoxProps>) {
     const { className, type, children, ...others } = props;
 
     let label = "",
