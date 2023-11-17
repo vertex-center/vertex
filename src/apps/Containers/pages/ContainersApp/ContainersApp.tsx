@@ -27,7 +27,7 @@ const ToolbarContainers = (props: ToolbarProps) => {
     const { tags, onTagsChange } = props;
 
     return (
-        <Toolbar className={styles.toolbar}>
+        <Toolbar>
             <SelectTags selected={tags} onChange={onTagsChange} />
             <Spacer />
             <Button

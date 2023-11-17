@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import EnvVariableInput from "../../components/EnvVariableInput/EnvVariableInput";
 import { Button, MaterialIcon, Title } from "@vertex-center/components";
-import { Horizontal, Vertical } from "../../../../components/Layouts/Layouts";
+import { Horizontal } from "../../../../components/Layouts/Layouts";
 import useContainer from "../../hooks/useContainer";
 import { Env, EnvVariable } from "../../../../models/service";
 import styles from "./ContainerEnv.module.sass";
@@ -73,19 +73,17 @@ export default function ContainerEnv() {
     return (
         <Content>
             <Title variant="h2">Environment</Title>
+            {env?.map((env, i) => (
+                <EnvVariableInput
+                    id={env.env.name}
+                    key={env.env.name}
+                    env={env.env}
+                    value={env.value}
+                    onChange={(v) => onChange(i, v)}
+                    disabled={isUploading}
+                />
+            ))}
             <ProgressOverlay show={isLoading ?? isUploading} />
-            <Vertical gap={20}>
-                {env?.map((env, i) => (
-                    <EnvVariableInput
-                        id={env.env.name}
-                        key={env.env.name}
-                        env={env.env}
-                        value={env.value}
-                        onChange={(v) => onChange(i, v)}
-                        disabled={isUploading}
-                    />
-                ))}
-            </Vertical>
             <Horizontal justifyContent="flex-end">
                 {saved && (
                     <Horizontal
