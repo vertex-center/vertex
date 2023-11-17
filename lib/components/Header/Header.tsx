@@ -71,7 +71,9 @@ export function Header<T extends IHeaderLink, U extends IHeaderLink>(
                     {...linkLogoProps}
                 >
                     <Logo size={24} />
-                    <Title variant="h4">{appName ?? "Vertex"}</Title>
+                    <div>
+                        <Title variant="h4">{appName ?? "Vertex"}</Title>
+                    </div>
                 </Link>
             </div>
             {(children || title) && (
