@@ -3,7 +3,7 @@ import { HTMLProps } from "react";
 import "./Box.sass";
 import { MaterialIcon } from "../MaterialIcon/MaterialIcon";
 
-export type BoxType = "info" | "tip" | "warning";
+export type BoxType = "info" | "tip" | "warning" | "error";
 
 export type BoxProps = HTMLProps<HTMLDivElement> & {
     type: BoxType;
@@ -27,6 +27,10 @@ export function Box(props: Readonly<BoxProps>) {
         case "warning":
             label = "Warning";
             icon = "warning";
+            break;
+        case "error":
+            label = "Error";
+            icon = "error";
             break;
     }
 
