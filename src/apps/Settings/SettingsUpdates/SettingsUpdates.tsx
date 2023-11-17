@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { Caption, Title } from "../../../components/Text/Text";
-import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
+import { Caption } from "../../../components/Text/Text";
+import { Horizontal } from "../../../components/Layouts/Layouts";
 import {
     Button,
     List,
     MaterialIcon,
     Paragraph,
+    Title,
 } from "@vertex-center/components";
 import Spacer from "../../../components/Spacer/Spacer";
 import Popup from "../../../components/Popup/Popup";
-import styles from "./SettingsUpdates.module.sass";
 import VertexUpdate from "../components/VertexUpdate/VertexUpdate";
 import { APIError } from "../../../components/Error/APIError";
 import ToggleButton from "../../../components/ToggleButton/ToggleButton";
@@ -19,6 +19,7 @@ import { useSettings } from "../hooks/useSettings";
 import { useUpdate } from "../hooks/useUpdate";
 import { useUpdateMutation } from "../hooks/useUpdateMutation";
 import { useSettingsChannelMutation } from "../hooks/useSettingsMutation";
+import Content from "../../../components/Content/Content";
 
 export default function SettingsUpdates() {
     const queryClient = useQueryClient();
@@ -61,11 +62,21 @@ export default function SettingsUpdates() {
     const error =
         errorUpdate || errorSettings || errorInstallUpdate || errorSetChannel;
 
+    const actions = (
+        <Button
+            variant="colored"
+            onClick={dismissPopup}
+            rightIcon={<MaterialIcon icon="check" />}
+        >
+            OK
+        </Button>
+    );
+
     return (
-        <Vertical gap={20}>
+        <Content>
             <ProgressOverlay show={isLoading} />
-            <Title className={styles.title}>Updates</Title>
-            <Horizontal className={styles.toggle} alignItems="center">
+            <Title variant="h2">Updates</Title>
+            <Horizontal alignItems="center">
                 <Paragraph>Enable Beta channel</Paragraph>
                 <Spacer />
                 <ToggleButton
@@ -76,7 +87,7 @@ export default function SettingsUpdates() {
             </Horizontal>
             <APIError error={error} />
             {update === null && !isLoadingUpdate && (
-                <Caption className={styles.content}>
+                <Caption>
                     <Horizontal alignItems="center" gap={6}>
                         <MaterialIcon icon="check" />
                         Vertex is up to date. You are running the latest
@@ -94,22 +105,14 @@ export default function SettingsUpdates() {
                     />
                 </List>
             )}
-            <Popup show={showMessage} onDismiss={dismissPopup}>
-                <Paragraph>
-                    Updates are installed. You can now restart your Vertex
-                    server.
-                </Paragraph>
-                <Horizontal>
-                    <Spacer />
-                    <Button
-                        variant="colored"
-                        onClick={dismissPopup}
-                        rightIcon={<MaterialIcon icon="check" />}
-                    >
-                        OK
-                    </Button>
-                </Horizontal>
+            <Popup
+                show={showMessage}
+                onDismiss={dismissPopup}
+                title="Updates are installed"
+                actions={actions}
+            >
+                <Paragraph>You can now restart your Vertex server.</Paragraph>
             </Popup>
-        </Vertical>
+        </Content>
     );
 }

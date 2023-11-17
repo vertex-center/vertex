@@ -5,7 +5,7 @@
     border-radius: dimensions.$border-radius-lg
     background-color: colors.$bg-primary
     position: fixed
-    padding: 25px 10px
+    padding: 25px
     top: 50%
     left: 50%
     transform: translate(-50%, -50%)
@@ -13,11 +13,7 @@
     border: 1px solid colors.$bg-secondary
     display: none
     flex-direction: column
-    gap: 20px
     min-width: 500px
-
-    & > *
-        margin: 0 20px
 
     @include dimensions.small-or-less
         width: calc(100vw - 100px)
@@ -25,6 +21,30 @@
 
     &Active
         display: flex
+
+.actions
+    display: flex
+    flex-direction: row
+    gap: 10px
+    justify-content: flex-end
+    margin-top: 20px
+
+.content
+    & > :first-child
+        margin-top: 0
+
+    & > :last-child
+        margin-bottom: 0
+
+.header
+    margin-top: 0
+    margin-bottom: 20px
+
+    & > :first-child
+        margin-top: 0
+
+    & > :last-child
+        margin-bottom: 0
 
 .overlay
     position: fixed

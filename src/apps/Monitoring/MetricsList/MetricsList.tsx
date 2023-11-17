@@ -1,11 +1,10 @@
-import { Vertical } from "../../../components/Layouts/Layouts";
-import styles from "./MetricsList.module.sass";
 import Metrics from "../Metrics/Metrics";
 import { api } from "../../../backend/api/backend";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { APIError } from "../../../components/Error/APIError";
-import { Title } from "../../../components/Text/Text";
 import { useQuery } from "@tanstack/react-query";
+import Content from "../../../components/Content/Content";
+import { Title } from "@vertex-center/components";
 
 export default function MetricsList() {
     const {
@@ -18,11 +17,11 @@ export default function MetricsList() {
     });
 
     return (
-        <Vertical gap={20}>
-            <ProgressOverlay show={isLoading} />
-            <Title className={styles.title}>Metrics</Title>
+        <Content>
+            <Title variant="h2">Metrics</Title>
             <APIError error={error} />
+            <ProgressOverlay show={isLoading} />
             <Metrics metrics={metrics} />
-        </Vertical>
+        </Content>
     );
 }

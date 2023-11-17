@@ -1,6 +1,4 @@
-import { Fragment } from "react";
-import { Title } from "../../../../components/Text/Text";
-import { MaterialIcon } from "@vertex-center/components";
+import { MaterialIcon, Title } from "@vertex-center/components";
 import styles from "./ContainerHome.module.sass";
 import { useParams } from "react-router-dom";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
@@ -9,6 +7,7 @@ import classNames from "classnames";
 import useContainer from "../../hooks/useContainer";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { APIError } from "../../../../components/Error/APIError";
+import Content from "../../../../components/Content/Content";
 
 export default function ContainerHome() {
     const { uuid } = useParams();
@@ -16,9 +15,9 @@ export default function ContainerHome() {
     const { container, isLoading, error } = useContainer(uuid);
 
     return (
-        <Fragment>
+        <Content>
+            <Title variant="h2">URLs</Title>
             <ProgressOverlay show={isLoading} />
-            <Title className={styles.title}>URLs</Title>
             <APIError error={error} />
             <nav className={styles.nav}>
                 {container?.service?.urls &&
@@ -59,6 +58,6 @@ export default function ContainerHome() {
                             );
                         })}
             </nav>
-        </Fragment>
+        </Content>
     );
 }

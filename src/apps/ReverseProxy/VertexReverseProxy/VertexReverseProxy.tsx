@@ -1,16 +1,20 @@
 import { api } from "../../../backend/api/backend";
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import styles from "./VertexReverseProxy.module.sass";
-import { Title } from "../../../components/Text/Text";
 import { APIError } from "../../../components/Error/APIError";
 import ProxyRedirect from "../../../components/ProxyRedirect/ProxyRedirect";
 import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
-import { Button, MaterialIcon, TextField } from "@vertex-center/components";
+import {
+    Button,
+    MaterialIcon,
+    TextField,
+    Title,
+} from "@vertex-center/components";
 import Popup from "../../../components/Popup/Popup";
-import Spacer from "../../../components/Spacer/Spacer";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import NoItems from "../../../components/NoItems/NoItems";
+import Content from "../../../components/Content/Content";
 
 export default function VertexReverseProxy() {
     const queryClient = useQueryClient();
@@ -59,44 +63,64 @@ export default function VertexReverseProxy() {
     const openNewRedirectPopup = () => setShowNewRedirectPopup(true);
     const closeNewRedirectPopup = () => setShowNewRedirectPopup(false);
 
-    return (
-        <Vertical gap={20}>
-            <ProgressOverlay show={isLoading} />
-            <Title className={styles.title}>Vertex Reverse Proxy</Title>
+    const popupActions = (
+        <Fragment>
+            <Button onClick={closeNewRedirectPopup}>Cancel</Button>
+            <Button
+                variant="colored"
+                onClick={async () => mutationAdd.mutate({ source, target })}
+                rightIcon={<MaterialIcon icon="send" />}
+            >
+                Send
+            </Button>
+        </Fragment>
+    );
 
-            <div className={styles.redirects}>
-                {error && <APIError error={error} />}
-                {!error &&
-                    Object.entries(redirects ?? {}).map(([uuid, redirect]) => (
-                        <ProxyRedirect
-                            key={uuid}
-                            enabled={true}
-                            source={redirect.source}
-                            target={redirect.target}
-                            onDelete={() => mutationDelete.mutate(uuid)}
-                        />
-                    ))}
-                {!error && redirects && Object.keys(redirects).length === 0 && (
-                    <NoItems
-                        text="No redirections found."
-                        icon="settings_ethernet"
-                    />
-                )}
-            </div>
-            <Horizontal className={styles.addRedirect} gap={10}>
-                <Button
-                    variant="colored"
-                    onClick={openNewRedirectPopup}
-                    leftIcon={<MaterialIcon icon="add" />}
-                >
-                    Add redirection
-                </Button>
-            </Horizontal>
+    return (
+        <Content>
+            <ProgressOverlay show={isLoading} />
+            <Title variant="h2">Vertex Reverse Proxy</Title>
+
+            <Vertical gap={20}>
+                <div className={styles.redirects}>
+                    {error && <APIError error={error} />}
+                    {!error &&
+                        Object.entries(redirects ?? {}).map(
+                            ([uuid, redirect]) => (
+                                <ProxyRedirect
+                                    key={uuid}
+                                    enabled={true}
+                                    source={redirect.source}
+                                    target={redirect.target}
+                                    onDelete={() => mutationDelete.mutate(uuid)}
+                                />
+                            )
+                        )}
+                    {!error &&
+                        redirects &&
+                        Object.keys(redirects).length === 0 && (
+                            <NoItems
+                                text="No redirections found."
+                                icon="settings_ethernet"
+                            />
+                        )}
+                </div>
+                <Horizontal gap={10}>
+                    <Button
+                        variant="colored"
+                        onClick={openNewRedirectPopup}
+                        leftIcon={<MaterialIcon icon="add" />}
+                    >
+                        Add redirection
+                    </Button>
+                </Horizontal>
+            </Vertical>
             <Popup
                 show={showNewRedirectPopup}
                 onDismiss={closeNewRedirectPopup}
+                actions={popupActions}
+                title="New redirection"
             >
-                <Title>New redirection</Title>
                 <Vertical gap={20} className={styles.input}>
                     <TextField
                         id="source"
@@ -112,20 +136,7 @@ export default function VertexReverseProxy() {
                         onChange={onTargetChange}
                     />
                 </Vertical>
-                <Horizontal gap={10}>
-                    <Spacer />
-                    <Button onClick={closeNewRedirectPopup}>Cancel</Button>
-                    <Button
-                        variant="colored"
-                        onClick={async () =>
-                            mutationAdd.mutate({ source, target })
-                        }
-                        rightIcon={<MaterialIcon icon="send" />}
-                    >
-                        Send
-                    </Button>
-                </Horizontal>
             </Popup>
-        </Vertical>
+        </Content>
     );
 }

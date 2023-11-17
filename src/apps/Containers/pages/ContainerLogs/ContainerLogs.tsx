@@ -1,14 +1,13 @@
 import Logs from "../../../../components/Logs/Logs";
-import { Fragment } from "react";
 import { useParams } from "react-router-dom";
-import { Title } from "../../../../components/Text/Text";
-import styles from "./ContainerLogs.module.sass";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useServerEvent } from "../../../../hooks/useEvent";
 import { useQueryClient } from "@tanstack/react-query";
 import { produce } from "immer";
 import { useContainerLogs } from "../../hooks/useContainer";
+import Content from "../../../../components/Content/Content";
+import { Title } from "@vertex-center/components";
 
 export default function ContainerLogs() {
     const { uuid } = useParams();
@@ -86,11 +85,11 @@ export default function ContainerLogs() {
     if (!logs) return null;
 
     return (
-        <Fragment>
-            <ProgressOverlay show={isLoading} />
-            <Title className={styles.title}>Logs</Title>
+        <Content>
+            <Title variant="h2">Logs</Title>
             <APIError error={error} />
+            <ProgressOverlay show={isLoading} />
             <Logs lines={logs} />
-        </Fragment>
+        </Content>
     );
 }

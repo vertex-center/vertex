@@ -1,7 +1,4 @@
 import { Horizontal, Vertical } from "../../../../components/Layouts/Layouts";
-
-import styles from "./ContainerDetailsDatabase.module.sass";
-import { Title } from "../../../../components/Text/Text";
 import {
     KeyValueGroup,
     KeyValueInfo,
@@ -12,13 +9,19 @@ import ContainerSelect from "../../components/ContainerSelect/ContainerSelect";
 import { ChangeEvent, Fragment, useEffect, useState } from "react";
 import { Container } from "../../../../models/container";
 import Progress from "../../../../components/Progress";
-import { Button, MaterialIcon, TextField } from "@vertex-center/components";
+import {
+    Button,
+    MaterialIcon,
+    TextField,
+    Title,
+} from "@vertex-center/components";
 import { api } from "../../../../backend/api/backend";
 import { DatabaseEnvironment } from "../../../../models/service";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Spacer from "../../../../components/Spacer/Spacer";
+import Content from "../../../../components/Content/Content";
 
 type DatabaseProps = {
     container?: Container;
@@ -61,8 +64,8 @@ function Database(props: Readonly<DatabaseProps>) {
     if (error) return <APIError error={error} />;
 
     return (
-        <Vertical gap={20}>
-            <Title className={styles.title}>{dbDefinition?.display_name}</Title>
+        <Content>
+            <Title variant="h2">{dbDefinition?.display_name}</Title>
             <Vertical gap={10}>
                 {!container && <Progress infinite />}
                 {container && (
@@ -91,7 +94,7 @@ function Database(props: Readonly<DatabaseProps>) {
                     </KeyValueGroup>
                 )}
             </Vertical>
-        </Vertical>
+        </Content>
     );
 }
 

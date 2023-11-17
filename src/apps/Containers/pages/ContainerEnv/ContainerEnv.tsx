@@ -1,9 +1,8 @@
-import { Fragment, useEffect, useState } from "react";
-import { Title } from "../../../../components/Text/Text";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import EnvVariableInput from "../../components/EnvVariableInput/EnvVariableInput";
-import { Button, MaterialIcon } from "@vertex-center/components";
-import { Horizontal } from "../../../../components/Layouts/Layouts";
+import { Button, MaterialIcon, Title } from "@vertex-center/components";
+import { Horizontal, Vertical } from "../../../../components/Layouts/Layouts";
 import useContainer from "../../hooks/useContainer";
 import { Env, EnvVariable } from "../../../../models/service";
 import styles from "./ContainerEnv.module.sass";
@@ -11,6 +10,7 @@ import { api } from "../../../../backend/api/backend";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Content from "../../../../components/Content/Content";
 
 export default function ContainerEnv() {
     const { uuid } = useParams();
@@ -71,19 +71,21 @@ export default function ContainerEnv() {
     };
 
     return (
-        <Fragment>
+        <Content>
+            <Title variant="h2">Environment</Title>
             <ProgressOverlay show={isLoading ?? isUploading} />
-            <Title className={styles.title}>Environment</Title>
-            {env?.map((env, i) => (
-                <EnvVariableInput
-                    id={env.env.name}
-                    key={env.env.name}
-                    env={env.env}
-                    value={env.value}
-                    onChange={(v) => onChange(i, v)}
-                    disabled={isUploading}
-                />
-            ))}
+            <Vertical gap={20}>
+                {env?.map((env, i) => (
+                    <EnvVariableInput
+                        id={env.env.name}
+                        key={env.env.name}
+                        env={env.env}
+                        value={env.value}
+                        onChange={(v) => onChange(i, v)}
+                        disabled={isUploading}
+                    />
+                ))}
+            </Vertical>
             <Horizontal justifyContent="flex-end">
                 {saved && (
                     <Horizontal
@@ -107,6 +109,6 @@ export default function ContainerEnv() {
                 </Button>
             </Horizontal>
             <APIError error={error} />
-        </Fragment>
+        </Content>
     );
 }

@@ -1,12 +1,16 @@
 import { Fragment, useEffect, useState } from "react";
-import { Title } from "../../../components/Text/Text";
-import { Button, MaterialIcon, TextField } from "@vertex-center/components";
+import {
+    Button,
+    MaterialIcon,
+    TextField,
+    Title,
+} from "@vertex-center/components";
 import { api } from "../../../backend/api/backend";
-import styles from "./SettingsNotifications.module.sass";
-import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
+import { Horizontal } from "../../../components/Layouts/Layouts";
 import { APIError } from "../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useQuery } from "@tanstack/react-query";
+import Content from "../../../components/Content/Content";
 
 export default function SettingsNotifications() {
     const [webhook, setWebhook] = useState<string>();
@@ -41,9 +45,9 @@ export default function SettingsNotifications() {
     };
 
     return (
-        <Vertical gap={20}>
+        <Content>
+            <Title variant="h2">Notifications</Title>
             <ProgressOverlay show={isLoading || saving} />
-            <Title className={styles.title}>Notifications</Title>
             <APIError error={error} />
             {!error && (
                 <Fragment>
@@ -55,7 +59,11 @@ export default function SettingsNotifications() {
                         disabled={isLoading}
                         placeholder={isLoading && "Loading..."}
                     />
-                    <Horizontal gap={20} justifyContent="flex-end">
+                    <Horizontal
+                        gap={20}
+                        justifyContent="flex-end"
+                        style={{ marginTop: 15 }}
+                    >
                         <Button
                             variant="colored"
                             rightIcon={<MaterialIcon icon="save" />}
@@ -67,6 +75,6 @@ export default function SettingsNotifications() {
                     </Horizontal>
                 </Fragment>
             )}
-        </Vertical>
+        </Content>
     );
 }

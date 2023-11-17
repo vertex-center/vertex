@@ -1,15 +1,13 @@
-import { Title } from "../../../components/Text/Text";
 import { api } from "../../../backend/api/backend";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import Service from "../../../components/Service/Service";
 import { Service as ServiceModel } from "../../../models/service";
-import styles from "./SqlInstaller.module.sass";
-import { Vertical } from "../../../components/Layouts/Layouts";
 import ServiceInstallPopup from "../../../components/ServiceInstallPopup/ServiceInstallPopup";
 import { useState } from "react";
 import { APIError } from "../../../components/Error/APIError";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { List } from "@vertex-center/components";
+import { List, Title } from "@vertex-center/components";
+import Content from "../../../components/Content/Content";
 
 export default function SqlInstaller() {
     const queryClient = useQueryClient();
@@ -78,9 +76,9 @@ export default function SqlInstaller() {
     const error = servicesError ?? containersError ?? installError;
 
     return (
-        <Vertical gap={20}>
+        <Content>
             <ProgressOverlay show={isContainersLoading ?? isServicesLoading} />
-            <Title className={styles.title}>SQL Database Installer</Title>
+            <Title variant="h2">Installer</Title>
             <APIError error={error} />
             <List>
                 {services
@@ -117,6 +115,6 @@ export default function SqlInstaller() {
                 dismiss={dismiss}
                 install={install}
             />
-        </Vertical>
+        </Content>
     );
 }

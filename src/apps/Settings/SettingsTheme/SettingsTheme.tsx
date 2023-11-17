@@ -1,17 +1,16 @@
 import { useContext } from "react";
-import { Button, MaterialIcon } from "@vertex-center/components";
+import { Button, MaterialIcon, Title } from "@vertex-center/components";
 import { Vertical } from "../../../components/Layouts/Layouts";
-import { Title } from "../../../components/Text/Text";
 import { ThemeContext } from "../../../main";
-import styles from "./SettingsTheme.module.sass";
 import { themes } from "../../../models/theme";
+import Content from "../../../components/Content/Content";
 
 export default function SettingsTheme() {
     const { theme, setTheme } = useContext(ThemeContext);
 
     return (
-        <Vertical gap={20}>
-            <Title className={styles.title}>Theme</Title>
+        <Content>
+            <Title variant="h2">Theme</Title>
             <Vertical gap={6}>
                 {themes.map((t) => {
                     let icon = "";
@@ -37,6 +36,6 @@ export default function SettingsTheme() {
                     );
                 })}
             </Vertical>
-        </Vertical>
+        </Content>
     );
 }

@@ -1,24 +1,22 @@
-import { SubTitle, Title } from "../../../components/Text/Text";
-
-import styles from "./SettingsSecurity.module.sass";
-import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
+import { Vertical } from "../../../components/Layouts/Layouts";
 import SSHKey, { SSHKeys } from "../../../components/SSHKey/SSHKey";
 import { Errors } from "../../../components/Error/Errors";
 import { APIError } from "../../../components/Error/APIError";
 import {
     Button,
+    Code,
     ListItem,
     MaterialIcon,
     TextField,
+    Title,
 } from "@vertex-center/components";
 import { api } from "../../../backend/api/backend";
 import { ChangeEvent, Fragment, useState } from "react";
 import Popup from "../../../components/Popup/Popup";
-import Spacer from "../../../components/Spacer/Spacer";
-import Code from "../../../components/Code/Code";
 import Progress from "../../../components/Progress";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import Content from "../../../components/Content/Content";
 
 export default function SettingsSecurity() {
     const queryClient = useQueryClient();
@@ -72,11 +70,24 @@ export default function SettingsSecurity() {
         setAuthorizedKey(e.target.value);
     };
 
-    return (
+    const popupActions = (
         <Fragment>
+            <Button onClick={dismissPopup}>Cancel</Button>
+            <Button
+                variant="colored"
+                disabled={authorizedKey === ""}
+                onClick={createSSHKey}
+            >
+                Create
+            </Button>
+        </Fragment>
+    );
+
+    return (
+        <Content>
             <ProgressOverlay show={isLoading} />
+            <Title variant="h2">SSH keys</Title>
             <Vertical gap={20}>
-                <Title className={styles.title}>SSH keys</Title>
                 {(error || deleteError) && (
                     <Errors>
                         <APIError error={error} />
@@ -111,45 +122,31 @@ export default function SettingsSecurity() {
                 </div>
             </Vertical>
 
-            <Popup show={showPopup} onDismiss={dismissPopup}>
-                <Title className={styles.title}>Create an SSH key</Title>
-
-                <SubTitle>
+            <Popup
+                show={showPopup}
+                onDismiss={dismissPopup}
+                title="Create SSH key"
+                actions={popupActions}
+            >
+                <Title variant="h4">
                     Step 1: Generate an SSH key if you don't have one
-                </SubTitle>
-                <Code
-                    className={styles.code}
-                    code={'ssh-keygen -t ed25519 -C "abc@example.com"'}
-                    language={"bash"}
+                </Title>
+                <Code language={"bash"}>
+                    ssh-keygen -t ed25519 -C "abc@example.com"
+                </Code>
+
+                <Title variant="h4">Step 2: Paste your public key below</Title>
+                <TextField
+                    id="authorized-key"
+                    value={authorizedKey}
+                    onChange={onAuthorizedKeyChange}
+                    placeholder="ssh-ed25519..."
+                    disabled={adding}
                 />
 
-                <SubTitle>Step 2: Paste your public key below</SubTitle>
-                <div className={styles.field}>
-                    <TextField
-                        id="authorized-key"
-                        value={authorizedKey}
-                        onChange={onAuthorizedKeyChange}
-                        placeholder="ssh-ed25519..."
-                        disabled={adding}
-                    />
-                </div>
-
-                <APIError className={styles.error} error={addError} />
-
+                <APIError error={addError} />
                 {adding && <Progress infinite />}
-
-                <Horizontal gap={6}>
-                    <Spacer />
-                    <Button onClick={dismissPopup}>Cancel</Button>
-                    <Button
-                        variant="colored"
-                        disabled={authorizedKey === ""}
-                        onClick={createSSHKey}
-                    >
-                        Create
-                    </Button>
-                </Horizontal>
             </Popup>
-        </Fragment>
+        </Content>
     );
 }

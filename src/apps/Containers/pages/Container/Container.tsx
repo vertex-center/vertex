@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { api } from "../../../../backend/api/backend";
 import { Outlet, useNavigate, useOutlet, useParams } from "react-router-dom";
 import styles from "./Container.module.sass";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
-import Spacer from "../../../../components/Spacer/Spacer";
 import Popup from "../../../../components/Popup/Popup";
 import {
     Button,
@@ -129,6 +128,22 @@ export default function ContainerDetails() {
         </Sidebar>
     );
 
+    const popupActions = (
+        <Fragment>
+            <Button onClick={dismissDeletePopup} disabled={isDeleting}>
+                Cancel
+            </Button>
+            <Button
+                variant="danger"
+                onClick={async () => mutationDeleteContainer.mutate()}
+                disabled={isDeleting}
+                rightIcon={<MaterialIcon icon="delete" />}
+            >
+                Confirm
+            </Button>
+        </Fragment>
+    );
+
     const content = (
         <Horizontal className={styles.content}>
             {sidebar}
@@ -137,11 +152,14 @@ export default function ContainerDetails() {
                     <Outlet />
                 </div>
             )}
-            <Popup show={showDeletePopup} onDismiss={dismissDeletePopup}>
-                <Paragraph>
-                    Delete {container?.display_name ?? container?.service?.name}
-                    ?
-                </Paragraph>
+            <Popup
+                show={showDeletePopup}
+                onDismiss={dismissDeletePopup}
+                title={`Delete ${
+                    container?.display_name ?? container?.service?.name
+                }?`}
+                actions={popupActions}
+            >
                 <Paragraph>
                     Are you sure you want to delete{" "}
                     {container?.display_name ?? container?.service?.name}? All
@@ -149,20 +167,6 @@ export default function ContainerDetails() {
                 </Paragraph>
                 {isDeleting && <Progress infinite />}
                 <APIError style={{ margin: 0 }} error={errorDeleting} />
-                <Horizontal gap={10}>
-                    <Spacer />
-                    <Button onClick={dismissDeletePopup} disabled={isDeleting}>
-                        Cancel
-                    </Button>
-                    <Button
-                        variant="danger"
-                        onClick={async () => mutationDeleteContainer.mutate()}
-                        disabled={isDeleting}
-                        rightIcon={<MaterialIcon icon="delete" />}
-                    >
-                        Confirm
-                    </Button>
-                </Horizontal>
             </Popup>
         </Horizontal>
     );

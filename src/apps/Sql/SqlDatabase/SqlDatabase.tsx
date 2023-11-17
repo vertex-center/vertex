@@ -18,11 +18,11 @@ import {
     ListItem,
     ListTitle,
     MaterialIcon,
+    Title,
 } from "@vertex-center/components";
-import { Title } from "../../../components/Text/Text";
-import styles from "./SqlDatabase.module.sass";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import NoItems from "../../../components/NoItems/NoItems";
+import Content from "../../../components/Content/Content";
 
 export default function SqlDatabase() {
     const { uuid } = useParams();
@@ -89,7 +89,7 @@ export default function SqlDatabase() {
     }
 
     return (
-        <Vertical gap={30}>
+        <Content>
             <ProgressOverlay show={isLoadingContainer ?? isLoadingDatabase} />
 
             <Vertical gap={20}>
@@ -116,10 +116,8 @@ export default function SqlDatabase() {
                 </KeyValueGroup>
             </Vertical>
 
-            <Vertical gap={20}>
-                <Title className={styles.title}>Databases</Title>
-                {databases}
-            </Vertical>
-        </Vertical>
+            <Title variant="h3">Databases</Title>
+            {databases}
+        </Content>
     );
 }

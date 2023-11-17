@@ -1,8 +1,6 @@
-import { Caption, Title } from "../../../../components/Text/Text";
+import { Caption } from "../../../../components/Text/Text";
 import { useParams } from "react-router-dom";
 import useContainer from "../../hooks/useContainer";
-import styles from "./ContainerUpdate.module.sass";
-import { Vertical } from "../../../../components/Layouts/Layouts";
 import { api } from "../../../../backend/api/backend";
 import { useState } from "react";
 import { APIError } from "../../../../components/Error/APIError";
@@ -16,7 +14,9 @@ import {
     ListItem,
     ListTitle,
     MaterialIcon,
+    Title,
 } from "@vertex-center/components";
+import Content from "../../../../components/Content/Content";
 
 export default function ContainerUpdate() {
     const { uuid } = useParams();
@@ -58,19 +58,15 @@ export default function ContainerUpdate() {
             </List>
         );
     } else {
-        content = (
-            <Caption className={styles.content}>
-                There are no updates available.
-            </Caption>
-        );
+        content = <Caption>There are no updates available.</Caption>;
     }
 
     return (
-        <Vertical gap={20}>
+        <Content>
+            <Title variant="h2">Update</Title>
             <ProgressOverlay show={isLoading} />
-            <Title className={styles.title}>Update</Title>
             <APIError error={error} />
             {!error && !isLoading && content}
-        </Vertical>
+        </Content>
     );
 }

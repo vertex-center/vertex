@@ -1,6 +1,5 @@
-import { Fragment, useEffect, useState } from "react";
-import { Title } from "../../../../components/Text/Text";
-import { Horizontal } from "../../../../components/Layouts/Layouts";
+import { useEffect, useState } from "react";
+import { Horizontal, Vertical } from "../../../../components/Layouts/Layouts";
 import Spacer from "../../../../components/Spacer/Spacer";
 import {
     Button,
@@ -9,6 +8,7 @@ import {
     SelectField,
     SelectOption,
     TextField,
+    Title,
 } from "@vertex-center/components";
 import { useParams } from "react-router-dom";
 import useContainer from "../../hooks/useContainer";
@@ -20,6 +20,7 @@ import VersionTag from "../../../../components/VersionTag/VersionTag";
 import classNames from "classnames";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Content from "../../../../components/Content/Content";
 
 export default function ContainerSettings() {
     const { uuid } = useParams();
@@ -98,88 +99,90 @@ export default function ContainerSettings() {
     );
 
     return (
-        <Fragment>
+        <Content>
+            <Title variant="h2">Settings</Title>
             <ProgressOverlay
                 show={isLoadingContainer || versionsLoading || isUploading}
             />
-            <Title className={styles.title}>Settings</Title>
             <APIError error={error} />
-            <Horizontal className={styles.toggle} alignItems="center">
-                <Paragraph>Launch on Startup</Paragraph>
-                <Spacer />
-                <ToggleButton
-                    value={launchOnStartup}
-                    onChange={(v) => {
-                        setLaunchOnStartup(v);
+            <Vertical gap={20}>
+                <Horizontal className={styles.toggle} alignItems="center">
+                    <Paragraph>Launch on Startup</Paragraph>
+                    <Spacer />
+                    <ToggleButton
+                        value={launchOnStartup}
+                        onChange={(v) => {
+                            setLaunchOnStartup(v);
+                            setSaved(false);
+                        }}
+                        disabled={isLoadingContainer}
+                    />
+                </Horizontal>
+                <TextField
+                    id="container-name"
+                    label="Container name"
+                    description="The custom name of your choice for this service"
+                    value={displayName}
+                    onChange={(e: any) => {
+                        setDisplayName(e.target.value);
                         setSaved(false);
                     }}
                     disabled={isLoadingContainer}
                 />
-            </Horizontal>
-            <TextField
-                id="container-name"
-                label="Container name"
-                description="The custom name of your choice for this service"
-                value={displayName}
-                onChange={(e: any) => {
-                    setDisplayName(e.target.value);
-                    setSaved(false);
-                }}
-                disabled={isLoadingContainer}
-            />
-            <div className={styles.versionSelect}>
-                <SelectField
-                    id="container-version"
-                    label="Version"
-                    onChange={onVersionChange}
-                    disabled={isLoadingContainer || versionsLoading}
-                    // @ts-ignore
-                    value={versionValue}
-                >
-                    {versions?.includes("latest") && (
-                        <SelectOption value="latest">
-                            Always pull latest version
-                        </SelectOption>
-                    )}
-                    {versions?.map((v) => {
-                        if (v === "latest") {
-                            return null;
-                        }
-                        return (
-                            <SelectOption key={v} value={v}>
-                                <VersionTag>{v}</VersionTag>
-                            </SelectOption>
-                        );
-                    })}
-                </SelectField>
-                <Button
-                    rightIcon={<MaterialIcon icon="refresh" />}
-                    onClick={() => reloadVersions(false)}
-                    disabled={isLoadingContainer || versionsLoading}
-                >
-                    Refresh
-                </Button>
-            </div>
-            <Horizontal justifyContent="flex-end">
-                {!isUploading && saved && (
-                    <Horizontal
-                        className={styles.saved}
-                        alignItems="center"
-                        gap={4}
+                <div className={styles.versionSelect}>
+                    <SelectField
+                        id="container-version"
+                        label="Version"
+                        onChange={onVersionChange}
+                        disabled={isLoadingContainer || versionsLoading}
+                        // @ts-ignore
+                        value={versionValue}
                     >
-                        <MaterialIcon icon="check" />
-                        Saved!
-                    </Horizontal>
-                )}
-                <Button
-                    variant="colored"
-                    onClick={async () => mutationSave.mutate()}
-                    rightIcon={<MaterialIcon icon="save" />}
-                    disabled={isUploading || saved || saved === undefined}
-                >
-                    Save
-                </Button>
-            </Horizontal>
-        </Fragment>
+                        {versions?.includes("latest") && (
+                            <SelectOption value="latest">
+                                Always pull latest version
+                            </SelectOption>
+                        )}
+                        {versions?.map((v) => {
+                            if (v === "latest") {
+                                return null;
+                            }
+                            return (
+                                <SelectOption key={v} value={v}>
+                                    <VersionTag>{v}</VersionTag>
+                                </SelectOption>
+                            );
+                        })}
+                    </SelectField>
+                    <Button
+                        rightIcon={<MaterialIcon icon="refresh" />}
+                        onClick={() => reloadVersions(false)}
+                        disabled={isLoadingContainer || versionsLoading}
+                    >
+                        Refresh
+                    </Button>
+                </div>
+                <Horizontal justifyContent="flex-end">
+                    {!isUploading && saved && (
+                        <Horizontal
+                            className={styles.saved}
+                            alignItems="center"
+                            gap={4}
+                        >
+                            <MaterialIcon icon="check" />
+                            Saved!
+                        </Horizontal>
+                    )}
+                    <Button
+                        variant="colored"
+                        onClick={async () => mutationSave.mutate()}
+                        rightIcon={<MaterialIcon icon="save" />}
+                        disabled={isUploading || saved || saved === undefined}
+                    >
+                        Save
+                    </Button>
+                </Horizontal>
+            </Vertical>
+        </Content>
     );
 }
