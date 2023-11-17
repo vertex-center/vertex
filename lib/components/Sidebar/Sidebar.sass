@@ -5,9 +5,9 @@
 .sidebar
     display: flex
     flex-direction: column
-    min-width: 310px
-    max-width: 310px
-    padding: 0 10px 10px 10px
+    min-width: 340px
+    max-width: 340px
+    padding: 0 15px 10px 30px
     box-sizing: border-box
     transition: max-width 0.1s ease, min-width 0.1s ease, padding 0.1s ease, padding 0.1s ease
     overflow: hidden
@@ -36,7 +36,7 @@
         &-visible
             max-width: 300px
             min-width: 300px
-            padding: 10px 15px 10px 10px
+            padding: 10px 15px 10px 20px
 
         &-overlay-visible
             display: block
@@ -56,8 +56,9 @@
         margin-bottom: 10px
 
     &-title
-        margin: 0 10px 5px 20px
+        margin: 0 10px 8px 0
         color: colors.$fg-secondary
+        font-size: 14px
 
     &-item
         display: flex
@@ -67,8 +68,7 @@
         box-sizing: border-box
         align-items: center
         cursor: pointer
-        padding: 0 15px
-        margin-left: 5px
+        padding: 0 12px
         border: 1px solid transparent
         transition: all 0.1s ease
         -webkit-user-select: none
