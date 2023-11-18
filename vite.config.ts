@@ -23,7 +23,27 @@ const remarkDirectiveBlocks = () => {
     };
 };
 
-// https://vitejs.dev/config/
+function transformYaml(data, filePath) {
+    if (filePath.endsWith("_category_.yml")) {
+        return data;
+    }
+    const regex = /\{"\$ref":"#\/(.*?)"}/g;
+    let dataString = JSON.stringify(data);
+    let match = null;
+    while ((match = regex.exec(dataString)) !== null) {
+        if (match.index === regex.lastIndex) {
+            regex.lastIndex++;
+        }
+        const ref = match[1];
+        const refPath = ref.split("/");
+        const refData = refPath.reduce((d, key) => d[key], data);
+        dataString = dataString.replace(match[0], JSON.stringify(refData));
+        data = JSON.parse(dataString);
+        regex.lastIndex = 0;
+    }
+    return JSON.parse(JSON.stringify(data));
+}
+
 export default defineConfig({
     plugins: [
         react(),
@@ -43,6 +63,6 @@ export default defineConfig({
                 ],
             ],
         }),
-        yaml(),
+        yaml({ transform: transformYaml }),
     ],
 });
