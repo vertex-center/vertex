@@ -23,7 +23,7 @@ func NewUpdateHandler(updateService port.UpdateService, settingsService port.Set
 
 // docapi begin get_updates
 // docapi method GET
-// docapi summary Get the latest version information.
+// docapi summary Get the latest version info
 // docapi tags Updates
 // docapi response 200 {Update} The latest version information.
 // docapi response 500
@@ -54,7 +54,7 @@ func (h *UpdateHandler) Get(c *router.Context) {
 
 // docapi begin install_update
 // docapi method POST
-// docapi summary Install the latest version.
+// docapi summary Install the latest version
 // docapi tags Updates
 // docapi response 204
 // docapi response 400

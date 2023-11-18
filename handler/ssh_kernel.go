@@ -25,7 +25,7 @@ func NewSshKernelHandler(sshKernelService port.SshService) port.SshKernelHandler
 
 // docapi begin get_ssh_keys_kernel
 // docapi method GET
-// docapi summary Get all SSH keys.
+// docapi summary Get all SSH keys
 // docapi tags Ssh
 // docapi response 200 {[]PublicKey} The list of SSH keys.
 // docapi response 500
@@ -47,7 +47,7 @@ func (h *SshKernelHandler) Get(c *router.Context) {
 
 // docapi begin add_ssh_key_kernel
 // docapi method POST
-// docapi summary Add an SSH key to the authorized_keys file.
+// docapi summary Add an SSH key to the authorized_keys file
 // docapi tags Ssh
 // docapi body {string} The key to append to the authorized_keys file.
 // docapi response 201
@@ -90,7 +90,7 @@ func (h *SshKernelHandler) Add(c *router.Context) {
 
 // docapi begin delete_ssh_key_kernel
 // docapi method DELETE
-// docapi summary Delete an SSH key from the authorized_keys file.
+// docapi summary Delete an SSH key from the authorized_keys file
 // docapi tags Ssh
 // docapi query fingerprint {string} The fingerprint of the SSH key to delete.
 // docapi response 204
