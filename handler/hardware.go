@@ -18,7 +18,7 @@ func NewHardwareHandler(hardwareService port.HardwareService) port.HardwareHandl
 // docapi begin get_hardware
 // docapi method GET
 // docapi summary Get hardware.
-// docapi tags hardware
+// docapi tags Hardware
 // docapi response 200 {Hardware} The hardware.
 // docapi end
 

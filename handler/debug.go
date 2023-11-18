@@ -18,7 +18,7 @@ func NewDebugHandler(debugService port.DebugService) port.DebugHandler {
 // docapi begin hard_reset
 // docapi method POST
 // docapi summary Hard reset the Vertex server.
-// docapi tags debug
+// docapi tags Debug
 // docapi response 204
 // docapi end
 
