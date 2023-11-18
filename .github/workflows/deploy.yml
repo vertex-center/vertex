@@ -14,6 +14,12 @@ jobs:
           npx playwright install
           npm ci && npm run build
 
+      - name: Download OpenAPI specs
+        run: |
+          git clone https://github.com/vertex-center/openapi.git vertex-openapi
+          cp vertex-openapi/openapi.vertex.dev.yml api/api/next/openapi.yml
+          cp vertex-openapi/openapi.kernel.dev.yml api/kernel-api/next/openapi.yml
+
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
