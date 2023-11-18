@@ -15,17 +15,18 @@ export default class APIs {
         });
 
         this.files = {};
-        console.log(Object.entries(imported));
         Object.entries(imported ?? {}).forEach(
             ([fsPath, api]: [string, any]) => {
                 this.files[fsPath] = api.default;
             }
         );
-        console.log(this.files);
 
         this.apis = {};
         this.hierarchy = {};
         this.populate();
+
+        console.log(this.hierarchy);
+        console.log(this.apis);
     }
 
     private populate() {

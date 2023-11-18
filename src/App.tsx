@@ -86,10 +86,10 @@ const SidebarItems = (props: SidebarItemsProps) => {
         link = { as: NavLink, to: path, end: true };
     }
 
+    console.log(hierarchy);
     const hasChildren = Object.keys(hierarchy ?? {}).length > 2;
 
     const children =
-        hasChildren &&
         typeof hierarchy === "object" &&
         Object.entries(hierarchy ?? {}).map(([label, hierarchy]) => {
             if (label === "_path") return null;
@@ -101,7 +101,7 @@ const SidebarItems = (props: SidebarItemsProps) => {
 
     return (
         <Sidebar.Item label={title ?? "---"} link={link}>
-            {children}
+            {hasChildren && children}
         </Sidebar.Item>
     );
 };
