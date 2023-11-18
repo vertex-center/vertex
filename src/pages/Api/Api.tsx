@@ -27,14 +27,16 @@ function ApiMethods(props: Readonly<ApiMethodsProps>) {
                 </tr>
             </thead>
             <tbody>
-                {Object.entries(responses ?? {}).map(([code, resp]) => {
-                    return (
-                        <tr key={code}>
-                            <td>{code}</td>
-                            <td>{resp.description}</td>
-                        </tr>
-                    );
-                })}
+                {Object.entries(responses ?? {}).map(
+                    ([code, resp]: [string, any]) => {
+                        return (
+                            <tr key={code}>
+                                <td>{code}</td>
+                                <td>{resp.description}</td>
+                            </tr>
+                        );
+                    }
+                )}
             </tbody>
         </Table>
     );

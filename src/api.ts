@@ -90,21 +90,23 @@ export default class APIs {
     getRoutes(): Route[] {
         const routes: Route[] = [];
         Object.entries(this.apis).forEach(([app, versions]) => {
-            Object.entries(versions).forEach(([version, tags]) => {
-                routes.push({
-                    path: `/${app}/${version}`,
-                    tag: "",
-                    api: undefined,
-                });
-                Object.entries(tags).forEach(([tag, api]) => {
-                    const t = tag.replace(/ /g, "-").toLowerCase();
+            Object.entries(versions).forEach(
+                ([version, tags]: [string, any]) => {
                     routes.push({
-                        path: `/${app}/${version}/${t}`,
-                        tag: tag,
-                        api: api,
+                        path: `/${app}/${version}`,
+                        tag: "",
+                        api: undefined,
                     });
-                });
-            });
+                    Object.entries(tags).forEach(([tag, api]) => {
+                        const t = tag.replace(/ /g, "-").toLowerCase();
+                        routes.push({
+                            path: `/${app}/${version}/${t}`,
+                            tag: tag,
+                            api: api,
+                        });
+                    });
+                }
+            );
         });
         return routes;
     }
