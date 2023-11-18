@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+api/api/**/openapi.kernel.*.yaml
+api/api/**/openapi.vertex.*.yaml
