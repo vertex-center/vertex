@@ -82,7 +82,7 @@ export default class Docs {
 
     private createHierarchy() {
         Object.entries(this.pages).forEach(([path]) => {
-            const segments = path.split("/").slice(2);
+            const segments = path.split("/").slice(1);
             let group = this.hierarchy;
             segments.forEach((segment) => {
                 if (!group[segment]) {
@@ -91,6 +91,7 @@ export default class Docs {
                 group = group[segment];
             });
             group._path = path;
+            group._title = this.pages[path].title;
         });
     }
 }

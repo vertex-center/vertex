@@ -9,15 +9,25 @@ import {
 } from "@vertex-center/components";
 import "./Documentation.sass";
 import { useMemo } from "react";
+import { useLocation } from "react-router-dom";
 
 type Props = {
     content: any;
 };
 
+const docs = import.meta.glob("/{docs,api}/*/{doc,api}.json", {
+    eager: true,
+});
+
 export default function Documentation(props: Props) {
     const { content } = props;
 
-    useTitle("Vertex");
+    const location = useLocation();
+
+    const app = location.pathname.split("/")?.[1];
+    const doc: any = docs?.[`/docs/${app}/doc.json`];
+
+    useTitle(doc?.title ?? "-");
 
     if (content === undefined) return null;
 

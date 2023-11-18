@@ -21,9 +21,12 @@ import {
 } from "@vertex-center/components";
 import Documentation from "./pages/Documentation/Documentation.tsx";
 import Generator from "./documentation.ts";
+import APIGenerator from "./api.ts";
 import AllDocs from "./pages/All/AllDocs.tsx";
+import { Api } from "./pages/Api/Api.tsx";
 
 const docs = new Generator("/docs");
+const apis = new APIGenerator();
 
 const router = createBrowserRouter([
     {
@@ -41,6 +44,10 @@ const router = createBrowserRouter([
                         element: (
                             <Documentation content={route.page?.default} />
                         ),
+                    })),
+                    ...apis.getRoutes().map((route) => ({
+                        path: route.path,
+                        element: <Api tag={route.tag} api={route.api} />,
                     })),
                     {
                         path: "*",
@@ -60,20 +67,33 @@ type SidebarItemsProps = {
 const SidebarItems = (props: SidebarItemsProps) => {
     const { root, hierarchy } = props;
 
-    console.log(docs.pages);
-    const { title, path, isPage } = docs?.getPage(hierarchy?._path) ?? {};
+    let title: string,
+        path: string,
+        isPage = true;
+
+    const page = docs?.getPage(hierarchy?._path);
+    if (page !== undefined) {
+        title = page.title;
+        path = page.path;
+        isPage = page.isPage;
+    } else {
+        title = hierarchy?._title;
+        path = hierarchy?._path;
+    }
 
     let link = {};
     if (isPage) {
         link = { as: NavLink, to: path, end: true };
     }
 
-    const hasChildren = Object.keys(hierarchy ?? {}).length > 1;
+    const hasChildren = Object.keys(hierarchy ?? {}).length > 2;
 
     const children =
         hasChildren &&
+        typeof hierarchy === "object" &&
         Object.entries(hierarchy ?? {}).map(([label, hierarchy]) => {
             if (label === "_path") return null;
+            if (label === "_title") return null;
             return <SidebarItems key={label} hierarchy={hierarchy} />;
         });
 
@@ -92,7 +112,6 @@ function Docs() {
 
     const app = location.pathname.split("/")?.[1];
     const version = location.pathname.split("/")?.[2];
-    console.log(app, version);
     if (version === undefined || version === "") navigate(`/${app}/next/`);
 
     const onVersionChange = (v: unknown) => {
@@ -100,6 +119,8 @@ function Docs() {
     };
 
     useHasSidebar(true);
+
+    const hierarchy = docs.hierarchy?.[app] ?? apis.hierarchy?.[app] ?? {};
 
     return (
         <Fragment>
@@ -109,14 +130,14 @@ function Docs() {
                     onChange={onVersionChange}
                     value={version}
                 >
-                    {Object.keys(docs.hierarchy).map((version) => (
+                    {Object.keys(hierarchy).map((version) => (
                         <SelectOption key={version} value={version}>
                             {version}
                         </SelectOption>
                     ))}
                 </SelectField>
                 <Sidebar.Group title={version}>
-                    <SidebarItems root hierarchy={docs.hierarchy[version]} />
+                    <SidebarItems root hierarchy={hierarchy?.[version]} />
                 </Sidebar.Group>
             </Sidebar>
             <Outlet />

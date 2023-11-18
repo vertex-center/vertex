@@ -11,7 +11,7 @@ import {
 import styles from "./AllDocs.module.sass";
 import { useNavigate } from "react-router-dom";
 
-const docs = import.meta.glob("/docs/*/doc.json", {
+const docs = import.meta.glob("/{docs,api}/*/{doc,api}.json", {
     eager: true,
 });
 
