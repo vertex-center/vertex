@@ -3,7 +3,6 @@ import classNames from "classnames";
 import { Caption } from "../Text/Text";
 import { Link } from "react-router-dom";
 import { Vertical } from "../Layouts/Layouts";
-import LogoIcon from "../Logo/LogoIcon";
 import { useApps } from "../../hooks/useApps";
 import { Logo, MaterialIcon, Title } from "@vertex-center/components";
 
@@ -21,9 +20,8 @@ function DrawerApp(props: AppProps) {
     return (
         <Link to={to} className={styles.app} onClick={onClick}>
             <MaterialIcon icon={icon} className={styles.appIcon} />
-            <Vertical gap={8}>
+            <Vertical>
                 <Title variant="h4" className={styles.appName}>
-                    <LogoIcon />
                     {name}
                 </Title>
                 <Caption>{description}</Caption>
@@ -49,8 +47,10 @@ export default function DockDrawer(props: Props) {
             })}
         >
             <div className={styles.header} onClick={onClose}>
-                <Logo />
-                <Title variant="h3">Vertex</Title>
+                <Logo size={24} />
+                <div>
+                    <Title variant="h3">Vertex</Title>
+                </div>
             </div>
             <div className={styles.apps}>
                 {[...(apps ?? [])]

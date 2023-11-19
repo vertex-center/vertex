@@ -58,6 +58,7 @@
     transition: all 0.05s linear
     min-width: 0
     border: 1px solid transparent
+    color: colors.$fg-primary
 
     & > *
         white-space: nowrap
@@ -82,10 +83,11 @@
         gap: 6px
         font-size: 17px
         line-height: 1 !important
+        margin-bottom: 5px !important
 
         & > :first-child
             margin-bottom: -2px
 
     &:hover
         & > :nth-child(2)
-            color: colors.$fg-secondary
+            color: colors.$bg-accent-hover
