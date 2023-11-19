@@ -91,8 +91,6 @@ export default function ContainerInstaller(props: Readonly<Props>) {
 
     return (
         <Fragment>
-            <ProgressOverlay show={downloading || isLoadingContainers} />
-            <APIError error={error ?? errorContainers} />
             <Containers>
                 <Container
                     container={{
@@ -105,6 +103,8 @@ export default function ContainerInstaller(props: Readonly<Props>) {
                     }}
                 />
             </Containers>
+            <ProgressOverlay show={downloading || isLoadingContainers} />
+            <APIError error={error ?? errorContainers} />
         </Fragment>
     );
 }
