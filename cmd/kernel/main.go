@@ -213,7 +213,7 @@ func initRoutes() {
 
 	// docapi:k url http://{ip}:{port-kernel}/api
 	// docapi:k urlvar ip localhost The IP address of the kernel.
-	// docapi:k urlvar port 6131 The port of the server.
+	// docapi:k urlvar port-kernel 6131 The port of the server.
 
 	api := r.Group("/api")
 
