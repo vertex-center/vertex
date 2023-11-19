@@ -11,8 +11,9 @@ jobs:
 
       - name: Install and Build
         run: |
+          npm ci
           npx playwright install
-          npm ci && npm run build
+          npm run build
 
       - name: Download OpenAPI specs
         run: |
