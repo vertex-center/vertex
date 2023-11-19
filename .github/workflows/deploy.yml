@@ -14,11 +14,14 @@ jobs:
         with:
           node-version: '16'
 
-      - name: Install and Build
-        run: |
-          npm ci
-          npx playwright install
-          npm run build
+      - name: Install
+        run: npm ci
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps
+
+      - name: Build
+        run: npm run build
 
       - name: Download OpenAPI specs
         run: |
