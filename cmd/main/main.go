@@ -214,14 +214,14 @@ func initRoutes(about types.About) {
 	// docapi:v urlvar ip localhost The IP address of the server.
 	// docapi:v urlvar port 6130 The port of the server.
 
-	// docapi code 200 Success.
-	// docapi code 201 Created.
-	// docapi code 204 No content.
-	// docapi code 400 {Error} Bad request.
-	// docapi code 404 {Error} Resource not found.
-	// docapi code 409 {Error} Conflict.
-	// docapi code 422 {Error} Unprocessable entity.
-	// docapi code 500 {Error} Internal error.
+	// docapi code 200 Success
+	// docapi code 201 Created
+	// docapi code 204 No content
+	// docapi code 400 {Error} Bad request
+	// docapi code 404 {Error} Resource not found
+	// docapi code 409 {Error} Conflict
+	// docapi code 422 {Error} Unprocessable entity
+	// docapi code 500 {Error} Internal error
 
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, router.Error{
