@@ -26,8 +26,8 @@ jobs:
       - name: Download OpenAPI specs
         run: |
           git clone https://github.com/vertex-center/openapi.git vertex-openapi
-          cp vertex-openapi/openapi.vertex.dev.yml api/api/next/openapi.yml
-          cp vertex-openapi/openapi.kernel.dev.yml api/kernel-api/next/openapi.yml
+          cp vertex-openapi/openapi.vertex.dev.yaml api/api/next/openapi.yml
+          cp vertex-openapi/openapi.kernel.dev.yaml api/kernel-api/next/openapi.yml
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
