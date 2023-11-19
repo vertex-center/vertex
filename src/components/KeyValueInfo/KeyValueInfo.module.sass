@@ -9,6 +9,13 @@
     padding: 20px
     border: 1px solid colors.$bg-tertiary
     border-radius: dimensions.$border-radius-lg
+    margin: 20px 0
+
+    &:first-child
+        margin-top: 0
+
+    &:last-child
+        margin-bottom: 0
 
     @include dimensions.large-or-less
         gap: 25px
