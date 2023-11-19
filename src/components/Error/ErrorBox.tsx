@@ -1,4 +1,4 @@
-import { Box, BoxProps } from "@vertex-center/components";
+import { Box, BoxProps, Paragraph } from "@vertex-center/components";
 
 type Props = BoxProps & {
     error?: any;
@@ -9,7 +9,7 @@ export default function ErrorBox(props: Readonly<Props>) {
     let err = error?.message ?? "An unknown error has occurred.";
     return (
         <Box type="error" {...others}>
-            {err}
+            <Paragraph>{err}</Paragraph>
         </Box>
     );
 }
