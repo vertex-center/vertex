@@ -167,14 +167,20 @@ func parseArgs() {
 
 func buildVertex() {
 	log.Info("Building vertex")
+
+	start := time.Now()
 	cmd := exec.Command("go", "build", "-o", "vertex", "cmd/main/main.go")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
+	end := time.Now()
+
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)
 	}
+
+	log.Info("Build completed in " + end.Sub(start).String())
 }
 
 func initRouter() {
