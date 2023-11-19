@@ -121,21 +121,19 @@ export default function VertexReverseProxy() {
                 actions={popupActions}
                 title="New redirection"
             >
-                <Vertical gap={20} className={styles.input}>
-                    <TextField
-                        id="source"
-                        className={styles.input}
-                        label="Source"
-                        value={source}
-                        onChange={onSourceChange}
-                    />
-                    <TextField
-                        id="target"
-                        label="Target"
-                        value={target}
-                        onChange={onTargetChange}
-                    />
-                </Vertical>
+                <TextField
+                    id="source"
+                    className={styles.input}
+                    label="Source"
+                    value={source}
+                    onChange={onSourceChange}
+                />
+                <TextField
+                    id="target"
+                    label="Target"
+                    value={target}
+                    onChange={onTargetChange}
+                />
             </Popup>
         </Content>
     );
