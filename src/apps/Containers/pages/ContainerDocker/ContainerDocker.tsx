@@ -43,9 +43,6 @@ export default function ContainerDocker() {
 
     return (
         <Content>
-            <ProgressOverlay show={isLoading} />
-            <APIError error={recreatingContainerError} />
-
             <Title variant="h3">Container</Title>
             <KeyValueGroup>
                 <KeyValueInfo
@@ -130,6 +127,9 @@ export default function ContainerDocker() {
                     </Button>
                 </Horizontal>
             </Vertical>
+
+            <ProgressOverlay show={isLoading} />
+            <APIError error={recreatingContainerError} />
         </Content>
     );
 }
