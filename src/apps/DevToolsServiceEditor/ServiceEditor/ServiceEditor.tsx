@@ -3,6 +3,7 @@ import { Horizontal, Vertical } from "../../../components/Layouts/Layouts";
 import NoItems from "../../../components/NoItems/NoItems";
 import {
     Button,
+    Code,
     List,
     ListItem,
     MaterialIcon,
@@ -27,7 +28,6 @@ import { Fragment, useState } from "react";
 import Card from "../../../components/Card/Card";
 import { api } from "../../../backend/api/backend";
 import { produce } from "immer";
-import Code from "../../../components/Code/Code";
 import Content from "../../../components/Content/Content";
 
 function EnvironmentInputs({ control, register, errors, i }) {
@@ -747,7 +747,7 @@ export default function ServiceEditor() {
             )}
 
             <Title variant="h2">Service.yml</Title>
-            <Code code={yaml} language="yaml" />
+            <Code language="yaml">{yaml}</Code>
 
             <Horizontal gap={10}>
                 <Spacer />
