@@ -85,11 +85,17 @@ export function Api(props: Readonly<ApiProps>) {
                 const { operationId, summary, description, responses } =
                     operation;
 
+                let server = api.servers?.[0]?.url ?? "";
+                const variables = api.servers?.[0]?.variables ?? {};
+                Object.entries(variables).forEach(([key, value]: any) => {
+                    server = server.replace(`{${key}}`, value.default);
+                });
+
                 return (
                     <Fragment key={operationId}>
                         <Title variant="h2">{summary}</Title>
                         <Code language="bash">
-                            {`${method.toUpperCase()} ${path}`}
+                            {`${method.toUpperCase()} ${server}${path}`}
                         </Code>
                         <Paragraph>{description}</Paragraph>
                         <div>
