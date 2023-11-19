@@ -1,4 +1,3 @@
-import { Vertical } from "../../../components/Layouts/Layouts";
 import { useParams } from "react-router-dom";
 import { api } from "../../../backend/api/backend";
 import { Container as ContainerModel } from "../../../models/container";
@@ -91,30 +90,28 @@ export default function SqlDatabase() {
     return (
         <Content>
             <ProgressOverlay show={isLoadingContainer ?? isLoadingDatabase} />
+            <APIError error={errorContainer ?? errorDatabase} />
 
-            <Vertical gap={20}>
-                <APIError error={errorContainer ?? errorDatabase} />
-                <Containers>
-                    <Container
-                        container={{
-                            value: container ?? {
-                                uuid: uuidv4(),
-                            },
-                            to: `/app/vx-containers/${container?.uuid}`,
-                            onPower: () => onPower(container),
-                        }}
-                    />
-                </Containers>
+            <Containers>
+                <Container
+                    container={{
+                        value: container ?? {
+                            uuid: uuidv4(),
+                        },
+                        to: `/app/vx-containers/${container?.uuid}`,
+                        onPower: () => onPower(container),
+                    }}
+                />
+            </Containers>
 
-                <KeyValueGroup>
-                    <KeyValueInfo name="Username" loading={isLoadingDatabase}>
-                        {db?.username}
-                    </KeyValueInfo>
-                    <KeyValueInfo name="Password" loading={isLoadingDatabase}>
-                        {db?.password}
-                    </KeyValueInfo>
-                </KeyValueGroup>
-            </Vertical>
+            <KeyValueGroup>
+                <KeyValueInfo name="Username" loading={isLoadingDatabase}>
+                    {db?.username}
+                </KeyValueInfo>
+                <KeyValueInfo name="Password" loading={isLoadingDatabase}>
+                    {db?.password}
+                </KeyValueInfo>
+            </KeyValueGroup>
 
             <Title variant="h3">Databases</Title>
             {databases}
