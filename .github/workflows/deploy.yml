@@ -20,14 +20,14 @@ jobs:
       - name: Install Playwright
         run: npx playwright@1.39.0 install --with-deps
 
-      - name: Build
-        run: npm run build
-
       - name: Download OpenAPI specs
         run: |
           git clone https://github.com/vertex-center/openapi.git vertex-openapi
           cp vertex-openapi/openapi.vertex.dev.yaml api/api/next/openapi.yml
           cp vertex-openapi/openapi.kernel.dev.yaml api/kernel-api/next/openapi.yml
+
+      - name: Build
+        run: npm run build
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
