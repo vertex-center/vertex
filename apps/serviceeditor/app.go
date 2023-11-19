@@ -38,6 +38,7 @@ func (a *App) Initialize(r *router.Group) error {
 
 	editorHandler := handler.NewEditorHandler(editorService)
 	editor := r.Group("/editor")
+	// docapi:v route /app/vx-devtools-service-editor/editor/to-yaml vx_devtools_service_editor_to_yaml
 	editor.POST("/to-yaml", editorHandler.ToYaml)
 
 	return nil

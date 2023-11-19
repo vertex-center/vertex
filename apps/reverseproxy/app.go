@@ -57,8 +57,11 @@ func (a *App) Initialize(r *router.Group) error {
 	}()
 
 	proxyHandler := handler.NewProxyHandler(proxyService)
+	// docapi:v route /app/vx-reverse-proxy/redirects vx_reverse_proxy_get_redirects
 	r.GET("/redirects", proxyHandler.GetRedirects)
+	// docapi:v route /app/vx-reverse-proxy/redirect vx_reverse_proxy_add_redirect
 	r.POST("/redirect", proxyHandler.AddRedirect)
+	// docapi:v route /app/vx-reverse-proxy/redirect/{id} vx_reverse_proxy_remove_redirect
 	r.DELETE("/redirect/:id", proxyHandler.RemoveRedirect)
 
 	return nil

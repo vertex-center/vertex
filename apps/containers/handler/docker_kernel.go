@@ -22,6 +22,14 @@ func NewDockerKernelHandler(dockerKernelService port.DockerService) port.DockerK
 	}
 }
 
+// docapi begin vx_containers_kernel_get_containers
+// docapi method GET
+// docapi summary Get containers
+// docapi tags Apps/Containers
+// docapi response 200 {[]Container} The containers.
+// docapi response 500
+// docapi end
+
 func (h *DockerKernelHandler) GetContainers(c *router.Context) {
 	containers, err := h.dockerService.ListContainers()
 	if err != nil {
@@ -35,6 +43,15 @@ func (h *DockerKernelHandler) GetContainers(c *router.Context) {
 
 	c.JSON(containers)
 }
+
+// docapi begin vx_containers_kernel_create_container
+// docapi method POST
+// docapi summary Create container
+// docapi tags Apps/Containers
+// docapi body CreateContainerOptions
+// docapi response 200 {Container} The container.
+// docapi response 500
+// docapi end
 
 func (h *DockerKernelHandler) CreateContainer(c *router.Context) {
 	var options types.CreateContainerOptions
@@ -55,6 +72,16 @@ func (h *DockerKernelHandler) CreateContainer(c *router.Context) {
 
 	c.JSON(res)
 }
+
+// docapi begin vx_containers_kernel_delete_container
+// docapi method DELETE
+// docapi summary Delete container
+// docapi tags Apps/Containers
+// docapi query id {string} The container id.
+// docapi response 200
+// docapi response 404
+// docapi response 500
+// docapi end
 
 func (h *DockerKernelHandler) DeleteContainer(c *router.Context) {
 	id := c.Param("id")
@@ -79,6 +106,15 @@ func (h *DockerKernelHandler) DeleteContainer(c *router.Context) {
 	c.OK()
 }
 
+// docapi begin vx_containers_kernel_start_container
+// docapi method POST
+// docapi summary Start container
+// docapi tags Apps/Containers
+// docapi query id {string} The container id.
+// docapi response 200
+// docapi response 500
+// docapi end
+
 func (h *DockerKernelHandler) StartContainer(c *router.Context) {
 	id := c.Param("id")
 
@@ -94,6 +130,15 @@ func (h *DockerKernelHandler) StartContainer(c *router.Context) {
 
 	c.OK()
 }
+
+// docapi begin vx_containers_kernel_stop_container
+// docapi method POST
+// docapi summary Stop container
+// docapi tags Apps/Containers
+// docapi query id {string} The container id.
+// docapi response 200
+// docapi response 500
+// docapi end
 
 func (h *DockerKernelHandler) StopContainer(c *router.Context) {
 	id := c.Param("id")
@@ -111,6 +156,16 @@ func (h *DockerKernelHandler) StopContainer(c *router.Context) {
 	c.OK()
 }
 
+// docapi begin vx_containers_kernel_patch_container
+// docapi method PATCH
+// docapi summary Patch container
+// docapi tags Apps/Containers
+// docapi query id {string} The container id.
+// docapi body PatchContainerOptions
+// docapi response 200
+// docapi response 500
+// docapi end
+
 func (h *DockerKernelHandler) InfoContainer(c *router.Context) {
 	id := c.Param("id")
 
@@ -126,6 +181,16 @@ func (h *DockerKernelHandler) InfoContainer(c *router.Context) {
 
 	c.JSON(info)
 }
+
+// docapi begin vx_containers_kernel_logs_stdout_container
+// docapi method GET
+// docapi summary Get container stdout logs
+// docapi desc Get container stdout logs as a stream.
+// docapi tags Apps/Containers
+// docapi query id {string} The container id.
+// docapi response 200
+// docapi response 500
+// docapi end
 
 func (h *DockerKernelHandler) LogsStdoutContainer(c *router.Context) {
 	id := c.Param("id")
@@ -160,6 +225,16 @@ func (h *DockerKernelHandler) LogsStdoutContainer(c *router.Context) {
 	})
 }
 
+// docapi begin vx_containers_kernel_logs_stderr_container
+// docapi method GET
+// docapi summary Get container stderr logs
+// docapi desc Get container stderr logs as a stream.
+// docapi tags Apps/Containers
+// docapi query id {string} The container id.
+// docapi response 200
+// docapi response 500
+// docapi end
+
 func (h *DockerKernelHandler) LogsStderrContainer(c *router.Context) {
 	id := c.Param("id")
 
@@ -193,6 +268,16 @@ func (h *DockerKernelHandler) LogsStderrContainer(c *router.Context) {
 	})
 }
 
+// docapi begin vx_containers_kernel_wait_container
+// docapi method GET
+// docapi summary Wait container
+// docapi tags Apps/Containers
+// docapi query id {string} The container id.
+// docapi query cond {string} The condition to wait for.
+// docapi response 200
+// docapi response 500
+// docapi end
+
 func (h *DockerKernelHandler) WaitContainer(c *router.Context) {
 	id := c.Param("id")
 	cond := c.Param("cond")
@@ -210,6 +295,15 @@ func (h *DockerKernelHandler) WaitContainer(c *router.Context) {
 	c.OK()
 }
 
+// docapi begin vx_containers_kernel_info_image
+// docapi method GET
+// docapi summary Get image info
+// docapi tags Apps/Containers
+// docapi query id {string} The image id.
+// docapi response 200 {InfoImageResponse} The image.
+// docapi response 500
+// docapi end
+
 func (h *DockerKernelHandler) InfoImage(c *router.Context) {
 	id := c.Param("id")
 
@@ -225,6 +319,16 @@ func (h *DockerKernelHandler) InfoImage(c *router.Context) {
 
 	c.JSON(info)
 }
+
+// docapi begin vx_containers_kernel_pull_image
+// docapi method POST
+// docapi summary Pull image
+// docapi desc Pull an image from a registry. The response is a stream of the logs.
+// docapi tags Apps/Containers
+// docapi body {PullImageOptions} The options to pull the image.
+// docapi response 200
+// docapi response 500
+// docapi end
 
 func (h *DockerKernelHandler) PullImage(c *router.Context) {
 	var options types.PullImageOptions
@@ -262,6 +366,16 @@ func (h *DockerKernelHandler) PullImage(c *router.Context) {
 		return true
 	})
 }
+
+// docapi begin vx_containers_kernel_build_image
+// docapi method POST
+// docapi summary Build image
+// docapi desc Build an image from a Dockerfile. The response is a stream of the logs.
+// docapi tags Apps/Containers
+// docapi body {BuildImageOptions} The options to build the image.
+// docapi response 200
+// docapi response 500
+// docapi end
 
 func (h *DockerKernelHandler) BuildImage(c *router.Context) {
 	var options types.BuildImageOptions
@@ -302,6 +416,15 @@ func (h *DockerKernelHandler) BuildImage(c *router.Context) {
 	})
 }
 
+// docapi begin vx_containers_kernel_create_volume
+// docapi method POST
+// docapi summary Create volume
+// docapi tags Apps/Containers
+// docapi body {CreateVolumeOptions} The options to create the volume.
+// docapi response 200 {Volume} The volume.
+// docapi response 500
+// docapi end
+
 func (h *DockerKernelHandler) CreateVolume(c *router.Context) {
 	var options types.CreateVolumeOptions
 	err := c.ParseBody(&options)
@@ -321,6 +444,15 @@ func (h *DockerKernelHandler) CreateVolume(c *router.Context) {
 
 	c.JSON(vol)
 }
+
+// docapi begin vx_containers_kernel_delete_volume
+// docapi method DELETE
+// docapi summary Delete volume
+// docapi tags Apps/Containers
+// docapi query name {string} The volume name.
+// docapi response 200
+// docapi response 500
+// docapi end
 
 func (h *DockerKernelHandler) DeleteVolume(c *router.Context) {
 	name := c.Param("name")

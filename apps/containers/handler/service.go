@@ -21,6 +21,16 @@ func NewServiceHandler(serviceService port.ServiceService, containerService port
 	}
 }
 
+// docapi begin vx_containers_get_service
+// docapi method GET
+// docapi summary Get service
+// docapi tags Apps/Containers
+// docapi query service_id {string} The service ID.
+// docapi response 200 {Service} The service.
+// docapi response 400
+// docapi response 404
+// docapi end
+
 func (h *ServiceHandler) Get(c *router.Context) {
 	serviceID := c.Param("service_id")
 	if serviceID == "" {
@@ -44,6 +54,17 @@ func (h *ServiceHandler) Get(c *router.Context) {
 
 	c.JSON(service)
 }
+
+// docapi begin vx_containers_install_service
+// docapi method POST
+// docapi summary Install a service
+// docapi tags Apps/Containers
+// docapi query service_id {string} The service ID.
+// docapi response 200 {Container} The container.
+// docapi response 400
+// docapi response 404
+// docapi response 500
+// docapi end
 
 func (h *ServiceHandler) Install(c *router.Context) {
 	serviceID := c.Param("service_id")

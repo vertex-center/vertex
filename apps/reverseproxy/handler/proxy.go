@@ -20,6 +20,13 @@ func NewProxyHandler(proxyService port.ProxyService) port.ProxyHandler {
 	}
 }
 
+// docapi begin vx_reverse_proxy_get_redirects
+// docapi method GET
+// docapi summary Get redirects
+// docapi tags Apps/Reverse Proxy
+// docapi response 200 {[]Redirect} The redirects.
+// docapi end
+
 func (r *ProxyHandler) GetRedirects(c *router.Context) {
 	redirects := r.proxyService.GetRedirects()
 	c.JSON(redirects)
@@ -29,6 +36,16 @@ type AddRedirectBody struct {
 	Source string `json:"source"`
 	Target string `json:"target"`
 }
+
+// docapi begin vx_reverse_proxy_add_redirect
+// docapi method POST
+// docapi summary Add redirect
+// docapi tags Apps/Reverse Proxy
+// docapi body {AddRedirectBody} The redirect to add.
+// docapi response 204
+// docapi response 400
+// docapi response 500
+// docapi end
 
 func (r *ProxyHandler) AddRedirect(c *router.Context) {
 	var body AddRedirectBody
@@ -68,6 +85,16 @@ func (r *ProxyHandler) AddRedirect(c *router.Context) {
 
 	c.OK()
 }
+
+// docapi begin vx_reverse_proxy_remove_redirect
+// docapi method DELETE
+// docapi summary Remove redirect
+// docapi tags Apps/Reverse Proxy
+// docapi query id {string} The redirect UUID.
+// docapi response 204
+// docapi response 400
+// docapi response 500
+// docapi end
 
 func (r *ProxyHandler) RemoveRedirect(c *router.Context) {
 	idString := c.Param("id")

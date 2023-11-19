@@ -47,9 +47,27 @@ func getVisualizer(c *router.Context) (string, error) {
 	return visualizer, nil
 }
 
+// docapi begin vx_monitoring_get_metrics
+// docapi method GET
+// docapi summary Get metrics
+// docapi tags Apps/Monitoring
+// docapi response 200 {Metrics} The metrics.
+// docapi end
+
 func (r *MetricsHandler) Get(c *router.Context) {
 	c.JSON(r.metricsService.GetMetrics())
 }
+
+// docapi begin vx_monitoring_install_collector
+// docapi method POST
+// docapi summary Install a collector
+// docapi tags Apps/Monitoring
+// docapi query collector {string} The collector to install.
+// docapi response 200
+// docapi response 400
+// docapi response 404
+// docapi response 500
+// docapi end
 
 func (r *MetricsHandler) InstallCollector(c *router.Context) {
 	collector, err := getCollector(c)
@@ -89,6 +107,17 @@ func (r *MetricsHandler) InstallCollector(c *router.Context) {
 
 	c.OK()
 }
+
+// docapi begin vx_monitoring_install_visualizer
+// docapi method POST
+// docapi summary Install a visualizer
+// docapi tags Apps/Monitoring
+// docapi query visualizer {string} The visualizer to install.
+// docapi response 200
+// docapi response 400
+// docapi response 404
+// docapi response 500
+// docapi end
 
 func (r *MetricsHandler) InstallVisualizer(c *router.Context) {
 	visualizer, err := getVisualizer(c)

@@ -33,6 +33,7 @@ func (a *App) Meta() apptypes.Meta {
 
 func (a *App) Initialize(r *router.Group) error {
 	providerHandler := handler.NewProviderHandler()
+	// docapi:v route /app/vx-tunnels/provider/{provider}/install vx_tunnels_install_provider
 	r.POST("/provider/:provider/install", providerHandler.Install)
 
 	return nil
