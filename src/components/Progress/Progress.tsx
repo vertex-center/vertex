@@ -1,12 +1,18 @@
 import styles from "./Progress.module.sass";
 import classNames from "classnames";
+import { createPortal } from "react-dom";
 
 export function ProgressOverlay({ show }: { show?: boolean }) {
     if (!show) return null;
-    return (
+
+    const app = document.getElementById("app");
+    if (!app) return null;
+
+    return createPortal(
         <div className={styles.top}>
             <Progress infinite small />
-        </div>
+        </div>,
+        app
     );
 }
 

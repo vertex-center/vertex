@@ -42,7 +42,7 @@ function App() {
     const { theme } = useContext(ThemeContext);
 
     return (
-        <div className={classNames("app", theme)}>
+        <div id="app" className={classNames("app", theme)}>
             <QueryClientProvider client={queryClient}>
                 <ReactQueryDevtools initialIsOpen={false} />
                 <HashRouter>
