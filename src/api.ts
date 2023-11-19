@@ -52,12 +52,23 @@ export default class APIs {
                     if (!this.hierarchy[app][version]) {
                         this.hierarchy[app][version] = {};
                     }
-                    const t = tag.replace(/ /g, "-").toLowerCase();
-                    this.hierarchy[app][version][t] = {
-                        _title: tag,
-                        _path: `/${app}/${version}/${t}`,
-                    };
+
+                    const tagParts = tag.split("/");
+                    let path = `/${app}/${version}`;
+                    let prev = this.hierarchy[app][version];
+                    tagParts.forEach((tagPart: string) => {
+                        path += `/${tagPart.replace(/ /g, "-").toLowerCase()}`;
+                        if (!prev[tagPart]) {
+                            prev[tagPart] = {
+                                _path: path,
+                                _title: tagPart,
+                            };
+                        }
+                        prev = prev[tagPart];
+                    });
                 });
+
+                console.log(this.hierarchy);
 
                 tags.forEach((tag: string) => {
                     if (!this.apis[app]) {
