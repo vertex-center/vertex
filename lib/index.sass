@@ -8,6 +8,7 @@
     font-size: $size-normal
 
 ul, ol
+    margin-left: 24px
     line-height: $line-height-normal
 
 ul
@@ -16,8 +17,9 @@ ul
 ol
     list-style: decimal
 
-li:not(:first-child)
-    margin-top: 0.5em
+li
+    &:not(:last-child), & > *:not(:last-child)
+        margin-bottom: 12px
 
 a
     color: $bg-accent
