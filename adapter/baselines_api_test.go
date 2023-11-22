@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-const baseURL = "https://bl.vx.quentinguidee.dev/"
+const baseURL = "https://bl.vx.arra.cloud/"
 
 type BaselinesApiAdapterTestSuite struct {
 	suite.Suite
