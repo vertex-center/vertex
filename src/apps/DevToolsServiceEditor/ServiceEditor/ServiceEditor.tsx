@@ -421,7 +421,7 @@ export default function ServiceEditor() {
     return (
         <Content className={styles.content}>
             <Title variant="h2">Info</Title>
-            <div className={classNames(styles.inputs)}>
+            <div className={styles.inputs}>
                 <TextField
                     id="id"
                     label="Service ID"

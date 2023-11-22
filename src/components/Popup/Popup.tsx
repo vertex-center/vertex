@@ -1,7 +1,7 @@
 import styles from "./Popup.module.sass";
 import { PropsWithChildren, ReactNode } from "react";
 import classNames from "classnames";
-import { Title } from "@vertex-center/components";
+import { Title, Vertical } from "@vertex-center/components";
 
 type Props = PropsWithChildren<{
     show: boolean;
@@ -31,7 +31,7 @@ export default function Popup(props: Readonly<Props>) {
                 <div className={styles.header}>
                     <Title variant="h3">{title}</Title>
                 </div>
-                <div className={styles.content}>{children}</div>
+                <Vertical gap={24}>{children}</Vertical>
                 <div className={styles.actions}>{actions}</div>
             </div>
         </div>

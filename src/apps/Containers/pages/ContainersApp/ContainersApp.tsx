@@ -9,7 +9,12 @@ import { useServerEvent } from "../../../../hooks/useEvent";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Toolbar from "../../../../components/Toolbar/Toolbar";
 import Spacer from "../../../../components/Spacer/Spacer";
-import { Button, MaterialIcon, useTitle } from "@vertex-center/components";
+import {
+    Button,
+    MaterialIcon,
+    useTitle,
+    Vertical,
+} from "@vertex-center/components";
 import SelectTags from "../../components/SelectTags/SelectTags";
 import { useState } from "react";
 import NoItems from "../../../../components/NoItems/NoItems";
@@ -93,7 +98,7 @@ export default function ContainersApp() {
     return (
         <div className={styles.server}>
             <ProgressOverlay show={isLoading} />
-            <div className={styles.containers}>
+            <Vertical gap={12} className={styles.containers}>
                 <ToolbarContainers tags={tags} onTagsChange={onTagsChange} />
 
                 {error && <APIError error={error} />}
@@ -119,7 +124,7 @@ export default function ContainersApp() {
                         )}
                     </Containers>
                 )}
-            </div>
+            </Vertical>
         </div>
     );
 }

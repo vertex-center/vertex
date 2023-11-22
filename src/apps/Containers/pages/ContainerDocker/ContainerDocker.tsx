@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Horizontal, Vertical } from "../../../../components/Layouts/Layouts";
-import { Button, MaterialIcon, Title } from "@vertex-center/components";
+import {
+    Button,
+    Horizontal,
+    MaterialIcon,
+    Title,
+    Vertical,
+} from "@vertex-center/components";
 import { api } from "../../../../backend/api/backend";
 import {
     KeyValueGroup,
