@@ -38,7 +38,7 @@ export function Box(props: Readonly<BoxProps>) {
         <div className={cx("box", `box-${type}`, className)} {...others}>
             <div className="box-header">
                 <MaterialIcon icon={icon} />
-                <h1>{label}</h1>
+                {label}
             </div>
             <div className="box-content">{children}</div>
         </div>
