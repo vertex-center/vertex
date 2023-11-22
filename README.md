@@ -11,7 +11,7 @@
 ## About
 
 This repository holds the documentation for Vertex. This documentation can be accessed
-at https://docs.vx.quentinguidee.dev/.
+at https://docs.vertex.arra.cloud/.
 
 ## License
 
