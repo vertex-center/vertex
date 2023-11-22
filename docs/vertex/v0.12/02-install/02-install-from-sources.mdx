@@ -9,18 +9,18 @@ pagination_next: security/vertex-kernel
 1. Install Go using the [official documentation](https://go.dev/doc/install).
 
 2. Download the project
-    ```Bash
+    ```bash
     git clone https://github.com/vertex-center/vertex.git
     cd vertex
     ```
 
 3. Run **Vertex Kernel as sudo**:
-    ```Bash
+    ```bash
     sudo go run ./cmd/kernel --user $(whoami)
     ```
 
     or if you want to use a custom host/port:
-    ```Bash
+    ```bash
     sudo go run ./cmd/kernel \
         --user $(whoami) \
         --host localhost \
