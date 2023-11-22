@@ -1,0 +1,195 @@
+<details>
+
+    <summary>Incoming updates</summary>
+
+    :::caution In development
+    This version is not released yet.
+    :::
+
+    ## Vertex 0.14
+
+    ### 0.14.0
+
+    *There is no changelog for this version yet.*
+
+</details>
+
+# Vertex 0.13
+
+## 0.13.0
+
+### Added
+
+- Entirely new update process with unified updates and more reliable beta channel.
+- Improve the modularity of the server source code.
+- Create a new components library that can be used by third-party apps.
+- Allow apps to register their own Vertex Monitoring metrics.
+- Allow apps to register code running on Vertex Kernel.
+- Add a new developer tool to generate `service.yml`.
+- Support for 201 and 422 HTTP status codes in the API ([vertex#86](https://github.com/vertex-center/vertex/pull/86)).
+- When linking a database to a service, the database name can now be changed ([vertex#87](https://github.com/vertex-center/vertex/pull/87)).
+
+### Fixed
+
+- Fix an issue where vertex could fail to update if the executable was not found.
+- Fix an issue where updates could be executed by multiple clients at the same time.
+- Fix an issue where empty redirections could be created in the reverse proxy ([vertex#85](https://github.com/vertex-center/vertex/pull/85)).
+- Fix an issue where setting a database in Vertex Containers could corrupt the environment file ([vertex#87](https://github.com/vertex-center/vertex/pull/87)).
+- Fix the container service update process that did not detect new updates.
+
+### Contributors
+
+- [**@AshwinKul28**](https://github.com/AshwinKul28) - *Reverse Proxy: Disallow empty string in source/target* ([vertex#85](https://github.com/vertex-center/vertex/pull/85)).
+- [**@Syycorax**](https://github.com/Syycorax) - *Added 201 and 422 http codes* ([vertex#86](https://github.com/vertex-center/vertex/pull/86)).
+- [**@MinhDuongg**](https://github.com/MinhDuongg) - *Add custom database name support* ([vertex#87](https://github.com/vertex-center/vertex/pull/87)).
+
+
+---
+
+# Vertex 0.12
+
+## 0.12.0
+
+### Added
+
+- Completely move to a multi-applications model. This will allow to create third-party apps for Vertex in the future.
+- New Vertex SQL app for relational databases management.
+- Complete overhaul of the API.
+- Auto-start a Postgres instance for Vertex.
+- Improve the API calls from the UI with caching and retries.
+- Improve global design.
+
+### Changed
+
+- Rename the Vertex Instances app to Vertex Containers.
+- Rename `instance_settings.json` to `settings.yml`.
+- Container tags are now readable names instead of ids.
+
+### Fixed
+
+- Fixed some errors with the logs.
+
+---
+
+# Vertex 0.11
+
+## 0.11.0
+
+### Added
+
+- Add a Vertex Tunnel app.
+- Add a Vertex Metrics app.
+- Expose a `/metrics` endpoint for Prometheus with events gathered by Vertex.
+- Find the server local IP automatically.
+- The server can now add tags to the instances.
+- Revamped navigation.
+
+### Changed
+
+- Change the kernel CLI flags.
+
+### Fixed
+
+- Fix an issue where the logs would recreate a deleted instance at midnight.
+- Fix an issue where Vertex displays 'building' indefinitely when an error occurs during the build of an instance.
+
+---
+
+# Vertex 0.10
+
+## 0.10.1
+
+### Added
+
+- Support for startup command in the services.
+
+## 0.10.0
+
+### Added
+
+- Allow to change the proxy and kernel port with command args.
+- Add a migration tool.
+- Add ability to change the version of an instance.
+- Logs can now display download progress properly.
+- Revamped loading progress bars.
+- Revamped UI controls size.
+- Revamped instance status.
+- Ignore instances start/stop when they are in a transition state.
+- Details about errors are now displayed only in the logs for security purposes. The error displayed to the user has no details about the infrastructure.
+
+### Removed
+
+- Remove the support for scripts, as the API is not good enough for public releases.
+
+---
+
+# Vertex 0.9
+
+## 0.9.3
+
+### Added
+
+- Beta channel for the releases.
+
+## 0.9.2
+
+### Fixed
+
+- Fix an issue building Vertex on Windows.
+
+## 0.9.1
+
+### Fixed
+
+- Fix an issue that prevents the kernel to open the port 80.
+- Fix an issue that makes the kernel close before vertex, blocking instances shutdown.
+
+## 0.9.0
+
+### Added
+
+- New Vertex-Kernel, which enhances the security and stability of Vertex.
+
+### Changed
+
+- Refined themes.
+
+### Fixed
+
+- Fix an issue that could occur when creating new url routes in the reverse proxy.
+
+---
+
+# Vertex 0.8
+
+## 0.8.0
+
+### Added
+
+- Setup your host SSH keys with Vertex.
+- Vertex now supports to run in Docker.
+
+---
+
+# Vertex 0.7
+
+## 0.7.0
+
+### Added
+
+- Show all dependencies with their versions on the update page.
+- Improve service update interface.
+- Show the hardware running vertex.
+- Simplify the About page.
+- Show API errors in the server logs.
+
+---
+
+# Vertex 0.6
+
+## 0.6.0
+
+### Added
+
+- Link databases with other services without settings environment manually.
+- Service versioning.

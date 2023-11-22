@@ -24,6 +24,7 @@ import Generator from "./documentation.ts";
 import APIGenerator from "./api.ts";
 import AllDocs from "./pages/All/AllDocs.tsx";
 import { Api } from "./pages/Api/Api.tsx";
+import Changelog from "./pages/Changelog.mdx";
 
 const docs = new Generator("/docs");
 const apis = new APIGenerator();
@@ -32,6 +33,12 @@ const router = createBrowserRouter([
     {
         element: <Root />,
         children: [
+            {
+                path: "/changelog",
+                element: (
+                    <Documentation content={Changelog} title="Changelog" />
+                ),
+            },
             {
                 path: "/",
                 element: <AllDocs />,
