@@ -12,6 +12,7 @@ type Story = StoryObj<typeof Box>;
 
 export const Normal: Story = {
     args: {
+        type: "info",
         children: (
             <Paragraph>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
