@@ -36,7 +36,7 @@ export default function VertexUpdate(props: Readonly<Props>) {
                 <Caption>{description}</Caption>
                 <div>
                     <URL
-                        href="https://vertex.quentinguidee.dev/docs/changelog"
+                        href="https://docs.vertex.arra.cloud/changelog"
                         target="_blank"
                     >
                         Changelog
