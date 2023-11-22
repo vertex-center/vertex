@@ -8,6 +8,7 @@ import {
     InlineCodeProps,
 } from "./components/InlineCode/InlineCode";
 import { Input, InputProps } from "./components/Input/Input";
+import { Horizontal, LayoutProps, Vertical } from "./components/Layout/Layout";
 import { Link, LinkProps } from "./components/Link/Link";
 import {
     List,
@@ -63,6 +64,7 @@ export type {
     HeaderProps,
     InlineCodeProps,
     InputProps,
+    LayoutProps,
     LinkProps,
     ListProps,
     ListActionsProps,
@@ -90,6 +92,7 @@ export {
     Header,
     PageContext,
     PageProvider,
+    Horizontal,
     InlineCode,
     Input,
     Link,
@@ -112,6 +115,7 @@ export {
     Table,
     TextField,
     Title,
+    Vertical,
     useHasSidebar,
     useShowSidebar,
     useTitle,
