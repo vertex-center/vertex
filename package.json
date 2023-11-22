@@ -1,6 +1,6 @@
 {
     "name": "@vertex-center/client",
-    "version": "0.13.1",
+    "version": "0.14.0",
     "private": true,
     "dependencies": {
         "@hookform/resolvers": "^3.3.2",
