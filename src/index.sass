@@ -18,14 +18,17 @@
     &-main
         display: flex
         flex-direction: row
-        overflow: auto
+        overflow: scroll
         flex-grow: 1
 
     &-content
-        height: 100%
         flex-grow: 1
-        overflow: scroll
-        padding-bottom: 130px
+        overflow: hidden
+        overflow-y: scroll
+        padding-bottom: 120px
+
+        @media (max-width: 480px)
+            padding: 0 20px 30px
 
 code
     font-family: fonts.$font-family-code

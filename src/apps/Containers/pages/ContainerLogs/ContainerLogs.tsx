@@ -6,8 +6,8 @@ import { useServerEvent } from "../../../../hooks/useEvent";
 import { useQueryClient } from "@tanstack/react-query";
 import { produce } from "immer";
 import { useContainerLogs } from "../../hooks/useContainer";
-import Content from "../../../../components/Content/Content";
 import { Title } from "@vertex-center/components";
+import { Fragment } from "react";
 
 export default function ContainerLogs() {
     const { uuid } = useParams();
@@ -85,11 +85,11 @@ export default function ContainerLogs() {
     if (!logs) return null;
 
     return (
-        <Content>
+        <Fragment>
             <Title variant="h2">Logs</Title>
             <APIError error={error} />
             <ProgressOverlay show={isLoading} />
-            <Logs lines={logs} />
-        </Content>
+            <Logs style={{}} lines={logs} />
+        </Fragment>
     );
 }
