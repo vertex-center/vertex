@@ -1,5 +1,6 @@
 import type { Preview } from "@storybook/react";
 
+import "../lib/styles/reset.css";
 import "../lib/index.sass";
 import { withTheme } from "./theme";
 
