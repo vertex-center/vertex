@@ -91,9 +91,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	ctx.DispatchEvent(types.EventServerStart{
-		PostMigrationCommands: []interface{}{},
-	})
+	ctx.DispatchEvent(types.EventServerStart{})
 
 	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
 

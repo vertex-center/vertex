@@ -2,11 +2,7 @@ package types
 
 type (
 	// EventServerStart is dispatched when the server is started.
-	EventServerStart struct {
-		// PostMigrationCommands are commands that should be executed after the server has started.
-		// These are migration commands that cannot be executed before the server has started.
-		PostMigrationCommands []interface{}
-	}
+	EventServerStart struct{}
 
 	// EventAppReady is dispatched when the app with the id AppID is ready to be used.
 	EventAppReady struct {
