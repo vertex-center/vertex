@@ -87,8 +87,5 @@ type (
 		InfoImage(id string) (types.InfoImageResponse, error)
 		PullImage(options types.PullImageOptions) (io.ReadCloser, error)
 		BuildImage(options types.BuildImageOptions) (dockertypes.ImageBuildResponse, error)
-
-		CreateVolume(options types.CreateVolumeOptions) (types.Volume, error)
-		DeleteVolume(name string) error
 	}
 )

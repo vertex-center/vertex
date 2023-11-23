@@ -41,6 +41,17 @@ func (a ContainerRunnerDockerAdapter) Delete(inst *types.Container) error {
 
 	apiError := router.Error{}
 	err = requests.URL(config.Current.KernelURL()).
+		Pathf("/api/app/vx-containers/docker/container/%s/mounts", inst.UUID.String()).
+		Delete().
+		ErrorJSON(&apiError).
+		Fetch(context.Background())
+
+	if err != nil {
+		log.Error(err, vlog.String("uuid", inst.UUID.String()))
+	}
+
+	apiError = router.Error{}
+	err = requests.URL(config.Current.KernelURL()).
 		Pathf("/api/app/vx-containers/docker/container/%s", id).
 		Delete().
 		ErrorJSON(&apiError).

@@ -295,6 +295,31 @@ func (h *DockerKernelHandler) WaitContainer(c *router.Context) {
 	c.OK()
 }
 
+// docapi begin vx_containers_kernel_delete_mounts
+// docapi method DELETE
+// docapi summary Delete mounts
+// docapi tags Apps/Containers
+// docapi query id {string} The container uuid.
+// docapi response 200
+// docapi response 500
+// docapi end
+
+func (h *DockerKernelHandler) DeleteMounts(c *router.Context) {
+	id := c.Param("id")
+
+	err := h.dockerService.DeleteMounts(id)
+	if err != nil {
+		c.Abort(router.Error{
+			Code:           types.ErrCodeFailedToDeleteMounts,
+			PublicMessage:  fmt.Sprintf("Failed to delete mounts of %s.", id),
+			PrivateMessage: err.Error(),
+		})
+		return
+	}
+
+	c.OK()
+}
+
 // docapi begin vx_containers_kernel_info_image
 // docapi method GET
 // docapi summary Get image info
@@ -414,58 +439,4 @@ func (h *DockerKernelHandler) BuildImage(c *router.Context) {
 		}
 		return true
 	})
-}
-
-// docapi begin vx_containers_kernel_create_volume
-// docapi method POST
-// docapi summary Create volume
-// docapi tags Apps/Containers
-// docapi body {CreateVolumeOptions} The options to create the volume.
-// docapi response 200 {Volume} The volume.
-// docapi response 500
-// docapi end
-
-func (h *DockerKernelHandler) CreateVolume(c *router.Context) {
-	var options types.CreateVolumeOptions
-	err := c.ParseBody(&options)
-	if err != nil {
-		return
-	}
-
-	vol, err := h.dockerService.CreateVolume(options)
-	if err != nil {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToCreateVolume,
-			PublicMessage:  fmt.Sprintf("Failed to create volume %s.", options.Name),
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(vol)
-}
-
-// docapi begin vx_containers_kernel_delete_volume
-// docapi method DELETE
-// docapi summary Delete volume
-// docapi tags Apps/Containers
-// docapi query name {string} The volume name.
-// docapi response 200
-// docapi response 500
-// docapi end
-
-func (h *DockerKernelHandler) DeleteVolume(c *router.Context) {
-	name := c.Param("name")
-
-	err := h.dockerService.DeleteVolume(name)
-	if err != nil {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToDeleteVolume,
-			PublicMessage:  fmt.Sprintf("Failed to delete volume %s.", name),
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.OK()
 }

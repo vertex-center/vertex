@@ -6,7 +6,6 @@ import (
 
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
@@ -166,20 +165,4 @@ func (a DockerCliAdapter) BuildImage(options types.BuildImageOptions) (dockertyp
 	}
 
 	return a.cli.ImageBuild(context.Background(), reader, buildOptions)
-}
-
-func (a DockerCliAdapter) CreateVolume(options types.CreateVolumeOptions) (types.Volume, error) {
-	vol, err := a.cli.VolumeCreate(context.Background(), volume.CreateOptions{
-		Name: options.Name,
-	})
-	if err != nil {
-		return types.Volume{}, err
-	}
-	return types.Volume{
-		Name: vol.Name,
-	}, nil
-}
-
-func (a DockerCliAdapter) DeleteVolume(name string) error {
-	return a.cli.VolumeRemove(context.Background(), name, true)
 }

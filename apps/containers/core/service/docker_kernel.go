@@ -1,7 +1,10 @@
 package service
 
 import (
+	"errors"
 	"io"
+	"os"
+	"path"
 
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
@@ -70,10 +73,11 @@ func (s DockerKernelService) BuildImage(options types.BuildImageOptions) (docker
 	return s.dockerAdapter.BuildImage(options)
 }
 
-func (s DockerKernelService) CreateVolume(options types.CreateVolumeOptions) (types.Volume, error) {
-	return s.dockerAdapter.CreateVolume(options)
-}
-
-func (s DockerKernelService) DeleteVolume(name string) error {
-	return s.dockerAdapter.DeleteVolume(name)
+func (s DockerKernelService) DeleteMounts(uuid string) error {
+	volumesPath := path.Join("live_docker", "apps", "vx-containers", "volumes", uuid)
+	err := os.RemoveAll(volumesPath)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+	return nil
 }

@@ -143,31 +143,6 @@ func (suite *DockerKernelServiceTestSuite) TestBuildImage() {
 	suite.adapter.AssertExpectations(suite.T())
 }
 
-func (suite *DockerKernelServiceTestSuite) TestCreateVolume() {
-	options := types.CreateVolumeOptions{
-		Name: "volume_name",
-	}
-
-	suite.adapter.On("CreateVolume", options).Return(types.Volume{}, nil)
-
-	volume, err := suite.service.CreateVolume(options)
-
-	suite.Require().NoError(err)
-	suite.Equal(types.Volume{}, volume)
-	suite.adapter.AssertExpectations(suite.T())
-}
-
-func (suite *DockerKernelServiceTestSuite) TestDeleteVolume() {
-	name := "volume_name"
-
-	suite.adapter.On("DeleteVolume", name).Return(nil)
-
-	err := suite.service.DeleteVolume(name)
-
-	suite.Require().NoError(err)
-	suite.adapter.AssertExpectations(suite.T())
-}
-
 type MockDockerAdapter struct {
 	mock.Mock
 }
@@ -230,14 +205,4 @@ func (m *MockDockerAdapter) PullImage(options types.PullImageOptions) (io.ReadCl
 func (m *MockDockerAdapter) BuildImage(options types.BuildImageOptions) (dockertypes.ImageBuildResponse, error) {
 	args := m.Called(options)
 	return args.Get(0).(dockertypes.ImageBuildResponse), args.Error(1)
-}
-
-func (m *MockDockerAdapter) CreateVolume(options types.CreateVolumeOptions) (types.Volume, error) {
-	args := m.Called(options)
-	return args.Get(0).(types.Volume), args.Error(1)
-}
-
-func (m *MockDockerAdapter) DeleteVolume(name string) error {
-	args := m.Called(name)
-	return args.Error(0)
 }
