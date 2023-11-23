@@ -80,12 +80,10 @@ type (
 		LogsStdoutContainer(id string) (io.ReadCloser, error)
 		LogsStderrContainer(id string) (io.ReadCloser, error)
 		WaitContainer(id string, cond types.WaitContainerCondition) error
+		DeleteMounts(uuid string) error
 
 		InfoImage(id string) (types.InfoImageResponse, error)
 		PullImage(options types.PullImageOptions) (io.ReadCloser, error)
 		BuildImage(options types.BuildImageOptions) (vtypes.ImageBuildResponse, error)
-
-		CreateVolume(options types.CreateVolumeOptions) (types.Volume, error)
-		DeleteVolume(name string) error
 	}
 )

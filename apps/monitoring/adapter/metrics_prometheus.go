@@ -15,7 +15,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"
 	"gopkg.in/yaml.v3"
 )
@@ -56,7 +55,7 @@ func NewMetricsPrometheusAdapter() *PrometheusAdapter {
 }
 
 func (a *PrometheusAdapter) ConfigureContainer(uuid uuid.UUID) error {
-	dir := path.Join(storage.Path, "apps", "vx-containers", uuid.String(), "volumes", "config")
+	dir := path.Join("live_docker", "apps", "vx-containers", "volumes", uuid.String(), "config")
 	p := path.Join(dir, "prometheus.yml")
 
 	err := os.MkdirAll(dir, 0755)

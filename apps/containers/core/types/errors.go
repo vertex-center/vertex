@@ -31,8 +31,7 @@ const (
 	ErrCodeFailedToGetImageInfo           router.ErrCode = "failed_to_get_image_info"
 	ErrCodeFailedToPullImage              router.ErrCode = "failed_to_pull_image"
 	ErrCodeFailedToBuildImage             router.ErrCode = "failed_to_build_image"
-	ErrCodeFailedToCreateVolume           router.ErrCode = "failed_to_create_volume"
-	ErrCodeFailedToDeleteVolume           router.ErrCode = "failed_to_delete_volume"
+	ErrCodeFailedToDeleteMounts           router.ErrCode = "failed_to_delete_mounts"
 
 	ErrCodeServiceIdMissing       router.ErrCode = "service_id_missing"
 	ErrCodeServiceNotFound        router.ErrCode = "service_not_found"

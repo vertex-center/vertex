@@ -152,36 +152,33 @@ func (a *App) InitializeKernel(r *router.Group) error {
 
 	dockerHandler := handler.NewDockerKernelHandler(dockerKernelService)
 	docker := r.Group("/docker")
-	// docapi:k route /app/vx-containers/containers vx_containers_kernel_get_containers
+	// docapi:k route /app/vx-containers/docker/containers vx_containers_kernel_get_containers
 	docker.GET("/containers", dockerHandler.GetContainers)
-	// docapi:k route /app/vx-containers/containers vx_containers_kernel_create_container
+	// docapi:k route /app/vx-containers/docker/containers vx_containers_kernel_create_container
 	docker.POST("/container", dockerHandler.CreateContainer)
-	// docapi:k route /app/vx-containers/containers/{id} vx_containers_kernel_delete_container
+	// docapi:k route /app/vx-containers/docker/containers/{id} vx_containers_kernel_delete_container
 	docker.DELETE("/container/:id", dockerHandler.DeleteContainer)
-	// docapi:k route /app/vx-containers/containers/{id}/start vx_containers_kernel_start_container
+	// docapi:k route /app/vx-containers/docker/containers/{id}/start vx_containers_kernel_start_container
 	docker.POST("/container/:id/start", dockerHandler.StartContainer)
-	// docapi:k route /app/vx-containers/containers/{id}/stop vx_containers_kernel_stop_container
+	// docapi:k route /app/vx-containers/docker/containers/{id}/stop vx_containers_kernel_stop_container
 	docker.POST("/container/:id/stop", dockerHandler.StopContainer)
-	// docapi:k route /app/vx-containers/containers/{id}/info vx_containers_kernel_info_container
+	// docapi:k route /app/vx-containers/docker/containers/{id}/info vx_containers_kernel_info_container
 	docker.GET("/container/:id/info", dockerHandler.InfoContainer)
-	// docapi:k route /app/vx-containers/containers/{id}/logs/stdout vx_containers_kernel_logs_stdout_container
+	// docapi:k route /app/vx-containers/docker/containers/{id}/logs/stdout vx_containers_kernel_logs_stdout_container
 	docker.GET("/container/:id/logs/stdout", dockerHandler.LogsStdoutContainer)
-	// docapi:k route /app/vx-containers/containers/{id}/logs/stderr vx_containers_kernel_logs_stderr_container
+	// docapi:k route /app/vx-containers/docker/containers/{id}/logs/stderr vx_containers_kernel_logs_stderr_container
 	docker.GET("/container/:id/logs/stderr", dockerHandler.LogsStderrContainer)
-	// docapi:k route /app/vx-containers/containers/{id}/wait/{cond} vx_containers_kernel_wait_container
+	// docapi:k route /app/vx-containers/docker/containers/{id}/wait/{cond} vx_containers_kernel_wait_container
 	docker.GET("/container/:id/wait/:cond", dockerHandler.WaitContainer)
+	// docapi:k route /app/vx-containers/docker/containers/mounts/{id} vx_containers_kernel_delete_mounts
+	docker.DELETE("/container/:id/mounts", dockerHandler.DeleteMounts)
 
-	// docapi:k route /app/vx-containers/image/{id}/info vx_containers_kernel_info_image
+	// docapi:k route /app/vx-containers/docker/image/{id}/info vx_containers_kernel_info_image
 	docker.GET("/image/:id/info", dockerHandler.InfoImage)
-	// docapi:k route /app/vx-containers/image/pull vx_containers_kernel_pull_image
+	// docapi:k route /app/vx-containers/docker/image/pull vx_containers_kernel_pull_image
 	docker.POST("/image/pull", dockerHandler.PullImage)
-	// docapi:k route /app/vx-containers/image/build vx_containers_kernel_build_image
+	// docapi:k route /app/vx-containers/docker/image/build vx_containers_kernel_build_image
 	docker.POST("/image/build", dockerHandler.BuildImage)
-
-	// docapi:k route /app/vx-containers/volume vx_containers_kernel_create_volume
-	docker.POST("/volume", dockerHandler.CreateVolume)
-	// docapi:k route /app/vx-containers/volume/{name} vx_containers_kernel_delete_volume
-	docker.DELETE("/volume/:name", dockerHandler.DeleteVolume)
 
 	return nil
 }

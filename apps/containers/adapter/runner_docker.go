@@ -18,11 +18,11 @@ import (
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/go-connections/nat"
 	"github.com/google/go-containerregistry/pkg/crane"
-	types "github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/pkg/vdocker"
 	"github.com/vertex-center/vlog"
 )
@@ -40,6 +40,17 @@ func (a ContainerRunnerDockerAdapter) Delete(inst *types.Container) error {
 	}
 
 	apiError := router.Error{}
+	err = requests.URL(config.Current.KernelURL()).
+		Pathf("/api/app/vx-containers/docker/container/%s/mounts", inst.UUID.String()).
+		Delete().
+		ErrorJSON(&apiError).
+		Fetch(context.Background())
+
+	if err != nil {
+		log.Error(err, vlog.String("uuid", inst.UUID.String()))
+	}
+
+	apiError = router.Error{}
 	err = requests.URL(config.Current.KernelURL()).
 		Pathf("/api/app/vx-containers/docker/container/%s", id).
 		Delete().
@@ -61,7 +72,6 @@ func (a ContainerRunnerDockerAdapter) Start(inst *types.Container, setStatus fun
 
 		setStatus(types.ContainerStatusBuilding)
 
-		containerPath := a.getPath(*inst)
 		service := inst.Service
 
 		log.Debug("building image", vlog.String("image", imageName))
@@ -70,6 +80,7 @@ func (a ContainerRunnerDockerAdapter) Start(inst *types.Container, setStatus fun
 		var err error
 		var stdout, stderr io.ReadCloser
 		if service.Methods.Docker.Dockerfile != nil {
+			containerPath := a.getContainerPath(inst.UUID)
 			stdout, err = a.buildImageFromDockerfile(containerPath, imageName)
 		} else if service.Methods.Docker.Image != nil {
 			stdout, err = a.buildImageFromName(inst.GetImageNameWithTag())
@@ -194,7 +205,8 @@ func (a ContainerRunnerDockerAdapter) Start(inst *types.Container, setStatus fun
 			if service.Methods.Docker.Volumes != nil {
 				for source, target := range *service.Methods.Docker.Volumes {
 					if !strings.HasPrefix(source, "/") {
-						source, err = filepath.Abs(path.Join(containerPath, "volumes", source))
+						volumePath := a.getVolumePath(inst.UUID)
+						source, err = filepath.Abs(path.Join(volumePath, source))
 					}
 					if err != nil {
 						return
@@ -571,9 +583,17 @@ func (a ContainerRunnerDockerAdapter) readLogs(containerID string) (stdout io.Re
 	return rOut, rErr, nil
 }
 
-func (a ContainerRunnerDockerAdapter) getPath(inst types.Container) string {
-	base := storage.Path
+func (a ContainerRunnerDockerAdapter) getVolumePath(uuid uuid.UUID) string {
+	appPath := a.getAppPath("live_docker")
+	return path.Join(appPath, "volumes", uuid.String())
+}
 
+func (a ContainerRunnerDockerAdapter) getContainerPath(uuid uuid.UUID) string {
+	appPath := a.getAppPath("live")
+	return path.Join(appPath, uuid.String())
+}
+
+func (a ContainerRunnerDockerAdapter) getAppPath(base string) string {
 	// If Vertex is running itself inside Docker, the containers are stored in the Vertex container volume.
 	if vdocker.RunningInDocker() {
 		var containers []types.DockerContainer
@@ -587,7 +607,7 @@ func (a ContainerRunnerDockerAdapter) getPath(inst types.Container) string {
 			for _, c := range containers {
 				// find the docker container that has a volume /live, which is the Vertex container.
 				for _, m := range c.Mounts {
-					if m.Destination == "/live" {
+					if m.Destination == "/"+base {
 						base = m.Source
 					}
 				}
@@ -595,5 +615,5 @@ func (a ContainerRunnerDockerAdapter) getPath(inst types.Container) string {
 		}
 	}
 
-	return path.Join(base, "apps", "vx-containers", inst.UUID.String())
+	return path.Join(base, "apps", "vx-containers")
 }
