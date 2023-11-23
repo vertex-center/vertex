@@ -1,0 +1,27 @@
+---
+title: Dev installation
+---
+
+# Install Vertex WebUI for local development
+
+First, you must have a working Vertex server running, whether it is a development server or a production server. Then, you can follow the instructions below to install Vertex WebUI.
+Please note that you must have [Node.js](https://nodejs.org/en/) installed on your machine, as well as [Git](https://git-scm.com/).
+
+```
+git clone https://github.com/vertex-center/vertex-webui.git
+```
+
+Then, go to the `vertex-webui` folder and install the dependencies:
+
+```bash
+cd vertex-webui
+npm install
+```
+
+Finally, you can start the UI with:
+
+```bash
+npm run dev
+```
+
+The UI can then be accessed at [http://localhost:5173](http://localhost:5173).
