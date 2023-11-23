@@ -9,26 +9,9 @@ Updating Vertex or the different dependencies is an easy process. In the Web UI,
 When an update is available, it will be shown on this page. Clicking on 'update' start the update process.
 
 :::warning{Backup your data}
-While this process __should__ be safe, we recommend you to make a backup of your data before updating. To do so, clone your `live` and `live_kernel` folder in a safe place. This folder is located at the root of your Vertex installation, and contains all your data.
+While this process __should__ be safe, we recommend you to make a backup of your data before updating. To do so, clone your `live`, `live_kernel` and `live_docker` folder in a safe place. These folders are located at the root of your Vertex installation, and contains all your data.
 :::
 
 :::info{Vertex in Docker}
 If you are using Vertex in a Docker container, You'll also need to update your Docker image.
 :::
-
-## Migrations **(advanced)**
-
-Vertex automatically migrates your data when updating.
-While this process is being tested on each new release,
-a table of all migrations is available below in case Vertex struggles to execute a migration.
-
-*e.g. If you upgraded from Vertex 0.11 to 0.12 and an issue occurs,
-you can manually execute the migration 0 and 1 to fix it.*
-
-After a manual migration, set the migration version in `live/metadata.yml` to the latest migration you executed.
-*e.g.* `migrations: 0` if you only did the migration 0.
-
-| ID | Version | Description                                                                                                                                                                                                                                                                                |
-|:--:|:--------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 0  | 0.12    | Rename `live/instances/*/instance_settings.json` to `live/instances/*/settings.yml`. Note that the JSON should be first converted to YAML.                                                                                                                                                 |
-| 1  | 0.12    | Move `live/instances/*` to `live/apps/vx-containers/*`. This migration also commands Vertex to recreate all containers after restart, which is necessary to move Docker volumes to the new directory.<br/>You can recreate containers manually on the UI in `Docker > Recreate container`. |

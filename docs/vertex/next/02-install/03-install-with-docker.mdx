@@ -31,6 +31,7 @@ import { Tabs, TabItem } from "@vertex-center/components";
         -v ~/.ssh:/root/.ssh \
         -v path_to_live:/live \
         -v path_to_live_kernel:/live_kernel \
+        -v path_to_live_docker:/live_docker \
         ghcr.io/vertex-center/vertex
     ```
 
@@ -59,6 +60,7 @@ import { Tabs, TabItem } from "@vertex-center/components";
           - ~/.ssh:/root/.ssh
           - path_to_live:/live
           - path_to_live_kernel:/live_kernel
+          - path_to_live_docker:/live_docker
     ```
 
 3. Run Docker Compose
