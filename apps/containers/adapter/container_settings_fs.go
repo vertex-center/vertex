@@ -29,7 +29,7 @@ func NewContainerSettingsFSAdapter(params *ContainerSettingsFSAdapterParams) por
 		params = &ContainerSettingsFSAdapterParams{}
 	}
 	if params.containersPath == "" {
-		params.containersPath = path.Join(storage.Path, "apps", "vx-containers")
+		params.containersPath = path.Join(storage.Path, "apps", "vx-containers", "containers")
 	}
 
 	adapter := &ContainerSettingsFSAdapter{

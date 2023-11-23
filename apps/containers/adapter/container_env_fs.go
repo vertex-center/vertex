@@ -29,7 +29,7 @@ func NewContainerEnvFSAdapter(params *ContainerEnvFSAdapterParams) port.Containe
 		params = &ContainerEnvFSAdapterParams{}
 	}
 	if params.containersPath == "" {
-		params.containersPath = path.Join(storage.Path, "apps", "vx-containers")
+		params.containersPath = path.Join(storage.Path, "apps", "vx-containers", "containers")
 	}
 
 	adapter := &ContainerEnvFSAdapter{

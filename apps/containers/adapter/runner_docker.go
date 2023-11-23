@@ -590,7 +590,7 @@ func (a ContainerRunnerDockerAdapter) getVolumePath(uuid uuid.UUID) string {
 
 func (a ContainerRunnerDockerAdapter) getContainerPath(uuid uuid.UUID) string {
 	appPath := a.getAppPath("live")
-	return path.Join(appPath, uuid.String())
+	return path.Join(appPath, "containers", uuid.String())
 }
 
 func (a ContainerRunnerDockerAdapter) getAppPath(base string) string {
