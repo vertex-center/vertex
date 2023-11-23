@@ -28,7 +28,6 @@ import (
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/handler"
-	"github.com/vertex-center/vertex/migration"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/net"
@@ -67,11 +66,6 @@ func main() {
 
 	log.Info("Vertex starting...")
 
-	postMigrationCommands, err := migration.NewMigrationTool(storage.Path).Migrate()
-	if err != nil {
-		panic(err)
-	}
-
 	parseArgs()
 
 	checkNotRoot()
@@ -91,14 +85,14 @@ func main() {
 	initRoutes(about)
 	handleSignals()
 
-	err = net.Wait("google.com:80")
+	err := net.Wait("google.com:80")
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)
 	}
 
 	ctx.DispatchEvent(types.EventServerStart{
-		PostMigrationCommands: postMigrationCommands,
+		PostMigrationCommands: []interface{}{},
 	})
 
 	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
