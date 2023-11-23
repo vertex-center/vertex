@@ -33,7 +33,9 @@ func (s *MetricsService) GetMetrics() []types.Metric {
 
 // ConfigureCollector will configure a container to monitor the metrics of Vertex.
 func (s *MetricsService) ConfigureCollector(inst *containerstypes.Container) error {
-	return s.adapter.ConfigureContainer(inst.UUID)
+	// TODO: Enable again, but permissions are not set correctly
+	// return s.adapter.ConfigureContainer(inst.UUID)
+	return nil
 }
 
 func (s *MetricsService) ConfigureVisualizer(inst *containerstypes.Container) error {
