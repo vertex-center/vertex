@@ -1,3 +1,23 @@
+import { Box} from "@vertex-center/components";
+
+# Vertex 0.15
+
+## 0.15.0
+
+### Fixed
+
+- Fix an issue where deleting a container failed if the volume was using custom UID/GID.
+
+### Removed
+
+- Remove the migration tool, as it is not flexible enough for now.
+
+<Box type="warning">
+    This release introduces breaking changes in the volumes management. Please backup your data before updating.
+</Box>
+
+---
+
 # Vertex 0.14
 
 ## 0.14.0
@@ -9,7 +29,7 @@
 - Support for [docapi](https://github.com/quentinguidee/docapi) to generate the API documentation.
 - APIs are now documented at [Vertex Docs](https://docs.vertex.arra.cloud/) `beta`.
 
-### Change
+### Changed
 
 - The baselines are moved to https://bl.vx.arra.cloud/
 
