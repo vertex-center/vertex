@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/mock"
 	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/pkg/user"
 )
 
 type (
@@ -64,4 +65,9 @@ func (m *MockSshAdapter) Add(key string) error {
 func (m *MockSshAdapter) Remove(fingerprint string) error {
 	args := m.Called(fingerprint)
 	return args.Error(0)
+}
+
+func (m *MockSshAdapter) GetUsers() ([]user.User, error) {
+	args := m.Called()
+	return args.Get(0).([]user.User), args.Error(1)
 }
