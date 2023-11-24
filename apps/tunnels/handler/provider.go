@@ -33,19 +33,21 @@ func (r *ProviderHandler) Install(c *router.Context) {
 		return
 	}
 
-	serv, apiError := containersapi.GetService(c, provider)
+	client := containersapi.NewContainersClient()
+
+	serv, apiError := client.GetService(c, provider)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
 	}
 
-	inst, apiError := containersapi.InstallService(c, serv.ID)
+	inst, apiError := client.InstallService(c, serv.ID)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
 	}
 
-	apiError = containersapi.PatchContainer(c, inst.UUID, containerstypes.ContainerSettings{
+	apiError = client.PatchContainer(c, inst.UUID, containerstypes.ContainerSettings{
 		Tags: []string{"Vertex Tunnels", "Vertex Tunnels - Cloudflare"},
 	})
 	if apiError != nil {

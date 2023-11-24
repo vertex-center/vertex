@@ -9,10 +9,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-const (
-	AppRoute = "/vx-monitoring"
-)
-
 var (
 	prometheusAdapter port.MetricsAdapter
 

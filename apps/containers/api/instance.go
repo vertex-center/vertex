@@ -5,16 +5,16 @@ import (
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/apps/containers"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-func GetContainer(ctx context.Context, uuid uuid.UUID) (*types.Container, *api.Error) {
+func (c *Client) GetContainer(ctx context.Context, uuid uuid.UUID) (*types.Container, *api.Error) {
 	var inst types.Container
 	var apiError api.Error
-	err := api.AppRequest(containers.AppRoute).
+
+	err := c.Request().
 		Pathf("./container/%s", uuid).
 		ToJSON(&inst).
 		ErrorJSON(&apiError).
@@ -22,9 +22,9 @@ func GetContainer(ctx context.Context, uuid uuid.UUID) (*types.Container, *api.E
 	return &inst, api.HandleError(err, apiError)
 }
 
-func DeleteContainer(ctx context.Context, uuid uuid.UUID) *api.Error {
+func (c *Client) DeleteContainer(ctx context.Context, uuid uuid.UUID) *api.Error {
 	var apiError api.Error
-	err := api.AppRequest(containers.AppRoute).
+	err := c.Request().
 		Pathf("./container/%s", uuid).
 		Delete().
 		ErrorJSON(&apiError).
@@ -32,9 +32,9 @@ func DeleteContainer(ctx context.Context, uuid uuid.UUID) *api.Error {
 	return api.HandleError(err, apiError)
 }
 
-func PatchContainer(ctx context.Context, uuid uuid.UUID, settings types.ContainerSettings) *api.Error {
+func (c *Client) PatchContainer(ctx context.Context, uuid uuid.UUID, settings types.ContainerSettings) *api.Error {
 	var apiError api.Error
-	err := api.AppRequest(containers.AppRoute).
+	err := c.Request().
 		Pathf("./container/%s", uuid).
 		Patch().
 		BodyJSON(&settings).
@@ -43,9 +43,9 @@ func PatchContainer(ctx context.Context, uuid uuid.UUID, settings types.Containe
 	return api.HandleError(err, apiError)
 }
 
-func StartContainer(ctx context.Context, uuid uuid.UUID) *api.Error {
+func (c *Client) StartContainer(ctx context.Context, uuid uuid.UUID) *api.Error {
 	var apiError api.Error
-	err := api.AppRequest(containers.AppRoute).
+	err := c.Request().
 		Pathf("./container/%s/start", uuid).
 		Post().
 		ErrorJSON(&apiError).
@@ -53,9 +53,9 @@ func StartContainer(ctx context.Context, uuid uuid.UUID) *api.Error {
 	return api.HandleError(err, apiError)
 }
 
-func StopContainer(ctx context.Context, uuid uuid.UUID) *api.Error {
+func (c *Client) StopContainer(ctx context.Context, uuid uuid.UUID) *api.Error {
 	var apiError api.Error
-	err := api.AppRequest(containers.AppRoute).
+	err := c.Request().
 		Pathf("./container/%s/stop", uuid).
 		Post().
 		ErrorJSON(&apiError).
@@ -63,9 +63,9 @@ func StopContainer(ctx context.Context, uuid uuid.UUID) *api.Error {
 	return api.HandleError(err, apiError)
 }
 
-func PatchContainerEnvironment(ctx context.Context, uuid uuid.UUID, env map[string]string) *api.Error {
+func (c *Client) PatchContainerEnvironment(ctx context.Context, uuid uuid.UUID, env map[string]string) *api.Error {
 	var apiError api.Error
-	err := api.AppRequest(containers.AppRoute).
+	err := c.Request().
 		Pathf("./container/%s/environment", uuid).
 		Patch().
 		BodyJSON(&env).
@@ -74,10 +74,10 @@ func PatchContainerEnvironment(ctx context.Context, uuid uuid.UUID, env map[stri
 	return api.HandleError(err, apiError)
 }
 
-func GetDocker(ctx context.Context, uuid uuid.UUID) (map[string]any, *api.Error) {
+func (c *Client) GetDocker(ctx context.Context, uuid uuid.UUID) (map[string]any, *api.Error) {
 	var info map[string]any
 	var apiError api.Error
-	err := api.AppRequest(containers.AppRoute).
+	err := c.Request().
 		Pathf("./container/%s/docker", uuid).
 		ToJSON(&info).
 		ErrorJSON(&apiError).
@@ -85,9 +85,9 @@ func GetDocker(ctx context.Context, uuid uuid.UUID) (map[string]any, *api.Error)
 	return info, api.HandleError(err, apiError)
 }
 
-func RecreateDocker(ctx context.Context, uuid uuid.UUID) *api.Error {
+func (c *Client) RecreateDocker(ctx context.Context, uuid uuid.UUID) *api.Error {
 	var apiError api.Error
-	err := api.AppRequest(containers.AppRoute).
+	err := c.Request().
 		Pathf("./container/%s/docker/recreate", uuid).
 		Post().
 		ErrorJSON(&apiError).
@@ -95,10 +95,10 @@ func RecreateDocker(ctx context.Context, uuid uuid.UUID) *api.Error {
 	return api.HandleError(err, apiError)
 }
 
-func GetContainerLogs(ctx context.Context, uuid uuid.UUID) (string, *api.Error) {
+func (c *Client) GetContainerLogs(ctx context.Context, uuid uuid.UUID) (string, *api.Error) {
 	var logs string
 	var apiError api.Error
-	err := api.AppRequest(containers.AppRoute).
+	err := c.Request().
 		Pathf("./container/%s/logs", uuid).
 		ToJSON(&logs).
 		ErrorJSON(&apiError).
@@ -106,9 +106,9 @@ func GetContainerLogs(ctx context.Context, uuid uuid.UUID) (string, *api.Error) 
 	return logs, api.HandleError(err, apiError)
 }
 
-func UpdateServiceContainer(ctx context.Context, uuid uuid.UUID) *api.Error {
+func (c *Client) UpdateServiceContainer(ctx context.Context, uuid uuid.UUID) *api.Error {
 	var apiError api.Error
-	err := api.AppRequest(containers.AppRoute).
+	err := c.Request().
 		Pathf("./container/%s/update/service", uuid).
 		Post().
 		ErrorJSON(&apiError).
@@ -116,10 +116,10 @@ func UpdateServiceContainer(ctx context.Context, uuid uuid.UUID) *api.Error {
 	return api.HandleError(err, apiError)
 }
 
-func GetVersions(ctx context.Context, uuid uuid.UUID) ([]string, *api.Error) {
+func (c *Client) GetVersions(ctx context.Context, uuid uuid.UUID) ([]string, *api.Error) {
 	var versions []string
 	var apiError api.Error
-	err := api.AppRequest(containers.AppRoute).
+	err := c.Request().
 		Pathf("./container/%s/versions", uuid).
 		ToJSON(&versions).
 		ErrorJSON(&apiError).
@@ -127,9 +127,9 @@ func GetVersions(ctx context.Context, uuid uuid.UUID) ([]string, *api.Error) {
 	return versions, api.HandleError(err, apiError)
 }
 
-func WaitCondition(ctx context.Context, uuid uuid.UUID, condition container.WaitCondition) *api.Error {
+func (c *Client) WaitCondition(ctx context.Context, uuid uuid.UUID, condition container.WaitCondition) *api.Error {
 	var apiError api.Error
-	err := api.AppRequest(containers.AppRoute).
+	err := c.Request().
 		Pathf("./container/%s/wait/%s", uuid, condition).
 		ErrorJSON(&apiError).
 		Fetch(ctx)

@@ -10,10 +10,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-const (
-	AppRoute = "/vx-reverse-proxy"
-)
-
 var (
 	proxyFSAdapter port.ProxyAdapter
 

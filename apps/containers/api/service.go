@@ -3,15 +3,14 @@ package containersapi
 import (
 	"context"
 
-	"github.com/vertex-center/vertex/apps/containers"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
 )
 
-func GetService(ctx context.Context, serviceId string) (types.Service, *api.Error) {
+func (c *Client) GetService(ctx context.Context, serviceId string) (types.Service, *api.Error) {
 	var service types.Service
 	var apiError api.Error
-	err := api.AppRequest(containers.AppRoute).
+	err := c.Request().
 		Pathf("./service/%s", serviceId).
 		ToJSON(&service).
 		ErrorJSON(&apiError).
@@ -19,10 +18,10 @@ func GetService(ctx context.Context, serviceId string) (types.Service, *api.Erro
 	return service, api.HandleError(err, apiError)
 }
 
-func InstallService(ctx context.Context, serviceId string) (*types.Container, *api.Error) {
+func (c *Client) InstallService(ctx context.Context, serviceId string) (*types.Container, *api.Error) {
 	var inst *types.Container
 	var apiError api.Error
-	err := api.AppRequest(containers.AppRoute).
+	err := c.Request().
 		Pathf("./service/%s/install", serviceId).
 		Post().
 		ToJSON(&inst).

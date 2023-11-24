@@ -8,10 +8,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-const (
-	AppRoute = "/vx-sql"
-)
-
 var (
 	sqlService port.SqlService
 )

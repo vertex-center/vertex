@@ -39,7 +39,9 @@ func (r *DBMSHandler) Get(c *router.Context) {
 		return
 	}
 
-	inst, apiError := containersapi.GetContainer(c, uuid)
+	client := containersapi.NewContainersClient()
+
+	inst, apiError := client.GetContainer(c, uuid)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
@@ -75,20 +77,22 @@ func (r *DBMSHandler) Install(c *router.Context) {
 		return
 	}
 
-	serv, apiError := containersapi.GetService(c, dbms)
+	client := containersapi.NewContainersClient()
+
+	serv, apiError := client.GetService(c, dbms)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
 	}
 
-	inst, apiError := containersapi.InstallService(c, serv.ID)
+	inst, apiError := client.InstallService(c, serv.ID)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
 	}
 
 	inst.ContainerSettings.Tags = []string{"Vertex SQL", "Vertex SQL - Postgres Database"}
-	apiError = containersapi.PatchContainer(c, inst.UUID, inst.ContainerSettings)
+	apiError = client.PatchContainer(c, inst.UUID, inst.ContainerSettings)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return
@@ -105,7 +109,7 @@ func (r *DBMSHandler) Install(c *router.Context) {
 		return
 	}
 
-	apiError = containersapi.PatchContainerEnvironment(c, inst.UUID, inst.Env)
+	apiError = client.PatchContainerEnvironment(c, inst.UUID, inst.Env)
 	if apiError != nil {
 		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
 		return

@@ -9,10 +9,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-const (
-	AppRoute = "/vx-containers"
-)
-
 var (
 	containerAdapter         port.ContainerAdapter
 	containerEnvAdapter      port.ContainerEnvAdapter

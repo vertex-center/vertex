@@ -7,10 +7,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-const (
-	AppRoute = "/vx-devtools-service-editor"
-)
-
 type App struct {
 	ctx *apptypes.Context
 }

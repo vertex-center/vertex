@@ -3,15 +3,14 @@ package api
 import (
 	"context"
 
-	"github.com/vertex-center/vertex/apps/monitoring"
 	metricstypes "github.com/vertex-center/vertex/apps/monitoring/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
 )
 
-func GetMetrics(ctx context.Context) ([]metricstypes.Metric, *api.Error) {
+func (c *Client) GetMetrics(ctx context.Context) ([]metricstypes.Metric, *api.Error) {
 	var metrics []metricstypes.Metric
 	var apiError api.Error
-	err := api.AppRequest(monitoring.AppRoute).
+	err := c.Request().
 		Path("./metrics").
 		ToJSON(&metrics).
 		ErrorJSON(&apiError).
@@ -19,9 +18,9 @@ func GetMetrics(ctx context.Context) ([]metricstypes.Metric, *api.Error) {
 	return metrics, api.HandleError(err, apiError)
 }
 
-func InstallCollector(ctx context.Context, collector string) *api.Error {
+func (c *Client) InstallCollector(ctx context.Context, collector string) *api.Error {
 	var apiError api.Error
-	err := api.AppRequest(monitoring.AppRoute).
+	err := c.Request().
 		Pathf("./collector/%s/install", collector).
 		Post().
 		ErrorJSON(&apiError).
@@ -29,9 +28,9 @@ func InstallCollector(ctx context.Context, collector string) *api.Error {
 	return api.HandleError(err, apiError)
 }
 
-func InstallVisualizer(ctx context.Context, visualizer string) *api.Error {
+func (c *Client) InstallVisualizer(ctx context.Context, visualizer string) *api.Error {
 	var apiError api.Error
-	err := api.AppRequest(monitoring.AppRoute).
+	err := c.Request().
 		Pathf("./visualizer/%s/install", visualizer).
 		Post().
 		ErrorJSON(&apiError).
