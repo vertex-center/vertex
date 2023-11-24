@@ -36,7 +36,7 @@ func (suite *SshE2ETestSuite) TestSsh() {
 	suite.Equal([]user.User{
 		{
 			Name:    "root",
-			HomeDir: "/",
+			HomeDir: "/root",
 		},
 		{
 			Name:    "nexa",
