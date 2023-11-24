@@ -12,6 +12,7 @@ import (
 var (
 	ErrInvalidPublicKey = errors.New("invalid key")
 	ErrUserNotFound     = errors.New("user not found")
+	ErrFailedToAddKey   = errors.New("failed to add key")
 )
 
 type SshKernelService struct {

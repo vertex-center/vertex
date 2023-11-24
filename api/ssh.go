@@ -34,6 +34,9 @@ func (c *Client) AddSSHKey(ctx context.Context, key string, username string) err
 		ErrorJSON(&apiError).
 		Fetch(ctx)
 
+	if apiError.Code == api.ErrFailedToAddSSHKey {
+		return service.ErrFailedToAddKey
+	}
 	if apiError.Code == api.ErrUserNotFound {
 		return service.ErrUserNotFound
 	}
