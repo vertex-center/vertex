@@ -5,9 +5,9 @@ updates:
     directory: "/"
     schedule:
       interval: daily
-    target-branch: dev
+    target-branch: main
     groups:
-      dev:
+      main:
         patterns:
           - "*"
     labels:
