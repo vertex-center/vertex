@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/handler"
+	"github.com/vertex-center/vertex/pkg/user"
 
 	"github.com/h2non/gock"
 	"github.com/stretchr/testify/suite"
@@ -40,19 +42,39 @@ func (suite *SshKernelApiAdapterTestSuite) TestGetAll() {
 func (suite *SshKernelApiAdapterTestSuite) TestAdd() {
 	gock.Off()
 	gock.New(config.Current.KernelURL()).
+		JSON(&handler.AddSSHKeyBody{
+			AuthorizedKey: "key",
+			Username:      "username",
+		}).
 		Post("/api/security/ssh").
 		Reply(http.StatusOK)
 
-	err := suite.adapter.Add("key")
+	err := suite.adapter.Add("key", "username")
 	suite.Require().NoError(err)
 }
 
 func (suite *SshKernelApiAdapterTestSuite) TestDelete() {
 	gock.Off()
 	gock.New(config.Current.KernelURL()).
-		Delete("/api/security/ssh/fingerprint").
+		JSON(&handler.DeleteSSHKeyBody{
+			Fingerprint: "fingerprint",
+			Username:    "username",
+		}).
+		Delete("/api/security/ssh").
 		Reply(http.StatusOK)
 
-	err := suite.adapter.Remove("fingerprint")
+	err := suite.adapter.Remove("fingerprint", "username")
 	suite.Require().NoError(err)
+}
+
+func (suite *SshKernelApiAdapterTestSuite) TestGetUsers() {
+	gock.Off()
+	gock.New(config.Current.KernelURL()).
+		Get("/api/security/ssh/users").
+		Reply(http.StatusOK).
+		JSON([]user.User{})
+
+	users, err := suite.adapter.GetUsers()
+	suite.Require().NoError(err)
+	suite.Empty(users)
 }

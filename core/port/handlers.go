@@ -39,6 +39,8 @@ type (
 		Add(c *router.Context)
 		// Delete handles the deletion of an SSH key.
 		Delete(c *router.Context)
+		// GetUsers handles the retrieval of all users that have can have SSH keys.
+		GetUsers(c *router.Context)
 	}
 
 	SshKernelHandler interface {
@@ -48,5 +50,7 @@ type (
 		Add(c *router.Context)
 		// Delete handles the deletion of an SSH key.
 		Delete(c *router.Context)
+		// GetUsers handles the retrieval of all users that have can have SSH keys.
+		GetUsers(c *router.Context)
 	}
 )

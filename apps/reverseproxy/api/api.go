@@ -3,15 +3,14 @@ package api
 import (
 	"context"
 
-	"github.com/vertex-center/vertex/apps/reverseproxy"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
 )
 
-func GetRedirects(ctx context.Context) ([]types.ProxyRedirect, *api.Error) {
+func (c *Client) GetRedirects(ctx context.Context) ([]types.ProxyRedirect, *api.Error) {
 	var redirects []types.ProxyRedirect
 	var apiError api.Error
-	err := api.AppRequest(reverseproxy.AppRoute).
+	err := c.Request().
 		Path("./redirects").
 		ToJSON(&redirects).
 		ErrorJSON(&apiError).
@@ -19,9 +18,9 @@ func GetRedirects(ctx context.Context) ([]types.ProxyRedirect, *api.Error) {
 	return redirects, api.HandleError(err, apiError)
 }
 
-func AddRedirect(ctx context.Context, redirect types.ProxyRedirect) *api.Error {
+func (c *Client) AddRedirect(ctx context.Context, redirect types.ProxyRedirect) *api.Error {
 	var apiError api.Error
-	err := api.AppRequest(reverseproxy.AppRoute).
+	err := c.Request().
 		Path("./redirect").
 		BodyJSON(&redirect).
 		Post().
@@ -30,9 +29,9 @@ func AddRedirect(ctx context.Context, redirect types.ProxyRedirect) *api.Error {
 	return api.HandleError(err, apiError)
 }
 
-func RemoveRedirect(ctx context.Context, id string) *api.Error {
+func (c *Client) RemoveRedirect(ctx context.Context, id string) *api.Error {
 	var apiError api.Error
-	err := api.AppRequest(reverseproxy.AppRoute).
+	err := c.Request().
 		Pathf("./redirect/%s", id).
 		Delete().
 		ErrorJSON(&apiError).

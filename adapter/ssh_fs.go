@@ -8,69 +8,61 @@ import (
 
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/pkg/user"
 
 	"github.com/vertex-center/vertex/pkg/log"
 	"golang.org/x/crypto/ssh"
 )
 
 type SshFsAdapter struct {
-	authorizedKeysPath string
 }
 
-type SshFsAdapterParams struct {
-	AuthorizedKeysPath string
+func NewSshFsAdapter() port.SshKernelAdapter {
+	return &SshFsAdapter{}
 }
 
-func NewSshFsAdapter(params *SshFsAdapterParams) port.SshAdapter {
-	s := &SshFsAdapter{}
+func (a *SshFsAdapter) GetAll(users []user.User) ([]types.PublicKey, error) {
+	var keys []types.PublicKey
+	for _, u := range users {
+		p := getAuthorizedKeysPath(u.HomeDir)
 
-	if params == nil {
-		params = &SshFsAdapterParams{}
-	}
+		bytes, err := os.ReadFile(p)
+		if err != nil && errors.Is(err, os.ErrNotExist) {
+			log.Info("authorized_keys file does not exist")
+			return []types.PublicKey{}, nil
+		} else if err != nil {
+			return nil, err
+		}
 
-	s.authorizedKeysPath = params.AuthorizedKeysPath
-	if s.authorizedKeysPath == "" {
-		var err error
-		s.authorizedKeysPath, err = getAuthorizedKeysPath()
-		if err != nil {
-			log.Error(err)
+		var publicKeys []ssh.PublicKey
+		for len(bytes) > 0 {
+			pubKey, _, _, rest, _ := ssh.ParseAuthorizedKey(bytes)
+			if pubKey != nil {
+				publicKeys = append(publicKeys, pubKey)
+			}
+			bytes = rest
+		}
+
+		for _, key := range publicKeys {
+			keys = append(keys, types.PublicKey{
+				Type:              key.Type(),
+				FingerprintSHA256: ssh.FingerprintSHA256(key),
+				Username:          u.Name,
+			})
 		}
 	}
-
-	return s
-}
-
-func (a *SshFsAdapter) GetAll() ([]types.PublicKey, error) {
-	bytes, err := os.ReadFile(a.authorizedKeysPath)
-	if err != nil && errors.Is(err, os.ErrNotExist) {
-		log.Info("authorized_keys file does not exist")
-		return []types.PublicKey{}, nil
-	} else if err != nil {
-		return nil, err
-	}
-
-	var publicKeys []ssh.PublicKey
-	for len(bytes) > 0 {
-		pubKey, _, _, rest, _ := ssh.ParseAuthorizedKey(bytes)
-		if pubKey != nil {
-			publicKeys = append(publicKeys, pubKey)
-		}
-		bytes = rest
-	}
-
-	keys := []types.PublicKey{}
-	for _, key := range publicKeys {
-		keys = append(keys, types.PublicKey{
-			Type:              key.Type(),
-			FingerprintSHA256: ssh.FingerprintSHA256(key),
-		})
-	}
-
 	return keys, nil
 }
 
-func (a *SshFsAdapter) Add(key string) error {
-	file, err := os.OpenFile(a.authorizedKeysPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+func (a *SshFsAdapter) Add(key string, user user.User) error {
+	p := getAuthorizedKeysPath(user.HomeDir)
+
+	err := os.MkdirAll(path.Dir(p), 0755)
+	if err != nil && !os.IsExist(err) {
+		return err
+	}
+
+	file, err := os.OpenFile(p, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
@@ -80,8 +72,10 @@ func (a *SshFsAdapter) Add(key string) error {
 	return err
 }
 
-func (a *SshFsAdapter) Remove(fingerprint string) error {
-	content, err := os.ReadFile(a.authorizedKeysPath)
+func (a *SshFsAdapter) Remove(fingerprint string, user user.User) error {
+	p := getAuthorizedKeysPath(user.HomeDir)
+
+	content, err := os.ReadFile(p)
 	if err != nil {
 		return err
 	}
@@ -101,13 +95,13 @@ func (a *SshFsAdapter) Remove(fingerprint string) error {
 		}
 	}
 
-	return os.WriteFile(a.authorizedKeysPath, []byte(strings.Join(lines, "\n")), 0644)
+	return os.WriteFile(p, []byte(strings.Join(lines, "\n")), 0644)
 }
 
-func getAuthorizedKeysPath() (string, error) {
-	dir, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-	return path.Join(dir, ".ssh", "authorized_keys"), nil
+func (a *SshFsAdapter) GetUsers() ([]user.User, error) {
+	return user.GetAll()
+}
+
+func getAuthorizedKeysPath(homeDir string) string {
+	return path.Join(homeDir, ".ssh", "authorized_keys")
 }

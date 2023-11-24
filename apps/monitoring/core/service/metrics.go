@@ -1,7 +1,10 @@
 package service
 
 import (
+	"context"
+
 	"github.com/google/uuid"
+	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types"
@@ -31,10 +34,66 @@ func (s *MetricsService) GetMetrics() []types.Metric {
 	return s.metrics
 }
 
+func (s *MetricsService) InstallCollector(ctx context.Context, collector string) error {
+	c := containersapi.NewContainersClient()
+
+	serv, apiError := c.GetService(ctx, collector)
+	if apiError != nil {
+		return apiError.RouterError()
+	}
+
+	inst, apiError := c.InstallService(ctx, serv.ID)
+	if apiError != nil {
+		return apiError.RouterError()
+	}
+
+	err := s.ConfigureCollector(inst)
+	if err != nil {
+		return err
+	}
+
+	apiError = c.PatchContainer(ctx, inst.UUID, containerstypes.ContainerSettings{
+		Tags: []string{"Vertex Monitoring", "Vertex Monitoring - Prometheus Collector"},
+	})
+	if apiError != nil {
+		return apiError.RouterError()
+	}
+
+	return nil
+}
+
 // ConfigureCollector will configure a container to monitor the metrics of Vertex.
 func (s *MetricsService) ConfigureCollector(inst *containerstypes.Container) error {
 	// TODO: Enable again, but permissions are not set correctly
 	// return s.adapter.ConfigureContainer(inst.UUID)
+	return nil
+}
+
+func (s *MetricsService) InstallVisualizer(ctx context.Context, visualizer string) error {
+	c := containersapi.NewContainersClient()
+
+	serv, apiError := c.GetService(ctx, visualizer)
+	if apiError != nil {
+		return apiError.RouterError()
+	}
+
+	inst, apiError := c.InstallService(ctx, serv.ID)
+	if apiError != nil {
+		return apiError.RouterError()
+	}
+
+	err := s.ConfigureVisualizer(inst)
+	if err != nil {
+		return err
+	}
+
+	apiError = c.PatchContainer(ctx, inst.UUID, containerstypes.ContainerSettings{
+		Tags: []string{"Vertex Monitoring", "Vertex Monitoring - Grafana Visualizer"},
+	})
+	if apiError != nil {
+		return apiError.RouterError()
+	}
+
 	return nil
 }
 

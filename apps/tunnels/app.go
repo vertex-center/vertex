@@ -6,10 +6,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-const (
-	AppRoute = "/vx-tunnels"
-)
-
 type App struct {
 	ctx *apptypes.Context
 }

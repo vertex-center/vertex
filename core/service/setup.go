@@ -80,7 +80,9 @@ func (s *SetupService) setupDatabase() error {
 }
 
 func (s *SetupService) getVertexDB() (*types.Container, error) {
-	insts, apiError := containersapi.GetContainers(context.Background())
+	client := containersapi.NewContainersClient()
+
+	insts, apiError := client.GetContainers(context.Background())
 	if apiError != nil {
 		log.Error(apiError.RouterError())
 		os.Exit(1)
@@ -114,7 +116,9 @@ func (s *SetupService) getVertexDB() (*types.Container, error) {
 func (s *SetupService) installVertexDB() error {
 	log.Info("installing vertex postgres database")
 
-	inst, apiError := sqlapi.InstallDBMS(context.Background(), "postgres")
+	sqlClient := sqlapi.NewSqlClient()
+
+	inst, apiError := sqlClient.InstallDBMS(context.Background(), "postgres")
 	if apiError != nil {
 		return apiError.RouterError()
 	}
@@ -122,7 +126,9 @@ func (s *SetupService) installVertexDB() error {
 	inst.Tags = append(inst.Tags, "Vertex Internal")
 	inst.DisplayName = "Vertex Database"
 
-	apiError = containersapi.PatchContainer(context.Background(), inst.UUID, inst.ContainerSettings)
+	client := containersapi.NewContainersClient()
+
+	apiError = client.PatchContainer(context.Background(), inst.UUID, inst.ContainerSettings)
 	if apiError != nil {
 		return apiError.RouterError()
 	}
@@ -150,8 +156,10 @@ func (s *SetupService) startDatabase(inst *types.Container) error {
 	s.ctx.AddListener(l)
 	defer s.ctx.RemoveListener(l)
 
+	client := containersapi.NewContainersClient()
+
 	go func() {
-		apiError := containersapi.StartContainer(context.Background(), inst.UUID)
+		apiError := client.StartContainer(context.Background(), inst.UUID)
 		if apiError != nil {
 			log.Error(apiError.RouterError())
 		}
