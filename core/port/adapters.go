@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/pkg/user"
 )
 
 type (
@@ -25,5 +26,6 @@ type (
 		GetAll() ([]types.PublicKey, error)
 		Add(key string) error
 		Remove(fingerprint string) error
+		GetUsers() ([]user.User, error)
 	}
 )

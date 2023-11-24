@@ -3,6 +3,7 @@ package port
 import (
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/pkg/user"
 )
 
 type (
@@ -31,6 +32,7 @@ type (
 		GetAll() ([]types.PublicKey, error)
 		Add(key string) error
 		Delete(fingerprint string) error
+		GetUsers() ([]user.User, error)
 	}
 
 	UpdateService interface {

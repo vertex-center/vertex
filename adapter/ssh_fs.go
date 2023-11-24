@@ -8,6 +8,7 @@ import (
 
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/pkg/user"
 
 	"github.com/vertex-center/vertex/pkg/log"
 	"golang.org/x/crypto/ssh"
@@ -102,6 +103,10 @@ func (a *SshFsAdapter) Remove(fingerprint string) error {
 	}
 
 	return os.WriteFile(a.authorizedKeysPath, []byte(strings.Join(lines, "\n")), 0644)
+}
+
+func (a *SshFsAdapter) GetUsers() ([]user.User, error) {
+	return user.GetAll()
 }
 
 func getAuthorizedKeysPath() (string, error) {

@@ -7,6 +7,7 @@ import (
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/pkg/user"
 )
 
 type SshKernelApiAdapter struct {
@@ -43,4 +44,13 @@ func (a *SshKernelApiAdapter) Remove(fingerprint string) error {
 		Pathf("/api/security/ssh/%s", fingerprint).
 		Delete().
 		Fetch(context.Background())
+}
+
+func (a *SshKernelApiAdapter) GetUsers() ([]user.User, error) {
+	var users []user.User
+	err := requests.New(a.config).
+		Path("/api/security/ssh/users").
+		ToJSON(&users).
+		Fetch(context.Background())
+	return users, err
 }

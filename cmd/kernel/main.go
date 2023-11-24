@@ -231,6 +231,8 @@ func initRoutes() {
 	ssh.POST("", sshHandler.Add)
 	// docapi:k route /security/ssh/{fingerprint} delete_ssh_key_kernel
 	ssh.DELETE("/:fingerprint", sshHandler.Delete)
+	// docapi:k route /security/ssh/users get_ssh_users_kernel
+	ssh.GET("/users", sshHandler.GetUsers)
 }
 
 func startRouter() {

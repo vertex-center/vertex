@@ -5,6 +5,7 @@ import (
 
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/pkg/user"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -40,4 +41,9 @@ func (s *SshKernelService) Add(authorizedKey string) error {
 // Delete deletes an SSH key from the authorized keys file.
 func (s *SshKernelService) Delete(fingerprint string) error {
 	return s.sshAdapter.Remove(fingerprint)
+}
+
+// GetUsers returns all users on the system that can have SSH keys.
+func (s *SshKernelService) GetUsers() ([]user.User, error) {
+	return s.sshAdapter.GetUsers()
 }

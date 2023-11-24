@@ -9,7 +9,6 @@ import (
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/service"
 	"github.com/vertex-center/vertex/core/types/api"
-
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
@@ -120,4 +119,25 @@ func (h *SshKernelHandler) Delete(c *router.Context) {
 	}
 
 	c.OK()
+}
+
+// docapi begin get_ssh_users_kernel
+// docapi method GET
+// docapi summary Get all users that can have SSH keys
+// docapi tags Ssh
+// docapi response 200 {[]User} The list of users.
+// docapi response 500
+// docapi end
+
+func (h *SshKernelHandler) GetUsers(c *router.Context) {
+	users, err := h.sshService.GetUsers()
+	if err != nil {
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToGetSshUsers,
+			PublicMessage:  "Failed to get ssh users.",
+			PrivateMessage: err.Error(),
+		})
+		return
+	}
+	c.JSON(users)
 }
