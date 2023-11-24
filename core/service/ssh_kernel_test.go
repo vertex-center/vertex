@@ -3,10 +3,10 @@ package service
 import (
 	"testing"
 
+	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
-
-	"github.com/stretchr/testify/suite"
+	"github.com/vertex-center/vertex/pkg/user"
 )
 
 const (
@@ -19,10 +19,12 @@ var (
 		{
 			Type:              "ssh-rsa",
 			FingerprintSHA256: "SHA256:eLfsDB1H1SrvT7Bgo9U1i/ATcldIrOqin2H0MGEy5I8",
+			Username:          "username",
 		},
 		{
 			Type:              "ssh-rsa",
 			FingerprintSHA256: "SHA256:ubvRPPaAlkFeuFQeC748c43nRPTjaRGxnG9C0j+WlJ0",
+			Username:          "username",
 		},
 	}
 )
@@ -30,8 +32,11 @@ var (
 type SshKernelServiceTestSuite struct {
 	suite.Suite
 
+	testUser  user.User
+	testUsers []user.User
+
 	service *SshKernelService
-	adapter *port.MockSshAdapter
+	adapter *port.MockSshKernelAdapter
 }
 
 func TestSshKernelServiceTestSuite(t *testing.T) {
@@ -39,12 +44,17 @@ func TestSshKernelServiceTestSuite(t *testing.T) {
 }
 
 func (suite *SshKernelServiceTestSuite) SetupTest() {
-	suite.adapter = &port.MockSshAdapter{}
+	suite.testUser = user.User{
+		Name: "username",
+	}
+	suite.testUsers = []user.User{suite.testUser}
+	suite.adapter = &port.MockSshKernelAdapter{}
 	suite.service = NewSshKernelService(suite.adapter).(*SshKernelService)
 }
 
 func (suite *SshKernelServiceTestSuite) TestGetAll() {
-	suite.adapter.On("GetAll").Return(testDataAuthorizedKeys, nil)
+	suite.adapter.On("GetAll", suite.testUsers).Return(testDataAuthorizedKeys, nil)
+	suite.adapter.On("GetUsers").Return(suite.testUsers, nil)
 
 	keys, err := suite.service.GetAll()
 
@@ -54,18 +64,20 @@ func (suite *SshKernelServiceTestSuite) TestGetAll() {
 }
 
 func (suite *SshKernelServiceTestSuite) TestAdd() {
-	suite.adapter.On("Add", testDataAuthorizedKey).Return(nil)
+	suite.adapter.On("Add", testDataAuthorizedKey, suite.testUser).Return(nil)
+	suite.adapter.On("GetUsers").Return(suite.testUsers, nil)
 
-	err := suite.service.Add(testDataAuthorizedKey)
+	err := suite.service.Add(testDataAuthorizedKey, suite.testUser.Name)
 
 	suite.Require().NoError(err)
 	suite.adapter.AssertExpectations(suite.T())
 }
 
 func (suite *SshKernelServiceTestSuite) TestAddInvalidKey() {
-	suite.adapter.On("Add", "invalid").Return(nil)
+	suite.adapter.On("Add", "invalid", suite.testUser).Return(nil)
+	suite.adapter.On("GetUsers").Return(suite.testUsers, nil)
 
-	err := suite.service.Add("invalid")
+	err := suite.service.Add("invalid", "username")
 
 	suite.Require().Error(err)
 	suite.Require().ErrorIsf(err, ErrInvalidPublicKey, "invalid key")
@@ -73,9 +85,10 @@ func (suite *SshKernelServiceTestSuite) TestAddInvalidKey() {
 }
 
 func (suite *SshKernelServiceTestSuite) TestDelete() {
-	suite.adapter.On("Remove", testDataFingerprint).Return(nil)
+	suite.adapter.On("Remove", testDataFingerprint, suite.testUser).Return(nil)
+	suite.adapter.On("GetUsers").Return(suite.testUsers, nil)
 
-	err := suite.service.Delete(testDataFingerprint)
+	err := suite.service.Delete(testDataFingerprint, "username")
 
 	suite.Require().NoError(err)
 	suite.adapter.AssertExpectations(suite.T())

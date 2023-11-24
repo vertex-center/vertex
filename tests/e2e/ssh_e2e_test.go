@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/api"
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/pkg/user"
 )
 
 type SshE2ETestSuite struct {
@@ -32,15 +31,5 @@ func (suite *SshE2ETestSuite) TestSsh() {
 
 	users, err := sshClient.GetSSHUsers(ctx)
 	suite.Require().NoError(err)
-	suite.Len(users, 2)
-	suite.Equal([]user.User{
-		{
-			Name:    "root",
-			HomeDir: "/root",
-		},
-		{
-			Name:    "nexa",
-			HomeDir: "/home/nexa",
-		},
-	}, users)
+	suite.Equal([]string{"nexa"}, users)
 }

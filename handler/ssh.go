@@ -44,10 +44,6 @@ func (h *SshHandler) Get(c *router.Context) {
 	c.JSON(keys)
 }
 
-type AddSSHKeyBody struct {
-	AuthorizedKey string `json:"authorized_key"`
-}
-
 // docapi begin add_ssh_key
 // docapi method POST
 // docapi summary Add an SSH key
@@ -58,6 +54,11 @@ type AddSSHKeyBody struct {
 // docapi response 500
 // docapi end
 
+type AddSSHKeyBody struct {
+	AuthorizedKey string `json:"authorized_key"`
+	Username      string `json:"username"`
+}
+
 func (h *SshHandler) Add(c *router.Context) {
 	var body AddSSHKeyBody
 	err := c.ParseBody(&body)
@@ -65,11 +66,18 @@ func (h *SshHandler) Add(c *router.Context) {
 		return
 	}
 
-	err = h.sshService.Add(body.AuthorizedKey)
+	err = h.sshService.Add(body.AuthorizedKey, body.Username)
 	if err != nil && errors.Is(err, service.ErrInvalidPublicKey) {
 		c.BadRequest(router.Error{
 			Code:           api.ErrInvalidPublicKey,
 			PublicMessage:  "Invalid public key.",
+			PrivateMessage: err.Error(),
+		})
+		return
+	} else if err != nil && errors.Is(err, service.ErrUserNotFound) {
+		c.BadRequest(router.Error{
+			Code:           api.ErrUserNotFound,
+			PublicMessage:  "User not found.",
 			PrivateMessage: err.Error(),
 		})
 		return
@@ -89,28 +97,29 @@ func (h *SshHandler) Add(c *router.Context) {
 // docapi method DELETE
 // docapi summary Delete SSH key
 // docapi tags Ssh
-// docapi query fingerprint {string} The fingerprint of the SSH key to delete.
+// docapi query fingerprint {DeleteSSHKeyBody} The fingerprint of the SSH key to delete.
 // docapi response 204
 // docapi response 400
 // docapi response 500
 // docapi end
 
+type DeleteSSHKeyBody struct {
+	Fingerprint string `json:"fingerprint"`
+	Username    string `json:"username"`
+}
+
 func (h *SshHandler) Delete(c *router.Context) {
-	fingerprint := c.Param("fingerprint")
-	if fingerprint == "" {
-		c.BadRequest(router.Error{
-			Code:           api.ErrInvalidFingerprint,
-			PublicMessage:  "The request is missing the fingerprint.",
-			PrivateMessage: "Field 'fingerprint' is required.",
-		})
+	var body DeleteSSHKeyBody
+	err := c.ParseBody(&body)
+	if err != nil {
 		return
 	}
 
-	err := h.sshService.Delete(fingerprint)
+	err = h.sshService.Delete(body.Fingerprint, body.Username)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToDeleteSSHKey,
-			PublicMessage:  fmt.Sprintf("Failed to delete SSH key with fingerprint '%s'.", fingerprint),
+			PublicMessage:  fmt.Sprintf("Failed to delete SSH key with fingerprint '%s' of the user '%s'.", body.Fingerprint, body.Username),
 			PrivateMessage: err.Error(),
 		})
 		return

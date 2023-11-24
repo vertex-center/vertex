@@ -5,9 +5,11 @@ import (
 	"crypto/rsa"
 	"errors"
 	"os"
+	"path"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
+	"github.com/vertex-center/vertex/pkg/user"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -26,6 +28,8 @@ var (
 type SshFsAdapterTestSuite struct {
 	suite.Suite
 
+	testUser user.User
+
 	adapter            SshFsAdapter
 	authorizedKeysFile *os.File
 }
@@ -37,7 +41,17 @@ func TestSshFsAdapterTestSuite(t *testing.T) {
 func (suite *SshFsAdapterTestSuite) SetupTest() {
 	var err error
 
-	suite.authorizedKeysFile, err = os.CreateTemp("", "*_authorized_keys")
+	suite.testUser = user.User{
+		Name:    "test",
+		HomeDir: suite.T().TempDir(),
+	}
+
+	err = os.MkdirAll(path.Join(suite.testUser.HomeDir, ".ssh"), os.ModePerm)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+
+	suite.authorizedKeysFile, err = os.Create(path.Join(suite.testUser.HomeDir, ".ssh", "authorized_keys"))
 	if err != nil {
 		suite.FailNow(err.Error())
 	}
@@ -49,20 +63,25 @@ func (suite *SshFsAdapterTestSuite) SetupTest() {
 		}
 	}
 
-	suite.adapter = *NewSshFsAdapter(&SshFsAdapterParams{
-		AuthorizedKeysPath: suite.authorizedKeysFile.Name(),
-	}).(*SshFsAdapter)
+	suite.adapter = *NewSshFsAdapter().(*SshFsAdapter)
 }
 
 func (suite *SshFsAdapterTestSuite) TearDownTest() {
+	suite.authorizedKeysFile.Close()
+
 	err := os.Remove(suite.authorizedKeysFile.Name())
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		suite.Require().NoError(err)
+	}
+
+	err = os.RemoveAll(suite.testUser.HomeDir)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		suite.Require().NoError(err)
 	}
 }
 
 func (suite *SshFsAdapterTestSuite) TestGetAll() {
-	keys, err := suite.adapter.GetAll()
+	keys, err := suite.adapter.GetAll([]user.User{suite.testUser})
 	suite.Require().NoError(err)
 	suite.Len(keys, 2)
 	for i, key := range keys {
@@ -75,17 +94,17 @@ func (suite *SshFsAdapterTestSuite) TestGetAllInvalidKey() {
 	_, err := suite.authorizedKeysFile.Write([]byte("invalid"))
 	suite.Require().NoError(err)
 
-	keys, err := suite.adapter.GetAll()
+	keys, err := suite.adapter.GetAll([]user.User{suite.testUser})
 	suite.Require().NoError(err)
 	suite.Len(keys, 2)
 }
 
 func (suite *SshFsAdapterTestSuite) TestGetAllNoSuchFile() {
 	suite.authorizedKeysFile.Close()
-	err := os.Remove(suite.adapter.authorizedKeysPath)
+	err := os.Remove(path.Join(suite.testUser.HomeDir, ".ssh", "authorized_keys"))
 	suite.Require().NoError(err)
 
-	keys, err := suite.adapter.GetAll()
+	keys, err := suite.adapter.GetAll([]user.User{suite.testUser})
 	suite.Require().NoError(err)
 	suite.Empty(keys)
 }
@@ -96,20 +115,20 @@ func (suite *SshFsAdapterTestSuite) TestAdd() {
 		suite.FailNow(err.Error())
 	}
 
-	err = suite.adapter.Add(string(publicKey))
+	err = suite.adapter.Add(string(publicKey), suite.testUser)
 	suite.Require().NoError(err)
 
-	keys, err := suite.adapter.GetAll()
+	keys, err := suite.adapter.GetAll([]user.User{suite.testUser})
 	suite.Require().NoError(err)
 	suite.Len(keys, 3)
 }
 
 func (suite *SshFsAdapterTestSuite) TestDelete() {
 	k, _, _, _, _ := ssh.ParseAuthorizedKey([]byte(keys[0]))
-	err := suite.adapter.Remove(ssh.FingerprintSHA256(k))
+	err := suite.adapter.Remove(ssh.FingerprintSHA256(k), suite.testUser)
 	suite.Require().NoError(err)
 
-	keys, err := suite.adapter.GetAll()
+	keys, err := suite.adapter.GetAll([]user.User{suite.testUser})
 	suite.Require().NoError(err)
 	suite.Len(keys, 1)
 }

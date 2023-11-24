@@ -3,7 +3,6 @@ package service
 import (
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
-	"github.com/vertex-center/vertex/pkg/user"
 )
 
 type SshService struct {
@@ -20,14 +19,24 @@ func (s *SshService) GetAll() ([]types.PublicKey, error) {
 	return s.adapter.GetAll()
 }
 
-func (s *SshService) Add(key string) error {
-	return s.adapter.Add(key)
+func (s *SshService) Add(key string, username string) error {
+	return s.adapter.Add(key, username)
 }
 
-func (s *SshService) Delete(fingerprint string) error {
-	return s.adapter.Remove(fingerprint)
+func (s *SshService) Delete(fingerprint string, username string) error {
+	return s.adapter.Remove(fingerprint, username)
 }
 
-func (s *SshService) GetUsers() ([]user.User, error) {
-	return s.adapter.GetUsers()
+func (s *SshService) GetUsers() ([]string, error) {
+	users, err := s.adapter.GetUsers()
+	if err != nil {
+		return nil, err
+	}
+
+	var res []string
+	for _, u := range users {
+		res = append(res, u.Name)
+	}
+
+	return res, nil
 }

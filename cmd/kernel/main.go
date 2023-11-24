@@ -37,9 +37,8 @@ var (
 	r   *router.Router
 	ctx *types.VertexContext
 
-	sshAdapter port.SshAdapter
-
-	sshService port.SshService
+	sshAdapter port.SshKernelAdapter
+	sshService port.SshKernelService
 )
 
 func main() {
@@ -193,7 +192,7 @@ func initRouter() {
 }
 
 func initAdapters() {
-	sshAdapter = adapter.NewSshFsAdapter(nil)
+	sshAdapter = adapter.NewSshFsAdapter()
 }
 
 func initServices() {
@@ -229,8 +228,8 @@ func initRoutes() {
 	ssh.GET("", sshHandler.Get)
 	// docapi:k route /security/ssh add_ssh_key_kernel
 	ssh.POST("", sshHandler.Add)
-	// docapi:k route /security/ssh/{fingerprint} delete_ssh_key_kernel
-	ssh.DELETE("/:fingerprint", sshHandler.Delete)
+	// docapi:k route /security/ssh delete_ssh_key_kernel
+	ssh.DELETE("", sshHandler.Delete)
 	// docapi:k route /security/ssh/users get_ssh_users_kernel
 	ssh.GET("/users", sshHandler.GetUsers)
 }

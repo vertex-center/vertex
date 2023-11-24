@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"net/http"
@@ -13,10 +12,10 @@ import (
 )
 
 type SshKernelHandler struct {
-	sshService port.SshService
+	sshService port.SshKernelService
 }
 
-func NewSshKernelHandler(sshKernelService port.SshService) port.SshKernelHandler {
+func NewSshKernelHandler(sshKernelService port.SshKernelService) port.SshKernelHandler {
 	return &SshKernelHandler{
 		sshService: sshKernelService,
 	}
@@ -48,15 +47,16 @@ func (h *SshKernelHandler) Get(c *router.Context) {
 // docapi method POST
 // docapi summary Add an SSH key to the authorized_keys file
 // docapi tags Ssh
-// docapi body {string} The key to append to the authorized_keys file.
+// docapi body {AddSSHKeyBody} Info about the key to append to the authorized_keys file.
 // docapi response 201
 // docapi response 400
+// docapi response 404
 // docapi response 500
 // docapi end
 
 func (h *SshKernelHandler) Add(c *router.Context) {
-	buf := new(bytes.Buffer)
-	_, err := buf.ReadFrom(c.Request.Body)
+	var body AddSSHKeyBody
+	err := c.ParseBody(&body)
 	if err != nil {
 		c.BadRequest(router.Error{
 			Code:           api.ErrFailedToParseBody,
@@ -65,13 +65,19 @@ func (h *SshKernelHandler) Add(c *router.Context) {
 		})
 		return
 	}
-	key := buf.String()
 
-	err = h.sshService.Add(key)
+	err = h.sshService.Add(body.AuthorizedKey, body.Username)
 	if err != nil && errors.Is(err, service.ErrInvalidPublicKey) {
 		c.BadRequest(router.Error{
 			Code:           api.ErrInvalidPublicKey,
 			PublicMessage:  "Invalid public key.",
+			PrivateMessage: err.Error(),
+		})
+		return
+	} else if err != nil && errors.Is(err, service.ErrUserNotFound) {
+		c.NotFound(router.Error{
+			Code:           api.ErrUserNotFound,
+			PublicMessage:  "User not found.",
 			PrivateMessage: err.Error(),
 		})
 		return
@@ -94,25 +100,29 @@ func (h *SshKernelHandler) Add(c *router.Context) {
 // docapi query fingerprint {string} The fingerprint of the SSH key to delete.
 // docapi response 204
 // docapi response 400
+// docapi response 404
 // docapi response 500
 // docapi end
 
 func (h *SshKernelHandler) Delete(c *router.Context) {
-	fingerprint := c.Param("fingerprint")
-	if fingerprint == "" {
-		c.BadRequest(router.Error{
-			Code:           api.ErrInvalidFingerprint,
-			PublicMessage:  "The request is missing the fingerprint.",
-			PrivateMessage: "Field 'fingerprint' is required.",
-		})
+	var body DeleteSSHKeyBody
+	err := c.ParseBody(&body)
+	if err != nil {
 		return
 	}
 
-	err := h.sshService.Delete(fingerprint)
-	if err != nil {
+	err = h.sshService.Delete(body.Fingerprint, body.Username)
+	if err != nil && errors.Is(err, service.ErrUserNotFound) {
+		c.NotFound(router.Error{
+			Code:           api.ErrUserNotFound,
+			PublicMessage:  "User not found.",
+			PrivateMessage: err.Error(),
+		})
+		return
+	} else if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToDeleteSSHKey,
-			PublicMessage:  fmt.Sprintf("Failed to delete SSH key with fingerprint '%s'.", fingerprint),
+			PublicMessage:  fmt.Sprintf("Failed to delete SSH key with fingerprint '%s' of the user '%s'.", body.Fingerprint, body.Username),
 			PrivateMessage: err.Error(),
 		})
 		return

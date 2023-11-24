@@ -17,7 +17,7 @@ const (
 	ErrFailedToDeleteSSHKey router.ErrCode = "failed_to_delete_ssh_key"
 	ErrFailedToGetSshUsers  router.ErrCode = "failed_to_get_ssh_users"
 	ErrInvalidPublicKey     router.ErrCode = "invalid_public_key"
-	ErrInvalidFingerprint   router.ErrCode = "invalid_fingerprint"
+	ErrUserNotFound         router.ErrCode = "user_not_found"
 
 	ErrFailedToPatchSettings router.ErrCode = "failed_to_patch_settings"
 )

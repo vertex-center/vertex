@@ -8,10 +8,7 @@ type User struct {
 }
 
 func GetAll() ([]User, error) {
-	users := []User{{
-		Name:    "root",
-		HomeDir: "/root",
-	}}
+	var users []User
 
 	usersDir := getUsersDir()
 

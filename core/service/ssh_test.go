@@ -34,18 +34,18 @@ func (suite *SshServiceTestSuite) TestGetAll() {
 }
 
 func (suite *SshServiceTestSuite) TestAdd() {
-	suite.adapter.On("Add", testDataAuthorizedKey).Return(nil)
+	suite.adapter.On("Add", testDataAuthorizedKey, "username").Return(nil)
 
-	err := suite.service.Add(testDataAuthorizedKey)
+	err := suite.service.Add(testDataAuthorizedKey, "username")
 
 	suite.Require().NoError(err)
 	suite.adapter.AssertExpectations(suite.T())
 }
 
 func (suite *SshServiceTestSuite) TestDelete() {
-	suite.adapter.On("Remove", testDataFingerprint).Return(nil)
+	suite.adapter.On("Remove", testDataFingerprint, "username").Return(nil)
 
-	err := suite.service.Delete(testDataFingerprint)
+	err := suite.service.Delete(testDataFingerprint, "username")
 
 	suite.Require().NoError(err)
 	suite.adapter.AssertExpectations(suite.T())

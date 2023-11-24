@@ -264,8 +264,8 @@ func initRoutes(about types.About) {
 	ssh.GET("", sshHandler.Get)
 	// docapi:v route /security/ssh add_ssh_key
 	ssh.POST("", sshHandler.Add)
-	// docapi:v route /security/ssh/{fingerprint} delete_ssh_key
-	ssh.DELETE("/:fingerprint", sshHandler.Delete)
+	// docapi:v route /security/ssh delete_ssh_key
+	ssh.DELETE("", sshHandler.Delete)
 	// docapi:v route /security/ssh/users get_ssh_users
 	ssh.GET("/users", sshHandler.GetUsers)
 }
