@@ -72,6 +72,8 @@ export default function SettingsUpdates() {
         </Button>
     );
 
+    const hasUpdate = update !== null && update !== undefined;
+
     return (
         <Content>
             <ProgressOverlay show={isLoading} />
@@ -86,7 +88,7 @@ export default function SettingsUpdates() {
                 />
             </Horizontal>
             <APIError error={error} />
-            {update === null && !isLoadingUpdate && (
+            {!hasUpdate && !isLoadingUpdate && (
                 <Caption>
                     <Horizontal alignItems="center" gap={6}>
                         <MaterialIcon icon="check" />
@@ -95,7 +97,7 @@ export default function SettingsUpdates() {
                     </Horizontal>
                 </Caption>
             )}
-            {update !== null && (
+            {hasUpdate && (
                 <List>
                     <VertexUpdate
                         version={update?.baseline.version}
