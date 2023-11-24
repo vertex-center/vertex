@@ -54,10 +54,11 @@ type CreateContainerResponse struct {
 }
 
 type InfoContainerResponse struct {
-	ID       string `json:"id,omitempty"`
-	Name     string `json:"name,omitempty"`
-	Platform string `json:"platform,omitempty"`
-	Image    string `json:"image,omitempty"`
+	ID           string   `json:"id,omitempty"`
+	Name         string   `json:"name,omitempty"`
+	Platform     string   `json:"platform,omitempty"`
+	Image        string   `json:"image,omitempty"`
+	PortBindings []string `json:"port_bindings,omitempty"`
 }
 
 type InfoImageResponse struct {

@@ -2,6 +2,7 @@ package adapter
 
 import (
 	"context"
+	"fmt"
 	"io"
 
 	dockertypes "github.com/docker/docker/api/types"
@@ -92,11 +93,18 @@ func (a DockerCliAdapter) InfoContainer(id string) (types.InfoContainerResponse,
 	if err != nil {
 		return types.InfoContainerResponse{}, err
 	}
+
+	var ports []string
+	for out, in := range info.HostConfig.PortBindings {
+		p := fmt.Sprintf("%s:%s", out, in[0].HostPort)
+		ports = append(ports, p)
+	}
 	return types.InfoContainerResponse{
-		ID:       info.ID,
-		Name:     info.Name,
-		Platform: info.Platform,
-		Image:    info.Image,
+		ID:           info.ID,
+		Name:         info.Name,
+		Platform:     info.Platform,
+		Image:        info.Image,
+		PortBindings: ports,
 	}, nil
 }
 
