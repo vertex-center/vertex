@@ -57,6 +57,11 @@ func (a *SshFsAdapter) GetAll(users []user.User) ([]types.PublicKey, error) {
 func (a *SshFsAdapter) Add(key string, user user.User) error {
 	p := getAuthorizedKeysPath(user.HomeDir)
 
+	err := os.MkdirAll(path.Dir(p), 0755)
+	if err != nil && !os.IsExist(err) {
+		return err
+	}
+
 	file, err := os.OpenFile(p, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
