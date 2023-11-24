@@ -4,9 +4,10 @@ import { Errors } from "../../../components/Error/Errors";
 import { APIError } from "../../../components/Error/APIError";
 import {
     Button,
-    Code,
     ListItem,
     MaterialIcon,
+    SelectField,
+    SelectOption,
     TextField,
     Title,
 } from "@vertex-center/components";
@@ -22,15 +23,25 @@ export default function SettingsSecurity() {
     const queryClient = useQueryClient();
     const {
         data: sshKeys,
-        error,
-        isLoading,
+        error: keysError,
+        isLoading: isKeysLoading,
     } = useQuery({
         queryKey: ["ssh_keys"],
         queryFn: api.security.ssh.get,
     });
 
+    const {
+        data: sshUsers,
+        error: usersError,
+        isLoading: isUsersLoading,
+    } = useQuery({
+        queryKey: ["ssh_users"],
+        queryFn: api.security.ssh.users,
+    });
+
     const [showPopup, setShowPopup] = useState(false);
     const [authorizedKey, setAuthorizedKey] = useState("");
+    const [username, setUsername] = useState("");
     const [addError, setAddError] = useState();
     const [deleteError, setDeleteError] = useState();
     const [adding, setAdding] = useState(false);
@@ -44,7 +55,7 @@ export default function SettingsSecurity() {
     const createSSHKey = () => {
         setAdding(true);
         api.security.ssh
-            .add(authorizedKey)
+            .add(authorizedKey, username)
             .then(() => {
                 dismissPopup();
                 queryClient.invalidateQueries({
@@ -55,9 +66,9 @@ export default function SettingsSecurity() {
             .finally(() => setAdding(false));
     };
 
-    const deleteSSHKey = (fingerprint: string) => {
+    const deleteSSHKey = (fingerprint: string, username: string) => {
         api.security.ssh
-            .delete(fingerprint)
+            .delete(fingerprint, username)
             .then(() => {
                 queryClient.invalidateQueries({
                     queryKey: ["ssh_keys"],
@@ -70,18 +81,25 @@ export default function SettingsSecurity() {
         setAuthorizedKey(e.target.value);
     };
 
+    const onUsernameChange = (value: any) => {
+        setUsername(value);
+    };
+
     const popupActions = (
         <Fragment>
             <Button onClick={dismissPopup}>Cancel</Button>
             <Button
                 variant="colored"
-                disabled={authorizedKey === ""}
+                disabled={authorizedKey === "" || username === ""}
                 onClick={createSSHKey}
             >
                 Create
             </Button>
         </Fragment>
     );
+
+    const error = keysError || usersError;
+    const isLoading = isKeysLoading || isUsersLoading;
 
     return (
         <Content>
@@ -104,8 +122,12 @@ export default function SettingsSecurity() {
                                 key={sshKey.fingerprint_sha_256}
                                 type={sshKey.type}
                                 fingerprint={sshKey.fingerprint_sha_256}
+                                username={sshKey.username}
                                 onDelete={() =>
-                                    deleteSSHKey(sshKey.fingerprint_sha_256)
+                                    deleteSSHKey(
+                                        sshKey.fingerprint_sha_256,
+                                        sshKey.username
+                                    )
                                 }
                             />
                         ))}
@@ -125,24 +147,32 @@ export default function SettingsSecurity() {
             <Popup
                 show={showPopup}
                 onDismiss={dismissPopup}
-                title="Create SSH key"
+                title="Add SSH key"
                 actions={popupActions}
             >
-                <Title variant="h4">
-                    Step 1: Generate an SSH key if you don't have one
-                </Title>
-                <Code language={"bash"}>
-                    ssh-keygen -t ed25519 -C "abc@example.com"
-                </Code>
-
-                <Title variant="h4">Step 2: Paste your public key below</Title>
                 <TextField
                     id="authorized-key"
                     value={authorizedKey}
+                    label="Public key"
+                    description="Paste your public SSH key here. It should start with ssh-ed25519."
+                    required
                     onChange={onAuthorizedKeyChange}
                     placeholder="ssh-ed25519..."
                     disabled={adding}
                 />
+                <SelectField
+                    onChange={onUsernameChange}
+                    value={username}
+                    label="User"
+                    description="Select the user to associate this key with."
+                    required
+                >
+                    {sshUsers?.map((user) => (
+                        <SelectOption key={user} value={user}>
+                            {user}
+                        </SelectOption>
+                    ))}
+                </SelectField>
 
                 <APIError error={addError} />
                 {adding && <Progress infinite />}

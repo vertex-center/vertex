@@ -18,11 +18,12 @@ export function SSHKeys(props: Readonly<ListProps>) {
 type SSHKeyProps = {
     type: string;
     fingerprint: string;
+    username: string;
     onDelete: () => void;
 };
 
 export default function SSHKey(props: Readonly<SSHKeyProps>) {
-    const { type, fingerprint, onDelete } = props;
+    const { type, fingerprint, username, onDelete } = props;
 
     return (
         <ListItem>
@@ -32,7 +33,7 @@ export default function SSHKey(props: Readonly<SSHKeyProps>) {
             <ListInfo>
                 <ListTitle>SSH Key</ListTitle>
                 <ListDescription>
-                    {type} - {fingerprint}
+                    {type} - {fingerprint} - {username}
                 </ListDescription>
             </ListInfo>
             <ListActions>
