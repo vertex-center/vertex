@@ -4,6 +4,7 @@ import { Title } from "../Title/Title.tsx";
 import { LinkProps } from "../Link/Link.tsx";
 import { HTMLProps } from "react";
 import { MaterialIcon } from "../MaterialIcon/MaterialIcon.tsx";
+import { ProfilePicture } from "../ProfilePicture/ProfilePicture.tsx";
 
 const meta: Meta<typeof Header> = {
     title: "Components/Header",
@@ -31,6 +32,7 @@ export const Normal: Story = {
         linkBack: linkBackProps,
         linkLogo: linkLogoProps,
         leading: <MaterialIcon icon="arrow_back" />,
+        trailing: <ProfilePicture size={36} />,
     },
     render: (props) => (
         <Header {...props}>

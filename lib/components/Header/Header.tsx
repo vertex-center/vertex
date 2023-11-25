@@ -14,6 +14,7 @@ interface IHeaderLink {
 export type HeaderProps<T, U> = HTMLProps<HTMLDivElement> & {
     appName?: string;
     leading?: ReactNode;
+    trailing?: ReactNode;
     linkLogo?: LinkProps<T>;
     linkBack?: LinkProps<U>;
 };
@@ -27,6 +28,7 @@ export function Header<T extends IHeaderLink, U extends IHeaderLink>(
         linkBack,
         appName,
         leading,
+        trailing,
         children,
         ...others
     } = props;
@@ -75,6 +77,7 @@ export function Header<T extends IHeaderLink, U extends IHeaderLink>(
                         <Title variant="h4">{appName ?? "Vertex"}</Title>
                     </div>
                 </Link>
+                {trailing && <div className="header-trailing">{trailing}</div>}
             </div>
             {(children || title) && (
                 <div className="header-bottom">
