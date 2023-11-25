@@ -9,13 +9,13 @@ export type ProfilePictureProps = HTMLProps<HTMLImageElement> & {
 export function ProfilePicture(props: Readonly<ProfilePictureProps>) {
     const { className, alt, size = 40, ...others } = props;
 
-    return (
-        <img
-            className={cx("profile-picture", className)}
-            alt={alt}
-            width={size}
-            height={size}
-            {...others}
-        />
-    );
+    const properties = {
+        className: cx("profile-picture", className),
+        ...others,
+    };
+
+    if (props.src === undefined) {
+        return <div style={{ width: size, height: size }} {...properties} />;
+    }
+    return <img alt={alt} width={size} height={size} {...properties} />;
 }
