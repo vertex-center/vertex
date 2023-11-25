@@ -7,7 +7,7 @@ export const withTheme = (Story: StoryFn, context: StoryContext) => {
             : "theme-vertex-dark";
 
     return (
-        <div className={theme}>
+        <div id="app" className={theme}>
             <Story
                 {...context}
                 globals={{
