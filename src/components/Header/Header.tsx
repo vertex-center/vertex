@@ -4,7 +4,13 @@ import {
     useLocation,
 } from "react-router-dom";
 import { useApps } from "../../hooks/useApps";
-import { Header, LinkProps } from "@vertex-center/components";
+import {
+    DropdownItem,
+    Header,
+    HeaderItem,
+    LinkProps,
+    ProfilePicture,
+} from "@vertex-center/components";
 
 type Props = {
     title?: string;
@@ -32,5 +38,24 @@ export default function (props: Readonly<Props>) {
         to,
     };
 
-    return <Header onClick={onClick} appName={app?.name} linkLogo={linkLogo} />;
+    const accountItems = (
+        <DropdownItem icon="logout" red>
+            Logout
+        </DropdownItem>
+    );
+
+    const account = (
+        <HeaderItem items={accountItems}>
+            <ProfilePicture size={36} />
+        </HeaderItem>
+    );
+
+    return (
+        <Header
+            onClick={onClick}
+            appName={app?.name}
+            linkLogo={linkLogo}
+            trailing={account}
+        />
+    );
 }
