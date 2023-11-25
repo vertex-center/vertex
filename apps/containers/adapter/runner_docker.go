@@ -187,7 +187,7 @@ func (a ContainerRunnerDockerAdapter) Start(inst *types.Container, setStatus fun
 
 				for in, out := range *service.Methods.Docker.Ports {
 					for _, e := range service.Env {
-						if e.Type == "port" && e.Default == out {
+						if e.Type == "port" && e.Name == out {
 							out = inst.Env[e.Name]
 							all = append(all, out+":"+in)
 							break
