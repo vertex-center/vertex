@@ -34,6 +34,10 @@ import {
     ParagraphProps,
 } from "./components/Paragraph/Paragraph.tsx";
 import {
+    ProfilePicture,
+    ProfilePictureProps,
+} from "./components/ProfilePicture/ProfilePicture";
+import {
     SelectField,
     SelectFieldProps,
     SelectOption,
@@ -75,6 +79,7 @@ export type {
     ListTitleProps,
     LogoProps,
     ParagraphProps,
+    ProfilePictureProps,
     SelectFieldProps,
     SelectOptionProps,
     SidebarProps,
@@ -92,6 +97,7 @@ export {
     Header,
     PageContext,
     PageProvider,
+    ProfilePicture,
     Horizontal,
     InlineCode,
     Input,
