@@ -5,6 +5,8 @@ import { LinkProps } from "../Link/Link.tsx";
 import { HTMLProps } from "react";
 import { MaterialIcon } from "../MaterialIcon/MaterialIcon.tsx";
 import { ProfilePicture } from "../ProfilePicture/ProfilePicture.tsx";
+import { HeaderItem } from "./HeaderItem.tsx";
+import { DropdownItem } from "../Dropdown/Dropdown.tsx";
 
 const meta: Meta<typeof Header> = {
     title: "Components/Header",
@@ -26,13 +28,24 @@ const linkBackProps: LinkProps<HTMLProps<HTMLAnchorElement>> = {
     href: "#",
 };
 
+const items = (
+    <DropdownItem icon="logout" red>
+        Logout
+    </DropdownItem>
+);
+
 export const Normal: Story = {
     args: {
         appName: "Vertex App",
         linkBack: linkBackProps,
         linkLogo: linkLogoProps,
         leading: <MaterialIcon icon="arrow_back" />,
-        trailing: <ProfilePicture size={36} />,
+        trailing: (
+            <HeaderItem items={items}>
+                Arra
+                <ProfilePicture size={36} />
+            </HeaderItem>
+        ),
     },
     render: (props) => (
         <Header {...props}>

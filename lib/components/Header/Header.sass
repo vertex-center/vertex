@@ -62,3 +62,20 @@
 
         & h1
             padding: 10px 0
+
+    &-item
+        display: flex
+        flex-direction: row
+        align-items: center
+        gap: 8px
+        color: colors.$fg-primary
+        text-decoration: none
+        cursor: pointer
+        position: relative
+        padding: 10px 0
+
+        &:hover
+            color: colors.$bg-accent-hover
+
+        &-opened
+            z-index: 100

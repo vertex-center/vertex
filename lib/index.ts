@@ -2,7 +2,14 @@ import { Box, BoxProps, BoxType } from "./components/Box/Box";
 import { Button, ButtonProps } from "./components/Button/Button";
 import { Checkbox, CheckboxProps } from "./components/Checkbox/Checkbox";
 import { Code, CodeProps } from "./components/Code/Code";
+import {
+    Dropdown,
+    DropdownItem,
+    DropdownItemProps,
+    DropdownProps,
+} from "./components/Dropdown/Dropdown";
 import { Header, HeaderProps } from "./components/Header/Header";
+import { HeaderItem, HeaderItemProps } from "./components/Header/HeaderItem";
 import {
     InlineCode,
     InlineCodeProps,
@@ -65,7 +72,10 @@ export type {
     ButtonProps,
     CheckboxProps,
     CodeProps,
+    DropdownProps,
+    DropdownItemProps,
     HeaderProps,
+    HeaderItemProps,
     InlineCodeProps,
     InputProps,
     LayoutProps,
@@ -94,7 +104,10 @@ export {
     Button,
     Checkbox,
     Code,
+    Dropdown,
+    DropdownItem,
     Header,
+    HeaderItem,
     PageContext,
     PageProvider,
     ProfilePicture,
