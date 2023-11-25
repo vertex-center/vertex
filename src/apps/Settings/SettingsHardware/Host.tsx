@@ -65,7 +65,7 @@ export default function Host(props: Readonly<HostProps>) {
                     {bootTime}
                 </KeyValueInfo>
                 <KeyValueInfo name="Uptime" icon="arrow_upward">
-                    {uptimeHours} days
+                    {uptimeHours}h
                 </KeyValueInfo>
             </KeyValueGroup>
         </Fragment>
