@@ -14,8 +14,10 @@ type (
 	}
 
 	HardwareHandler interface {
-		// Get handles the retrieval of the current hardware.
-		Get(c *router.Context)
+		// GetHost handles the retrieval of the current host.
+		GetHost(c *router.Context)
+		// GetCPUs handles the retrieval of all CPUs.
+		GetCPUs(c *router.Context)
 	}
 
 	UpdateHandler interface {

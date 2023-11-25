@@ -20,4 +20,7 @@ const (
 	ErrUserNotFound         router.ErrCode = "user_not_found"
 
 	ErrFailedToPatchSettings router.ErrCode = "failed_to_patch_settings"
+
+	ErrFailedToGetHost router.ErrCode = "failed_to_get_host"
+	ErrFailedToGetCPUs router.ErrCode = "failed_to_get_cpus"
 )

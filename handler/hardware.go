@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/vertex-center/vertex/core/port"
+	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
@@ -15,13 +16,44 @@ func NewHardwareHandler(hardwareService port.HardwareService) port.HardwareHandl
 	}
 }
 
-// docapi begin get_hardware
+// docapi begin get_host
 // docapi method GET
-// docapi summary Get hardware
+// docapi summary Get host
 // docapi tags Hardware
-// docapi response 200 {Hardware} The hardware.
+// docapi response 200 {Host} The host information.
+// docapi response 500
 // docapi end
 
-func (h *HardwareHandler) Get(c *router.Context) {
-	c.JSON(h.hardwareService.Get())
+func (h *HardwareHandler) GetHost(c *router.Context) {
+	host, err := h.hardwareService.GetHost()
+	if err != nil {
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToGetHost,
+			PublicMessage:  "Failed to get host information.",
+			PrivateMessage: err.Error(),
+		})
+		return
+	}
+	c.JSON(host)
+}
+
+// docapi begin get_cpus
+// docapi method GET
+// docapi summary Get CPUs
+// docapi tags Hardware
+// docapi response 200 {[]CPU} The CPUs information.
+// docapi response 500
+// docapi end
+
+func (h *HardwareHandler) GetCPUs(c *router.Context) {
+	cpus, err := h.hardwareService.GetCPUs()
+	if err != nil {
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToGetCPUs,
+			PublicMessage:  "Failed to get CPUs information.",
+			PrivateMessage: err.Error(),
+		})
+		return
+	}
+	c.JSON(cpus)
 }

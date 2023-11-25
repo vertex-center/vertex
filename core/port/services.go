@@ -16,7 +16,8 @@ type (
 	}
 
 	HardwareService interface {
-		Get() types.Hardware
+		GetHost() (types.Host, error)
+		GetCPUs() ([]types.CPU, error)
 	}
 
 	SettingsService interface {
