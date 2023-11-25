@@ -1,6 +1,5 @@
 import axios from "axios";
 import { About } from "../../models/about";
-import { Hardware } from "../../models/hardware";
 import { SSHKeys } from "../../models/security";
 import { vxContainersRoutes } from "./vxContainers";
 import { vxTunnelsRoutes } from "./vxTunnels";
@@ -11,6 +10,7 @@ import { VertexApp } from "../../models/app";
 import { Console } from "../../logging/logging";
 import { Update } from "../../models/update";
 import { vxServiceEditorRoutes } from "./vxServiceEditor";
+import { CPU, Host } from "../../models/hardware";
 
 export const server = axios.create({
     // @ts-ignore
@@ -45,8 +45,13 @@ const getAbout = async () => {
     return data;
 };
 
-const getHardware = async () => {
-    const { data } = await server.get<Hardware>("/hardware");
+const getHost = async () => {
+    const { data } = await server.get<Host>("/hardware/host");
+    return data;
+};
+
+const getCPUs = async () => {
+    const { data } = await server.get<CPU[]>("/hardware/cpus");
     return data;
 };
 
@@ -62,7 +67,10 @@ const installUpdate = async () => {
 
 export const api = {
     about: getAbout,
-    hardware: getHardware,
+    hardware: {
+        host: getHost,
+        cpus: getCPUs,
+    },
 
     vxContainers: vxContainersRoutes,
     vxTunnels: vxTunnelsRoutes,
