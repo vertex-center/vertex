@@ -10,7 +10,11 @@ export function MaterialIcon(props: Readonly<Props>) {
     const { className, icon, ...others } = props;
     return (
         <span
-            className={classNames("material-symbols-rounded", className)}
+            className={classNames(
+                "material-icon",
+                "material-symbols-rounded",
+                className,
+            )}
             {...others}
         >
             {icon}
