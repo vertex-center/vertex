@@ -24,12 +24,8 @@ export default function ContainerHome() {
                     container?.service?.urls
                         .filter((u) => u.kind === "client")
                         .map((u) => {
-                            const portEnvName = container?.service?.environment
-                                ?.filter((e) => e.type === "port")
-                                ?.find((e) => e.default === u.port).name;
-
                             const port =
-                                container?.environment[portEnvName] ?? u.port;
+                                container?.environment[u.port] ?? u.port;
                             const disabled = container.status !== "running";
 
                             // @ts-ignore
