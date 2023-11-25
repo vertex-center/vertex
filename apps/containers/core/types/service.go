@@ -2,13 +2,14 @@ package types
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 )
 
 const (
-	MaxSupportedVersion Version = 1
+	MaxSupportedVersion Version = 2
 )
 
 var (
@@ -61,6 +62,39 @@ type Service struct {
 
 type ServiceV1 Service
 
+// Upgrade ServiceV1 to ServiceV2.
+// Ports are now a map from port:ENV_NAME instead of port:port.
+func (s *ServiceV1) Upgrade() *ServiceV2 {
+	s.Version = 2
+	if s.Methods.Docker != nil && s.Methods.Docker.Ports != nil {
+		ports := make(map[string]string)
+		for in, out := range *s.Methods.Docker.Ports {
+			for _, e := range s.Env {
+				if e.Type == "port" && e.Default == out {
+					ports[in] = e.Name
+					break
+				}
+			}
+		}
+		s.Methods.Docker.Ports = &ports
+	}
+	for i, url := range s.URLs {
+		for _, e := range s.Env {
+			if e.Type == "port" && e.Default == url.Port {
+				s.URLs[i].Port = e.Name
+				break
+			}
+		}
+	}
+	return (*ServiceV2)(s)
+}
+
+type ServiceV2 Service
+
+func (s *ServiceV2) Upgrade() *Service {
+	return (*Service)(s)
+}
+
 func (s *Service) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var service struct {
 		ServiceVersioning `yaml:",inline"`
@@ -78,18 +112,33 @@ func (s *Service) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		vlog.String("id", service.ID),
 	)
 
+	var serv any
 	switch service.Version {
 	case 0, 1:
-		var service ServiceV1
-		err := unmarshal(&service)
-		if err != nil {
-			return err
-		}
-		*s = Service(service)
-	default:
-		return errors.New("service version not supported")
+		serv = &ServiceV1{}
+	case 2:
+		serv = &ServiceV2{}
+	}
+	err = unmarshal(serv)
+	if err != nil {
+		return err
 	}
 
+	version := service.Version
+
+	switch version {
+	case 0, 1:
+		serv = serv.(*ServiceV1).Upgrade()
+		fallthrough
+	case 2:
+		serv = serv.(*ServiceV2).Upgrade()
+	}
+
+	if serv, ok := serv.(*Service); ok {
+		*s = *serv
+	} else {
+		return fmt.Errorf("unknown service version: %d", version)
+	}
 	return nil
 }
 
