@@ -20,6 +20,7 @@ import {
     SubmitHandler,
     useFieldArray,
     useForm,
+    useWatch,
 } from "react-hook-form";
 import * as yup from "yup";
 import { object } from "yup";
@@ -93,7 +94,8 @@ function EnvironmentInputs({ control, register, errors, i }) {
     );
 }
 
-function UrlInputs({ control, register, errors, i }) {
+function UrlInputs({ control, register, errors, i, env }) {
+    console.log(env);
     return (
         <Fragment>
             <TextField
@@ -104,13 +106,38 @@ function UrlInputs({ control, register, errors, i }) {
                 error={errors?.name?.message}
                 required
             />
-            <TextField
-                id={`urls.${i}.port`}
-                label="Port"
-                {...register(`urls.${i}.port`)}
-                aria-invalid={errors?.port ? "true" : "false"}
-                error={errors?.port?.message}
-                required
+            <Controller
+                render={({ field }) => {
+                    const e = env?.find((e) => e.name === field.value);
+                    return (
+                        <SelectField
+                            id={`urls.${i}.port`}
+                            label="Port"
+                            {...register(`urls.${i}.port`)}
+                            // @ts-ignore
+                            value={e?.name ?? ""}
+                            onChange={field.onChange}
+                            aria-invalid={errors?.value ? "true" : "false"}
+                            error={errors?.port?.message}
+                            placeholder="ENV_NAME"
+                            required
+                        >
+                            {env?.map((env) => {
+                                if (env.type !== "port") return null;
+                                return (
+                                    <SelectOption
+                                        key={env.name}
+                                        value={env.name}
+                                    >
+                                        {env.name}
+                                    </SelectOption>
+                                );
+                            })}
+                        </SelectField>
+                    );
+                }}
+                name={`urls.${i}.port`}
+                control={control}
             />
             <Controller
                 render={({ field }) => {
@@ -174,7 +201,7 @@ function VolumeInputs({ register, errors, i }) {
     );
 }
 
-function PortInputs({ register, errors, i }) {
+function PortInputs({ control, register, errors, i, env }) {
     return (
         <div className={styles.port}>
             <TextField
@@ -186,14 +213,38 @@ function PortInputs({ register, errors, i }) {
                 placeholder="3000"
                 required
             />
-            <TextField
-                id={`methods.docker.ports.${i}.value`}
-                label="Port out of the container"
-                {...register(`methods.docker.ports.${i}.value`)}
-                aria-invalid={errors?.value ? "true" : "false"}
-                error={errors?.value?.message}
-                placeholder="3000"
-                required
+            <Controller
+                render={({ field }) => {
+                    const e = env?.find((e) => e.name === field.value);
+                    return (
+                        <SelectField
+                            id={`methods.docker.ports.${i}.value`}
+                            label="Port out of the container"
+                            {...register(`methods.docker.ports.${i}.value`)}
+                            // @ts-ignore
+                            value={e?.name ?? ""}
+                            onChange={field.onChange}
+                            aria-invalid={errors?.value ? "true" : "false"}
+                            error={errors?.value?.message}
+                            placeholder="ENV_NAME"
+                            required
+                        >
+                            {env?.map((env) => {
+                                if (env.type !== "port") return null;
+                                return (
+                                    <SelectOption
+                                        key={env.name}
+                                        value={env.name}
+                                    >
+                                        {env.name}
+                                    </SelectOption>
+                                );
+                            })}
+                        </SelectField>
+                    );
+                }}
+                name={`methods.docker.ports.${i}.value`}
+                control={control}
             />
         </div>
     );
@@ -280,7 +331,7 @@ const schema = object({
     urls: yup.array().of(
         yup.object().shape({
             name: yup.string().label("Name").required(),
-            port: yup.number().label("Port").required(),
+            port: yup.string().label("Port").required(),
             ping: yup.string().label("Ping"),
             kind: yup
                 .string()
@@ -303,7 +354,7 @@ const schema = object({
             ports: yup.array().of(
                 yup.object().shape({
                     key: yup.number().label("Port input").required(),
-                    value: yup.number().label("Port output").required(),
+                    value: yup.string().label("Port output").required(),
                 })
             ),
             environment: yup.array().of(
@@ -377,6 +428,8 @@ export default function ServiceEditor() {
     });
 
     const [yaml, setYaml] = useState();
+
+    const env = useWatch({ control, name: "environment", defaultValue: [] });
 
     const download = () => {
         const service = getService();
@@ -570,6 +623,7 @@ export default function ServiceEditor() {
                                         control={control}
                                         register={register}
                                         i={i}
+                                        env={env}
                                         errors={errors.urls?.[i]}
                                     />
                                 </div>
@@ -678,9 +732,11 @@ export default function ServiceEditor() {
                             >
                                 <PortInputs
                                     key={field.id}
+                                    control={control}
                                     register={register}
                                     i={i}
                                     errors={errors?.methods?.docker?.ports?.[i]}
+                                    env={env}
                                 />
                                 <Button
                                     variant="danger"
