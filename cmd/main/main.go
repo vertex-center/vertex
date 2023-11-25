@@ -241,9 +241,9 @@ func initRoutes(about types.About) {
 
 	hardwareHandler := handler.NewHardwareHandler(hardwareService)
 	hardware := api.Group("/hardware")
-	// docapi:v route /hardware get_host
+	// docapi:v route /hardware/host get_host
 	hardware.GET("/host", hardwareHandler.GetHost)
-	// docapi:v route /hardware get_cpus
+	// docapi:v route /hardware/cpus get_cpus
 	hardware.GET("/cpus", hardwareHandler.GetCPUs)
 
 	updateHandler := handler.NewUpdateHandler(updateService, settingsService)
