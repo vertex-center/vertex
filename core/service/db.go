@@ -61,7 +61,7 @@ func (s *DbService) MigrateTo(dbms vtypes.DbmsName) error {
 
 	switch currentDbms {
 	case vtypes.DbmsNameSqlite:
-		// Nothing to do yet
+		err = s.deleteSqliteDB()
 	case vtypes.DbmsNamePostgres:
 		err = s.deletePostgresDB()
 	default:
