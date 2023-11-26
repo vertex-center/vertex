@@ -47,10 +47,10 @@ func (s *DataService) MigrateTo(dbms vtypes.DbmsName) error {
 
 	var err error
 	switch dbms {
-	case vtypes.DbNamePostgres:
-		//err = errors.New("postgres migration not implemented yet")
 	case vtypes.DbNameSqlite:
 		//err = errors.New("sqlite migration not implemented yet")
+	case vtypes.DbNamePostgres:
+		err = s.migrateToPostgres()
 	default:
 		err = errors.New("unknown dbms: " + string(dbms))
 	}
@@ -85,10 +85,10 @@ func (s *DataService) setup() {
 
 	var err error
 	switch dbms {
-	case vtypes.DbNamePostgres:
-		err = s.setupPostgres()
 	case vtypes.DbNameSqlite:
 		// Nothing to do yet
+	case vtypes.DbNamePostgres:
+		err = s.setupPostgres()
 	default:
 		log.Error(errors.New("unknown dbms"), vlog.String("dbms", string(dbms)))
 	}
