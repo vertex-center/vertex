@@ -24,6 +24,7 @@ import Progress, {
 } from "../../../components/Progress/Progress";
 import { APIError } from "../../../components/Error/APIError";
 import { useDBMSMutation } from "../hooks/useDBMSMutation";
+import { useQueryClient } from "@tanstack/react-query";
 
 type DatabaseProps = {
     name: string;
@@ -79,6 +80,8 @@ function Database(props: Readonly<DatabaseProps>) {
 }
 
 export default function SettingsData() {
+    const queryClient = useQueryClient();
+
     const [showPopup, setShowPopup] = useState(false);
     const [selectedDB, setSelectedDB] = useState<string>();
 
@@ -88,7 +91,9 @@ export default function SettingsData() {
             setShowPopup(false);
         },
         onSuccess: () => {
-            setShowPopup(false);
+            queryClient.invalidateQueries({
+                queryKey: ["admin_data_dbms"],
+            });
         },
     });
 
