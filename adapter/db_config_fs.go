@@ -81,7 +81,7 @@ func (a *DbConfigFSAdapter) Connect() error {
 	var err error
 	switch a.config.DbmsName {
 	case types.DbmsNameSqlite:
-		p := path.Join(a.configDir, "gorm.db")
+		p := path.Join(a.configDir, "vertex.db")
 		err = a.ConnectTo(sqlite.Open(p), 1)
 	case types.DbmsNamePostgres:
 		err = a.ConnectTo(postgres.Open("host=localhost port=5432 user=postgres password=postgres dbname=postgres sslmode=disable"), 15)
