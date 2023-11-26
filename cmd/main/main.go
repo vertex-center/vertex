@@ -93,8 +93,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	ctx.DispatchEvent(types.EventServerStart{})
-
 	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
 
 	err = notificationsService.StartWebhook()
@@ -288,12 +286,23 @@ func startRouter() {
 	fmt.Printf("\n-- Vertex Client :: %s\n\n", url)
 	log.Info("Vertex started", vlog.String("url", url))
 
-	err := r.Start(fmt.Sprintf(":%s", config.Current.Port))
-	if errors.Is(err, http.ErrServerClosed) {
-		log.Info("Vertex closed")
-	} else if err != nil {
-		log.Error(err)
-	}
+	stopChan := make(chan struct{})
+	defer close(stopChan)
+
+	go func() {
+		err := r.Start(fmt.Sprintf(":%s", config.Current.Port))
+		if errors.Is(err, http.ErrServerClosed) {
+			log.Info("Vertex closed")
+		} else if err != nil {
+			log.Error(err)
+		}
+
+		stopChan <- struct{}{}
+	}()
+
+	ctx.DispatchEvent(types.EventServerStart{})
+
+	<-stopChan
 }
 
 func stopRouter() {
