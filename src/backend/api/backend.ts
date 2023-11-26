@@ -56,12 +56,12 @@ const getCPUs = async () => {
 };
 
 const getUpdate = async () => {
-    const { data } = await server.get<Update>("/update");
+    const { data } = await server.get<Update>("/admin/update");
     return data;
 };
 
 const installUpdate = async () => {
-    const { data } = await server.post("/update");
+    const { data } = await server.post("/admin/update");
     return data;
 };
 
@@ -131,10 +131,10 @@ export const api = {
 
     settings: {
         get: async () => {
-            const { data } = await server.get<Settings>("/settings");
+            const { data } = await server.get<Settings>("/admin/settings");
             return data;
         },
         patch: (settings: Partial<Settings>) =>
-            server.patch("/settings", settings),
+            server.patch("/admin/settings", settings),
     },
 };
