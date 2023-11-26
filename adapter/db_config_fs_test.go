@@ -9,23 +9,23 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type DataConfigFSAdapterTestSuite struct {
+type DbConfigFSAdapterTestSuite struct {
 	suite.Suite
 
-	adapter *DataConfigFSAdapter
+	adapter *DbConfigFSAdapter
 }
 
 func TestDataConfigFSAdapterTestSuite(t *testing.T) {
-	suite.Run(t, new(DataConfigFSAdapterTestSuite))
+	suite.Run(t, new(DbConfigFSAdapterTestSuite))
 }
 
-func (suite *DataConfigFSAdapterTestSuite) SetupTest() {
-	suite.adapter = NewDataConfigFSAdapter(&DataConfigFSAdapterParams{
+func (suite *DbConfigFSAdapterTestSuite) SetupTest() {
+	suite.adapter = NewDataConfigFSAdapter(&DbConfigFSAdapterParams{
 		configDir: suite.T().TempDir(),
-	}).(*DataConfigFSAdapter)
+	}).(*DbConfigFSAdapter)
 }
 
-func (suite *DataConfigFSAdapterTestSuite) TestReadDataConfig() {
+func (suite *DbConfigFSAdapterTestSuite) TestReadDataConfig() {
 	data, err := yaml.Marshal(suite.adapter.config)
 	suite.Require().NoError(err)
 

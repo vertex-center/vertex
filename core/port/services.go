@@ -11,7 +11,7 @@ type (
 		All() []app.Meta
 	}
 
-	DataService interface {
+	DbService interface {
 		GetCurrentDbms() types.DbmsName
 		MigrateTo(dbms types.DbmsName) error
 	}

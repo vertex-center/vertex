@@ -10,12 +10,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type DataHandler struct {
-	dataService port.DataService
+type DatabaseHandler struct {
+	dataService port.DbService
 }
 
-func NewDataHandler(dataService port.DataService) port.DataHandler {
-	return &DataHandler{
+func NewDatabaseHandler(dataService port.DbService) port.DatabaseHandler {
+	return &DatabaseHandler{
 		dataService: dataService,
 	}
 }
@@ -28,7 +28,7 @@ func NewDataHandler(dataService port.DataService) port.DataHandler {
 // docapi response 200 {string} The current DBMS.
 // docapi end
 
-func (h *DataHandler) GetCurrentDbms(c *router.Context) {
+func (h *DatabaseHandler) GetCurrentDbms(c *router.Context) {
 	c.JSON(h.dataService.GetCurrentDbms())
 }
 
@@ -48,7 +48,7 @@ type MigrateToBody struct {
 	Dbms string `json:"dbms"`
 }
 
-func (h *DataHandler) MigrateTo(c *router.Context) {
+func (h *DatabaseHandler) MigrateTo(c *router.Context) {
 	var body MigrateToBody
 	err := c.BindJSON(&body)
 	if err != nil {

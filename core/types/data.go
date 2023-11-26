@@ -3,11 +3,11 @@ package types
 type DbmsName string
 
 const (
-	DbNameSqlite   DbmsName = "sqlite" // Default
-	DbNamePostgres DbmsName = "postgres"
+	DbmsNameSqlite   DbmsName = "sqlite" // Default
+	DbmsNamePostgres DbmsName = "postgres"
 )
 
-type DataConfig struct {
+type DbConfig struct {
 	// DbmsName is the database management system name that Vertex will use.
 	DbmsName DbmsName `json:"dbms_name" yaml:"dbms_name"`
 }

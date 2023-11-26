@@ -12,7 +12,7 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-func (s *DataService) setupPostgres() error {
+func (s *DbService) setupPostgres() error {
 	inst, err := s.getPostgresContainer()
 	if err != nil && !errors.Is(err, ErrPostgresDatabaseNotFound) {
 		return err
@@ -37,7 +37,7 @@ func (s *DataService) setupPostgres() error {
 	return nil
 }
 
-func (s *DataService) deletePostgresDB() error {
+func (s *DbService) deletePostgresDB() error {
 	inst, err := s.getPostgresContainer()
 	if err != nil {
 		return err
@@ -58,7 +58,7 @@ func (s *DataService) deletePostgresDB() error {
 	return nil
 }
 
-func (s *DataService) getPostgresContainer() (*types.Container, error) {
+func (s *DbService) getPostgresContainer() (*types.Container, error) {
 	client := containersapi.NewContainersClient()
 
 	insts, apiError := client.GetContainers(context.Background())
@@ -92,7 +92,7 @@ func (s *DataService) getPostgresContainer() (*types.Container, error) {
 	return nil, ErrPostgresDatabaseNotFound
 }
 
-func (s *DataService) installPostgresDB() error {
+func (s *DbService) installPostgresDB() error {
 	log.Info("installing vertex postgres database")
 
 	sqlClient := sqlapi.NewSqlClient()
@@ -115,7 +115,7 @@ func (s *DataService) installPostgresDB() error {
 	return nil
 }
 
-func (s *DataService) migrateToPostgres() error {
+func (s *DbService) migrateToPostgres() error {
 	err := s.setupPostgres()
 	if err != nil {
 		return err

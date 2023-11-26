@@ -8,7 +8,7 @@ type (
 		Get(c *router.Context)
 	}
 
-	DataHandler interface {
+	DatabaseHandler interface {
 		// GetCurrentDbms handles the retrieval of the current database management system
 		// that Vertex is using.
 		GetCurrentDbms(c *router.Context)

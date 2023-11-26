@@ -22,8 +22,8 @@ type (
 		SetChannel(channel types.SettingsUpdatesChannel) error
 	}
 
-	DataConfigAdapter interface {
-		GetDataConfig() types.DataConfig
+	DbConfigAdapter interface {
+		GetDbConfig() types.DbConfig
 		GetDBMSName() types.DbmsName
 		SetDBMSName(name types.DbmsName) error
 	}

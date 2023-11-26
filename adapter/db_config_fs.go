@@ -15,27 +15,27 @@ import (
 )
 
 var (
-	errDataConfigNotFound       = errors.New("config.yml doesn't exists or could not be found")
-	errDataConfigFailedToRead   = errors.New("failed to read config.yml")
-	errDataConfigFailedToDecode = errors.New("failed to decode config.yml")
+	errDataConfigNotFound       = errors.New("live/database/config.yml doesn't exists or could not be found")
+	errDataConfigFailedToRead   = errors.New("failed to read live/database/config.yml")
+	errDataConfigFailedToDecode = errors.New("failed to decode live/database/config.yml")
 )
 
-// DataConfigFSAdapter is an adapter to configure how Vertex will store data.
-type DataConfigFSAdapter struct {
+// DbConfigFSAdapter is an adapter to configure how Vertex will store data.
+type DbConfigFSAdapter struct {
 	configDir string
-	config    types.DataConfig
+	config    types.DbConfig
 }
 
-type DataConfigFSAdapterParams struct {
+type DbConfigFSAdapterParams struct {
 	configDir string
 }
 
-func NewDataConfigFSAdapter(params *DataConfigFSAdapterParams) port.DataConfigAdapter {
+func NewDataConfigFSAdapter(params *DbConfigFSAdapterParams) port.DbConfigAdapter {
 	if params == nil {
-		params = &DataConfigFSAdapterParams{}
+		params = &DbConfigFSAdapterParams{}
 	}
 	if params.configDir == "" {
-		params.configDir = path.Join(storage.Path, "data")
+		params.configDir = path.Join(storage.Path, "database")
 	}
 
 	err := os.MkdirAll(params.configDir, os.ModePerm)
@@ -47,10 +47,10 @@ func NewDataConfigFSAdapter(params *DataConfigFSAdapterParams) port.DataConfigAd
 		os.Exit(1)
 	}
 
-	adapter := &DataConfigFSAdapter{
+	adapter := &DbConfigFSAdapter{
 		configDir: params.configDir,
-		config: types.DataConfig{
-			DbmsName: types.DbNameSqlite,
+		config: types.DbConfig{
+			DbmsName: types.DbmsNameSqlite,
 		},
 	}
 
@@ -62,20 +62,20 @@ func NewDataConfigFSAdapter(params *DataConfigFSAdapterParams) port.DataConfigAd
 	return adapter
 }
 
-func (a *DataConfigFSAdapter) GetDataConfig() types.DataConfig {
+func (a *DbConfigFSAdapter) GetDbConfig() types.DbConfig {
 	return a.config
 }
 
-func (a *DataConfigFSAdapter) GetDBMSName() types.DbmsName {
+func (a *DbConfigFSAdapter) GetDBMSName() types.DbmsName {
 	return a.config.DbmsName
 }
 
-func (a *DataConfigFSAdapter) SetDBMSName(name types.DbmsName) error {
+func (a *DbConfigFSAdapter) SetDBMSName(name types.DbmsName) error {
 	a.config.DbmsName = name
 	return a.write()
 }
 
-func (a *DataConfigFSAdapter) read() error {
+func (a *DbConfigFSAdapter) read() error {
 	p := path.Join(a.configDir, "config.yml")
 	file, err := os.ReadFile(p)
 
@@ -92,7 +92,7 @@ func (a *DataConfigFSAdapter) read() error {
 	return nil
 }
 
-func (a *DataConfigFSAdapter) write() error {
+func (a *DbConfigFSAdapter) write() error {
 	p := path.Join(a.configDir, "config.yml")
 
 	data, err := yaml.Marshal(&a.config)

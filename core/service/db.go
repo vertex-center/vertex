@@ -17,14 +17,14 @@ var (
 	ErrPostgresDatabaseNotFound = errors.New("vertex postgres database not found")
 )
 
-type DataService struct {
+type DbService struct {
 	uuid              uuid.UUID
 	ctx               *vtypes.VertexContext
-	dataConfigAdapter port.DataConfigAdapter
+	dataConfigAdapter port.DbConfigAdapter
 }
 
-func NewDataService(ctx *vtypes.VertexContext, dataConfigAdapter port.DataConfigAdapter) *DataService {
-	s := &DataService{
+func NewDbService(ctx *vtypes.VertexContext, dataConfigAdapter port.DbConfigAdapter) port.DbService {
+	s := &DbService{
 		uuid:              uuid.New(),
 		ctx:               ctx,
 		dataConfigAdapter: dataConfigAdapter,
@@ -33,11 +33,11 @@ func NewDataService(ctx *vtypes.VertexContext, dataConfigAdapter port.DataConfig
 	return s
 }
 
-func (s *DataService) GetCurrentDbms() vtypes.DbmsName {
+func (s *DbService) GetCurrentDbms() vtypes.DbmsName {
 	return s.dataConfigAdapter.GetDBMSName()
 }
 
-func (s *DataService) MigrateTo(dbms vtypes.DbmsName) error {
+func (s *DbService) MigrateTo(dbms vtypes.DbmsName) error {
 	log.Info("Migrating data to " + string(dbms))
 
 	currentDbms := s.dataConfigAdapter.GetDBMSName()
@@ -47,9 +47,9 @@ func (s *DataService) MigrateTo(dbms vtypes.DbmsName) error {
 
 	var err error
 	switch dbms {
-	case vtypes.DbNameSqlite:
+	case vtypes.DbmsNameSqlite:
 		//err = errors.New("sqlite migration not implemented yet")
-	case vtypes.DbNamePostgres:
+	case vtypes.DbmsNamePostgres:
 		err = s.migrateToPostgres()
 	default:
 		err = errors.New("unknown dbms: " + string(dbms))
@@ -60,9 +60,9 @@ func (s *DataService) MigrateTo(dbms vtypes.DbmsName) error {
 	}
 
 	switch currentDbms {
-	case vtypes.DbNameSqlite:
+	case vtypes.DbmsNameSqlite:
 		// Nothing to do yet
-	case vtypes.DbNamePostgres:
+	case vtypes.DbmsNamePostgres:
 		err = s.deletePostgresDB()
 	default:
 		err = errors.New("unknown dbms: " + string(currentDbms))
@@ -75,7 +75,7 @@ func (s *DataService) MigrateTo(dbms vtypes.DbmsName) error {
 	return s.dataConfigAdapter.SetDBMSName(dbms)
 }
 
-func (s *DataService) OnEvent(e event.Event) {
+func (s *DbService) OnEvent(e event.Event) {
 	switch e := e.(type) {
 	case vtypes.EventAppReady:
 		if e.AppID != "vx-containers" {
@@ -88,20 +88,20 @@ func (s *DataService) OnEvent(e event.Event) {
 	}
 }
 
-func (s *DataService) GetUUID() uuid.UUID {
+func (s *DbService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *DataService) setup() {
+func (s *DbService) setup() {
 	log.Info("Starting Data setup")
 
 	dbms := s.dataConfigAdapter.GetDBMSName()
 
 	var err error
 	switch dbms {
-	case vtypes.DbNameSqlite:
+	case vtypes.DbmsNameSqlite:
 		// Nothing to do yet
-	case vtypes.DbNamePostgres:
+	case vtypes.DbmsNamePostgres:
 		err = s.setupPostgres()
 	default:
 		log.Error(errors.New("unknown dbms"), vlog.String("dbms", string(dbms)))

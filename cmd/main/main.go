@@ -48,14 +48,14 @@ var (
 	r   *router.Router
 	ctx *types.VertexContext
 
-	dataConfigFSAdapter port.DataConfigAdapter
+	dbConfigFSAdapter   port.DbConfigAdapter
 	settingsFSAdapter   port.SettingsAdapter
 	sshKernelApiAdapter port.SshAdapter
 	baselinesApiAdapter port.BaselinesAdapter
 
 	appsService          port.AppsService
 	debugService         port.DebugService
-	dataService          port.DataService
+	dbService            port.DbService
 	notificationsService service.NotificationsService
 	hardwareService      port.HardwareService
 	settingsService      port.SettingsService
@@ -167,7 +167,7 @@ func initRouter() {
 }
 
 func initAdapters() {
-	dataConfigFSAdapter = adapter.NewDataConfigFSAdapter(nil)
+	dbConfigFSAdapter = adapter.NewDataConfigFSAdapter(nil)
 	settingsFSAdapter = adapter.NewSettingsFSAdapter(nil)
 	sshKernelApiAdapter = adapter.NewSshKernelApiAdapter()
 	baselinesApiAdapter = adapter.NewBaselinesApiAdapter()
@@ -194,7 +194,7 @@ func initServices(about types.About) {
 	debugService = service.NewDebugService(ctx)
 	notificationsService = service.NewNotificationsService(ctx, settingsFSAdapter)
 	settingsService = service.NewSettingsService(settingsFSAdapter)
-	dataService = service.NewDataService(ctx, dataConfigFSAdapter)
+	dbService = service.NewDbService(ctx, dbConfigFSAdapter)
 	hardwareService = service.NewHardwareService()
 	sshService = service.NewSshService(sshKernelApiAdapter)
 }
@@ -264,12 +264,12 @@ func initRoutes(about types.About) {
 	// docapi:v route /settings patch_settings
 	settings.PATCH("", settingsHandler.Patch)
 
-	dataHandler := handler.NewDataHandler(dataService)
-	data := api.Group("/admin/data")
-	// docapi:v route /admin/data/dbms get_current_dbms
-	data.GET("/dbms", dataHandler.GetCurrentDbms)
-	// docapi:v route /admin/data/dbms migrate_to_dbms
-	data.POST("/dbms", dataHandler.MigrateTo)
+	dbHandler := handler.NewDatabaseHandler(dbService)
+	db := api.Group("/admin/db")
+	// docapi:v route /admin/db/dbms get_current_dbms
+	db.GET("/dbms", dbHandler.GetCurrentDbms)
+	// docapi:v route /admin/db/dbms migrate_to_dbms
+	db.POST("/dbms", dbHandler.MigrateTo)
 
 	sshHandler := handler.NewSshHandler(sshService)
 	ssh := api.Group("/security/ssh")
