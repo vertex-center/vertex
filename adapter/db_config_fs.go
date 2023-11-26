@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"os"
 	"path"
+	"time"
 
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
@@ -75,13 +76,15 @@ func (a *DbConfigFSAdapter) Get() *gorm.DB {
 }
 
 func (a *DbConfigFSAdapter) Connect() error {
+	log.Info("connecting to the database", vlog.String("dbms", string(a.config.DbmsName)))
+
 	var err error
 	switch a.config.DbmsName {
 	case types.DbmsNameSqlite:
 		p := path.Join(a.configDir, "gorm.db")
-		a.db, err = gorm.Open(sqlite.Open(p), &gorm.Config{})
+		err = a.ConnectTo(sqlite.Open(p), 1)
 	case types.DbmsNamePostgres:
-		a.db, err = gorm.Open(postgres.Open("host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable"), &gorm.Config{})
+		err = a.ConnectTo(postgres.Open("host=localhost port=5432 user=postgres password=postgres dbname=postgres sslmode=disable"), 15)
 	default:
 		err = errors.New("invalid dbms name")
 	}
@@ -93,6 +96,29 @@ func (a *DbConfigFSAdapter) Connect() error {
 	return a.db.AutoMigrate(
 		&types.AdminSettings{},
 	)
+}
+
+func (a *DbConfigFSAdapter) ConnectTo(dialector gorm.Dialector, retries int) error {
+	var err error
+	for i := 0; i < retries; i++ {
+		a.db, err = gorm.Open(dialector, &gorm.Config{})
+		if err != nil {
+			if i == retries-1 {
+				return err
+			}
+			log.Info("failed to connect to the database, retrying...",
+				vlog.String("error", err.Error()),
+				vlog.Int("retry", i+1),
+			)
+			<-time.After(1 * time.Second)
+		} else {
+			log.Info("connected to the database after some retries",
+				vlog.Int("count", i+1),
+			)
+			break
+		}
+	}
+	return nil
 }
 
 func (a *DbConfigFSAdapter) GetDbConfig() types.DbConfig {
