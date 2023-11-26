@@ -212,6 +212,7 @@ func initRoutes(about types.About) {
 	// docapi code 200 Success
 	// docapi code 201 Created
 	// docapi code 204 No content
+	// docapi code 304 Not modified
 	// docapi code 400 {Error} Bad request
 	// docapi code 404 {Error} Resource not found
 	// docapi code 409 {Error} Conflict
