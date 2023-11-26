@@ -76,11 +76,8 @@ func (s *DbService) MigrateTo(dbms vtypes.DbmsName) error {
 }
 
 func (s *DbService) OnEvent(e event.Event) {
-	switch e := e.(type) {
-	case vtypes.EventAppReady:
-		if e.AppID != "vx-containers" {
-			return
-		}
+	switch e.(type) {
+	case vtypes.EventServerStart:
 		go func() {
 			s.setup()
 			s.ctx.DispatchEvent(vtypes.EventServerSetupCompleted{})
