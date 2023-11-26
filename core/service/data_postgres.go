@@ -12,7 +12,7 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-func (s *SetupService) setupPostgres() error {
+func (s *DataService) setupPostgres() error {
 	inst, err := s.getPostgresContainer()
 	if err != nil && !errors.Is(err, ErrPostgresDatabaseNotFound) {
 		return err
@@ -37,7 +37,7 @@ func (s *SetupService) setupPostgres() error {
 	return s.startContainer(inst)
 }
 
-func (s *SetupService) getPostgresContainer() (*types.Container, error) {
+func (s *DataService) getPostgresContainer() (*types.Container, error) {
 	client := containersapi.NewContainersClient()
 
 	insts, apiError := client.GetContainers(context.Background())
@@ -71,7 +71,7 @@ func (s *SetupService) getPostgresContainer() (*types.Container, error) {
 	return nil, ErrPostgresDatabaseNotFound
 }
 
-func (s *SetupService) installPostgresDB() error {
+func (s *DataService) installPostgresDB() error {
 	log.Info("installing vertex postgres database")
 
 	sqlClient := sqlapi.NewSqlClient()

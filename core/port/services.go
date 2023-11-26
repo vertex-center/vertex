@@ -11,6 +11,11 @@ type (
 		All() []app.Meta
 	}
 
+	DataService interface {
+		GetCurrentDbms() types.DbmsName
+		MigrateTo(dbms types.DbmsName) error
+	}
+
 	DebugService interface {
 		HardReset()
 	}

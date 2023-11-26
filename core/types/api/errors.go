@@ -23,4 +23,6 @@ const (
 
 	ErrFailedToGetHost router.ErrCode = "failed_to_get_host"
 	ErrFailedToGetCPUs router.ErrCode = "failed_to_get_cpus"
+
+	ErrFailedToMigrateToNewDbms router.ErrCode = "failed_to_migrate_to_new_dbms"
 )

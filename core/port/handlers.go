@@ -8,6 +8,14 @@ type (
 		Get(c *router.Context)
 	}
 
+	DataHandler interface {
+		// GetCurrentDbms handles the retrieval of the current database management system
+		// that Vertex is using.
+		GetCurrentDbms(c *router.Context)
+		// MigrateTo handles the migration to the given database management system.
+		MigrateTo(c *router.Context)
+	}
+
 	DebugHandler interface {
 		// HardReset do a hard reset of Vertex.
 		HardReset(c *router.Context)

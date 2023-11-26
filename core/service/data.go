@@ -16,14 +16,14 @@ var (
 	ErrPostgresDatabaseNotFound = errors.New("vertex postgres database not found")
 )
 
-type SetupService struct {
+type DataService struct {
 	uuid              uuid.UUID
 	ctx               *vtypes.VertexContext
 	dataConfigAdapter port.DataConfigAdapter
 }
 
-func NewSetupService(ctx *vtypes.VertexContext, dataConfigAdapter port.DataConfigAdapter) *SetupService {
-	s := &SetupService{
+func NewDataService(ctx *vtypes.VertexContext, dataConfigAdapter port.DataConfigAdapter) *DataService {
+	s := &DataService{
 		uuid:              uuid.New(),
 		ctx:               ctx,
 		dataConfigAdapter: dataConfigAdapter,
@@ -32,7 +32,24 @@ func NewSetupService(ctx *vtypes.VertexContext, dataConfigAdapter port.DataConfi
 	return s
 }
 
-func (s *SetupService) OnEvent(e event.Event) {
+func (s *DataService) GetCurrentDbms() vtypes.DbmsName {
+	return s.dataConfigAdapter.GetDBMSName()
+}
+
+func (s *DataService) MigrateTo(dbms vtypes.DbmsName) error {
+	log.Info("Migrating data to " + string(dbms))
+
+	switch dbms {
+	case vtypes.DbNamePostgres:
+		return errors.New("postgres migration not implemented yet")
+	case vtypes.DbNameSqlite:
+		return errors.New("sqlite migration not implemented yet")
+	default:
+		return errors.New("unknown dbms: " + string(dbms))
+	}
+}
+
+func (s *DataService) OnEvent(e event.Event) {
 	switch e := e.(type) {
 	case vtypes.EventAppReady:
 		if e.AppID != "vx-containers" {
@@ -45,12 +62,12 @@ func (s *SetupService) OnEvent(e event.Event) {
 	}
 }
 
-func (s *SetupService) GetUUID() uuid.UUID {
+func (s *DataService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *SetupService) setup() {
-	log.Info("Starting vertex setup")
+func (s *DataService) setup() {
+	log.Info("Starting Data setup")
 
 	dbms := s.dataConfigAdapter.GetDBMSName()
 
@@ -69,5 +86,5 @@ func (s *SetupService) setup() {
 		os.Exit(1)
 	}
 
-	log.Info("Vertex setup completed")
+	log.Info("Data setup completed")
 }

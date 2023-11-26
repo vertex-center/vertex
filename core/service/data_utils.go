@@ -10,7 +10,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/log"
 )
 
-func (s *SetupService) startContainer(inst *types.Container) error {
+func (s *DataService) startContainer(inst *types.Container) error {
 	eventsChan := make(chan interface{})
 	defer close(eventsChan)
 

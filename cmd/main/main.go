@@ -55,6 +55,7 @@ var (
 
 	appsService          port.AppsService
 	debugService         port.DebugService
+	dataService          port.DataService
 	notificationsService service.NotificationsService
 	hardwareService      port.HardwareService
 	settingsService      port.SettingsService
@@ -193,7 +194,7 @@ func initServices(about types.About) {
 	debugService = service.NewDebugService(ctx)
 	notificationsService = service.NewNotificationsService(ctx, settingsFSAdapter)
 	settingsService = service.NewSettingsService(settingsFSAdapter)
-	service.NewSetupService(ctx, dataConfigFSAdapter)
+	dataService = service.NewDataService(ctx, dataConfigFSAdapter)
 	hardwareService = service.NewHardwareService()
 	sshService = service.NewSshService(sshKernelApiAdapter)
 }
@@ -261,6 +262,13 @@ func initRoutes(about types.About) {
 	settings.GET("", settingsHandler.Get)
 	// docapi:v route /settings patch_settings
 	settings.PATCH("", settingsHandler.Patch)
+
+	dataHandler := handler.NewDataHandler(dataService)
+	data := api.Group("/admin/data")
+	// docapi:v route /admin/data/dbms get_current_dbms
+	data.GET("/dbms", dataHandler.GetCurrentDbms)
+	// docapi:v route /admin/data/dbms migrate_to_dbms
+	data.POST("/dbms", dataHandler.MigrateTo)
 
 	sshHandler := handler.NewSshHandler(sshService)
 	ssh := api.Group("/security/ssh")
