@@ -31,6 +31,12 @@ func (s *DbService) setupPostgres() error {
 
 		log.Info("vertex postgres database installed successfully", vlog.String("uuid", inst.UUID.String()))
 	} else {
+		client := containersapi.NewContainersClient()
+		apiError := client.StartContainer(context.Background(), inst.UUID)
+		if apiError != nil {
+			return apiError.RouterError()
+		}
+
 		log.Info("found vertex postgres container", vlog.String("uuid", inst.UUID.String()))
 	}
 
