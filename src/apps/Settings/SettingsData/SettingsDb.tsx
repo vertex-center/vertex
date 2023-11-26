@@ -15,7 +15,7 @@ import {
     Vertical,
 } from "@vertex-center/components";
 import { SiPostgresql, SiSqlite } from "@icons-pack/react-simple-icons";
-import styles from "./SettingsData.module.sass";
+import styles from "./SettingsDb.module.sass";
 import Popup from "../../../components/Popup/Popup";
 import { Fragment, useState } from "react";
 import { useDBMS } from "../hooks/useDBMS";
@@ -36,7 +36,7 @@ type DatabaseProps = {
     hideActions?: boolean;
 };
 
-function Database(props: Readonly<DatabaseProps>) {
+function Db(props: Readonly<DatabaseProps>) {
     const {
         name,
         icon,
@@ -79,7 +79,7 @@ function Database(props: Readonly<DatabaseProps>) {
     );
 }
 
-export default function SettingsData() {
+export default function SettingsDb() {
     const queryClient = useQueryClient();
 
     const [showPopup, setShowPopup] = useState(false);
@@ -92,7 +92,7 @@ export default function SettingsData() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ["admin_data_dbms"],
+                queryKey: ["admin_db_dbms"],
             });
         },
     });
@@ -121,7 +121,7 @@ export default function SettingsData() {
 
     return (
         <Content>
-            <Title variant="h2">Data</Title>
+            <Title variant="h2">Database</Title>
             <Paragraph>
                 You can choose between <b>SQLite</b> and <b>Postgres</b> to
                 store your Vertex data. You don't need to worry about installing
@@ -131,7 +131,7 @@ export default function SettingsData() {
             <ProgressOverlay show={isLoadingDbms} />
             <APIError error={errorDbms || errorMigrate} />
             <List>
-                <Database
+                <Db
                     name="sqlite"
                     icon={<SiSqlite />}
                     title="SQLite"
@@ -140,7 +140,7 @@ export default function SettingsData() {
                     onMigrate={askMigrate}
                     hideActions={isMigrating || isLoadingDbms}
                 />
-                <Database
+                <Db
                     name="postgres"
                     icon={<SiPostgresql />}
                     title="Postgres"

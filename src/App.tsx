@@ -35,7 +35,7 @@ import SqlDatabase from "./apps/Sql/SqlDatabase/SqlDatabase";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import ServiceEditor from "./apps/DevToolsServiceEditor/ServiceEditor/ServiceEditor";
-import SettingsData from "./apps/Settings/SettingsData/SettingsData";
+import SettingsDb from "./apps/Settings/SettingsData/SettingsDb";
 
 const queryClient = new QueryClient();
 
@@ -166,8 +166,8 @@ function App() {
                                         element={<SettingsHardware />}
                                     />
                                     <Route
-                                        path="/settings/data"
-                                        element={<SettingsData />}
+                                        path="/settings/database"
+                                        element={<SettingsDb />}
                                     />
                                     <Route
                                         path="/settings/security"

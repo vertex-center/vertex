@@ -5,7 +5,7 @@ export const useDBMSMutation = (
     options: UseMutationOptions<unknown, unknown, string>
 ) => {
     const mutation = useMutation({
-        mutationKey: ["admin_data_dbms"],
+        mutationKey: ["admin_db_dbms"],
         mutationFn: api.admin.data.dbms.migrate,
         ...options,
     });

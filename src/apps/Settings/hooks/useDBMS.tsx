@@ -3,7 +3,7 @@ import { api } from "../../../backend/api/backend";
 
 export const useDBMS = () => {
     const query = useQuery({
-        queryKey: ["admin_data_dbms"],
+        queryKey: ["admin_db_dbms"],
         queryFn: api.admin.data.dbms.get,
     });
     const { data: dbms, isLoading: isLoadingDbms, error: errorDbms } = query;
