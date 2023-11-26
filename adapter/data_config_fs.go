@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
@@ -29,7 +30,7 @@ type DataConfigFSAdapterParams struct {
 	configDir string
 }
 
-func NewDataConfigFSAdapter(params *DataConfigFSAdapterParams) *DataConfigFSAdapter {
+func NewDataConfigFSAdapter(params *DataConfigFSAdapterParams) port.DataConfigAdapter {
 	if params == nil {
 		params = &DataConfigFSAdapterParams{}
 	}
@@ -75,7 +76,7 @@ func (a *DataConfigFSAdapter) SetDBMSName(name types.DbmsName) error {
 }
 
 func (a *DataConfigFSAdapter) read() error {
-	p := path.Join(a.configDir, "data.yml")
+	p := path.Join(a.configDir, "data_config.yml")
 	file, err := os.ReadFile(p)
 
 	if errors.Is(err, fs.ErrNotExist) {
@@ -92,7 +93,7 @@ func (a *DataConfigFSAdapter) read() error {
 }
 
 func (a *DataConfigFSAdapter) write() error {
-	p := path.Join(a.configDir, "data.yml")
+	p := path.Join(a.configDir, "data_config.yml")
 
 	data, err := yaml.Marshal(&a.config)
 	if err != nil {

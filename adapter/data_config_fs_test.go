@@ -1,18 +1,18 @@
 package adapter
 
 import (
-	"encoding/json"
 	"os"
 	"path"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
+	"gopkg.in/yaml.v3"
 )
 
 type DataConfigFSAdapterTestSuite struct {
 	suite.Suite
 
-	adapter *SettingsFSAdapter
+	adapter *DataConfigFSAdapter
 }
 
 func TestDataConfigFSAdapterTestSuite(t *testing.T) {
@@ -20,16 +20,16 @@ func TestDataConfigFSAdapterTestSuite(t *testing.T) {
 }
 
 func (suite *DataConfigFSAdapterTestSuite) SetupTest() {
-	suite.adapter = NewSettingsFSAdapter(&SettingsFSAdapterParams{
-		settingsDir: suite.T().TempDir(),
-	}).(*SettingsFSAdapter)
+	suite.adapter = NewDataConfigFSAdapter(&DataConfigFSAdapterParams{
+		configDir: suite.T().TempDir(),
+	}).(*DataConfigFSAdapter)
 }
 
 func (suite *DataConfigFSAdapterTestSuite) TestReadDataConfig() {
-	data, err := json.Marshal(suite.adapter.settings)
+	data, err := yaml.Marshal(suite.adapter.config)
 	suite.Require().NoError(err)
 
-	p := path.Join(suite.adapter.settingsDir, "data_config.yml")
+	p := path.Join(suite.adapter.configDir, "data_config.yml")
 	err = os.WriteFile(p, data, 0644)
 	suite.Require().NoError(err)
 
