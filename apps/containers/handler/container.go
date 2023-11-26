@@ -216,7 +216,6 @@ func (h *ContainerHandler) Patch(c *router.Context) {
 	}
 
 	if body.Databases != nil {
-
 		databases := map[string]uuid.UUID{}
 		options := map[string]*types.SetDatabasesOptions{}
 
