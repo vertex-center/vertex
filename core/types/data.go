@@ -9,5 +9,5 @@ const (
 
 type DataConfig struct {
 	// DbmsName is the database management system name that Vertex will use.
-	DbmsName DbmsName `json:"dbms_name"`
+	DbmsName DbmsName `json:"dbms_name" yaml:"dbms_name"`
 }
