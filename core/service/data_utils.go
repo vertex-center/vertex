@@ -11,7 +11,7 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-func (s *DataService) startContainer(inst *types.Container) error {
+func (s *DataService) waitContainer(inst *types.Container, status string) error {
 	eventsChan := make(chan interface{})
 	defer close(eventsChan)
 
@@ -43,22 +43,17 @@ func (s *DataService) startContainer(inst *types.Container) error {
 
 	errFailedToStart := errors.New("failed to start container")
 
-	prevStatus := types.ContainerStatusOff
-
 	for {
 		select {
 		case e := <-eventsChan:
 			switch e := e.(type) {
 			case types.EventContainerStatusChange:
 				log.Info("container status changed", vlog.String("uuid", e.ContainerUUID.String()), vlog.String("status", e.Status))
-				if e.Status == types.ContainerStatusOff && (prevStatus == types.ContainerStatusBuilding || prevStatus == types.ContainerStatusStarting) {
+				if e.Status == types.ContainerStatusError {
 					return errFailedToStart
-				} else if e.Status == types.ContainerStatusError {
-					return errFailedToStart
-				} else if e.Status == types.ContainerStatusRunning {
+				} else if e.Status == status {
 					return nil
 				}
-				prevStatus = e.Status
 			}
 		case <-abortChan:
 			return errFailedToStart

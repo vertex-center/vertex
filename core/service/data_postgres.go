@@ -34,7 +34,7 @@ func (s *DataService) setupPostgres() error {
 		log.Info("found vertex postgres container", vlog.String("uuid", inst.UUID.String()))
 	}
 
-	return s.startContainer(inst)
+	return s.waitContainer(inst, types.ContainerStatusRunning)
 }
 
 func (s *DataService) getPostgresContainer() (*types.Container, error) {
