@@ -48,17 +48,17 @@ var (
 	r   *router.Router
 	ctx *types.VertexContext
 
-	dbConfigFSAdapter   port.DbConfigAdapter
-	settingsFSAdapter   port.SettingsAdapter
-	sshKernelApiAdapter port.SshAdapter
-	baselinesApiAdapter port.BaselinesAdapter
+	dbConfigFSAdapter      port.DbConfigAdapter
+	adminSettingsDbAdapter port.AdminSettingsAdapter
+	sshKernelApiAdapter    port.SshAdapter
+	baselinesApiAdapter    port.BaselinesAdapter
 
 	appsService          port.AppsService
 	debugService         port.DebugService
 	dbService            port.DbService
 	notificationsService service.NotificationsService
 	hardwareService      port.HardwareService
-	settingsService      port.SettingsService
+	adminSettingsService port.AdminSettingsService
 	sshService           port.SshService
 	updateService        port.UpdateService
 )
@@ -161,7 +161,7 @@ func initRouter() {
 
 func initAdapters() {
 	dbConfigFSAdapter = adapter.NewDataConfigFSAdapter(nil)
-	settingsFSAdapter = adapter.NewSettingsFSAdapter(nil)
+	adminSettingsDbAdapter = adapter.NewAdminSettingsDbAdapter(dbConfigFSAdapter)
 	sshKernelApiAdapter = adapter.NewSshKernelApiAdapter()
 	baselinesApiAdapter = adapter.NewBaselinesApiAdapter()
 }
@@ -185,8 +185,8 @@ func initServices(about types.About) {
 		},
 	)
 	debugService = service.NewDebugService(ctx)
-	notificationsService = service.NewNotificationsService(ctx, settingsFSAdapter)
-	settingsService = service.NewSettingsService(settingsFSAdapter)
+	notificationsService = service.NewNotificationsService(ctx, adminSettingsDbAdapter)
+	adminSettingsService = service.NewAdminSettingsService(adminSettingsDbAdapter)
 	dbService = service.NewDbService(ctx, dbConfigFSAdapter)
 	hardwareService = service.NewHardwareService()
 	sshService = service.NewSshService(sshKernelApiAdapter)
@@ -243,18 +243,18 @@ func initRoutes(about types.About) {
 	// docapi:v route /hardware/cpus get_cpus
 	hardware.GET("/cpus", hardwareHandler.GetCPUs)
 
-	updateHandler := handler.NewUpdateHandler(updateService, settingsService)
-	update := api.Group("/update")
-	// docapi:v route /update get_updates
+	updateHandler := handler.NewUpdateHandler(updateService, adminSettingsService)
+	update := api.Group("/admin/update")
+	// docapi:v route /admin/update get_updates
 	update.GET("", updateHandler.Get)
-	// docapi:v route /update install_update
+	// docapi:v route /admin/update install_update
 	update.POST("", updateHandler.Install)
 
-	settingsHandler := handler.NewSettingsHandler(settingsService)
-	settings := api.Group("/settings")
-	// docapi:v route /settings get_settings
+	settingsHandler := handler.NewSettingsHandler(adminSettingsService)
+	settings := api.Group("/admin/settings")
+	// docapi:v route /admin/settings get_settings
 	settings.GET("", settingsHandler.Get)
-	// docapi:v route /settings patch_settings
+	// docapi:v route /admin/settings patch_settings
 	settings.PATCH("", settingsHandler.Patch)
 
 	dbHandler := handler.NewDatabaseHandler(dbService)

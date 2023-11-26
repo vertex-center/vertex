@@ -35,7 +35,7 @@ func NewUpdateService(ctx *types.VertexContext, adapter port.BaselinesAdapter, u
 	return s
 }
 
-func (s *UpdateService) GetUpdate(channel types.SettingsUpdatesChannel) (*types.Update, error) {
+func (s *UpdateService) GetUpdate(channel types.UpdatesChannel) (*types.Update, error) {
 	available := false
 	update := types.Update{}
 
@@ -76,7 +76,7 @@ func (s *UpdateService) GetUpdate(channel types.SettingsUpdatesChannel) (*types.
 	return &update, nil
 }
 
-func (s *UpdateService) InstallLatest(channel types.SettingsUpdatesChannel) error {
+func (s *UpdateService) InstallLatest(channel types.UpdatesChannel) error {
 	if !s.updating.CompareAndSwap(false, true) {
 		return types.ErrAlreadyUpdating
 	}
@@ -118,7 +118,7 @@ func (s *UpdateService) firstSetup() error {
 
 	log.Info("installing missing dependencies", vlog.Any("count", len(missingDeps)))
 
-	latest, err := s.adapter.GetLatest(context.Background(), types.SettingsUpdatesChannelStable)
+	latest, err := s.adapter.GetLatest(context.Background(), types.UpdatesChannelStable)
 	if err != nil {
 		return err
 	}

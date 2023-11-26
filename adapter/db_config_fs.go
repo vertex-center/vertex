@@ -12,6 +12,9 @@ import (
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"
 	"gopkg.in/yaml.v3"
+	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 var (
@@ -24,6 +27,7 @@ var (
 type DbConfigFSAdapter struct {
 	configDir string
 	config    types.DbConfig
+	db        *gorm.DB
 }
 
 type DbConfigFSAdapterParams struct {
@@ -62,6 +66,35 @@ func NewDataConfigFSAdapter(params *DbConfigFSAdapterParams) port.DbConfigAdapte
 	return adapter
 }
 
+func (a *DbConfigFSAdapter) Get() *gorm.DB {
+	if a.db == nil {
+		log.Error(errors.New("database should be connected first"))
+		os.Exit(1)
+	}
+	return a.db
+}
+
+func (a *DbConfigFSAdapter) Connect() error {
+	var err error
+	switch a.config.DbmsName {
+	case types.DbmsNameSqlite:
+		p := path.Join(a.configDir, "gorm.db")
+		a.db, err = gorm.Open(sqlite.Open(p), &gorm.Config{})
+	case types.DbmsNamePostgres:
+		a.db, err = gorm.Open(postgres.Open("host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable"), &gorm.Config{})
+	default:
+		err = errors.New("invalid dbms name")
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return a.db.AutoMigrate(
+		&types.AdminSettings{},
+	)
+}
+
 func (a *DbConfigFSAdapter) GetDbConfig() types.DbConfig {
 	return a.config
 }
@@ -70,6 +103,8 @@ func (a *DbConfigFSAdapter) GetDBMSName() types.DbmsName {
 	return a.config.DbmsName
 }
 
+// SetDBMSName sets the database management system name.
+// The user must also Connect to the database afterwords.
 func (a *DbConfigFSAdapter) SetDBMSName(name types.DbmsName) error {
 	a.config.DbmsName = name
 	return a.write()

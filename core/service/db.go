@@ -72,7 +72,12 @@ func (s *DbService) MigrateTo(dbms vtypes.DbmsName) error {
 		return err
 	}
 
-	return s.dataConfigAdapter.SetDBMSName(dbms)
+	err = s.dataConfigAdapter.SetDBMSName(dbms)
+	if err != nil {
+		return err
+	}
+
+	return s.dataConfigAdapter.Connect()
 }
 
 func (s *DbService) OnEvent(e event.Event) {
@@ -90,9 +95,9 @@ func (s *DbService) GetUUID() uuid.UUID {
 }
 
 func (s *DbService) setup() {
-	log.Info("Starting Data setup")
-
 	dbms := s.dataConfigAdapter.GetDBMSName()
+
+	log.Info("database setup started", vlog.String("dbms", string(dbms)))
 
 	var err error
 	switch dbms {
@@ -109,5 +114,11 @@ func (s *DbService) setup() {
 		os.Exit(1)
 	}
 
-	log.Info("Data setup completed")
+	err = s.dataConfigAdapter.Connect()
+	if err != nil {
+		log.Error(err)
+		os.Exit(1)
+	}
+
+	log.Info("database setup completed")
 }

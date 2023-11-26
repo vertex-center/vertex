@@ -13,7 +13,7 @@ type (
 		mock.Mock
 	}
 
-	MockSettingsAdapter struct {
+	MockAdminSettingsAdapter struct {
 		mock.Mock
 	}
 
@@ -26,33 +26,18 @@ type (
 	}
 )
 
-func (m *MockBaselinesAdapter) GetLatest(ctx context.Context, channel types.SettingsUpdatesChannel) (types.Baseline, error) {
+func (m *MockBaselinesAdapter) GetLatest(ctx context.Context, channel types.UpdatesChannel) (types.Baseline, error) {
 	args := m.Called(ctx, channel)
 	return args.Get(0).(types.Baseline), args.Error(1)
 }
 
-func (m *MockSettingsAdapter) GetSettings() types.Settings {
+func (m *MockAdminSettingsAdapter) Get() (types.AdminSettings, error) {
 	args := m.Called()
-	return args.Get(0).(types.Settings)
+	return args.Get(0).(types.AdminSettings), args.Error(1)
 }
 
-func (m *MockSettingsAdapter) GetNotificationsWebhook() *string {
-	args := m.Called()
-	return args.Get(0).(*string)
-}
-
-func (m *MockSettingsAdapter) SetNotificationsWebhook(webhook string) error {
-	args := m.Called(webhook)
-	return args.Error(0)
-}
-
-func (m *MockSettingsAdapter) GetChannel() *types.SettingsUpdatesChannel {
-	args := m.Called()
-	return args.Get(0).(*types.SettingsUpdatesChannel)
-}
-
-func (m *MockSettingsAdapter) SetChannel(channel types.SettingsUpdatesChannel) error {
-	args := m.Called(channel)
+func (m *MockAdminSettingsAdapter) Update(settings types.AdminSettings) error {
+	args := m.Called(settings)
 	return args.Error(0)
 }
 
