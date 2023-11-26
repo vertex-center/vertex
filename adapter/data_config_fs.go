@@ -15,9 +15,9 @@ import (
 )
 
 var (
-	errDataConfigNotFound       = errors.New("data_config.yml doesn't exists or could not be found")
-	errDataConfigFailedToRead   = errors.New("failed to read data_config.yml")
-	errDataConfigFailedToDecode = errors.New("failed to decode data_config.yml")
+	errDataConfigNotFound       = errors.New("config.yml doesn't exists or could not be found")
+	errDataConfigFailedToRead   = errors.New("failed to read config.yml")
+	errDataConfigFailedToDecode = errors.New("failed to decode config.yml")
 )
 
 // DataConfigFSAdapter is an adapter to configure how Vertex will store data.
@@ -76,7 +76,7 @@ func (a *DataConfigFSAdapter) SetDBMSName(name types.DbmsName) error {
 }
 
 func (a *DataConfigFSAdapter) read() error {
-	p := path.Join(a.configDir, "data_config.yml")
+	p := path.Join(a.configDir, "config.yml")
 	file, err := os.ReadFile(p)
 
 	if errors.Is(err, fs.ErrNotExist) {
@@ -93,7 +93,7 @@ func (a *DataConfigFSAdapter) read() error {
 }
 
 func (a *DataConfigFSAdapter) write() error {
-	p := path.Join(a.configDir, "data_config.yml")
+	p := path.Join(a.configDir, "config.yml")
 
 	data, err := yaml.Marshal(&a.config)
 	if err != nil {

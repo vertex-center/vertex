@@ -29,7 +29,7 @@ func (suite *DataConfigFSAdapterTestSuite) TestReadDataConfig() {
 	data, err := yaml.Marshal(suite.adapter.config)
 	suite.Require().NoError(err)
 
-	p := path.Join(suite.adapter.configDir, "data_config.yml")
+	p := path.Join(suite.adapter.configDir, "config.yml")
 	err = os.WriteFile(p, data, 0644)
 	suite.Require().NoError(err)
 
