@@ -58,6 +58,20 @@ func (s *DataService) MigrateTo(dbms vtypes.DbmsName) error {
 	if err != nil {
 		return err
 	}
+
+	switch currentDbms {
+	case vtypes.DbNameSqlite:
+		// Nothing to do yet
+	case vtypes.DbNamePostgres:
+		err = s.deletePostgresDB()
+	default:
+		err = errors.New("unknown dbms: " + string(currentDbms))
+	}
+
+	if err != nil {
+		return err
+	}
+
 	return s.dataConfigAdapter.SetDBMSName(dbms)
 }
 

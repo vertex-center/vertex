@@ -37,6 +37,27 @@ func (s *DataService) setupPostgres() error {
 	return nil
 }
 
+func (s *DataService) deletePostgresDB() error {
+	inst, err := s.getPostgresContainer()
+	if err != nil {
+		return err
+	}
+
+	client := containersapi.NewContainersClient()
+
+	apiError := client.StopContainer(context.Background(), inst.UUID)
+	if apiError != nil {
+		return apiError.RouterError()
+	}
+
+	apiError = client.DeleteContainer(context.Background(), inst.UUID)
+	if apiError != nil {
+		return apiError.RouterError()
+	}
+
+	return nil
+}
+
 func (s *DataService) getPostgresContainer() (*types.Container, error) {
 	client := containersapi.NewContainersClient()
 
