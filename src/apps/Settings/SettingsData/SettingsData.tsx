@@ -87,7 +87,7 @@ export default function SettingsData() {
 
     const { dbms, isLoadingDbms, errorDbms } = useDBMS();
     const { migrate, isMigrating, errorMigrate } = useDBMSMutation({
-        onSettled: () => {
+        onMutate: () => {
             setShowPopup(false);
         },
         onSuccess: () => {
