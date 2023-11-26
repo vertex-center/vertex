@@ -54,6 +54,11 @@ func (s *NotificationsService) GetUUID() uuid.UUID {
 
 func (s *NotificationsService) OnEvent(e event.Event) {
 	switch e := e.(type) {
+	case types.EventServerSetupCompleted:
+		err := s.StartWebhook()
+		if err != nil {
+			log.Warn("failed to start webhook", vlog.String("error", err.Error()))
+		}
 	case containerstypes.EventContainerStatusChange:
 		if e.Status == containerstypes.ContainerStatusOff || e.Status == containerstypes.ContainerStatusError || e.Status == containerstypes.ContainerStatusRunning {
 			s.sendStatus(e.Name, e.Status)

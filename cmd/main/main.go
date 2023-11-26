@@ -95,11 +95,6 @@ func main() {
 
 	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
 
-	err = notificationsService.StartWebhook()
-	if err != nil {
-		log.Error(err)
-	}
-
 	startRouter()
 }
 
