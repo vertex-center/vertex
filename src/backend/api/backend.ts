@@ -83,13 +83,11 @@ export const api = {
         data: {
             dbms: {
                 get: async () => {
-                    const { data } = await server.get<string>(
-                        "/admin/data/dbms"
-                    );
+                    const { data } = await server.get<string>("/admin/db/dbms");
                     return data;
                 },
                 migrate: async (dbms: string) => {
-                    const { data } = await server.post("/admin/data/dbms", {
+                    const { data } = await server.post("/admin/db/dbms", {
                         dbms,
                     });
                     return data;
