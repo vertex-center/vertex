@@ -13,12 +13,13 @@ func (s *ContainerService) GetUUID() uuid.UUID {
 func (s *ContainerService) OnEvent(e event.Event) {
 	switch e.(type) {
 	case types.EventServerStart:
+		s.LoadAll()
+		s.ctx.DispatchEvent(types.EventAppReady{
+			AppID: "vx-containers",
+		})
+	case types.EventServerSetupCompleted:
 		go func() {
-			s.LoadAll()
 			s.StartAll()
-			s.ctx.DispatchEvent(types.EventAppReady{
-				AppID: "vx-containers",
-			})
 		}()
 	case types.EventServerStop:
 		s.StopAll()

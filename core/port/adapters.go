@@ -22,6 +22,12 @@ type (
 		SetChannel(channel types.SettingsUpdatesChannel) error
 	}
 
+	DataConfigAdapter interface {
+		GetDataConfig() types.DataConfig
+		GetDBMSName() types.DbmsName
+		SetDBMSName(name types.DbmsName) error
+	}
+
 	SshAdapter interface {
 		GetAll() ([]types.PublicKey, error)
 		Add(key string, username string) error

@@ -48,6 +48,7 @@ var (
 	r   *router.Router
 	ctx *types.VertexContext
 
+	dataConfigFSAdapter port.DataConfigAdapter
 	settingsFSAdapter   port.SettingsAdapter
 	sshKernelApiAdapter port.SshAdapter
 	baselinesApiAdapter port.BaselinesAdapter
@@ -165,6 +166,7 @@ func initRouter() {
 }
 
 func initAdapters() {
+	dataConfigFSAdapter = adapter.NewDataConfigFSAdapter(nil)
 	settingsFSAdapter = adapter.NewSettingsFSAdapter(nil)
 	sshKernelApiAdapter = adapter.NewSshKernelApiAdapter()
 	baselinesApiAdapter = adapter.NewBaselinesApiAdapter()
@@ -191,7 +193,7 @@ func initServices(about types.About) {
 	debugService = service.NewDebugService(ctx)
 	notificationsService = service.NewNotificationsService(ctx, settingsFSAdapter)
 	settingsService = service.NewSettingsService(settingsFSAdapter)
-	//services.NewSetupService(r.ctx)
+	service.NewSetupService(ctx, dataConfigFSAdapter)
 	hardwareService = service.NewHardwareService()
 	sshService = service.NewSshService(sshKernelApiAdapter)
 }
