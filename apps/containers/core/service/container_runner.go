@@ -8,12 +8,12 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/apps/containers/adapter"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
-
-	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/apps/containers/adapter"
+	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"
@@ -243,8 +243,30 @@ func (s *ContainerRunnerService) RecreateContainer(inst *types.Container) error 
 	return nil
 }
 
-func (s *ContainerRunnerService) WaitCondition(inst *types.Container, cond types.WaitContainerCondition) error {
-	return s.adapter.WaitCondition(inst, cond)
+func (s *ContainerRunnerService) WaitStatus(inst *types.Container, status string) error {
+	statusChan := make(chan string)
+	defer close(statusChan)
+
+	l := event.NewTempListener(func(e event.Event) {
+		switch e := e.(type) {
+		case types.EventContainerStatusChange:
+			if e.ContainerUUID != inst.UUID {
+				return
+			}
+			statusChan <- e.Status
+		}
+	})
+
+	s.ctx.AddListener(l)
+	defer s.ctx.RemoveListener(l)
+
+	for e := range statusChan {
+		if e == status {
+			return nil
+		}
+	}
+
+	return errors.New("wait status timeout")
 }
 
 func (s *ContainerRunnerService) setStatus(inst *types.Container, status string) {

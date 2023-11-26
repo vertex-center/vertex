@@ -109,8 +109,8 @@ func (a *App) Initialize(r *router.Group) error {
 	container.POST("/update/service", containerHandler.UpdateService)
 	// docapi:v route /app/vx-containers/container/{container_uuid}/versions vx_containers_get_versions
 	container.GET("/versions", containerHandler.GetVersions)
-	// docapi:v route /app/vx-containers/container/{container_uuid}/wait vx_containers_wait
-	container.GET("/wait", containerHandler.Wait)
+	// docapi:v route /app/vx-containers/container/{container_uuid}/wait vx_containers_wait_status
+	container.GET("/wait", containerHandler.WaitStatus)
 
 	containersHandler := handler.NewContainersHandler(a.ctx, containerService)
 	containers := r.Group("/containers")
