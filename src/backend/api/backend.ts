@@ -79,6 +79,25 @@ export const api = {
     vxReverseProxy: vxReverseProxyRoutes,
     vxServiceEditor: vxServiceEditorRoutes,
 
+    admin: {
+        data: {
+            dbms: {
+                get: async () => {
+                    const { data } = await server.get<string>(
+                        "/admin/data/dbms"
+                    );
+                    return data;
+                },
+                migrate: async (dbms: string) => {
+                    const { data } = await server.post("/admin/data/dbms", {
+                        dbms,
+                    });
+                    return data;
+                },
+            },
+        },
+    },
+
     apps: {
         all: async () => {
             const { data } = await server.get<VertexApp[]>("/apps");

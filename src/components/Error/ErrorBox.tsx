@@ -1,6 +1,6 @@
 import { Box, BoxProps, Paragraph } from "@vertex-center/components";
 
-type Props = BoxProps & {
+type Props = Omit<BoxProps, "type"> & {
     error?: any;
 };
 
