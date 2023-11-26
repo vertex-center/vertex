@@ -13,6 +13,7 @@ import (
 )
 
 var (
+	ErrDbmsAlreadySet           = errors.New("dbms already set")
 	ErrPostgresDatabaseNotFound = errors.New("vertex postgres database not found")
 )
 
@@ -39,14 +40,25 @@ func (s *DataService) GetCurrentDbms() vtypes.DbmsName {
 func (s *DataService) MigrateTo(dbms vtypes.DbmsName) error {
 	log.Info("Migrating data to " + string(dbms))
 
+	currentDbms := s.dataConfigAdapter.GetDBMSName()
+	if currentDbms == dbms {
+		return ErrDbmsAlreadySet
+	}
+
+	var err error
 	switch dbms {
 	case vtypes.DbNamePostgres:
-		return errors.New("postgres migration not implemented yet")
+		//err = errors.New("postgres migration not implemented yet")
 	case vtypes.DbNameSqlite:
-		return errors.New("sqlite migration not implemented yet")
+		//err = errors.New("sqlite migration not implemented yet")
 	default:
-		return errors.New("unknown dbms: " + string(dbms))
+		err = errors.New("unknown dbms: " + string(dbms))
 	}
+
+	if err != nil {
+		return err
+	}
+	return s.dataConfigAdapter.SetDBMSName(dbms)
 }
 
 func (s *DataService) OnEvent(e event.Event) {

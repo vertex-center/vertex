@@ -1,7 +1,10 @@
 package handler
 
 import (
+	"errors"
+
 	"github.com/vertex-center/vertex/core/port"
+	"github.com/vertex-center/vertex/core/service"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -36,6 +39,7 @@ func (h *DataHandler) GetCurrentDbms(c *router.Context) {
 // docapi tags Admin/Data
 // docapi body {MigrateToBody} The DBMS to migrate to.
 // docapi response 204
+// docapi response 304
 // docapi response 400
 // docapi response 500
 // docapi end
@@ -52,6 +56,10 @@ func (h *DataHandler) MigrateTo(c *router.Context) {
 	}
 
 	err = h.dataService.MigrateTo(types.DbmsName(body.Dbms))
+	if err != nil && errors.Is(err, service.ErrDbmsAlreadySet) {
+		c.NotModified()
+		return
+	}
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToMigrateToNewDbms,
