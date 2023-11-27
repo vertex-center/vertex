@@ -56,7 +56,6 @@ var (
 	appsService          port.AppsService
 	debugService         port.DebugService
 	dbService            port.DbService
-	notificationsService service.NotificationsService
 	hardwareService      port.HardwareService
 	adminSettingsService port.AdminSettingsService
 	sshService           port.SshService
@@ -185,7 +184,7 @@ func initServices(about types.About) {
 		},
 	)
 	debugService = service.NewDebugService(ctx)
-	notificationsService = service.NewNotificationsService(ctx, adminSettingsDbAdapter)
+	service.NewNotificationsService(ctx, adminSettingsDbAdapter)
 	adminSettingsService = service.NewAdminSettingsService(adminSettingsDbAdapter)
 	dbService = service.NewDbService(ctx, dbConfigFSAdapter)
 	hardwareService = service.NewHardwareService()
