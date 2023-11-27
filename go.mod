@@ -3,7 +3,6 @@ module github.com/vertex-center/vertex
 go 1.21
 
 require (
-	github.com/antelman107/net-wait-go v0.0.0-20220211074630-12d8a944b87d
 	github.com/carlmjohnson/requests v0.23.5
 	github.com/disgoorg/disgo v0.17.0
 	github.com/docker/docker v24.0.7+incompatible
