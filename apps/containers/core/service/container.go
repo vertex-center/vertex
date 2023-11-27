@@ -1,8 +1,10 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"sync"
+	"time"
 
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
@@ -198,7 +200,9 @@ func (s *ContainerService) StartAll() {
 	log.Info("trying to ping Google...")
 
 	// Wait for internet connection
-	err := net.WaitInternetConn()
+	timeout, cancelTimeout := context.WithTimeout(context.Background(), 60*time.Second)
+	err := net.WaitInternetConn(timeout)
+	cancelTimeout()
 	if err != nil {
 		log.Error(err)
 		return

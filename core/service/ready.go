@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"time"
 
 	"github.com/vertex-center/vertex/config"
@@ -25,8 +26,8 @@ func NewReadyService() port.ReadyService {
 // It returns a channel of ReadyResponse, which contains
 // the result of each check. The channel is closed when all
 // checks are done.
-func (s *ReadyService) Wait() <-chan types.ReadyResponse {
-	checks := []func() types.ReadyResponse{
+func (s *ReadyService) Wait(ctx context.Context) <-chan types.ReadyResponse {
+	checks := []func(ctx context.Context) types.ReadyResponse{
 		s.waitInternet,
 		s.waitVertex,
 		s.waitKernel,
@@ -38,7 +39,7 @@ func (s *ReadyService) Wait() <-chan types.ReadyResponse {
 	for _, check := range checks {
 		check := check
 		go func() {
-			res := check()
+			res := check(ctx)
 			resChan <- res
 			if res.Error != nil {
 				log.Error(res.Error)
@@ -55,32 +56,32 @@ func (s *ReadyService) Wait() <-chan types.ReadyResponse {
 	return resChan
 }
 
-func (s *ReadyService) waitInternet() types.ReadyResponse {
+func (s *ReadyService) waitInternet(ctx context.Context) types.ReadyResponse {
 	res := types.ReadyResponse{
 		ID:   "internet",
 		Name: "Internet connection",
 	}
-	err := net.WaitInternetConn()
+	err := net.WaitInternetConn(ctx)
 	if err != nil {
 		res.Error = err
 	}
 	return res
 }
 
-func (s *ReadyService) waitVertex() types.ReadyResponse {
-	return s.waitURL("api_vertex", "Vertex API", config.Current.VertexURL())
+func (s *ReadyService) waitVertex(ctx context.Context) types.ReadyResponse {
+	return s.waitURL(ctx, "api_vertex", "Vertex API", config.Current.VertexURL())
 }
 
-func (s *ReadyService) waitKernel() types.ReadyResponse {
-	return s.waitURL("api_kernel", "Vertex Kernel API", config.Current.KernelURL())
+func (s *ReadyService) waitKernel(ctx context.Context) types.ReadyResponse {
+	return s.waitURL(ctx, "api_kernel", "Vertex Kernel API", config.Current.KernelURL())
 }
 
-func (s *ReadyService) waitURL(id, name, url string) types.ReadyResponse {
+func (s *ReadyService) waitURL(ctx context.Context, id, name, url string) types.ReadyResponse {
 	res := types.ReadyResponse{
 		ID:   id,
 		Name: name,
 	}
-	err := net.Wait(url)
+	err := net.Wait(ctx, url)
 	if err != nil {
 		res.Error = err
 	}

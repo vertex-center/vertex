@@ -1,6 +1,8 @@
 package port
 
 import (
+	"context"
+
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/user"
@@ -35,7 +37,7 @@ type (
 	}
 
 	ReadyService interface {
-		Wait() <-chan types.ReadyResponse
+		Wait(ctx context.Context) <-chan types.ReadyResponse
 	}
 
 	SshService interface {

@@ -30,7 +30,6 @@ import (
 	"github.com/vertex-center/vertex/handler"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/pkg/net"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/updates"
@@ -86,12 +85,6 @@ func main() {
 	initServices(about)
 	initRoutes(about)
 	handleSignals()
-
-	err := net.WaitInternetConn()
-	if err != nil {
-		log.Error(err)
-		os.Exit(1)
-	}
 
 	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
 
@@ -296,12 +289,15 @@ func startRouter() {
 		stopChan <- struct{}{}
 	}()
 
-	resCh := readyService.Wait()
+	timeout, cancelTimeout := context.WithTimeout(context.Background(), 60*time.Second)
+	resCh := readyService.Wait(timeout)
 	for res := range resCh {
 		if res.Error != nil {
 			log.Error(res.Error)
+			os.Exit(1)
 		}
 	}
+	cancelTimeout()
 
 	ctx.DispatchEvent(types.EventServerStart{})
 

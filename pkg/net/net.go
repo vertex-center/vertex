@@ -1,6 +1,7 @@
 package net
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -20,9 +21,9 @@ func LocalIP() (string, error) {
 	return localAddr.IP.String(), nil
 }
 
-func Wait(url string) error {
+func Wait(ctx context.Context, url string) error {
 	ch := make(chan bool)
-	timeout := time.After(10 * time.Second)
+	done := ctx.Done()
 
 	go func() {
 		for {
@@ -39,11 +40,11 @@ func Wait(url string) error {
 	case <-ch:
 		log.Info("successfully pinged", vlog.String("url", url))
 		return nil
-	case <-timeout:
+	case <-done:
 		return fmt.Errorf("internet connection: Failed to ping %s", url)
 	}
 }
 
-func WaitInternetConn() error {
-	return Wait("https://www.google.com/robots.txt")
+func WaitInternetConn(ctx context.Context) error {
+	return Wait(ctx, "https://www.google.com/robots.txt")
 }
