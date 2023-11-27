@@ -8,6 +8,8 @@ import (
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/event"
+	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vlog"
 )
 
 // TODO: Move webhooks use to a Discord adapter
@@ -15,11 +17,11 @@ import (
 type NotificationsService struct {
 	uuid            uuid.UUID
 	ctx             *types.VertexContext
-	settingsAdapter port.SettingsAdapter
+	settingsAdapter port.AdminSettingsAdapter
 	client          webhook.Client
 }
 
-func NewNotificationsService(ctx *types.VertexContext, settingsAdapter port.SettingsAdapter) NotificationsService {
+func NewNotificationsService(ctx *types.VertexContext, settingsAdapter port.AdminSettingsAdapter) NotificationsService {
 	return NotificationsService{
 		uuid:            uuid.New(),
 		ctx:             ctx,
@@ -28,13 +30,17 @@ func NewNotificationsService(ctx *types.VertexContext, settingsAdapter port.Sett
 }
 
 func (s *NotificationsService) StartWebhook() error {
-	webhookURL := s.settingsAdapter.GetNotificationsWebhook()
-	if webhookURL == nil {
+	adminSetting, err := s.settingsAdapter.Get()
+	if err != nil {
+		return err
+	}
+
+	url := adminSetting.Webhook
+	if url == nil {
 		return nil
 	}
 
-	var err error
-	s.client, err = webhook.NewWithURL(*webhookURL)
+	s.client, err = webhook.NewWithURL(*url)
 	if err != nil {
 		return err
 	}
@@ -54,6 +60,11 @@ func (s *NotificationsService) GetUUID() uuid.UUID {
 
 func (s *NotificationsService) OnEvent(e event.Event) {
 	switch e := e.(type) {
+	case types.EventServerSetupCompleted:
+		err := s.StartWebhook()
+		if err != nil {
+			log.Warn("failed to start webhook", vlog.String("error", err.Error()))
+		}
 	case containerstypes.EventContainerStatusChange:
 		if e.Status == containerstypes.ContainerStatusOff || e.Status == containerstypes.ContainerStatusError || e.Status == containerstypes.ContainerStatusRunning {
 			s.sendStatus(e.Name, e.Status)

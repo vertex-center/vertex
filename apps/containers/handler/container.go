@@ -216,7 +216,6 @@ func (h *ContainerHandler) Patch(c *router.Context) {
 	}
 
 	if body.Databases != nil {
-
 		databases := map[string]uuid.UUID{}
 		options := map[string]*types.SetDatabasesOptions{}
 
@@ -636,29 +635,29 @@ func (h *ContainerHandler) GetVersions(c *router.Context) {
 	c.JSON(versions)
 }
 
-// docapi begin vx_containers_wait
+// docapi begin vx_containers_wait_status
 // docapi method GET
-// docapi summary Wait for a container event
+// docapi summary Wait for a status change
 // docapi tags Apps/Containers
-// docapi query cond {string} The condition to wait for.
+// docapi query status {string} The status to wait for.
 // docapi response 204
 // docapi response 404
 // docapi response 500
 // docapi end
 
-func (h *ContainerHandler) Wait(c *router.Context) {
-	cond := c.Param("cond")
+func (h *ContainerHandler) WaitStatus(c *router.Context) {
+	status := c.Query("status")
 
 	inst := h.getContainer(c)
 	if inst == nil {
 		return
 	}
 
-	err := h.containerRunnerService.WaitCondition(inst, types.WaitContainerCondition(cond))
+	err := h.containerRunnerService.WaitStatus(inst, status)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           types.ErrCodeFailedToWaitContainer,
-			PublicMessage:  fmt.Sprintf("Failed to wait the event '%s' for container %s.", cond, inst.UUID),
+			PublicMessage:  fmt.Sprintf("Failed to wait the status '%s' for container %s.", status, inst.UUID),
 			PrivateMessage: err.Error(),
 		})
 		return

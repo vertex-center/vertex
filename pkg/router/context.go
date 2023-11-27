@@ -29,6 +29,12 @@ func (c *Context) OK() {
 	c.Context.Status(http.StatusNoContent)
 }
 
+// 300
+
+func (c *Context) NotModified() {
+	c.Context.Status(http.StatusNotModified)
+}
+
 // 400
 
 func (c *Context) BadRequest(err Error) {

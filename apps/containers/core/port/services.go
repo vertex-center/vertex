@@ -43,7 +43,7 @@ type (
 		GetAllVersions(inst *types.Container, useCache bool) ([]string, error)
 		CheckForUpdates(inst *types.Container) error
 		RecreateContainer(inst *types.Container) error
-		WaitCondition(inst *types.Container, condition types.WaitContainerCondition) error
+		WaitStatus(inst *types.Container, status string) error
 	}
 
 	ContainerServiceService interface {

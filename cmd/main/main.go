@@ -48,15 +48,16 @@ var (
 	r   *router.Router
 	ctx *types.VertexContext
 
-	settingsFSAdapter   port.SettingsAdapter
-	sshKernelApiAdapter port.SshAdapter
-	baselinesApiAdapter port.BaselinesAdapter
+	dbConfigFSAdapter      port.DbConfigAdapter
+	adminSettingsDbAdapter port.AdminSettingsAdapter
+	sshKernelApiAdapter    port.SshAdapter
+	baselinesApiAdapter    port.BaselinesAdapter
 
 	appsService          port.AppsService
 	debugService         port.DebugService
-	notificationsService service.NotificationsService
+	dbService            port.DbService
 	hardwareService      port.HardwareService
-	settingsService      port.SettingsService
+	adminSettingsService port.AdminSettingsService
 	sshService           port.SshService
 	updateService        port.UpdateService
 )
@@ -91,14 +92,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	ctx.DispatchEvent(types.EventServerStart{})
-
 	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
-
-	err = notificationsService.StartWebhook()
-	if err != nil {
-		log.Error(err)
-	}
 
 	startRouter()
 }
@@ -165,7 +159,8 @@ func initRouter() {
 }
 
 func initAdapters() {
-	settingsFSAdapter = adapter.NewSettingsFSAdapter(nil)
+	dbConfigFSAdapter = adapter.NewDataConfigFSAdapter(nil)
+	adminSettingsDbAdapter = adapter.NewAdminSettingsDbAdapter(dbConfigFSAdapter)
 	sshKernelApiAdapter = adapter.NewSshKernelApiAdapter()
 	baselinesApiAdapter = adapter.NewBaselinesApiAdapter()
 }
@@ -189,9 +184,9 @@ func initServices(about types.About) {
 		},
 	)
 	debugService = service.NewDebugService(ctx)
-	notificationsService = service.NewNotificationsService(ctx, settingsFSAdapter)
-	settingsService = service.NewSettingsService(settingsFSAdapter)
-	//services.NewSetupService(r.ctx)
+	service.NewNotificationsService(ctx, adminSettingsDbAdapter)
+	adminSettingsService = service.NewAdminSettingsService(adminSettingsDbAdapter)
+	dbService = service.NewDbService(ctx, dbConfigFSAdapter)
 	hardwareService = service.NewHardwareService()
 	sshService = service.NewSshService(sshKernelApiAdapter)
 }
@@ -209,6 +204,7 @@ func initRoutes(about types.About) {
 	// docapi code 200 Success
 	// docapi code 201 Created
 	// docapi code 204 No content
+	// docapi code 304 Not modified
 	// docapi code 400 {Error} Bad request
 	// docapi code 404 {Error} Resource not found
 	// docapi code 409 {Error} Conflict
@@ -246,19 +242,26 @@ func initRoutes(about types.About) {
 	// docapi:v route /hardware/cpus get_cpus
 	hardware.GET("/cpus", hardwareHandler.GetCPUs)
 
-	updateHandler := handler.NewUpdateHandler(updateService, settingsService)
-	update := api.Group("/update")
-	// docapi:v route /update get_updates
+	updateHandler := handler.NewUpdateHandler(updateService, adminSettingsService)
+	update := api.Group("/admin/update")
+	// docapi:v route /admin/update get_updates
 	update.GET("", updateHandler.Get)
-	// docapi:v route /update install_update
+	// docapi:v route /admin/update install_update
 	update.POST("", updateHandler.Install)
 
-	settingsHandler := handler.NewSettingsHandler(settingsService)
-	settings := api.Group("/settings")
-	// docapi:v route /settings get_settings
+	settingsHandler := handler.NewSettingsHandler(adminSettingsService)
+	settings := api.Group("/admin/settings")
+	// docapi:v route /admin/settings get_settings
 	settings.GET("", settingsHandler.Get)
-	// docapi:v route /settings patch_settings
+	// docapi:v route /admin/settings patch_settings
 	settings.PATCH("", settingsHandler.Patch)
+
+	dbHandler := handler.NewDatabaseHandler(dbService)
+	db := api.Group("/admin/db")
+	// docapi:v route /admin/db/dbms get_current_dbms
+	db.GET("/dbms", dbHandler.GetCurrentDbms)
+	// docapi:v route /admin/db/dbms migrate_to_dbms
+	db.POST("/dbms", dbHandler.MigrateTo)
 
 	sshHandler := handler.NewSshHandler(sshService)
 	ssh := api.Group("/security/ssh")
@@ -277,12 +280,23 @@ func startRouter() {
 	fmt.Printf("\n-- Vertex Client :: %s\n\n", url)
 	log.Info("Vertex started", vlog.String("url", url))
 
-	err := r.Start(fmt.Sprintf(":%s", config.Current.Port))
-	if errors.Is(err, http.ErrServerClosed) {
-		log.Info("Vertex closed")
-	} else if err != nil {
-		log.Error(err)
-	}
+	stopChan := make(chan struct{})
+	defer close(stopChan)
+
+	go func() {
+		err := r.Start(fmt.Sprintf(":%s", config.Current.Port))
+		if errors.Is(err, http.ErrServerClosed) {
+			log.Info("Vertex closed")
+		} else if err != nil {
+			log.Error(err)
+		}
+
+		stopChan <- struct{}{}
+	}()
+
+	ctx.DispatchEvent(types.EventServerStart{})
+
+	<-stopChan
 }
 
 func stopRouter() {

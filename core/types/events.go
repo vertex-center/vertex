@@ -1,8 +1,12 @@
 package types
 
 type (
-	// EventServerStart is dispatched when the server is started.
+	// EventServerStart is dispatched when the server is started. This event is
+	// dispatched before the setup.
 	EventServerStart struct{}
+
+	// EventServerSetupCompleted is dispatched when the server setup is completed.
+	EventServerSetupCompleted struct{}
 
 	// EventAppReady is dispatched when the app with the id AppID is ready to be used.
 	EventAppReady struct {

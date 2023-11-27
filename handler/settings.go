@@ -8,12 +8,12 @@ import (
 )
 
 type SettingsHandler struct {
-	settingsService port.SettingsService
+	service port.AdminSettingsService
 }
 
-func NewSettingsHandler(settingsService port.SettingsService) port.SettingsHandler {
+func NewSettingsHandler(settingsService port.AdminSettingsService) port.SettingsHandler {
 	return &SettingsHandler{
-		settingsService: settingsService,
+		service: settingsService,
 	}
 }
 
@@ -22,10 +22,20 @@ func NewSettingsHandler(settingsService port.SettingsService) port.SettingsHandl
 // docapi summary Get settings
 // docapi tags Settings
 // docapi response 200 {Settings} The settings.
+// docapi response 500
 // docapi end
 
 func (h *SettingsHandler) Get(c *router.Context) {
-	c.JSON(h.settingsService.Get())
+	settings, err := h.service.Get()
+	if err != nil {
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToGetSettings,
+			PublicMessage:  "Failed to get settings.",
+			PrivateMessage: err.Error(),
+		})
+		return
+	}
+	c.JSON(settings)
 }
 
 // docapi begin patch_settings
@@ -39,13 +49,13 @@ func (h *SettingsHandler) Get(c *router.Context) {
 // docapi end
 
 func (h *SettingsHandler) Patch(c *router.Context) {
-	var settings types.Settings
+	var settings types.AdminSettings
 	err := c.ParseBody(&settings)
 	if err != nil {
 		return
 	}
 
-	err = h.settingsService.Update(settings)
+	err = h.service.Update(settings)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToPatchSettings,

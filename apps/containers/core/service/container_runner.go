@@ -8,12 +8,12 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/apps/containers/adapter"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
-
-	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/apps/containers/adapter"
+	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"
@@ -88,12 +88,7 @@ func (s *ContainerRunnerService) Start(inst *types.Container) error {
 		return err
 	}
 
-	var wg sync.WaitGroup
-
-	wg.Add(1)
 	go func() {
-		defer wg.Done()
-
 		scanner := bufio.NewScanner(stdout)
 		for scanner.Scan() {
 			if scanner.Err() != nil {
@@ -126,10 +121,7 @@ func (s *ContainerRunnerService) Start(inst *types.Container) error {
 		}
 	}()
 
-	wg.Add(1)
 	go func() {
-		defer wg.Done()
-
 		scanner := bufio.NewScanner(stderr)
 		for scanner.Scan() {
 			if scanner.Err() != nil {
@@ -143,18 +135,18 @@ func (s *ContainerRunnerService) Start(inst *types.Container) error {
 		}
 	}()
 
-	// Wait for the container until stopped
-	wg.Wait()
+	var wg sync.WaitGroup
 
-	// Log stopped
-	s.ctx.DispatchEvent(types.EventContainerLog{
-		ContainerUUID: inst.UUID,
-		Kind:          types.LogKindVertexOut,
-		Message:       types.NewLogLineMessageString("Stopping container..."),
-	})
-	log.Info("stopping container",
-		vlog.String("uuid", inst.UUID.String()),
-	)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+
+		err := s.WaitStatus(inst, types.ContainerStatusRunning)
+		if err != nil {
+			log.Error(err)
+		}
+	}()
+	wg.Wait()
 
 	return nil
 }
@@ -175,6 +167,16 @@ func (s *ContainerRunnerService) Stop(inst *types.Container) error {
 		})
 		return ErrContainerNotRunning
 	}
+
+	// Log stopped
+	s.ctx.DispatchEvent(types.EventContainerLog{
+		ContainerUUID: inst.UUID,
+		Kind:          types.LogKindVertexOut,
+		Message:       types.NewLogLineMessageString("Stopping container..."),
+	})
+	log.Info("stopping container",
+		vlog.String("uuid", inst.UUID.String()),
+	)
 
 	s.setStatus(inst, types.ContainerStatusStopping)
 
@@ -232,19 +234,37 @@ func (s *ContainerRunnerService) RecreateContainer(inst *types.Container) error 
 		return err
 	}
 
-	go func() {
-		err := s.Start(inst)
-		if err != nil {
-			log.Error(err)
-			return
-		}
-	}()
-
-	return nil
+	return s.Start(inst)
 }
 
-func (s *ContainerRunnerService) WaitCondition(inst *types.Container, cond types.WaitContainerCondition) error {
-	return s.adapter.WaitCondition(inst, cond)
+func (s *ContainerRunnerService) WaitStatus(inst *types.Container, status string) error {
+	statusChan := make(chan string)
+	defer close(statusChan)
+
+	if inst.Status == status {
+		return nil
+	}
+
+	l := event.NewTempListener(func(e event.Event) {
+		switch e := e.(type) {
+		case types.EventContainerStatusChange:
+			if e.ContainerUUID != inst.UUID {
+				return
+			}
+			statusChan <- e.Status
+		}
+	})
+
+	s.ctx.AddListener(l)
+	defer s.ctx.RemoveListener(l)
+
+	for e := range statusChan {
+		if e == status {
+			return nil
+		}
+	}
+
+	return errors.New("wait status timeout")
 }
 
 func (s *ContainerRunnerService) setStatus(inst *types.Container, status string) {

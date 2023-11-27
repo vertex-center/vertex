@@ -11,6 +11,11 @@ type (
 		All() []app.Meta
 	}
 
+	DbService interface {
+		GetCurrentDbms() types.DbmsName
+		MigrateTo(dbms types.DbmsName) error
+	}
+
 	DebugService interface {
 		HardReset()
 	}
@@ -20,13 +25,13 @@ type (
 		GetCPUs() ([]types.CPU, error)
 	}
 
-	SettingsService interface {
-		Get() types.Settings
-		Update(settings types.Settings) error
-		GetNotificationsWebhook() *string
-		SetNotificationsWebhook(webhook string) error
-		GetChannel() types.SettingsUpdatesChannel
-		SetChannel(channel types.SettingsUpdatesChannel) error
+	AdminSettingsService interface {
+		Get() (types.AdminSettings, error)
+		Update(settings types.AdminSettings) error
+		GetWebhook() (*string, error)
+		SetWebhook(webhook string) error
+		GetChannel() (types.UpdatesChannel, error)
+		SetChannel(channel types.UpdatesChannel) error
 	}
 
 	SshService interface {
@@ -44,7 +49,7 @@ type (
 	}
 
 	UpdateService interface {
-		GetUpdate(channel types.SettingsUpdatesChannel) (*types.Update, error)
-		InstallLatest(channel types.SettingsUpdatesChannel) error
+		GetUpdate(channel types.UpdatesChannel) (*types.Update, error)
+		InstallLatest(channel types.UpdatesChannel) error
 	}
 )

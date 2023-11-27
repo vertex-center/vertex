@@ -23,7 +23,7 @@ func NewBaselinesApiAdapter() port.BaselinesAdapter {
 	}
 }
 
-func (a *BaselinesApiAdapter) GetLatest(ctx context.Context, channel types.SettingsUpdatesChannel) (types.Baseline, error) {
+func (a *BaselinesApiAdapter) GetLatest(ctx context.Context, channel types.UpdatesChannel) (types.Baseline, error) {
 	var baseline types.Baseline
 	builder := requests.New(a.config).
 		Pathf("%s.json", channel).

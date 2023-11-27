@@ -15,7 +15,7 @@ type (
 		GetLogs(c *router.Context)
 		UpdateService(c *router.Context)
 		GetVersions(c *router.Context)
-		Wait(c *router.Context)
+		WaitStatus(c *router.Context)
 		Events(c *router.Context)
 	}
 

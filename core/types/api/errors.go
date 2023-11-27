@@ -19,8 +19,11 @@ const (
 	ErrInvalidPublicKey     router.ErrCode = "invalid_public_key"
 	ErrUserNotFound         router.ErrCode = "user_not_found"
 
+	ErrFailedToGetSettings   router.ErrCode = "failed_to_get_settings"
 	ErrFailedToPatchSettings router.ErrCode = "failed_to_patch_settings"
 
 	ErrFailedToGetHost router.ErrCode = "failed_to_get_host"
 	ErrFailedToGetCPUs router.ErrCode = "failed_to_get_cpus"
+
+	ErrFailedToMigrateToNewDbms router.ErrCode = "failed_to_migrate_to_new_dbms"
 )

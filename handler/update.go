@@ -11,10 +11,10 @@ import (
 
 type UpdateHandler struct {
 	updateService   port.UpdateService
-	settingsService port.SettingsService
+	settingsService port.AdminSettingsService
 }
 
-func NewUpdateHandler(updateService port.UpdateService, settingsService port.SettingsService) port.UpdateHandler {
+func NewUpdateHandler(updateService port.UpdateService, settingsService port.AdminSettingsService) port.UpdateHandler {
 	return &UpdateHandler{
 		updateService:   updateService,
 		settingsService: settingsService,
@@ -30,7 +30,15 @@ func NewUpdateHandler(updateService port.UpdateService, settingsService port.Set
 // docapi end
 
 func (h *UpdateHandler) Get(c *router.Context) {
-	channel := h.settingsService.GetChannel()
+	channel, err := h.settingsService.GetChannel()
+	if err != nil {
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToGetSettings,
+			PublicMessage:  "Failed to retrieve update settings.",
+			PrivateMessage: err.Error(),
+		})
+		return
+	}
 
 	update, err := h.updateService.GetUpdate(channel)
 	if errors.Is(err, types.ErrFailedToFetchBaseline) {
@@ -62,9 +70,17 @@ func (h *UpdateHandler) Get(c *router.Context) {
 // docapi end
 
 func (h *UpdateHandler) Install(c *router.Context) {
-	channel := h.settingsService.GetChannel()
+	channel, err := h.settingsService.GetChannel()
+	if err != nil {
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToGetSettings,
+			PublicMessage:  "Failed to retrieve update settings.",
+			PrivateMessage: err.Error(),
+		})
+		return
+	}
 
-	err := h.updateService.InstallLatest(channel)
+	err = h.updateService.InstallLatest(channel)
 	if errors.Is(err, types.ErrAlreadyUpdating) {
 		c.Abort(router.Error{
 			Code:           api.ErrAlreadyUpdating,

@@ -50,8 +50,8 @@ func (suite *UpdateServiceTestSuite) SetupTest() {
 	}
 
 	suite.adapter = &port.MockBaselinesAdapter{}
-	suite.adapter.On("GetLatest", mock.Anything, types.SettingsUpdatesChannelStable).Return(suite.latestBaseline, nil)
-	suite.adapter.On("GetLatest", mock.Anything, types.SettingsUpdatesChannelBeta).Return(suite.betaBaseline, nil)
+	suite.adapter.On("GetLatest", mock.Anything, types.UpdatesChannelStable).Return(suite.latestBaseline, nil)
+	suite.adapter.On("GetLatest", mock.Anything, types.UpdatesChannelBeta).Return(suite.betaBaseline, nil)
 	suite.service = NewUpdateService(types.NewVertexContext(), suite.adapter, updaters).(*UpdateService)
 }
 
@@ -59,7 +59,7 @@ func (suite *UpdateServiceTestSuite) TestGetUpdate() {
 	suite.updaterA.On("CurrentVersion").Return("v0.11.0", nil)
 	suite.updaterB.On("CurrentVersion").Return("v0.11.0", nil)
 
-	update, err := suite.service.GetUpdate(types.SettingsUpdatesChannelStable)
+	update, err := suite.service.GetUpdate(types.UpdatesChannelStable)
 	suite.Require().NoError(err)
 	suite.NotNil(update)
 	suite.Equal(suite.latestBaseline, update.Baseline)
@@ -69,7 +69,7 @@ func (suite *UpdateServiceTestSuite) TestGetUpdateNoUpdate() {
 	suite.updaterA.On("CurrentVersion").Return("v0.12.1", nil)
 	suite.updaterB.On("CurrentVersion").Return("v0.12.0", nil)
 
-	update, err := suite.service.GetUpdate(types.SettingsUpdatesChannelStable)
+	update, err := suite.service.GetUpdate(types.UpdatesChannelStable)
 	suite.Require().NoError(err)
 	suite.Nil(update)
 }
@@ -78,7 +78,7 @@ func (suite *UpdateServiceTestSuite) TestGetUpdateBeta() {
 	suite.updaterA.On("CurrentVersion").Return("v0.12.0", nil)
 	suite.updaterB.On("CurrentVersion").Return("v0.12.0", nil)
 
-	update, err := suite.service.GetUpdate(types.SettingsUpdatesChannelBeta)
+	update, err := suite.service.GetUpdate(types.UpdatesChannelBeta)
 	suite.Require().NoError(err)
 	suite.NotNil(update)
 	suite.Equal(suite.betaBaseline, update.Baseline)
