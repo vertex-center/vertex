@@ -1,8 +1,6 @@
 package adapter
 
 import (
-	"errors"
-
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
 	"gorm.io/gorm"
@@ -20,13 +18,20 @@ func NewAdminSettingsDbAdapter(db port.DbConfigAdapter) port.AdminSettingsAdapte
 
 func (s AdminSettingsDbAdapter) Get() (types.AdminSettings, error) {
 	var settings types.AdminSettings
-	err := s.db.Get().First(&settings).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return types.NewAdminSettings(), nil
-	}
+	settings.ID = 1
+	err := s.db.Get().Debug().FirstOrCreate(&settings).Error
 	return settings, err
 }
 
 func (s AdminSettingsDbAdapter) Update(settings types.AdminSettings) error {
-	return s.db.Get().Save(&settings).Error
+	return s.db.Get().Debug().Transaction(func(tx *gorm.DB) error {
+		var current types.AdminSettings
+		current.ID = 1
+		err := tx.FirstOrCreate(&current).Error
+		if err != nil {
+			return err
+		}
+		settings.ID = 1
+		return tx.Model(&current).Updates(&settings).Error
+	})
 }
