@@ -16,6 +16,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var (
@@ -101,7 +102,9 @@ func (a *DbConfigFSAdapter) Connect() error {
 func (a *DbConfigFSAdapter) ConnectTo(dialector gorm.Dialector, retries int) error {
 	var err error
 	for i := 0; i < retries; i++ {
-		a.db, err = gorm.Open(dialector, &gorm.Config{})
+		a.db, err = gorm.Open(dialector, &gorm.Config{
+			Logger: logger.Default.LogMode(logger.Silent),
+		})
 		if err != nil {
 			if i == retries-1 {
 				return err
