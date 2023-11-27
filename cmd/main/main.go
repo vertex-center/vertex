@@ -300,6 +300,8 @@ func startRouter() {
 		log.Error(err)
 		os.Exit(1)
 	}
+	// And wait a bit more to make sure the routes are properly registered.
+	<-time.After(500 * time.Millisecond)
 
 	ctx.DispatchEvent(types.EventServerStart{})
 
