@@ -82,7 +82,7 @@ export default function SettingsUpdates() {
                 <Paragraph>Enable Beta channel</Paragraph>
                 <Spacer />
                 <ToggleButton
-                    value={settings?.updates?.channel === "beta"}
+                    value={settings?.updates_channel === "beta"}
                     onChange={(beta: boolean) => setChannel(beta)}
                     disabled={isLoading}
                 />
