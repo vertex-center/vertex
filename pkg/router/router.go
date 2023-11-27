@@ -2,6 +2,8 @@ package router
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -23,19 +25,27 @@ func (r *Router) Start(addr string) error {
 		Addr:    addr,
 		Handler: r.Engine,
 	}
-	return r.server.ListenAndServe()
+	err := r.server.ListenAndServe()
+	if errors.Is(err, http.ErrServerClosed) {
+		err = nil
+	}
+	return err
 }
 
+// Stop gracefully shuts down the server. It will throw ErrFailedToStopServer
+// if the server fails to stop.
 func (r *Router) Stop(ctx context.Context) error {
 	if r.server == nil {
 		return nil
 	}
 	err := r.server.Shutdown(ctx)
-	if err != nil {
-		return err
+	if errors.Is(err, http.ErrServerClosed) {
+		err = nil
+	} else if err != nil {
+		err = fmt.Errorf("%w: %w", ErrFailedToStopServer, err)
 	}
 	r.server = nil
-	return nil
+	return err
 }
 
 func (r *Router) Group(path string, handlers ...HandlerFunc) *Group {

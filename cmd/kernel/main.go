@@ -253,6 +253,7 @@ func stopRouter() {
 	err := r.Stop(ctx)
 	if err != nil {
 		log.Error(err)
-		os.Exit(1)
+		return
 	}
+	log.Info("kernel server closed")
 }

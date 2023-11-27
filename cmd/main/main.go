@@ -286,7 +286,7 @@ func startRouter() {
 	go func() {
 		err := r.Start(fmt.Sprintf(":%s", config.Current.Port))
 		if errors.Is(err, http.ErrServerClosed) {
-			log.Info("Vertex closed")
+			log.Info("server closed")
 		} else if err != nil {
 			log.Error(err)
 		}
@@ -321,4 +321,5 @@ func stopRouter() {
 		log.Error(err)
 		return
 	}
+	log.Info("vertex server closed")
 }
