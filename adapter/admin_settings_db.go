@@ -19,12 +19,12 @@ func NewAdminSettingsDbAdapter(db port.DbConfigAdapter) port.AdminSettingsAdapte
 func (s AdminSettingsDbAdapter) Get() (types.AdminSettings, error) {
 	var settings types.AdminSettings
 	settings.ID = 1
-	err := s.db.Get().Debug().FirstOrCreate(&settings).Error
+	err := s.db.Get().FirstOrCreate(&settings).Error
 	return settings, err
 }
 
 func (s AdminSettingsDbAdapter) Update(settings types.AdminSettings) error {
-	return s.db.Get().Debug().Transaction(func(tx *gorm.DB) error {
+	return s.db.Get().Transaction(func(tx *gorm.DB) error {
 		var current types.AdminSettings
 		current.ID = 1
 		err := tx.FirstOrCreate(&current).Error
