@@ -164,7 +164,9 @@ export default function SettingsDb() {
             >
                 <Paragraph>
                     Are you sure you want to migrate from {dbms} to {selectedDB}
-                    ?
+                    ? All the data will be copied to the new database. The
+                    previous database will deleted if the migration is
+                    successful.
                 </Paragraph>
             </Popup>
         </Content>
