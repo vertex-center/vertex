@@ -42,6 +42,11 @@ export default function SettingsApp() {
                     link={l("/settings/updates")}
                 />
                 <Sidebar.Item
+                    label="Checks"
+                    icon={<MaterialIcon icon="checklist" />}
+                    link={l("/settings/checks")}
+                />
+                <Sidebar.Item
                     label="About"
                     icon={<MaterialIcon icon="info" />}
                     link={l("/settings/about")}

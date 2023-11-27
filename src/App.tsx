@@ -36,6 +36,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import ServiceEditor from "./apps/DevToolsServiceEditor/ServiceEditor/ServiceEditor";
 import SettingsDb from "./apps/Settings/SettingsData/SettingsDb";
+import SettingsChecks from "./apps/Settings/SettingsChecks/SettingsChecks";
 
 const queryClient = new QueryClient();
 
@@ -176,6 +177,10 @@ function App() {
                                     <Route
                                         path="/settings/updates"
                                         element={<SettingsUpdates />}
+                                    />
+                                    <Route
+                                        path="/settings/checks"
+                                        element={<SettingsChecks />}
                                     />
                                     <Route
                                         path="/settings/about"

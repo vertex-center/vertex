@@ -13,9 +13,14 @@ export function useServerEvent(
     route: string,
     events: {
         [name: string]: ServerEvent;
-    }
+    },
+    disabled?: boolean
 ) {
     useEffect(() => {
+        if (disabled) {
+            return;
+        }
+
         const sse = registerSSE(route);
 
         Console.event("SSE connected\n%O", { id: sse });
@@ -32,5 +37,5 @@ export function useServerEvent(
 
             Console.event("SSE disconnected\n%O", { id: sse });
         };
-    }, [route]);
+    }, [route, disabled]);
 }
