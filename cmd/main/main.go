@@ -86,7 +86,7 @@ func main() {
 	initRoutes(about)
 	handleSignals()
 
-	err := net.Wait("google.com:80")
+	err := net.WaitInternetConn()
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)
@@ -293,6 +293,13 @@ func startRouter() {
 
 		stopChan <- struct{}{}
 	}()
+
+	err := net.Wait(config.Current.VertexURL())
+	if err != nil {
+		err := fmt.Errorf("failed to wait for Vertex api to start: %w", err)
+		log.Error(err)
+		os.Exit(1)
+	}
 
 	ctx.DispatchEvent(types.EventServerStart{})
 

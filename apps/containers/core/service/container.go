@@ -198,7 +198,7 @@ func (s *ContainerService) StartAll() {
 	log.Info("trying to ping Google...")
 
 	// Wait for internet connection
-	err := net.Wait("google.com:80")
+	err := net.WaitInternetConn()
 	if err != nil {
 		log.Error(err)
 		return

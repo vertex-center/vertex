@@ -3,9 +3,11 @@ package net
 import (
 	"fmt"
 	"net"
+	"net/http"
 	"time"
 
-	"github.com/antelman107/net-wait-go/wait"
+	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vlog"
 )
 
 func LocalIP() (string, error) {
@@ -19,12 +21,29 @@ func LocalIP() (string, error) {
 }
 
 func Wait(url string) error {
-	if !wait.New(
-		wait.WithWait(time.Second),
-		wait.WithBreak(500*time.Millisecond),
-	).Do([]string{url}) {
-		return fmt.Errorf("internet connection: Failed to ping %s", url)
-	} else {
+	ch := make(chan bool)
+	timeout := time.After(10 * time.Second)
+
+	go func() {
+		for {
+			_, err := http.Get(url)
+			if err == nil {
+				ch <- true
+				return
+			}
+			time.Sleep(500 * time.Millisecond)
+		}
+	}()
+
+	select {
+	case <-ch:
+		log.Info("successfully pinged", vlog.String("url", url))
 		return nil
+	case <-timeout:
+		return fmt.Errorf("internet connection: Failed to ping %s", url)
 	}
+}
+
+func WaitInternetConn() error {
+	return Wait("https://www.google.com/robots.txt")
 }
