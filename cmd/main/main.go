@@ -58,6 +58,7 @@ var (
 	dbService            port.DbService
 	hardwareService      port.HardwareService
 	adminSettingsService port.AdminSettingsService
+	readyService         port.ReadyService
 	sshService           port.SshService
 	updateService        port.UpdateService
 )
@@ -188,6 +189,7 @@ func initServices(about types.About) {
 	adminSettingsService = service.NewAdminSettingsService(adminSettingsDbAdapter)
 	dbService = service.NewDbService(ctx, dbConfigFSAdapter)
 	hardwareService = service.NewHardwareService()
+	readyService = service.NewReadyService()
 	sshService = service.NewSshService(sshKernelApiAdapter)
 }
 
@@ -294,14 +296,12 @@ func startRouter() {
 		stopChan <- struct{}{}
 	}()
 
-	err := net.Wait(config.Current.VertexURL())
-	if err != nil {
-		err := fmt.Errorf("failed to wait for Vertex api to start: %w", err)
-		log.Error(err)
-		os.Exit(1)
+	resCh := readyService.Wait()
+	for res := range resCh {
+		if res.Error != nil {
+			log.Error(res.Error)
+		}
 	}
-	// And wait a bit more to make sure the routes are properly registered.
-	<-time.After(500 * time.Millisecond)
 
 	ctx.DispatchEvent(types.EventServerStart{})
 

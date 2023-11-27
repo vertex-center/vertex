@@ -34,6 +34,10 @@ type (
 		SetChannel(channel types.UpdatesChannel) error
 	}
 
+	ReadyService interface {
+		Wait() <-chan types.ReadyResponse
+	}
+
 	SshService interface {
 		GetAll() ([]types.PublicKey, error)
 		Add(key string, username string) error
