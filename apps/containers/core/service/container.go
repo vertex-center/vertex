@@ -7,6 +7,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vlog"
 
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/adapter"
@@ -214,7 +215,10 @@ func (s *ContainerService) StartAll() {
 
 			err = s.containerRunnerService.Start(inst)
 			if err != nil {
-				log.Error(err)
+				log.Warn("failed to auto-start the container",
+					vlog.String("uuid", inst.UUID.String()),
+					vlog.String("reason", err.Error()),
+				)
 			}
 		}(id)
 	}
