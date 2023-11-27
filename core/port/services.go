@@ -36,8 +36,8 @@ type (
 		SetChannel(channel types.UpdatesChannel) error
 	}
 
-	ReadyService interface {
-		Wait(ctx context.Context) <-chan types.ReadyResponse
+	ChecksService interface {
+		CheckAll(ctx context.Context) <-chan types.CheckResponse
 	}
 
 	SshService interface {

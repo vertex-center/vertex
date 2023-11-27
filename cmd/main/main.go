@@ -57,7 +57,7 @@ var (
 	dbService            port.DbService
 	hardwareService      port.HardwareService
 	adminSettingsService port.AdminSettingsService
-	readyService         port.ReadyService
+	checksService        port.ChecksService
 	sshService           port.SshService
 	updateService        port.UpdateService
 )
@@ -182,7 +182,7 @@ func initServices(about types.About) {
 	adminSettingsService = service.NewAdminSettingsService(adminSettingsDbAdapter)
 	dbService = service.NewDbService(ctx, dbConfigFSAdapter)
 	hardwareService = service.NewHardwareService()
-	readyService = service.NewReadyService()
+	checksService = service.NewChecksService()
 	sshService = service.NewSshService(sshKernelApiAdapter)
 }
 
@@ -290,7 +290,7 @@ func startRouter() {
 	}()
 
 	timeout, cancelTimeout := context.WithTimeout(context.Background(), 60*time.Second)
-	resCh := readyService.Wait(timeout)
+	resCh := checksService.CheckAll(timeout)
 	for res := range resCh {
 		if res.Error != nil {
 			log.Error(res.Error)
