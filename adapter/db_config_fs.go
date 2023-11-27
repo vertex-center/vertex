@@ -85,7 +85,7 @@ func (a *DbConfigFSAdapter) Connect() error {
 		p := path.Join(a.configDir, "vertex.db")
 		err = a.ConnectTo(sqlite.Open(p), 1)
 	case types.DbmsNamePostgres:
-		err = a.ConnectTo(postgres.Open("host=localhost port=5432 user=postgres password=postgres dbname=postgres sslmode=disable"), 15)
+		err = a.ConnectTo(postgres.Open("host=localhost port=5432 user=postgres password=postgres dbname=postgres sslmode=disable"), 30)
 	default:
 		err = errors.New("invalid dbms name")
 	}
