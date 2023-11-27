@@ -1,9 +1,10 @@
 import { Vertical } from "../../../components/Layouts/Layouts";
-import SSHKey, { SSHKeys } from "../../../components/SSHKey/SSHKey";
+import SSHKey from "../../../components/SSHKey/SSHKey";
 import { Errors } from "../../../components/Error/Errors";
 import { APIError } from "../../../components/Error/APIError";
 import {
     Button,
+    List,
     ListItem,
     MaterialIcon,
     SelectField,
@@ -113,7 +114,7 @@ export default function SettingsSecurity() {
                     </Errors>
                 )}
                 {!error && sshKeys && (
-                    <SSHKeys>
+                    <List>
                         {sshKeys?.length === 0 && (
                             <ListItem>No SSH keys found.</ListItem>
                         )}
@@ -131,7 +132,7 @@ export default function SettingsSecurity() {
                                 }
                             />
                         ))}
-                    </SSHKeys>
+                    </List>
                 )}
                 <div>
                     <Button

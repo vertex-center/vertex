@@ -1,19 +1,13 @@
 import {
     Button,
-    List,
     ListActions,
     ListDescription,
     ListIcon,
     ListInfo,
     ListItem,
-    ListProps,
     ListTitle,
     MaterialIcon,
 } from "@vertex-center/components";
-
-export function SSHKeys(props: Readonly<ListProps>) {
-    return <List {...props} />;
-}
 
 type SSHKeyProps = {
     type: string;
