@@ -8,9 +8,7 @@ export const useSettingsChannelMutation = (
         mutationKey: ["settings"],
         mutationFn: (beta?: boolean) =>
             api.settings.patch({
-                updates: {
-                    channel: beta ? "beta" : "stable",
-                },
+                updates_channel: beta ? "beta" : "stable",
             }),
         ...options,
     });

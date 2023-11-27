@@ -27,6 +27,11 @@ export default function SettingsApp() {
                     link={l("/settings/hardware")}
                 />
                 <Sidebar.Item
+                    label="Database"
+                    icon={<MaterialIcon icon="database" />}
+                    link={l("/settings/database")}
+                />
+                <Sidebar.Item
                     label="Security"
                     icon={<MaterialIcon icon="key" />}
                     link={l("/settings/security")}

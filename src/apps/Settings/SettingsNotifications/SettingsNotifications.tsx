@@ -27,7 +27,7 @@ export default function SettingsNotifications() {
     });
 
     useEffect(() => {
-        setWebhook(settings?.notifications?.webhook);
+        setWebhook(settings?.webhook);
     }, [settings]);
 
     const onWebhookChange = (e: any) => {
@@ -38,7 +38,7 @@ export default function SettingsNotifications() {
     const onSave = () => {
         setSaving(true);
         api.settings
-            .patch({ notifications: { webhook } })
+            .patch({ webhook })
             .then(() => setChanged(false))
             .catch(console.error)
             .finally(() => setSaving(false));
