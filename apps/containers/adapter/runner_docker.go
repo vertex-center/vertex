@@ -33,7 +33,7 @@ func NewContainerRunnerFSAdapter() ContainerRunnerDockerAdapter {
 	return ContainerRunnerDockerAdapter{}
 }
 
-func (a ContainerRunnerDockerAdapter) Delete(inst *types.Container) error {
+func (a ContainerRunnerDockerAdapter) DeleteContainer(inst *types.Container) error {
 	id, err := a.getContainerID(*inst)
 	if err != nil {
 		return err
@@ -41,18 +41,26 @@ func (a ContainerRunnerDockerAdapter) Delete(inst *types.Container) error {
 
 	apiError := router.Error{}
 	err = requests.URL(config.Current.KernelURL()).
-		Pathf("/api/app/vx-containers/docker/container/%s/mounts", inst.UUID.String()).
+		Pathf("/api/app/vx-containers/docker/container/%s", id).
 		Delete().
 		ErrorJSON(&apiError).
 		Fetch(context.Background())
 
+	if apiError.Code == types.ErrCodeContainerNotFound {
+		return ErrContainerNotFound
+	}
+	return err
+}
+
+func (a ContainerRunnerDockerAdapter) DeleteMounts(inst *types.Container) error {
+	id, err := a.getContainerID(*inst)
 	if err != nil {
-		log.Error(err, vlog.String("uuid", inst.UUID.String()))
+		return err
 	}
 
-	apiError = router.Error{}
+	apiError := router.Error{}
 	err = requests.URL(config.Current.KernelURL()).
-		Pathf("/api/app/vx-containers/docker/container/%s", id).
+		Pathf("/api/app/vx-containers/docker/container/%s/mounts", id).
 		Delete().
 		ErrorJSON(&apiError).
 		Fetch(context.Background())

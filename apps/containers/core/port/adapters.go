@@ -44,7 +44,8 @@ type (
 	}
 
 	ContainerRunnerAdapter interface {
-		Delete(inst *types.Container) error
+		DeleteContainer(inst *types.Container) error
+		DeleteMounts(inst *types.Container) error
 		Start(inst *types.Container, setStatus func(status string)) (stdout io.ReadCloser, stderr io.ReadCloser, err error)
 		Stop(inst *types.Container) error
 		Info(inst types.Container) (map[string]any, error)

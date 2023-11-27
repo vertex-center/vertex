@@ -48,7 +48,11 @@ func (s *ContainerRunnerService) Install(uuid uuid.UUID, service types.Service) 
 }
 
 func (s *ContainerRunnerService) Delete(inst *types.Container) error {
-	return s.adapter.Delete(inst)
+	err := s.adapter.DeleteMounts(inst)
+	if err != nil {
+		return err
+	}
+	return s.adapter.DeleteContainer(inst)
 }
 
 // Start starts a container by its UUID.
@@ -229,7 +233,7 @@ func (s *ContainerRunnerService) RecreateContainer(inst *types.Container) error 
 		}
 	}
 
-	err := s.adapter.Delete(inst)
+	err := s.adapter.DeleteContainer(inst)
 	if err != nil && !errors.Is(err, adapter.ErrContainerNotFound) {
 		return err
 	}
