@@ -42,14 +42,11 @@ func (s *AdminSettingsService) GetChannel() (types.UpdatesChannel, error) {
 	if err != nil {
 		return types.UpdatesChannelStable, err
 	}
-	if settings.UpdatesChannel == nil {
-		return types.UpdatesChannelStable, nil
-	}
-	return *settings.UpdatesChannel, nil
+	return settings.UpdatesChannel, nil
 }
 
 func (s *AdminSettingsService) SetChannel(channel types.UpdatesChannel) error {
 	return s.Update(types.AdminSettings{
-		UpdatesChannel: &channel,
+		UpdatesChannel: channel,
 	})
 }
