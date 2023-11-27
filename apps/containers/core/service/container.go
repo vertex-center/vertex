@@ -186,7 +186,7 @@ func (s *ContainerService) StartAll() {
 
 	for _, inst := range s.containers {
 		// vertex containers autostart are managed by the startup service.
-		if inst.LaunchOnStartup() && !inst.HasTag("vertex") {
+		if inst.LaunchOnStartup() {
 			ids = append(ids, inst.UUID)
 		}
 	}

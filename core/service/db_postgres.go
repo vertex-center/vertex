@@ -110,8 +110,10 @@ func (s *DbService) installPostgresDB() error {
 		return apiError.RouterError()
 	}
 
-	inst.Tags = append(inst.Tags, "Vertex Internal")
-	inst.DisplayName = "Vertex Database"
+	launchOnStartup := false
+	inst.ContainerSettings.Tags = append(inst.Tags, "Vertex Internal")
+	inst.ContainerSettings.LaunchOnStartup = &launchOnStartup
+	inst.ContainerSettings.DisplayName = "Vertex Database"
 
 	client := containersapi.NewContainersClient()
 
