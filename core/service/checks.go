@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/vertex-center/vertex/config"
@@ -41,8 +42,8 @@ func (s *ChecksService) CheckAll(ctx context.Context) <-chan types.CheckResponse
 		go func() {
 			res := check(ctx)
 			resChan <- res
-			if res.Error != nil {
-				log.Error(res.Error)
+			if res.Error != "" {
+				log.Error(errors.New(res.Error))
 			} else {
 				log.Info("component check: ok", vlog.String("id", res.ID), vlog.String("name", res.Name))
 			}
@@ -63,7 +64,7 @@ func (s *ChecksService) checkInternet(ctx context.Context) types.CheckResponse {
 	}
 	err := net.WaitInternetConn(ctx)
 	if err != nil {
-		res.Error = err
+		res.Error = err.Error()
 	}
 	return res
 }
@@ -83,7 +84,7 @@ func (s *ChecksService) checkURL(ctx context.Context, id, name, url string) type
 	}
 	err := net.Wait(ctx, url)
 	if err != nil {
-		res.Error = err
+		res.Error = err.Error()
 	}
 	// Wait a little bit more to make sure the server is ready.
 	<-time.After(500 * time.Millisecond)

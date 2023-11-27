@@ -230,6 +230,11 @@ func initRoutes(about types.About) {
 	// docapi:v route /apps get_apps
 	apps.GET("", appsHandler.Get)
 
+	checksHandler := handler.NewChecksHandler(checksService)
+	checks := api.Group("/admin/checks")
+	// docapi:v route /admin/checks admin_checks
+	checks.GET("", app.HeadersSSE, checksHandler.Check)
+
 	hardwareHandler := handler.NewHardwareHandler(hardwareService)
 	hardware := api.Group("/hardware")
 	// docapi:v route /hardware/host get_host
@@ -292,8 +297,8 @@ func startRouter() {
 	timeout, cancelTimeout := context.WithTimeout(context.Background(), 60*time.Second)
 	resCh := checksService.CheckAll(timeout)
 	for res := range resCh {
-		if res.Error != nil {
-			log.Error(res.Error)
+		if res.Error != "" {
+			log.Error(errors.New(res.Error))
 			os.Exit(1)
 		}
 	}
