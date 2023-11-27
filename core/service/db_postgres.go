@@ -124,14 +124,3 @@ func (s *DbService) installPostgresDB() error {
 
 	return nil
 }
-
-func (s *DbService) migrateToPostgres() error {
-	err := s.setupPostgres()
-	if err != nil {
-		return err
-	}
-
-	// TODO: Migrate data
-
-	return nil
-}

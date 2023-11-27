@@ -38,26 +38,51 @@ func (s *DbService) GetCurrentDbms() vtypes.DbmsName {
 }
 
 func (s *DbService) MigrateTo(dbms vtypes.DbmsName) error {
-	log.Info("Migrating data to " + string(dbms))
+	log.Info("migrating database", vlog.String("name", string(dbms)))
 
 	currentDbms := s.dataConfigAdapter.GetDBMSName()
 	if currentDbms == dbms {
 		return ErrDbmsAlreadySet
 	}
 
+	log.Info("setup new dbms", vlog.String("name", string(dbms)))
+
 	var err error
 	switch dbms {
 	case vtypes.DbmsNameSqlite:
 		//err = errors.New("sqlite migration not implemented yet")
 	case vtypes.DbmsNamePostgres:
-		err = s.migrateToPostgres()
+		err = s.setupPostgres()
 	default:
 		err = errors.New("unknown dbms: " + string(dbms))
 	}
-
 	if err != nil {
 		return err
 	}
+
+	log.Info("setup new dbms completed", vlog.String("name", string(dbms)))
+	log.Info("retrieving connections to previous and next databases", vlog.String("name", string(dbms)))
+
+	prevDb := s.dataConfigAdapter.Get()
+	err = s.dataConfigAdapter.SetDBMSName(dbms)
+	if err != nil {
+		return err
+	}
+	err = s.dataConfigAdapter.Connect()
+	if err != nil {
+		return err
+	}
+	nextDb := s.dataConfigAdapter.Get()
+
+	log.Info("copying data between databases", vlog.String("from", string(dbms)), vlog.String("to", string(currentDbms)))
+
+	err = s.copyDb(prevDb, nextDb)
+	if err != nil {
+		return err
+	}
+
+	log.Info("copying data between databases completed", vlog.String("from", string(dbms)), vlog.String("to", string(currentDbms)))
+	log.Info("deleting previous database", vlog.String("name", string(currentDbms)))
 
 	switch currentDbms {
 	case vtypes.DbmsNameSqlite:
@@ -68,16 +93,9 @@ func (s *DbService) MigrateTo(dbms vtypes.DbmsName) error {
 		err = errors.New("unknown dbms: " + string(currentDbms))
 	}
 
-	if err != nil {
-		return err
-	}
+	log.Info("deleting previous database completed", vlog.String("name", string(currentDbms)))
 
-	err = s.dataConfigAdapter.SetDBMSName(dbms)
-	if err != nil {
-		return err
-	}
-
-	return s.dataConfigAdapter.Connect()
+	return err
 }
 
 func (s *DbService) OnEvent(e event.Event) {
