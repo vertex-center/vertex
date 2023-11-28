@@ -11,6 +11,7 @@ import { Console } from "../../logging/logging";
 import { Update } from "../../models/update";
 import { vxServiceEditorRoutes } from "./vxServiceEditor";
 import { CPU, Host } from "../../models/hardware";
+import { Credentials } from "../../models/auth";
 
 export const server = axios.create({
     // @ts-ignore
@@ -136,5 +137,19 @@ export const api = {
         },
         patch: (settings: Partial<Settings>) =>
             server.patch("/admin/settings", settings),
+    },
+
+    auth: {
+        register: async (credentials: Credentials) => {
+            const Authorization = `Basic ${btoa(
+                credentials.username + ":" + credentials.password
+            )}`;
+            const { data } = await server.post(
+                "/auth/register",
+                {},
+                { headers: { Authorization } }
+            );
+            return data;
+        },
     },
 };
