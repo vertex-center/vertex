@@ -77,6 +77,7 @@ export default function Dock() {
                                         showDevtools ||
                                         app.category !== "devtools"
                                 )
+                                ?.filter((app) => !app.hidden)
                                 ?.sort((a, b) => (a.name > b.name ? 1 : -1))
                                 ?.map((app) => (
                                     <DockApp

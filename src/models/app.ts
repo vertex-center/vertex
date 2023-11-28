@@ -4,4 +4,5 @@ export type VertexApp = {
     icon: string;
     description: string;
     category: string;
+    hidden: boolean;
 };
