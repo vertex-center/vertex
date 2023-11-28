@@ -1,6 +1,5 @@
 import { CPU as CPUModel } from "../../../models/hardware";
 import {
-    List,
     ListDescription,
     ListIcon,
     ListInfo,
@@ -19,18 +18,16 @@ export default function CPU(props: Readonly<HostProps>) {
     const { model_name, mhz, cores_count } = props.cpu;
 
     return (
-        <List>
-            <ListItem>
-                <ListIcon>
-                    <MaterialIcon icon="memory" />
-                </ListIcon>
-                <ListInfo>
-                    <ListTitle>{model_name}</ListTitle>
-                    <ListDescription>
-                        {mhz} MHz - {cores_count} cores
-                    </ListDescription>
-                </ListInfo>
-            </ListItem>
-        </List>
+        <ListItem>
+            <ListIcon>
+                <MaterialIcon icon="memory" />
+            </ListIcon>
+            <ListInfo>
+                <ListTitle>{model_name}</ListTitle>
+                <ListDescription>
+                    {mhz} MHz - {cores_count} cores
+                </ListDescription>
+            </ListInfo>
+        </ListItem>
     );
 }
