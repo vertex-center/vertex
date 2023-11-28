@@ -59,18 +59,18 @@ func (s *AuthService) Login(login, password string) (types.Token, error) {
 
 // Register creates a new user account. It can return ErrLoginEmpty, ErrPasswordEmpty, or
 // ErrPasswordLength if the login or password is too short.
-func (s *AuthService) Register(login, password string) error {
+func (s *AuthService) Register(login, password string) (types.Token, error) {
 	// TODO: make these settings configurable in the admin settings
 	// https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#argon2id
 
 	if len(login) == 0 {
-		return types.ErrLoginEmpty
+		return types.Token{}, types.ErrLoginEmpty
 	}
 	if len(password) == 0 {
-		return types.ErrPasswordEmpty
+		return types.Token{}, types.ErrPasswordEmpty
 	}
 	if len(password) < 8 {
-		return types.ErrPasswordLength
+		return types.Token{}, types.ErrPasswordLength
 	}
 
 	it := uint32(3)
@@ -82,7 +82,7 @@ func (s *AuthService) Register(login, password string) error {
 	key := argon2.IDKey([]byte(password), []byte(salt), it, mem, threads, keyLen)
 	hash := base64.StdEncoding.EncodeToString(key)
 
-	return s.adapter.CreateAccount(login, types.CredentialsArgon2id{
+	cred := types.CredentialsArgon2id{
 		Login:       login,
 		Hash:        hash,
 		Type:        "argon2id",
@@ -91,7 +91,13 @@ func (s *AuthService) Register(login, password string) error {
 		Parallelism: threads,
 		Salt:        salt,
 		KeyLen:      keyLen,
-	})
+	}
+	err := s.adapter.CreateAccount(login, cred)
+	if err != nil {
+		return types.Token{}, err
+	}
+
+	return s.Login(login, password)
 }
 
 func (s *AuthService) Logout(token string) error {

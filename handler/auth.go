@@ -46,7 +46,7 @@ func (h AuthHandler) Register(c *router.Context) {
 		return
 	}
 
-	err = h.authService.Register(login, pass)
+	token, err := h.authService.Register(login, pass)
 	if errors.Is(err, types.ErrLoginEmpty) {
 		c.BadRequest(router.Error{
 			Code:           api.ErrLoginEmpty,
@@ -77,7 +77,7 @@ func (h AuthHandler) Register(c *router.Context) {
 		return
 	}
 
-	c.OK()
+	c.JSON(token)
 }
 
 func (h AuthHandler) Logout(c *router.Context) {

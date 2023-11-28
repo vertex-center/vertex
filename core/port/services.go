@@ -15,7 +15,7 @@ type (
 
 	AuthService interface {
 		Login(login, password string) (types.Token, error)
-		Register(login, password string) error
+		Register(login, password string) (types.Token, error)
 		Logout(token string) error
 		Verify(token string) error
 	}
