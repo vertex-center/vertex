@@ -21,6 +21,16 @@ func NewAuthHandler(authService port.AuthService) port.AuthHandler {
 	}
 }
 
+// docapi begin auth_login
+// docapi method POST
+// docapi summary Login
+// docapi description Login with username and password
+// docapi tags Authentication
+// docapi response 200 {Token} The auth token
+// docapi response 400
+// docapi response 500
+// docapi end
+
 func (h AuthHandler) Login(c *router.Context) {
 	login, pass, err := h.getUserPassFromHeader(c)
 	if err != nil {
@@ -39,6 +49,15 @@ func (h AuthHandler) Login(c *router.Context) {
 
 	c.JSON(token)
 }
+
+// docapi begin auth_register
+// docapi method POST
+// docapi summary Register
+// docapi description Register a new user with username and password
+// docapi tags Authentication
+// docapi response 200 {Token} The auth token
+// docapi response 400
+// docapi response 500
 
 func (h AuthHandler) Register(c *router.Context) {
 	login, pass, err := h.getUserPassFromHeader(c)
@@ -79,6 +98,14 @@ func (h AuthHandler) Register(c *router.Context) {
 
 	c.JSON(token)
 }
+
+// docapi begin auth_logout
+// docapi method POST
+// docapi summary Logout
+// docapi tags Authentication
+// docapi response 204
+// docapi response 500
+// docapi end
 
 func (h AuthHandler) Logout(c *router.Context) {
 	token := c.MustGet("token").(string)

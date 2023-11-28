@@ -241,11 +241,11 @@ func initRoutes(about types.About) {
 
 	authHandler := handler.NewAuthHandler(authService)
 	auth := a.Group("/auth")
-	// docapi:v route /auth/login login
+	// docapi:v route /auth/login auth_login
 	auth.POST("/login", authHandler.Login)
-	// docapi:v route /auth/register register
+	// docapi:v route /auth/register auth_register
 	auth.POST("/register", authHandler.Register)
-	// docapi:v route /auth/logout logout
+	// docapi:v route /auth/logout auth_logout
 	auth.POST("/logout", authenticated, authHandler.Logout)
 
 	appsHandler := handler.NewAppsHandler(appsService)
