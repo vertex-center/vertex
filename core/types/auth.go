@@ -35,6 +35,7 @@ type CredentialsArgon2id struct {
 	Memory      uint32         `json:"memory"`
 	Parallelism uint8          `json:"parallelism"`
 	Salt        string         `json:"salt"`
+	KeyLen      uint32         `json:"key_len"`
 	Users       []*User        `json:"users,omitempty" gorm:"many2many:user_credentials_argon2id;"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`

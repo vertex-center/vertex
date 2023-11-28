@@ -42,8 +42,9 @@ func (s *AuthService) Register(login, password string) error {
 	mem := uint32(12 * 1024)
 	threads := uint8(4)
 	salt := "vertex"
+	keyLen := uint32(32)
 
-	key := argon2.IDKey([]byte(password), []byte(salt), it, mem, threads, 32)
+	key := argon2.IDKey([]byte(password), []byte(salt), it, mem, threads, keyLen)
 	hash := base64.StdEncoding.EncodeToString(key)
 
 	return s.adapter.CreateAccount(login, types.CredentialsArgon2id{
@@ -54,5 +55,6 @@ func (s *AuthService) Register(login, password string) error {
 		Memory:      mem,
 		Parallelism: threads,
 		Salt:        salt,
+		KeyLen:      keyLen,
 	})
 }
