@@ -1,4 +1,7 @@
-import "./Login.sass";
+import "../Login/Login.sass";
+import { useState } from "react";
+import { useRegister } from "../../hooks/useRegister";
+import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import {
     Button,
     Horizontal,
@@ -8,31 +11,28 @@ import {
     Title,
     Vertical,
 } from "@vertex-center/components";
-import Spacer from "../../../../components/Spacer/Spacer";
 import { APIError } from "../../../../components/Error/APIError";
-import { useState } from "react";
-import { ProgressOverlay } from "../../../../components/Progress/Progress";
-import { useLogin } from "../../hooks/useLogin";
+import Spacer from "../../../../components/Spacer/Spacer";
 
-export default function Login() {
+export default function Register() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const { login, isLoggingIn, errorLogin } = useLogin({
+    const { register, isRegistering, errorRegister } = useRegister({
         onSuccess: () => {},
     });
 
-    const onRegister = () => login({ username, password });
+    const onRegister = () => register({ username, password });
     const onUsernameChange = (e: any) => setUsername(e.target.value);
     const onPasswordChange = (e: any) => setPassword(e.target.value);
 
     return (
         <div className="login">
             <div className="login-container">
-                <ProgressOverlay show={isLoggingIn} />
+                <ProgressOverlay show={isRegistering} />
                 <Horizontal gap={12}>
                     <Logo />
-                    <Title variant="h1">Login</Title>
+                    <Title variant="h1">Register</Title>
                 </Horizontal>
                 <Vertical gap={20}>
                     <TextField
@@ -48,7 +48,7 @@ export default function Login() {
                         type="password"
                         required
                     />
-                    <APIError error={errorLogin} />
+                    <APIError error={errorRegister} />
                     <Horizontal>
                         <Spacer />
                         <Button
@@ -56,7 +56,7 @@ export default function Login() {
                             rightIcon={<MaterialIcon icon="login" />}
                             onClick={onRegister}
                         >
-                            Login
+                            Register
                         </Button>
                     </Horizontal>
                 </Vertical>

@@ -16,7 +16,23 @@ import { Credentials } from "../../models/auth";
 export const server = axios.create({
     // @ts-ignore
     baseURL: `${window.apiURL}/api`,
+    headers: {
+        Authorization: `Bearer ${getAuthToken()}`,
+    },
 });
+
+export function setAuthToken(token: string) {
+    // Set cookie
+    document.cookie = `vertex_auth_token=${token};path=/`;
+    server.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+}
+
+function getAuthToken() {
+    return document?.cookie
+        ?.split(";")
+        ?.find((c) => c.trim().startsWith("vertex_auth_token="))
+        ?.slice("vertex_auth_token=".length);
+}
 
 // server.interceptors.response.use(async (response) => {
 //     if (process.env.NODE_ENV === "development")
@@ -140,6 +156,17 @@ export const api = {
     },
 
     auth: {
+        login: async (credentials: Credentials) => {
+            const Authorization = `Basic ${btoa(
+                credentials.username + ":" + credentials.password
+            )}`;
+            const { data } = await server.post(
+                "/auth/login",
+                {},
+                { headers: { Authorization } }
+            );
+            return data;
+        },
         register: async (credentials: Credentials) => {
             const Authorization = `Basic ${btoa(
                 credentials.username + ":" + credentials.password
@@ -149,6 +176,10 @@ export const api = {
                 {},
                 { headers: { Authorization } }
             );
+            return data;
+        },
+        logout: async () => {
+            const { data } = await server.post("/auth/logout");
             return data;
         },
     },

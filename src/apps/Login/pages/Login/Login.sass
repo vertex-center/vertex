@@ -19,4 +19,8 @@
         flex-direction: column
         gap: 32px
         z-index: 100
+        width: 300px
         border-radius: dimensions.$border-radius-lg
+
+        @include dimensions.extra-small-or-less
+            width: calc(100% - 64px)

@@ -44,6 +44,8 @@ import ServiceEditor from "./apps/DevToolsServiceEditor/ServiceEditor/ServiceEdi
 import Login from "./apps/Login/pages/Login/Login";
 import SettingsDb from "./apps/Settings/SettingsData/SettingsDb";
 import SettingsChecks from "./apps/Settings/SettingsChecks/SettingsChecks";
+import Register from "./apps/Login/pages/Register/Register";
+import Logout from "./apps/Login/pages/Logout/Logout";
 
 const queryClient = new QueryClient();
 
@@ -55,7 +57,11 @@ function AllRoutes() {
         dock: true,
     };
 
-    if (pathname === "/login") {
+    if (
+        pathname === "/login" ||
+        pathname === "/register" ||
+        pathname === "/logout"
+    ) {
         show = {
             header: false,
             dock: false,
@@ -70,6 +76,8 @@ function AllRoutes() {
                 <div className="app-content">
                     <Routes>
                         <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/logout" element={<Logout />} />
                         <Route
                             path="/"
                             element={<Navigate to="/app/vx-containers" />}
