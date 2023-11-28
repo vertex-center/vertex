@@ -16,6 +16,7 @@ var (
 	ErrPasswordEmpty  = errors.New("password is empty")
 	ErrPasswordLength = errors.New("password length requirement not met")
 	ErrLoginFailed    = errors.New("login failed")
+	ErrTokenInvalid   = errors.New("token is invalid")
 )
 
 type User struct {

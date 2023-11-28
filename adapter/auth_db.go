@@ -52,3 +52,13 @@ func (a *AuthDbAdapter) SaveToken(token *types.Token) error {
 		return tx.Model(&types.Token{}).Preload("User").First(&token).Error
 	})
 }
+
+func (a *AuthDbAdapter) RemoveToken(token string) error {
+	return a.db.Get().Delete(&types.Token{Token: token}).Error
+}
+
+func (a *AuthDbAdapter) GetToken(token string) (*types.Token, error) {
+	var t types.Token
+	err := a.db.Get().Preload("User").First(&t, &types.Token{Token: token}).Error
+	return &t, err
+}

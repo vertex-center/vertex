@@ -26,6 +26,7 @@ import (
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/service"
 	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/handler"
 	"github.com/vertex-center/vertex/pkg/ginutils"
@@ -222,65 +223,71 @@ func initRoutes(about types.About) {
 		})
 	})
 
-	api := r.Group("/api")
-	api.GET("/about", func(c *router.Context) {
+	a := r.Group("/api")
+	a.GET("/about", func(c *router.Context) {
 		c.JSON(about)
 	})
 
 	if config.Current.Debug() {
 		debugHandler := handler.NewDebugHandler(debugService)
-		debug := api.Group("/debug")
+		debug := a.Group("/debug")
 		// docapi:v route /debug/hard-reset hard_reset
 		debug.POST("/hard-reset", debugHandler.HardReset)
 	}
 
+	authenticated := func(c *router.Context) {
+		api.AuthMiddleware(c, authService)
+	}
+
 	authHandler := handler.NewAuthHandler(authService)
-	auth := api.Group("/auth")
+	auth := a.Group("/auth")
 	// docapi:v route /auth/login login
 	auth.POST("/login", authHandler.Login)
 	// docapi:v route /auth/register register
 	auth.POST("/register", authHandler.Register)
+	// docapi:v route /auth/logout logout
+	auth.POST("/logout", authenticated, authHandler.Logout)
 
 	appsHandler := handler.NewAppsHandler(appsService)
-	apps := api.Group("/apps")
+	apps := a.Group("/apps")
 	// docapi:v route /apps get_apps
 	apps.GET("", appsHandler.Get)
 
 	checksHandler := handler.NewChecksHandler(checksService)
-	checks := api.Group("/admin/checks")
+	checks := a.Group("/admin/checks")
 	// docapi:v route /admin/checks admin_checks
 	checks.GET("", app.HeadersSSE, checksHandler.Check)
 
 	hardwareHandler := handler.NewHardwareHandler(hardwareService)
-	hardware := api.Group("/hardware")
+	hardware := a.Group("/hardware")
 	// docapi:v route /hardware/host get_host
 	hardware.GET("/host", hardwareHandler.GetHost)
 	// docapi:v route /hardware/cpus get_cpus
 	hardware.GET("/cpus", hardwareHandler.GetCPUs)
 
 	updateHandler := handler.NewUpdateHandler(updateService, adminSettingsService)
-	update := api.Group("/admin/update")
+	update := a.Group("/admin/update")
 	// docapi:v route /admin/update get_updates
 	update.GET("", updateHandler.Get)
 	// docapi:v route /admin/update install_update
 	update.POST("", updateHandler.Install)
 
 	settingsHandler := handler.NewSettingsHandler(adminSettingsService)
-	settings := api.Group("/admin/settings")
+	settings := a.Group("/admin/settings")
 	// docapi:v route /admin/settings get_settings
 	settings.GET("", settingsHandler.Get)
 	// docapi:v route /admin/settings patch_settings
 	settings.PATCH("", settingsHandler.Patch)
 
 	dbHandler := handler.NewDatabaseHandler(dbService)
-	db := api.Group("/admin/db")
+	db := a.Group("/admin/db")
 	// docapi:v route /admin/db/dbms get_current_dbms
 	db.GET("/dbms", dbHandler.GetCurrentDbms)
 	// docapi:v route /admin/db/dbms migrate_to_dbms
 	db.POST("/dbms", dbHandler.MigrateTo)
 
 	sshHandler := handler.NewSshHandler(sshService)
-	ssh := api.Group("/security/ssh")
+	ssh := a.Group("/security/ssh")
 	// docapi:v route /security/ssh get_ssh_keys
 	ssh.GET("", sshHandler.Get)
 	// docapi:v route /security/ssh add_ssh_key

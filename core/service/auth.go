@@ -94,6 +94,18 @@ func (s *AuthService) Register(login, password string) error {
 	})
 }
 
+func (s *AuthService) Logout(token string) error {
+	return s.adapter.RemoveToken(token)
+}
+
+func (s *AuthService) Verify(token string) error {
+	_, err := s.adapter.GetToken(token)
+	if err != nil {
+		return types.ErrTokenInvalid
+	}
+	return nil
+}
+
 func (s *AuthService) generateToken() (types.Token, error) {
 	token := make([]byte, 32)
 	_, err := rand.Read(token)

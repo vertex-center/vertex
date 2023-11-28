@@ -28,7 +28,10 @@ const (
 	ErrFailedToMigrateToNewDbms router.ErrCode = "failed_to_migrate_to_new_dbms"
 
 	ErrInvalidCredentials router.ErrCode = "invalid_credentials"
+	ErrInvalidToken       router.ErrCode = "invalid_token"
+	ErrAuthorizationEmpty router.ErrCode = "authorization_empty"
 	ErrLoginEmpty         router.ErrCode = "login_empty"
 	ErrPasswordEmpty      router.ErrCode = "password_empty"
 	ErrPasswordLength     router.ErrCode = "password_length"
+	ErrFailedToLogout     router.ErrCode = "failed_to_logout"
 )
