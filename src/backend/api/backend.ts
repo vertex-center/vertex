@@ -16,21 +16,15 @@ import { Credentials } from "../../models/auth";
 export const server = axios.create({
     // @ts-ignore
     baseURL: `${window.apiURL}/api`,
-    headers: {
-        Authorization: `Bearer ${getAuthToken()}`,
-    },
 });
 
 export function setAuthToken(token?: string) {
     if (token === undefined) {
         // delete cookie
         document.cookie = "vertex_auth_token=;Max-Age=-99999999;path=/";
-        delete server.defaults.headers.common["Authorization"];
         return;
     }
-
     document.cookie = `vertex_auth_token=${token};path=/`;
-    server.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 }
 
 export function getAuthToken() {
@@ -40,12 +34,12 @@ export function getAuthToken() {
         ?.slice("vertex_auth_token=".length);
 }
 
-// server.interceptors.response.use(async (response) => {
-//     if (process.env.NODE_ENV === "development")
-//         await new Promise((resolve) => setTimeout(resolve, 1000));
-//
-//     return response;
-// });
+server.interceptors.request.use(async (config) => {
+    if (!config.headers.Authorization) {
+        config.headers.Authorization = `Bearer ${getAuthToken()}`;
+    }
+    return config;
+});
 
 server.interceptors.request.use((req) => {
     if (!req) return;
