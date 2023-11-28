@@ -14,9 +14,6 @@ func (s *ContainerService) OnEvent(e event.Event) {
 	switch e.(type) {
 	case types.EventServerStart:
 		s.LoadAll()
-		s.ctx.DispatchEvent(types.EventAppReady{
-			AppID: "vx-containers",
-		})
 	case types.EventServerSetupCompleted:
 		go func() {
 			s.StartAll()

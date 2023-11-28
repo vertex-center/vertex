@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/core/port"
@@ -86,7 +85,5 @@ func (s *ChecksService) checkURL(ctx context.Context, id, name, url string) type
 	if err != nil {
 		res.Error = err.Error()
 	}
-	// Wait a little bit more to make sure the server is ready.
-	<-time.After(500 * time.Millisecond)
 	return res
 }

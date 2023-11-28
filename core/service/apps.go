@@ -76,12 +76,18 @@ func (s *AppsService) StartApps() {
 			}
 		}
 
+		s.ctx.DispatchEvent(types.EventAppReady{
+			AppID: a.Meta().ID,
+		})
+
 		if err != nil {
 			log.Error(err)
 			log.Error(errors.New("failed to initialize app"),
 				vlog.String("id", id))
 		}
 	}
+
+	s.ctx.DispatchEvent(types.EventAllAppsReady{})
 
 	log.Info("apps initialized")
 }

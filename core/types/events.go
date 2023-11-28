@@ -16,6 +16,9 @@ type (
 		AppID string
 	}
 
+	// EventAllAppsReady is dispatched when all apps are ready to be used.
+	EventAllAppsReady struct{}
+
 	// EventDbMigrate is dispatched when the database is migrated.
 	// Use this event to migrate the database of your app.
 	EventDbMigrate struct {
