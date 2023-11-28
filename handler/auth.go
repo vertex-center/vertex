@@ -22,34 +22,31 @@ func NewAuthHandler(authService port.AuthService) port.AuthHandler {
 }
 
 func (h AuthHandler) Login(c *router.Context) {
-	c.OK()
+	login, pass, err := h.getUserPassFromHeader(c)
+	if err != nil {
+		return
+	}
+
+	token, err := h.authService.Login(login, pass)
+	if errors.Is(err, types.ErrLoginFailed) {
+		c.Abort(router.Error{
+			Code:           api.ErrInvalidCredentials,
+			PublicMessage:  "Invalid credentials",
+			PrivateMessage: "Invalid credentials",
+		})
+		return
+	}
+
+	c.JSON(token)
 }
 
 func (h AuthHandler) Register(c *router.Context) {
-	authorization := c.Request.Header.Get("Authorization")
-
-	userpass := strings.TrimPrefix(authorization, "Basic ")
-	userpassBytes, err := base64.StdEncoding.DecodeString(userpass)
+	login, pass, err := h.getUserPassFromHeader(c)
 	if err != nil {
-		c.BadRequest(router.Error{
-			Code:           api.ErrInvalidCredentials,
-			PublicMessage:  "Invalid credentials",
-			PrivateMessage: "Invalid credentials: expected base64 encoded login:password",
-		})
-		return
-	}
-	userpass = string(userpassBytes)
-	creds := strings.Split(userpass, ":")
-	if len(creds) != 2 {
-		c.BadRequest(router.Error{
-			Code:           api.ErrInvalidCredentials,
-			PublicMessage:  "Invalid credentials",
-			PrivateMessage: "Invalid credentials: expected login:password",
-		})
 		return
 	}
 
-	err = h.authService.Register(creds[0], creds[1])
+	err = h.authService.Register(login, pass)
 	if errors.Is(err, types.ErrLoginEmpty) {
 		c.BadRequest(router.Error{
 			Code:           api.ErrLoginEmpty,
@@ -81,4 +78,30 @@ func (h AuthHandler) Register(c *router.Context) {
 	}
 
 	c.OK()
+}
+
+func (h AuthHandler) getUserPassFromHeader(c *router.Context) (string, string, error) {
+	authorization := c.Request.Header.Get("Authorization")
+
+	userpass := strings.TrimPrefix(authorization, "Basic ")
+	userpassBytes, err := base64.StdEncoding.DecodeString(userpass)
+	if err != nil {
+		c.BadRequest(router.Error{
+			Code:           api.ErrInvalidCredentials,
+			PublicMessage:  "Invalid credentials",
+			PrivateMessage: "Invalid credentials: expected base64 encoded login:password",
+		})
+		return "", "", err
+	}
+	userpass = string(userpassBytes)
+	creds := strings.Split(userpass, ":")
+	if len(creds) != 2 {
+		c.BadRequest(router.Error{
+			Code:           api.ErrInvalidCredentials,
+			PublicMessage:  "Invalid credentials",
+			PrivateMessage: "Invalid credentials: expected login:password",
+		})
+		return "", "", err
+	}
+	return creds[0], creds[1], nil
 }

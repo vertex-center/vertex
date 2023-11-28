@@ -4,6 +4,7 @@ import (
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type AuthDbAdapter struct {
@@ -32,5 +33,22 @@ func (a *AuthDbAdapter) CreateAccount(username string, credentials types.Credent
 			return err
 		}
 		return tx.Model(&user).Association("CredentialsArgon2id").Append(&credentials)
+	})
+}
+
+func (a *AuthDbAdapter) GetCredentials(login string) ([]types.CredentialsArgon2id, error) {
+	var creds []types.CredentialsArgon2id
+	err := a.db.Get().Find(&creds, &types.CredentialsArgon2id{Login: login}).Error
+	return creds, err
+}
+
+func (a *AuthDbAdapter) SaveToken(token *types.Token) error {
+	return a.db.Get().Transaction(func(tx *gorm.DB) error {
+		err := tx.Omit(clause.Associations).Create(token).Error
+		if err != nil {
+			return err
+		}
+		*token = types.Token{Token: token.Token}
+		return tx.Model(&types.Token{}).Preload("User").First(&token).Error
 	})
 }

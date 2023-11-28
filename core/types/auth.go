@@ -15,11 +15,12 @@ var (
 	ErrLoginEmpty     = errors.New("login is empty")
 	ErrPasswordEmpty  = errors.New("password is empty")
 	ErrPasswordLength = errors.New("password length requirement not met")
+	ErrLoginFailed    = errors.New("login failed")
 )
 
 type User struct {
 	Username            string                 `json:"username" gorm:"primaryKey"`
-	CredentialsArgon2id []*CredentialsArgon2id `json:"credentials_argon2id" gorm:"many2many:user_credentials_argon2id;"`
+	CredentialsArgon2id []*CredentialsArgon2id `json:"-" gorm:"many2many:user_credentials_argon2id;"`
 	CreatedAt           time.Time              `json:"created_at"`
 	UpdatedAt           time.Time              `json:"updated_at"`
 	DeletedAt           gorm.DeletedAt         `json:"deleted_at,omitempty" gorm:"index"`
@@ -40,4 +41,13 @@ type CredentialsArgon2id struct {
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`
+}
+
+type Token struct {
+	Token     string         `json:"token" gorm:"primaryKey"`
+	Username  string         `json:"-" gorm:"not null"`
+	User      User           `json:"user,omitempty" gorm:"foreignKey:Username;references:Username"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`
 }

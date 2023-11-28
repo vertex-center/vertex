@@ -18,6 +18,7 @@ func (s *DbService) copyDb(from *gorm.DB, to *gorm.DB) error {
 		// Auth
 		types.User{},
 		types.CredentialsArgon2id{},
+		types.Token{},
 	}
 
 	toTx := to.Begin()

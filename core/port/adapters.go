@@ -44,5 +44,7 @@ type (
 
 	AuthAdapter interface {
 		CreateAccount(username string, credentials types.CredentialsArgon2id) error
+		GetCredentials(login string) ([]types.CredentialsArgon2id, error)
+		SaveToken(token *types.Token) error
 	}
 )
