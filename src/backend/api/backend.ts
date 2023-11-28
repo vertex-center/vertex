@@ -31,7 +31,7 @@ export function getAuthToken() {
     return document?.cookie
         ?.split(";")
         ?.find((c) => c.trim().startsWith("vertex_auth_token="))
-        ?.slice("vertex_auth_token=".length);
+        ?.replace("vertex_auth_token=", "");
 }
 
 server.interceptors.request.use(async (config) => {
