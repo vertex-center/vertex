@@ -4,6 +4,7 @@ import {
     Route,
     Routes,
     useLocation,
+    useNavigate,
 } from "react-router-dom";
 import ContainersApp from "./apps/Containers/pages/ContainersApp/ContainersApp";
 import ContainerDetails from "./apps/Containers/pages/Container/Container";
@@ -46,11 +47,13 @@ import SettingsDb from "./apps/Settings/SettingsData/SettingsDb";
 import SettingsChecks from "./apps/Settings/SettingsChecks/SettingsChecks";
 import Register from "./apps/Login/pages/Register/Register";
 import Logout from "./apps/Login/pages/Logout/Logout";
+import { getAuthToken } from "./backend/api/backend";
 
 const queryClient = new QueryClient();
 
 function AllRoutes() {
     const { pathname } = useLocation();
+    const navigate = useNavigate();
 
     let show = {
         header: true,
@@ -66,6 +69,11 @@ function AllRoutes() {
             header: false,
             dock: false,
         };
+    } else {
+        const token = getAuthToken();
+        if (!token) {
+            navigate("/login");
+        }
     }
 
     return (
