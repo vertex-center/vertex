@@ -13,13 +13,16 @@ import { APIError } from "../../../../components/Error/APIError";
 import { useState } from "react";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useLogin } from "../../hooks/useLogin";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
+    const navigate = useNavigate();
+
     const { login, isLoggingIn, errorLogin } = useLogin({
-        onSuccess: () => {},
+        onSuccess: () => navigate("/"),
     });
 
     const onRegister = () => login({ username, password });

@@ -13,13 +13,16 @@ import {
 } from "@vertex-center/components";
 import { APIError } from "../../../../components/Error/APIError";
 import Spacer from "../../../../components/Spacer/Spacer";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
+    const navigate = useNavigate();
+
     const { register, isRegistering, errorRegister } = useRegister({
-        onSuccess: () => {},
+        onSuccess: () => navigate("/"),
     });
 
     const onRegister = () => register({ username, password });
