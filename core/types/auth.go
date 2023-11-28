@@ -1,6 +1,7 @@
 package types
 
 import (
+	"errors"
 	"time"
 
 	"gorm.io/gorm"
@@ -9,6 +10,12 @@ import (
 // User and CredentialsArgon2id are many-to-many relationship, because one user
 // can have multiple login methods, and one login method can be used to
 // connect to multiple users at once.
+
+var (
+	ErrLoginEmpty     = errors.New("login is empty")
+	ErrPasswordEmpty  = errors.New("password is empty")
+	ErrPasswordLength = errors.New("password length requirement not met")
+)
 
 type User struct {
 	Username            string                 `json:"username" gorm:"primaryKey"`

@@ -22,9 +22,21 @@ func (s *AuthService) Login(login, password string) error {
 	return nil
 }
 
+// Register creates a new user account. It can return ErrLoginEmpty, ErrPasswordEmpty, or
+// ErrPasswordLength if the login or password is too short.
 func (s *AuthService) Register(login, password string) error {
 	// TODO: make these settings configurable in the admin settings
 	// https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#argon2id
+
+	if len(login) == 0 {
+		return types.ErrLoginEmpty
+	}
+	if len(password) == 0 {
+		return types.ErrPasswordEmpty
+	}
+	if len(password) < 8 {
+		return types.ErrPasswordLength
+	}
 
 	it := uint32(3)
 	mem := uint32(12 * 1024)
