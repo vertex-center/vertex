@@ -41,4 +41,8 @@ type (
 		Remove(fingerprint string, user user.User) error
 		GetUsers() ([]user.User, error)
 	}
+
+	AuthAdapter interface {
+		CreateAccount(username string, credentials types.CredentialsArgon2id) error
+	}
 )

@@ -14,6 +14,10 @@ func (s *DbService) copyDb(from *gorm.DB, to *gorm.DB) error {
 	// Adding a table here must also be added in the Connect() method in adapter/db_config_fs.go
 	tables := []interface{}{
 		types.AdminSettings{},
+
+		// Auth
+		types.User{},
+		types.CredentialsArgon2id{},
 	}
 
 	toTx := to.Begin()

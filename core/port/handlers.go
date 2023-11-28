@@ -8,6 +8,13 @@ type (
 		Get(c *router.Context)
 	}
 
+	AuthHandler interface {
+		// Login handles the login of a user.
+		Login(c *router.Context)
+		// Register handles the registration of a user.
+		Register(c *router.Context)
+	}
+
 	ChecksHandler interface {
 		// Check handles the check of all components.
 		Check(c *router.Context)

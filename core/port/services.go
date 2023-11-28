@@ -13,6 +13,11 @@ type (
 		All() []app.Meta
 	}
 
+	AuthService interface {
+		Login(login, password string) error
+		Register(login, password string) error
+	}
+
 	DbService interface {
 		GetCurrentDbms() types.DbmsName
 		MigrateTo(dbms types.DbmsName) error

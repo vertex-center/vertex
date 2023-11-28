@@ -49,10 +49,12 @@ var (
 
 	dbConfigFSAdapter      port.DbConfigAdapter
 	adminSettingsDbAdapter port.AdminSettingsAdapter
+	authDbAdapter          port.AuthAdapter
 	sshKernelApiAdapter    port.SshAdapter
 	baselinesApiAdapter    port.BaselinesAdapter
 
 	appsService          port.AppsService
+	authService          port.AuthService
 	debugService         port.DebugService
 	dbService            port.DbService
 	hardwareService      port.HardwareService
@@ -146,7 +148,12 @@ func initRouter() {
 	gin.SetMode(gin.ReleaseMode)
 	ctx = types.NewVertexContext()
 	r = router.New()
-	r.Use(cors.Default())
+
+	cfg := cors.DefaultConfig()
+	cfg.AllowAllOrigins = true
+	cfg.AddAllowHeaders("Authorization")
+
+	r.Use(cors.New(cfg))
 	r.Use(ginutils.ErrorHandler())
 	r.Use(ginutils.Logger("MAIN"))
 	r.Use(gin.Recovery())
@@ -155,6 +162,7 @@ func initRouter() {
 func initAdapters() {
 	dbConfigFSAdapter = adapter.NewDataConfigFSAdapter(nil)
 	adminSettingsDbAdapter = adapter.NewAdminSettingsDbAdapter(dbConfigFSAdapter)
+	authDbAdapter = adapter.NewAuthDbAdapter(dbConfigFSAdapter)
 	sshKernelApiAdapter = adapter.NewSshKernelApiAdapter()
 	baselinesApiAdapter = adapter.NewBaselinesApiAdapter()
 }
@@ -167,6 +175,7 @@ func initServices(about types.About) {
 		updates.NewVertexClientUpdater(path.Join(storage.Path, "client")),
 		updates.NewRepositoryUpdater("vertex_services", path.Join(storage.Path, "services"), "vertex-center", "services"),
 	})
+	authService = service.NewAuthService(authDbAdapter)
 	appsService = service.NewAppsService(ctx, false, r,
 		[]app.Interface{
 			sql.NewApp(),
@@ -224,6 +233,13 @@ func initRoutes(about types.About) {
 		// docapi:v route /debug/hard-reset hard_reset
 		debug.POST("/hard-reset", debugHandler.HardReset)
 	}
+
+	authHandler := handler.NewAuthHandler(authService)
+	auth := api.Group("/auth")
+	// docapi:v route /auth/login login
+	auth.POST("/login", authHandler.Login)
+	// docapi:v route /auth/register register
+	auth.POST("/register", authHandler.Register)
 
 	appsHandler := handler.NewAppsHandler(appsService)
 	apps := api.Group("/apps")

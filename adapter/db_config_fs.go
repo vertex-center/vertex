@@ -97,6 +97,10 @@ func (a *DbConfigFSAdapter) Connect() error {
 	// Adding a table here must also be added in the copyDb() method in core/service/db_utils.go
 	return a.db.AutoMigrate(
 		&types.AdminSettings{},
+
+		// Auth
+		&types.User{},
+		&types.CredentialsArgon2id{},
 	)
 }
 
