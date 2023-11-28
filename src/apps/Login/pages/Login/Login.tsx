@@ -13,7 +13,7 @@ import { APIError } from "../../../../components/Error/APIError";
 import { useState } from "react";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useLogin } from "../../hooks/useLogin";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
     const [username, setUsername] = useState("");
@@ -52,6 +52,7 @@ export default function Login() {
                         required
                     />
                     <APIError error={errorLogin} />
+                    <Link to="/register">I don't have an account</Link>
                     <Horizontal>
                         <Spacer />
                         <Button

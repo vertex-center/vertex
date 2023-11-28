@@ -13,7 +13,7 @@ import {
 } from "@vertex-center/components";
 import { APIError } from "../../../../components/Error/APIError";
 import Spacer from "../../../../components/Spacer/Spacer";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Register() {
     const [username, setUsername] = useState("");
@@ -52,6 +52,7 @@ export default function Register() {
                         required
                     />
                     <APIError error={errorRegister} />
+                    <Link to="/login">I already have an account</Link>
                     <Horizontal>
                         <Spacer />
                         <Button
