@@ -29,13 +29,13 @@ type User struct {
 // hash the password.
 type CredentialsArgon2id struct {
 	Login       string         `json:"login" gorm:"primaryKey"`
-	Hash        string         `json:"hash"`
-	Type        string         `json:"type" gorm:"default:argon2id"`
-	Iterations  uint32         `json:"iterations"`
-	Memory      uint32         `json:"memory"`
-	Parallelism uint8          `json:"parallelism"`
-	Salt        string         `json:"salt"`
-	KeyLen      uint32         `json:"key_len"`
+	Hash        string         `json:"hash" gorm:"not null"`
+	Type        string         `json:"type" gorm:"default:argon2id;not null"`
+	Iterations  uint32         `json:"iterations" gorm:"not null"`
+	Memory      uint32         `json:"memory" gorm:"not null"`
+	Parallelism uint8          `json:"parallelism" gorm:"not null"`
+	Salt        string         `json:"salt" gorm:"not null"`
+	KeyLen      uint32         `json:"key_len" gorm:"not null"`
 	Users       []*User        `json:"users,omitempty" gorm:"many2many:user_credentials_argon2id;"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
