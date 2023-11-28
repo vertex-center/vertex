@@ -52,7 +52,7 @@ func (suite *UpdateServiceTestSuite) SetupTest() {
 	suite.adapter = &port.MockBaselinesAdapter{}
 	suite.adapter.On("GetLatest", mock.Anything, types.UpdatesChannelStable).Return(suite.latestBaseline, nil)
 	suite.adapter.On("GetLatest", mock.Anything, types.UpdatesChannelBeta).Return(suite.betaBaseline, nil)
-	suite.service = NewUpdateService(types.NewVertexContext(), suite.adapter, updaters).(*UpdateService)
+	suite.service = NewUpdateService(types.NewVertexContext(&types.DB{}), suite.adapter, updaters).(*UpdateService)
 }
 
 func (suite *UpdateServiceTestSuite) TestGetUpdate() {
