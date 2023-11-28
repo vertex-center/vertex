@@ -1,7 +1,9 @@
 import { v4 as uuidv4 } from "uuid";
+import { EventSourcePolyfill } from "event-source-polyfill";
+import { getAuthToken } from "./api/backend";
 
 type SSE = {
-    eventSource: EventSource;
+    eventSource: EventSourcePolyfill;
     url: string;
     watchers: number;
 };
@@ -18,7 +20,11 @@ export function registerSSE(url: string): string {
 
     uuid = uuidv4();
     // @ts-ignore
-    const eventSource = new EventSource(`${window.apiURL}/api${url}`);
+    const eventSource = new EventSourcePolyfill(`${window.apiURL}/api${url}`, {
+        headers: {
+            Authorization: `Bearer ${getAuthToken()}`,
+        },
+    });
     allSSE[uuid] = { url, eventSource, watchers: 1 };
 
     return uuid;
