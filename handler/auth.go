@@ -81,9 +81,9 @@ func (h AuthHandler) Register(c *router.Context) {
 }
 
 func (h AuthHandler) Logout(c *router.Context) {
-	token := c.MustGet("token").(types.Token)
+	token := c.MustGet("token").(string)
 
-	err := h.authService.Logout(token.Token)
+	err := h.authService.Logout(token)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToLogout,
