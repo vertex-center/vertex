@@ -207,6 +207,7 @@ func initServices() {
 			reverseproxy.NewApp(),
 			serviceeditor.NewApp(),
 		},
+		func(c *router.Context) {},
 	)
 }
 

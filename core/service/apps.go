@@ -14,22 +14,24 @@ import (
 )
 
 type AppsService struct {
-	uuid     uuid.UUID
-	kernel   bool
-	ctx      *types.VertexContext
-	apps     []app.Interface
-	registry *app.AppsRegistry
-	router   *router.Router
+	uuid                    uuid.UUID
+	kernel                  bool
+	ctx                     *types.VertexContext
+	apps                    []app.Interface
+	registry                *app.AppsRegistry
+	router                  *router.Router
+	authenticatedMiddleware func(c *router.Context)
 }
 
-func NewAppsService(ctx *types.VertexContext, kernel bool, router *router.Router, apps []app.Interface) port.AppsService {
+func NewAppsService(ctx *types.VertexContext, kernel bool, router *router.Router, apps []app.Interface, authenticatedMiddleware func(c *router.Context)) port.AppsService {
 	s := &AppsService{
-		uuid:     uuid.New(),
-		kernel:   kernel,
-		ctx:      ctx,
-		apps:     apps,
-		registry: app.NewAppsRegistry(ctx),
-		router:   router,
+		uuid:                    uuid.New(),
+		kernel:                  kernel,
+		ctx:                     ctx,
+		apps:                    apps,
+		registry:                app.NewAppsRegistry(ctx),
+		router:                  router,
+		authenticatedMiddleware: authenticatedMiddleware,
 	}
 	s.ctx.AddListener(s)
 	return s
@@ -59,7 +61,7 @@ func (s *AppsService) StartApps() {
 
 	for _, a := range s.registry.Apps() {
 		id := a.Meta().ID
-		group := s.router.Group("/api/app/" + id)
+		group := s.router.Group("/api/app/"+id, s.authenticatedMiddleware)
 
 		var err error
 		if s.kernel {

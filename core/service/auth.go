@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"errors"
 
+	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
@@ -105,6 +106,10 @@ func (s *AuthService) Logout(token string) error {
 }
 
 func (s *AuthService) Verify(token string) error {
+	if token == config.Current.MasterApiKey {
+		log.Debug("master key used for authentication")
+		return nil
+	}
 	_, err := s.adapter.GetToken(token)
 	if err != nil {
 		return types.ErrTokenInvalid

@@ -10,6 +10,7 @@ import (
 	"os/signal"
 	"path"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -185,6 +186,14 @@ func initServices(about types.About) {
 			containers.NewApp(),
 			reverseproxy.NewApp(),
 			serviceeditor.NewApp(),
+		},
+		func(c *router.Context) {
+			// Workaround for now
+			if strings.HasPrefix(c.Request.URL.Path, "/api/app/vx-containers/services/icons") {
+				c.Next()
+				return
+			}
+			api.AuthMiddleware(c, authService)
 		},
 	)
 	debugService = service.NewDebugService(ctx)
