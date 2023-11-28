@@ -161,7 +161,7 @@ export const api = {
                 credentials.username + ":" + credentials.password
             )}`;
             const { data } = await server.post(
-                "/auth/login",
+                "/app/vx-auth/auth/login",
                 {},
                 { headers: { Authorization } }
             );
@@ -172,14 +172,14 @@ export const api = {
                 credentials.username + ":" + credentials.password
             )}`;
             const { data } = await server.post(
-                "/auth/register",
+                "/app/vx-auth/auth/register",
                 {},
                 { headers: { Authorization } }
             );
             return data;
         },
         logout: async () => {
-            const { data } = await server.post("/auth/logout");
+            const { data } = await server.post("/app/vx-auth/auth/logout");
             return data;
         },
     },
