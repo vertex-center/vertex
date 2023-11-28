@@ -2,9 +2,17 @@ import {
     Link,
     LinkProps as RouterLinkProps,
     useLocation,
+    useNavigate,
 } from "react-router-dom";
 import { useApps } from "../../hooks/useApps";
-import { Header, LinkProps } from "@vertex-center/components";
+import {
+    DropdownItem,
+    Header,
+    HeaderItem,
+    LinkProps,
+    ProfilePicture,
+} from "@vertex-center/components";
+import useAuth from "../../apps/Login/hooks/useAuth";
 
 type Props = {
     title?: string;
@@ -14,7 +22,9 @@ type Props = {
 export default function (props: Readonly<Props>) {
     const { onClick } = props;
     const { apps } = useApps();
+    const { isLoggedIn } = useAuth();
 
+    const navigate = useNavigate();
     const location = useLocation();
 
     let to = "/app/vx-containers";
@@ -32,5 +42,33 @@ export default function (props: Readonly<Props>) {
         to,
     };
 
-    return <Header onClick={onClick} appName={app?.name} linkLogo={linkLogo} />;
+    let accountItems;
+    if (isLoggedIn) {
+        accountItems = (
+            <DropdownItem icon="logout" red onClick={() => navigate("/logout")}>
+                Logout
+            </DropdownItem>
+        );
+    } else {
+        accountItems = (
+            <DropdownItem icon="login" onClick={() => navigate("/login")}>
+                Login
+            </DropdownItem>
+        );
+    }
+
+    const account = (
+        <HeaderItem items={accountItems}>
+            <ProfilePicture size={36} />
+        </HeaderItem>
+    );
+
+    return (
+        <Header
+            onClick={onClick}
+            appName={app?.name}
+            linkLogo={linkLogo}
+            trailing={account}
+        />
+    );
 }

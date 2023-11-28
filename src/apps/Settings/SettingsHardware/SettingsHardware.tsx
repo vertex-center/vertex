@@ -1,6 +1,6 @@
 import { api } from "../../../backend/api/backend";
 import { APIError } from "../../../components/Error/APIError";
-import { Title } from "@vertex-center/components";
+import { List, Title } from "@vertex-center/components";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useQuery } from "@tanstack/react-query";
 import Content from "../../../components/Content/Content";
@@ -39,9 +39,11 @@ export default function SettingsHardware() {
             <Host host={host} />
 
             <Title variant="h3">CPUs</Title>
-            {cpus?.map((cpu, i) => (
-                <CPU key={i} cpu={cpu} />
-            ))}
+            <List>
+                {cpus?.map((cpu, i) => (
+                    <CPU key={i} cpu={cpu} />
+                ))}
+            </List>
         </Content>
     );
 }

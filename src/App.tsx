@@ -1,4 +1,11 @@
-import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
+import {
+    HashRouter,
+    Navigate,
+    Route,
+    Routes,
+    useLocation,
+    useNavigate,
+} from "react-router-dom";
 import ContainersApp from "./apps/Containers/pages/ContainersApp/ContainersApp";
 import ContainerDetails from "./apps/Containers/pages/Container/Container";
 import ContainerLogs from "./apps/Containers/pages/ContainerLogs/ContainerLogs";
@@ -6,7 +13,7 @@ import ContainerEnv from "./apps/Containers/pages/ContainerEnv/ContainerEnv";
 import ContainerHome from "./apps/Containers/pages/ContainerHome/ContainerHome";
 import SettingsApp from "./apps/Settings/SettingsApp/SettingsApp";
 import SettingsTheme from "./apps/Settings/SettingsTheme/SettingsTheme";
-import { useContext } from "react";
+import { Fragment, useContext } from "react";
 import { ThemeContext } from "./main";
 import classNames from "classnames";
 import SettingsAbout from "./apps/Settings/SettingsAbout/SettingsAbout";
@@ -35,10 +42,183 @@ import SqlDatabase from "./apps/Sql/SqlDatabase/SqlDatabase";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import ServiceEditor from "./apps/DevToolsServiceEditor/ServiceEditor/ServiceEditor";
+import Login from "./apps/Login/pages/Login/Login";
 import SettingsDb from "./apps/Settings/SettingsData/SettingsDb";
 import SettingsChecks from "./apps/Settings/SettingsChecks/SettingsChecks";
+import Register from "./apps/Login/pages/Register/Register";
+import Logout from "./apps/Login/pages/Logout/Logout";
+import { getAuthToken } from "./backend/api/backend";
 
 const queryClient = new QueryClient();
+
+function AllRoutes() {
+    const { pathname } = useLocation();
+    const navigate = useNavigate();
+
+    let show = {
+        header: true,
+        dock: true,
+    };
+
+    if (
+        pathname === "/login" ||
+        pathname === "/register" ||
+        pathname === "/logout"
+    ) {
+        show = {
+            header: false,
+            dock: false,
+        };
+    } else {
+        const token = getAuthToken();
+        if (!token) {
+            navigate("/login");
+        }
+    }
+
+    return (
+        <Fragment>
+            {show.header && <Header />}
+            <div className="app-main">
+                <div className="app-sidebar" />
+                <div className="app-content">
+                    <Routes>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/logout" element={<Logout />} />
+                        <Route
+                            path="/"
+                            element={<Navigate to="/app/vx-containers" />}
+                            index
+                        />
+                        <Route
+                            path="/app/vx-containers"
+                            element={<ContainersApp />}
+                        />
+                        <Route
+                            path="/app/vx-containers/add"
+                            element={<ContainersStore />}
+                        />
+                        <Route
+                            path="/app/vx-devtools-service-editor"
+                            element={<ServiceEditor />}
+                        />
+                        <Route path="/app/vx-sql" element={<SqlApp />}>
+                            <Route
+                                path="/app/vx-sql/install"
+                                element={<SqlInstaller />}
+                            />
+                            <Route
+                                path="/app/vx-sql/db/:uuid"
+                                element={<SqlDatabase />}
+                            />
+                        </Route>
+                        <Route
+                            path="/app/vx-monitoring"
+                            element={<MonitoringApp />}
+                        >
+                            <Route
+                                path="/app/vx-monitoring/metrics"
+                                element={<MetricsList />}
+                            />
+                            <Route
+                                path="/app/vx-monitoring/prometheus"
+                                element={<Prometheus />}
+                            />
+                            <Route
+                                path="/app/vx-monitoring/grafana"
+                                element={<Grafana />}
+                            />
+                        </Route>
+                        <Route path="/app/vx-tunnels" element={<TunnelsApp />}>
+                            <Route
+                                path="/app/vx-tunnels/cloudflare"
+                                element={<CloudflareTunnels />}
+                            />
+                        </Route>
+                        <Route
+                            path="/app/vx-reverse-proxy"
+                            element={<ReverseProxyApp />}
+                        >
+                            <Route
+                                path="/app/vx-reverse-proxy/vertex"
+                                element={<VertexReverseProxy />}
+                            />
+                        </Route>
+                        <Route
+                            path="/app/vx-containers/:uuid/"
+                            element={<ContainerDetails />}
+                        >
+                            <Route
+                                path="/app/vx-containers/:uuid/home"
+                                element={<ContainerHome />}
+                            />
+                            <Route
+                                path="/app/vx-containers/:uuid/docker"
+                                element={<ContainerDocker />}
+                            />
+                            <Route
+                                path="/app/vx-containers/:uuid/logs"
+                                element={<ContainerLogs />}
+                            />
+                            <Route
+                                path="/app/vx-containers/:uuid/environment"
+                                element={<ContainerEnv />}
+                            />
+                            <Route
+                                path="/app/vx-containers/:uuid/database"
+                                element={<ContainerDetailsDatabase />}
+                            />
+                            <Route
+                                path="/app/vx-containers/:uuid/update"
+                                element={<ContainerUpdate />}
+                            />
+                            <Route
+                                path="/app/vx-containers/:uuid/settings"
+                                element={<ContainerSettings />}
+                            />
+                        </Route>
+                        <Route path="/settings" element={<SettingsApp />}>
+                            <Route
+                                path="/settings/theme"
+                                element={<SettingsTheme />}
+                            />
+                            <Route
+                                path="/settings/notifications"
+                                element={<SettingsNotifications />}
+                            />
+                            <Route
+                                path="/settings/hardware"
+                                element={<SettingsHardware />}
+                            />
+                            <Route
+                                path="/settings/database"
+                                element={<SettingsDb />}
+                            />
+                            <Route
+                                path="/settings/security"
+                                element={<SettingsSecurity />}
+                            />
+                            <Route
+                                path="/settings/updates"
+                                element={<SettingsUpdates />}
+                            />
+                            <Route
+                                path="/settings/checks"
+                                element={<SettingsChecks />}
+                            />
+                            <Route
+                                path="/settings/about"
+                                element={<SettingsAbout />}
+                            />
+                        </Route>
+                    </Routes>
+                </div>
+            </div>
+            {show.dock && <Dock />}
+        </Fragment>
+    );
+}
 
 function App() {
     const { theme } = useContext(ThemeContext);
@@ -48,149 +228,7 @@ function App() {
             <QueryClientProvider client={queryClient}>
                 <ReactQueryDevtools initialIsOpen={false} />
                 <HashRouter>
-                    <Header />
-                    <div className="app-main">
-                        <div className="app-sidebar" />
-                        <div className="app-content">
-                            <Routes>
-                                <Route
-                                    path="/"
-                                    element={
-                                        <Navigate to="/app/vx-containers" />
-                                    }
-                                    index
-                                />
-                                <Route
-                                    path="/app/vx-containers"
-                                    element={<ContainersApp />}
-                                />
-                                <Route
-                                    path="/app/vx-containers/add"
-                                    element={<ContainersStore />}
-                                />
-                                <Route
-                                    path="/app/vx-devtools-service-editor"
-                                    element={<ServiceEditor />}
-                                />
-                                <Route path="/app/vx-sql" element={<SqlApp />}>
-                                    <Route
-                                        path="/app/vx-sql/install"
-                                        element={<SqlInstaller />}
-                                    />
-                                    <Route
-                                        path="/app/vx-sql/db/:uuid"
-                                        element={<SqlDatabase />}
-                                    />
-                                </Route>
-                                <Route
-                                    path="/app/vx-monitoring"
-                                    element={<MonitoringApp />}
-                                >
-                                    <Route
-                                        path="/app/vx-monitoring/metrics"
-                                        element={<MetricsList />}
-                                    />
-                                    <Route
-                                        path="/app/vx-monitoring/prometheus"
-                                        element={<Prometheus />}
-                                    />
-                                    <Route
-                                        path="/app/vx-monitoring/grafana"
-                                        element={<Grafana />}
-                                    />
-                                </Route>
-                                <Route
-                                    path="/app/vx-tunnels"
-                                    element={<TunnelsApp />}
-                                >
-                                    <Route
-                                        path="/app/vx-tunnels/cloudflare"
-                                        element={<CloudflareTunnels />}
-                                    />
-                                </Route>
-                                <Route
-                                    path="/app/vx-reverse-proxy"
-                                    element={<ReverseProxyApp />}
-                                >
-                                    <Route
-                                        path="/app/vx-reverse-proxy/vertex"
-                                        element={<VertexReverseProxy />}
-                                    />
-                                </Route>
-                                <Route
-                                    path="/app/vx-containers/:uuid/"
-                                    element={<ContainerDetails />}
-                                >
-                                    <Route
-                                        path="/app/vx-containers/:uuid/home"
-                                        element={<ContainerHome />}
-                                    />
-                                    <Route
-                                        path="/app/vx-containers/:uuid/docker"
-                                        element={<ContainerDocker />}
-                                    />
-                                    <Route
-                                        path="/app/vx-containers/:uuid/logs"
-                                        element={<ContainerLogs />}
-                                    />
-                                    <Route
-                                        path="/app/vx-containers/:uuid/environment"
-                                        element={<ContainerEnv />}
-                                    />
-                                    <Route
-                                        path="/app/vx-containers/:uuid/database"
-                                        element={<ContainerDetailsDatabase />}
-                                    />
-                                    <Route
-                                        path="/app/vx-containers/:uuid/update"
-                                        element={<ContainerUpdate />}
-                                    />
-                                    <Route
-                                        path="/app/vx-containers/:uuid/settings"
-                                        element={<ContainerSettings />}
-                                    />
-                                </Route>
-                                <Route
-                                    path="/settings"
-                                    element={<SettingsApp />}
-                                >
-                                    <Route
-                                        path="/settings/theme"
-                                        element={<SettingsTheme />}
-                                    />
-                                    <Route
-                                        path="/settings/notifications"
-                                        element={<SettingsNotifications />}
-                                    />
-                                    <Route
-                                        path="/settings/hardware"
-                                        element={<SettingsHardware />}
-                                    />
-                                    <Route
-                                        path="/settings/database"
-                                        element={<SettingsDb />}
-                                    />
-                                    <Route
-                                        path="/settings/security"
-                                        element={<SettingsSecurity />}
-                                    />
-                                    <Route
-                                        path="/settings/updates"
-                                        element={<SettingsUpdates />}
-                                    />
-                                    <Route
-                                        path="/settings/checks"
-                                        element={<SettingsChecks />}
-                                    />
-                                    <Route
-                                        path="/settings/about"
-                                        element={<SettingsAbout />}
-                                    />
-                                </Route>
-                            </Routes>
-                        </div>
-                    </div>
-                    <Dock />
+                    <AllRoutes />
                 </HashRouter>
             </QueryClientProvider>
         </div>

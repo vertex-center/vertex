@@ -11,18 +11,35 @@ import { Console } from "../../logging/logging";
 import { Update } from "../../models/update";
 import { vxServiceEditorRoutes } from "./vxServiceEditor";
 import { CPU, Host } from "../../models/hardware";
+import { Credentials } from "../../models/auth";
 
 export const server = axios.create({
     // @ts-ignore
     baseURL: `${window.apiURL}/api`,
 });
 
-// server.interceptors.response.use(async (response) => {
-//     if (process.env.NODE_ENV === "development")
-//         await new Promise((resolve) => setTimeout(resolve, 1000));
-//
-//     return response;
-// });
+export function setAuthToken(token?: string) {
+    if (token === undefined) {
+        // delete cookie
+        document.cookie = "vertex_auth_token=;Max-Age=-99999999;path=/";
+        return;
+    }
+    document.cookie = `vertex_auth_token=${token};path=/`;
+}
+
+export function getAuthToken() {
+    return document?.cookie
+        ?.split(";")
+        ?.find((c) => c.trim().startsWith("vertex_auth_token="))
+        ?.replace("vertex_auth_token=", "");
+}
+
+server.interceptors.request.use(async (config) => {
+    if (!config.headers.Authorization) {
+        config.headers.Authorization = `Bearer ${getAuthToken()}`;
+    }
+    return config;
+});
 
 server.interceptors.request.use((req) => {
     if (!req) return;
@@ -136,5 +153,34 @@ export const api = {
         },
         patch: (settings: Partial<Settings>) =>
             server.patch("/admin/settings", settings),
+    },
+
+    auth: {
+        login: async (credentials: Credentials) => {
+            const Authorization = `Basic ${btoa(
+                credentials.username + ":" + credentials.password
+            )}`;
+            const { data } = await server.post(
+                "/app/vx-auth/auth/login",
+                {},
+                { headers: { Authorization } }
+            );
+            return data;
+        },
+        register: async (credentials: Credentials) => {
+            const Authorization = `Basic ${btoa(
+                credentials.username + ":" + credentials.password
+            )}`;
+            const { data } = await server.post(
+                "/app/vx-auth/auth/register",
+                {},
+                { headers: { Authorization } }
+            );
+            return data;
+        },
+        logout: async () => {
+            const { data } = await server.post("/app/vx-auth/auth/logout");
+            return data;
+        },
     },
 };
