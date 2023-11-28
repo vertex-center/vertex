@@ -11,14 +11,13 @@ import (
 )
 
 func (s *DbService) copyDb(from *gorm.DB, to *gorm.DB) error {
-	// Adding a table here must also be added in the Connect() method in adapter/db_config_fs.go
-	tables := []interface{}{
-		types.AdminSettings{},
-	}
+	dbCopy := types.EventDbCopy{}
+	dbCopy.AddTable(types.AdminSettings{})
+	s.ctx.DispatchEvent(dbCopy)
 
 	toTx := to.Begin()
 
-	for _, t := range tables {
+	for _, t := range dbCopy.All() {
 		err := s.copyDbTable(t, from, toTx)
 		if err != nil {
 			toTx.Rollback()

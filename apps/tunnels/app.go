@@ -1,6 +1,7 @@
 package tunnels
 
 import (
+	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/tunnels/handler"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -30,7 +31,7 @@ func (a *App) Meta() apptypes.Meta {
 func (a *App) Initialize(r *router.Group) error {
 	providerHandler := handler.NewProviderHandler()
 	// docapi:v route /app/vx-tunnels/provider/{provider}/install vx_tunnels_install_provider
-	r.POST("/provider/:provider/install", providerHandler.Install)
+	r.POST("/provider/:provider/install", middleware.Authenticated, providerHandler.Install)
 
 	return nil
 }

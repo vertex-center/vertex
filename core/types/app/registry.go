@@ -3,9 +3,8 @@ package app
 import (
 	"sync"
 
-	"github.com/vertex-center/vertex/core/types"
-
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/core/types"
 )
 
 type AppsRegistry struct {

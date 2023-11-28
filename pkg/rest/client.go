@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/carlmjohnson/requests"
+	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 )
@@ -20,6 +21,7 @@ func NewClient(baseURL string, path string) *Client {
 				log.Request("request from app", vlog.String("path", response.Request.URL.Path))
 				return nil
 			})
+			rb.Header("Authorization", "Bearer "+config.Current.MasterApiKey)
 		},
 	}
 }

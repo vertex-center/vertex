@@ -184,7 +184,7 @@ func buildVertex() {
 
 func initRouter() {
 	gin.SetMode(gin.ReleaseMode)
-	ctx = types.NewVertexContext()
+	ctx = types.NewVertexContext(&types.DB{})
 	r = router.New()
 	r.Use(ginutils.ErrorHandler())
 	r.Use(ginutils.Logger("KERNEL"))
@@ -198,16 +198,14 @@ func initAdapters() {
 func initServices() {
 	sshService = service.NewSshKernelService(sshAdapter)
 
-	service.NewAppsService(ctx, true, r,
-		[]app.Interface{
-			sql.NewApp(),
-			tunnels.NewApp(),
-			monitoring.NewApp(),
-			containers.NewApp(),
-			reverseproxy.NewApp(),
-			serviceeditor.NewApp(),
-		},
-	)
+	service.NewAppsService(ctx, true, r, []app.Interface{
+		sql.NewApp(),
+		tunnels.NewApp(),
+		monitoring.NewApp(),
+		containers.NewApp(),
+		reverseproxy.NewApp(),
+		serviceeditor.NewApp(),
+	})
 }
 
 func initRoutes() {

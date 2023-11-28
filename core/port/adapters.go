@@ -5,7 +5,6 @@ import (
 
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/user"
-	"gorm.io/gorm"
 )
 
 type (
@@ -20,8 +19,8 @@ type (
 		Update(settings types.AdminSettings) error
 	}
 
-	DbConfigAdapter interface {
-		Get() *gorm.DB
+	DbAdapter interface {
+		Get() *types.DB
 		Connect() error
 		GetDbConfig() types.DbConfig
 		GetDBMSName() types.DbmsName

@@ -16,6 +16,8 @@ import (
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/adapter"
+	"github.com/vertex-center/vertex/apps/auth"
+	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/containers"
 	"github.com/vertex-center/vertex/apps/monitoring"
 	"github.com/vertex-center/vertex/apps/reverseproxy"
@@ -47,7 +49,7 @@ var (
 	r   *router.Router
 	ctx *types.VertexContext
 
-	dbConfigFSAdapter      port.DbConfigAdapter
+	dbAdapter              port.DbAdapter
 	adminSettingsDbAdapter port.AdminSettingsAdapter
 	sshKernelApiAdapter    port.SshAdapter
 	baselinesApiAdapter    port.BaselinesAdapter
@@ -144,17 +146,22 @@ func checkNotRoot() {
 
 func initRouter() {
 	gin.SetMode(gin.ReleaseMode)
-	ctx = types.NewVertexContext()
 	r = router.New()
-	r.Use(cors.Default())
+
+	cfg := cors.DefaultConfig()
+	cfg.AllowAllOrigins = true
+	cfg.AddAllowHeaders("Authorization")
+
+	r.Use(cors.New(cfg))
 	r.Use(ginutils.ErrorHandler())
 	r.Use(ginutils.Logger("MAIN"))
 	r.Use(gin.Recovery())
 }
 
 func initAdapters() {
-	dbConfigFSAdapter = adapter.NewDataConfigFSAdapter(nil)
-	adminSettingsDbAdapter = adapter.NewAdminSettingsDbAdapter(dbConfigFSAdapter)
+	dbAdapter = adapter.NewDbAdapter(nil)
+	ctx = types.NewVertexContext(dbAdapter.Get())
+	adminSettingsDbAdapter = adapter.NewAdminSettingsDbAdapter(dbAdapter)
 	sshKernelApiAdapter = adapter.NewSshKernelApiAdapter()
 	baselinesApiAdapter = adapter.NewBaselinesApiAdapter()
 }
@@ -167,20 +174,19 @@ func initServices(about types.About) {
 		updates.NewVertexClientUpdater(path.Join(storage.Path, "client")),
 		updates.NewRepositoryUpdater("vertex_services", path.Join(storage.Path, "services"), "vertex-center", "services"),
 	})
-	appsService = service.NewAppsService(ctx, false, r,
-		[]app.Interface{
-			sql.NewApp(),
-			tunnels.NewApp(),
-			monitoring.NewApp(),
-			containers.NewApp(),
-			reverseproxy.NewApp(),
-			serviceeditor.NewApp(),
-		},
-	)
+	appsService = service.NewAppsService(ctx, false, r, []app.Interface{
+		auth.NewApp(),
+		sql.NewApp(),
+		tunnels.NewApp(),
+		monitoring.NewApp(),
+		containers.NewApp(),
+		reverseproxy.NewApp(),
+		serviceeditor.NewApp(),
+	})
 	debugService = service.NewDebugService(ctx)
 	service.NewNotificationsService(ctx, adminSettingsDbAdapter)
 	adminSettingsService = service.NewAdminSettingsService(adminSettingsDbAdapter)
-	dbService = service.NewDbService(ctx, dbConfigFSAdapter)
+	dbService = service.NewDbService(ctx, dbAdapter)
 	hardwareService = service.NewHardwareService()
 	checksService = service.NewChecksService()
 	sshService = service.NewSshService(sshKernelApiAdapter)
@@ -213,58 +219,58 @@ func initRoutes(about types.About) {
 		})
 	})
 
-	api := r.Group("/api")
-	api.GET("/about", func(c *router.Context) {
+	a := r.Group("/api", middleware.ReadAuth)
+	a.GET("/about", func(c *router.Context) {
 		c.JSON(about)
 	})
 
 	if config.Current.Debug() {
 		debugHandler := handler.NewDebugHandler(debugService)
-		debug := api.Group("/debug")
+		debug := a.Group("/debug", middleware.Authenticated)
 		// docapi:v route /debug/hard-reset hard_reset
 		debug.POST("/hard-reset", debugHandler.HardReset)
 	}
 
 	appsHandler := handler.NewAppsHandler(appsService)
-	apps := api.Group("/apps")
+	apps := a.Group("/apps", middleware.Authenticated)
 	// docapi:v route /apps get_apps
 	apps.GET("", appsHandler.Get)
 
 	checksHandler := handler.NewChecksHandler(checksService)
-	checks := api.Group("/admin/checks")
+	checks := a.Group("/admin/checks", middleware.Authenticated)
 	// docapi:v route /admin/checks admin_checks
 	checks.GET("", app.HeadersSSE, checksHandler.Check)
 
 	hardwareHandler := handler.NewHardwareHandler(hardwareService)
-	hardware := api.Group("/hardware")
+	hardware := a.Group("/hardware", middleware.Authenticated)
 	// docapi:v route /hardware/host get_host
 	hardware.GET("/host", hardwareHandler.GetHost)
 	// docapi:v route /hardware/cpus get_cpus
 	hardware.GET("/cpus", hardwareHandler.GetCPUs)
 
 	updateHandler := handler.NewUpdateHandler(updateService, adminSettingsService)
-	update := api.Group("/admin/update")
+	update := a.Group("/admin/update", middleware.Authenticated)
 	// docapi:v route /admin/update get_updates
 	update.GET("", updateHandler.Get)
 	// docapi:v route /admin/update install_update
 	update.POST("", updateHandler.Install)
 
 	settingsHandler := handler.NewSettingsHandler(adminSettingsService)
-	settings := api.Group("/admin/settings")
+	settings := a.Group("/admin/settings", middleware.Authenticated)
 	// docapi:v route /admin/settings get_settings
 	settings.GET("", settingsHandler.Get)
 	// docapi:v route /admin/settings patch_settings
 	settings.PATCH("", settingsHandler.Patch)
 
 	dbHandler := handler.NewDatabaseHandler(dbService)
-	db := api.Group("/admin/db")
+	db := a.Group("/admin/db", middleware.Authenticated)
 	// docapi:v route /admin/db/dbms get_current_dbms
 	db.GET("/dbms", dbHandler.GetCurrentDbms)
 	// docapi:v route /admin/db/dbms migrate_to_dbms
 	db.POST("/dbms", dbHandler.MigrateTo)
 
 	sshHandler := handler.NewSshHandler(sshService)
-	ssh := api.Group("/security/ssh")
+	ssh := a.Group("/security/ssh", middleware.Authenticated)
 	// docapi:v route /security/ssh get_ssh_keys
 	ssh.GET("", sshHandler.Get)
 	// docapi:v route /security/ssh add_ssh_key

@@ -9,13 +9,13 @@ import (
 )
 
 type AdminSettingsDbAdapter struct {
-	db port.DbConfigAdapter
+	db port.DbAdapter
 	// dbMutex is used to prevent concurrent access to the settings table.
 	// This is also needed to ensure that there is only one row in the table.
 	dbMutex sync.RWMutex
 }
 
-func NewAdminSettingsDbAdapter(db port.DbConfigAdapter) port.AdminSettingsAdapter {
+func NewAdminSettingsDbAdapter(db port.DbAdapter) port.AdminSettingsAdapter {
 	return &AdminSettingsDbAdapter{
 		db: db,
 	}

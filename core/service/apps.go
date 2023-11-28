@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
@@ -59,17 +60,18 @@ func (s *AppsService) StartApps() {
 
 	for _, a := range s.registry.Apps() {
 		id := a.Meta().ID
-		group := s.router.Group("/api/app/" + id)
 
 		var err error
 		if s.kernel {
 			if a, ok := a.(app.KernelInitializable); ok {
 				log.Info("initializing kernel app", vlog.String("id", id))
+				group := s.router.Group("/api/app/" + id)
 				err = a.InitializeKernel(group)
 			}
 		} else {
 			if a, ok := a.(app.Initializable); ok {
 				log.Info("initializing app", vlog.String("id", id))
+				group := s.router.Group("/api/app/"+id, middleware.ReadAuth)
 				err = a.Initialize(group)
 			}
 		}

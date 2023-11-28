@@ -3,12 +3,11 @@ package service
 import (
 	"testing"
 
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	vtypes "github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
-
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/suite"
 )
 
 type ContainerServiceTestSuite struct {
@@ -25,7 +24,7 @@ func TestContainerServiceTestSuite(t *testing.T) {
 
 func (suite *ContainerServiceTestSuite) SetupTest() {
 	suite.service = NewContainerService(ContainerServiceParams{
-		Ctx: app.NewContext(vtypes.NewVertexContext()),
+		Ctx: app.NewContext(vtypes.NewVertexContext(&vtypes.DB{})),
 	}).(*ContainerService)
 
 	suite.containerA = types.Container{
