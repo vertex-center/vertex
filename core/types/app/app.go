@@ -21,6 +21,9 @@ type Meta struct {
 
 	// Category is the category of the app.
 	Category string `json:"category"`
+
+	// Hidden is a flag that indicates if the app does only backend work and should be hidden from the frontend.
+	Hidden bool `json:"hidden"`
 }
 
 type Interface interface {

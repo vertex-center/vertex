@@ -34,6 +34,7 @@ func (a *App) Meta() apptypes.Meta {
 		Name:        "Vertex Auth",
 		Description: "Authentication app for Vertex",
 		Icon:        "admin_panel_settings",
+		Hidden:      true,
 	}
 }
 
