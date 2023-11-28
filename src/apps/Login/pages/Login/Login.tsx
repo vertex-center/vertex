@@ -39,12 +39,14 @@ export default function Login() {
                         id="username"
                         label="Username"
                         onChange={onUsernameChange}
+                        required
                     />
                     <TextField
                         id="password"
                         label="Password"
                         onChange={onPasswordChange}
                         type="password"
+                        required
                     />
                     <APIError error={errorRegister} />
                     <Horizontal>
