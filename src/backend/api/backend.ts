@@ -21,13 +21,19 @@ export const server = axios.create({
     },
 });
 
-export function setAuthToken(token: string) {
-    // Set cookie
+export function setAuthToken(token?: string) {
+    if (token === undefined) {
+        // delete cookie
+        document.cookie = "vertex_auth_token=;Max-Age=-99999999;path=/";
+        delete server.defaults.headers.common["Authorization"];
+        return;
+    }
+
     document.cookie = `vertex_auth_token=${token};path=/`;
     server.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 }
 
-function getAuthToken() {
+export function getAuthToken() {
     return document?.cookie
         ?.split(";")
         ?.find((c) => c.trim().startsWith("vertex_auth_token="))
