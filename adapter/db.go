@@ -20,25 +20,25 @@ import (
 )
 
 var (
-	errDataConfigNotFound       = errors.New("live/database/config.yml doesn't exists or could not be found")
-	errDataConfigFailedToRead   = errors.New("failed to read live/database/config.yml")
-	errDataConfigFailedToDecode = errors.New("failed to decode live/database/config.yml")
+	errDbConfigNotFound       = errors.New("live/database/config.yml doesn't exists or could not be found")
+	errDbConfigFailedToRead   = errors.New("failed to read live/database/config.yml")
+	errDbConfigFailedToDecode = errors.New("failed to decode live/database/config.yml")
 )
 
-// DbConfigFSAdapter is an adapter to configure how Vertex will store data.
-type DbConfigFSAdapter struct {
+// DbAdapter is an adapter to configure how Vertex will store data.
+type DbAdapter struct {
 	configDir string
 	config    types.DbConfig
-	db        *gorm.DB
+	db        *types.DB
 }
 
-type DbConfigFSAdapterParams struct {
+type DbAdapterParams struct {
 	configDir string
 }
 
-func NewDataConfigFSAdapter(params *DbConfigFSAdapterParams) port.DbConfigAdapter {
+func NewDbAdapter(params *DbAdapterParams) port.DbAdapter {
 	if params == nil {
-		params = &DbConfigFSAdapterParams{}
+		params = &DbAdapterParams{}
 	}
 	if params.configDir == "" {
 		params.configDir = path.Join(storage.Path, "database")
@@ -53,30 +53,27 @@ func NewDataConfigFSAdapter(params *DbConfigFSAdapterParams) port.DbConfigAdapte
 		os.Exit(1)
 	}
 
-	adapter := &DbConfigFSAdapter{
+	adapter := &DbAdapter{
 		configDir: params.configDir,
 		config: types.DbConfig{
 			DbmsName: types.DbmsNameSqlite,
 		},
+		db: &types.DB{},
 	}
 
 	err = adapter.read()
-	if errors.Is(err, errDataConfigFailedToDecode) {
+	if errors.Is(err, errDbConfigFailedToDecode) {
 		log.Error(err)
 	}
 
 	return adapter
 }
 
-func (a *DbConfigFSAdapter) Get() *gorm.DB {
-	if a.db == nil {
-		log.Error(errors.New("database should be connected first"))
-		os.Exit(1)
-	}
+func (a *DbAdapter) Get() *types.DB {
 	return a.db
 }
 
-func (a *DbConfigFSAdapter) Connect() error {
+func (a *DbAdapter) Connect() error {
 	log.Info("connecting to the database", vlog.String("dbms", string(a.config.DbmsName)))
 
 	var err error
@@ -89,30 +86,12 @@ func (a *DbConfigFSAdapter) Connect() error {
 	default:
 		err = errors.New("invalid dbms name")
 	}
-
-	if err != nil {
-		return err
-	}
-
-	// Adding a table here must also be added in the copyDb() method in core/service/db_utils.go
-	err = a.db.AutoMigrate(
-		&types.AdminSettings{},
-		// Auth
-		&types.User{},
-		&types.CredentialsArgon2id{},
-	)
-	if err != nil {
-		return err
-	}
-	return a.db.AutoMigrate(
-		&types.Token{},
-	)
+	return err
 }
 
-func (a *DbConfigFSAdapter) ConnectTo(dialector gorm.Dialector, retries int) error {
-	var err error
+func (a *DbAdapter) ConnectTo(dialector gorm.Dialector, retries int) error {
 	for i := 0; i < retries; i++ {
-		a.db, err = gorm.Open(dialector, &gorm.Config{
+		db, err := gorm.Open(dialector, &gorm.Config{
 			Logger: logger.Default.LogMode(logger.Silent),
 		})
 		if err != nil {
@@ -125,6 +104,7 @@ func (a *DbConfigFSAdapter) ConnectTo(dialector gorm.Dialector, retries int) err
 			)
 			<-time.After(1 * time.Second)
 		} else {
+			a.db.SetDB(db)
 			log.Info("connected to the database after some retries",
 				vlog.Int("count", i+1),
 			)
@@ -134,39 +114,39 @@ func (a *DbConfigFSAdapter) ConnectTo(dialector gorm.Dialector, retries int) err
 	return nil
 }
 
-func (a *DbConfigFSAdapter) GetDbConfig() types.DbConfig {
+func (a *DbAdapter) GetDbConfig() types.DbConfig {
 	return a.config
 }
 
-func (a *DbConfigFSAdapter) GetDBMSName() types.DbmsName {
+func (a *DbAdapter) GetDBMSName() types.DbmsName {
 	return a.config.DbmsName
 }
 
 // SetDBMSName sets the database management system name.
 // The user must also Connect to the database afterwords.
-func (a *DbConfigFSAdapter) SetDBMSName(name types.DbmsName) error {
+func (a *DbAdapter) SetDBMSName(name types.DbmsName) error {
 	a.config.DbmsName = name
 	return a.write()
 }
 
-func (a *DbConfigFSAdapter) read() error {
+func (a *DbAdapter) read() error {
 	p := path.Join(a.configDir, "config.yml")
 	file, err := os.ReadFile(p)
 
 	if errors.Is(err, fs.ErrNotExist) {
-		return errDataConfigNotFound
+		return errDbConfigNotFound
 	} else if err != nil {
-		return errDataConfigFailedToRead
+		return errDbConfigFailedToRead
 	}
 
 	err = yaml.Unmarshal(file, &a.config)
 	if err != nil {
-		return errDataConfigFailedToDecode
+		return errDbConfigFailedToDecode
 	}
 	return nil
 }
 
-func (a *DbConfigFSAdapter) write() error {
+func (a *DbAdapter) write() error {
 	p := path.Join(a.configDir, "config.yml")
 
 	data, err := yaml.Marshal(&a.config)

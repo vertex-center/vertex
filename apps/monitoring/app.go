@@ -1,6 +1,7 @@
 package monitoring
 
 import (
+	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/monitoring/adapter"
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	"github.com/vertex-center/vertex/apps/monitoring/core/service"
@@ -43,7 +44,7 @@ func (a *App) Initialize(r *router.Group) error {
 
 	metricsHandler := handler.NewMetricsHandler(metricsService)
 	// docapi:v route /app/vx-monitoring/metrics vx_monitoring_get_metrics
-	r.GET("/metrics", metricsHandler.Get)
+	r.GET("/metrics", middleware.Authenticated, metricsHandler.Get)
 	// docapi:v route /app/vx-monitoring/collector/{collector}/install vx_monitoring_install_collector
 	r.POST("/collector/:collector/install", metricsHandler.InstallCollector)
 	// docapi:v route /app/vx-monitoring/visualizer/{visualizer}/install vx_monitoring_install_visualizer

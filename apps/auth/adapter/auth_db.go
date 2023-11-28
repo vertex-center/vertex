@@ -1,17 +1,18 @@
 package adapter
 
 import (
-	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/apps/auth/core/port"
+	"github.com/vertex-center/vertex/apps/auth/core/types"
+	vtypes "github.com/vertex-center/vertex/core/types"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
 type AuthDbAdapter struct {
-	db port.DbConfigAdapter
+	db *vtypes.DB
 }
 
-func NewAuthDbAdapter(db port.DbConfigAdapter) port.AuthAdapter {
+func NewAuthDbAdapter(db *vtypes.DB) port.AuthAdapter {
 	return &AuthDbAdapter{
 		db: db,
 	}
@@ -22,7 +23,7 @@ func (a *AuthDbAdapter) CreateAccount(username string, credentials types.Credent
 		Username: username,
 	}
 
-	return a.db.Get().Transaction(func(tx *gorm.DB) error {
+	return a.db.Transaction(func(tx *gorm.DB) error {
 		// Caution: never change this to FirstOrCreate, as it will allow
 		// anyone to take over an existing account by simply registering
 		// with the same username.
@@ -38,12 +39,12 @@ func (a *AuthDbAdapter) CreateAccount(username string, credentials types.Credent
 
 func (a *AuthDbAdapter) GetCredentials(login string) ([]types.CredentialsArgon2id, error) {
 	var creds []types.CredentialsArgon2id
-	err := a.db.Get().Find(&creds, &types.CredentialsArgon2id{Login: login}).Error
+	err := a.db.Find(&creds, &types.CredentialsArgon2id{Login: login}).Error
 	return creds, err
 }
 
 func (a *AuthDbAdapter) SaveToken(token *types.Token) error {
-	return a.db.Get().Transaction(func(tx *gorm.DB) error {
+	return a.db.Transaction(func(tx *gorm.DB) error {
 		err := tx.Omit(clause.Associations).Create(token).Error
 		if err != nil {
 			return err
@@ -54,11 +55,11 @@ func (a *AuthDbAdapter) SaveToken(token *types.Token) error {
 }
 
 func (a *AuthDbAdapter) RemoveToken(token string) error {
-	return a.db.Get().Delete(&types.Token{Token: token}).Error
+	return a.db.Delete(&types.Token{Token: token}).Error
 }
 
 func (a *AuthDbAdapter) GetToken(token string) (*types.Token, error) {
 	var t types.Token
-	err := a.db.Get().Preload("User").First(&t, &types.Token{Token: token}).Error
+	err := a.db.Preload("User").First(&t, &types.Token{Token: token}).Error
 	return &t, err
 }

@@ -20,10 +20,10 @@ var (
 type DbService struct {
 	uuid              uuid.UUID
 	ctx               *vtypes.VertexContext
-	dataConfigAdapter port.DbConfigAdapter
+	dataConfigAdapter port.DbAdapter
 }
 
-func NewDbService(ctx *vtypes.VertexContext, dataConfigAdapter port.DbConfigAdapter) port.DbService {
+func NewDbService(ctx *vtypes.VertexContext, dataConfigAdapter port.DbAdapter) port.DbService {
 	s := &DbService{
 		uuid:              uuid.New(),
 		ctx:               ctx,
@@ -74,9 +74,14 @@ func (s *DbService) MigrateTo(dbms vtypes.DbmsName) error {
 	}
 	nextDb := s.dataConfigAdapter.Get()
 
+	err = s.runMigrations(nextDb)
+	if err != nil {
+		return err
+	}
+
 	log.Info("copying data between databases", vlog.String("from", string(dbms)), vlog.String("to", string(currentDbms)))
 
-	err = s.copyDb(prevDb, nextDb)
+	err = s.copyDb(prevDb.DB, nextDb.DB)
 	if err != nil {
 		return err
 	}
@@ -138,5 +143,22 @@ func (s *DbService) setup() {
 		os.Exit(1)
 	}
 
+	err = s.runMigrations(s.dataConfigAdapter.Get())
+	if err != nil {
+		log.Error(err)
+		os.Exit(1)
+	}
+
 	log.Info("database setup completed")
+}
+
+func (s *DbService) runMigrations(db *vtypes.DB) error {
+	err := db.AutoMigrate(
+		&vtypes.AdminSettings{},
+	)
+	if err != nil {
+		return err
+	}
+	s.ctx.DispatchEvent(vtypes.EventDbMigrate{Db: db.DB})
+	return nil
 }

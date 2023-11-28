@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
@@ -14,24 +15,22 @@ import (
 )
 
 type AppsService struct {
-	uuid                    uuid.UUID
-	kernel                  bool
-	ctx                     *types.VertexContext
-	apps                    []app.Interface
-	registry                *app.AppsRegistry
-	router                  *router.Router
-	authenticatedMiddleware func(c *router.Context)
+	uuid     uuid.UUID
+	kernel   bool
+	ctx      *types.VertexContext
+	apps     []app.Interface
+	registry *app.AppsRegistry
+	router   *router.Router
 }
 
-func NewAppsService(ctx *types.VertexContext, kernel bool, router *router.Router, apps []app.Interface, authenticatedMiddleware func(c *router.Context)) port.AppsService {
+func NewAppsService(ctx *types.VertexContext, kernel bool, router *router.Router, apps []app.Interface) port.AppsService {
 	s := &AppsService{
-		uuid:                    uuid.New(),
-		kernel:                  kernel,
-		ctx:                     ctx,
-		apps:                    apps,
-		registry:                app.NewAppsRegistry(ctx),
-		router:                  router,
-		authenticatedMiddleware: authenticatedMiddleware,
+		uuid:     uuid.New(),
+		kernel:   kernel,
+		ctx:      ctx,
+		apps:     apps,
+		registry: app.NewAppsRegistry(ctx),
+		router:   router,
 	}
 	s.ctx.AddListener(s)
 	return s
@@ -61,17 +60,18 @@ func (s *AppsService) StartApps() {
 
 	for _, a := range s.registry.Apps() {
 		id := a.Meta().ID
-		group := s.router.Group("/api/app/"+id, s.authenticatedMiddleware)
 
 		var err error
 		if s.kernel {
 			if a, ok := a.(app.KernelInitializable); ok {
 				log.Info("initializing kernel app", vlog.String("id", id))
+				group := s.router.Group("/api/app/" + id)
 				err = a.InitializeKernel(group)
 			}
 		} else {
 			if a, ok := a.(app.Initializable); ok {
 				log.Info("initializing app", vlog.String("id", id))
+				group := s.router.Group("/api/app/"+id, middleware.ReadAuth)
 				err = a.Initialize(group)
 			}
 		}

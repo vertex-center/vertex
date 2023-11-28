@@ -5,9 +5,8 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/core/types"
-	"github.com/vertex-center/vertex/core/types/api"
+	"github.com/vertex-center/vertex/apps/auth/core/port"
+	"github.com/vertex-center/vertex/apps/auth/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
@@ -40,7 +39,7 @@ func (h AuthHandler) Login(c *router.Context) {
 	token, err := h.authService.Login(login, pass)
 	if errors.Is(err, types.ErrLoginFailed) {
 		c.Abort(router.Error{
-			Code:           api.ErrInvalidCredentials,
+			Code:           types.ErrCodeInvalidCredentials,
 			PublicMessage:  "Invalid credentials",
 			PrivateMessage: err.Error(),
 		})
@@ -68,28 +67,28 @@ func (h AuthHandler) Register(c *router.Context) {
 	token, err := h.authService.Register(login, pass)
 	if errors.Is(err, types.ErrLoginEmpty) {
 		c.BadRequest(router.Error{
-			Code:           api.ErrLoginEmpty,
+			Code:           types.ErrCodeLoginEmpty,
 			PublicMessage:  "Login must not be empty",
 			PrivateMessage: err.Error(),
 		})
 		return
 	} else if errors.Is(err, types.ErrPasswordEmpty) {
 		c.BadRequest(router.Error{
-			Code:           api.ErrPasswordEmpty,
+			Code:           types.ErrCodePasswordEmpty,
 			PublicMessage:  "Password must not be empty",
 			PrivateMessage: err.Error(),
 		})
 		return
 	} else if errors.Is(err, types.ErrPasswordLength) {
 		c.BadRequest(router.Error{
-			Code:           api.ErrPasswordLength,
+			Code:           types.ErrCodePasswordLength,
 			PublicMessage:  "Password must be at least 8 characters long",
 			PrivateMessage: err.Error(),
 		})
 		return
 	} else if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrInvalidCredentials,
+			Code:           types.ErrCodeInvalidCredentials,
 			PublicMessage:  "Invalid credentials",
 			PrivateMessage: err.Error(),
 		})
@@ -113,7 +112,7 @@ func (h AuthHandler) Logout(c *router.Context) {
 	err := h.authService.Logout(token)
 	if err != nil {
 		c.Abort(router.Error{
-			Code:           api.ErrFailedToLogout,
+			Code:           types.ErrCodeFailedToLogout,
 			PublicMessage:  "Failed to logout",
 			PrivateMessage: err.Error(),
 		})
@@ -130,7 +129,7 @@ func (h AuthHandler) getUserPassFromHeader(c *router.Context) (string, string, e
 	userpassBytes, err := base64.StdEncoding.DecodeString(userpass)
 	if err != nil {
 		c.BadRequest(router.Error{
-			Code:           api.ErrInvalidCredentials,
+			Code:           types.ErrCodeInvalidCredentials,
 			PublicMessage:  "Invalid credentials",
 			PrivateMessage: "Expected base64 encoded login:password",
 		})
@@ -140,7 +139,7 @@ func (h AuthHandler) getUserPassFromHeader(c *router.Context) (string, string, e
 	creds := strings.Split(userpass, ":")
 	if len(creds) != 2 {
 		c.BadRequest(router.Error{
-			Code:           api.ErrInvalidCredentials,
+			Code:           types.ErrCodeInvalidCredentials,
 			PublicMessage:  "Invalid credentials",
 			PrivateMessage: "Expected login:password",
 		})

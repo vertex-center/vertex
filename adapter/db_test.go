@@ -12,7 +12,7 @@ import (
 type DbConfigFSAdapterTestSuite struct {
 	suite.Suite
 
-	adapter *DbConfigFSAdapter
+	adapter *DbAdapter
 }
 
 func TestDataConfigFSAdapterTestSuite(t *testing.T) {
@@ -20,9 +20,9 @@ func TestDataConfigFSAdapterTestSuite(t *testing.T) {
 }
 
 func (suite *DbConfigFSAdapterTestSuite) SetupTest() {
-	suite.adapter = NewDataConfigFSAdapter(&DbConfigFSAdapterParams{
+	suite.adapter = NewDbAdapter(&DbAdapterParams{
 		configDir: suite.T().TempDir(),
-	}).(*DbConfigFSAdapter)
+	}).(*DbAdapter)
 }
 
 func (suite *DbConfigFSAdapterTestSuite) TestReadDataConfig() {

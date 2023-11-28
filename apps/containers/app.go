@@ -1,6 +1,7 @@
 package containers
 
 import (
+	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/containers/adapter"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/service"
@@ -84,7 +85,7 @@ func (a *App) Initialize(r *router.Group) error {
 		ContainerLogsService:     containerLogsService,
 		ServiceService:           serviceService,
 	})
-	container := r.Group("/container/:container_uuid")
+	container := r.Group("/container/:container_uuid", middleware.Authenticated)
 	// docapi:v route /app/vx-containers/container/{container_uuid} vx_containers_get_container
 	container.GET("", containerHandler.Get)
 	// docapi:v route /app/vx-containers/container/{container_uuid} vx_containers_delete_container
@@ -113,7 +114,7 @@ func (a *App) Initialize(r *router.Group) error {
 	container.GET("/wait", containerHandler.WaitStatus)
 
 	containersHandler := handler.NewContainersHandler(a.ctx, containerService)
-	containers := r.Group("/containers")
+	containers := r.Group("/containers", middleware.Authenticated)
 	// docapi:v route /app/vx-containers/containers vx_containers_get_containers
 	containers.GET("", containersHandler.Get)
 	// docapi:v route /app/vx-containers/containers/tags vx_containers_get_tags
@@ -126,7 +127,7 @@ func (a *App) Initialize(r *router.Group) error {
 	containers.GET("/events", apptypes.HeadersSSE, containersHandler.Events)
 
 	serviceHandler := handler.NewServiceHandler(serviceService, containerService)
-	serv := r.Group("/service/:service_id")
+	serv := r.Group("/service/:service_id", middleware.Authenticated)
 	// docapi:v route /app/vx-containers/service/{service_id} vx_containers_get_service
 	serv.GET("", serviceHandler.Get)
 	// docapi:v route /app/vx-containers/service/{service_id}/install vx_containers_install_service
@@ -135,7 +136,7 @@ func (a *App) Initialize(r *router.Group) error {
 	servicesHandler := handler.NewServicesHandler(serviceService)
 	services := r.Group("/services")
 	// docapi:v route /app/vx-containers/services vx_containers_get_services
-	services.GET("", servicesHandler.Get)
+	services.GET("", middleware.Authenticated, servicesHandler.Get)
 	services.Static("/icons", "./live/services/icons")
 
 	return nil

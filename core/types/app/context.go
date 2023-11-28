@@ -26,3 +26,7 @@ func (ctx *Context) RemoveListener(listener event.Listener) {
 func (ctx *Context) DispatchEvent(event event.Event) {
 	ctx.vertexCtx.DispatchEvent(event)
 }
+
+func (ctx *Context) Db() *types.DB {
+	return ctx.vertexCtx.Db()
+}

@@ -1,6 +1,7 @@
 package serviceeditor
 
 import (
+	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/serviceeditor/core/service"
 	"github.com/vertex-center/vertex/apps/serviceeditor/handler"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
@@ -33,7 +34,7 @@ func (a *App) Initialize(r *router.Group) error {
 	editorService := service.NewEditorService()
 
 	editorHandler := handler.NewEditorHandler(editorService)
-	editor := r.Group("/editor")
+	editor := r.Group("/editor", middleware.Authenticated)
 	// docapi:v route /app/vx-devtools-service-editor/editor/to-yaml vx_devtools_service_editor_to_yaml
 	editor.POST("/to-yaml", editorHandler.ToYaml)
 

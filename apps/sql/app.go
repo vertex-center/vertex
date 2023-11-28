@@ -1,6 +1,7 @@
 package sql
 
 import (
+	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/sql/core/port"
 	"github.com/vertex-center/vertex/apps/sql/core/service"
 	"github.com/vertex-center/vertex/apps/sql/handler"
@@ -38,9 +39,9 @@ func (a *App) Initialize(r *router.Group) error {
 
 	dbmsHandler := handler.NewDBMSHandler(sqlService)
 	// docapi:v route /app/vx-sql/container/{container_uuid} vx_sql_get_dbms
-	r.GET("/container/:container_uuid", dbmsHandler.Get)
+	r.GET("/container/:container_uuid", middleware.Authenticated, dbmsHandler.Get)
 	// docapi:v route /app/vx-sql/dbms/{dbms}/install vx_sql_install_dbms
-	r.POST("/dbms/:dbms/install", dbmsHandler.Install)
+	r.POST("/dbms/:dbms/install", middleware.Authenticated, dbmsHandler.Install)
 
 	return nil
 }

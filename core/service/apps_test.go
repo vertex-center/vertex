@@ -3,11 +3,10 @@ package service
 import (
 	"testing"
 
-	"github.com/vertex-center/vertex/core/types"
-	"github.com/vertex-center/vertex/core/types/app"
-
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
@@ -26,7 +25,7 @@ func (suite *AppsServiceTestSuite) SetupTest() {
 	suite.app = &MockApp{}
 	suite.service = NewAppsService(ctx, false, router.New(), []app.Interface{
 		suite.app,
-	}, func(c *router.Context) {}).(*AppsService)
+	}).(*AppsService)
 }
 
 func (suite *AppsServiceTestSuite) TestStartApps() {

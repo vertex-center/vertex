@@ -1,6 +1,7 @@
 package reverseproxy
 
 import (
+	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/reverseproxy/adapter"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/service"
@@ -54,11 +55,11 @@ func (a *App) Initialize(r *router.Group) error {
 
 	proxyHandler := handler.NewProxyHandler(proxyService)
 	// docapi:v route /app/vx-reverse-proxy/redirects vx_reverse_proxy_get_redirects
-	r.GET("/redirects", proxyHandler.GetRedirects)
+	r.GET("/redirects", middleware.Authenticated, proxyHandler.GetRedirects)
 	// docapi:v route /app/vx-reverse-proxy/redirect vx_reverse_proxy_add_redirect
-	r.POST("/redirect", proxyHandler.AddRedirect)
+	r.POST("/redirect", middleware.Authenticated, proxyHandler.AddRedirect)
 	// docapi:v route /app/vx-reverse-proxy/redirect/{id} vx_reverse_proxy_remove_redirect
-	r.DELETE("/redirect/:id", proxyHandler.RemoveRedirect)
+	r.DELETE("/redirect/:id", middleware.Authenticated, proxyHandler.RemoveRedirect)
 
 	return nil
 }

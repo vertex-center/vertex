@@ -5,7 +5,6 @@ import (
 
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/user"
-	"gorm.io/gorm"
 )
 
 type (
@@ -20,8 +19,8 @@ type (
 		Update(settings types.AdminSettings) error
 	}
 
-	DbConfigAdapter interface {
-		Get() *gorm.DB
+	DbAdapter interface {
+		Get() *types.DB
 		Connect() error
 		GetDbConfig() types.DbConfig
 		GetDBMSName() types.DbmsName
@@ -40,13 +39,5 @@ type (
 		Add(key string, user user.User) error
 		Remove(fingerprint string, user user.User) error
 		GetUsers() ([]user.User, error)
-	}
-
-	AuthAdapter interface {
-		CreateAccount(username string, credentials types.CredentialsArgon2id) error
-		GetCredentials(login string) ([]types.CredentialsArgon2id, error)
-		SaveToken(token *types.Token) error
-		RemoveToken(token string) error
-		GetToken(token string) (*types.Token, error)
 	}
 )
