@@ -251,51 +251,51 @@ func initRoutes(about types.About) {
 	appsHandler := handler.NewAppsHandler(appsService)
 	apps := a.Group("/apps")
 	// docapi:v route /apps get_apps
-	apps.GET("", appsHandler.Get)
+	apps.GET("", authenticated, appsHandler.Get)
 
 	checksHandler := handler.NewChecksHandler(checksService)
 	checks := a.Group("/admin/checks")
 	// docapi:v route /admin/checks admin_checks
-	checks.GET("", app.HeadersSSE, checksHandler.Check)
+	checks.GET("", authenticated, app.HeadersSSE, checksHandler.Check)
 
 	hardwareHandler := handler.NewHardwareHandler(hardwareService)
 	hardware := a.Group("/hardware")
 	// docapi:v route /hardware/host get_host
-	hardware.GET("/host", hardwareHandler.GetHost)
+	hardware.GET("/host", authenticated, hardwareHandler.GetHost)
 	// docapi:v route /hardware/cpus get_cpus
-	hardware.GET("/cpus", hardwareHandler.GetCPUs)
+	hardware.GET("/cpus", authenticated, hardwareHandler.GetCPUs)
 
 	updateHandler := handler.NewUpdateHandler(updateService, adminSettingsService)
 	update := a.Group("/admin/update")
 	// docapi:v route /admin/update get_updates
-	update.GET("", updateHandler.Get)
+	update.GET("", authenticated, updateHandler.Get)
 	// docapi:v route /admin/update install_update
-	update.POST("", updateHandler.Install)
+	update.POST("", authenticated, updateHandler.Install)
 
 	settingsHandler := handler.NewSettingsHandler(adminSettingsService)
 	settings := a.Group("/admin/settings")
 	// docapi:v route /admin/settings get_settings
-	settings.GET("", settingsHandler.Get)
+	settings.GET("", authenticated, settingsHandler.Get)
 	// docapi:v route /admin/settings patch_settings
-	settings.PATCH("", settingsHandler.Patch)
+	settings.PATCH("", authenticated, settingsHandler.Patch)
 
 	dbHandler := handler.NewDatabaseHandler(dbService)
 	db := a.Group("/admin/db")
 	// docapi:v route /admin/db/dbms get_current_dbms
-	db.GET("/dbms", dbHandler.GetCurrentDbms)
+	db.GET("/dbms", authenticated, dbHandler.GetCurrentDbms)
 	// docapi:v route /admin/db/dbms migrate_to_dbms
-	db.POST("/dbms", dbHandler.MigrateTo)
+	db.POST("/dbms", authenticated, dbHandler.MigrateTo)
 
 	sshHandler := handler.NewSshHandler(sshService)
 	ssh := a.Group("/security/ssh")
 	// docapi:v route /security/ssh get_ssh_keys
-	ssh.GET("", sshHandler.Get)
+	ssh.GET("", authenticated, sshHandler.Get)
 	// docapi:v route /security/ssh add_ssh_key
-	ssh.POST("", sshHandler.Add)
+	ssh.POST("", authenticated, sshHandler.Add)
 	// docapi:v route /security/ssh delete_ssh_key
-	ssh.DELETE("", sshHandler.Delete)
+	ssh.DELETE("", authenticated, sshHandler.Delete)
 	// docapi:v route /security/ssh/users get_ssh_users
-	ssh.GET("/users", sshHandler.GetUsers)
+	ssh.GET("/users", authenticated, sshHandler.GetUsers)
 }
 
 func startRouter() {
