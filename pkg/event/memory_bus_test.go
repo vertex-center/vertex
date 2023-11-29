@@ -25,7 +25,7 @@ func (suite *MemoryBusTestSuite) TestEvents() {
 	id := uuid.New()
 
 	listener := &MockListener{}
-	listener.On("OnEvent", MockEvent{}).Return()
+	listener.On("OnEvent", MockEvent{}).Return(nil)
 	listener.On("GetUUID").Return(id)
 
 	// Add a listener

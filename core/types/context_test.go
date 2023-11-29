@@ -25,7 +25,7 @@ func (suite *VertexContextTestSuite) SetupSuite() {
 
 func (suite *VertexContextTestSuite) TestDispatchEvent() {
 	bus := &event.MockBus{}
-	bus.On("DispatchEvent", event.MockEvent{}).Return()
+	bus.On("DispatchEvent", event.MockEvent{}).Return(nil)
 	suite.context.bus = bus
 
 	err := suite.context.DispatchEvent(event.MockEvent{})
