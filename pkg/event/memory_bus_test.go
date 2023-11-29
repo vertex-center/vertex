@@ -33,7 +33,8 @@ func (suite *MemoryBusTestSuite) TestEvents() {
 	suite.Len(*suite.bus.listeners, 1)
 
 	// Fire event
-	suite.bus.DispatchEvent(MockEvent{})
+	err := suite.bus.DispatchEvent(MockEvent{})
+	suite.Require().NoError(err)
 	listener.AssertExpectations(suite.T())
 
 	// Remove listener

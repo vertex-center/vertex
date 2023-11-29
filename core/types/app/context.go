@@ -23,8 +23,8 @@ func (ctx *Context) RemoveListener(listener event.Listener) {
 	ctx.vertexCtx.RemoveListener(listener)
 }
 
-func (ctx *Context) DispatchEvent(event event.Event) {
-	ctx.vertexCtx.DispatchEvent(event)
+func (ctx *Context) DispatchEvent(event event.Event) error {
+	return ctx.vertexCtx.DispatchEvent(event)
 }
 
 func (ctx *Context) Db() *types.DB {

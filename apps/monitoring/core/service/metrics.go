@@ -106,7 +106,7 @@ func (s *MetricsService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *MetricsService) OnEvent(e event.Event) {
+func (s *MetricsService) OnEvent(e event.Event) error {
 	switch e := e.(type) {
 	case types.EventRegisterMetrics:
 		log.Info("registering metrics", vlog.Int("count", len(e.Metrics)))
@@ -119,4 +119,5 @@ func (s *MetricsService) OnEvent(e event.Event) {
 	case types.EventDecrementMetric:
 		s.adapter.Dec(e.MetricID, e.Labels...)
 	}
+	return nil
 }

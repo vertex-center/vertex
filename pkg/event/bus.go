@@ -10,5 +10,5 @@ type Bus interface {
 	RemoveListener(l Listener)
 	// DispatchEvent dispatches an event to all listeners
 	// listening to this Bus.
-	DispatchEvent(e Event)
+	DispatchEvent(e Event) error
 }

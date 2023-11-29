@@ -310,7 +310,10 @@ func startRouter() {
 	}
 	cancelTimeout()
 
-	ctx.DispatchEvent(types.EventServerStart{})
+	err := ctx.DispatchEvent(types.EventServerStart{})
+	if err != nil {
+		log.Error(err)
+	}
 
 	<-stopChan
 }
@@ -320,12 +323,15 @@ func stopRouter() {
 
 	log.Info("gracefully stopping Vertex")
 
-	ctx.DispatchEvent(types.EventServerStop{})
+	err := ctx.DispatchEvent(types.EventServerStop{})
+	if err != nil {
+		log.Error(err)
+	}
 
 	cancelCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
-	err := r.Stop(cancelCtx)
+	err = r.Stop(cancelCtx)
 	if err != nil {
 		log.Error(err)
 		return

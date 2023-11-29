@@ -7,7 +7,6 @@ import (
 	vtypes "github.com/vertex-center/vertex/core/types"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/event"
-	"github.com/vertex-center/vertex/pkg/log"
 	"gorm.io/gorm"
 )
 
@@ -43,16 +42,14 @@ func (s *MigrationService) getTypes() []interface{} {
 	}
 }
 
-func (s *MigrationService) OnEvent(e event.Event) {
+func (s *MigrationService) OnEvent(e event.Event) error {
 	switch e := e.(type) {
 	case vtypes.EventDbMigrate:
-		err := s.migrate(e.Db)
-		if err != nil {
-			log.Error(err)
-		}
+		return s.migrate(e.Db)
 	case vtypes.EventDbCopy:
 		e.AddTable(s.getTypes()...)
 	}
+	return nil
 }
 
 func (s *MigrationService) GetUUID() uuid.UUID {

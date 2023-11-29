@@ -35,7 +35,7 @@ func (b *MemoryBus) RemoveListener(l Listener) {
 	delete(*b.listeners, l.GetUUID())
 }
 
-func (b *MemoryBus) DispatchEvent(e Event) {
+func (b *MemoryBus) DispatchEvent(e Event) error {
 	// This code notifies all listeners.
 	// If some listeners are added while notifying, they will be
 	// notified in the next loop, until all listeners are notified.
@@ -68,9 +68,13 @@ func (b *MemoryBus) DispatchEvent(e Event) {
 		}
 
 		for _, l := range toNotify {
-			l.OnEvent(e)
+			err := l.OnEvent(e)
+			if err != nil {
+				return err
+			}
 			notified[l.GetUUID()] = l
 		}
 		tryCount++
 	}
+	return nil
 }

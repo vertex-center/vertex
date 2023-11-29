@@ -8,8 +8,6 @@ import (
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/event"
-	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vlog"
 )
 
 // TODO: Move webhooks use to a Discord adapter
@@ -58,18 +56,16 @@ func (s *NotificationsService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *NotificationsService) OnEvent(e event.Event) {
+func (s *NotificationsService) OnEvent(e event.Event) error {
 	switch e := e.(type) {
 	case types.EventServerSetupCompleted:
-		err := s.StartWebhook()
-		if err != nil {
-			log.Warn("failed to start webhook", vlog.String("error", err.Error()))
-		}
+		return s.StartWebhook()
 	case containerstypes.EventContainerStatusChange:
 		if e.Status == containerstypes.ContainerStatusOff || e.Status == containerstypes.ContainerStatusError || e.Status == containerstypes.ContainerStatusRunning {
 			s.sendStatus(e.Name, e.Status)
 		}
 	}
+	return nil
 }
 
 func (s *NotificationsService) sendStatus(name string, status string) {

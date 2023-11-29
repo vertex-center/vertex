@@ -10,7 +10,7 @@ func (s *ContainerService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *ContainerService) OnEvent(e event.Event) {
+func (s *ContainerService) OnEvent(e event.Event) error {
 	switch e.(type) {
 	case types.EventServerStart:
 		s.LoadAll()
@@ -24,4 +24,5 @@ func (s *ContainerService) OnEvent(e event.Event) {
 		s.StopAll()
 		s.DeleteAll()
 	}
+	return nil
 }

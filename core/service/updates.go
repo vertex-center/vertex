@@ -99,8 +99,7 @@ func (s *UpdateService) InstallLatest(channel types.UpdatesChannel) error {
 		}
 	}
 
-	s.ctx.DispatchEvent(types.EventVertexUpdated{})
-	return nil
+	return s.ctx.DispatchEvent(types.EventVertexUpdated{})
 }
 
 func (s *UpdateService) firstSetup() error {
@@ -138,14 +137,13 @@ func (s *UpdateService) firstSetup() error {
 	return nil
 }
 
-func (s *UpdateService) OnEvent(e event.Event) {
+func (s *UpdateService) OnEvent(e event.Event) error {
 	switch e.(type) {
 	case types.EventServerStart:
 		err := s.firstSetup()
 		if err != nil {
 			log.Error(err)
-			err = errors.New("failed to fetch latest baseline. panic because vertex cannot run without missing dependencies")
-			log.Error(err)
+			log.Error(errors.New("failed to fetch latest baseline. panic because vertex cannot run without missing dependencies"))
 			os.Exit(1)
 		}
 
@@ -155,6 +153,7 @@ func (s *UpdateService) OnEvent(e event.Event) {
 			os.Exit(1)
 		}
 	}
+	return nil
 }
 
 func (s *UpdateService) GetUUID() uuid.UUID {

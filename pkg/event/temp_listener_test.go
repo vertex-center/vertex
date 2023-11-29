@@ -17,19 +17,26 @@ func TestTempListenerTestSuite(t *testing.T) {
 
 func (suite *TempListenerTestSuite) TestOnEvent() {
 	called := false
-	listener := NewTempListener(func(e Event) {
+	listener := NewTempListener(func(e Event) error {
 		switch e.(type) {
 		case MockEvent:
 			called = true
 		}
+		return nil
 	})
-	listener.OnEvent(struct{}{})
+
+	err := listener.OnEvent(struct{}{})
+	suite.Require().NoError(err)
 	suite.False(called)
-	listener.OnEvent(MockEvent{})
+
+	err = listener.OnEvent(MockEvent{})
+	suite.Require().NoError(err)
 	suite.True(called)
 }
 
 func (suite *TempListenerTestSuite) TestGetUUID() {
-	listener := NewTempListener(func(e Event) {})
+	listener := NewTempListener(func(e Event) error {
+		return nil
+	})
 	suite.NotEqual(uuid.Nil, listener.GetUUID())
 }

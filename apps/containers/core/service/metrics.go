@@ -35,10 +35,10 @@ func (s *MetricsService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *MetricsService) OnEvent(e event.Event) {
+func (s *MetricsService) OnEvent(e event.Event) error {
 	switch e := e.(type) {
 	case vtypes.EventServerStart:
-		s.ctx.DispatchEvent(monitoringtypes.EventRegisterMetrics{
+		return s.ctx.DispatchEvent(monitoringtypes.EventRegisterMetrics{
 			Metrics: []monitoringtypes.Metric{
 				{
 					ID:          MetricIDContainerStatus,
@@ -56,38 +56,42 @@ func (s *MetricsService) OnEvent(e event.Event) {
 			},
 		})
 	case types.EventContainerStatusChange:
-		s.updateStatus(e.ContainerUUID, e.ServiceID, e.Status)
+		return s.updateStatus(e.ContainerUUID, e.ServiceID, e.Status)
 	case types.EventContainerCreated:
-		s.ctx.DispatchEvent(monitoringtypes.EventIncrementMetric{
+		return s.ctx.DispatchEvent(monitoringtypes.EventIncrementMetric{
 			MetricID: MetricIDContainersCount,
 		})
 	case types.EventContainerDeleted:
-		s.ctx.DispatchEvent(monitoringtypes.EventDecrementMetric{
+		err := s.ctx.DispatchEvent(monitoringtypes.EventDecrementMetric{
 			MetricID: MetricIDContainersCount,
 		})
-		s.ctx.DispatchEvent(monitoringtypes.EventSetMetric{
+		if err != nil {
+			return err
+		}
+		return s.ctx.DispatchEvent(monitoringtypes.EventSetMetric{
 			MetricID: MetricIDContainerStatus,
 			Value:    math.NaN(),
 			Labels:   []string{e.ContainerUUID.String(), e.ServiceID},
 		})
 	case types.EventContainersLoaded:
-		s.ctx.DispatchEvent(monitoringtypes.EventSetMetric{
+		return s.ctx.DispatchEvent(monitoringtypes.EventSetMetric{
 			MetricID: MetricIDContainersCount,
 			Value:    float64(e.Count),
 		})
 	}
+	return nil
 }
 
-func (s *MetricsService) updateStatus(uuid uuid.UUID, serviceId string, status string) {
+func (s *MetricsService) updateStatus(uuid uuid.UUID, serviceId string, status string) error {
 	switch status {
 	case types.ContainerStatusRunning:
-		s.ctx.DispatchEvent(monitoringtypes.EventSetMetric{
+		return s.ctx.DispatchEvent(monitoringtypes.EventSetMetric{
 			MetricID: MetricIDContainerStatus,
 			Value:    monitoringtypes.MetricStatusOn,
 			Labels:   []string{uuid.String(), serviceId},
 		})
 	default:
-		s.ctx.DispatchEvent(monitoringtypes.EventSetMetric{
+		return s.ctx.DispatchEvent(monitoringtypes.EventSetMetric{
 			MetricID: MetricIDContainerStatus,
 			Value:    monitoringtypes.MetricStatusOff,
 			Labels:   []string{uuid.String(), serviceId},

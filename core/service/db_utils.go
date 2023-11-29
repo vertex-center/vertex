@@ -12,7 +12,10 @@ import (
 func (s *DbService) copyDb(from *gorm.DB, to *gorm.DB) error {
 	dbCopy := types.NewEventDbCopy()
 	dbCopy.AddTable(types.AdminSettings{})
-	s.ctx.DispatchEvent(dbCopy)
+	err := s.ctx.DispatchEvent(dbCopy)
+	if err != nil {
+		return err
+	}
 
 	toTx := to.Begin()
 

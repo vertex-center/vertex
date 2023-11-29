@@ -412,7 +412,7 @@ func (h *ContainerHandler) Events(c *router.Context) {
 
 	done := c.Request.Context().Done()
 
-	listener := event.NewTempListener(func(e event.Event) {
+	listener := event.NewTempListener(func(e event.Event) error {
 		switch e := e.(type) {
 		case types.EventContainerLog:
 			if inst.UUID != e.ContainerUUID {
@@ -446,6 +446,7 @@ func (h *ContainerHandler) Events(c *router.Context) {
 				Data:  e.Status,
 			}
 		}
+		return nil
 	})
 
 	h.ctx.AddListener(listener)

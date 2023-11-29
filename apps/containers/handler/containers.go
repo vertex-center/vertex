@@ -111,13 +111,14 @@ func (h *ContainersHandler) Events(c *router.Context) {
 
 	done := c.Request.Context().Done()
 
-	listener := event.NewTempListener(func(e event.Event) {
+	listener := event.NewTempListener(func(e event.Event) error {
 		switch e.(type) {
 		case types.EventContainersChange:
 			eventsChan <- sse.Event{
 				Event: types.EventNameContainersChange,
 			}
 		}
+		return nil
 	})
 
 	h.ctx.AddListener(listener)

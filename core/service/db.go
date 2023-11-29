@@ -104,15 +104,19 @@ func (s *DbService) MigrateTo(dbms vtypes.DbmsName) error {
 	return err
 }
 
-func (s *DbService) OnEvent(e event.Event) {
+func (s *DbService) OnEvent(e event.Event) error {
 	switch e.(type) {
 	// This needs vx-containers and vx-sql to work
 	case vtypes.EventAllAppsReady:
 		go func() {
 			s.setup()
-			s.ctx.DispatchEvent(vtypes.EventServerSetupCompleted{})
+			err := s.ctx.DispatchEvent(vtypes.EventServerSetupCompleted{})
+			if err != nil {
+				log.Error(err)
+			}
 		}()
 	}
+	return nil
 }
 
 func (s *DbService) GetUUID() uuid.UUID {
@@ -161,6 +165,5 @@ func (s *DbService) runMigrations(db *gorm.DB) error {
 	if err != nil {
 		return err
 	}
-	s.ctx.DispatchEvent(vtypes.EventDbMigrate{Db: db})
-	return nil
+	return s.ctx.DispatchEvent(vtypes.EventDbMigrate{Db: db})
 }

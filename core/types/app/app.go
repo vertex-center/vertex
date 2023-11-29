@@ -54,7 +54,7 @@ type KernelUninitializable interface {
 type HttpHandler func(r *router.Group)
 
 type Service interface {
-	OnEvent(e event.Event)
+	OnEvent(e event.Event) error
 }
 
 func HeadersSSE(c *router.Context) {

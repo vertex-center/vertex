@@ -10,7 +10,7 @@ func (s *SqlService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *SqlService) OnEvent(e event.Event) {
+func (s *SqlService) OnEvent(e event.Event) error {
 	switch e := e.(type) {
 	case types.EventContainerStatusChange:
 		if e.Status == types.ContainerStatusRunning {
@@ -19,6 +19,7 @@ func (s *SqlService) OnEvent(e event.Event) {
 			s.onContainerStop(e.ContainerUUID)
 		}
 	}
+	return nil
 }
 
 func (s *SqlService) onContainerStart(inst *types.Container) {

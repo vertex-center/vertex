@@ -40,13 +40,14 @@ func (s *AppsService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *AppsService) OnEvent(e event.Event) {
+func (s *AppsService) OnEvent(e event.Event) error {
 	switch e.(type) {
 	case types.EventServerStart:
 		s.StartApps()
 	case types.EventServerStop:
 		s.StopApps()
 	}
+	return nil
 }
 
 func (s *AppsService) StartApps() {
@@ -75,19 +76,24 @@ func (s *AppsService) StartApps() {
 				err = a.Initialize(group)
 			}
 		}
-
-		s.ctx.DispatchEvent(types.EventAppReady{
-			AppID: a.Meta().ID,
-		})
-
 		if err != nil {
 			log.Error(err)
 			log.Error(errors.New("failed to initialize app"),
 				vlog.String("id", id))
 		}
+
+		err = s.ctx.DispatchEvent(types.EventAppReady{
+			AppID: a.Meta().ID,
+		})
+		if err != nil {
+			log.Error(err)
+		}
 	}
 
-	s.ctx.DispatchEvent(types.EventAllAppsReady{})
+	err := s.ctx.DispatchEvent(types.EventAllAppsReady{})
+	if err != nil {
+		log.Error(err)
+	}
 
 	log.Info("apps initialized")
 }

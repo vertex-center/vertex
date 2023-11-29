@@ -9,8 +9,9 @@ type MockListener struct {
 	mock.Mock
 }
 
-func (m *MockListener) OnEvent(e Event) {
-	m.Called(e)
+func (m *MockListener) OnEvent(e Event) error {
+	args := m.Called(e)
+	return args.Error(0)
 }
 
 func (m *MockListener) GetUUID() uuid.UUID {

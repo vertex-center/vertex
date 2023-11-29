@@ -7,7 +7,6 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	vtypes "github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/event"
-	"github.com/vertex-center/vertex/pkg/log"
 )
 
 type ServiceService struct {
@@ -38,13 +37,10 @@ func (s *ServiceService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *ServiceService) OnEvent(e event.Event) {
+func (s *ServiceService) OnEvent(e event.Event) error {
 	switch e.(type) {
 	case vtypes.EventVertexUpdated:
-		err := s.reload()
-		if err != nil {
-			log.Error(err)
-			return
-		}
+		return s.reload()
 	}
+	return nil
 }
