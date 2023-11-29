@@ -22,9 +22,9 @@ require (
 	github.com/shirou/gopsutil/v3 v3.23.10
 	github.com/stretchr/testify v1.8.4
 	github.com/vertex-center/vlog v1.0.2
-	go.uber.org/atomic v1.9.0
+	go.uber.org/atomic v1.11.0
 	golang.org/x/crypto v0.16.0
-	golang.org/x/net v0.18.0
+	golang.org/x/net v0.19.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/postgres v1.5.4
 	gorm.io/driver/sqlite v1.5.4
