@@ -1,7 +1,6 @@
 package service
 
 import (
-	"errors"
 	"reflect"
 
 	"github.com/vertex-center/vertex/core/types"
@@ -11,7 +10,7 @@ import (
 )
 
 func (s *DbService) copyDb(from *gorm.DB, to *gorm.DB) error {
-	dbCopy := types.EventDbCopy{}
+	dbCopy := types.NewEventDbCopy()
 	dbCopy.AddTable(types.AdminSettings{})
 	s.ctx.DispatchEvent(dbCopy)
 
@@ -34,16 +33,21 @@ func (s *DbService) copyDbTable(tp interface{}, from *gorm.DB, to *gorm.DB) erro
 	items := reflect.New(t).Interface()
 
 	log.Info("copying table",
-		vlog.String("table", reflect.TypeOf(items).String()),
+		vlog.String("table", reflect.TypeOf(tp).String()),
 		vlog.String("from", from.Name()),
 		vlog.String("to", to.Name()),
 	)
 
-	err := from.Find(items).Error
-	if errors.Is(err, gorm.ErrEmptySlice) {
-		return nil
-	} else if err != nil {
-		return err
+	log.Debug("getting items from database", vlog.String("table", reflect.TypeOf(tp).String()))
+	res := from.Find(items)
+	if res.Error != nil {
+		return res.Error
 	}
+	if res.RowsAffected == 0 {
+		log.Debug("no items found", vlog.String("table", reflect.TypeOf(tp).String()))
+		return nil
+	}
+
+	log.Debug("found items", vlog.String("table", reflect.TypeOf(tp).String()), vlog.Int64("count", res.RowsAffected))
 	return to.Create(items).Error
 }

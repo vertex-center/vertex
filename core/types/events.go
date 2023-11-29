@@ -41,19 +41,19 @@ type (
 	EventVertexUpdated struct{}
 )
 
+func NewEventDbCopy() EventDbCopy {
+	return EventDbCopy{
+		tables: &[]interface{}{},
+	}
+}
+
 // AddTable adds a table to the list of tables that will be copied to the new database.
 // Example usage: e.AddTable(types.User{})
 func (e *EventDbCopy) AddTable(t ...interface{}) {
-	if e.tables == nil {
-		e.tables = &[]interface{}{}
-	}
 	*e.tables = append(*e.tables, t...)
 }
 
 // All returns all tables that will be copied to the new database.
 func (e *EventDbCopy) All() []interface{} {
-	if e.tables == nil {
-		return []interface{}{}
-	}
 	return *e.tables
 }

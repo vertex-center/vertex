@@ -10,6 +10,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
+	"gorm.io/gorm"
 )
 
 var (
@@ -63,7 +64,7 @@ func (s *DbService) MigrateTo(dbms vtypes.DbmsName) error {
 	log.Info("setup new dbms completed", vlog.String("name", string(dbms)))
 	log.Info("retrieving connections to previous and next databases", vlog.String("name", string(dbms)))
 
-	prevDb := s.dataConfigAdapter.Get()
+	prevDb := s.dataConfigAdapter.Get().DB
 	err = s.dataConfigAdapter.SetDBMSName(dbms)
 	if err != nil {
 		return err
@@ -72,7 +73,7 @@ func (s *DbService) MigrateTo(dbms vtypes.DbmsName) error {
 	if err != nil {
 		return err
 	}
-	nextDb := s.dataConfigAdapter.Get()
+	nextDb := s.dataConfigAdapter.Get().DB
 
 	err = s.runMigrations(nextDb)
 	if err != nil {
@@ -81,7 +82,7 @@ func (s *DbService) MigrateTo(dbms vtypes.DbmsName) error {
 
 	log.Info("copying data between databases", vlog.String("from", string(dbms)), vlog.String("to", string(currentDbms)))
 
-	err = s.copyDb(prevDb.DB, nextDb.DB)
+	err = s.copyDb(prevDb, nextDb)
 	if err != nil {
 		return err
 	}
@@ -144,7 +145,7 @@ func (s *DbService) setup() {
 		os.Exit(1)
 	}
 
-	err = s.runMigrations(s.dataConfigAdapter.Get())
+	err = s.runMigrations(s.dataConfigAdapter.Get().DB)
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)
@@ -153,13 +154,13 @@ func (s *DbService) setup() {
 	log.Info("database setup completed")
 }
 
-func (s *DbService) runMigrations(db *vtypes.DB) error {
+func (s *DbService) runMigrations(db *gorm.DB) error {
 	err := db.AutoMigrate(
 		&vtypes.AdminSettings{},
 	)
 	if err != nil {
 		return err
 	}
-	s.ctx.DispatchEvent(vtypes.EventDbMigrate{Db: db.DB})
+	s.ctx.DispatchEvent(vtypes.EventDbMigrate{Db: db})
 	return nil
 }
