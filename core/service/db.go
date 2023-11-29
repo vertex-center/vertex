@@ -110,10 +110,7 @@ func (s *DbService) OnEvent(e event.Event) error {
 	case vtypes.EventAllAppsReady:
 		go func() {
 			s.setup()
-			err := s.ctx.DispatchEvent(vtypes.EventServerSetupCompleted{})
-			if err != nil {
-				log.Error(err)
-			}
+			s.ctx.DispatchEvent(vtypes.EventServerSetupCompleted{})
 		}()
 	}
 	return nil
@@ -165,5 +162,5 @@ func (s *DbService) runMigrations(db *gorm.DB) error {
 	if err != nil {
 		return err
 	}
-	return s.ctx.DispatchEvent(vtypes.EventDbMigrate{Db: db})
+	return s.ctx.DispatchEventWithErr(vtypes.EventDbMigrate{Db: db})
 }

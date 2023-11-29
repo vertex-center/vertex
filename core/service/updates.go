@@ -99,7 +99,8 @@ func (s *UpdateService) InstallLatest(channel types.UpdatesChannel) error {
 		}
 	}
 
-	return s.ctx.DispatchEvent(types.EventVertexUpdated{})
+	s.ctx.DispatchEvent(types.EventVertexUpdated{})
+	return nil
 }
 
 func (s *UpdateService) firstSetup() error {

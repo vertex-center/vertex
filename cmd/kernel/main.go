@@ -62,10 +62,7 @@ func main() {
 	initServices()
 	initRoutes()
 
-	err = ctx.DispatchEvent(types.EventServerStart{})
-	if err != nil {
-		log.Error(err)
-	}
+	ctx.DispatchEvent(types.EventServerStart{})
 
 	shutdownChan := make(chan os.Signal, 1)
 	go func() {
@@ -247,14 +244,11 @@ func startRouter() {
 }
 
 func stopRouter() {
-	err := ctx.DispatchEvent(types.EventServerStop{})
-	if err != nil {
-		log.Error(err)
-	}
+	ctx.DispatchEvent(types.EventServerStop{})
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	err = r.Stop(ctx)
+	err := r.Stop(ctx)
 	if err != nil {
 		log.Error(err)
 		return

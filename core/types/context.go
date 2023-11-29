@@ -21,7 +21,14 @@ func NewVertexContext(db *DB) *VertexContext {
 	}
 }
 
-func (c *VertexContext) DispatchEvent(e event.Event) error {
+func (c *VertexContext) DispatchEvent(e event.Event) {
+	err := c.DispatchEventWithErr(e)
+	if err != nil {
+		log.Error(err)
+	}
+}
+
+func (c *VertexContext) DispatchEventWithErr(e event.Event) error {
 	log.Debug("dispatching event", vlog.String("name", reflect.TypeOf(e).String()))
 
 	if _, ok := e.(EventServerHardReset); ok {

@@ -82,18 +82,12 @@ func (s *AppsService) StartApps() {
 				vlog.String("id", id))
 		}
 
-		err = s.ctx.DispatchEvent(types.EventAppReady{
+		s.ctx.DispatchEvent(types.EventAppReady{
 			AppID: a.Meta().ID,
 		})
-		if err != nil {
-			log.Error(err)
-		}
 	}
 
-	err := s.ctx.DispatchEvent(types.EventAllAppsReady{})
-	if err != nil {
-		log.Error(err)
-	}
+	s.ctx.DispatchEvent(types.EventAllAppsReady{})
 
 	log.Info("apps initialized")
 }

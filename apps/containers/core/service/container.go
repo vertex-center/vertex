@@ -171,18 +171,12 @@ func (s *ContainerService) Delete(inst *types.Container) error {
 	defer s.containersMutex.Unlock()
 	delete(s.containers, inst.UUID)
 
-	err = s.ctx.DispatchEvent(types.EventContainerDeleted{
+	s.ctx.DispatchEvent(types.EventContainerDeleted{
 		ContainerUUID: inst.UUID,
 		ServiceID:     serviceID,
 	})
-	if err != nil {
-		log.Error(err)
-	}
 
-	err = s.ctx.DispatchEvent(types.EventContainersChange{})
-	if err != nil {
-		log.Error(err)
-	}
+	s.ctx.DispatchEvent(types.EventContainersChange{})
 
 	return nil
 }
@@ -246,10 +240,7 @@ func (s *ContainerService) StopAll() {
 		}
 	}
 
-	err := s.ctx.DispatchEvent(types.EventContainersStopped{})
-	if err != nil {
-		log.Error(err)
-	}
+	s.ctx.DispatchEvent(types.EventContainersStopped{})
 }
 
 func (s *ContainerService) LoadAll() {
@@ -268,12 +259,9 @@ func (s *ContainerService) LoadAll() {
 		loaded += 1
 	}
 
-	err = s.ctx.DispatchEvent(types.EventContainersLoaded{
+	s.ctx.DispatchEvent(types.EventContainersLoaded{
 		Count: loaded,
 	})
-	if err != nil {
-		log.Error(err)
-	}
 }
 
 func (s *ContainerService) DeleteAll() {
@@ -330,15 +318,8 @@ func (s *ContainerService) Install(service types.Service, method string) (*types
 		return nil, err
 	}
 
-	err = s.ctx.DispatchEvent(types.EventContainerCreated{})
-	if err != nil {
-		log.Error(err)
-	}
-
-	err = s.ctx.DispatchEvent(types.EventContainersChange{})
-	if err != nil {
-		log.Error(err)
-	}
+	s.ctx.DispatchEvent(types.EventContainerCreated{})
+	s.ctx.DispatchEvent(types.EventContainersChange{})
 
 	return inst, nil
 }
@@ -390,12 +371,9 @@ func (s *ContainerService) load(uuid uuid.UUID) error {
 		return ErrContainerAlreadyExists
 	}
 
-	err = s.ctx.DispatchEvent(types.EventContainerLoaded{
+	s.ctx.DispatchEvent(types.EventContainerLoaded{
 		Container: &inst,
 	})
-	if err != nil {
-		log.Error(err)
-	}
 
 	return nil
 }

@@ -63,28 +63,22 @@ func (s *ContainerRunnerService) Start(inst *types.Container) error {
 		return nil
 	}
 
-	err := s.ctx.DispatchEvent(types.EventContainerLog{
+	s.ctx.DispatchEvent(types.EventContainerLog{
 		ContainerUUID: inst.UUID,
 		Kind:          types.LogKindOut,
 		Message:       types.NewLogLineMessageString("Starting container..."),
 	})
-	if err != nil {
-		return err
-	}
 
 	log.Info("starting container",
 		vlog.String("uuid", inst.UUID.String()),
 	)
 
 	if inst.IsRunning() {
-		err := s.ctx.DispatchEvent(types.EventContainerLog{
+		s.ctx.DispatchEvent(types.EventContainerLog{
 			ContainerUUID: inst.UUID,
 			Kind:          types.LogKindVertexErr,
 			Message:       types.NewLogLineMessageString(ErrContainerAlreadyRunning.Error()),
 		})
-		if err != nil {
-			log.Error(err)
-		}
 		return ErrContainerAlreadyRunning
 	}
 
@@ -115,25 +109,19 @@ func (s *ContainerRunnerService) Start(inst *types.Container) error {
 					continue
 				}
 
-				err = s.ctx.DispatchEvent(types.EventContainerLog{
+				s.ctx.DispatchEvent(types.EventContainerLog{
 					ContainerUUID: inst.UUID,
 					Kind:          types.LogKindDownload,
 					Message:       types.NewLogLineMessageDownload(&downloadProgress),
 				})
-				if err != nil {
-					log.Error(err)
-				}
 				continue
 			}
 
-			err := s.ctx.DispatchEvent(types.EventContainerLog{
+			s.ctx.DispatchEvent(types.EventContainerLog{
 				ContainerUUID: inst.UUID,
 				Kind:          types.LogKindOut,
 				Message:       types.NewLogLineMessageString(scanner.Text()),
 			})
-			if err != nil {
-				log.Error(err)
-			}
 		}
 	}()
 
@@ -143,14 +131,11 @@ func (s *ContainerRunnerService) Start(inst *types.Container) error {
 			if scanner.Err() != nil {
 				break
 			}
-			err := s.ctx.DispatchEvent(types.EventContainerLog{
+			s.ctx.DispatchEvent(types.EventContainerLog{
 				ContainerUUID: inst.UUID,
 				Kind:          types.LogKindErr,
 				Message:       types.NewLogLineMessageString(scanner.Text()),
 			})
-			if err != nil {
-				log.Error(err)
-			}
 		}
 	}()
 
@@ -179,42 +164,33 @@ func (s *ContainerRunnerService) Stop(inst *types.Container) error {
 	}
 
 	if !inst.IsRunning() {
-		err := s.ctx.DispatchEvent(types.EventContainerLog{
+		s.ctx.DispatchEvent(types.EventContainerLog{
 			ContainerUUID: inst.UUID,
 			Kind:          types.LogKindVertexErr,
 			Message:       types.NewLogLineMessageString(ErrContainerNotRunning.Error()),
 		})
-		if err != nil {
-			log.Error(err)
-		}
 		return ErrContainerNotRunning
 	}
 
 	// Log stopped
-	err := s.ctx.DispatchEvent(types.EventContainerLog{
+	s.ctx.DispatchEvent(types.EventContainerLog{
 		ContainerUUID: inst.UUID,
 		Kind:          types.LogKindVertexOut,
 		Message:       types.NewLogLineMessageString("Stopping container..."),
 	})
-	if err != nil {
-		log.Error(err)
-	}
 	log.Info("stopping container",
 		vlog.String("uuid", inst.UUID.String()),
 	)
 
 	s.setStatus(inst, types.ContainerStatusStopping)
 
-	err = s.adapter.Stop(inst)
+	err := s.adapter.Stop(inst)
 	if err == nil {
-		err := s.ctx.DispatchEvent(types.EventContainerLog{
+		s.ctx.DispatchEvent(types.EventContainerLog{
 			ContainerUUID: inst.UUID,
 			Kind:          types.LogKindVertexOut,
 			Message:       types.NewLogLineMessageString("Container stopped."),
 		})
-		if err != nil {
-			log.Error(err)
-		}
 
 		log.Info("container stopped",
 			vlog.String("uuid", inst.UUID.String()),
@@ -302,19 +278,12 @@ func (s *ContainerRunnerService) setStatus(inst *types.Container, status string)
 	}
 
 	inst.Status = status
-	err := s.ctx.DispatchEvent(types.EventContainersChange{})
-	if err != nil {
-		log.Error(err)
-	}
-
-	err = s.ctx.DispatchEvent(types.EventContainerStatusChange{
+	s.ctx.DispatchEvent(types.EventContainersChange{})
+	s.ctx.DispatchEvent(types.EventContainerStatusChange{
 		ContainerUUID: inst.UUID,
 		ServiceID:     inst.Service.ID,
 		Container:     *inst,
 		Name:          inst.DisplayName,
 		Status:        status,
 	})
-	if err != nil {
-		log.Error(err)
-	}
 }

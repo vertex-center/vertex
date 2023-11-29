@@ -28,7 +28,7 @@ func (suite *VertexContextTestSuite) TestDispatchEvent() {
 	bus.On("DispatchEvent", event.MockEvent{}).Return(nil)
 	suite.context.bus = bus
 
-	err := suite.context.DispatchEvent(event.MockEvent{})
+	err := suite.context.DispatchEventWithErr(event.MockEvent{})
 	suite.Require().NoError(err)
 	bus.AssertExpectations(suite.T())
 }
@@ -37,7 +37,7 @@ func (suite *VertexContextTestSuite) TestDispatchHardReset() {
 	bus := &event.MockBus{}
 	suite.context.bus = bus
 
-	err := suite.context.DispatchEvent(EventServerHardReset{})
+	err := suite.context.DispatchEventWithErr(EventServerHardReset{})
 	suite.Require().NoError(err)
 	bus.AssertNotCalled(suite.T(), "DispatchEvent", mock.Anything)
 }
