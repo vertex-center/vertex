@@ -73,7 +73,7 @@ export default function ContainerLogs() {
         });
     };
 
-    const route = uuid ? `/app/vx-containers/container/${uuid}/events` : "";
+    const route = uuid ? `/app/containers/container/${uuid}/events` : "";
 
     useServerEvent(route, {
         stdout: onStdout,

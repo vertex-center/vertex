@@ -1,7 +1,7 @@
 import { Metric } from "../../models/metrics";
 import { server } from "./backend";
 
-const BASE_URL = "/app/vx-monitoring";
+const BASE_URL = "/app/monitoring";
 
 const getMetrics = async () => {
     const { data } = await server.get<Metric[]>(`${BASE_URL}/metrics`);

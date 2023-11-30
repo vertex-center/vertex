@@ -1,6 +1,6 @@
 import { server } from "./backend";
 
-const BASE_URL = "/app/vx-sql";
+const BASE_URL = "/app/sql";
 
 const installDbms = (dbms: string) => {
     return server.post(`${BASE_URL}/dbms/${dbms}/install`);

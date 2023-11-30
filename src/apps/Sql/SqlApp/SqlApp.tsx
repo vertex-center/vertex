@@ -36,7 +36,7 @@ export default function SqlApp() {
                                 key={inst.uuid}
                                 label={inst?.display_name ?? inst.service.name}
                                 icon={icon}
-                                link={l(`/app/vx-sql/db/${inst.uuid}`)}
+                                link={l(`/app/sql/db/${inst.uuid}`)}
                                 trailing={
                                     inst && (
                                         <ContainerLed
@@ -54,13 +54,13 @@ export default function SqlApp() {
                 <Sidebar.Item
                     label="Installer"
                     icon={<MaterialIcon icon="download" />}
-                    link={l("/app/vx-sql/install")}
+                    link={l("/app/sql/install")}
                 />
             </Sidebar.Group>
         </Sidebar>
     );
 
-    useServerEvent("/app/vx-containers/containers/events", {
+    useServerEvent("/app/containers/containers/events", {
         change: () => {
             queryClient.invalidateQueries({
                 queryKey: ["containers"],

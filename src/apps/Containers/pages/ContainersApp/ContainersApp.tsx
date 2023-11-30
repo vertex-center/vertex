@@ -37,7 +37,7 @@ const ToolbarContainers = (props: ToolbarProps) => {
             <Spacer />
             <Button
                 variant="colored"
-                onClick={() => navigate("/app/vx-containers/add")}
+                onClick={() => navigate("/app/containers/add")}
                 rightIcon={<MaterialIcon icon="add" />}
             >
                 Create container
@@ -72,7 +72,7 @@ export default function ContainersApp() {
         },
     });
 
-    useServerEvent("/app/vx-containers/containers/events", {
+    useServerEvent("/app/containers/containers/events", {
         change: () => {
             queryClient.invalidateQueries({
                 queryKey: ["containers"],
@@ -110,7 +110,7 @@ export default function ContainersApp() {
                                 key={inst.uuid}
                                 container={{
                                     value: inst,
-                                    to: `/app/vx-containers/${inst.uuid}/`,
+                                    to: `/app/containers/${inst.uuid}/`,
                                     onPower: async () =>
                                         mutationPower.mutate(inst.uuid),
                                 }}

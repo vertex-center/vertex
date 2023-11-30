@@ -21,7 +21,7 @@ export default function TunnelsApp() {
 
     const container = Object.values(containers || {})?.[0];
 
-    useServerEvent("/app/vx-containers/containers/events", {
+    useServerEvent("/app/containers/containers/events", {
         change: (e) => {
             queryClient.invalidateQueries({
                 queryKey: ["containers"],
@@ -35,7 +35,7 @@ export default function TunnelsApp() {
                 <Sidebar.Item
                     label="Cloudflare Tunnel"
                     icon={<SiCloudflare size={20} />}
-                    link={l("/app/vx-tunnels/cloudflare")}
+                    link={l("/app/tunnels/cloudflare")}
                     trailing={
                         container && (
                             <ContainerLed small status={container?.status} />

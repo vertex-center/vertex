@@ -57,7 +57,7 @@ export default function SqlDatabase() {
         await api.vxContainers.container(inst.uuid).stop();
     };
 
-    const route = uuid ? `/app/vx-containers/container/${uuid}/events` : "";
+    const route = uuid ? `/app/containers/container/${uuid}/events` : "";
 
     useServerEvent(route, {
         status_change: () => {
@@ -98,7 +98,7 @@ export default function SqlDatabase() {
                         value: container ?? {
                             uuid: uuidv4(),
                         },
-                        to: `/app/vx-containers/${container?.uuid}`,
+                        to: `/app/containers/${container?.uuid}`,
                         onPower: () => onPower(container),
                     }}
                 />

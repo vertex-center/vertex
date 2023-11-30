@@ -80,7 +80,7 @@ export default function ContainerInstaller(props: Readonly<Props>) {
     };
 
     const route = container?.uuid
-        ? `/app/vx-containers/container/${container?.uuid}/events`
+        ? `/app/containers/container/${container?.uuid}/events`
         : "";
 
     useServerEvent(route, {
@@ -96,7 +96,7 @@ export default function ContainerInstaller(props: Readonly<Props>) {
                     container={{
                         value: container,
                         to: container?.uuid
-                            ? `/app/vx-containers/${container?.uuid}`
+                            ? `/app/containers/${container?.uuid}`
                             : undefined,
                         onInstall: onInstall,
                         onPower: () => onPower(container),

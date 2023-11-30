@@ -27,7 +27,7 @@ export default function (props: Readonly<Props>) {
     const navigate = useNavigate();
     const location = useLocation();
 
-    let to = "/app/vx-containers";
+    let to = "/app/containers";
     let app = undefined;
     if (location.pathname.startsWith("/app/")) {
         app = apps?.find((app) => location.pathname.includes(`/app/${app.id}`));

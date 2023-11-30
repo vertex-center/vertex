@@ -32,7 +32,7 @@ export default function ContainerDetails() {
 
     const [showDeletePopup, setShowDeletePopup] = useState<boolean>();
 
-    const route = uuid ? `/app/vx-containers/container/${uuid}/events` : "";
+    const route = uuid ? `/app/containers/container/${uuid}/events` : "";
 
     useServerEvent(route, {
         status_change: (e) => {
@@ -59,7 +59,7 @@ export default function ContainerDetails() {
     const mutationDeleteContainer = useMutation({
         mutationFn: api.vxContainers.container(uuid).delete,
         onSuccess: () => {
-            navigate("/app/vx-containers");
+            navigate("/app/containers");
         },
     });
     const { isLoading: isDeleting, error: errorDeleting } =
@@ -75,20 +75,20 @@ export default function ContainerDetails() {
                 <Sidebar.Item
                     label="Home"
                     icon={<MaterialIcon icon="home" />}
-                    link={l(`/app/vx-containers/${uuid}/home`)}
+                    link={l(`/app/containers/${uuid}/home`)}
                 />
             </Sidebar.Group>
             <Sidebar.Group title="Analyze">
                 <Sidebar.Item
                     label="Logs"
                     icon={<MaterialIcon icon="terminal" />}
-                    link={l(`/app/vx-containers/${uuid}/logs`)}
+                    link={l(`/app/containers/${uuid}/logs`)}
                 />
                 {container?.install_method === "docker" && (
                     <Sidebar.Item
                         label="Docker"
                         icon={<SiDocker size={20} />}
-                        link={l(`/app/vx-containers/${uuid}/docker`)}
+                        link={l(`/app/containers/${uuid}/docker`)}
                     />
                 )}
             </Sidebar.Group>
@@ -96,19 +96,19 @@ export default function ContainerDetails() {
                 <Sidebar.Item
                     label="Environment"
                     icon={<MaterialIcon icon="tune" />}
-                    link={l(`/app/vx-containers/${uuid}/environment`)}
+                    link={l(`/app/containers/${uuid}/environment`)}
                 />
                 {container?.service?.databases && (
                     <Sidebar.Item
                         label="Database"
                         icon={<MaterialIcon icon="database" />}
-                        link={l(`/app/vx-containers/${uuid}/database`)}
+                        link={l(`/app/containers/${uuid}/database`)}
                     />
                 )}
                 <Sidebar.Item
                     icon={<MaterialIcon icon="update" />}
                     label="Update"
-                    link={l(`/app/vx-containers/${uuid}/update`)}
+                    link={l(`/app/containers/${uuid}/update`)}
                     notifications={
                         container?.service_update?.available ? 1 : undefined
                     }
@@ -116,7 +116,7 @@ export default function ContainerDetails() {
                 <Sidebar.Item
                     label="Settings"
                     icon={<MaterialIcon icon="settings" />}
-                    link={l(`/app/vx-containers/${uuid}/settings`)}
+                    link={l(`/app/containers/${uuid}/settings`)}
                 />
                 <Sidebar.Item
                     label="Delete"

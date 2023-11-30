@@ -27,7 +27,7 @@ export default function MonitoringApp() {
         });
     const grafanaContainer = Object.values(grafanaContainers ?? {})[0];
 
-    useServerEvent("/app/vx-containers/containers/events", {
+    useServerEvent("/app/containers/containers/events", {
         change: (e) => {
             queryClient.invalidateQueries({
                 queryKey: ["containers"],
@@ -41,14 +41,14 @@ export default function MonitoringApp() {
                 <Sidebar.Item
                     label="Metrics"
                     icon={<MaterialIcon icon="rule" />}
-                    link={l("/app/vx-monitoring/metrics")}
+                    link={l("/app/monitoring/metrics")}
                 />
             </Sidebar.Group>
             <Sidebar.Group title="Collectors">
                 <Sidebar.Item
                     label="Prometheus"
                     icon={<SiPrometheus size={20} />}
-                    link={l("/app/vx-monitoring/prometheus")}
+                    link={l("/app/monitoring/prometheus")}
                     trailing={
                         prometheusContainer && (
                             <ContainerLed
@@ -63,7 +63,7 @@ export default function MonitoringApp() {
                 <Sidebar.Item
                     label="Grafana"
                     icon={<SiGrafana size={20} />}
-                    link={l("/app/vx-monitoring/grafana")}
+                    link={l("/app/monitoring/grafana")}
                     trailing={
                         grafanaContainer && (
                             <ContainerLed

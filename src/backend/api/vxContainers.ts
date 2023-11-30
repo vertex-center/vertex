@@ -3,7 +3,7 @@ import { Env, Service } from "../../models/service";
 import { DockerContainerInfo } from "../../models/docker";
 import { server } from "./backend";
 
-const BASE_URL = "/app/vx-containers";
+const BASE_URL = "/app/containers";
 
 const getAllContainers = async () => {
     const { data } = await server.get<Containers>(`${BASE_URL}/containers`);

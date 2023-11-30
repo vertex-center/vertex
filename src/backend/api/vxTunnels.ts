@@ -1,6 +1,6 @@
 import { server } from "./backend";
 
-const BASE_URL = "/app/vx-tunnels";
+const BASE_URL = "/app/tunnels";
 
 const installProvider = (provider: string) => {
     return server.post(`${BASE_URL}/provider/${provider}/install`);

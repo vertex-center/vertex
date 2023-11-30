@@ -1,41 +1,41 @@
 const createContainerAndNavigate = (to: string) => {
-    cy.visit("/app/vx-containers");
+    cy.visit("/app/containers");
     cy.request(
         "POST",
-        "http://localhost:6130/api/app/vx-containers/service/postgres/install"
+        "http://localhost:6130/api/app/containers/service/postgres/install"
     ).then((res: any) => {
-        cy.visit(`/app/vx-containers/${res.body.uuid}${to}`);
+        cy.visit(`/app/containers/${res.body.uuid}${to}`);
     });
 };
 
 describe("The Vertex Containers app", () => {
     it("loads", () => {
-        cy.visit("/app/vx-containers");
+        cy.visit("/app/containers");
     });
 
     it("can create a new container", () => {
         // Navigate to the create container page
-        cy.visit("/app/vx-containers");
+        cy.visit("/app/containers");
         cy.contains("Create container").click();
-        cy.url().should("include", "/app/vx-containers/add");
+        cy.url().should("include", "/app/containers/add");
 
         // Create an container
         cy.contains("Postgres").click();
         cy.get("button").contains("Create container").click();
 
         // Go back
-        cy.visit("/app/vx-containers");
+        cy.visit("/app/containers");
         cy.contains("Postgres");
     });
 
     it("can navigate to an container", () => {
         cy.request(
             "POST",
-            "http://localhost:6130/api/app/vx-containers/service/postgres/install"
+            "http://localhost:6130/api/app/containers/service/postgres/install"
         );
 
         // Navigate to
-        cy.visit("/app/vx-containers");
+        cy.visit("/app/containers");
         cy.contains("Postgres").click();
     });
 
@@ -72,7 +72,7 @@ describe("The Vertex Containers app", () => {
 
     it("can delete an container", () => {
         // Go to the containers page
-        cy.visit("/app/vx-containers");
+        cy.visit("/app/containers");
 
         // Create an container
         createContainerAndNavigate("/");

@@ -10,7 +10,7 @@ export default function ServiceLogo(props: Readonly<Props>) {
 
     // @ts-ignore
     const iconURL = new URL(window.apiURL);
-    iconURL.pathname = `/api/app/vx-containers/services/icons/${service?.icon}`;
+    iconURL.pathname = `/api/app/containers/services/icons/${service?.icon}`;
 
     if (!service?.icon) {
         return <MaterialIcon icon="extension" style={{ opacity: 0.8 }} />;

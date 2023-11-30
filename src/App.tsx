@@ -88,93 +88,93 @@ function AllRoutes() {
                         <Route path="/logout" element={<Logout />} />
                         <Route
                             path="/"
-                            element={<Navigate to="/app/vx-containers" />}
+                            element={<Navigate to="/app/containers" />}
                             index
                         />
                         <Route
-                            path="/app/vx-containers"
+                            path="/app/containers"
                             element={<ContainersApp />}
                         />
                         <Route
-                            path="/app/vx-containers/add"
+                            path="/app/containers/add"
                             element={<ContainersStore />}
                         />
                         <Route
-                            path="/app/vx-devtools-service-editor"
+                            path="/app/devtools-service-editor"
                             element={<ServiceEditor />}
                         />
-                        <Route path="/app/vx-sql" element={<SqlApp />}>
+                        <Route path="/app/sql" element={<SqlApp />}>
                             <Route
-                                path="/app/vx-sql/install"
+                                path="/app/sql/install"
                                 element={<SqlInstaller />}
                             />
                             <Route
-                                path="/app/vx-sql/db/:uuid"
+                                path="/app/sql/db/:uuid"
                                 element={<SqlDatabase />}
                             />
                         </Route>
                         <Route
-                            path="/app/vx-monitoring"
+                            path="/app/monitoring"
                             element={<MonitoringApp />}
                         >
                             <Route
-                                path="/app/vx-monitoring/metrics"
+                                path="/app/monitoring/metrics"
                                 element={<MetricsList />}
                             />
                             <Route
-                                path="/app/vx-monitoring/prometheus"
+                                path="/app/monitoring/prometheus"
                                 element={<Prometheus />}
                             />
                             <Route
-                                path="/app/vx-monitoring/grafana"
+                                path="/app/monitoring/grafana"
                                 element={<Grafana />}
                             />
                         </Route>
-                        <Route path="/app/vx-tunnels" element={<TunnelsApp />}>
+                        <Route path="/app/tunnels" element={<TunnelsApp />}>
                             <Route
-                                path="/app/vx-tunnels/cloudflare"
+                                path="/app/tunnels/cloudflare"
                                 element={<CloudflareTunnels />}
                             />
                         </Route>
                         <Route
-                            path="/app/vx-reverse-proxy"
+                            path="/app/reverse-proxy"
                             element={<ReverseProxyApp />}
                         >
                             <Route
-                                path="/app/vx-reverse-proxy/vertex"
+                                path="/app/reverse-proxy/vertex"
                                 element={<VertexReverseProxy />}
                             />
                         </Route>
                         <Route
-                            path="/app/vx-containers/:uuid/"
+                            path="/app/containers/:uuid/"
                             element={<ContainerDetails />}
                         >
                             <Route
-                                path="/app/vx-containers/:uuid/home"
+                                path="/app/containers/:uuid/home"
                                 element={<ContainerHome />}
                             />
                             <Route
-                                path="/app/vx-containers/:uuid/docker"
+                                path="/app/containers/:uuid/docker"
                                 element={<ContainerDocker />}
                             />
                             <Route
-                                path="/app/vx-containers/:uuid/logs"
+                                path="/app/containers/:uuid/logs"
                                 element={<ContainerLogs />}
                             />
                             <Route
-                                path="/app/vx-containers/:uuid/environment"
+                                path="/app/containers/:uuid/environment"
                                 element={<ContainerEnv />}
                             />
                             <Route
-                                path="/app/vx-containers/:uuid/database"
+                                path="/app/containers/:uuid/database"
                                 element={<ContainerDetailsDatabase />}
                             />
                             <Route
-                                path="/app/vx-containers/:uuid/update"
+                                path="/app/containers/:uuid/update"
                                 element={<ContainerUpdate />}
                             />
                             <Route
-                                path="/app/vx-containers/:uuid/settings"
+                                path="/app/containers/:uuid/settings"
                                 element={<ContainerSettings />}
                             />
                         </Route>

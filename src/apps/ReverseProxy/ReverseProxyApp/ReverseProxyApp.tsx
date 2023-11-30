@@ -13,7 +13,7 @@ export default function ReverseProxyApp() {
                 <Sidebar.Item
                     label="Vertex Reverse Proxy"
                     icon={<MaterialIcon icon="router" />}
-                    link={l("/app/vx-reverse-proxy/vertex")}
+                    link={l("/app/reverse-proxy/vertex")}
                 />
             </Sidebar.Group>
         </Sidebar>

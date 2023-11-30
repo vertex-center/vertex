@@ -1,6 +1,6 @@
 import { server } from "./backend";
 
-const BASE_URL = `/app/vx-reverse-proxy`;
+const BASE_URL = `/app/reverse-proxy`;
 
 const getRedirects = async () => {
     const { data } = await server.get<ProxyRedirects>(`${BASE_URL}/redirects`);
