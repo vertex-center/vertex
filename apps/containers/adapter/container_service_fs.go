@@ -31,7 +31,7 @@ func NewContainerServiceFSAdapter(params *ContainerServiceFSAdapterParams) port.
 		params = &ContainerServiceFSAdapterParams{}
 	}
 	if params.containersPath == "" {
-		params.containersPath = path.Join(storage.Path, "apps", "vx-containers", "containers")
+		params.containersPath = path.Join(storage.Path, "apps", "containers", "containers")
 	}
 
 	adapter := &ContainerServiceFSAdapter{

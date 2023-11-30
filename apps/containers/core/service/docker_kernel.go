@@ -74,7 +74,7 @@ func (s DockerKernelService) BuildImage(options types.BuildImageOptions) (docker
 }
 
 func (s DockerKernelService) DeleteMounts(uuid string) error {
-	volumesPath := path.Join("live_docker", "apps", "vx-containers", "volumes", uuid)
+	volumesPath := path.Join("live_docker", "apps", "containers", "volumes", uuid)
 	err := os.RemoveAll(volumesPath)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err

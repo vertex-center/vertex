@@ -11,6 +11,6 @@ type Client struct {
 
 func NewTunnelsClient() *Client {
 	return &Client{
-		Client: rest.NewClient(config.Current.VertexURL(), "/api/app/vx-tunnels/"),
+		Client: rest.NewClient(config.Current.VertexURL(), "/api/app/tunnels/"),
 	}
 }

@@ -55,7 +55,7 @@ func NewMetricsPrometheusAdapter() *PrometheusAdapter {
 }
 
 func (a *PrometheusAdapter) ConfigureContainer(uuid uuid.UUID) error {
-	dir := path.Join("live_docker", "apps", "vx-containers", "volumes", uuid.String(), "config")
+	dir := path.Join("live_docker", "apps", "containers", "volumes", uuid.String(), "config")
 	p := path.Join(dir, "prometheus.yml")
 
 	err := os.MkdirAll(dir, 0755)

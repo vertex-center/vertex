@@ -11,6 +11,6 @@ type Client struct {
 
 func NewSqlClient() *Client {
 	return &Client{
-		Client: rest.NewClient(config.Current.VertexURL(), "/api/app/vx-sql/"),
+		Client: rest.NewClient(config.Current.VertexURL(), "/api/app/sql/"),
 	}
 }

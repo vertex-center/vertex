@@ -11,6 +11,6 @@ type Client struct {
 
 func NewReverseProxyClient() *Client {
 	return &Client{
-		Client: rest.NewClient(config.Current.VertexURL(), "/api/app/vx-reverse-proxy/"),
+		Client: rest.NewClient(config.Current.VertexURL(), "/api/app/reverse-proxy/"),
 	}
 }

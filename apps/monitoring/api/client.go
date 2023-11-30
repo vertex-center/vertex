@@ -11,6 +11,6 @@ type Client struct {
 
 func NewMonitoringClient() *Client {
 	return &Client{
-		Client: rest.NewClient(config.Current.VertexURL(), "/api/app/vx-monitoring/"),
+		Client: rest.NewClient(config.Current.VertexURL(), "/api/app/monitoring/"),
 	}
 }

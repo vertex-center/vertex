@@ -52,7 +52,7 @@ func NewContainerLogsFSAdapter(params *ContainerLogsFSAdapterParams) port.Contai
 	}
 
 	if params.ContainersPath == "" {
-		params.ContainersPath = path.Join(storage.Path, "apps", "vx-containers", "containers")
+		params.ContainersPath = path.Join(storage.Path, "apps", "containers", "containers")
 	}
 
 	return &ContainerLogsFSAdapter{

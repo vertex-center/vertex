@@ -32,7 +32,7 @@ func (a *App) Load(ctx *apptypes.Context) {
 
 func (a *App) Meta() apptypes.Meta {
 	return apptypes.Meta{
-		ID:          "vx-reverse-proxy",
+		ID:          "reverse-proxy",
 		Name:        "Vertex Reverse Proxy",
 		Description: "Redirect traffic to your containers.",
 		Icon:        "router",
@@ -54,11 +54,11 @@ func (a *App) Initialize(r *router.Group) error {
 	}()
 
 	proxyHandler := handler.NewProxyHandler(proxyService)
-	// docapi:v route /app/vx-reverse-proxy/redirects vx_reverse_proxy_get_redirects
+	// docapi:v route /app/reverse-proxy/redirects vx_reverse_proxy_get_redirects
 	r.GET("/redirects", middleware.Authenticated, proxyHandler.GetRedirects)
-	// docapi:v route /app/vx-reverse-proxy/redirect vx_reverse_proxy_add_redirect
+	// docapi:v route /app/reverse-proxy/redirect vx_reverse_proxy_add_redirect
 	r.POST("/redirect", middleware.Authenticated, proxyHandler.AddRedirect)
-	// docapi:v route /app/vx-reverse-proxy/redirect/{id} vx_reverse_proxy_remove_redirect
+	// docapi:v route /app/reverse-proxy/redirect/{id} vx_reverse_proxy_remove_redirect
 	r.DELETE("/redirect/:id", middleware.Authenticated, proxyHandler.RemoveRedirect)
 
 	return nil

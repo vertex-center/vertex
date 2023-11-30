@@ -21,7 +21,7 @@ func (a *App) Load(ctx *apptypes.Context) {
 
 func (a *App) Meta() apptypes.Meta {
 	return apptypes.Meta{
-		ID:          "vx-tunnels",
+		ID:          "tunnels",
 		Name:        "Vertex Tunnels",
 		Description: "Create and manage tunnels.",
 		Icon:        "subway",
@@ -30,7 +30,7 @@ func (a *App) Meta() apptypes.Meta {
 
 func (a *App) Initialize(r *router.Group) error {
 	providerHandler := handler.NewProviderHandler()
-	// docapi:v route /app/vx-tunnels/provider/{provider}/install vx_tunnels_install_provider
+	// docapi:v route /app/tunnels/provider/{provider}/install vx_tunnels_install_provider
 	r.POST("/provider/:provider/install", middleware.Authenticated, providerHandler.Install)
 
 	return nil

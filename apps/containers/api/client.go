@@ -11,6 +11,6 @@ type Client struct {
 
 func NewContainersClient() *Client {
 	return &Client{
-		Client: rest.NewClient(config.Current.VertexURL(), "/api/app/vx-containers/"),
+		Client: rest.NewClient(config.Current.VertexURL(), "/api/app/containers/"),
 	}
 }

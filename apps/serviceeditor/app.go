@@ -22,7 +22,7 @@ func (a *App) Load(ctx *apptypes.Context) {
 
 func (a *App) Meta() apptypes.Meta {
 	return apptypes.Meta{
-		ID:          "vx-devtools-service-editor",
+		ID:          "devtools-service-editor",
 		Name:        "Vertex Service Editor",
 		Description: "Create services for publishing.",
 		Icon:        "frame_source",
@@ -35,7 +35,7 @@ func (a *App) Initialize(r *router.Group) error {
 
 	editorHandler := handler.NewEditorHandler(editorService)
 	editor := r.Group("/editor", middleware.Authenticated)
-	// docapi:v route /app/vx-devtools-service-editor/editor/to-yaml vx_devtools_service_editor_to_yaml
+	// docapi:v route /app/devtools-service-editor/editor/to-yaml vx_devtools_service_editor_to_yaml
 	editor.POST("/to-yaml", editorHandler.ToYaml)
 
 	return nil

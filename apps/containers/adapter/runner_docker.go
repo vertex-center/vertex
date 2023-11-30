@@ -41,7 +41,7 @@ func (a ContainerRunnerDockerAdapter) DeleteContainer(inst *types.Container) err
 
 	apiError := router.Error{}
 	err = requests.URL(config.Current.KernelURL()).
-		Pathf("/api/app/vx-containers/docker/container/%s", id).
+		Pathf("/api/app/containers/docker/container/%s", id).
 		Delete().
 		ErrorJSON(&apiError).
 		Fetch(context.Background())
@@ -60,7 +60,7 @@ func (a ContainerRunnerDockerAdapter) DeleteMounts(inst *types.Container) error 
 
 	apiError := router.Error{}
 	err = requests.URL(config.Current.KernelURL()).
-		Pathf("/api/app/vx-containers/docker/container/%s/mounts", id).
+		Pathf("/api/app/containers/docker/container/%s/mounts", id).
 		Delete().
 		ErrorJSON(&apiError).
 		Fetch(context.Background())
@@ -262,7 +262,7 @@ func (a ContainerRunnerDockerAdapter) Start(inst *types.Container, setStatus fun
 
 		// Start
 		err = requests.URL(config.Current.KernelURL()).
-			Pathf("/api/app/vx-containers/docker/container/%s/start", id).
+			Pathf("/api/app/containers/docker/container/%s/start", id).
 			Post().
 			Fetch(context.Background())
 		if err != nil {
@@ -317,7 +317,7 @@ func (a ContainerRunnerDockerAdapter) Stop(inst *types.Container) error {
 	}
 
 	return requests.URL(config.Current.KernelURL()).
-		Pathf("/api/app/vx-containers/docker/container/%s/stop", id).
+		Pathf("/api/app/containers/docker/container/%s/stop", id).
 		Post().
 		Fetch(context.Background())
 }
@@ -330,7 +330,7 @@ func (a ContainerRunnerDockerAdapter) Info(inst types.Container) (map[string]any
 
 	var info types.InfoContainerResponse
 	err = requests.URL(config.Current.KernelURL()).
-		Pathf("/api/app/vx-containers/docker/container/%s/info", id).
+		Pathf("/api/app/containers/docker/container/%s/info", id).
 		ToJSON(&info).
 		Fetch(context.Background())
 	if err != nil {
@@ -339,7 +339,7 @@ func (a ContainerRunnerDockerAdapter) Info(inst types.Container) (map[string]any
 
 	var imageInfo types.InfoImageResponse
 	err = requests.URL(config.Current.KernelURL()).
-		Pathf("/api/app/vx-containers/docker/image/%s/info", info.Image).
+		Pathf("/api/app/containers/docker/image/%s/info", info.Image).
 		ToJSON(&imageInfo).
 		Fetch(context.Background())
 	if err != nil {
@@ -370,7 +370,7 @@ func (a ContainerRunnerDockerAdapter) CheckForUpdates(inst *types.Container) err
 
 	var imageInfo types.InfoImageResponse
 	err = requests.URL(config.Current.KernelURL()).
-		Pathf("/api/app/vx-containers/docker/%s/info", imageName).
+		Pathf("/api/app/containers/docker/%s/info", imageName).
 		ToJSON(&imageInfo).
 		Fetch(context.Background())
 	if err != nil {
@@ -425,14 +425,14 @@ func (a ContainerRunnerDockerAdapter) WaitCondition(inst *types.Container, cond 
 	}
 
 	return requests.URL(config.Current.KernelURL()).
-		Pathf("/api/app/vx-containers/docker/container/%s/wait/%s", id, cond).
+		Pathf("/api/app/containers/docker/container/%s/wait/%s", id, cond).
 		Fetch(context.Background())
 }
 
 func (a ContainerRunnerDockerAdapter) getContainer(inst types.Container) (types.DockerContainer, error) {
 	var containers []types.DockerContainer
 	err := requests.URL(config.Current.KernelURL()).
-		Path("/api/app/vx-containers/docker/containers").
+		Path("/api/app/containers/docker/containers").
 		ToJSON(&containers).
 		Fetch(context.Background())
 	if err != nil {
@@ -475,7 +475,7 @@ func (a ContainerRunnerDockerAdapter) pullImage(imageName string) (io.ReadCloser
 	options := types.PullImageOptions{Image: imageName}
 
 	req, err := requests.URL(config.Current.KernelURL()).
-		Path("/api/app/vx-containers/docker/image/pull").
+		Path("/api/app/containers/docker/image/pull").
 		Post().
 		BodyJSON(options).
 		Request(context.Background())
@@ -508,7 +508,7 @@ func (a ContainerRunnerDockerAdapter) buildImageFromDockerfile(containerPath str
 	}
 
 	req, err := requests.URL(config.Current.KernelURL()).
-		Pathf("/api/app/vx-containers/docker/image/build").
+		Pathf("/api/app/containers/docker/image/build").
 		Post().
 		BodyJSON(options).
 		Request(context.Background())
@@ -526,7 +526,7 @@ func (a ContainerRunnerDockerAdapter) buildImageFromDockerfile(containerPath str
 func (a ContainerRunnerDockerAdapter) createContainer(options types.CreateContainerOptions) (string, error) {
 	var res types.CreateContainerResponse
 	err := requests.URL(config.Current.KernelURL()).
-		Pathf("/api/app/vx-containers/docker/container").
+		Pathf("/api/app/containers/docker/container").
 		Post().
 		BodyJSON(options).
 		ToJSON(&res).
@@ -546,14 +546,14 @@ func (a ContainerRunnerDockerAdapter) createContainer(options types.CreateContai
 func (a ContainerRunnerDockerAdapter) readLogs(containerID string) (stdout io.ReadCloser, stderr io.ReadCloser, err error) {
 	var reqStdout, reqStderr *http.Request
 	reqStdout, err = requests.URL(config.Current.KernelURL()).
-		Pathf("/api/app/vx-containers/docker/container/%s/logs/stdout", containerID).
+		Pathf("/api/app/containers/docker/container/%s/logs/stdout", containerID).
 		Request(context.Background())
 	if err != nil {
 		return
 	}
 
 	reqStderr, err = requests.URL(config.Current.KernelURL()).
-		Pathf("/api/app/vx-containers/docker/container/%s/logs/stderr", containerID).
+		Pathf("/api/app/containers/docker/container/%s/logs/stderr", containerID).
 		Request(context.Background())
 	if err != nil {
 		return
@@ -606,7 +606,7 @@ func (a ContainerRunnerDockerAdapter) getAppPath(base string) string {
 	if vdocker.RunningInDocker() {
 		var containers []types.DockerContainer
 		err := requests.URL(config.Current.KernelURL()).
-			Path("/api/app/vx-containers/docker/containers").
+			Path("/api/app/containers/docker/containers").
 			ToJSON(&containers).
 			Fetch(context.Background())
 		if err != nil {
@@ -623,5 +623,5 @@ func (a ContainerRunnerDockerAdapter) getAppPath(base string) string {
 		}
 	}
 
-	return path.Join(base, "apps", "vx-containers")
+	return path.Join(base, "apps", "containers")
 }

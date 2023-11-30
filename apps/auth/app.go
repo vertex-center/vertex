@@ -30,7 +30,7 @@ func (a *App) Load(ctx *apptypes.Context) {
 
 func (a *App) Meta() apptypes.Meta {
 	return apptypes.Meta{
-		ID:          "vx-auth",
+		ID:          "auth",
 		Name:        "Vertex Auth",
 		Description: "Authentication app for Vertex",
 		Icon:        "admin_panel_settings",
@@ -48,11 +48,11 @@ func (a *App) Initialize(r *router.Group) error {
 
 	authHandler := handler.NewAuthHandler(AuthService)
 	auth := r.Group("/auth")
-	// docapi:v route /app/vx-auth/auth/login auth_login
+	// docapi:v route /app/auth/auth/login auth_login
 	auth.POST("/login", authHandler.Login)
-	// docapi:v route /app/vx-auth/auth/register auth_register
+	// docapi:v route /app/auth/auth/register auth_register
 	auth.POST("/register", authHandler.Register)
-	// docapi:v route /app/vx-auth/auth/logout auth_logout
+	// docapi:v route /app/auth/auth/logout auth_logout
 	auth.POST("/logout", middleware.Authenticated, authHandler.Logout)
 
 	return nil

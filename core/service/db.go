@@ -106,7 +106,7 @@ func (s *DbService) MigrateTo(dbms vtypes.DbmsName) error {
 
 func (s *DbService) OnEvent(e event.Event) error {
 	switch e.(type) {
-	// This needs vx-containers and vx-sql to work
+	// This needs containers and sql to work
 	case vtypes.EventAllAppsReady:
 		go func() {
 			s.setup()
