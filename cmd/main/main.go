@@ -304,7 +304,6 @@ func startRouter() {
 	resCh := checksService.CheckAll(timeout)
 	for res := range resCh {
 		if res.Error != "" {
-			log.Error(errors.New(res.Error))
 			os.Exit(1)
 		}
 	}
