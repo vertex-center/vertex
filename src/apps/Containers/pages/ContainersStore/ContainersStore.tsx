@@ -83,45 +83,29 @@ export default function ContainersStore() {
             <ProgressOverlay
                 show={isContainersLoading ?? isServicesLoading ?? isInstalling}
             />
-            <div className={styles.page}>
-                <Vertical gap={10}>
-                    <APIError error={error} />
-                    {/*<Toolbar className={styles.toolbar}>*/}
-                    {/*    <Select*/}
-                    {/*        // @ts-ignore*/}
-                    {/*        value={<SelectValue>Category</SelectValue>}*/}
-                    {/*        disabled*/}
-                    {/*    />*/}
-                    {/*    <Spacer />*/}
-                    {/*    <Button*/}
-                    {/*        to="/app/vx-devtools-service-editor"*/}
-                    {/*        leftIcon="frame_source"*/}
-                    {/*    >*/}
-                    {/*        Service Editor*/}
-                    {/*    </Button>*/}
-                    {/*</Toolbar>*/}
-                    <List className={styles.content}>
-                        {services?.map((service) => (
-                            <Service
-                                key={service.id}
-                                service={service}
-                                onInstall={() => openInstallPopup(service)}
-                                downloading={downloading.some(
-                                    ({ service: s }) => s.id === service.id
-                                )}
-                                installedCount={
-                                    containers === undefined
-                                        ? undefined
-                                        : Object.values(containers)?.filter(
-                                              ({ service: s }) =>
-                                                  s.id === service.id
-                                          )?.length
-                                }
-                            />
-                        ))}
-                    </List>
-                </Vertical>
-            </div>
+            <Vertical className={styles.content} gap={10}>
+                <APIError error={error} />
+                <List>
+                    {services?.map((service) => (
+                        <Service
+                            key={service.id}
+                            service={service}
+                            onInstall={() => openInstallPopup(service)}
+                            downloading={downloading.some(
+                                ({ service: s }) => s.id === service.id
+                            )}
+                            installedCount={
+                                containers === undefined
+                                    ? undefined
+                                    : Object.values(containers)?.filter(
+                                          ({ service: s }) =>
+                                              s.id === service.id
+                                      )?.length
+                            }
+                        />
+                    ))}
+                </List>
+            </Vertical>
             <ServiceInstallPopup
                 service={selectedService}
                 show={showInstallPopup}
