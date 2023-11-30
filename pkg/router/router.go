@@ -82,6 +82,10 @@ func (r *Router) HEAD(path string, handlers ...HandlerFunc) {
 	r.RouterGroup.HEAD(path, wrapHandlers(handlers...)...)
 }
 
+func (r *Router) Handle(method, path string, handlers ...HandlerFunc) {
+	r.RouterGroup.Handle(method, path, wrapHandlers(handlers...)...)
+}
+
 func (r *Router) Any(path string, handlers ...HandlerFunc) {
 	r.RouterGroup.Any(path, wrapHandlers(handlers...)...)
 }
