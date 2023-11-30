@@ -1,7 +1,7 @@
 <p align="center">
     <img height="96" src="https://github.com/vertex-center/vertex-design/raw/main/logos/transparent/vertex_logo_transparent.png" alt="Vertex logo" />
 </p>
-<h1 align="center">Vertex Web UI</h1>
+<h1 align="center">Vertex Client</h1>
 
 <p align="center">
 <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/vertex-center/client?color=DE3C4B&labelColor=1E212B&style=for-the-badge">
