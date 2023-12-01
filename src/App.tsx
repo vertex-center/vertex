@@ -42,11 +42,11 @@ import SqlDatabase from "./apps/Sql/SqlDatabase/SqlDatabase";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import ServiceEditor from "./apps/DevToolsServiceEditor/ServiceEditor/ServiceEditor";
-import Login from "./apps/Login/pages/Login/Login";
+import Login from "./apps/Auth/pages/Login/Login";
 import SettingsDb from "./apps/Settings/SettingsData/SettingsDb";
 import SettingsChecks from "./apps/Settings/SettingsChecks/SettingsChecks";
-import Register from "./apps/Login/pages/Register/Register";
-import Logout from "./apps/Login/pages/Logout/Logout";
+import Register from "./apps/Auth/pages/Register/Register";
+import Logout from "./apps/Auth/pages/Logout/Logout";
 import { getAuthToken } from "./backend/api/backend";
 
 const queryClient = new QueryClient();

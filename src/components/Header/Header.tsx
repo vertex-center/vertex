@@ -12,7 +12,7 @@ import {
     LinkProps,
     ProfilePicture,
 } from "@vertex-center/components";
-import useAuth from "../../apps/Login/hooks/useAuth";
+import useAuth from "../../apps/Auth/hooks/useAuth";
 
 type Props = {
     title?: string;
