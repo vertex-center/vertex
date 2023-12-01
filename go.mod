@@ -14,7 +14,7 @@ require (
 	github.com/go-co-op/gocron v1.36.0
 	github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20231010084843-55a94097c399
 	github.com/go-git/go-git/v5 v5.10.1
-	github.com/google/go-containerregistry v0.16.1
+	github.com/google/go-containerregistry v0.17.0
 	github.com/google/go-github/v50 v50.2.0
 	github.com/google/uuid v1.4.0
 	github.com/h2non/gock v1.2.0
