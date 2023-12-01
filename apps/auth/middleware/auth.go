@@ -22,7 +22,7 @@ func ReadAuth(c *router.Context) {
 		return
 	}
 
-	token, err := AuthService.Verify(tokenStr)
+	session, err := AuthService.Verify(tokenStr)
 	if err != nil {
 		c.Set("authenticated", false)
 		c.Next()
@@ -31,8 +31,7 @@ func ReadAuth(c *router.Context) {
 
 	c.Set("authenticated", true)
 	c.Set("token", tokenStr)
-	c.Set("user_id", token.User.ID)
-	c.Set("username", token.User.Username)
+	c.Set("user_id", int(session.UserID))
 	c.Next()
 }
 

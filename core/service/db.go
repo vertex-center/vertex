@@ -5,12 +5,14 @@ import (
 	"os"
 
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 	"github.com/vertex-center/vertex/core/port"
 	vtypes "github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/database"
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/pkg/vsql"
 	"github.com/vertex-center/vlog"
-	"gorm.io/gorm"
 )
 
 var (
@@ -155,12 +157,23 @@ func (s *DbService) setup() {
 	log.Info("database setup completed")
 }
 
-func (s *DbService) runMigrations(db *gorm.DB) error {
-	err := db.AutoMigrate(
-		&vtypes.AdminSettings{},
-	)
+func (s *DbService) runMigrations(db *sqlx.DB) error {
+	var version int
+	err := db.Get(&version, "SELECT version FROM migrations LIMIT 1")
+	if err != nil {
+		return s.createSchemas(db)
+	}
+
+	// TODO: Else migrate
+
+	return s.ctx.DispatchEventWithErr(vtypes.EventDbMigrate{Db: db})
+}
+
+func (s *DbService) createSchemas(db *sqlx.DB) error {
+	vsqlDriver := vsql.DriverFromName(db.DriverName())
+	_, err := db.Exec(database.GetSchema(vsqlDriver))
 	if err != nil {
 		return err
 	}
-	return s.ctx.DispatchEventWithErr(vtypes.EventDbMigrate{Db: db})
+	return s.ctx.DispatchEventWithErr(vtypes.EventDbCreate{Db: db})
 }

@@ -14,9 +14,9 @@ import (
 type AuthHandlerTestSuite struct {
 	suite.Suite
 
-	service   port.MockAuthService
-	handler   *AuthHandler
-	testToken types.Token
+	service     port.MockAuthService
+	handler     *AuthHandler
+	testSession types.Session
 }
 
 func TestAuthHandlerTestSuite(t *testing.T) {
@@ -26,13 +26,13 @@ func TestAuthHandlerTestSuite(t *testing.T) {
 func (suite *AuthHandlerTestSuite) SetupTest() {
 	suite.service = port.MockAuthService{}
 	suite.handler = NewAuthHandler(&suite.service).(*AuthHandler)
-	suite.testToken = types.Token{
+	suite.testSession = types.Session{
 		Token: "test_token",
 	}
 }
 
 func (suite *AuthHandlerTestSuite) TestLogin() {
-	suite.service.On("Login", "test_login", "test_password").Return(suite.testToken, nil)
+	suite.service.On("Login", "test_login", "test_password").Return(suite.testSession, nil)
 
 	auth := base64.StdEncoding.EncodeToString([]byte("test_login:test_password"))
 
@@ -43,12 +43,12 @@ func (suite *AuthHandlerTestSuite) TestLogin() {
 	})
 
 	suite.Equal(200, res.Code)
-	suite.JSONEq(routertest.ToJSON(suite.testToken), res.Body.String())
+	suite.JSONEq(routertest.ToJSON(suite.testSession), res.Body.String())
 	suite.service.AssertExpectations(suite.T())
 }
 
 func (suite *AuthHandlerTestSuite) TestLoginInvalidCredentials() {
-	suite.service.On("Login", "test_login", "invalid_password").Return(types.Token{}, types.ErrLoginFailed)
+	suite.service.On("Login", "test_login", "invalid_password").Return(types.Session{}, types.ErrLoginFailed)
 
 	auth := base64.StdEncoding.EncodeToString([]byte("test_login:invalid_password"))
 
@@ -64,7 +64,7 @@ func (suite *AuthHandlerTestSuite) TestLoginInvalidCredentials() {
 
 func (suite *AuthHandlerTestSuite) TestRegister() {
 
-	suite.service.On("Register", "test_login", "test_password").Return(suite.testToken, nil)
+	suite.service.On("Register", "test_login", "test_password").Return(suite.testSession, nil)
 
 	auth := base64.StdEncoding.EncodeToString([]byte("test_login:test_password"))
 
@@ -75,7 +75,7 @@ func (suite *AuthHandlerTestSuite) TestRegister() {
 	})
 
 	suite.Equal(200, res.Code)
-	suite.JSONEq(routertest.ToJSON(suite.testToken), res.Body.String())
+	suite.JSONEq(routertest.ToJSON(suite.testSession), res.Body.String())
 	suite.service.AssertExpectations(suite.T())
 }
 

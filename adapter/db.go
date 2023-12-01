@@ -7,16 +7,15 @@ import (
 	"path"
 	"time"
 
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"
 	"gopkg.in/yaml.v3"
-	"gorm.io/driver/postgres"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 var (
@@ -80,21 +79,19 @@ func (a *DbAdapter) Connect() error {
 	switch a.config.DbmsName {
 	case types.DbmsNameSqlite:
 		p := path.Join(a.configDir, "vertex.db")
-		err = a.ConnectTo(sqlite.Open(p), 1)
+		err = a.ConnectTo("sqlite3", p, 1)
 	case types.DbmsNamePostgres:
-		err = a.ConnectTo(postgres.Open("host=localhost port=5432 user=postgres password=postgres dbname=postgres sslmode=disable"), 30)
+		err = a.ConnectTo("postgres", "host=localhost port=5432 user=postgres password=postgres dbname=postgres sslmode=disable", 30)
 	default:
 		err = errors.New("invalid dbms name")
 	}
 	return err
 }
 
-func (a *DbAdapter) ConnectTo(dialector gorm.Dialector, retries int) error {
+func (a *DbAdapter) ConnectTo(driver string, dataSource string, retries int) error {
 	for i := 0; i < retries; i++ {
-		db, err := gorm.Open(dialector, &gorm.Config{
-			Logger: logger.Default.LogMode(logger.Silent),
-		})
-		if err != nil {
+		db, err := sqlx.Connect(driver, dataSource)
+		if err != nil || db == nil {
 			if i == retries-1 {
 				return err
 			}

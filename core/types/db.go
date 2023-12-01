@@ -1,11 +1,11 @@
 package types
 
-import "gorm.io/gorm"
+import "github.com/jmoiron/sqlx"
 
 type DB struct {
-	*gorm.DB
+	*sqlx.DB
 }
 
-func (d *DB) SetDB(db *gorm.DB) {
+func (d *DB) SetDB(db *sqlx.DB) {
 	d.DB = db
 }

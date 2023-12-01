@@ -2,10 +2,10 @@ package adapter
 
 import (
 	"sync"
+	"time"
 
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
-	"gorm.io/gorm"
 )
 
 type AdminSettingsDbAdapter struct {
@@ -21,25 +21,38 @@ func NewAdminSettingsDbAdapter(db port.DbAdapter) port.AdminSettingsAdapter {
 	}
 }
 
-func (s *AdminSettingsDbAdapter) Get() (types.AdminSettings, error) {
-	s.dbMutex.Lock()
-	defer s.dbMutex.Unlock()
+func (a *AdminSettingsDbAdapter) Get() (types.AdminSettings, error) {
+	a.dbMutex.Lock()
+	defer a.dbMutex.Unlock()
 
 	var settings types.AdminSettings
-	err := s.db.Get().FirstOrCreate(&settings).Error
+	err := a.db.Get().Get(&settings, "SELECT * FROM admin_settings LIMIT 1")
+	if err != nil {
+		return types.AdminSettings{}, err
+	}
 	return settings, err
 }
 
-func (s *AdminSettingsDbAdapter) Update(settings types.AdminSettings) error {
-	s.dbMutex.Lock()
-	defer s.dbMutex.Unlock()
+func (a *AdminSettingsDbAdapter) SetChannel(channel types.UpdatesChannel) error {
+	a.dbMutex.Lock()
+	defer a.dbMutex.Unlock()
 
-	return s.db.Get().Transaction(func(tx *gorm.DB) error {
-		var current types.AdminSettings
-		err := tx.FirstOrCreate(&current).Error
-		if err != nil {
-			return err
-		}
-		return tx.Model(&current).Updates(&settings).Error
-	})
+	_, err := a.db.Get().Exec(`
+		UPDATE admin_settings
+		SET updates_channel = $1, updated_at = $2
+		WHERE id = 1
+	`, channel, time.Now().Unix())
+	return err
+}
+
+func (a *AdminSettingsDbAdapter) SetWebhook(webhook string) error {
+	a.dbMutex.Lock()
+	defer a.dbMutex.Unlock()
+
+	_, err := a.db.Get().Exec(`
+		UPDATE admin_settings
+		SET webhook = $1, updated_at = $2
+		WHERE id = 1
+	`, webhook, time.Now().Unix())
+	return err
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
@@ -41,11 +42,20 @@ func (s *AppsService) GetUUID() uuid.UUID {
 }
 
 func (s *AppsService) OnEvent(e event.Event) error {
-	switch e.(type) {
+	switch e := e.(type) {
 	case types.EventServerStart:
 		s.StartApps()
 	case types.EventServerStop:
 		s.StopApps()
+	case types.EventDbCreate:
+		for _, a := range s.registry.Apps() {
+			if a, ok := a.(app.DbSchemaProvider); ok {
+				_, err := s.ctx.Db().Exec(a.DbSchema(e.Db.DriverName()))
+				if err != nil {
+					return fmt.Errorf("failed to execute db schema: %w", err)
+				}
+			}
+		}
 	}
 	return nil
 }

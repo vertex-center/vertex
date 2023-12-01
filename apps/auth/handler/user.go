@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"fmt"
-
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -28,13 +26,13 @@ func NewUserHandler(userService port.UserService) port.UserHandler {
 // docapi end
 
 func (h *UserHandler) GetCurrentUser(c *router.Context) {
-	username := c.GetString("username")
+	userID := c.GetInt("user_id")
 
-	user, err := h.service.GetUser(username)
+	user, err := h.service.GetUserByID(uint(userID))
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           types.ErrCodeFailedToGetUser,
-			PublicMessage:  fmt.Sprintf("Failed to retrieve the user '%s'", username),
+			PublicMessage:  "Failed to retrieve the user",
 			PrivateMessage: err.Error(),
 		})
 		return

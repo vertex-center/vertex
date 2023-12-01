@@ -1,6 +1,8 @@
 package service
 
 import (
+	"errors"
+
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
 )
@@ -20,7 +22,18 @@ func (s *AdminSettingsService) Get() (types.AdminSettings, error) {
 }
 
 func (s *AdminSettingsService) Update(settings types.AdminSettings) error {
-	return s.adapter.Update(settings)
+	var errs []error
+	if settings.Webhook != nil {
+		if err := s.SetWebhook(*settings.Webhook); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	if settings.UpdatesChannel != "" {
+		if err := s.SetChannel(settings.UpdatesChannel); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return errors.Join(errs...)
 }
 
 func (s *AdminSettingsService) GetWebhook() (*string, error) {
@@ -32,9 +45,7 @@ func (s *AdminSettingsService) GetWebhook() (*string, error) {
 }
 
 func (s *AdminSettingsService) SetWebhook(webhook string) error {
-	return s.Update(types.AdminSettings{
-		Webhook: &webhook,
-	})
+	return s.adapter.SetWebhook(webhook)
 }
 
 func (s *AdminSettingsService) GetChannel() (types.UpdatesChannel, error) {
@@ -46,7 +57,5 @@ func (s *AdminSettingsService) GetChannel() (types.UpdatesChannel, error) {
 }
 
 func (s *AdminSettingsService) SetChannel(channel types.UpdatesChannel) error {
-	return s.Update(types.AdminSettings{
-		UpdatesChannel: channel,
-	})
+	return s.adapter.SetChannel(channel)
 }

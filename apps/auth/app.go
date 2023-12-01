@@ -4,10 +4,12 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/adapter"
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/service"
+	"github.com/vertex-center/vertex/apps/auth/db"
 	"github.com/vertex-center/vertex/apps/auth/handler"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/vsql"
 )
 
 var (
@@ -62,4 +64,9 @@ func (a *App) Initialize(r *router.Group) error {
 	user.GET("", middleware.Authenticated, userHandler.GetCurrentUser)
 
 	return nil
+}
+
+func (a *App) DbSchema(driver string) string {
+	vsqlDriver := vsql.DriverFromName(driver)
+	return db.GetSchema(vsqlDriver)
 }

@@ -14,24 +14,17 @@ func TestEventsTestSuite(t *testing.T) {
 	suite.Run(t, new(EventsTestSuite))
 }
 
-type (
-	MockObjA struct{}
-	MockObjB struct{}
-)
-
 func (suite *EventsTestSuite) TestEventDbCopy() {
 	event := NewEventDbCopy()
 	suite.NotNil(event.tables)
 	suite.Empty(event.All())
 
-	event.AddTable(MockObjA{})
-	event.AddTable(MockObjB{})
+	event.AddTable("table_a")
+	event.AddTable("table_b")
 
 	suite.NotEmpty(event.All())
-
-	expected := []interface{}{
-		MockObjA{},
-		MockObjB{},
-	}
-	suite.Equal(expected, event.All())
+	suite.Equal([]string{
+		"table_a",
+		"table_b",
+	}, event.All())
 }

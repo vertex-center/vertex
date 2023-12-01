@@ -1,56 +1,100 @@
 package service
 
 import (
-	"reflect"
+	"fmt"
+	"strings"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
-	"gorm.io/gorm"
 )
 
-func (s *DbService) copyDb(from *gorm.DB, to *gorm.DB) error {
+func (s *DbService) copyDb(from *sqlx.DB, to *sqlx.DB) error {
 	dbCopy := types.NewEventDbCopy()
-	dbCopy.AddTable(types.AdminSettings{})
+	dbCopy.AddTable("admin_settings")
+	dbCopy.AddTable("migrations")
+
 	err := s.ctx.DispatchEventWithErr(dbCopy)
 	if err != nil {
 		return err
 	}
 
-	toTx := to.Begin()
+	toTx, err := to.Beginx()
+	if err != nil {
+		return err
+	}
 
 	for _, t := range dbCopy.All() {
 		err := s.copyDbTable(t, from, toTx)
 		if err != nil {
-			toTx.Rollback()
+			_ = toTx.Rollback()
 			return err
 		}
 	}
 
-	return toTx.Commit().Error
+	return toTx.Commit()
 }
 
-func (s *DbService) copyDbTable(tp interface{}, from *gorm.DB, to *gorm.DB) error {
-	t := reflect.TypeOf(tp)
-	t = reflect.SliceOf(t)
-	items := reflect.New(t).Interface()
-
+func (s *DbService) copyDbTable(name string, from *sqlx.DB, to *sqlx.Tx) error {
 	log.Info("copying table",
-		vlog.String("table", reflect.TypeOf(tp).String()),
-		vlog.String("from", from.Name()),
-		vlog.String("to", to.Name()),
+		vlog.String("table", name),
+		vlog.String("from", from.DriverName()),
+		vlog.String("to", to.DriverName()),
 	)
 
-	log.Debug("getting items from database", vlog.String("table", reflect.TypeOf(tp).String()))
-	res := from.Find(items)
-	if res.Error != nil {
-		return res.Error
+	rows, err := from.Queryx(fmt.Sprintf("SELECT * FROM %s", name))
+	if err != nil {
+		return err
 	}
-	if res.RowsAffected == 0 {
-		log.Debug("no items found", vlog.String("table", reflect.TypeOf(tp).String()))
-		return nil
+	defer rows.Close()
+
+	// Delete all rows in the table
+	_, err = to.Exec(fmt.Sprintf("DELETE FROM %s", name))
+	if err != nil {
+		return err
 	}
 
-	log.Debug("found items", vlog.String("table", reflect.TypeOf(tp).String()), vlog.Int64("count", res.RowsAffected))
-	return to.Create(items).Error
+	columns, err := rows.Columns()
+	if err != nil {
+		return err
+	}
+
+	for rows.Next() {
+		var values []string
+
+		row := map[string]interface{}{}
+		err := rows.MapScan(row)
+		if err != nil {
+			return err
+		}
+
+		for _, c := range columns {
+			v := row[c]
+			if v == nil {
+				values = append(values, "NULL")
+				continue
+			}
+			if _, ok := v.(string); ok {
+				values = append(values, fmt.Sprintf("'%s'", v))
+				continue
+			}
+			values = append(values, fmt.Sprintf("%v", v))
+		}
+
+		q := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)",
+			name,
+			strings.Join(columns, ", "),
+			strings.Join(values, ", "),
+		)
+
+		log.Debug(q)
+
+		_, err = to.Exec(q)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

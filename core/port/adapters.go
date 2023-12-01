@@ -16,7 +16,8 @@ type (
 
 	AdminSettingsAdapter interface {
 		Get() (types.AdminSettings, error)
-		Update(settings types.AdminSettings) error
+		SetChannel(channel types.UpdatesChannel) error
+		SetWebhook(webhook string) error
 	}
 
 	DbAdapter interface {

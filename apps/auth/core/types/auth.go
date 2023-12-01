@@ -2,9 +2,6 @@ package types
 
 import (
 	"errors"
-	"time"
-
-	"gorm.io/gorm"
 )
 
 // User and CredentialsArgon2id are many-to-many relationship, because one user
@@ -20,38 +17,35 @@ var (
 )
 
 type User struct {
-	ID                  uint                   `json:"id" gorm:"primaryKey,autoIncrement"`
-	Username            string                 `json:"username"`
-	CredentialsArgon2id []*CredentialsArgon2id `json:"-" gorm:"many2many:user_credentials_argon2id;"`
-	CreatedAt           time.Time              `json:"created_at"`
-	UpdatedAt           time.Time              `json:"updated_at"`
-	DeletedAt           gorm.DeletedAt         `json:"deleted_at,omitempty" gorm:"index"`
+	ID        uint   `json:"id" db:"id"`
+	Username  string `json:"username" db:"username"`
+	CreatedAt int64  `json:"created_at" db:"created_at"`
+	UpdatedAt int64  `json:"updated_at" db:"updated_at"`
+	DeletedAt *int64 `json:"deleted_at,omitempty" db:"deleted_at"`
 }
 
 // CredentialsArgon2id is the login method that uses Argon2id algorithm to
 // hash the password.
 type CredentialsArgon2id struct {
-	ID          uint           `json:"id" gorm:"primaryKey,autoIncrement"`
-	Login       string         `json:"login" gorm:"not null;unique;index"`
-	Hash        string         `json:"hash" gorm:"not null"`
-	Type        string         `json:"type" gorm:"default:argon2id;not null"`
-	Iterations  uint32         `json:"iterations" gorm:"not null"`
-	Memory      uint32         `json:"memory" gorm:"not null"`
-	Parallelism uint8          `json:"parallelism" gorm:"not null"`
-	Salt        string         `json:"salt" gorm:"not null"`
-	KeyLen      uint32         `json:"key_len" gorm:"not null"`
-	Users       []*User        `json:"users,omitempty" gorm:"many2many:user_credentials_argon2id;"`
-	CreatedAt   time.Time      `json:"created_at"`
-	UpdatedAt   time.Time      `json:"updated_at"`
-	DeletedAt   gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`
+	ID          uint   `json:"id" db:"id"`
+	Login       string `json:"login" db:"login"`
+	Hash        string `json:"hash" db:"hash"`
+	Type        string `json:"type" db:"type"`
+	Iterations  uint32 `json:"iterations" db:"iterations"`
+	Memory      uint32 `json:"memory" db:"memory"`
+	Parallelism uint8  `json:"parallelism" db:"parallelism"`
+	Salt        string `json:"salt" db:"salt"`
+	KeyLen      uint32 `json:"key_len" db:"key_len"`
+	CreatedAt   int64  `json:"created_at" db:"created_at"`
+	UpdatedAt   int64  `json:"updated_at" db:"updated_at"`
+	DeletedAt   *int64 `json:"deleted_at,omitempty" db:"deleted_at"`
 }
 
-type Token struct {
-	ID        uint           `json:"id" gorm:"primaryKey,autoIncrement"`
-	Token     string         `json:"token" gorm:"not null;unique;index"`
-	UserID    uint           `json:"-" gorm:"not null"`
-	User      User           `json:"user,omitempty" gorm:"foreignKey:UserID;references:ID"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`
+type Session struct {
+	ID        uint   `json:"id" db:"id"`
+	Token     string `json:"token" db:"token"`
+	UserID    uint   `json:"user,omitempty" db:"user_id"`
+	CreatedAt int64  `json:"created_at" db:"created_at"`
+	UpdatedAt int64  `json:"updated_at" db:"updated_at"`
+	DeletedAt *int64 `json:"deleted_at,omitempty" db:"deleted_at"`
 }

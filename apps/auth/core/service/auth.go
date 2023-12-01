@@ -27,10 +27,10 @@ func NewAuthService(adapter port.AuthAdapter) port.AuthService {
 // Login checks the provided login and password against the database. If the login is
 // valid and the password matches, it returns a token that can be used to authenticate
 // future requests.
-func (s *AuthService) Login(login, password string) (types.Token, error) {
+func (s *AuthService) Login(login, password string) (types.Session, error) {
 	creds, err := s.adapter.GetCredentials(login)
 	if err != nil {
-		return types.Token{}, err
+		return types.Session{}, err
 	}
 
 	for _, cred := range creds {
@@ -42,40 +42,44 @@ func (s *AuthService) Login(login, password string) (types.Token, error) {
 
 		key := argon2.IDKey([]byte(password), []byte(cred.Salt), cred.Iterations, cred.Memory, cred.Parallelism, cred.KeyLen)
 		if bytes.Equal(storedKey, key) {
-			token, err := s.generateToken()
+			session, err := s.generateToken()
 			if err != nil {
-				return types.Token{}, err
+				return types.Session{}, err
 			}
-			if len(cred.Users) == 0 {
-				return types.Token{}, errors.New("no users linked to this credential")
-			}
-			token.UserID = cred.Users[0].ID
-			token.User = *cred.Users[0]
-			err = s.adapter.SaveToken(&token)
+
+			users, err := s.adapter.GetUsersByCredential(cred.ID)
 			if err != nil {
-				return types.Token{}, err
+				return types.Session{}, err
 			}
-			return token, nil
+			if len(users) == 0 {
+				return types.Session{}, errors.New("no users linked to this credential")
+			}
+			session.UserID = users[0].ID
+			err = s.adapter.SaveSession(&session)
+			if err != nil {
+				return types.Session{}, err
+			}
+			return session, nil
 		}
 	}
 
-	return types.Token{}, types.ErrLoginFailed
+	return types.Session{}, types.ErrLoginFailed
 }
 
 // Register creates a new user account. It can return ErrLoginEmpty, ErrPasswordEmpty, or
 // ErrPasswordLength if the login or password is too short.
-func (s *AuthService) Register(login, password string) (types.Token, error) {
+func (s *AuthService) Register(login, password string) (types.Session, error) {
 	// TODO: make these settings configurable in the admin settings
 	// https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#argon2id
 
 	if len(login) == 0 {
-		return types.Token{}, types.ErrLoginEmpty
+		return types.Session{}, types.ErrLoginEmpty
 	}
 	if len(password) == 0 {
-		return types.Token{}, types.ErrPasswordEmpty
+		return types.Session{}, types.ErrPasswordEmpty
 	}
 	if len(password) < 8 {
-		return types.Token{}, types.ErrPasswordLength
+		return types.Session{}, types.ErrPasswordLength
 	}
 
 	it := uint32(3)
@@ -99,37 +103,37 @@ func (s *AuthService) Register(login, password string) (types.Token, error) {
 	}
 	err := s.adapter.CreateAccount(login, cred)
 	if err != nil {
-		return types.Token{}, err
+		return types.Session{}, err
 	}
 
 	return s.Login(login, password)
 }
 
 func (s *AuthService) Logout(token string) error {
-	return s.adapter.RemoveToken(token)
+	return s.adapter.DeleteSession(token)
 }
 
-func (s *AuthService) Verify(token string) (*types.Token, error) {
+func (s *AuthService) Verify(token string) (*types.Session, error) {
 	if token == config.Current.MasterApiKey {
 		log.Debug("master key used for authentication")
-		return &types.Token{
+		return &types.Session{
 			Token: token,
 		}, nil
 	}
-	t, err := s.adapter.GetToken(token)
+	session, err := s.adapter.GetSession(token)
 	if err != nil {
 		return nil, types.ErrTokenInvalid
 	}
-	return t, nil
+	return session, nil
 }
 
-func (s *AuthService) generateToken() (types.Token, error) {
+func (s *AuthService) generateToken() (types.Session, error) {
 	token := make([]byte, 32)
 	_, err := rand.Read(token)
 	if err != nil {
-		return types.Token{}, err
+		return types.Session{}, err
 	}
-	return types.Token{
+	return types.Session{
 		Token: base64.StdEncoding.EncodeToString(token),
 	}, nil
 }

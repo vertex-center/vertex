@@ -16,6 +16,7 @@ type AuthServiceTestSuite struct {
 	service  *AuthService
 	adapter  port.MockAuthAdapter
 	testCred types.CredentialsArgon2id
+	testUser types.User
 }
 
 func TestAuthServiceTestSuite(t *testing.T) {
@@ -34,22 +35,20 @@ func (suite *AuthServiceTestSuite) SetupTest() {
 		Memory:      12 * 1024,
 		Parallelism: 4,
 		KeyLen:      32,
-		Users: []*types.User{
-			{
-				ID:       1,
-				Username: "test_username",
-			},
-		},
+	}
+	suite.testUser = types.User{
+		ID:       10,
+		Username: "test_username",
 	}
 }
 
 func (suite *AuthServiceTestSuite) TestLogin() {
 	suite.adapter.On("GetCredentials", "test_login").Return([]types.CredentialsArgon2id{suite.testCred}, nil)
-	suite.adapter.On("SaveToken", mock.Anything).Return(nil)
+	suite.adapter.On("GetUsersByCredential", suite.testCred.ID).Return([]types.User{suite.testUser}, nil)
+	suite.adapter.On("SaveSession", mock.Anything).Return(nil)
 
 	token, err := suite.service.Login("test_login", "test_password")
 	suite.Require().NoError(err)
-	suite.Equal("test_username", token.User.Username)
 	suite.NotEmpty(token.Token)
 	suite.Len(token.Token, 44)
 	suite.adapter.AssertExpectations(suite.T())
@@ -73,13 +72,12 @@ func (suite *AuthServiceTestSuite) TestLoginInvalidPassword() {
 
 func (suite *AuthServiceTestSuite) TestRegister() {
 	suite.adapter.On("GetCredentials", "test_login").Return([]types.CredentialsArgon2id{suite.testCred}, nil)
-	suite.testCred.Users = nil
+	suite.adapter.On("GetUsersByCredential", suite.testCred.ID).Return([]types.User{suite.testUser}, nil)
 	suite.adapter.On("CreateAccount", "test_login", suite.testCred).Return(nil)
-	suite.adapter.On("SaveToken", mock.Anything).Return(nil)
+	suite.adapter.On("SaveSession", mock.Anything).Return(nil)
 
 	token, err := suite.service.Register("test_login", "test_password")
 	suite.Require().NoError(err)
-	suite.Equal("test_username", token.User.Username)
 	suite.NotEmpty(token.Token)
 	suite.Len(token.Token, 44)
 	suite.adapter.AssertExpectations(suite.T())
@@ -97,7 +95,7 @@ func (suite *AuthServiceTestSuite) TestRegisterInvalidInput() {
 }
 
 func (suite *AuthServiceTestSuite) TestLogout() {
-	suite.adapter.On("RemoveToken", "valid_token").Return(nil)
+	suite.adapter.On("DeleteSession", "valid_token").Return(nil)
 
 	err := suite.service.Logout("valid_token")
 	suite.Require().NoError(err)
@@ -105,7 +103,7 @@ func (suite *AuthServiceTestSuite) TestLogout() {
 }
 
 func (suite *AuthServiceTestSuite) TestLogoutInvalidToken() {
-	suite.adapter.On("RemoveToken", "invalid_token").Return(types.ErrTokenInvalid)
+	suite.adapter.On("DeleteSession", "invalid_token").Return(types.ErrTokenInvalid)
 
 	err := suite.service.Logout("invalid_token")
 	suite.Require().ErrorIs(err, types.ErrTokenInvalid)
@@ -113,7 +111,7 @@ func (suite *AuthServiceTestSuite) TestLogoutInvalidToken() {
 }
 
 func (suite *AuthServiceTestSuite) TestVerify() {
-	suite.adapter.On("GetToken", "valid_token").Return(&types.Token{User: types.User{Username: "test_login"}}, nil)
+	suite.adapter.On("GetSession", "valid_token").Return(&types.Session{UserID: suite.testUser.ID}, nil)
 
 	_, err := suite.service.Verify("valid_token")
 	suite.Require().NoError(err)
@@ -127,7 +125,7 @@ func (suite *AuthServiceTestSuite) TestVerifyMasterKey() {
 }
 
 func (suite *AuthServiceTestSuite) TestVerifyInvalidToken() {
-	suite.adapter.On("GetToken", "invalid_token").Return(&types.Token{}, types.ErrTokenInvalid)
+	suite.adapter.On("GetSession", "invalid_token").Return(&types.Session{}, types.ErrTokenInvalid)
 
 	_, err := suite.service.Verify("invalid_token")
 	suite.Require().ErrorIs(err, types.ErrTokenInvalid)

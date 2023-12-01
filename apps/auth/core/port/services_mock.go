@@ -11,14 +11,14 @@ type (
 	}
 )
 
-func (m *MockAuthService) Login(login, password string) (types.Token, error) {
+func (m *MockAuthService) Login(login, password string) (types.Session, error) {
 	args := m.Called(login, password)
-	return args.Get(0).(types.Token), args.Error(1)
+	return args.Get(0).(types.Session), args.Error(1)
 }
 
-func (m *MockAuthService) Register(login, password string) (types.Token, error) {
+func (m *MockAuthService) Register(login, password string) (types.Session, error) {
 	args := m.Called(login, password)
-	return args.Get(0).(types.Token), args.Error(1)
+	return args.Get(0).(types.Session), args.Error(1)
 }
 
 func (m *MockAuthService) Logout(token string) error {
@@ -26,7 +26,7 @@ func (m *MockAuthService) Logout(token string) error {
 	return args.Error(0)
 }
 
-func (m *MockAuthService) Verify(token string) (*types.Token, error) {
+func (m *MockAuthService) Verify(token string) (*types.Session, error) {
 	args := m.Called(token)
 	return nil, args.Error(0)
 }

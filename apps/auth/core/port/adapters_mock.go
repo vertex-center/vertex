@@ -19,22 +19,32 @@ func (m *MockAuthAdapter) GetCredentials(login string) ([]types.CredentialsArgon
 	return args.Get(0).([]types.CredentialsArgon2id), args.Error(1)
 }
 
-func (m *MockAuthAdapter) SaveToken(token *types.Token) error {
+func (m *MockAuthAdapter) GetUsersByCredential(credentialID uint) ([]types.User, error) {
+	args := m.Called(credentialID)
+	return args.Get(0).([]types.User), args.Error(1)
+}
+
+func (m *MockAuthAdapter) SaveSession(session *types.Session) error {
+	args := m.Called(session)
+	return args.Error(0)
+}
+
+func (m *MockAuthAdapter) DeleteSession(token string) error {
 	args := m.Called(token)
 	return args.Error(0)
 }
 
-func (m *MockAuthAdapter) RemoveToken(token string) error {
+func (m *MockAuthAdapter) GetSession(token string) (*types.Session, error) {
 	args := m.Called(token)
-	return args.Error(0)
-}
-
-func (m *MockAuthAdapter) GetToken(token string) (*types.Token, error) {
-	args := m.Called(token)
-	return args.Get(0).(*types.Token), args.Error(1)
+	return args.Get(0).(*types.Session), args.Error(1)
 }
 
 func (m *MockAuthAdapter) GetUser(username string) (types.User, error) {
 	args := m.Called(username)
+	return args.Get(0).(types.User), args.Error(1)
+}
+
+func (m *MockAuthAdapter) GetUserByID(id uint) (types.User, error) {
+	args := m.Called(id)
 	return args.Get(0).(types.User), args.Error(1)
 }

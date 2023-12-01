@@ -18,3 +18,7 @@ func NewUserService(adapter port.AuthAdapter) port.UserService {
 func (s *UserService) GetUser(username string) (types.User, error) {
 	return s.adapter.GetUser(username)
 }
+
+func (s *UserService) GetUserByID(id uint) (types.User, error) {
+	return s.adapter.GetUserByID(id)
+}
