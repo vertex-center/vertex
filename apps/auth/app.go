@@ -47,13 +47,12 @@ func (a *App) Initialize(r *router.Group) error {
 	middleware.AuthService = AuthService
 
 	authHandler := handler.NewAuthHandler(AuthService)
-	auth := r.Group("/auth")
-	// docapi:v route /app/auth/auth/login auth_login
-	auth.POST("/login", authHandler.Login)
-	// docapi:v route /app/auth/auth/register auth_register
-	auth.POST("/register", authHandler.Register)
-	// docapi:v route /app/auth/auth/logout auth_logout
-	auth.POST("/logout", middleware.Authenticated, authHandler.Logout)
+	// docapi:v route /app/auth/login auth_login
+	r.POST("/login", authHandler.Login)
+	// docapi:v route /app/auth/register auth_register
+	r.POST("/register", authHandler.Register)
+	// docapi:v route /app/auth/logout auth_logout
+	r.POST("/logout", middleware.Authenticated, authHandler.Logout)
 
 	return nil
 }
