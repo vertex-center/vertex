@@ -31,7 +31,8 @@ type User struct {
 // CredentialsArgon2id is the login method that uses Argon2id algorithm to
 // hash the password.
 type CredentialsArgon2id struct {
-	Login       string         `json:"login" gorm:"primaryKey"`
+	ID          uint           `json:"id" gorm:"primaryKey,autoIncrement"`
+	Login       string         `json:"login" gorm:"not null;unique;index"`
 	Hash        string         `json:"hash" gorm:"not null"`
 	Type        string         `json:"type" gorm:"default:argon2id;not null"`
 	Iterations  uint32         `json:"iterations" gorm:"not null"`
@@ -46,7 +47,8 @@ type CredentialsArgon2id struct {
 }
 
 type Token struct {
-	Token     string         `json:"token" gorm:"primaryKey"`
+	ID        uint           `json:"id" gorm:"primaryKey,autoIncrement"`
+	Token     string         `json:"token" gorm:"not null;unique;index"`
 	UserID    uint           `json:"-" gorm:"not null"`
 	User      User           `json:"user,omitempty" gorm:"foreignKey:UserID;references:ID"`
 	CreatedAt time.Time      `json:"created_at"`
