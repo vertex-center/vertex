@@ -109,16 +109,18 @@ func (s *AuthService) Logout(token string) error {
 	return s.adapter.RemoveToken(token)
 }
 
-func (s *AuthService) Verify(token string) error {
+func (s *AuthService) Verify(token string) (*types.Token, error) {
 	if token == config.Current.MasterApiKey {
 		log.Debug("master key used for authentication")
-		return nil
+		return &types.Token{
+			Token: token,
+		}, nil
 	}
-	_, err := s.adapter.GetToken(token)
+	t, err := s.adapter.GetToken(token)
 	if err != nil {
-		return types.ErrTokenInvalid
+		return nil, types.ErrTokenInvalid
 	}
-	return nil
+	return t, nil
 }
 
 func (s *AuthService) generateToken() (types.Token, error) {

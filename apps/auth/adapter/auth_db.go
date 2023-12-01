@@ -63,3 +63,9 @@ func (a *AuthDbAdapter) GetToken(token string) (*types.Token, error) {
 	err := a.db.Preload("User").First(&t, &types.Token{Token: token}).Error
 	return &t, err
 }
+
+func (a *AuthDbAdapter) GetUser(username string) (types.User, error) {
+	var user types.User
+	err := a.db.First(&user, &types.User{Username: username}).Error
+	return user, err
+}

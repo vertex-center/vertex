@@ -33,3 +33,8 @@ func (m *MockAuthAdapter) GetToken(token string) (*types.Token, error) {
 	args := m.Called(token)
 	return args.Get(0).(*types.Token), args.Error(1)
 }
+
+func (m *MockAuthAdapter) GetUser(username string) (types.User, error) {
+	args := m.Called(username)
+	return args.Get(0).(types.User), args.Error(1)
+}

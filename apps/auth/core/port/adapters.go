@@ -9,5 +9,6 @@ type (
 		SaveToken(token *types.Token) error
 		RemoveToken(token string) error
 		GetToken(token string) (*types.Token, error)
+		GetUser(username string) (types.User, error)
 	}
 )

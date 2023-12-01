@@ -14,15 +14,15 @@ import (
 var AuthService port.AuthService
 
 func ReadAuth(c *router.Context) {
-	token := c.Request.Header.Get("Authorization")
-	token = strings.TrimPrefix(token, "Bearer ")
+	tokenStr := c.Request.Header.Get("Authorization")
+	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
 
 	if AuthService == nil {
 		log.Error(errors.New("auth_service is nil"))
 		return
 	}
 
-	err := AuthService.Verify(token)
+	token, err := AuthService.Verify(tokenStr)
 	if err != nil {
 		c.Set("authenticated", false)
 		c.Next()
@@ -30,7 +30,9 @@ func ReadAuth(c *router.Context) {
 	}
 
 	c.Set("authenticated", true)
-	c.Set("token", token)
+	c.Set("token", tokenStr)
+	c.Set("user_id", token.User.ID)
+	c.Set("username", token.User.Username)
 	c.Next()
 }
 

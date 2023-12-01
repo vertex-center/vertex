@@ -26,7 +26,7 @@ func (m *MockAuthService) Logout(token string) error {
 	return args.Error(0)
 }
 
-func (m *MockAuthService) Verify(token string) error {
+func (m *MockAuthService) Verify(token string) (*types.Token, error) {
 	args := m.Called(token)
-	return args.Error(0)
+	return nil, args.Error(0)
 }

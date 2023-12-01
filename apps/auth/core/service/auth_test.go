@@ -115,21 +115,21 @@ func (suite *AuthServiceTestSuite) TestLogoutInvalidToken() {
 func (suite *AuthServiceTestSuite) TestVerify() {
 	suite.adapter.On("GetToken", "valid_token").Return(&types.Token{User: types.User{Username: "test_login"}}, nil)
 
-	err := suite.service.Verify("valid_token")
+	_, err := suite.service.Verify("valid_token")
 	suite.Require().NoError(err)
 	suite.adapter.AssertExpectations(suite.T())
 }
 
 func (suite *AuthServiceTestSuite) TestVerifyMasterKey() {
 	suite.Require().Len(config.Current.MasterApiKey, 44)
-	err := suite.service.Verify(config.Current.MasterApiKey)
+	_, err := suite.service.Verify(config.Current.MasterApiKey)
 	suite.Require().NoError(err)
 }
 
 func (suite *AuthServiceTestSuite) TestVerifyInvalidToken() {
 	suite.adapter.On("GetToken", "invalid_token").Return(&types.Token{}, types.ErrTokenInvalid)
 
-	err := suite.service.Verify("invalid_token")
+	_, err := suite.service.Verify("invalid_token")
 	suite.Require().ErrorIs(err, types.ErrTokenInvalid)
 	suite.adapter.AssertExpectations(suite.T())
 }

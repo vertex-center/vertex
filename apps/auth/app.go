@@ -14,6 +14,7 @@ var (
 	authAdapter port.AuthAdapter
 
 	AuthService port.AuthService
+	userService port.UserService
 )
 
 type App struct {
@@ -42,6 +43,7 @@ func (a *App) Initialize(r *router.Group) error {
 	authAdapter = adapter.NewAuthDbAdapter(a.ctx.Db())
 
 	AuthService = service.NewAuthService(authAdapter)
+	userService = service.NewUserService(authAdapter)
 	service.NewMigrationService(a.ctx)
 
 	middleware.AuthService = AuthService
@@ -53,6 +55,11 @@ func (a *App) Initialize(r *router.Group) error {
 	r.POST("/register", authHandler.Register)
 	// docapi:v route /app/auth/logout auth_logout
 	r.POST("/logout", middleware.Authenticated, authHandler.Logout)
+
+	userHandler := handler.NewUserHandler(userService)
+	user := r.Group("/user")
+	// docapi:v route /app/auth/user auth_get_current_user
+	user.GET("", middleware.Authenticated, userHandler.GetCurrentUser)
 
 	return nil
 }
