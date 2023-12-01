@@ -39,7 +39,7 @@ func (a *AuthDbAdapter) CreateAccount(username string, credentials types.Credent
 
 func (a *AuthDbAdapter) GetCredentials(login string) ([]types.CredentialsArgon2id, error) {
 	var creds []types.CredentialsArgon2id
-	err := a.db.Find(&creds, &types.CredentialsArgon2id{Login: login}).Error
+	err := a.db.Preload("Users").Find(&creds, &types.CredentialsArgon2id{Login: login}).Error
 	return creds, err
 }
 

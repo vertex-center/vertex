@@ -34,6 +34,12 @@ func (suite *AuthServiceTestSuite) SetupTest() {
 		Memory:      12 * 1024,
 		Parallelism: 4,
 		KeyLen:      32,
+		Users: []*types.User{
+			{
+				ID:       1,
+				Username: "test_username",
+			},
+		},
 	}
 }
 
@@ -43,7 +49,7 @@ func (suite *AuthServiceTestSuite) TestLogin() {
 
 	token, err := suite.service.Login("test_login", "test_password")
 	suite.Require().NoError(err)
-	suite.Equal("test_login", token.Username)
+	suite.Equal("test_username", token.User.Username)
 	suite.NotEmpty(token.Token)
 	suite.Len(token.Token, 44)
 	suite.adapter.AssertExpectations(suite.T())
@@ -66,13 +72,14 @@ func (suite *AuthServiceTestSuite) TestLoginInvalidPassword() {
 }
 
 func (suite *AuthServiceTestSuite) TestRegister() {
-	suite.adapter.On("CreateAccount", "test_login", suite.testCred).Return(nil)
 	suite.adapter.On("GetCredentials", "test_login").Return([]types.CredentialsArgon2id{suite.testCred}, nil)
+	suite.testCred.Users = nil
+	suite.adapter.On("CreateAccount", "test_login", suite.testCred).Return(nil)
 	suite.adapter.On("SaveToken", mock.Anything).Return(nil)
 
 	token, err := suite.service.Register("test_login", "test_password")
 	suite.Require().NoError(err)
-	suite.Equal("test_login", token.Username)
+	suite.Equal("test_username", token.User.Username)
 	suite.NotEmpty(token.Token)
 	suite.Len(token.Token, 44)
 	suite.adapter.AssertExpectations(suite.T())
@@ -106,7 +113,7 @@ func (suite *AuthServiceTestSuite) TestLogoutInvalidToken() {
 }
 
 func (suite *AuthServiceTestSuite) TestVerify() {
-	suite.adapter.On("GetToken", "valid_token").Return(&types.Token{Username: "test_login"}, nil)
+	suite.adapter.On("GetToken", "valid_token").Return(&types.Token{User: types.User{Username: "test_login"}}, nil)
 
 	err := suite.service.Verify("valid_token")
 	suite.Require().NoError(err)

@@ -20,7 +20,8 @@ var (
 )
 
 type User struct {
-	Username            string                 `json:"username" gorm:"primaryKey"`
+	ID                  uint                   `json:"id" gorm:"primaryKey,autoIncrement"`
+	Username            string                 `json:"username"`
 	CredentialsArgon2id []*CredentialsArgon2id `json:"-" gorm:"many2many:user_credentials_argon2id;"`
 	CreatedAt           time.Time              `json:"created_at"`
 	UpdatedAt           time.Time              `json:"updated_at"`
@@ -46,8 +47,8 @@ type CredentialsArgon2id struct {
 
 type Token struct {
 	Token     string         `json:"token" gorm:"primaryKey"`
-	Username  string         `json:"-" gorm:"not null"`
-	User      User           `json:"user,omitempty" gorm:"foreignKey:Username;references:Username"`
+	UserID    uint           `json:"-" gorm:"not null"`
+	User      User           `json:"user,omitempty" gorm:"foreignKey:UserID;references:ID"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`

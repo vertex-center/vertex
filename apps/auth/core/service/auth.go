@@ -46,7 +46,11 @@ func (s *AuthService) Login(login, password string) (types.Token, error) {
 			if err != nil {
 				return types.Token{}, err
 			}
-			token.Username = login
+			if len(cred.Users) == 0 {
+				return types.Token{}, errors.New("no users linked to this credential")
+			}
+			token.UserID = cred.Users[0].ID
+			token.User = *cred.Users[0]
 			err = s.adapter.SaveToken(&token)
 			if err != nil {
 				return types.Token{}, err
