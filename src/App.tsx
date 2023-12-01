@@ -48,6 +48,9 @@ import SettingsChecks from "./apps/Settings/SettingsChecks/SettingsChecks";
 import Register from "./apps/Auth/pages/Register/Register";
 import Logout from "./apps/Auth/pages/Logout/Logout";
 import { getAuthToken } from "./backend/api/backend";
+import Account from "./apps/Auth/pages/Account/Account";
+import AccountInfo from "./apps/Auth/pages/Account/AccountInfo";
+import AccountSecurity from "./apps/Auth/pages/Account/AccountSecurity";
 
 const queryClient = new QueryClient();
 
@@ -86,6 +89,16 @@ function AllRoutes() {
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
                         <Route path="/logout" element={<Logout />} />
+                        <Route path="/account" element={<Account />}>
+                            <Route
+                                path="/account/info"
+                                element={<AccountInfo />}
+                            />
+                            <Route
+                                path="/account/security"
+                                element={<AccountSecurity />}
+                            />
+                        </Route>
                         <Route
                             path="/"
                             element={<Navigate to="/app/containers" />}

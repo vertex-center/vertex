@@ -13,6 +13,7 @@ import {
     ProfilePicture,
 } from "@vertex-center/components";
 import useAuth from "../../apps/Auth/hooks/useAuth";
+import { Fragment } from "react";
 
 type Props = {
     title?: string;
@@ -45,9 +46,21 @@ export default function (props: Readonly<Props>) {
     let accountItems;
     if (isLoggedIn) {
         accountItems = (
-            <DropdownItem icon="logout" red onClick={() => navigate("/logout")}>
-                Logout
-            </DropdownItem>
+            <Fragment>
+                <DropdownItem
+                    icon="settings"
+                    onClick={() => navigate("/account/info")}
+                >
+                    Settings
+                </DropdownItem>
+                <DropdownItem
+                    icon="logout"
+                    red
+                    onClick={() => navigate("/logout")}
+                >
+                    Logout
+                </DropdownItem>
+            </Fragment>
         );
     } else {
         accountItems = (
