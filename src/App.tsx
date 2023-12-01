@@ -1,5 +1,5 @@
 import {
-    HashRouter,
+    BrowserRouter,
     Navigate,
     Route,
     Routes,
@@ -240,9 +240,9 @@ function App() {
         <div id="app" className={classNames("app", theme)}>
             <QueryClientProvider client={queryClient}>
                 <ReactQueryDevtools initialIsOpen={false} />
-                <HashRouter>
+                <BrowserRouter>
                     <AllRoutes />
-                </HashRouter>
+                </BrowserRouter>
             </QueryClientProvider>
         </div>
     );
