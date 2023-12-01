@@ -161,7 +161,7 @@ export const api = {
                 credentials.username + ":" + credentials.password
             )}`;
             const { data } = await server.post(
-                "/app/auth/auth/login",
+                "/app/auth/login",
                 {},
                 { headers: { Authorization } }
             );
@@ -172,15 +172,31 @@ export const api = {
                 credentials.username + ":" + credentials.password
             )}`;
             const { data } = await server.post(
-                "/app/auth/auth/register",
+                "/app/auth/register",
                 {},
                 { headers: { Authorization } }
             );
             return data;
         },
         logout: async () => {
-            const { data } = await server.post("/app/auth/auth/logout");
+            const { data } = await server.post("/app/auth/logout");
             return data;
+        },
+        user: (username?: string) => {
+            if (username !== undefined) {
+                username = `/${username}`;
+            } else {
+                username = "";
+            }
+
+            return {
+                get: async () => {
+                    const { data } = await server.get(
+                        `/app/auth/user${username}`
+                    );
+                    return data;
+                },
+            };
         },
     },
 };
