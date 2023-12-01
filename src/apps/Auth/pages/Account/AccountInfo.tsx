@@ -11,7 +11,7 @@ export default function AccountInfo() {
             <Title variant="h2">Information</Title>
             <ProgressOverlay show={isLoadingUser} />
             <APIError error={errorUser} />
-            <div>{user?.toString()}</div>
+            <div>{JSON.stringify(user)}</div>
         </Content>
     );
 }
