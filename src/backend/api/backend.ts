@@ -191,8 +191,15 @@ export const api = {
 
             return {
                 get: async () => {
-                    const { data } = await server.get(
+                    const { data } = await server.get<User>(
                         `/app/auth/user${username}`
+                    );
+                    return data;
+                },
+                patch: async (user: Partial<User>) => {
+                    const { data } = await server.patch(
+                        `/app/auth/user${username}`,
+                        user
                     );
                     return data;
                 },
