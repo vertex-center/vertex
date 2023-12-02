@@ -14,12 +14,13 @@ import Spacer from "../../../../components/Spacer/Spacer";
 import { usePatchUser } from "../../hooks/usePatchUser";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import Saved from "../../../../components/Saved/Saved";
 
 export default function AccountInfo() {
     const queryClient = useQueryClient();
     const { user, isLoadingUser, errorUser } = useUser();
 
-    const [saved, setSaved] = useState(true);
+    const [saved, setSaved] = useState<boolean>(undefined);
 
     const [username, setUsername] = useState(user?.username);
 
@@ -63,6 +64,7 @@ export default function AccountInfo() {
                 />
                 <Horizontal gap={20}>
                     <Spacer />
+                    <Saved show={saved} />
                     <Button
                         variant="colored"
                         rightIcon={<MaterialIcon icon="save" />}
