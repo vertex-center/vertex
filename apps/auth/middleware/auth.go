@@ -15,7 +15,8 @@ var AuthService port.AuthService
 
 func ReadAuth(c *router.Context) {
 	tokenStr := c.Request.Header.Get("Authorization")
-	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
+	tokenStr = strings.TrimPrefix(tokenStr, "Bearer")
+	tokenStr = strings.TrimSpace(tokenStr)
 
 	if AuthService == nil {
 		log.Error(errors.New("auth_service is nil"))
