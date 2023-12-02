@@ -24,7 +24,9 @@ export function setAuthToken(token?: string) {
         document.cookie = "vertex_auth_token=;Max-Age=-99999999;path=/";
         return;
     }
-    document.cookie = `vertex_auth_token=${token};path=/`;
+    const expires = new Date();
+    expires.setTime(expires.getTime() + 60 * 60 * 24 * 365);
+    document.cookie = `vertex_auth_token=${token};path=/;SameSite=Lax;expires=${expires.toUTCString()}`;
 }
 
 export function getAuthToken() {
