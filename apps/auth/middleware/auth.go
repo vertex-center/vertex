@@ -19,6 +19,8 @@ func ReadAuth(c *router.Context) {
 
 	if AuthService == nil {
 		log.Error(errors.New("auth_service is nil"))
+		c.Set("authenticated", false)
+		c.Next()
 		return
 	}
 
