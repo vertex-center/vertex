@@ -125,18 +125,18 @@ export const api = {
     security: {
         ssh: {
             get: async () => {
-                const { data } = await server.get<SSHKeys>("/security/ssh");
+                const { data } = await server.get<SSHKeys>("/app/admin/ssh");
                 return data;
             },
             add: (authorized_key: string, username: string) =>
-                server.post("/security/ssh", { authorized_key, username }),
+                server.post("/app/admin/ssh", { authorized_key, username }),
             delete: (fingerprint: string, username: string) =>
-                server.delete("/security/ssh", {
+                server.delete("/app/admin/ssh", {
                     data: { fingerprint, username },
                 }),
             users: async () => {
                 const { data } = await server.get<string[]>(
-                    "/security/ssh/users"
+                    "/app/admin/ssh/users"
                 );
                 return data;
             },
