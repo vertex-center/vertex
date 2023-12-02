@@ -62,11 +62,15 @@ export default function ContainerDetails() {
             navigate("/app/containers");
         },
     });
-    const { isLoading: isDeleting, error: errorDeleting } =
-        mutationDeleteContainer;
+    const {
+        isLoading: isDeleting,
+        error: errorDeleting,
+        reset: resetDelete,
+    } = mutationDeleteContainer;
 
     const dismissDeletePopup = () => {
         setShowDeletePopup(false);
+        resetDelete();
     };
 
     const sidebar = useSidebar(
