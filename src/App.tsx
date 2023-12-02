@@ -51,12 +51,14 @@ import { getAuthToken } from "./backend/api/backend";
 import Account from "./apps/Auth/pages/Account/Account";
 import AccountInfo from "./apps/Auth/pages/Account/AccountInfo";
 import AccountSecurity from "./apps/Auth/pages/Account/AccountSecurity";
+import useUser from "./apps/Auth/hooks/useUser";
 
 const queryClient = new QueryClient();
 
 function AllRoutes() {
     const { pathname } = useLocation();
     const navigate = useNavigate();
+    const { errorUser } = useUser();
 
     let show = {
         header: true,
@@ -76,6 +78,11 @@ function AllRoutes() {
         const token = getAuthToken();
         if (!token) {
             navigate("/login");
+        }
+
+        if (errorUser) {
+            // @ts-ignore
+            errorUser?.response?.status === 401 && navigate("/login");
         }
     }
 
