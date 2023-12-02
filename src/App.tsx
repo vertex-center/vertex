@@ -1,5 +1,5 @@
 import {
-    BrowserRouter,
+    HashRouter,
     Navigate,
     Route,
     Routes,
@@ -249,9 +249,9 @@ function App() {
     return (
         <div id="app" className={classNames("app", theme)}>
             <QueryClientProvider client={queryClient}>
-                <BrowserRouter>
+                <HashRouter>
                     <AllRoutes />
-                </BrowserRouter>
+                </HashRouter>
             </QueryClientProvider>
         </div>
     );
