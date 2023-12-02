@@ -11,5 +11,6 @@ type (
 
 	UserHandler interface {
 		GetCurrentUser(c *router.Context)
+		PatchCurrentUser(c *router.Context)
 	}
 )

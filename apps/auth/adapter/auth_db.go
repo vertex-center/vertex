@@ -181,3 +181,34 @@ func (a *AuthDbAdapter) GetUserByID(id uint) (types.User, error) {
 	`, id)
 	return user, err
 }
+
+func (a *AuthDbAdapter) PatchUser(user types.User) (types.User, error) {
+	user.UpdatedAt = time.Now().Unix()
+
+	tx, err := a.db.Beginx()
+	if err != nil {
+		return user, err
+	}
+
+	_, err = tx.NamedExec(`
+		UPDATE users
+		SET username = :username, updated_at = :updated_at
+		WHERE id = :id
+	`, user)
+	if err != nil {
+		_ = tx.Rollback()
+		return user, err
+	}
+
+	err = tx.Get(&user, `
+		SELECT users.id, users.username, users.created_at, users.updated_at, users.deleted_at
+		FROM users
+		WHERE users.id = $1
+	`, user.ID)
+	if err != nil {
+		_ = tx.Rollback()
+		return user, err
+	}
+
+	return user, tx.Commit()
+}

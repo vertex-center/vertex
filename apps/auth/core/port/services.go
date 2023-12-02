@@ -15,5 +15,6 @@ type (
 	UserService interface {
 		GetUser(username string) (types.User, error)
 		GetUserByID(id uint) (types.User, error)
+		PatchUser(user types.User) (types.User, error)
 	}
 )

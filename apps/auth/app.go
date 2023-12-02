@@ -62,6 +62,8 @@ func (a *App) Initialize(r *router.Group) error {
 	user := r.Group("/user")
 	// docapi:v route /app/auth/user auth_get_current_user
 	user.GET("", middleware.Authenticated, userHandler.GetCurrentUser)
+	// docapi:v route /app/auth/user auth_patch_current_user
+	user.PATCH("", middleware.Authenticated, userHandler.PatchCurrentUser)
 
 	return nil
 }

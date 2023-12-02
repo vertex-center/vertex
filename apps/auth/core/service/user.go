@@ -22,3 +22,7 @@ func (s *UserService) GetUser(username string) (types.User, error) {
 func (s *UserService) GetUserByID(id uint) (types.User, error) {
 	return s.adapter.GetUserByID(id)
 }
+
+func (s *UserService) PatchUser(user types.User) (types.User, error) {
+	return s.adapter.PatchUser(user)
+}

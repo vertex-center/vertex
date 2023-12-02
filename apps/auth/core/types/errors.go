@@ -10,4 +10,5 @@ const (
 	ErrCodePasswordLength     router.ErrCode = "password_length"
 	ErrCodeFailedToLogout     router.ErrCode = "failed_to_logout"
 	ErrCodeFailedToGetUser    router.ErrCode = "failed_to_get_user"
+	ErrCodeFailedToPatchUser  router.ErrCode = "failed_to_patch_user"
 )
