@@ -65,12 +65,12 @@ const getAbout = async () => {
 };
 
 const getHost = async () => {
-    const { data } = await server.get<Host>("/hardware/host");
+    const { data } = await server.get<Host>("/app/admin/hardware/host");
     return data;
 };
 
 const getCPUs = async () => {
-    const { data } = await server.get<CPU[]>("/hardware/cpus");
+    const { data } = await server.get<CPU[]>("/app/admin/hardware/cpus");
     return data;
 };
 

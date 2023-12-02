@@ -12,44 +12,44 @@ export default function SettingsApp() {
                 <Sidebar.Item
                     label="Theme"
                     icon={<MaterialIcon icon="palette" />}
-                    link={l("/settings/theme")}
+                    link={l("/app/admin/theme")}
                 />
             </Sidebar.Group>
             <Sidebar.Group title="Administration">
                 <Sidebar.Item
                     label="Notifications"
                     icon={<MaterialIcon icon="notifications" />}
-                    link={l("/settings/notifications")}
+                    link={l("/app/admin/notifications")}
                 />
                 <Sidebar.Item
                     label="Hardware"
                     icon={<MaterialIcon icon="hard_drive" />}
-                    link={l("/settings/hardware")}
+                    link={l("/app/admin/hardware")}
                 />
                 <Sidebar.Item
                     label="Database"
                     icon={<MaterialIcon icon="database" />}
-                    link={l("/settings/database")}
+                    link={l("/app/admin/database")}
                 />
                 <Sidebar.Item
                     label="Security"
                     icon={<MaterialIcon icon="key" />}
-                    link={l("/settings/security")}
+                    link={l("/app/admin/security")}
                 />
                 <Sidebar.Item
                     label="Updates"
                     icon={<MaterialIcon icon="update" />}
-                    link={l("/settings/updates")}
+                    link={l("/app/admin/updates")}
                 />
                 <Sidebar.Item
                     label="Checks"
                     icon={<MaterialIcon icon="checklist" />}
-                    link={l("/settings/checks")}
+                    link={l("/app/admin/checks")}
                 />
                 <Sidebar.Item
                     label="About"
                     icon={<MaterialIcon icon="info" />}
-                    link={l("/settings/about")}
+                    link={l("/app/admin/about")}
                 />
             </Sidebar.Group>
         </Sidebar>

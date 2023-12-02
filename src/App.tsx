@@ -11,24 +11,24 @@ import ContainerDetails from "./apps/Containers/pages/Container/Container";
 import ContainerLogs from "./apps/Containers/pages/ContainerLogs/ContainerLogs";
 import ContainerEnv from "./apps/Containers/pages/ContainerEnv/ContainerEnv";
 import ContainerHome from "./apps/Containers/pages/ContainerHome/ContainerHome";
-import SettingsApp from "./apps/Settings/SettingsApp/SettingsApp";
-import SettingsTheme from "./apps/Settings/SettingsTheme/SettingsTheme";
+import SettingsApp from "./apps/AdminSettings/SettingsApp/SettingsApp";
+import SettingsTheme from "./apps/AdminSettings/SettingsTheme/SettingsTheme";
 import { Fragment, useContext } from "react";
 import { ThemeContext } from "./main";
 import classNames from "classnames";
-import SettingsAbout from "./apps/Settings/SettingsAbout/SettingsAbout";
-import SettingsUpdates from "./apps/Settings/SettingsUpdates/SettingsUpdates";
+import SettingsAbout from "./apps/AdminSettings/SettingsAbout/SettingsAbout";
+import SettingsUpdates from "./apps/AdminSettings/SettingsUpdates/SettingsUpdates";
 import ContainerDocker from "./apps/Containers/pages/ContainerDocker/ContainerDocker";
 import ContainerSettings from "./apps/Containers/pages/ContainerSettings/ContainerSettings";
 import ContainersStore from "./apps/Containers/pages/ContainersStore/ContainersStore";
 import Dock from "./components/Dock/Dock";
 import ContainerUpdate from "./apps/Containers/pages/ContainerUpdate/ContainerUpdate";
 import ReverseProxyApp from "./apps/ReverseProxy/ReverseProxyApp/ReverseProxyApp";
-import SettingsNotifications from "./apps/Settings/SettingsNotifications/SettingsNotifications";
+import SettingsNotifications from "./apps/AdminSettings/SettingsNotifications/SettingsNotifications";
 import Header from "./components/Header/Header";
 import ContainerDetailsDatabase from "./apps/Containers/pages/ContainerDatabase/ContainerDetailsDatabase";
-import SettingsHardware from "./apps/Settings/SettingsHardware/SettingsHardware";
-import SettingsSecurity from "./apps/Settings/SettingsSecurity/SettingsSecurity";
+import SettingsHardware from "./apps/AdminSettings/SettingsHardware/SettingsHardware";
+import SettingsSecurity from "./apps/AdminSettings/SettingsSecurity/SettingsSecurity";
 import MonitoringApp from "./apps/Monitoring/MonitoringApp/MonitoringApp";
 import Prometheus from "./apps/Monitoring/Prometheus/Prometheus";
 import MetricsList from "./apps/Monitoring/MetricsList/MetricsList";
@@ -43,8 +43,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import ServiceEditor from "./apps/DevToolsServiceEditor/ServiceEditor/ServiceEditor";
 import Login from "./apps/Auth/pages/Login/Login";
-import SettingsDb from "./apps/Settings/SettingsData/SettingsDb";
-import SettingsChecks from "./apps/Settings/SettingsChecks/SettingsChecks";
+import SettingsDb from "./apps/AdminSettings/SettingsData/SettingsDb";
+import SettingsChecks from "./apps/AdminSettings/SettingsChecks/SettingsChecks";
 import Register from "./apps/Auth/pages/Register/Register";
 import Logout from "./apps/Auth/pages/Logout/Logout";
 import { getAuthToken } from "./backend/api/backend";
@@ -201,37 +201,37 @@ function AllRoutes() {
                                 element={<ContainerSettings />}
                             />
                         </Route>
-                        <Route path="/settings" element={<SettingsApp />}>
+                        <Route path="/app/admin" element={<SettingsApp />}>
                             <Route
-                                path="/settings/theme"
+                                path="/app/admin/theme"
                                 element={<SettingsTheme />}
                             />
                             <Route
-                                path="/settings/notifications"
+                                path="/app/admin/notifications"
                                 element={<SettingsNotifications />}
                             />
                             <Route
-                                path="/settings/hardware"
+                                path="/app/admin/hardware"
                                 element={<SettingsHardware />}
                             />
                             <Route
-                                path="/settings/database"
+                                path="/app/admin/database"
                                 element={<SettingsDb />}
                             />
                             <Route
-                                path="/settings/security"
+                                path="/app/admin/security"
                                 element={<SettingsSecurity />}
                             />
                             <Route
-                                path="/settings/updates"
+                                path="/app/admin/updates"
                                 element={<SettingsUpdates />}
                             />
                             <Route
-                                path="/settings/checks"
+                                path="/app/admin/checks"
                                 element={<SettingsChecks />}
                             />
                             <Route
-                                path="/settings/about"
+                                path="/app/admin/about"
                                 element={<SettingsAbout />}
                             />
                         </Route>
