@@ -1,0 +1,24 @@
+---
+description: Manage your SSH keys.
+---
+
+# Security
+
+This menu allows you to manage your SSH keys, without having to access your server manually.
+
+### Add a new SSH key
+
+1. Click on the `Create an SSH key` button.
+
+2. Generate an SSH key if you don't have one yet:
+
+    ```bash
+    ssh-keygen -t ed25519 -C "abc@example.com"
+    ```
+
+3. Copy your public key (the one ending with `.pub`), and paste it in the `Public key` field.
+
+4. Select the user you want to add this key to.
+    *e.g. If you have an user `nexa` on your Linux server, the key will be added to the `/home/nexa/.ssh/authorized_keys` file.*
+
+5. Click on `Create`.
