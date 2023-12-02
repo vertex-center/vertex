@@ -1,3 +1,29 @@
+# Vertex 0.16
+
+## 0.16.0
+
+### Added
+
+- Vertex now support user accounts.
+- Adding an SSH key can now be made for different users.
+- New internal database for Vertex, with SQLite or Postgres.
+- The internal database can be changed at any time from the admin settings.
+- Vertex can now retrieve more information about the host, and supports CPUs listing.
+- Check for server health on startup and at any time from the admin settings.
+
+### Changed
+
+- `service.yml` v2: The ports are now defined by name instead of by default value.
+- The API and client URLs are cleaner and more consistent.
+
+### Fixed
+
+- Fix an issue where recreating a container would also recreate the volumes.
+- Fix an issue where the update page would not display correctly when loading.
+- Fix issues with ssh keys not being installed correctly.
+
+---
+
 # Vertex 0.15
 
 ## 0.15.0
