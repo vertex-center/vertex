@@ -9,13 +9,13 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"
 	"gopkg.in/yaml.v3"
+	_ "modernc.org/sqlite"
 )
 
 var (
@@ -79,7 +79,7 @@ func (a *DbAdapter) Connect() error {
 	switch a.config.DbmsName {
 	case types.DbmsNameSqlite:
 		p := path.Join(a.configDir, "vertex.db")
-		err = a.ConnectTo("sqlite3", p, 1)
+		err = a.ConnectTo("sqlite", p, 1)
 	case types.DbmsNamePostgres:
 		err = a.ConnectTo("postgres", "host=localhost port=5432 user=postgres password=postgres dbname=postgres sslmode=disable", 30)
 	default:
