@@ -69,7 +69,9 @@ export default function AccountInfo() {
                         variant="colored"
                         rightIcon={<MaterialIcon icon="save" />}
                         onClick={save}
-                        disabled={isLoading || saved}
+                        disabled={
+                            isLoading || saved === true || saved === undefined
+                        }
                     >
                         Save
                     </Button>
