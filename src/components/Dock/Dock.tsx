@@ -93,12 +93,6 @@ export default function Dock() {
                         </div>
                     )}
                     <DockApp
-                        to="/app/admin"
-                        icon="admin_panel_settings"
-                        name="Admin Settings"
-                        onClick={() => setDrawerOpen(false)}
-                    />
-                    <DockApp
                         icon="apps"
                         name="Apps"
                         onClick={() => {
