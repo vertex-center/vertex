@@ -24,6 +24,8 @@ func ReadAuth(c *router.Context) {
 		return
 	}
 
+	log.Debug("reading auth", vlog.String("token", tokenStr))
+
 	session, err := AuthService.Verify(tokenStr)
 	if err != nil {
 		c.Set("authenticated", false)
