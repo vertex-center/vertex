@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/carlmjohnson/requests"
+	"github.com/vertex-center/vertex/apps/admin/core/port"
+	"github.com/vertex-center/vertex/apps/admin/core/service"
+	"github.com/vertex-center/vertex/apps/admin/core/types"
+	"github.com/vertex-center/vertex/apps/admin/handler"
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/core/service"
-	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
-	"github.com/vertex-center/vertex/handler"
 	"github.com/vertex-center/vertex/pkg/user"
 )
 
@@ -30,7 +30,7 @@ func (a *SshKernelApiAdapter) GetAll() ([]types.PublicKey, error) {
 	var apiError api.Error
 
 	err := requests.New(a.config).
-		Path("/api/security/ssh").
+		Path("/api/app/admin/ssh").
 		ToJSON(&keys).
 		ErrorJSON(&apiError).
 		Fetch(context.Background())
@@ -41,7 +41,7 @@ func (a *SshKernelApiAdapter) Add(key string, username string) error {
 	var apiError api.Error
 
 	err := requests.New(a.config).
-		Path("/api/security/ssh").
+		Path("/api/app/admin/ssh").
 		BodyJSON(&handler.AddSSHKeyBody{
 			AuthorizedKey: key,
 			Username:      username,
@@ -60,7 +60,7 @@ func (a *SshKernelApiAdapter) Remove(fingerprint string, username string) error 
 	var apiError api.Error
 
 	err := requests.New(a.config).
-		Pathf("/api/security/ssh").
+		Pathf("/api/app/admin/ssh").
 		BodyJSON(&handler.DeleteSSHKeyBody{
 			Fingerprint: fingerprint,
 			Username:    username,
@@ -80,7 +80,7 @@ func (a *SshKernelApiAdapter) GetUsers() ([]user.User, error) {
 	var apiError api.Error
 
 	err := requests.New(a.config).
-		Path("/api/security/ssh/users").
+		Path("/api/app/admin/ssh/users").
 		ToJSON(&users).
 		ErrorJSON(&apiError).
 		Fetch(context.Background())

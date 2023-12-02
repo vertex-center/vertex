@@ -52,7 +52,6 @@ var (
 
 	dbAdapter              port.DbAdapter
 	adminSettingsDbAdapter port.AdminSettingsAdapter
-	sshKernelApiAdapter    port.SshAdapter
 	baselinesApiAdapter    port.BaselinesAdapter
 
 	appsService          port.AppsService
@@ -60,7 +59,6 @@ var (
 	dbService            port.DbService
 	adminSettingsService port.AdminSettingsService
 	checksService        port.ChecksService
-	sshService           port.SshService
 	updateService        port.UpdateService
 )
 
@@ -162,7 +160,6 @@ func initAdapters() {
 	dbAdapter = adapter.NewDbAdapter(nil)
 	ctx = types.NewVertexContext(dbAdapter.Get())
 	adminSettingsDbAdapter = adapter.NewAdminSettingsDbAdapter(dbAdapter)
-	sshKernelApiAdapter = adapter.NewSshKernelApiAdapter()
 	baselinesApiAdapter = adapter.NewBaselinesApiAdapter()
 }
 
@@ -189,7 +186,6 @@ func initServices(about types.About) {
 	adminSettingsService = service.NewAdminSettingsService(adminSettingsDbAdapter)
 	dbService = service.NewDbService(ctx, dbAdapter)
 	checksService = service.NewChecksService()
-	sshService = service.NewSshService(sshKernelApiAdapter)
 }
 
 func initRoutes(about types.About) {
@@ -262,17 +258,6 @@ func initRoutes(about types.About) {
 	db.GET("/dbms", dbHandler.GetCurrentDbms)
 	// docapi:v route /admin/db/dbms migrate_to_dbms
 	db.POST("/dbms", dbHandler.MigrateTo)
-
-	sshHandler := handler.NewSshHandler(sshService)
-	ssh := a.Group("/security/ssh", middleware.Authenticated)
-	// docapi:v route /security/ssh get_ssh_keys
-	ssh.GET("", sshHandler.Get)
-	// docapi:v route /security/ssh add_ssh_key
-	ssh.POST("", sshHandler.Add)
-	// docapi:v route /security/ssh delete_ssh_key
-	ssh.DELETE("", sshHandler.Delete)
-	// docapi:v route /security/ssh/users get_ssh_users
-	ssh.GET("/users", sshHandler.GetUsers)
 }
 
 func startRouter() {

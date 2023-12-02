@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"github.com/vertex-center/vertex/api"
+	"github.com/vertex-center/vertex/apps/admin/api"
 	"github.com/vertex-center/vertex/config"
 	"golang.org/x/crypto/ssh"
 )

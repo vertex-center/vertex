@@ -9,8 +9,8 @@ type Client struct {
 	*rest.Client
 }
 
-func NewClient() *Client {
+func NewAdminClient() *Client {
 	return &Client{
-		Client: rest.NewClient(config.Current.VertexURL(), "/api/"),
+		Client: rest.NewClient(config.Current.VertexURL(), "/api/app/admin/"),
 	}
 }

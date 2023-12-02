@@ -6,16 +6,15 @@ import (
 	"path"
 	"strings"
 
-	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/apps/admin/core/port"
+	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/pkg/user"
 
 	"github.com/vertex-center/vertex/pkg/log"
 	"golang.org/x/crypto/ssh"
 )
 
-type SshFsAdapter struct {
-}
+type SshFsAdapter struct{}
 
 func NewSshFsAdapter() port.SshKernelAdapter {
 	return &SshFsAdapter{}

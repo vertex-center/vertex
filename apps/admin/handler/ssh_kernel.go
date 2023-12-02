@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/core/service"
+	"github.com/vertex-center/vertex/apps/admin/core/port"
+	"github.com/vertex-center/vertex/apps/admin/core/service"
 	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
 )
@@ -24,7 +24,7 @@ func NewSshKernelHandler(sshKernelService port.SshKernelService) port.SshKernelH
 // docapi begin get_ssh_keys_kernel
 // docapi method GET
 // docapi summary Get all SSH keys
-// docapi tags Ssh
+// docapi tags Apps/Admin/SSH
 // docapi response 200 {[]PublicKey} The list of SSH keys.
 // docapi response 500
 // docapi end
@@ -46,7 +46,7 @@ func (h *SshKernelHandler) Get(c *router.Context) {
 // docapi begin add_ssh_key_kernel
 // docapi method POST
 // docapi summary Add an SSH key to the authorized_keys file
-// docapi tags Ssh
+// docapi tags Apps/Admin/SSH
 // docapi body {AddSSHKeyBody} Info about the key to append to the authorized_keys file.
 // docapi response 201
 // docapi response 400
@@ -96,7 +96,7 @@ func (h *SshKernelHandler) Add(c *router.Context) {
 // docapi begin delete_ssh_key_kernel
 // docapi method DELETE
 // docapi summary Delete an SSH key from the authorized_keys file
-// docapi tags Ssh
+// docapi tags Apps/Admin/SSH
 // docapi query fingerprint {string} The fingerprint of the SSH key to delete.
 // docapi response 204
 // docapi response 400
@@ -134,7 +134,7 @@ func (h *SshKernelHandler) Delete(c *router.Context) {
 // docapi begin get_ssh_users_kernel
 // docapi method GET
 // docapi summary Get all users that can have SSH keys
-// docapi tags Ssh
+// docapi tags Apps/Admin/SSH
 // docapi response 200 {[]User} The list of users.
 // docapi response 500
 // docapi end

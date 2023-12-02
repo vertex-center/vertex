@@ -3,10 +3,10 @@ package api
 import (
 	"context"
 
-	"github.com/vertex-center/vertex/core/service"
-	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/apps/admin/core/service"
+	"github.com/vertex-center/vertex/apps/admin/core/types"
+	"github.com/vertex-center/vertex/apps/admin/handler"
 	"github.com/vertex-center/vertex/core/types/api"
-	"github.com/vertex-center/vertex/handler"
 )
 
 func (c *Client) GetSSHKeys(ctx context.Context) ([]types.PublicKey, error) {
@@ -14,7 +14,7 @@ func (c *Client) GetSSHKeys(ctx context.Context) ([]types.PublicKey, error) {
 	var apiError api.Error
 
 	err := c.Request().
-		Pathf("./security/ssh").
+		Pathf("./ssh").
 		ToJSON(&keys).
 		ErrorJSON(&apiError).
 		Fetch(ctx)
@@ -25,7 +25,7 @@ func (c *Client) GetSSHKeys(ctx context.Context) ([]types.PublicKey, error) {
 func (c *Client) AddSSHKey(ctx context.Context, key string, username string) error {
 	var apiError api.Error
 	err := c.Request().
-		Pathf("./security/ssh").
+		Pathf("./ssh").
 		Post().
 		BodyJSON(&handler.AddSSHKeyBody{
 			AuthorizedKey: key,
@@ -46,7 +46,7 @@ func (c *Client) AddSSHKey(ctx context.Context, key string, username string) err
 func (c *Client) DeleteSSHKey(ctx context.Context, key string, username string) error {
 	var apiError api.Error
 	err := c.Request().
-		Pathf("./security/ssh").
+		Pathf("./ssh").
 		BodyJSON(&handler.DeleteSSHKeyBody{
 			Fingerprint: key,
 			Username:    username,
@@ -66,7 +66,7 @@ func (c *Client) GetSSHUsers(ctx context.Context) ([]string, error) {
 	var apiError api.Error
 
 	err := c.Request().
-		Pathf("./security/ssh/users").
+		Pathf("./ssh/users").
 		ToJSON(&users).
 		ErrorJSON(&apiError).
 		Fetch(ctx)

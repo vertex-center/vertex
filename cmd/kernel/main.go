@@ -13,7 +13,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/adapter"
+	"github.com/vertex-center/vertex/apps/admin"
+	"github.com/vertex-center/vertex/apps/auth"
 	"github.com/vertex-center/vertex/apps/containers"
 	"github.com/vertex-center/vertex/apps/monitoring"
 	"github.com/vertex-center/vertex/apps/reverseproxy"
@@ -21,11 +22,9 @@ import (
 	"github.com/vertex-center/vertex/apps/sql"
 	"github.com/vertex-center/vertex/apps/tunnels"
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/service"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
-	"github.com/vertex-center/vertex/handler"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/netcap"
@@ -36,9 +35,6 @@ import (
 var (
 	r   *router.Router
 	ctx *types.VertexContext
-
-	sshAdapter port.SshKernelAdapter
-	sshService port.SshKernelService
 )
 
 func main() {
@@ -58,7 +54,6 @@ func main() {
 	}
 
 	initRouter()
-	initAdapters()
 	initServices()
 	initRoutes()
 
@@ -191,14 +186,10 @@ func initRouter() {
 	r.Use(gin.Recovery())
 }
 
-func initAdapters() {
-	sshAdapter = adapter.NewSshFsAdapter()
-}
-
 func initServices() {
-	sshService = service.NewSshKernelService(sshAdapter)
-
 	service.NewAppsService(ctx, true, r, []app.Interface{
+		admin.NewApp(),
+		auth.NewApp(),
 		sql.NewApp(),
 		tunnels.NewApp(),
 		monitoring.NewApp(),
@@ -217,19 +208,6 @@ func initRoutes() {
 	// docapi:k url http://{ip}:{port-kernel}/api
 	// docapi:k urlvar ip localhost The IP address of the kernel.
 	// docapi:k urlvar port-kernel 6131 The port of the server.
-
-	api := r.Group("/api")
-
-	sshHandler := handler.NewSshKernelHandler(sshService)
-	ssh := api.Group("/security/ssh")
-	// docapi:k route /security/ssh get_ssh_keys_kernel
-	ssh.GET("", sshHandler.Get)
-	// docapi:k route /security/ssh add_ssh_key_kernel
-	ssh.POST("", sshHandler.Add)
-	// docapi:k route /security/ssh delete_ssh_key_kernel
-	ssh.DELETE("", sshHandler.Delete)
-	// docapi:k route /security/ssh/users get_ssh_users_kernel
-	ssh.GET("/users", sshHandler.GetUsers)
 }
 
 func startRouter() {

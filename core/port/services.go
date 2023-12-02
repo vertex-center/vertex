@@ -5,7 +5,6 @@ import (
 
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
-	"github.com/vertex-center/vertex/pkg/user"
 )
 
 type (
@@ -33,20 +32,6 @@ type (
 
 	ChecksService interface {
 		CheckAll(ctx context.Context) <-chan types.CheckResponse
-	}
-
-	SshService interface {
-		GetAll() ([]types.PublicKey, error)
-		Add(key string, username string) error
-		Delete(fingerprint string, username string) error
-		GetUsers() ([]string, error)
-	}
-
-	SshKernelService interface {
-		GetAll() ([]types.PublicKey, error)
-		Add(key string, username string) error
-		Delete(fingerprint string, username string) error
-		GetUsers() ([]user.User, error)
 	}
 
 	UpdateService interface {
