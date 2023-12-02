@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vlog"
 )
 
 type Migration interface {
@@ -15,10 +17,14 @@ type Migration interface {
 func Migrate(migrations []Migration, db *sqlx.DB, current int) error {
 	target := len(migrations)
 	for i := current; i < target; i++ {
+		log.Info("executing migration", vlog.Int("version", i+1))
+
 		tx, err := db.Beginx()
 		if err != nil {
 			return fmt.Errorf("failed to start migration transaction: %w", err)
 		}
+
+		log.Info("migration transaction started", vlog.Int("version", i+1))
 
 		err = migrations[i].Up(tx)
 		if err != nil {
@@ -36,6 +42,8 @@ func Migrate(migrations []Migration, db *sqlx.DB, current int) error {
 		if err != nil {
 			return fmt.Errorf("failed to commit migration transaction: %w", err)
 		}
+
+		log.Info("migration transaction committed", vlog.Int("version", i+1))
 	}
 	return nil
 }

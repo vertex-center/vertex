@@ -3,6 +3,7 @@ package database
 import (
 	"time"
 
+	"github.com/vertex-center/vertex/database/migration"
 	"github.com/vertex-center/vertex/pkg/vsql"
 )
 
@@ -28,8 +29,8 @@ func GetSchema(driver vsql.Driver) string {
 			WithDeletedAt(),
 
 		vsql.InsertInto("migrations").
-			Columns("version", "created_at", "updated_at").
-			Values(0, time.Now().Unix(), time.Now().Unix()),
+			Columns("version").
+			Values(len(migration.Migrations)),
 
 		vsql.CreateTable("users").
 			WithID().

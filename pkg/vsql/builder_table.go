@@ -130,9 +130,17 @@ func (q *QueryWithForeignKey) Build(driver Driver) string {
 	)
 }
 
-type QueryAlterTable struct {
+type QueryRemoveField struct {
 	name string
-	add  []Builder
+}
+
+func (q *QueryRemoveField) Build(driver Driver) string {
+	return fmt.Sprintf("DROP COLUMN %s", q.name)
+}
+
+type QueryAlterTable struct {
+	name       string
+	operations []Builder
 }
 
 func AlterTable(name string) *QueryAlterTable {
@@ -142,7 +150,7 @@ func AlterTable(name string) *QueryAlterTable {
 }
 
 func (q *QueryAlterTable) AddField(name string, dataType string, options ...string) *QueryAlterTable {
-	q.add = append(q.add, &QueryWithField{
+	q.operations = append(q.operations, &QueryWithField{
 		name:     name,
 		dataType: dataType,
 		options:  options,
@@ -150,12 +158,21 @@ func (q *QueryAlterTable) AddField(name string, dataType string, options ...stri
 	return q
 }
 
+func (q *QueryAlterTable) RemoveField(name string) *QueryAlterTable {
+	q.operations = append(q.operations, &QueryRemoveField{
+		name: name,
+	})
+	return q
+}
+
 func (q *QueryAlterTable) Build(driver Driver) string {
-	res := fmt.Sprintf("ALTER TABLE %s ", q.name)
-	var fields []string
-	for _, f := range q.add {
-		fields = append(fields, "ADD "+f.Build(driver))
+	// Note that SQLite does not support altering multiple columns in a single statement,
+	// so we need to build a separate statement for each operation.
+	res := ""
+	for _, op := range q.operations {
+		res += fmt.Sprintf("ALTER TABLE %s ", q.name)
+		res += op.Build(driver)
+		res += ";"
 	}
-	res += fmt.Sprintf("%s;", strings.Join(fields, ", "))
 	return res
 }
