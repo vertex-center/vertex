@@ -18,7 +18,7 @@ type BaselinesApiAdapter struct {
 func NewBaselinesApiAdapter() port.BaselinesAdapter {
 	return &BaselinesApiAdapter{
 		config: func(rb *requests.Builder) {
-			rb.BaseURL("https://bl.vx.arra.cloud/")
+			rb.BaseURL("https://bl.vx.arra.red/")
 		},
 	}
 }

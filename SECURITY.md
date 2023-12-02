@@ -6,4 +6,4 @@ During the beta of vertex, security updates are applied to the latest release on
 
 ## Reporting a Vulnerability
 
-To report a vulnerability, please report them at vertex-security@arra.cloud.
+To report a vulnerability, please report them at vertex-security@arra.red.
