@@ -1,10 +1,14 @@
 ---
-description: Install Vertex by building it manually from sources.
-pagination_prev: about
-pagination_next: security/vertex-kernel
+title: Dev installation
 ---
 
-# Install from sources
+# Install for development
+
+To install Vertex for development, you will need to install both the Vertex Client and the Vertex Server.
+
+---
+
+## Install the Server
 
 1. Install Go using the [official documentation](https://go.dev/doc/install).
 
@@ -29,6 +33,24 @@ pagination_next: security/vertex-kernel
 
 4. Open the UI in your browser: [http://localhost:6130](http://localhost:6130)
 
-:::tip{About sudo}
-To learn more about permissions, read [Security > Vertex Kernel](../security/vertex-kernel).
-:::
+---
+
+## Install the Client
+
+1. Install Node.js using the [official documentation](https://nodejs.org/en/download/).
+
+2. Download the project
+    ```bash
+    git clone https://github.com/vertex-center/client.git vertex-client
+    cd vertex-client
+    ```
+
+3. Install dependencies
+    ```bash
+    npm install
+    ```
+
+4. Run the client
+    ```bash
+    npm run dev
+    ```
