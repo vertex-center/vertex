@@ -47,7 +47,6 @@ func (h *UserHandler) GetCurrentUser(c *router.Context) {
 // docapi description Patch the logged-in user
 // docapi tags Authentication/Users
 // docapi response 200 {User} The user
-// docapi response 400
 // docapi response 500
 // docapi end
 
@@ -72,4 +71,29 @@ func (h *UserHandler) PatchCurrentUser(c *router.Context) {
 	}
 
 	c.JSON(user)
+}
+
+// docapi begin auth_get_current_user_credentials
+// docapi method GET
+// docapi summary Get user credentials
+// docapi description Retrieve the logged-in user credentials
+// docapi tags Authentication/Users
+// docapi response 200 {UserCredentials} The user credentials
+// docapi response 500
+// docapi end
+
+func (h *UserHandler) GetCurrentUserCredentials(c *router.Context) {
+	userID := c.GetInt("user_id")
+
+	credentials, err := h.service.GetUserCredentialsMethods(uint(userID))
+	if err != nil {
+		c.Abort(router.Error{
+			Code:           types.ErrCodeFailedToGetUserCredentials,
+			PublicMessage:  "Failed to retrieve the user credentials",
+			PrivateMessage: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(credentials)
 }

@@ -16,5 +16,6 @@ type (
 		GetUser(username string) (types.User, error)
 		GetUserByID(id uint) (types.User, error)
 		PatchUser(user types.User) (types.User, error)
+		GetUserCredentialsMethods(userID uint) ([]types.CredentialsMethods, error)
 	}
 )

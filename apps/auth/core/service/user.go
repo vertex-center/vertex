@@ -26,3 +26,7 @@ func (s *UserService) GetUserByID(id uint) (types.User, error) {
 func (s *UserService) PatchUser(user types.User) (types.User, error) {
 	return s.adapter.PatchUser(user)
 }
+
+func (s *UserService) GetUserCredentialsMethods(userID uint) ([]types.CredentialsMethods, error) {
+	return s.adapter.GetUserCredentialsMethods(userID)
+}

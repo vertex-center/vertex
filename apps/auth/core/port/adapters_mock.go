@@ -48,3 +48,13 @@ func (m *MockAuthAdapter) GetUserByID(id uint) (types.User, error) {
 	args := m.Called(id)
 	return args.Get(0).(types.User), args.Error(1)
 }
+
+func (m *MockAuthAdapter) PatchUser(user types.User) (types.User, error) {
+	args := m.Called(user)
+	return args.Get(0).(types.User), args.Error(1)
+}
+
+func (m *MockAuthAdapter) GetUserCredentialsMethods(userID uint) ([]types.CredentialsMethods, error) {
+	args := m.Called(userID)
+	return args.Get(0).([]types.CredentialsMethods), args.Error(1)
+}

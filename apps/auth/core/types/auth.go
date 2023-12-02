@@ -16,36 +16,47 @@ var (
 	ErrTokenInvalid   = errors.New("token is invalid")
 )
 
-type User struct {
-	ID        uint   `json:"id" db:"id"`
-	Username  string `json:"username" db:"username"`
-	CreatedAt int64  `json:"created_at" db:"created_at"`
-	UpdatedAt int64  `json:"updated_at" db:"updated_at"`
-	DeletedAt *int64 `json:"deleted_at,omitempty" db:"deleted_at"`
-}
+type CredentialsType string
 
-// CredentialsArgon2id is the login method that uses Argon2id algorithm to
-// hash the password.
-type CredentialsArgon2id struct {
-	ID          uint   `json:"id" db:"id"`
-	Login       string `json:"login" db:"login"`
-	Hash        string `json:"hash" db:"hash"`
-	Type        string `json:"type" db:"type"`
-	Iterations  uint32 `json:"iterations" db:"iterations"`
-	Memory      uint32 `json:"memory" db:"memory"`
-	Parallelism uint8  `json:"parallelism" db:"parallelism"`
-	Salt        string `json:"salt" db:"salt"`
-	KeyLen      uint32 `json:"key_len" db:"key_len"`
-	CreatedAt   int64  `json:"created_at" db:"created_at"`
-	UpdatedAt   int64  `json:"updated_at" db:"updated_at"`
-	DeletedAt   *int64 `json:"deleted_at,omitempty" db:"deleted_at"`
-}
+const CredentialsTypeLoginPassword CredentialsType = "Login and password"
 
-type Session struct {
-	ID        uint   `json:"id" db:"id"`
-	Token     string `json:"token" db:"token"`
-	UserID    uint   `json:"user,omitempty" db:"user_id"`
-	CreatedAt int64  `json:"created_at" db:"created_at"`
-	UpdatedAt int64  `json:"updated_at" db:"updated_at"`
-	DeletedAt *int64 `json:"deleted_at,omitempty" db:"deleted_at"`
-}
+type (
+	User struct {
+		ID        uint   `json:"id" db:"id"`
+		Username  string `json:"username" db:"username"`
+		CreatedAt int64  `json:"created_at" db:"created_at"`
+		UpdatedAt int64  `json:"updated_at" db:"updated_at"`
+		DeletedAt *int64 `json:"deleted_at,omitempty" db:"deleted_at"`
+	}
+
+	CredentialsMethods struct {
+		Name        CredentialsType `json:"name"`
+		Description string          `json:"description"`
+	}
+
+	// CredentialsArgon2id is the login method that uses Argon2id algorithm to
+	// hash the password.
+	CredentialsArgon2id struct {
+		ID          uint   `json:"id" db:"id"`
+		Login       string `json:"login" db:"login"`
+		Hash        string `json:"hash" db:"hash"`
+		Type        string `json:"type" db:"type"`
+		Iterations  uint32 `json:"iterations" db:"iterations"`
+		Memory      uint32 `json:"memory" db:"memory"`
+		Parallelism uint8  `json:"parallelism" db:"parallelism"`
+		Salt        string `json:"salt" db:"salt"`
+		KeyLen      uint32 `json:"key_len" db:"key_len"`
+		CreatedAt   int64  `json:"created_at" db:"created_at"`
+		UpdatedAt   int64  `json:"updated_at" db:"updated_at"`
+		DeletedAt   *int64 `json:"deleted_at,omitempty" db:"deleted_at"`
+	}
+
+	Session struct {
+		ID        uint   `json:"id" db:"id"`
+		Token     string `json:"token" db:"token"`
+		UserID    uint   `json:"user,omitempty" db:"user_id"`
+		CreatedAt int64  `json:"created_at" db:"created_at"`
+		UpdatedAt int64  `json:"updated_at" db:"updated_at"`
+		DeletedAt *int64 `json:"deleted_at,omitempty" db:"deleted_at"`
+	}
+)

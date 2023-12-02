@@ -212,3 +212,23 @@ func (a *AuthDbAdapter) PatchUser(user types.User) (types.User, error) {
 
 	return user, tx.Commit()
 }
+
+func (a *AuthDbAdapter) GetUserCredentialsMethods(userID uint) ([]types.CredentialsMethods, error) {
+	var credsArgon2id []types.CredentialsArgon2id
+	err := a.db.Select(&credsArgon2id, `
+		SELECT credentials_argon2.id, credentials_argon2.login, credentials_argon2.hash, credentials_argon2.type, credentials_argon2.iterations, credentials_argon2.memory, credentials_argon2.parallelism, credentials_argon2.salt, credentials_argon2.key_len, credentials_argon2.created_at, credentials_argon2.updated_at, credentials_argon2.deleted_at
+		FROM credentials_argon2
+		JOIN credentials_argon2_users ON credentials_argon2.id = credentials_argon2_users.credential_id
+		WHERE credentials_argon2_users.user_id = $1
+	`, userID)
+
+	var creds []types.CredentialsMethods
+	for _, cr := range credsArgon2id {
+		creds = append(creds, types.CredentialsMethods{
+			Name:        types.CredentialsTypeLoginPassword,
+			Description: fmt.Sprintf("Your password is hashed with the %s algorithm", cr.Type),
+		})
+	}
+
+	return creds, err
+}
