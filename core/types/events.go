@@ -17,12 +17,6 @@ type (
 	// EventAllAppsReady is dispatched when all apps are ready to be used.
 	EventAllAppsReady struct{}
 
-	// EventDbCopy is dispatched when the database is copied.
-	// Use this event to send which tables you want to copy to the new database.
-	EventDbCopy struct {
-		tables *[]string
-	}
-
 	// EventServerStop is dispatched when the server is stopped.
 	EventServerStop struct{}
 
