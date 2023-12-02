@@ -39,7 +39,7 @@ func Authenticated(c *router.Context) {
 	authenticated, exists := c.Get("authenticated")
 	log.Debug("authenticated", vlog.Any("authenticated", authenticated))
 	if !exists || !authenticated.(bool) {
-		c.Abort(router.Error{
+		c.Unauthorized(router.Error{
 			Code:           types.ErrCodeInvalidToken,
 			PublicMessage:  "Invalid token",
 			PrivateMessage: "Invalid token",

@@ -41,6 +41,10 @@ func (c *Context) BadRequest(err Error) {
 	c.AbortWithError(http.StatusBadRequest, err)
 }
 
+func (c *Context) Unauthorized(err Error) {
+	c.AbortWithError(http.StatusUnauthorized, err)
+}
+
 func (c *Context) NotFound(err Error) {
 	c.AbortWithError(http.StatusNotFound, err)
 }
