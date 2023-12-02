@@ -44,7 +44,6 @@ func (a *App) Initialize(r *router.Group) error {
 
 	AuthService = service.NewAuthService(authAdapter)
 	userService = service.NewUserService(authAdapter)
-	service.NewMigrationService(a.ctx)
 
 	middleware.AuthService = AuthService
 

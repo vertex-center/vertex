@@ -5,19 +5,18 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 )
 
 func (s *DbService) copyDb(from *sqlx.DB, to *sqlx.DB) error {
-	dbCopy := types.NewEventDbCopy()
-	dbCopy.AddTable("admin_settings")
-	dbCopy.AddTable("migrations")
-
-	err := s.ctx.DispatchEventWithErr(dbCopy)
-	if err != nil {
-		return err
+	tables := []string{
+		"admin_settings",
+		"migrations",
+		"users",
+		"credentials_argon2",
+		"credentials_argon2_users",
+		"sessions",
 	}
 
 	toTx, err := to.Beginx()
@@ -25,7 +24,7 @@ func (s *DbService) copyDb(from *sqlx.DB, to *sqlx.DB) error {
 		return err
 	}
 
-	for _, t := range dbCopy.All() {
+	for _, t := range tables {
 		err := s.copyDbTable(t, from, toTx)
 		if err != nil {
 			_ = toTx.Rollback()

@@ -170,8 +170,5 @@ func (s *DbService) runMigrations(db *sqlx.DB) error {
 func (s *DbService) createSchemas(db *sqlx.DB) error {
 	vsqlDriver := vsql.DriverFromName(db.DriverName())
 	_, err := db.Exec(database.GetSchema(vsqlDriver))
-	if err != nil {
-		return err
-	}
-	return s.ctx.DispatchEventWithErr(vtypes.EventDbCreate{Db: db})
+	return err
 }
