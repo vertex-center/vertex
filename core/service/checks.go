@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/docker/docker/client"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
@@ -32,7 +31,6 @@ func (s *ChecksService) CheckAll(ctx context.Context) <-chan types.CheckResponse
 		s.checkInternet,
 		s.checkVertex,
 		s.checkKernel,
-		s.checkDocker,
 	}
 
 	resChan := make(chan types.CheckResponse, len(checks))
@@ -90,23 +88,24 @@ func (s *ChecksService) checkURL(ctx context.Context, id, name, url string) type
 	return res
 }
 
-func (s *ChecksService) checkDocker(ctx context.Context) types.CheckResponse {
-	res := types.CheckResponse{
-		ID:   "docker",
-		Name: "Docker",
-	}
-
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	if err != nil {
-		res.Error = err.Error()
-		return res
-	}
-
-	_, err = cli.Ping(ctx)
-	if err != nil {
-		res.Error = err.Error()
-		return res
-	}
-
-	return res
-}
+// Disabled for now, since ping requires access to the socket, which needs root.
+// func (s *ChecksService) checkDocker(ctx context.Context) types.CheckResponse {
+// 	res := types.CheckResponse{
+// 		ID:   "docker",
+// 		Name: "Docker",
+// 	}
+//
+// 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+// 	if err != nil {
+// 		res.Error = err.Error()
+// 		return res
+// 	}
+//
+// 	_, err = cli.Ping(ctx)
+// 	if err != nil {
+// 		res.Error = err.Error()
+// 		return res
+// 	}
+//
+// 	return res
+// }
