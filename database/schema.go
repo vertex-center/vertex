@@ -23,10 +23,7 @@ func GetSchema(driver vsql.Driver) string {
 
 		vsql.CreateTable("migrations").
 			WithID().
-			WithField("version", "INTEGER", "NOT NULL").
-			WithCreatedAt().
-			WithUpdatedAt().
-			WithDeletedAt(),
+			WithField("version", "INTEGER", "NOT NULL"),
 
 		vsql.InsertInto("migrations").
 			Columns("version").
