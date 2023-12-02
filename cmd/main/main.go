@@ -16,6 +16,7 @@ import (
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/adapter"
+	"github.com/vertex-center/vertex/apps/admin"
 	"github.com/vertex-center/vertex/apps/auth"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/containers"
@@ -57,7 +58,6 @@ var (
 	appsService          port.AppsService
 	debugService         port.DebugService
 	dbService            port.DbService
-	hardwareService      port.HardwareService
 	adminSettingsService port.AdminSettingsService
 	checksService        port.ChecksService
 	sshService           port.SshService
@@ -175,6 +175,7 @@ func initServices(about types.About) {
 		updates.NewRepositoryUpdater("vertex_services", path.Join(storage.Path, "services"), "vertex-center", "services"),
 	})
 	appsService = service.NewAppsService(ctx, false, r, []app.Interface{
+		admin.NewApp(),
 		auth.NewApp(),
 		sql.NewApp(),
 		tunnels.NewApp(),
@@ -187,7 +188,6 @@ func initServices(about types.About) {
 	service.NewNotificationsService(ctx, adminSettingsDbAdapter)
 	adminSettingsService = service.NewAdminSettingsService(adminSettingsDbAdapter)
 	dbService = service.NewDbService(ctx, dbAdapter)
-	hardwareService = service.NewHardwareService()
 	checksService = service.NewChecksService()
 	sshService = service.NewSshService(sshKernelApiAdapter)
 }
@@ -241,13 +241,6 @@ func initRoutes(about types.About) {
 	checks := a.Group("/admin/checks", middleware.Authenticated)
 	// docapi:v route /admin/checks admin_checks
 	checks.GET("", app.HeadersSSE, checksHandler.Check)
-
-	hardwareHandler := handler.NewHardwareHandler(hardwareService)
-	hardware := a.Group("/hardware", middleware.Authenticated)
-	// docapi:v route /hardware/host get_host
-	hardware.GET("/host", hardwareHandler.GetHost)
-	// docapi:v route /hardware/cpus get_cpus
-	hardware.GET("/cpus", hardwareHandler.GetCPUs)
 
 	updateHandler := handler.NewUpdateHandler(updateService, adminSettingsService)
 	update := a.Group("/admin/update", middleware.Authenticated)

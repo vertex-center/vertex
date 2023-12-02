@@ -22,11 +22,6 @@ type (
 		HardReset()
 	}
 
-	HardwareService interface {
-		GetHost() (types.Host, error)
-		GetCPUs() ([]types.CPU, error)
-	}
-
 	AdminSettingsService interface {
 		Get() (types.AdminSettings, error)
 		Update(settings types.AdminSettings) error

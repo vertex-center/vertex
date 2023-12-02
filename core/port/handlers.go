@@ -35,13 +35,6 @@ type (
 		HardReset(c *router.Context)
 	}
 
-	HardwareHandler interface {
-		// GetHost handles the retrieval of the current host.
-		GetHost(c *router.Context)
-		// GetCPUs handles the retrieval of all CPUs.
-		GetCPUs(c *router.Context)
-	}
-
 	UpdateHandler interface {
 		// Get handles the retrieval of an update, if any.
 		Get(c *router.Context)
