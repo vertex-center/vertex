@@ -51,10 +51,6 @@ type KernelUninitializable interface {
 	UninitializeKernel() error
 }
 
-type DbSchemaProvider interface {
-	DbSchema(driver string) string
-}
-
 type HttpHandler func(r *router.Group)
 
 type Service interface {

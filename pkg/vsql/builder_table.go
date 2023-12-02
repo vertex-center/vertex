@@ -129,3 +129,33 @@ func (q *QueryWithForeignKey) Build(driver Driver) string {
 		q.reference,
 	)
 }
+
+type QueryAlterTable struct {
+	name string
+	add  []Builder
+}
+
+func AlterTable(name string) *QueryAlterTable {
+	return &QueryAlterTable{
+		name: name,
+	}
+}
+
+func (q *QueryAlterTable) AddField(name string, dataType string, options ...string) *QueryAlterTable {
+	q.add = append(q.add, &QueryWithField{
+		name:     name,
+		dataType: dataType,
+		options:  options,
+	})
+	return q
+}
+
+func (q *QueryAlterTable) Build(driver Driver) string {
+	res := fmt.Sprintf("ALTER TABLE %s ", q.name)
+	var fields []string
+	for _, f := range q.add {
+		fields = append(fields, "ADD "+f.Build(driver))
+	}
+	res += fmt.Sprintf("%s;", strings.Join(fields, ", "))
+	return res
+}

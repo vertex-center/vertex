@@ -9,6 +9,7 @@ import (
 	"github.com/vertex-center/vertex/core/port"
 	vtypes "github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/database"
+	"github.com/vertex-center/vertex/database/migration"
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/vsql"
@@ -163,10 +164,7 @@ func (s *DbService) runMigrations(db *sqlx.DB) error {
 	if err != nil {
 		return s.createSchemas(db)
 	}
-
-	// TODO: Else migrate
-
-	return s.ctx.DispatchEventWithErr(vtypes.EventDbMigrate{Db: db})
+	return vsql.Migrate(migration.Migrations, db, version)
 }
 
 func (s *DbService) createSchemas(db *sqlx.DB) error {
