@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { api, setAuthToken } from "../../../backend/api/backend";
-import { Credentials } from "../../../models/auth";
+import { AuthCredentials } from "../../../models/auth";
 
 export const useRegister = (
-    options: UseMutationOptions<unknown, unknown, Credentials>
+    options: UseMutationOptions<unknown, unknown, AuthCredentials>
 ) => {
     const { onSuccess, ...others } = options;
     const mutation = useMutation({

@@ -11,7 +11,7 @@ import { Console } from "../../logging/logging";
 import { Update } from "../../models/update";
 import { vxServiceEditorRoutes } from "./vxServiceEditor";
 import { CPU, Host } from "../../models/hardware";
-import { Credentials } from "../../models/auth";
+import { AuthCredentials, Credentials } from "../../models/auth";
 
 export const server = axios.create({
     // @ts-ignore
@@ -156,7 +156,7 @@ export const api = {
     },
 
     auth: {
-        login: async (credentials: Credentials) => {
+        login: async (credentials: AuthCredentials) => {
             const Authorization = `Basic ${btoa(
                 credentials.username + ":" + credentials.password
             )}`;
@@ -167,7 +167,7 @@ export const api = {
             );
             return data;
         },
-        register: async (credentials: Credentials) => {
+        register: async (credentials: AuthCredentials) => {
             const Authorization = `Basic ${btoa(
                 credentials.username + ":" + credentials.password
             )}`;
@@ -190,6 +190,14 @@ export const api = {
             }
 
             return {
+                credentials: {
+                    get: async () => {
+                        const { data } = await server.get<Credentials[]>(
+                            `/app/auth/user${username}/credentials`
+                        );
+                        return data;
+                    },
+                },
                 get: async () => {
                     const { data } = await server.get<User>(
                         `/app/auth/user${username}`
