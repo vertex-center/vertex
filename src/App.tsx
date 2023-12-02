@@ -77,17 +77,20 @@ function AllRoutes() {
     } else {
         const token = getAuthToken();
         if (!token) {
+            console.log("No token found. Redirecting to login.");
             navigate("/login");
         }
 
-        if (errorUser) {
-            // @ts-ignore
-            errorUser?.response?.status === 401 && navigate("/login");
+        // @ts-ignore
+        if (errorUser && errorUser?.response?.status === 401) {
+            console.log("The token is invalid. Redirecting to login.");
+            navigate("/login");
         }
     }
 
     return (
         <Fragment>
+            <ReactQueryDevtools initialIsOpen={false} />
             {show.header && <Header />}
             <div className="app-main">
                 <div className="app-sidebar" />
@@ -246,7 +249,6 @@ function App() {
     return (
         <div id="app" className={classNames("app", theme)}>
             <QueryClientProvider client={queryClient}>
-                <ReactQueryDevtools initialIsOpen={false} />
                 <BrowserRouter>
                     <AllRoutes />
                 </BrowserRouter>
