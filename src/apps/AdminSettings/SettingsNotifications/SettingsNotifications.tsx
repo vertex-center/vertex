@@ -5,17 +5,16 @@ import {
     TextField,
     Title,
 } from "@vertex-center/components";
-import { api } from "../../../backend/api/backend";
 import { Horizontal } from "../../../components/Layouts/Layouts";
 import { APIError } from "../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import Content from "../../../components/Content/Content";
 import { useSettings } from "../hooks/useSettings";
+import { usePatchSettings } from "../hooks/usePatchSettings";
 
 export default function SettingsNotifications() {
     const [webhook, setWebhook] = useState<string>();
     const [changed, setChanged] = useState(false);
-    const [saving, setSaving] = useState(false);
 
     const { settings, errorSettings, isLoadingSettings } = useSettings();
 
@@ -28,22 +27,18 @@ export default function SettingsNotifications() {
         setChanged(true);
     };
 
-    const onSave = () => {
-        setSaving(true);
-        api.settings
-            .patch({ webhook })
-            .then(() => setChanged(false))
-            .catch(console.error)
-            .finally(() => setSaving(false));
-    };
+    const { patchSettings, isPatchingSettings, errorPatchingSettings } =
+        usePatchSettings({
+            onSuccess: () => setChanged(false),
+        });
 
-    const error = errorSettings;
+    const error = errorSettings || errorPatchingSettings;
     const isLoading = isLoadingSettings;
 
     return (
         <Content>
             <Title variant="h2">Notifications</Title>
-            <ProgressOverlay show={isLoading || saving} />
+            <ProgressOverlay show={isLoading || isPatchingSettings} />
             <APIError error={error} />
             {!error && (
                 <Fragment>
@@ -63,8 +58,8 @@ export default function SettingsNotifications() {
                         <Button
                             variant="colored"
                             rightIcon={<MaterialIcon icon="save" />}
-                            onClick={onSave}
-                            disabled={!changed || saving}
+                            onClick={() => patchSettings({ webhook })}
+                            disabled={!changed || isPatchingSettings}
                         >
                             Save
                         </Button>

@@ -2,20 +2,17 @@ import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { API } from "../backend/api";
 
 export const usePatchSettings = (
-    options: UseMutationOptions<unknown, unknown, boolean>
+    options: UseMutationOptions<unknown, unknown, Partial<Settings>>
 ) => {
-    const mutation = useMutation<unknown, unknown, boolean, unknown>({
+    const mutation = useMutation({
         mutationKey: ["settings"],
-        mutationFn: (beta?: boolean) =>
-            API.patchSettings({
-                updates_channel: beta ? "beta" : "stable",
-            }),
+        mutationFn: API.patchSettings,
         ...options,
     });
     const {
-        mutate: setChannel,
-        isLoading: isSettingChannel,
-        error: errorSetChannel,
+        mutate: patchSettings,
+        isLoading: isPatchingSettings,
+        error: errorPatchingSettings,
     } = mutation;
-    return { setChannel, isSettingChannel, errorSetChannel };
+    return { patchSettings, isPatchingSettings, errorPatchingSettings };
 };

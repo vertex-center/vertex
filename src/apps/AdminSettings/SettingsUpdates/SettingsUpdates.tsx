@@ -38,13 +38,14 @@ export default function SettingsUpdates() {
             },
         });
 
-    const { setChannel, isSettingChannel, errorSetChannel } = usePatchSettings({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ["settings"],
-            });
-        },
-    });
+    const { patchSettings, isPatchingSettings, errorPatchingSettings } =
+        usePatchSettings({
+            onSuccess: () => {
+                queryClient.invalidateQueries({
+                    queryKey: ["settings"],
+                });
+            },
+        });
 
     const dismissPopup = () => {
         setShowMessage(false);
@@ -56,10 +57,13 @@ export default function SettingsUpdates() {
         isLoadingUpdate ||
         isLoadingSettings ||
         isInstalling ||
-        isSettingChannel;
+        isPatchingSettings;
 
     const error =
-        errorUpdate || errorSettings || errorInstallUpdate || errorSetChannel;
+        errorUpdate ||
+        errorSettings ||
+        errorInstallUpdate ||
+        errorPatchingSettings;
 
     const actions = (
         <Button
@@ -73,6 +77,12 @@ export default function SettingsUpdates() {
 
     const hasUpdate = update !== null && update !== undefined;
 
+    const onChannelChange = (beta: boolean) => {
+        patchSettings(
+            beta ? { updates_channel: "beta" } : { updates_channel: "stable" }
+        );
+    };
+
     return (
         <Content>
             <ProgressOverlay show={isLoading} />
@@ -82,7 +92,7 @@ export default function SettingsUpdates() {
                 <Spacer />
                 <ToggleButton
                     value={settings?.updates_channel === "beta"}
-                    onChange={(beta: boolean) => setChannel(beta)}
+                    onChange={onChannelChange}
                     disabled={isLoading}
                 />
             </Horizontal>

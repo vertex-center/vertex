@@ -42,33 +42,33 @@ const getSSHUsers = async () => {
 };
 
 const getSettings = async () => {
-    const { data } = await server.get<Settings>("/admin/settings");
+    const { data } = await server.get<Settings>("/app/admin/settings");
     return data;
 };
 
 const patchSettings = async (settings: Partial<Settings>) => {
-    const { data } = await server.patch("/admin/settings", settings);
+    const { data } = await server.patch("/app/admin/settings", settings);
     return data;
 };
 
 const getUpdate = async () => {
-    const { data } = await server.get<Update>("/admin/update");
+    const { data } = await server.get<Update>("/app/admin/update");
     return data;
 };
 
 const installUpdate = async () => {
-    const { data } = await server.post("/admin/update");
+    const { data } = await server.post("/app/admin/update");
     return data;
 };
 
 const getDatabases = async () => {
-    const { data } = await server.get<string>("/admin/db/dbms");
+    const { data } = await server.get<string>("/app/admin/db/dbms");
     return data;
 };
 
 const migrateDatabase = async (dbms: string) => {
     const body = { dbms };
-    const { data } = await server.post("/admin/db/dbms", body);
+    const { data } = await server.post("/app/admin/db/dbms", body);
     return data;
 };
 
