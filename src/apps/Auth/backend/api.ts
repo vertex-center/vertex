@@ -1,4 +1,4 @@
-import { AuthCredentials, Credentials, User } from "./models";
+import { AuthCredentials, Credentials, Email, User } from "./models";
 import { server } from "../../../backend/api/backend";
 
 const login = async (credentials: AuthCredentials) => {
@@ -47,6 +47,23 @@ const getCredentialsCurrentUser = async () => {
     return data;
 };
 
+const getEmailsCurrentUser = async () => {
+    const { data } = await server.get<Email[]>("/app/auth/user/emails");
+    return data;
+};
+
+const postEmailCurrentUser = async (email: Partial<Email>) => {
+    const { data } = await server.post("/app/auth/user/email", email);
+    return data;
+};
+
+const deleteEmailCurrentUser = async (email: Partial<Email>) => {
+    const { data } = await server.delete("/app/auth/user/email", {
+        data: email,
+    });
+    return data;
+};
+
 export const API = {
     login,
     register,
@@ -54,4 +71,7 @@ export const API = {
     getCurrentUser,
     patchCurrentUser,
     getCredentialsCurrentUser,
+    getEmailsCurrentUser,
+    postEmailCurrentUser,
+    deleteEmailCurrentUser,
 };

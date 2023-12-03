@@ -52,6 +52,7 @@ import Account from "./apps/Auth/pages/Account/Account";
 import AccountInfo from "./apps/Auth/pages/Account/AccountInfo";
 import AccountSecurity from "./apps/Auth/pages/Account/AccountSecurity";
 import useUser from "./apps/Auth/hooks/useUser";
+import AccountEmails from "./apps/Auth/pages/Account/AccountEmails";
 
 const queryClient = new QueryClient();
 
@@ -107,6 +108,10 @@ function AllRoutes() {
                             <Route
                                 path="/account/security"
                                 element={<AccountSecurity />}
+                            />
+                            <Route
+                                path="/account/emails"
+                                element={<AccountEmails />}
                             />
                         </Route>
                         <Route

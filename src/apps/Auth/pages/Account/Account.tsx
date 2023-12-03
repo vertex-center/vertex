@@ -19,6 +19,11 @@ export default function Account() {
                     icon={<MaterialIcon icon="security" />}
                     link={l("/account/security")}
                 />
+                <Sidebar.Item
+                    label="Emails"
+                    icon={<MaterialIcon icon="email" />}
+                    link={l("/account/emails")}
+                />
             </Sidebar.Group>
         </Sidebar>
     );

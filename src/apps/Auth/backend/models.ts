@@ -9,5 +9,12 @@ export type Credentials = {
 };
 
 export type User = {
+    id: number;
     username: string;
+};
+
+export type Email = {
+    id: number;
+    user_id: number;
+    email: string;
 };
