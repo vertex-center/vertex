@@ -2,8 +2,7 @@
 
 package reboot
 
-import "syscall"
-
 func Reboot() error {
-	return syscall.Reboot(syscall.LINUX_REBOOT_CMD_RESTART)
+	cmd := exec.Command("shutdown", "/r", "/t", "0")
+	return cmd.Run()
 }
