@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"net/mail"
 
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
@@ -67,10 +68,20 @@ func (h *EmailHandler) CreateCurrentUserEmail(c *router.Context) {
 		return
 	}
 
-	email, err := h.service.CreateEmail(uint(userID), body.Email)
+	addr, err := mail.ParseAddress(body.Email)
+	if err != nil {
+		c.BadRequest(router.Error{
+			Code:           types.ErrCodeInvalidEmail,
+			PublicMessage:  "This email address is not a valid email address",
+			PrivateMessage: err.Error(),
+		})
+		return
+	}
+
+	email, err := h.service.CreateEmail(uint(userID), addr.Address)
 	if errors.Is(err, types.ErrEmailAlreadyExists) {
 		c.Conflict(router.Error{
-			Code:           types.ErrcodeEmailAlreadyExists,
+			Code:           types.ErrCodeEmailAlreadyExists,
 			PublicMessage:  "This email address is already registered on your account",
 			PrivateMessage: err.Error(),
 		})
