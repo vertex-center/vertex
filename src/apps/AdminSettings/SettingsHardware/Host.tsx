@@ -1,4 +1,4 @@
-import { Host as HostModel } from "../../../models/hardware";
+import { Host as HostModel } from "../models/hardware";
 import { SiApple, SiLinux, SiWindows } from "@icons-pack/react-simple-icons";
 import {
     List,

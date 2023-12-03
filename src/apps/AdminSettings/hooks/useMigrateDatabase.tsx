@@ -1,12 +1,12 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { api } from "../../../backend/api/backend";
+import { API } from "../backend/api";
 
-export const useDBMSMutation = (
+export const useMigrateDatabase = (
     options: UseMutationOptions<unknown, unknown, string>
 ) => {
     const mutation = useMutation({
         mutationKey: ["admin_db_dbms"],
-        mutationFn: api.admin.data.dbms.migrate,
+        mutationFn: API.migrateDatabase,
         ...options,
     });
     const {

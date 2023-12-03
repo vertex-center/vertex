@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../../../backend/api/backend";
+import { API } from "../backend/api";
 
 export const useUpdate = () => {
     const query = useQuery({
         queryKey: ["updates"],
-        queryFn: api.update.get,
+        queryFn: API.getUpdate,
     });
     const {
         data: update,

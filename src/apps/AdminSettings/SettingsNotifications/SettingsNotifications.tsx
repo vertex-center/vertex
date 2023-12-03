@@ -9,22 +9,15 @@ import { api } from "../../../backend/api/backend";
 import { Horizontal } from "../../../components/Layouts/Layouts";
 import { APIError } from "../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
-import { useQuery } from "@tanstack/react-query";
 import Content from "../../../components/Content/Content";
+import { useSettings } from "../hooks/useSettings";
 
 export default function SettingsNotifications() {
     const [webhook, setWebhook] = useState<string>();
     const [changed, setChanged] = useState(false);
     const [saving, setSaving] = useState(false);
 
-    const {
-        data: settings,
-        error,
-        isLoading,
-    } = useQuery({
-        queryKey: ["settings"],
-        queryFn: api.settings.get,
-    });
+    const { settings, errorSettings, isLoadingSettings } = useSettings();
 
     useEffect(() => {
         setWebhook(settings?.webhook);
@@ -43,6 +36,9 @@ export default function SettingsNotifications() {
             .catch(console.error)
             .finally(() => setSaving(false));
     };
+
+    const error = errorSettings;
+    const isLoading = isLoadingSettings;
 
     return (
         <Content>

@@ -23,7 +23,7 @@ import Progress, {
     ProgressOverlay,
 } from "../../../components/Progress/Progress";
 import { APIError } from "../../../components/Error/APIError";
-import { useDBMSMutation } from "../hooks/useDBMSMutation";
+import { useMigrateDatabase } from "../hooks/useMigrateDatabase";
 import { useQueryClient } from "@tanstack/react-query";
 
 type DatabaseProps = {
@@ -86,7 +86,7 @@ export default function SettingsDb() {
     const [selectedDB, setSelectedDB] = useState<string>();
 
     const { dbms, isLoadingDbms, errorDbms } = useDBMS();
-    const { migrate, isMigrating, errorMigrate } = useDBMSMutation({
+    const { migrate, isMigrating, errorMigrate } = useMigrateDatabase({
         onMutate: () => {
             setShowPopup(false);
         },

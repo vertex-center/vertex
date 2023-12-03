@@ -1,10 +1,10 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { api } from "../../../backend/api/backend";
+import { API } from "../backend/api";
 
 export const useUpdateMutation = (options: UseMutationOptions) => {
     const mutation = useMutation({
         mutationKey: ["updates"],
-        mutationFn: api.update.install,
+        mutationFn: API.installUpdate,
         ...options,
     });
     const {

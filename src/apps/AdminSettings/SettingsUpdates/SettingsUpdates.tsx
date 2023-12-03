@@ -18,7 +18,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useSettings } from "../hooks/useSettings";
 import { useUpdate } from "../hooks/useUpdate";
 import { useUpdateMutation } from "../hooks/useUpdateMutation";
-import { useSettingsChannelMutation } from "../hooks/useSettingsMutation";
+import { usePatchSettings } from "../hooks/usePatchSettings";
 import Content from "../../../components/Content/Content";
 
 export default function SettingsUpdates() {
@@ -38,14 +38,13 @@ export default function SettingsUpdates() {
             },
         });
 
-    const { setChannel, isSettingChannel, errorSetChannel } =
-        useSettingsChannelMutation({
-            onSuccess: () => {
-                queryClient.invalidateQueries({
-                    queryKey: ["settings"],
-                });
-            },
-        });
+    const { setChannel, isSettingChannel, errorSetChannel } = usePatchSettings({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["settings"],
+            });
+        },
+    });
 
     const dismissPopup = () => {
         setShowMessage(false);

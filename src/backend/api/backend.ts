@@ -1,6 +1,5 @@
 import axios from "axios";
 import { About } from "../../models/about";
-import { SSHKeys } from "../../models/security";
 import { vxContainersRoutes } from "./vxContainers";
 import { vxTunnelsRoutes } from "./vxTunnels";
 import { vxMonitoringRoutes } from "./vxMonitoring";
@@ -8,9 +7,7 @@ import { vxSqlRoutes } from "./vxSql";
 import { vxReverseProxyRoutes } from "./vxReverseProxy";
 import { VertexApp } from "../../models/app";
 import { Console } from "../../logging/logging";
-import { Update } from "../../models/update";
 import { vxServiceEditorRoutes } from "./vxServiceEditor";
-import { CPU, Host } from "../../models/hardware";
 import { AuthCredentials, Credentials } from "../../models/auth";
 
 export const server = axios.create({
@@ -64,32 +61,8 @@ const getAbout = async () => {
     return data;
 };
 
-const getHost = async () => {
-    const { data } = await server.get<Host>("/app/admin/hardware/host");
-    return data;
-};
-
-const getCPUs = async () => {
-    const { data } = await server.get<CPU[]>("/app/admin/hardware/cpus");
-    return data;
-};
-
-const getUpdate = async () => {
-    const { data } = await server.get<Update>("/admin/update");
-    return data;
-};
-
-const installUpdate = async () => {
-    const { data } = await server.post("/admin/update");
-    return data;
-};
-
 export const api = {
     about: getAbout,
-    hardware: {
-        host: getHost,
-        cpus: getCPUs,
-    },
 
     vxContainers: vxContainersRoutes,
     vxTunnels: vxTunnelsRoutes,
@@ -98,63 +71,11 @@ export const api = {
     vxReverseProxy: vxReverseProxyRoutes,
     vxServiceEditor: vxServiceEditorRoutes,
 
-    admin: {
-        data: {
-            dbms: {
-                get: async () => {
-                    const { data } = await server.get<string>("/admin/db/dbms");
-                    return data;
-                },
-                migrate: async (dbms: string) => {
-                    const { data } = await server.post("/admin/db/dbms", {
-                        dbms,
-                    });
-                    return data;
-                },
-            },
-        },
-    },
-
     apps: {
         all: async () => {
             const { data } = await server.get<VertexApp[]>("/apps");
             return data;
         },
-    },
-
-    security: {
-        ssh: {
-            get: async () => {
-                const { data } = await server.get<SSHKeys>("/app/admin/ssh");
-                return data;
-            },
-            add: (authorized_key: string, username: string) =>
-                server.post("/app/admin/ssh", { authorized_key, username }),
-            delete: (fingerprint: string, username: string) =>
-                server.delete("/app/admin/ssh", {
-                    data: { fingerprint, username },
-                }),
-            users: async () => {
-                const { data } = await server.get<string[]>(
-                    "/app/admin/ssh/users"
-                );
-                return data;
-            },
-        },
-    },
-
-    update: {
-        get: getUpdate,
-        install: installUpdate,
-    },
-
-    settings: {
-        get: async () => {
-            const { data } = await server.get<Settings>("/admin/settings");
-            return data;
-        },
-        patch: (settings: Partial<Settings>) =>
-            server.patch("/admin/settings", settings),
     },
 
     auth: {
