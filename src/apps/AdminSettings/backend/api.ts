@@ -72,6 +72,11 @@ const migrateDatabase = async (dbms: string) => {
     return data;
 };
 
+const reboot = async () => {
+    const { data } = await server.post("/app/admin/hardware/reboot");
+    return data;
+};
+
 export const API = {
     getHost,
     getCPUs,
@@ -85,4 +90,5 @@ export const API = {
     installUpdate,
     getDatabases,
     migrateDatabase,
+    reboot,
 };

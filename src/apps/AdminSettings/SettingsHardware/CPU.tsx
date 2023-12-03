@@ -1,4 +1,4 @@
-import { CPU as CPUModel } from "../models/hardware";
+import { CPU as CPUModel } from "../backend/models";
 import {
     ListDescription,
     ListIcon,
