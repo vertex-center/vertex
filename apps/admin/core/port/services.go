@@ -1,6 +1,8 @@
 package port
 
 import (
+	"context"
+
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/pkg/user"
 )
@@ -9,6 +11,11 @@ type (
 	HardwareService interface {
 		GetHost() (types.Host, error)
 		GetCPUs() ([]types.CPU, error)
+		Reboot(ctx context.Context) error
+	}
+
+	HardwareKernelService interface {
+		Reboot() error
 	}
 
 	SshService interface {

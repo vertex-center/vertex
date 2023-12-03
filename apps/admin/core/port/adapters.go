@@ -1,11 +1,21 @@
 package port
 
 import (
+	"context"
+
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/pkg/user"
 )
 
 type (
+	HardwareAdapter interface {
+		Reboot(ctx context.Context) error
+	}
+
+	HardwareKernelAdapter interface {
+		Reboot() error
+	}
+
 	SshAdapter interface {
 		GetAll() ([]types.PublicKey, error)
 		Add(key string, username string) error

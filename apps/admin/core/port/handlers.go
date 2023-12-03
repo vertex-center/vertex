@@ -8,6 +8,13 @@ type (
 		GetHost(c *router.Context)
 		// GetCPUs handles the retrieval of all CPUs.
 		GetCPUs(c *router.Context)
+		// Reboot handles the reboot of the server.
+		Reboot(c *router.Context)
+	}
+
+	HardwareKernelHandler interface {
+		// Reboot handles the reboot of the server.
+		Reboot(c *router.Context)
 	}
 
 	SshHandler interface {

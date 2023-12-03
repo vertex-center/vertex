@@ -1,16 +1,22 @@
 package service
 
 import (
+	"context"
+
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 )
 
-type HardwareService struct{}
+type HardwareService struct {
+	adapter port.HardwareAdapter
+}
 
-func NewHardwareService() port.HardwareService {
-	return &HardwareService{}
+func NewHardwareService(adapter port.HardwareAdapter) port.HardwareService {
+	return &HardwareService{
+		adapter: adapter,
+	}
 }
 
 func (s HardwareService) GetHost() (types.Host, error) {
@@ -61,4 +67,8 @@ func (s HardwareService) GetCPUs() ([]types.CPU, error) {
 		})
 	}
 	return cpus, nil
+}
+
+func (s HardwareService) Reboot(ctx context.Context) error {
+	return s.adapter.Reboot(ctx)
 }

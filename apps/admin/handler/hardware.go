@@ -7,12 +7,12 @@ import (
 )
 
 type HardwareHandler struct {
-	hardwareService port.HardwareService
+	service port.HardwareService
 }
 
-func NewHardwareHandler(hardwareService port.HardwareService) port.HardwareHandler {
+func NewHardwareHandler(service port.HardwareService) port.HardwareHandler {
 	return &HardwareHandler{
-		hardwareService: hardwareService,
+		service: service,
 	}
 }
 
@@ -25,7 +25,7 @@ func NewHardwareHandler(hardwareService port.HardwareService) port.HardwareHandl
 // docapi end
 
 func (h *HardwareHandler) GetHost(c *router.Context) {
-	host, err := h.hardwareService.GetHost()
+	host, err := h.service.GetHost()
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToGetHost,
@@ -46,7 +46,7 @@ func (h *HardwareHandler) GetHost(c *router.Context) {
 // docapi end
 
 func (h *HardwareHandler) GetCPUs(c *router.Context) {
-	cpus, err := h.hardwareService.GetCPUs()
+	cpus, err := h.service.GetCPUs()
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToGetCPUs,
@@ -56,4 +56,25 @@ func (h *HardwareHandler) GetCPUs(c *router.Context) {
 		return
 	}
 	c.JSON(cpus)
+}
+
+// docapi begin reboot
+// docapi method POST
+// docapi summary Reboot
+// docapi tags Apps/Admin/Hardware
+// docapi response 204
+// docapi response 500
+// docapi end
+
+func (h *HardwareHandler) Reboot(c *router.Context) {
+	err := h.service.Reboot(c)
+	if err != nil {
+		c.Abort(router.Error{
+			Code:           api.ErrFailedToReboot,
+			PublicMessage:  "Failed to reboot.",
+			PrivateMessage: err.Error(),
+		})
+		return
+	}
+	c.OK()
 }

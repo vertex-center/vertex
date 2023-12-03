@@ -14,3 +14,13 @@ func NewAdminClient() *Client {
 		Client: rest.NewClient(config.Current.VertexURL(), "/api/app/admin/"),
 	}
 }
+
+type KernelClient struct {
+	*rest.Client
+}
+
+func NewAdminKernelClient() *KernelClient {
+	return &KernelClient{
+		Client: rest.NewClient(config.Current.KernelURL(), "/api/app/admin/"),
+	}
+}

@@ -31,9 +31,10 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
+	hardwareAdapter := adapter.NewHardwareApiAdapter()
 	sshAdapter := adapter.NewSshKernelApiAdapter()
 
-	hardwareService := service.NewHardwareService()
+	hardwareService := service.NewHardwareService(hardwareAdapter)
 	sshService := service.NewSshService(sshAdapter)
 
 	hardwareHandler := handler.NewHardwareHandler(hardwareService)
@@ -42,6 +43,8 @@ func (a *App) Initialize(r *router.Group) error {
 	hardware.GET("/host", hardwareHandler.GetHost)
 	// docapi:v route /app/admin/hardware/cpus get_cpus
 	hardware.GET("/cpus", hardwareHandler.GetCPUs)
+	// docapi:v route /app/admin/hardware/reboot reboot
+	hardware.POST("/reboot", hardwareHandler.Reboot)
 
 	sshHandler := handler.NewSshHandler(sshService)
 	ssh := r.Group("/ssh", middleware.Authenticated)
@@ -58,9 +61,16 @@ func (a *App) Initialize(r *router.Group) error {
 }
 
 func (a *App) InitializeKernel(r *router.Group) error {
+	hardwareAdapter := adapter.NewHardwareKernelAdapter()
 	sshAdapter := adapter.NewSshFsAdapter()
 
+	hardwareService := service.NewHardwareKernelService(hardwareAdapter)
 	sshService := service.NewSshKernelService(sshAdapter)
+
+	hardwareHandler := handler.NewHardwareKernelHandler(hardwareService)
+	hardware := r.Group("/hardware")
+	// docapi:k route /app/admin/hardware/reboot reboot_kernel
+	hardware.POST("/reboot", hardwareHandler.Reboot)
 
 	sshHandler := handler.NewSshKernelHandler(sshService)
 	ssh := r.Group("/ssh")
