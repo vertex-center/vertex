@@ -12,4 +12,9 @@ const (
 	ErrCodeFailedToGetUser            router.ErrCode = "failed_to_get_user"
 	ErrCodeFailedToPatchUser          router.ErrCode = "failed_to_patch_user"
 	ErrCodeFailedToGetUserCredentials router.ErrCode = "failed_to_get_user_credentials"
+	ErrCodeFailedToGetUserEmails      router.ErrCode = "failed_to_get_user_emails"
+	ErrCodeEmailEmpty                 router.ErrCode = "email_empty"
+	ErrcodeEmailAlreadyExists         router.ErrCode = "email_already_exists"
+	ErrCodeFailedToCreateEmail        router.ErrCode = "failed_to_create_email"
+	ErrCodeFailedToDeleteEmail        router.ErrCode = "failed_to_delete_email"
 )

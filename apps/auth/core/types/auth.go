@@ -9,11 +9,13 @@ import (
 // connect to multiple users at once.
 
 var (
-	ErrLoginEmpty     = errors.New("login is empty")
-	ErrPasswordEmpty  = errors.New("password is empty")
-	ErrPasswordLength = errors.New("password length requirement not met")
-	ErrLoginFailed    = errors.New("login failed")
-	ErrTokenInvalid   = errors.New("token is invalid")
+	ErrLoginEmpty         = errors.New("login is empty")
+	ErrPasswordEmpty      = errors.New("password is empty")
+	ErrPasswordLength     = errors.New("password length requirement not met")
+	ErrLoginFailed        = errors.New("login failed")
+	ErrTokenInvalid       = errors.New("token is invalid")
+	ErrEmailEmpty         = errors.New("email is empty")
+	ErrEmailAlreadyExists = errors.New("email already exists")
 )
 
 type CredentialsType string
@@ -24,6 +26,15 @@ type (
 	User struct {
 		ID        uint   `json:"id" db:"id"`
 		Username  string `json:"username" db:"username"`
+		CreatedAt int64  `json:"created_at" db:"created_at"`
+		UpdatedAt int64  `json:"updated_at" db:"updated_at"`
+		DeletedAt *int64 `json:"deleted_at,omitempty" db:"deleted_at"`
+	}
+
+	Email struct {
+		ID        uint   `json:"id" db:"id"`
+		UserID    uint   `json:"user_id" db:"user_id"`
+		Email     string `json:"email" db:"email"`
 		CreatedAt int64  `json:"created_at" db:"created_at"`
 		UpdatedAt int64  `json:"updated_at" db:"updated_at"`
 		DeletedAt *int64 `json:"deleted_at,omitempty" db:"deleted_at"`

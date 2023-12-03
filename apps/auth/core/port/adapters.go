@@ -18,4 +18,10 @@ type (
 		PatchUser(user types.User) (types.User, error)
 		GetUserCredentialsMethods(userID uint) ([]types.CredentialsMethods, error)
 	}
+
+	EmailAdapter interface {
+		CreateEmail(email *types.Email) error
+		GetEmails(userID uint) ([]types.Email, error)
+		DeleteEmail(userID uint, email string) error
+	}
 )

@@ -32,10 +32,18 @@ func GetSchema(driver vsql.Driver) string {
 		vsql.CreateTable("users").
 			WithID().
 			WithField("username", "VARCHAR(255)", "NOT NULL").
-			WithField("email", "VARCHAR(255)").
 			WithCreatedAt().
 			WithUpdatedAt().
 			WithDeletedAt(),
+
+		vsql.CreateTable("emails").
+			WithID().
+			WithField("user_id", "INTEGER", "NOT NULL").
+			WithField("email", "VARCHAR(255)", "NOT NULL").
+			WithCreatedAt().
+			WithUpdatedAt().
+			WithDeletedAt().
+			WithForeignKey("user_id", "users", "id"),
 
 		vsql.CreateTable("credentials_argon2").
 			WithID().

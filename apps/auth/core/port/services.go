@@ -10,6 +10,12 @@ type (
 		Verify(token string) (*types.Session, error)
 	}
 
+	EmailService interface {
+		CreateEmail(userID uint, email string) (types.Email, error)
+		GetEmails(userID uint) ([]types.Email, error)
+		DeleteEmail(userID uint, email string) error
+	}
+
 	MigrationService interface{}
 
 	UserService interface {

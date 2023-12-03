@@ -41,8 +41,10 @@ func (a *App) Meta() apptypes.Meta {
 
 func (a *App) Initialize(r *router.Group) error {
 	authAdapter = adapter.NewAuthDbAdapter(a.ctx.Db())
+	emailAdapter := adapter.NewEmailDbAdapter(a.ctx.Db())
 
 	AuthService = service.NewAuthService(authAdapter)
+	emailService := service.NewEmailService(emailAdapter)
 	userService = service.NewUserService(authAdapter)
 
 	middleware.AuthService = AuthService
@@ -63,6 +65,17 @@ func (a *App) Initialize(r *router.Group) error {
 	user.PATCH("", middleware.Authenticated, userHandler.PatchCurrentUser)
 	// docapi:v route /app/auth/credentials auth_get_current_user_credentials
 	user.GET("/credentials", middleware.Authenticated, userHandler.GetCurrentUserCredentials)
+
+	emailHandler := handler.NewEmailHandler(emailService)
+	email := user.Group("/email")
+	// docapi:v route /app/auth/user/email auth_current_user_create_email
+	email.POST("", middleware.Authenticated, emailHandler.CreateCurrentUserEmail)
+	// docapi:v route /app/auth/user/email auth_current_user_delete_email
+	email.DELETE("", middleware.Authenticated, emailHandler.DeleteCurrentUserEmail)
+
+	emails := user.Group("/emails")
+	// docapi:v route /app/auth/user/emails auth_current_user_get_emails
+	emails.GET("", middleware.Authenticated, emailHandler.GetCurrentUserEmails)
 
 	return nil
 }
