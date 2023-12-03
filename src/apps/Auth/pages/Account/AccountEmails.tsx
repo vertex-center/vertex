@@ -4,6 +4,8 @@ import {
     Code,
     List,
     ListActions,
+    ListDescription,
+    ListInfo,
     ListItem,
     ListTitle,
     MaterialIcon,
@@ -112,7 +114,15 @@ export default function AccountEmails() {
                 <List>
                     {emails?.map((m) => (
                         <ListItem key={m.id}>
-                            <ListTitle>{m.email}</ListTitle>
+                            <ListInfo>
+                                <ListTitle>{m.email}</ListTitle>
+                                <ListDescription>
+                                    Added on{" "}
+                                    {new Date(
+                                        m.created_at * 1000
+                                    ).toDateString()}
+                                </ListDescription>
+                            </ListInfo>
                             <ListActions>
                                 <Button
                                     variant="danger"

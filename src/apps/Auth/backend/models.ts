@@ -17,4 +17,7 @@ export type Email = {
     id: number;
     user_id: number;
     email: string;
+    created_at: number;
+    updated_at: number;
+    deleted_at: number;
 };
