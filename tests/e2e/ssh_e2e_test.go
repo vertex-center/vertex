@@ -26,7 +26,7 @@ func (suite *SshE2ETestSuite) SetupSuite() {
 }
 
 func (suite *SshE2ETestSuite) TestSsh() {
-	sshClient := api.NewClient()
+	sshClient := api.NewAdminClient()
 
 	ctx := context.Background()
 
