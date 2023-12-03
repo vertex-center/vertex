@@ -3,14 +3,15 @@ import {
     UseMutationOptions,
     useQueryClient,
 } from "@tanstack/react-query";
-import { api, setAuthToken } from "../../../backend/api/backend";
+import { setAuthToken } from "../../../backend/api/backend";
+import { API } from "../backend/api";
 
 export const useLogout = (options: UseMutationOptions) => {
     const { onSuccess, ...others } = options;
     const queryClient = useQueryClient();
     const mutation = useMutation({
         mutationKey: ["auth_logout"],
-        mutationFn: api.auth.logout,
+        mutationFn: API.logout,
         onSuccess: (...args) => {
             setAuthToken(undefined);
             queryClient.invalidateQueries(["user"]);

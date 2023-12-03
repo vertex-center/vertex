@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../../../backend/api/backend";
+import { API } from "../backend/api";
 
 export default function useUser(username?: string) {
     const query = useQuery({
         queryKey: ["user", username],
-        queryFn: api.auth.user().get,
+        queryFn: API.getCurrentUser,
         retry: (failureCount, error) => {
             // Don't retry too much if the error was caused by an authentication issue
             // @ts-ignore

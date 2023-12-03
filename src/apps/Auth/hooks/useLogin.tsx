@@ -3,8 +3,9 @@ import {
     UseMutationOptions,
     useQueryClient,
 } from "@tanstack/react-query";
-import { api, setAuthToken } from "../../../backend/api/backend";
-import { AuthCredentials } from "../../../models/auth";
+import { setAuthToken } from "../../../backend/api/backend";
+import { AuthCredentials } from "../backend/models";
+import { API } from "../backend/api";
 
 export const useLogin = (
     options: UseMutationOptions<unknown, unknown, AuthCredentials>
@@ -13,7 +14,7 @@ export const useLogin = (
     const queryClient = useQueryClient();
     const mutation = useMutation({
         mutationKey: ["auth_login"],
-        mutationFn: api.auth.login,
+        mutationFn: API.login,
         onSuccess: (...args) => {
             const data: any = args[0];
             setAuthToken(data?.token);

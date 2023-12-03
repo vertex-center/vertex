@@ -1,12 +1,13 @@
-import { api } from "../../../backend/api/backend";
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
+import { API } from "../backend/api";
+import { User } from "../backend/models";
 
 export const usePatchUser = (
     options: UseMutationOptions<unknown, unknown, Partial<User>>
 ) => {
     const mutation = useMutation({
         mutationKey: ["user"],
-        mutationFn: api.auth.user().patch,
+        mutationFn: API.patchCurrentUser,
         ...options,
     });
     const {

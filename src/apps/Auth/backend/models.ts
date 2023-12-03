@@ -7,3 +7,7 @@ export type Credentials = {
     name: string;
     description: string;
 };
+
+export type User = {
+    username: string;
+};

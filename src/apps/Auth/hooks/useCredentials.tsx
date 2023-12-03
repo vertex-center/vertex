@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../../../backend/api/backend";
+import { API } from "../backend/api";
 
 export const useCredentials = () => {
     const query = useQuery({
         queryKey: ["credentials"],
-        queryFn: api.auth.user().credentials.get,
+        queryFn: API.getCredentialsCurrentUser,
     });
     const {
         data: credentials,
