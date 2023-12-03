@@ -42,6 +42,8 @@ func (s *AppsService) GetUUID() uuid.UUID {
 
 func (s *AppsService) OnEvent(e event.Event) error {
 	switch e.(type) {
+	case types.EventServerLoad:
+		s.LoadApps()
 	case types.EventServerStart:
 		s.StartApps()
 	case types.EventServerStop:
@@ -50,14 +52,20 @@ func (s *AppsService) OnEvent(e event.Event) error {
 	return nil
 }
 
-func (s *AppsService) StartApps() {
-	log.Info("initializing apps")
+func (s *AppsService) LoadApps() {
+	log.Info("loading apps")
 
 	for i := range s.apps {
 		ctx := app.NewContext(s.ctx)
 		s.apps[i].Load(ctx)
 		s.registry.RegisterApp(s.apps[i])
 	}
+
+	log.Info("apps loaded")
+}
+
+func (s *AppsService) StartApps() {
+	log.Info("initializing apps")
 
 	for _, a := range s.registry.Apps() {
 		id := a.Meta().ID

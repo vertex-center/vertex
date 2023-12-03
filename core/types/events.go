@@ -1,8 +1,8 @@
 package types
 
 type (
-	// EventServerDownloadDependencies is dispatched before the server starts.
-	EventServerDownloadDependencies struct{}
+	// EventServerLoad is dispatched before the server starts.
+	EventServerLoad struct{}
 
 	// EventServerStart is dispatched when the server is started. This event is
 	// dispatched before the setup.

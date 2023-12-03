@@ -4,6 +4,7 @@ import (
 	"path"
 
 	"github.com/vertex-center/vertex/apps/admin/adapter"
+	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/service"
 	types2 "github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/apps/admin/handler"
@@ -13,6 +14,8 @@ import (
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/updates"
 )
+
+var updateService port.UpdateService
 
 type App struct {
 	ctx *apptypes.Context
@@ -24,6 +27,13 @@ func NewApp() *App {
 
 func (a *App) Load(ctx *apptypes.Context) {
 	a.ctx = ctx
+
+	baselinesApiAdapter := adapter.NewBaselinesApiAdapter()
+	updateService = service.NewUpdateService(a.ctx, baselinesApiAdapter, []types2.Updater{
+		updates.NewVertexUpdater(a.ctx.About()),
+		updates.NewVertexClientUpdater(path.Join(storage.Path, "client")),
+		updates.NewRepositoryUpdater("vertex_services", path.Join(storage.Path, "services"), "vertex-center", "services"),
+	})
 }
 
 func (a *App) Meta() apptypes.Meta {
@@ -39,7 +49,6 @@ func (a *App) Initialize(r *router.Group) error {
 	dbAdapter := adapter.NewDbAdapter(nil)
 	a.ctx.SetDb(dbAdapter.Get())
 
-	baselinesApiAdapter := adapter.NewBaselinesApiAdapter()
 	settingsAdapter := adapter.NewAdminSettingsDbAdapter(dbAdapter)
 	hardwareAdapter := adapter.NewHardwareApiAdapter()
 	sshAdapter := adapter.NewSshKernelApiAdapter()
@@ -48,11 +57,6 @@ func (a *App) Initialize(r *router.Group) error {
 	dbService := service.NewDbService(a.ctx, dbAdapter)
 	hardwareService := service.NewHardwareService(hardwareAdapter)
 	sshService := service.NewSshService(sshAdapter)
-	updateService := service.NewUpdateService(a.ctx, baselinesApiAdapter, []types2.Updater{
-		updates.NewVertexUpdater(a.ctx.About()),
-		updates.NewVertexClientUpdater(path.Join(storage.Path, "client")),
-		updates.NewRepositoryUpdater("vertex_services", path.Join(storage.Path, "services"), "vertex-center", "services"),
-	})
 
 	service.NewNotificationsService(a.ctx, settingsAdapter)
 

@@ -142,7 +142,7 @@ func (s *UpdateService) firstSetup() error {
 
 func (s *UpdateService) OnEvent(e event.Event) error {
 	switch e.(type) {
-	case coretypes.EventServerDownloadDependencies:
+	case coretypes.EventServerLoad:
 		err := s.firstSetup()
 		if err != nil {
 			log.Error(err)

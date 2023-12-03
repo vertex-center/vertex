@@ -51,6 +51,10 @@ type KernelUninitializable interface {
 	UninitializeKernel() error
 }
 
+type DependenciesProvider interface {
+	DownloadDependencies() error
+}
+
 type HttpHandler func(r *router.Group)
 
 type Service interface {

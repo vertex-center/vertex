@@ -249,6 +249,7 @@ func startRouter() {
 	}
 	cancelTimeout()
 
+	ctx.DispatchEvent(types.EventServerLoad{})
 	ctx.DispatchEvent(types.EventServerStart{})
 
 	<-stopChan
