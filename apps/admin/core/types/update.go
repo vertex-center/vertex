@@ -1,6 +1,8 @@
 package types
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
 	ErrAlreadyUpdating = errors.New("an update is already in progress, cannot start another")

@@ -5,8 +5,10 @@ import (
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/apps/admin/core/port"
+	"github.com/vertex-center/vertex/apps/admin/core/types"
+	coretypes "github.com/vertex-center/vertex/core/types"
+	apptypes "github.com/vertex-center/vertex/core/types/app"
 )
 
 type UpdateServiceTestSuite struct {
@@ -49,10 +51,12 @@ func (suite *UpdateServiceTestSuite) SetupTest() {
 		suite.updaterB,
 	}
 
+	ctx := coretypes.NewVertexContext(coretypes.About{})
+
 	suite.adapter = &port.MockBaselinesAdapter{}
 	suite.adapter.On("GetLatest", mock.Anything, types.UpdatesChannelStable).Return(suite.latestBaseline, nil)
 	suite.adapter.On("GetLatest", mock.Anything, types.UpdatesChannelBeta).Return(suite.betaBaseline, nil)
-	suite.service = NewUpdateService(types.NewVertexContext(&types.DB{}), suite.adapter, updaters).(*UpdateService)
+	suite.service = NewUpdateService(apptypes.NewContext(ctx), suite.adapter, updaters).(*UpdateService)
 }
 
 func (suite *UpdateServiceTestSuite) TestGetUpdate() {

@@ -9,8 +9,9 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/apps/admin/core/port"
+	"github.com/vertex-center/vertex/apps/admin/core/types"
+	coretypes "github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"
@@ -28,7 +29,7 @@ var (
 type DbAdapter struct {
 	configDir string
 	config    types.DbConfig
-	db        *types.DB
+	db        *coretypes.DB
 }
 
 type DbAdapterParams struct {
@@ -57,7 +58,7 @@ func NewDbAdapter(params *DbAdapterParams) port.DbAdapter {
 		config: types.DbConfig{
 			DbmsName: types.DbmsNameSqlite,
 		},
-		db: &types.DB{},
+		db: &coretypes.DB{},
 	}
 
 	err = adapter.read()
@@ -68,7 +69,7 @@ func NewDbAdapter(params *DbAdapterParams) port.DbAdapter {
 	return adapter
 }
 
-func (a *DbAdapter) Get() *types.DB {
+func (a *DbAdapter) Get() *coretypes.DB {
 	return a.db
 }
 

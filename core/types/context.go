@@ -10,14 +10,15 @@ import (
 )
 
 type VertexContext struct {
-	bus event.Bus
-	db  *DB
+	about About
+	bus   event.Bus
+	db    *DB
 }
 
-func NewVertexContext(db *DB) *VertexContext {
+func NewVertexContext(about About) *VertexContext {
 	return &VertexContext{
-		bus: event.NewMemoryBus(),
-		db:  db,
+		about: about,
+		bus:   event.NewMemoryBus(),
 	}
 }
 
@@ -50,6 +51,14 @@ func (c *VertexContext) RemoveListener(l event.Listener) {
 	c.bus.RemoveListener(l)
 }
 
+func (c *VertexContext) SetDb(db *DB) {
+	c.db = db
+}
+
 func (c *VertexContext) Db() *DB {
 	return c.db
+}
+
+func (c *VertexContext) About() About {
+	return c.about
 }

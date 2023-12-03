@@ -15,7 +15,6 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/adapter"
 	"github.com/vertex-center/vertex/apps/admin"
 	"github.com/vertex-center/vertex/apps/auth"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
@@ -35,7 +34,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/pkg/storage"
-	"github.com/vertex-center/vertex/updates"
 	"github.com/vertex-center/vlog"
 )
 
@@ -50,17 +48,12 @@ var (
 	r   *router.Router
 	ctx *types.VertexContext
 
-	dbAdapter              port.DbAdapter
-	adminSettingsDbAdapter port.AdminSettingsAdapter
-	baselinesApiAdapter    port.BaselinesAdapter
-
-	appsService          port.AppsService
-	debugService         port.DebugService
-	dbService            port.DbService
-	adminSettingsService port.AdminSettingsService
-	checksService        port.ChecksService
-	updateService        port.UpdateService
+	appsService   port.AppsService
+	debugService  port.DebugService
+	checksService port.ChecksService
 )
+
+var About types.About
 
 func main() {
 	defer log.Default.Close()
@@ -81,8 +74,8 @@ func main() {
 	}
 
 	initRouter()
-	initAdapters()
-	initServices(about)
+	initAdapters(about)
+	initServices()
 	initRoutes(about)
 	handleSignals()
 
@@ -156,21 +149,13 @@ func initRouter() {
 	r.Use(gin.Recovery())
 }
 
-func initAdapters() {
-	dbAdapter = adapter.NewDbAdapter(nil)
-	ctx = types.NewVertexContext(dbAdapter.Get())
-	adminSettingsDbAdapter = adapter.NewAdminSettingsDbAdapter(dbAdapter)
-	baselinesApiAdapter = adapter.NewBaselinesApiAdapter()
+func initAdapters(about types.About) {
+	ctx = types.NewVertexContext(about)
 }
 
-func initServices(about types.About) {
+func initServices() {
 	// Update service must be initialized before all other services, because it
 	// is responsible for downloading dependencies for other services.
-	updateService = service.NewUpdateService(ctx, baselinesApiAdapter, []types.Updater{
-		updates.NewVertexUpdater(about),
-		updates.NewVertexClientUpdater(path.Join(storage.Path, "client")),
-		updates.NewRepositoryUpdater("vertex_services", path.Join(storage.Path, "services"), "vertex-center", "services"),
-	})
 	appsService = service.NewAppsService(ctx, false, r, []app.Interface{
 		admin.NewApp(),
 		auth.NewApp(),
@@ -182,9 +167,6 @@ func initServices(about types.About) {
 		serviceeditor.NewApp(),
 	})
 	debugService = service.NewDebugService(ctx)
-	service.NewNotificationsService(ctx, adminSettingsDbAdapter)
-	adminSettingsService = service.NewAdminSettingsService(adminSettingsDbAdapter)
-	dbService = service.NewDbService(ctx, dbAdapter)
 	checksService = service.NewChecksService()
 }
 
@@ -237,27 +219,6 @@ func initRoutes(about types.About) {
 	checks := a.Group("/admin/checks", middleware.Authenticated)
 	// docapi:v route /admin/checks admin_checks
 	checks.GET("", app.HeadersSSE, checksHandler.Check)
-
-	updateHandler := handler.NewUpdateHandler(updateService, adminSettingsService)
-	update := a.Group("/admin/update", middleware.Authenticated)
-	// docapi:v route /admin/update get_updates
-	update.GET("", updateHandler.Get)
-	// docapi:v route /admin/update install_update
-	update.POST("", updateHandler.Install)
-
-	settingsHandler := handler.NewSettingsHandler(adminSettingsService)
-	settings := a.Group("/admin/settings", middleware.Authenticated)
-	// docapi:v route /admin/settings get_settings
-	settings.GET("", settingsHandler.Get)
-	// docapi:v route /admin/settings patch_settings
-	settings.PATCH("", settingsHandler.Patch)
-
-	dbHandler := handler.NewDatabaseHandler(dbService)
-	db := a.Group("/admin/db", middleware.Authenticated)
-	// docapi:v route /admin/db/dbms get_current_dbms
-	db.GET("/dbms", dbHandler.GetCurrentDbms)
-	// docapi:v route /admin/db/dbms migrate_to_dbms
-	db.POST("/dbms", dbHandler.MigrateTo)
 }
 
 func startRouter() {

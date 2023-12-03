@@ -22,30 +22,8 @@ type (
 		Check(c *router.Context)
 	}
 
-	DatabaseHandler interface {
-		// GetCurrentDbms handles the retrieval of the current database management system
-		// that Vertex is using.
-		GetCurrentDbms(c *router.Context)
-		// MigrateTo handles the migration to the given database management system.
-		MigrateTo(c *router.Context)
-	}
-
 	DebugHandler interface {
 		// HardReset do a hard reset of Vertex.
 		HardReset(c *router.Context)
-	}
-
-	UpdateHandler interface {
-		// Get handles the retrieval of an update, if any.
-		Get(c *router.Context)
-		// Install handles the installation of the update.
-		Install(c *router.Context)
-	}
-
-	SettingsHandler interface {
-		// Get handles the retrieval of all settings.
-		Get(c *router.Context)
-		// Patch handles the update of all settings.
-		Patch(c *router.Context)
 	}
 )

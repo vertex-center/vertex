@@ -4,9 +4,10 @@ import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/webhook"
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/apps/admin/core/port"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
+	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/event"
 )
 
@@ -14,12 +15,12 @@ import (
 
 type NotificationsService struct {
 	uuid            uuid.UUID
-	ctx             *types.VertexContext
+	ctx             *apptypes.Context
 	settingsAdapter port.AdminSettingsAdapter
 	client          webhook.Client
 }
 
-func NewNotificationsService(ctx *types.VertexContext, settingsAdapter port.AdminSettingsAdapter) NotificationsService {
+func NewNotificationsService(ctx *apptypes.Context, settingsAdapter port.AdminSettingsAdapter) NotificationsService {
 	return NotificationsService{
 		uuid:            uuid.New(),
 		ctx:             ctx,

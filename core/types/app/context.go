@@ -31,6 +31,14 @@ func (ctx *Context) DispatchEventWithErr(event event.Event) error {
 	return ctx.vertexCtx.DispatchEventWithErr(event)
 }
 
+func (ctx *Context) SetDb(db *types.DB) {
+	ctx.vertexCtx.SetDb(db)
+}
+
 func (ctx *Context) Db() *types.DB {
 	return ctx.vertexCtx.Db()
+}
+
+func (ctx *Context) About() types.About {
+	return ctx.vertexCtx.About()
 }

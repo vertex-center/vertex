@@ -8,9 +8,11 @@ import (
 	"sync/atomic"
 
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/apps/admin/core/port"
+	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/core/types"
+	coretypes "github.com/vertex-center/vertex/core/types"
+	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
@@ -18,13 +20,13 @@ import (
 
 type UpdateService struct {
 	uuid     uuid.UUID
-	ctx      *types.VertexContext
+	ctx      *apptypes.Context
 	adapter  port.BaselinesAdapter
 	updaters []types.Updater // updaters containers update logic for each dependency.
 	updating atomic.Bool     // updating is true if an update is currently in progress.
 }
 
-func NewUpdateService(ctx *types.VertexContext, adapter port.BaselinesAdapter, updaters []types.Updater) port.UpdateService {
+func NewUpdateService(ctx *apptypes.Context, adapter port.BaselinesAdapter, updaters []types.Updater) port.UpdateService {
 	s := &UpdateService{
 		uuid:     uuid.New(),
 		ctx:      ctx,
@@ -99,7 +101,7 @@ func (s *UpdateService) InstallLatest(channel types.UpdatesChannel) error {
 		}
 	}
 
-	s.ctx.DispatchEvent(types.EventVertexUpdated{})
+	s.ctx.DispatchEvent(coretypes.EventVertexUpdated{})
 	return nil
 }
 
@@ -140,7 +142,7 @@ func (s *UpdateService) firstSetup() error {
 
 func (s *UpdateService) OnEvent(e event.Event) error {
 	switch e.(type) {
-	case types.EventServerStart:
+	case coretypes.EventServerDownloadDependencies:
 		err := s.firstSetup()
 		if err != nil {
 			log.Error(err)

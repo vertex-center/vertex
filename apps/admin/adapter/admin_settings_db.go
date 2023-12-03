@@ -4,8 +4,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/apps/admin/core/port"
+	"github.com/vertex-center/vertex/apps/admin/core/types"
 )
 
 type AdminSettingsDbAdapter struct {

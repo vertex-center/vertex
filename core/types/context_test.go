@@ -19,7 +19,7 @@ func TestVertexContextTestSuite(t *testing.T) {
 }
 
 func (suite *VertexContextTestSuite) SetupSuite() {
-	suite.context = NewVertexContext(&DB{})
+	suite.context = NewVertexContext(About{})
 	suite.NotNil(suite.context.bus)
 }
 

@@ -179,7 +179,7 @@ func buildVertex() {
 
 func initRouter() {
 	gin.SetMode(gin.ReleaseMode)
-	ctx = types.NewVertexContext(&types.DB{})
+	ctx = types.NewVertexContext(types.About{})
 	r = router.New()
 	r.Use(ginutils.ErrorHandler())
 	r.Use(ginutils.Logger("KERNEL"))

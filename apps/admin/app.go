@@ -1,12 +1,17 @@
 package admin
 
 import (
+	"path"
+
 	"github.com/vertex-center/vertex/apps/admin/adapter"
 	"github.com/vertex-center/vertex/apps/admin/core/service"
+	types2 "github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/apps/admin/handler"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/storage"
+	"github.com/vertex-center/vertex/updates"
 )
 
 type App struct {
@@ -31,11 +36,25 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
+	dbAdapter := adapter.NewDbAdapter(nil)
+	a.ctx.SetDb(dbAdapter.Get())
+
+	baselinesApiAdapter := adapter.NewBaselinesApiAdapter()
+	settingsAdapter := adapter.NewAdminSettingsDbAdapter(dbAdapter)
 	hardwareAdapter := adapter.NewHardwareApiAdapter()
 	sshAdapter := adapter.NewSshKernelApiAdapter()
 
+	settingsService := service.NewAdminSettingsService(settingsAdapter)
+	dbService := service.NewDbService(a.ctx, dbAdapter)
 	hardwareService := service.NewHardwareService(hardwareAdapter)
 	sshService := service.NewSshService(sshAdapter)
+	updateService := service.NewUpdateService(a.ctx, baselinesApiAdapter, []types2.Updater{
+		updates.NewVertexUpdater(a.ctx.About()),
+		updates.NewVertexClientUpdater(path.Join(storage.Path, "client")),
+		updates.NewRepositoryUpdater("vertex_services", path.Join(storage.Path, "services"), "vertex-center", "services"),
+	})
+
+	service.NewNotificationsService(a.ctx, settingsAdapter)
 
 	hardwareHandler := handler.NewHardwareHandler(hardwareService)
 	hardware := r.Group("/hardware", middleware.Authenticated)
@@ -56,6 +75,27 @@ func (a *App) Initialize(r *router.Group) error {
 	ssh.DELETE("", sshHandler.Delete)
 	// docapi:v route /app/admin/ssh/users get_ssh_users
 	ssh.GET("/users", sshHandler.GetUsers)
+
+	dbHandler := handler.NewDatabaseHandler(dbService)
+	db := r.Group("/db", middleware.Authenticated)
+	// docapi:v route /app/admin/db/dbms get_current_dbms
+	db.GET("/dbms", dbHandler.GetCurrentDbms)
+	// docapi:v route /app/admin/db/dbms migrate_to_dbms
+	db.POST("/dbms", dbHandler.MigrateTo)
+
+	settingsHandler := handler.NewSettingsHandler(settingsService)
+	settings := r.Group("/settings", middleware.Authenticated)
+	// docapi:v route /app/admin/settings get_settings
+	settings.GET("", settingsHandler.Get)
+	// docapi:v route /app/admin/settings patch_settings
+	settings.PATCH("", settingsHandler.Patch)
+
+	updateHandler := handler.NewUpdateHandler(updateService, settingsService)
+	update := r.Group("/update", middleware.Authenticated)
+	// docapi:v route /app/admin/update get_updates
+	update.GET("", updateHandler.Get)
+	// docapi:v route /app/admin/update install_update
+	update.POST("", updateHandler.Install)
 
 	return nil
 }

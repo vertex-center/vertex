@@ -21,7 +21,7 @@ func TestAppsServiceTestSuite(t *testing.T) {
 }
 
 func (suite *AppsServiceTestSuite) SetupTest() {
-	ctx := types.NewVertexContext(&types.DB{})
+	ctx := types.NewVertexContext(types.About{})
 	suite.app = &MockApp{}
 	suite.service = NewAppsService(ctx, false, router.New(), []app.Interface{
 		suite.app,

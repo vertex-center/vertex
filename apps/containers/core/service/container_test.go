@@ -24,7 +24,7 @@ func TestContainerServiceTestSuite(t *testing.T) {
 
 func (suite *ContainerServiceTestSuite) SetupTest() {
 	suite.service = NewContainerService(ContainerServiceParams{
-		Ctx: app.NewContext(vtypes.NewVertexContext(&vtypes.DB{})),
+		Ctx: app.NewContext(vtypes.NewVertexContext(vtypes.About{})),
 	}).(*ContainerService)
 
 	suite.containerA = types.Container{

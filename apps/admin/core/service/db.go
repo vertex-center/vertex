@@ -6,8 +6,10 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
-	"github.com/vertex-center/vertex/core/port"
+	"github.com/vertex-center/vertex/apps/admin/core/port"
+	"github.com/vertex-center/vertex/apps/admin/core/types"
 	vtypes "github.com/vertex-center/vertex/core/types"
+	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/database"
 	"github.com/vertex-center/vertex/database/migration"
 	"github.com/vertex-center/vertex/pkg/event"
@@ -23,11 +25,11 @@ var (
 
 type DbService struct {
 	uuid              uuid.UUID
-	ctx               *vtypes.VertexContext
+	ctx               *apptypes.Context
 	dataConfigAdapter port.DbAdapter
 }
 
-func NewDbService(ctx *vtypes.VertexContext, dataConfigAdapter port.DbAdapter) port.DbService {
+func NewDbService(ctx *apptypes.Context, dataConfigAdapter port.DbAdapter) port.DbService {
 	s := &DbService{
 		uuid:              uuid.New(),
 		ctx:               ctx,
@@ -37,11 +39,11 @@ func NewDbService(ctx *vtypes.VertexContext, dataConfigAdapter port.DbAdapter) p
 	return s
 }
 
-func (s *DbService) GetCurrentDbms() vtypes.DbmsName {
+func (s *DbService) GetCurrentDbms() types.DbmsName {
 	return s.dataConfigAdapter.GetDBMSName()
 }
 
-func (s *DbService) MigrateTo(dbms vtypes.DbmsName) error {
+func (s *DbService) MigrateTo(dbms types.DbmsName) error {
 	log.Info("migrating database", vlog.String("name", string(dbms)))
 
 	currentDbms := s.dataConfigAdapter.GetDBMSName()
@@ -53,9 +55,9 @@ func (s *DbService) MigrateTo(dbms vtypes.DbmsName) error {
 
 	var err error
 	switch dbms {
-	case vtypes.DbmsNameSqlite:
+	case types.DbmsNameSqlite:
 		//err = errors.New("sqlite migration not implemented yet")
-	case vtypes.DbmsNamePostgres:
+	case types.DbmsNamePostgres:
 		err = s.setupPostgres()
 	default:
 		err = errors.New("unknown dbms: " + string(dbms))
@@ -94,9 +96,9 @@ func (s *DbService) MigrateTo(dbms vtypes.DbmsName) error {
 	log.Info("deleting previous database", vlog.String("name", string(currentDbms)))
 
 	switch currentDbms {
-	case vtypes.DbmsNameSqlite:
+	case types.DbmsNameSqlite:
 		err = s.deleteSqliteDB()
-	case vtypes.DbmsNamePostgres:
+	case types.DbmsNamePostgres:
 		err = s.deletePostgresDB()
 	default:
 		err = errors.New("unknown dbms: " + string(currentDbms))
@@ -130,9 +132,9 @@ func (s *DbService) setup() {
 
 	var err error
 	switch dbms {
-	case vtypes.DbmsNameSqlite:
+	case types.DbmsNameSqlite:
 		// Nothing to do yet
-	case vtypes.DbmsNamePostgres:
+	case types.DbmsNamePostgres:
 		err = s.setupPostgres()
 	default:
 		log.Error(errors.New("unknown dbms"), vlog.String("dbms", string(dbms)))
