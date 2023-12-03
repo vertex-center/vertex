@@ -57,6 +57,7 @@ func main() {
 	initServices()
 	initRoutes()
 
+	ctx.DispatchEvent(types.EventServerLoad{})
 	ctx.DispatchEvent(types.EventServerStart{})
 
 	shutdownChan := make(chan os.Signal, 1)
@@ -179,7 +180,7 @@ func buildVertex() {
 
 func initRouter() {
 	gin.SetMode(gin.ReleaseMode)
-	ctx = types.NewVertexContext(types.About{})
+	ctx = types.NewVertexContext(types.About{}, true)
 	r = router.New()
 	r.Use(ginutils.ErrorHandler())
 	r.Use(ginutils.Logger("KERNEL"))

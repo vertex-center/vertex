@@ -31,6 +31,10 @@ type Interface interface {
 	Meta() Meta
 }
 
+type InterfaceKernel interface {
+	LoadKernel(ctx *Context)
+}
+
 type Initializable interface {
 	Interface
 	Initialize(r *router.Group) error

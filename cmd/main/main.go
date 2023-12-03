@@ -150,7 +150,7 @@ func initRouter() {
 }
 
 func initAdapters(about types.About) {
-	ctx = types.NewVertexContext(about)
+	ctx = types.NewVertexContext(about, false)
 }
 
 func initServices() {

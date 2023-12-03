@@ -28,12 +28,14 @@ func NewApp() *App {
 func (a *App) Load(ctx *apptypes.Context) {
 	a.ctx = ctx
 
-	baselinesApiAdapter := adapter.NewBaselinesApiAdapter()
-	updateService = service.NewUpdateService(a.ctx, baselinesApiAdapter, []types2.Updater{
-		updates.NewVertexUpdater(a.ctx.About()),
-		updates.NewVertexClientUpdater(path.Join(storage.Path, "client")),
-		updates.NewRepositoryUpdater("vertex_services", path.Join(storage.Path, "services"), "vertex-center", "services"),
-	})
+	if !ctx.Kernel() {
+		baselinesApiAdapter := adapter.NewBaselinesApiAdapter()
+		updateService = service.NewUpdateService(a.ctx, baselinesApiAdapter, []types2.Updater{
+			updates.NewVertexUpdater(a.ctx.About()),
+			updates.NewVertexClientUpdater(path.Join(storage.Path, "client")),
+			updates.NewRepositoryUpdater("vertex_services", path.Join(storage.Path, "services"), "vertex-center", "services"),
+		})
+	}
 }
 
 func (a *App) Meta() apptypes.Meta {

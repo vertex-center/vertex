@@ -65,7 +65,7 @@ func (s *AppsService) LoadApps() {
 }
 
 func (s *AppsService) StartApps() {
-	log.Info("initializing apps")
+	log.Info("initializing apps", vlog.Int("count", len(s.registry.Apps())))
 
 	for _, a := range s.registry.Apps() {
 		id := a.Meta().ID

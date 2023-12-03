@@ -10,15 +10,17 @@ import (
 )
 
 type VertexContext struct {
-	about About
-	bus   event.Bus
-	db    *DB
+	about  About
+	bus    event.Bus
+	db     *DB
+	kernel bool
 }
 
-func NewVertexContext(about About) *VertexContext {
+func NewVertexContext(about About, kernel bool) *VertexContext {
 	return &VertexContext{
-		about: about,
-		bus:   event.NewMemoryBus(),
+		about:  about,
+		bus:    event.NewMemoryBus(),
+		kernel: kernel,
 	}
 }
 
@@ -61,4 +63,8 @@ func (c *VertexContext) Db() *DB {
 
 func (c *VertexContext) About() About {
 	return c.about
+}
+
+func (c *VertexContext) Kernel() bool {
+	return c.kernel
 }

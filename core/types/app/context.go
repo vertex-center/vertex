@@ -42,3 +42,7 @@ func (ctx *Context) Db() *types.DB {
 func (ctx *Context) About() types.About {
 	return ctx.vertexCtx.About()
 }
+
+func (ctx *Context) Kernel() bool {
+	return ctx.vertexCtx.Kernel()
+}

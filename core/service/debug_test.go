@@ -14,7 +14,7 @@ type DebugServiceTestSuite struct {
 }
 
 func (suite *DebugServiceTestSuite) SetupSuite() {
-	ctx := types.NewVertexContext(types.About{})
+	ctx := types.NewVertexContext(types.About{}, false)
 	suite.service = NewDebugService(ctx).(*DebugService)
 }
 

@@ -51,7 +51,7 @@ func (suite *UpdateServiceTestSuite) SetupTest() {
 		suite.updaterB,
 	}
 
-	ctx := coretypes.NewVertexContext(coretypes.About{})
+	ctx := coretypes.NewVertexContext(coretypes.About{}, false)
 
 	suite.adapter = &port.MockBaselinesAdapter{}
 	suite.adapter.On("GetLatest", mock.Anything, types.UpdatesChannelStable).Return(suite.latestBaseline, nil)

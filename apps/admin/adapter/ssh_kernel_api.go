@@ -3,86 +3,34 @@ package adapter
 import (
 	"context"
 
-	"github.com/carlmjohnson/requests"
+	"github.com/vertex-center/vertex/apps/admin/api"
 	"github.com/vertex-center/vertex/apps/admin/core/port"
-	"github.com/vertex-center/vertex/apps/admin/core/service"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
-	"github.com/vertex-center/vertex/apps/admin/handler"
-	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/user"
 )
 
 type SshKernelApiAdapter struct {
-	config requests.Config
+	client *api.KernelClient
 }
 
 func NewSshKernelApiAdapter() port.SshAdapter {
 	return &SshKernelApiAdapter{
-		config: func(rb *requests.Builder) {
-			rb.BaseURL(config.Current.KernelURL())
-		},
+		client: api.NewAdminKernelClient(),
 	}
 }
 
 func (a *SshKernelApiAdapter) GetAll() ([]types.PublicKey, error) {
-	var keys []types.PublicKey
-	var apiError api.Error
-
-	err := requests.New(a.config).
-		Path("/api/app/admin/ssh").
-		ToJSON(&keys).
-		ErrorJSON(&apiError).
-		Fetch(context.Background())
-	return keys, err
+	return a.client.GetSSHKeys(context.Background())
 }
 
 func (a *SshKernelApiAdapter) Add(key string, username string) error {
-	var apiError api.Error
-
-	err := requests.New(a.config).
-		Path("/api/app/admin/ssh").
-		BodyJSON(&handler.AddSSHKeyBody{
-			AuthorizedKey: key,
-			Username:      username,
-		}).
-		Post().
-		ErrorJSON(&apiError).
-		Fetch(context.Background())
-
-	if apiError.Code == api.ErrUserNotFound {
-		return service.ErrUserNotFound
-	}
-	return err
+	return a.client.AddSSHKey(context.Background(), key, username)
 }
 
 func (a *SshKernelApiAdapter) Remove(fingerprint string, username string) error {
-	var apiError api.Error
-
-	err := requests.New(a.config).
-		Pathf("/api/app/admin/ssh").
-		BodyJSON(&handler.DeleteSSHKeyBody{
-			Fingerprint: fingerprint,
-			Username:    username,
-		}).
-		Delete().
-		ErrorJSON(&apiError).
-		Fetch(context.Background())
-
-	if apiError.Code == api.ErrUserNotFound {
-		return service.ErrUserNotFound
-	}
-	return err
+	return a.client.DeleteSSHKey(context.Background(), fingerprint, username)
 }
 
 func (a *SshKernelApiAdapter) GetUsers() ([]user.User, error) {
-	var users []user.User
-	var apiError api.Error
-
-	err := requests.New(a.config).
-		Path("/api/app/admin/ssh/users").
-		ToJSON(&users).
-		ErrorJSON(&apiError).
-		Fetch(context.Background())
-	return users, err
+	return a.client.GetSSHUsers(context.Background())
 }
