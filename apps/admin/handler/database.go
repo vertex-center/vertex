@@ -50,7 +50,7 @@ type MigrateToBody struct {
 
 func (h *DatabaseHandler) MigrateTo(c *router.Context) {
 	var body MigrateToBody
-	err := c.BindJSON(&body)
+	err := c.ParseBody(&body)
 	if err != nil {
 		return
 	}
