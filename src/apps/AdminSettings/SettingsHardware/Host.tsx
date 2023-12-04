@@ -67,14 +67,23 @@ export default function Host(props: Readonly<HostProps>) {
     const onPopupDismiss = () => setShowRebootPopup(false);
 
     const popupActions = (
-        <Button
-            variant="danger"
-            leftIcon={<MaterialIcon icon="restart_alt" />}
-            onClick={() => reboot()}
-            disabled={rebootSent || isRebooting}
-        >
-            Reboot
-        </Button>
+        <Fragment>
+            <Button
+                variant="outlined"
+                onClick={onPopupDismiss}
+                disabled={rebootSent || isRebooting}
+            >
+                Cancel
+            </Button>
+            <Button
+                variant="danger"
+                leftIcon={<MaterialIcon icon="restart_alt" />}
+                onClick={() => reboot()}
+                disabled={rebootSent || isRebooting}
+            >
+                Reboot
+            </Button>
+        </Fragment>
     );
 
     return (
