@@ -36,6 +36,7 @@ func (h *EditorHandler) ToYaml(c *router.Context) {
 			PublicMessage:  "Invalid service.",
 			PrivateMessage: "The service is invalid.",
 		})
+		return
 	}
 
 	yaml, err := h.editorService.ToYaml(serv)
@@ -45,6 +46,7 @@ func (h *EditorHandler) ToYaml(c *router.Context) {
 			PublicMessage:  "Invalid service.",
 			PrivateMessage: "The service is invalid.",
 		})
+		return
 	}
 
 	c.Data(200, "yaml", yaml)
