@@ -1,8 +1,12 @@
 package app
 
 import (
+	"os"
+
 	"github.com/gin-contrib/sse"
+	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/event"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
@@ -33,6 +37,7 @@ type Interface interface {
 
 type InterfaceKernel interface {
 	LoadKernel(ctx *Context)
+	Meta() Meta
 }
 
 type Initializable interface {
@@ -70,4 +75,68 @@ func HeadersSSE(c *router.Context) {
 	c.Writer.Header().Set("Cache-Control", "no-cache")
 	c.Writer.Header().Set("Connection", "keep-alive")
 	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+}
+
+// RunStandalone runs the app as a standalone service.
+// It loads the app, initializes it and starts the HTTP server.
+func RunStandalone(app Interface) {
+	vertexCtx := types.NewVertexContext(types.About{}, false)
+	ctx := NewContext(vertexCtx)
+	app.Load(ctx)
+
+	r := router.New()
+	id := app.Meta().ID
+
+	if a, ok := app.(Initializable); ok {
+		err := a.Initialize(r.Group("/api/app/" + id))
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+	}
+
+	err := r.Run(":6130")
+	if err != nil {
+		log.Error(err)
+	}
+
+	if a, ok := app.(Uninitializable); ok {
+		err := a.Uninitialize()
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+	}
+}
+
+// RunStandaloneKernel runs the app as a standalone service.
+// It loads the app, initializes it and starts the HTTP server.
+func RunStandaloneKernel(app Interface) {
+	vertexCtx := types.NewVertexContext(types.About{}, true)
+	ctx := NewContext(vertexCtx)
+	app.Load(ctx)
+
+	r := router.New()
+	id := app.Meta().ID
+
+	if a, ok := app.(KernelInitializable); ok {
+		err := a.InitializeKernel(r.Group("/api/app/" + id))
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+	}
+
+	err := r.Run(":6131")
+	if err != nil {
+		log.Error(err)
+	}
+
+	if a, ok := app.(KernelUninitializable); ok {
+		err := a.UninitializeKernel()
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+	}
 }

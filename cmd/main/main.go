@@ -53,8 +53,6 @@ var (
 	checksService port.ChecksService
 )
 
-var About types.About
-
 func main() {
 	defer log.Default.Close()
 
