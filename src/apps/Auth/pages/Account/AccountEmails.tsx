@@ -59,6 +59,8 @@ export default function AccountEmails() {
 
     const dismissDeletePopup = () => {
         setShowDeletePopup(false);
+        setEmail("");
+        resetDeleteEmail();
     };
 
     const openDeletePopup = (email: string) => {
