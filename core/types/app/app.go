@@ -88,6 +88,10 @@ func HeadersSSE(c *router.Context) {
 }
 
 func (a Meta) ApiURL() string {
+	if a.DefaultPort == "" {
+		// The app does not support non-kernel extensions.
+		return ""
+	}
 	var (
 		portName = strings.ToUpper(a.ID)
 		port     = config.Current.GetPort(portName, a.DefaultPort)
@@ -97,6 +101,10 @@ func (a Meta) ApiURL() string {
 }
 
 func (a Meta) ApiKernelURL() string {
+	if a.DefaultKernelPort == "" {
+		// The app does not support kernel extensions.
+		return ""
+	}
 	var (
 		portName = strings.ToUpper(a.ID)
 		port     = config.Current.GetPort(portName+"_KERNEL", a.DefaultKernelPort)
