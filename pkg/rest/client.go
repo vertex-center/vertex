@@ -12,11 +12,11 @@ type Client struct {
 	config requests.Config
 }
 
-func NewClient(host, port, token string) *Client {
+func NewClient(url, token string) *Client {
 	return &Client{
 		config: func(rb *requests.Builder) {
 			rb.
-				BaseURL("http://" + host + ":" + port).
+				BaseURL(url).
 				Path("/api/").
 				AddValidator(func(response *http.Response) error {
 					log.Request("request from app", vlog.String("path", response.Request.URL.Path))

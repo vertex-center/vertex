@@ -87,6 +87,24 @@ func HeadersSSE(c *router.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 }
 
+func (a Meta) ApiURL() string {
+	var (
+		portName = strings.ToUpper(a.ID)
+		port     = config.Current.GetPort(portName, a.DefaultPort)
+		host     = config.Current.Host
+	)
+	return fmt.Sprintf("http://%s:%s/api", host, port)
+}
+
+func (a Meta) ApiKernelURL() string {
+	var (
+		portName = strings.ToUpper(a.ID)
+		port     = config.Current.GetPort(portName+"_KERNEL", a.DefaultKernelPort)
+		host     = config.Current.Host
+	)
+	return fmt.Sprintf("http://%s:%s/api", host, port)
+}
+
 // RunStandalone runs the app as a standalone service.
 // It loads the app, initializes it and starts the HTTP server.
 func RunStandalone(app Interface) {

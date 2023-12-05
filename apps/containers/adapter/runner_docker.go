@@ -21,7 +21,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/containers/meta"
-	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/pkg/vdocker"
@@ -34,8 +33,6 @@ func NewContainerRunnerFSAdapter() ContainerRunnerDockerAdapter {
 	return ContainerRunnerDockerAdapter{}
 }
 
-var url = "http://" + config.Current.Host + ":" + config.Current.GetPort(meta.Meta.ID+"_KERNEL", "7505")
-
 func (a ContainerRunnerDockerAdapter) DeleteContainer(inst *types.Container) error {
 	id, err := a.getContainerID(*inst)
 	if err != nil {
@@ -43,7 +40,7 @@ func (a ContainerRunnerDockerAdapter) DeleteContainer(inst *types.Container) err
 	}
 
 	apiError := router.Error{}
-	err = requests.URL(url).
+	err = requests.URL(meta.Meta.ApiKernelURL()).
 		Pathf("/api/docker/container/%s", id).
 		Delete().
 		ErrorJSON(&apiError).
@@ -62,7 +59,7 @@ func (a ContainerRunnerDockerAdapter) DeleteMounts(inst *types.Container) error 
 	}
 
 	apiError := router.Error{}
-	err = requests.URL(url).
+	err = requests.URL(meta.Meta.ApiKernelURL()).
 		Pathf("/api/docker/container/%s/mounts", id).
 		Delete().
 		ErrorJSON(&apiError).
@@ -264,7 +261,7 @@ func (a ContainerRunnerDockerAdapter) Start(inst *types.Container, setStatus fun
 		}
 
 		// Start
-		err = requests.URL(url).
+		err = requests.URL(meta.Meta.ApiKernelURL()).
 			Pathf("/api/docker/container/%s/start", id).
 			Post().
 			Fetch(context.Background())
@@ -319,7 +316,7 @@ func (a ContainerRunnerDockerAdapter) Stop(inst *types.Container) error {
 		return err
 	}
 
-	return requests.URL(url).
+	return requests.URL(meta.Meta.ApiKernelURL()).
 		Pathf("/api/docker/container/%s/stop", id).
 		Post().
 		Fetch(context.Background())
@@ -332,7 +329,7 @@ func (a ContainerRunnerDockerAdapter) Info(inst types.Container) (map[string]any
 	}
 
 	var info types.InfoContainerResponse
-	err = requests.URL(url).
+	err = requests.URL(meta.Meta.ApiKernelURL()).
 		Pathf("/api/docker/container/%s/info", id).
 		ToJSON(&info).
 		Fetch(context.Background())
@@ -341,7 +338,7 @@ func (a ContainerRunnerDockerAdapter) Info(inst types.Container) (map[string]any
 	}
 
 	var imageInfo types.InfoImageResponse
-	err = requests.URL(url).
+	err = requests.URL(meta.Meta.ApiKernelURL()).
 		Pathf("/api/docker/image/%s/info", info.Image).
 		ToJSON(&imageInfo).
 		Fetch(context.Background())
@@ -372,7 +369,7 @@ func (a ContainerRunnerDockerAdapter) CheckForUpdates(inst *types.Container) err
 	defer res.Close()
 
 	var imageInfo types.InfoImageResponse
-	err = requests.URL(url).
+	err = requests.URL(meta.Meta.ApiKernelURL()).
 		Pathf("/api/docker/%s/info", imageName).
 		ToJSON(&imageInfo).
 		Fetch(context.Background())
@@ -427,14 +424,14 @@ func (a ContainerRunnerDockerAdapter) WaitCondition(inst *types.Container, cond 
 		return err
 	}
 
-	return requests.URL(url).
+	return requests.URL(meta.Meta.ApiKernelURL()).
 		Pathf("/api/docker/container/%s/wait/%s", id, cond).
 		Fetch(context.Background())
 }
 
 func (a ContainerRunnerDockerAdapter) getContainer(inst types.Container) (types.DockerContainer, error) {
 	var containers []types.DockerContainer
-	err := requests.URL(url).
+	err := requests.URL(meta.Meta.ApiKernelURL()).
 		Path("/api/docker/containers").
 		ToJSON(&containers).
 		Fetch(context.Background())
@@ -477,7 +474,7 @@ func (a ContainerRunnerDockerAdapter) getImageID(inst types.Container) (string, 
 func (a ContainerRunnerDockerAdapter) pullImage(imageName string) (io.ReadCloser, error) {
 	options := types.PullImageOptions{Image: imageName}
 
-	req, err := requests.URL(url).
+	req, err := requests.URL(meta.Meta.ApiKernelURL()).
 		Path("/api/docker/image/pull").
 		Post().
 		BodyJSON(options).
@@ -510,7 +507,7 @@ func (a ContainerRunnerDockerAdapter) buildImageFromDockerfile(containerPath str
 		Dockerfile: "Dockerfile",
 	}
 
-	req, err := requests.URL(url).
+	req, err := requests.URL(meta.Meta.ApiKernelURL()).
 		Pathf("/api/docker/image/build").
 		Post().
 		BodyJSON(options).
@@ -528,7 +525,7 @@ func (a ContainerRunnerDockerAdapter) buildImageFromDockerfile(containerPath str
 
 func (a ContainerRunnerDockerAdapter) createContainer(options types.CreateContainerOptions) (string, error) {
 	var res types.CreateContainerResponse
-	err := requests.URL(url).
+	err := requests.URL(meta.Meta.ApiKernelURL()).
 		Pathf("/api/docker/container").
 		Post().
 		BodyJSON(options).
@@ -548,14 +545,14 @@ func (a ContainerRunnerDockerAdapter) createContainer(options types.CreateContai
 
 func (a ContainerRunnerDockerAdapter) readLogs(containerID string) (stdout io.ReadCloser, stderr io.ReadCloser, err error) {
 	var reqStdout, reqStderr *http.Request
-	reqStdout, err = requests.URL(url).
+	reqStdout, err = requests.URL(meta.Meta.ApiKernelURL()).
 		Pathf("/api/docker/container/%s/logs/stdout", containerID).
 		Request(context.Background())
 	if err != nil {
 		return
 	}
 
-	reqStderr, err = requests.URL(url).
+	reqStderr, err = requests.URL(meta.Meta.ApiKernelURL()).
 		Pathf("/api/docker/container/%s/logs/stderr", containerID).
 		Request(context.Background())
 	if err != nil {
@@ -608,7 +605,7 @@ func (a ContainerRunnerDockerAdapter) getAppPath(base string) string {
 	// If Vertex is running itself inside Docker, the containers are stored in the Vertex container volume.
 	if vdocker.RunningInDocker() {
 		var containers []types.DockerContainer
-		err := requests.URL(url).
+		err := requests.URL(meta.Meta.ApiKernelURL()).
 			Path("/api/docker/containers").
 			ToJSON(&containers).
 			Fetch(context.Background())
