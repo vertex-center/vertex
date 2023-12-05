@@ -4,6 +4,7 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/adapter"
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/service"
+	"github.com/vertex-center/vertex/apps/auth/database"
 	"github.com/vertex-center/vertex/apps/auth/handler"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
@@ -44,7 +45,11 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
-	db, err := storage.NewDB(nil)
+	db, err := storage.NewDB(storage.DBParams{
+		ID:         Meta.ID,
+		SchemaFunc: database.GetSchema,
+		Migrations: database.Migrations,
+	})
 	if err != nil {
 		return err
 	}

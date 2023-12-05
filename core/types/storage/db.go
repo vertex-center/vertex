@@ -7,13 +7,14 @@ import (
 	"path"
 	"time"
 
-	_ "github.com/lib/pq"
-	_ "modernc.org/sqlite"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/pkg/vsql"
 	"github.com/vertex-center/vlog"
 	"gopkg.in/yaml.v3"
+
+	_ "github.com/lib/pq"
+	_ "modernc.org/sqlite"
 )
 
 var (
@@ -35,22 +36,35 @@ type DBConfig struct {
 }
 
 type DBParams struct {
-	configDir string
+	// ID is the database identifier.
+	// For an SQLite database, it is the path to the database file.
+	// For a Postgres database, it is the database name.
+	ID string
+
+	// SchemaFunc is a function that returns the database schema depending on the driver.
+	SchemaFunc func(driver vsql.Driver) string
+
+	// Migrations is a list of migrations to run when needed.
+	Migrations []vsql.Migration
+
+	// ConfigDir is the path to the database config file.
+	configPath string
 }
 
-func NewDB(params *DBParams) (DB, error) {
-	if params == nil {
-		params = &DBParams{}
+func NewDB(params DBParams) (DB, error) {
+	if params.ID == "" {
+		log.Warn("no database ID provided, using a placeholder one")
+		params.ID = "default"
 	}
-	if params.configDir == "" {
-		params.configDir = path.Join(FSPath, "database", "config.yml")
+	if params.configPath == "" {
+		params.configPath = path.Join(FSPath, "database", "config.yml")
 	}
 
 	db := DB{
-		configPath: params.configDir,
+		configPath: params.configPath,
 		config: DBConfig{
 			DbmsName:   "sqlite",
-			DataSource: path.Join(FSPath, "database", "default.db"),
+			DataSource: path.Join(FSPath, "database", params.ID+".db"),
 		},
 	}
 
@@ -64,7 +78,8 @@ func NewDB(params *DBParams) (DB, error) {
 		return db, err
 	}
 
-	return db, nil
+	err = db.runMigrations(params.SchemaFunc, params.Migrations)
+	return db, err
 }
 
 func (db *DB) Connect() error {
@@ -125,4 +140,20 @@ func (db *DB) writeConfig() error {
 		return err
 	}
 	return os.WriteFile(db.configPath, data, os.ModePerm)
+}
+
+func (db *DB) runMigrations(schemaFunc func(driver vsql.Driver) string, migrations []vsql.Migration) error {
+	var current int
+	err := db.Get(&current, "SELECT version FROM migrations LIMIT 1")
+	if err != nil {
+		return db.createSchemas(schemaFunc)
+	}
+	return vsql.Migrate(migrations, db.DB, current)
+}
+
+func (db *DB) createSchemas(schemaFunc func(driver vsql.Driver) string) error {
+	vsqlDriver := vsql.DriverFromName(db.DriverName())
+	schema := schemaFunc(vsqlDriver)
+	_, err := db.Exec(schema)
+	return err
 }

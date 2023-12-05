@@ -7,6 +7,7 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/service"
 	types2 "github.com/vertex-center/vertex/apps/admin/core/types"
+	"github.com/vertex-center/vertex/apps/admin/database"
 	"github.com/vertex-center/vertex/apps/admin/handler"
 	"github.com/vertex-center/vertex/apps/admin/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
@@ -44,7 +45,11 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
-	db, err := storage.NewDB(nil)
+	db, err := storage.NewDB(storage.DBParams{
+		ID:         meta.Meta.ID,
+		SchemaFunc: database.GetSchema,
+		Migrations: database.Migrations,
+	})
 	if err != nil {
 		return err
 	}
@@ -54,7 +59,6 @@ func (a *App) Initialize(r *router.Group) error {
 	sshAdapter := adapter.NewSshKernelApiAdapter()
 
 	settingsService := service.NewAdminSettingsService(settingsAdapter)
-	dbService := service.NewDbService(a.ctx, db)
 	hardwareService := service.NewHardwareService(hardwareAdapter)
 	sshService := service.NewSshService(sshAdapter)
 
@@ -79,13 +83,6 @@ func (a *App) Initialize(r *router.Group) error {
 	ssh.DELETE("", sshHandler.Delete)
 	// docapi:v route /app/admin/ssh/users get_ssh_users
 	ssh.GET("/users", sshHandler.GetUsers)
-
-	dbHandler := handler.NewDatabaseHandler(dbService)
-	dbr := r.Group("/db", middleware.Authenticated)
-	// docapi:v route /app/admin/db/dbms get_current_dbms
-	dbr.GET("/dbms", dbHandler.GetCurrentDbms)
-	// docapi:v route /app/admin/db/dbms migrate_to_dbms
-	dbr.POST("/dbms", dbHandler.MigrateTo)
 
 	settingsHandler := handler.NewSettingsHandler(settingsService)
 	settings := r.Group("/settings", middleware.Authenticated)
