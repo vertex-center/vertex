@@ -23,7 +23,7 @@ func TestAppsServiceTestSuite(t *testing.T) {
 func (suite *AppsServiceTestSuite) SetupTest() {
 	ctx := types.NewVertexContext(types.About{}, false)
 	suite.app = &MockApp{}
-	suite.service = NewAppsService(ctx, false, router.New(), []app.Interface{
+	suite.service = NewAppsService(ctx, false, []app.Interface{
 		suite.app,
 	}).(*AppsService)
 }
@@ -36,7 +36,12 @@ func (suite *AppsServiceTestSuite) TestLoadApps() {
 }
 
 func (suite *AppsServiceTestSuite) TestStartApps() {
-	suite.app.On("Meta").Return(app.Meta{ID: "test"})
+	suite.app.On("Load", mock.Anything).Return()
+	suite.app.On("Meta").Return(app.Meta{
+		ID:                "test",
+		DefaultPort:       "8000",
+		DefaultKernelPort: "8001",
+	})
 	suite.service.registry.RegisterApp(suite.app)
 	suite.app.On("Initialize", mock.Anything).Return(nil)
 	suite.service.StartApps()
