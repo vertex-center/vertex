@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/vertex-center/vertex/apps/monitoring"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/rest"
 )
@@ -10,7 +11,8 @@ type Client struct {
 }
 
 func NewMonitoringClient() *Client {
+	port := config.Current.GetPort(monitoring.Meta.ID, monitoring.Meta.DefaultPort)
 	return &Client{
-		Client: rest.NewClient(config.Current.VertexURL(), "/api/app/monitoring/"),
+		Client: rest.NewClient(config.Current.Host, port, "/api"),
 	}
 }

@@ -7,6 +7,14 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
+var Meta = apptypes.Meta{
+	ID:          "tunnels",
+	Name:        "Vertex Tunnels",
+	Description: "Create and manage tunnels.",
+	Icon:        "subway",
+	DefaultPort: "7514",
+}
+
 type App struct {
 	ctx *apptypes.Context
 }
@@ -20,13 +28,7 @@ func (a *App) Load(ctx *apptypes.Context) {
 }
 
 func (a *App) Meta() apptypes.Meta {
-	return apptypes.Meta{
-		ID:          "tunnels",
-		Name:        "Vertex Tunnels",
-		Description: "Create and manage tunnels.",
-		Icon:        "subway",
-		DefaultPort: "7514",
-	}
+	return Meta
 }
 
 func (a *App) Initialize(r *router.Group) error {

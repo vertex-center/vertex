@@ -84,6 +84,13 @@ func (c Config) KernelURL() string {
 	return fmt.Sprintf(urlFormat, c.Host, c.Ports["VERTEX_KERNEL"])
 }
 
+func (c Config) GetPort(name string, fallback string) string {
+	if port, ok := c.Ports[name]; ok {
+		return port
+	}
+	return fallback
+}
+
 func (c Config) Debug() bool {
 	return c.mode == DebugMode
 }

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/vertex-center/vertex/apps/tunnels"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/rest"
 )
@@ -10,7 +11,8 @@ type Client struct {
 }
 
 func NewTunnelsClient() *Client {
+	port := config.Current.GetPort(tunnels.Meta.ID, tunnels.Meta.DefaultPort)
 	return &Client{
-		Client: rest.NewClient(config.Current.VertexURL(), "/api/app/tunnels/"),
+		Client: rest.NewClient(config.Current.Host, port, "/api"),
 	}
 }

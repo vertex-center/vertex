@@ -16,6 +16,14 @@ var (
 	metricsService port.MetricsService
 )
 
+var Meta = apptypes.Meta{
+	ID:          "monitoring",
+	Name:        "Vertex Monitoring",
+	Description: "Create and manage containers.",
+	Icon:        "monitoring",
+	DefaultPort: "7506",
+}
+
 type App struct {
 	ctx *apptypes.Context
 }
@@ -29,13 +37,7 @@ func (a *App) Load(ctx *apptypes.Context) {
 }
 
 func (a *App) Meta() apptypes.Meta {
-	return apptypes.Meta{
-		ID:          "monitoring",
-		Name:        "Vertex Monitoring",
-		Description: "Create and manage containers.",
-		Icon:        "monitoring",
-		DefaultPort: "7506",
-	}
+	return Meta
 }
 
 func (a *App) Initialize(r *router.Group) error {

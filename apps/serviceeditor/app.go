@@ -8,6 +8,15 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
+var Meta = apptypes.Meta{
+	ID:          "devtools-service-editor",
+	Name:        "Vertex Service Editor",
+	Description: "Create services for publishing.",
+	Icon:        "frame_source",
+	Category:    "devtools",
+	DefaultPort: "7510",
+}
+
 type App struct {
 	ctx *apptypes.Context
 }
@@ -21,14 +30,7 @@ func (a *App) Load(ctx *apptypes.Context) {
 }
 
 func (a *App) Meta() apptypes.Meta {
-	return apptypes.Meta{
-		ID:          "devtools-service-editor",
-		Name:        "Vertex Service Editor",
-		Description: "Create services for publishing.",
-		Icon:        "frame_source",
-		Category:    "devtools",
-		DefaultPort: "7510",
-	}
+	return Meta
 }
 
 func (a *App) Initialize(r *router.Group) error {

@@ -17,6 +17,14 @@ var (
 	proxyService port.ProxyService
 )
 
+var Meta = apptypes.Meta{
+	ID:          "reverse-proxy",
+	Name:        "Vertex Reverse Proxy",
+	Description: "Redirect traffic to your containers.",
+	Icon:        "router",
+	DefaultPort: "7508",
+}
+
 type App struct {
 	ctx   *apptypes.Context
 	proxy *ProxyRouter
@@ -31,13 +39,7 @@ func (a *App) Load(ctx *apptypes.Context) {
 }
 
 func (a *App) Meta() apptypes.Meta {
-	return apptypes.Meta{
-		ID:          "reverse-proxy",
-		Name:        "Vertex Reverse Proxy",
-		Description: "Redirect traffic to your containers.",
-		Icon:        "router",
-		DefaultPort: "7508",
-	}
+	return Meta
 }
 
 func (a *App) Initialize(r *router.Group) error {

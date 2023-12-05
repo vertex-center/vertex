@@ -17,6 +17,15 @@ var (
 	userService port.UserService
 )
 
+var Meta = apptypes.Meta{
+	ID:          "auth",
+	Name:        "Vertex Auth",
+	Description: "Authentication app for Vertex",
+	Icon:        "admin_panel_settings",
+	Hidden:      true,
+	DefaultPort: "7502",
+}
+
 type App struct {
 	ctx *apptypes.Context
 }
@@ -30,14 +39,7 @@ func (a *App) Load(ctx *apptypes.Context) {
 }
 
 func (a *App) Meta() apptypes.Meta {
-	return apptypes.Meta{
-		ID:          "auth",
-		Name:        "Vertex Auth",
-		Description: "Authentication app for Vertex",
-		Icon:        "admin_panel_settings",
-		Hidden:      true,
-		DefaultPort: "7502",
-	}
+	return Meta
 }
 
 func (a *App) Initialize(r *router.Group) error {

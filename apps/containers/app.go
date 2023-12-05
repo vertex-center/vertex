@@ -29,6 +29,15 @@ var (
 	dockerKernelService      port.DockerService
 )
 
+var Meta = apptypes.Meta{
+	ID:                "containers",
+	Name:              "Vertex Containers",
+	Description:       "Create and manage containers.",
+	Icon:              "deployed_code",
+	DefaultPort:       "7504",
+	DefaultKernelPort: "7505",
+}
+
 type App struct {
 	ctx *apptypes.Context
 }
@@ -42,14 +51,7 @@ func (a *App) Load(ctx *apptypes.Context) {
 }
 
 func (a *App) Meta() apptypes.Meta {
-	return apptypes.Meta{
-		ID:                "containers",
-		Name:              "Vertex Containers",
-		Description:       "Create and manage containers.",
-		Icon:              "deployed_code",
-		DefaultPort:       "7504",
-		DefaultKernelPort: "7505",
-	}
+	return Meta
 }
 
 func (a *App) Initialize(r *router.Group) error {

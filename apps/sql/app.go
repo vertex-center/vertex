@@ -13,6 +13,14 @@ var (
 	sqlService port.SqlService
 )
 
+var Meta = apptypes.Meta{
+	ID:          "sql",
+	Name:        "Vertex SQL",
+	Description: "Create and manage SQL databases.",
+	Icon:        "database",
+	DefaultPort: "7512",
+}
+
 type App struct {
 	ctx *apptypes.Context
 }
@@ -26,13 +34,7 @@ func (a *App) Load(ctx *apptypes.Context) {
 }
 
 func (a *App) Meta() apptypes.Meta {
-	return apptypes.Meta{
-		ID:          "sql",
-		Name:        "Vertex SQL",
-		Description: "Create and manage SQL databases.",
-		Icon:        "database",
-		DefaultPort: "7512",
-	}
+	return Meta
 }
 
 func (a *App) Initialize(r *router.Group) error {

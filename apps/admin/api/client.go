@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/vertex-center/vertex/apps/admin/meta"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/rest"
 )
@@ -10,8 +11,9 @@ type Client struct {
 }
 
 func NewAdminClient() *Client {
+	port := config.Current.GetPort(meta.Meta.ID, meta.Meta.DefaultPort)
 	return &Client{
-		Client: rest.NewClient(config.Current.VertexURL(), "/api/app/admin/"),
+		Client: rest.NewClient(config.Current.Host, port, "/api"),
 	}
 }
 
@@ -20,7 +22,8 @@ type KernelClient struct {
 }
 
 func NewAdminKernelClient() *KernelClient {
+	port := config.Current.GetPort(meta.Meta.ID, meta.Meta.DefaultKernelPort)
 	return &KernelClient{
-		Client: rest.NewClient(config.Current.KernelURL(), "/api/app/admin/"),
+		Client: rest.NewClient(config.Current.Host, port, "/api"),
 	}
 }
