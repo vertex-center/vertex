@@ -141,10 +141,9 @@ func RunStandaloneKernel(app Interface) {
 	addr := fmt.Sprintf(":%s", port)
 
 	srv := server.New(app.Meta().ID, addr, vertexCtx)
-	id := app.Meta().ID
 
 	if a, ok := app.(KernelInitializable); ok {
-		err := a.InitializeKernel(srv.Router.Group("/api/app/" + id))
+		err := a.InitializeKernel(srv.Router.Group("/api"))
 		if err != nil {
 			log.Error(err)
 			os.Exit(1)
