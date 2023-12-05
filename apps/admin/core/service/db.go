@@ -7,9 +7,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/vertex-center/vertex/apps/admin/core/port"
-	"github.com/vertex-center/vertex/apps/admin/core/types"
 	vtypes "github.com/vertex-center/vertex/core/types"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/database"
 	"github.com/vertex-center/vertex/database/migration"
 	"github.com/vertex-center/vertex/pkg/event"
@@ -24,87 +24,87 @@ var (
 )
 
 type DbService struct {
-	uuid              uuid.UUID
-	ctx               *apptypes.Context
-	dataConfigAdapter port.DbAdapter
+	uuid uuid.UUID
+	ctx  *apptypes.Context
+	db   storage.DB
 }
 
-func NewDbService(ctx *apptypes.Context, dataConfigAdapter port.DbAdapter) port.DbService {
+func NewDbService(ctx *apptypes.Context, db storage.DB) port.DbService {
 	s := &DbService{
-		uuid:              uuid.New(),
-		ctx:               ctx,
-		dataConfigAdapter: dataConfigAdapter,
+		uuid: uuid.New(),
+		ctx:  ctx,
+		db:   db,
 	}
 	s.ctx.AddListener(s)
 	return s
 }
 
-func (s *DbService) GetCurrentDbms() types.DbmsName {
-	return s.dataConfigAdapter.GetDBMSName()
+func (s *DbService) GetCurrentDbms() string {
+	return s.db.GetDBMSName()
 }
 
-func (s *DbService) MigrateTo(dbms types.DbmsName) error {
-	log.Info("migrating database", vlog.String("name", string(dbms)))
+func (s *DbService) MigrateTo(dbms string) error {
+	log.Info("migrating database", vlog.String("name", dbms))
 
-	currentDbms := s.dataConfigAdapter.GetDBMSName()
+	currentDbms := s.db.GetDBMSName()
 	if currentDbms == dbms {
 		return ErrDbmsAlreadySet
 	}
 
-	log.Info("setup new dbms", vlog.String("name", string(dbms)))
+	log.Info("setup new dbms", vlog.String("name", dbms))
 
 	var err error
 	switch dbms {
-	case types.DbmsNameSqlite:
+	case "sqlite":
 		//err = errors.New("sqlite migration not implemented yet")
-	case types.DbmsNamePostgres:
+	case "postgres":
 		err = s.setupPostgres()
 	default:
-		err = errors.New("unknown dbms: " + string(dbms))
+		err = errors.New("unknown dbms: " + dbms)
 	}
 	if err != nil {
 		return err
 	}
 
-	log.Info("setup new dbms completed", vlog.String("name", string(dbms)))
-	log.Info("retrieving connections to previous and next databases", vlog.String("name", string(dbms)))
+	log.Info("setup new dbms completed", vlog.String("name", dbms))
+	log.Info("retrieving connections to previous and next databases", vlog.String("name", dbms))
 
-	prevDb := s.dataConfigAdapter.Get().DB
-	err = s.dataConfigAdapter.SetDBMSName(dbms)
+	prevDb := s.db.DB
+	err = s.db.SetDBMSName(dbms)
 	if err != nil {
 		return err
 	}
-	err = s.dataConfigAdapter.Connect()
+	err = s.db.Connect()
 	if err != nil {
 		return err
 	}
-	nextDb := s.dataConfigAdapter.Get().DB
+	nextDb := s.db.DB
 
 	err = s.runMigrations(nextDb)
 	if err != nil {
 		return err
 	}
 
-	log.Info("copying data between databases", vlog.String("from", string(dbms)), vlog.String("to", string(currentDbms)))
+	log.Info("copying data between databases", vlog.String("from", dbms), vlog.String("to", currentDbms))
 
 	err = s.copyDb(prevDb, nextDb)
 	if err != nil {
 		return err
 	}
 
-	log.Info("copying data between databases completed", vlog.String("from", string(dbms)), vlog.String("to", string(currentDbms)))
-	log.Info("deleting previous database", vlog.String("name", string(currentDbms)))
+	log.Info("copying data between databases completed", vlog.String("from", dbms), vlog.String("to", currentDbms))
+	log.Info("deleting previous database", vlog.String("name", currentDbms))
 
 	switch currentDbms {
-	case types.DbmsNameSqlite:
+	case "sqlite":
 		err = s.deleteSqliteDB()
-	case types.DbmsNamePostgres:
+	case "postgres":
 		err = s.deletePostgresDB()
 	default:
-		err = errors.New("unknown dbms: " + string(currentDbms))
+		err = errors.New("unknown dbms: " + currentDbms)
 	}
 
-	log.Info("deleting previous database completed", vlog.String("name", string(currentDbms)))
+	log.Info("deleting previous database completed", vlog.String("name", currentDbms))
 
 	return err
 }
@@ -126,18 +126,18 @@ func (s *DbService) GetUUID() uuid.UUID {
 }
 
 func (s *DbService) setup() {
-	dbms := s.dataConfigAdapter.GetDBMSName()
+	dbms := s.db.GetDBMSName()
 
-	log.Info("database setup started", vlog.String("dbms", string(dbms)))
+	log.Info("database setup started", vlog.String("dbms", dbms))
 
 	var err error
 	switch dbms {
-	case types.DbmsNameSqlite:
+	case "sqlite":
 		// Nothing to do yet
-	case types.DbmsNamePostgres:
+	case "postgres":
 		err = s.setupPostgres()
 	default:
-		log.Error(errors.New("unknown dbms"), vlog.String("dbms", string(dbms)))
+		log.Error(errors.New("unknown dbms"), vlog.String("dbms", dbms))
 	}
 
 	if err != nil {
@@ -145,13 +145,13 @@ func (s *DbService) setup() {
 		os.Exit(1)
 	}
 
-	err = s.dataConfigAdapter.Connect()
+	err = s.db.Connect()
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)
 	}
 
-	err = s.runMigrations(s.dataConfigAdapter.Get().DB)
+	err = s.runMigrations(s.db.DB)
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)

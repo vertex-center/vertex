@@ -11,8 +11,8 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/updates"
 )
 
@@ -33,8 +33,8 @@ func (a *App) Load(ctx *apptypes.Context) {
 		baselinesApiAdapter := adapter.NewBaselinesApiAdapter()
 		updateService = service.NewUpdateService(a.ctx, baselinesApiAdapter, []types2.Updater{
 			updates.NewVertexUpdater(a.ctx.About()),
-			updates.NewVertexClientUpdater(path.Join(storage.Path, "client")),
-			updates.NewRepositoryUpdater("vertex_services", path.Join(storage.Path, "services"), "vertex-center", "services"),
+			updates.NewVertexClientUpdater(path.Join(storage.FSPath, "client")),
+			updates.NewRepositoryUpdater("vertex_services", path.Join(storage.FSPath, "services"), "vertex-center", "services"),
 		})
 	}
 }
@@ -44,15 +44,17 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
-	dbAdapter := adapter.NewDbAdapter(nil)
-	a.ctx.SetDb(dbAdapter.Get())
+	db, err := storage.NewDB(nil)
+	if err != nil {
+		return err
+	}
 
-	settingsAdapter := adapter.NewAdminSettingsDbAdapter(dbAdapter)
+	settingsAdapter := adapter.NewAdminSettingsDbAdapter(db)
 	hardwareAdapter := adapter.NewHardwareApiAdapter()
 	sshAdapter := adapter.NewSshKernelApiAdapter()
 
 	settingsService := service.NewAdminSettingsService(settingsAdapter)
-	dbService := service.NewDbService(a.ctx, dbAdapter)
+	dbService := service.NewDbService(a.ctx, db)
 	hardwareService := service.NewHardwareService(hardwareAdapter)
 	sshService := service.NewSshService(sshAdapter)
 
@@ -79,11 +81,11 @@ func (a *App) Initialize(r *router.Group) error {
 	ssh.GET("/users", sshHandler.GetUsers)
 
 	dbHandler := handler.NewDatabaseHandler(dbService)
-	db := r.Group("/db", middleware.Authenticated)
+	dbr := r.Group("/db", middleware.Authenticated)
 	// docapi:v route /app/admin/db/dbms get_current_dbms
-	db.GET("/dbms", dbHandler.GetCurrentDbms)
+	dbr.GET("/dbms", dbHandler.GetCurrentDbms)
 	// docapi:v route /app/admin/db/dbms migrate_to_dbms
-	db.POST("/dbms", dbHandler.MigrateTo)
+	dbr.POST("/dbms", dbHandler.MigrateTo)
 
 	settingsHandler := handler.NewSettingsHandler(settingsService)
 	settings := r.Group("/settings", middleware.Authenticated)

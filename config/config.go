@@ -8,9 +8,9 @@ import (
 	"path"
 	"strings"
 
+	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/net"
-	"github.com/vertex-center/vertex/pkg/storage"
 )
 
 const urlFormat = "http://%s:%s"
@@ -100,5 +100,5 @@ func (c Config) Apply() error {
 	configJsContent += fmt.Sprintf("window.apiPort_VERTEX = \"%s\";", c.Ports["VERTEX"])
 	configJsContent += fmt.Sprintf("window.apiPort_VERTEX_PROXY = \"%s\";", c.Ports["VERTEX_PROXY"])
 
-	return os.WriteFile(path.Join(storage.Path, "client", "dist", "config.js"), []byte(configJsContent), os.ModePerm)
+	return os.WriteFile(path.Join(storage.FSPath, "client", "dist", "config.js"), []byte(configJsContent), os.ModePerm)
 }

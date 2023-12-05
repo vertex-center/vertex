@@ -7,6 +7,7 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/handler"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
@@ -43,8 +44,13 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
-	authAdapter = adapter.NewAuthDbAdapter(a.ctx.Db())
-	emailAdapter := adapter.NewEmailDbAdapter(a.ctx.Db())
+	db, err := storage.NewDB(nil)
+	if err != nil {
+		return err
+	}
+
+	authAdapter = adapter.NewAuthDbAdapter(db)
+	emailAdapter := adapter.NewEmailDbAdapter(db)
 
 	AuthService = service.NewAuthService(authAdapter)
 	emailService := service.NewEmailService(emailAdapter)

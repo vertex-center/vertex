@@ -25,10 +25,10 @@ import (
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/core/types/server"
+	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/handler"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/storage"
 )
 
 // docapi:v title Vertex
@@ -92,7 +92,7 @@ func main() {
 	initServices()
 	initRoutes(about)
 
-	srv.Router.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
+	srv.Router.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.FSPath, "client", "dist"), true)))
 
 	exitChan := srv.StartAsync()
 

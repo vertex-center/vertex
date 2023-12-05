@@ -10,8 +10,9 @@ import (
 
 	"github.com/google/go-github/v50/github"
 	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/pkg/storage"
+	vstorage "github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"
 )
 
@@ -30,7 +31,7 @@ func (u VertexUpdater) CurrentVersion() (string, error) {
 }
 
 func (u VertexUpdater) Install(tag string) error {
-	dir := path.Join(storage.Path, "updates", "vertex")
+	dir := path.Join(storage.FSPath, "updates", "vertex")
 
 	log.Info("installing vertex", vlog.String("tag", tag))
 
@@ -42,7 +43,7 @@ func (u VertexUpdater) Install(tag string) error {
 	}
 	defer res.Body.Close()
 
-	err = storage.DownloadGithubRelease(release, dir)
+	err = vstorage.DownloadGithubRelease(release, dir)
 	if err != nil {
 		return err
 	}

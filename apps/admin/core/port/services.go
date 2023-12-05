@@ -18,8 +18,8 @@ type (
 	}
 
 	DbService interface {
-		GetCurrentDbms() types.DbmsName
-		MigrateTo(dbms types.DbmsName) error
+		GetCurrentDbms() string
+		MigrateTo(dbms string) error
 	}
 
 	HardwareService interface {

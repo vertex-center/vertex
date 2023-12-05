@@ -5,12 +5,11 @@ import (
 	"os"
 	"path"
 
+	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-
-	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/pkg/storage"
 	"gopkg.in/yaml.v3"
 )
 
@@ -29,7 +28,7 @@ func NewContainerSettingsFSAdapter(params *ContainerSettingsFSAdapterParams) por
 		params = &ContainerSettingsFSAdapterParams{}
 	}
 	if params.containersPath == "" {
-		params.containersPath = path.Join(storage.Path, "apps", "containers", "containers")
+		params.containersPath = path.Join(storage.FSPath, "apps", "containers", "containers")
 	}
 
 	adapter := &ContainerSettingsFSAdapter{

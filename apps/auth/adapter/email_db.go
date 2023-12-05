@@ -4,14 +4,14 @@ import (
 	"time"
 
 	"github.com/vertex-center/vertex/apps/auth/core/types"
-	vtypes "github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/core/types/storage"
 )
 
 type EmailDbAdapter struct {
-	db *vtypes.DB
+	db storage.DB
 }
 
-func NewEmailDbAdapter(db *vtypes.DB) *EmailDbAdapter {
+func NewEmailDbAdapter(db storage.DB) *EmailDbAdapter {
 	return &EmailDbAdapter{
 		db: db,
 	}

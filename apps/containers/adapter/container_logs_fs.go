@@ -8,13 +8,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/vertex-center/vertex/apps/containers/core/port"
-	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
-
 	"github.com/go-co-op/gocron"
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/apps/containers/core/port"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"
 )
 
@@ -28,7 +27,7 @@ type ContainerLogger struct {
 	uuid uuid.UUID
 
 	file        *os.File
-	buffer      []containerstypes.LogLine
+	buffer      []types.LogLine
 	currentLine int
 	scheduler   *gocron.Scheduler
 
@@ -52,7 +51,7 @@ func NewContainerLogsFSAdapter(params *ContainerLogsFSAdapterParams) port.Contai
 	}
 
 	if params.ContainersPath == "" {
-		params.ContainersPath = path.Join(storage.Path, "apps", "containers", "containers")
+		params.ContainersPath = path.Join(storage.FSPath, "apps", "containers", "containers")
 	}
 
 	return &ContainerLogsFSAdapter{
@@ -73,7 +72,7 @@ func (a *ContainerLogsFSAdapter) Register(uuid uuid.UUID) error {
 
 	l := ContainerLogger{
 		uuid:   uuid,
-		buffer: []containerstypes.LogLine{},
+		buffer: []types.LogLine{},
 		dir:    dir,
 	}
 
@@ -111,7 +110,7 @@ func (a *ContainerLogsFSAdapter) Unregister(uuid uuid.UUID) error {
 	return nil
 }
 
-func (a *ContainerLogsFSAdapter) Push(uuid uuid.UUID, line containerstypes.LogLine) {
+func (a *ContainerLogsFSAdapter) Push(uuid uuid.UUID, line types.LogLine) {
 	l, err := a.getLogger(uuid)
 	if err != nil {
 		log.Error(err)
@@ -129,20 +128,20 @@ func (a *ContainerLogsFSAdapter) Push(uuid uuid.UUID, line containerstypes.LogLi
 	}
 }
 
-func (a *ContainerLogsFSAdapter) Pop(uuid uuid.UUID) (containerstypes.LogLine, error) {
+func (a *ContainerLogsFSAdapter) Pop(uuid uuid.UUID) (types.LogLine, error) {
 	l, err := a.getLogger(uuid)
 	if err != nil {
-		return containerstypes.LogLine{}, err
+		return types.LogLine{}, err
 	}
 	if len(l.buffer) == 0 {
-		return containerstypes.LogLine{}, containerstypes.ErrBufferEmpty
+		return types.LogLine{}, types.ErrBufferEmpty
 	}
 	line := l.buffer[len(l.buffer)-1]
 	l.buffer = l.buffer[:len(l.buffer)-1]
 	return line, nil
 }
 
-func (a *ContainerLogsFSAdapter) LoadBuffer(uuid uuid.UUID) ([]containerstypes.LogLine, error) {
+func (a *ContainerLogsFSAdapter) LoadBuffer(uuid uuid.UUID) ([]types.LogLine, error) {
 	l, err := a.getLogger(uuid)
 	if err != nil {
 		return nil, err
