@@ -83,11 +83,13 @@ func (s *AppsService) StartApps() {
 
 	s.ctx.DispatchEvent(types.EventAllAppsReady{})
 
-	t := table.New().Headers("App", "API")
-	for _, a := range s.registry.Apps() {
-		t.Row(a.Meta().Name, a.Meta().ApiURL())
+	if !s.kernel {
+		t := table.New().Headers("App", "API", "Kernel API")
+		for _, a := range s.registry.Apps() {
+			t.Row(a.Meta().Name, a.Meta().ApiURL(), a.Meta().ApiKernelURL())
+		}
+		fmt.Println(t)
 	}
-	fmt.Println(t)
 
 	log.Info("apps initialized")
 }
