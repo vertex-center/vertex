@@ -40,10 +40,12 @@ func (a *App) Load(ctx *apptypes.Context) {
 
 func (a *App) Meta() apptypes.Meta {
 	return apptypes.Meta{
-		ID:          "admin",
-		Name:        "Vertex Admin",
-		Description: "Administer Vertex",
-		Icon:        "admin_panel_settings",
+		ID:                "admin",
+		Name:              "Vertex Admin",
+		Description:       "Administer Vertex",
+		Icon:              "admin_panel_settings",
+		DefaultPort:       "7500",
+		DefaultKernelPort: "7501",
 	}
 }
 

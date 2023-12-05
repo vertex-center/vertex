@@ -36,6 +36,7 @@ func (a *App) Meta() apptypes.Meta {
 		Name:        "Vertex Reverse Proxy",
 		Description: "Redirect traffic to your containers.",
 		Icon:        "router",
+		DefaultPort: "7508",
 	}
 }
 

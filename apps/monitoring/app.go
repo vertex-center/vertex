@@ -34,6 +34,7 @@ func (a *App) Meta() apptypes.Meta {
 		Name:        "Vertex Monitoring",
 		Description: "Create and manage containers.",
 		Icon:        "monitoring",
+		DefaultPort: "7506",
 	}
 }
 

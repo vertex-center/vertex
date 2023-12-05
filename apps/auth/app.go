@@ -36,6 +36,7 @@ func (a *App) Meta() apptypes.Meta {
 		Description: "Authentication app for Vertex",
 		Icon:        "admin_panel_settings",
 		Hidden:      true,
+		DefaultPort: "7502",
 	}
 }
 

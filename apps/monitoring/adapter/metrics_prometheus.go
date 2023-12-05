@@ -63,7 +63,7 @@ func (a *PrometheusAdapter) ConfigureContainer(uuid uuid.UUID) error {
 		return err
 	}
 
-	url := fmt.Sprintf("%s:%s", config.Current.Host, config.Current.PortPrometheus)
+	url := fmt.Sprintf("%s:%s", config.Current.Host, "2112")
 
 	data := map[string]interface{}{
 		"scrape_configs": []map[string]interface{}{

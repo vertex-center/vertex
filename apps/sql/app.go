@@ -31,6 +31,7 @@ func (a *App) Meta() apptypes.Meta {
 		Name:        "Vertex SQL",
 		Description: "Create and manage SQL databases.",
 		Icon:        "database",
+		DefaultPort: "7512",
 	}
 }
 

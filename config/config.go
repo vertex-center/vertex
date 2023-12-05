@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/net"
@@ -24,14 +25,10 @@ const (
 )
 
 type Config struct {
-	mode Mode
-
-	Host           string `json:"host"`
-	Port           string `json:"port"`
-	PortKernel     string `json:"port_kernel"`
-	PortProxy      string `json:"port_proxy"`
-	PortPrometheus string `json:"port_prometheus"`
-	MasterApiKey   string `json:"master_api_key"`
+	mode         Mode
+	Host         string `json:"host"`
+	Ports        map[string]string
+	MasterApiKey string `json:"master_api_key"`
 }
 
 func New() Config {
@@ -50,13 +47,25 @@ func New() Config {
 
 	c := Config{
 		mode: ProductionMode,
+		Host: host,
+		Ports: map[string]string{
+			"VERTEX":        "6130",
+			"VERTEX_KERNEL": "6131",
+			"VERTEX_PROXY":  "80",
+		},
+		MasterApiKey: base64.StdEncoding.EncodeToString(token),
+	}
 
-		Host:           host,
-		Port:           "6130",
-		PortKernel:     "6131",
-		PortProxy:      "80",
-		PortPrometheus: "2112",
-		MasterApiKey:   base64.StdEncoding.EncodeToString(token),
+	env := os.Environ()
+	for _, e := range env {
+		pair := strings.SplitN(e, "=", 2)
+		if len(pair) == 2 {
+			key, value := pair[0], pair[1]
+			if strings.HasPrefix(key, "VERTEX_PORT_") {
+				name := strings.TrimPrefix(key, "VERTEX_PORT_")
+				c.Ports[name] = value
+			}
+		}
 	}
 
 	if os.Getenv("DEBUG") == "1" {
@@ -68,15 +77,11 @@ func New() Config {
 }
 
 func (c Config) VertexURL() string {
-	return fmt.Sprintf(urlFormat, c.Host, c.Port)
+	return fmt.Sprintf(urlFormat, c.Host, c.Ports["VERTEX"])
 }
 
 func (c Config) KernelURL() string {
-	return fmt.Sprintf(urlFormat, c.Host, c.PortKernel)
-}
-
-func (c Config) ProxyURL() string {
-	return fmt.Sprintf(urlFormat, c.Host, c.PortProxy)
+	return fmt.Sprintf(urlFormat, c.Host, c.Ports["VERTEX_KERNEL"])
 }
 
 func (c Config) Debug() bool {
@@ -84,6 +89,9 @@ func (c Config) Debug() bool {
 }
 
 func (c Config) Apply() error {
-	configJsContent := fmt.Sprintf("window.apiURL = \"%s\";", c.VertexURL())
+	configJsContent := fmt.Sprintf("window.apiURL = \"%s\";", c.Host)
+	configJsContent += fmt.Sprintf("window.apiPort_VERTEX = \"%s\";", c.Ports["VERTEX"])
+	configJsContent += fmt.Sprintf("window.apiPort_VERTEX_PROXY = \"%s\";", c.Ports["VERTEX_PROXY"])
+
 	return os.WriteFile(path.Join(storage.Path, "client", "dist", "config.js"), []byte(configJsContent), os.ModePerm)
 }

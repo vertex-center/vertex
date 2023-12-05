@@ -27,6 +27,7 @@ func (a *App) Meta() apptypes.Meta {
 		Description: "Create services for publishing.",
 		Icon:        "frame_source",
 		Category:    "devtools",
+		DefaultPort: "7510",
 	}
 }
 

@@ -1,18 +1,14 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"os"
 	"os/exec"
-	"os/signal"
 	"os/user"
 	"strconv"
-	"syscall"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/apps/admin"
 	"github.com/vertex-center/vertex/apps/auth"
 	"github.com/vertex-center/vertex/apps/containers"
@@ -25,17 +21,25 @@ import (
 	"github.com/vertex-center/vertex/core/service"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
-	"github.com/vertex-center/vertex/pkg/ginutils"
+	"github.com/vertex-center/vertex/core/types/server"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/netcap"
-	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vlog"
 )
 
 var (
-	r   *router.Router
+	srv *server.Server
 	ctx *types.VertexContext
 )
+
+// docapi:k title Vertex Kernel
+// docapi:k description A platform to manage your self-hosted server.
+// docapi:k version 0.0.0
+// docapi:k filename kernel
+
+// docapi:k url http://{ip}:{port-kernel}/api
+// docapi:k urlvar ip localhost The IP address of the kernel.
+// docapi:k urlvar port-kernel 6131 The port of the server.
 
 func main() {
 	ensureRoot()
@@ -53,52 +57,47 @@ func main() {
 		log.Error(err)
 	}
 
-	initRouter()
+	ctx = types.NewVertexContext(types.About{}, true)
+	addr := fmt.Sprintf(":%s", config.KernelCurrent.Ports["VERTEX_KERNEL"])
+
+	srv = server.New("kernel", addr, ctx)
 	initServices()
-	initRoutes()
 
 	ctx.DispatchEvent(types.EventServerLoad{})
 	ctx.DispatchEvent(types.EventServerStart{})
 
-	shutdownChan := make(chan os.Signal, 1)
-	go func() {
-		startRouter()
-		shutdownChan <- syscall.SIGINT
-	}()
+	exitKernelChan := srv.StartAsync()
+	exitVertexChan := make(chan error)
 
-	// Vertex
 	var vertex *exec.Cmd
 	go func() {
+		defer close(exitVertexChan)
+
 		var err error
-		vertex, err = runVertex([]string{
-			"-host", config.KernelCurrent.Host,
-			"-port", config.KernelCurrent.Port,
-			"-port-kernel", config.KernelCurrent.PortKernel,
-			"-port-proxy", config.KernelCurrent.PortProxy,
-			"-port-prometheus", config.KernelCurrent.PortPrometheus,
-		}...)
+		vertex, err = runVertex()
 		if err != nil {
-			log.Error(err)
-			shutdownChan <- syscall.SIGINT
+			exitVertexChan <- err
 			return
 		}
-		err = vertex.Wait()
-		if err != nil {
-			log.Error(err)
-		}
-		shutdownChan <- syscall.SIGINT
+		exitVertexChan <- vertex.Wait()
 	}()
 
-	// OS interrupt
-	signal.Notify(shutdownChan, os.Interrupt, syscall.SIGTERM)
-
-	<-shutdownChan
-	log.Info("Shutting down...")
-	if vertex != nil && vertex.Process != nil {
-		_ = vertex.Process.Signal(os.Interrupt)
-		_, _ = vertex.Process.Wait()
+	for {
+		select {
+		case err := <-exitKernelChan:
+			if err != nil {
+				log.Error(err)
+			}
+			if vertex != nil && vertex.Process != nil {
+				_ = vertex.Process.Signal(os.Interrupt)
+				_, _ = vertex.Process.Wait()
+			}
+		case err := <-exitVertexChan:
+			if err != nil {
+				log.Error(err)
+			}
+		}
 	}
-	stopRouter()
 }
 
 func ensureRoot() {
@@ -109,23 +108,15 @@ func ensureRoot() {
 
 func parseArgs() {
 	var (
-		flagUsername       = flag.String("user", "", "username of the unprivileged user")
-		flagUID            = flag.Uint("uid", 0, "uid of the unprivileged user")
-		flagGID            = flag.Uint("gid", 0, "gid of the unprivileged user")
-		flagHost           = flag.String("host", config.Current.Host, "The Vertex access url")
-		flagPort           = flag.String("port", config.Current.Port, "The Vertex port")
-		flagPortKernel     = flag.String("port-kernel", config.Current.PortKernel, "The Vertex Kernel port")
-		flagPortProxy      = flag.String("port-proxy", config.Current.PortProxy, "The Vertex Proxy port")
-		flagPortPrometheus = flag.String("port-prometheus", config.Current.PortPrometheus, "The Prometheus port")
+		flagUsername = flag.String("user", "", "username of the unprivileged user")
+		flagUID      = flag.Uint("uid", 0, "uid of the unprivileged user")
+		flagGID      = flag.Uint("gid", 0, "gid of the unprivileged user")
+		flagHost     = flag.String("host", config.Current.Host, "The Vertex access url")
 	)
 
 	flag.Parse()
 
 	config.KernelCurrent.Host = *flagHost
-	config.KernelCurrent.Port = *flagPort
-	config.KernelCurrent.PortKernel = *flagPortKernel
-	config.KernelCurrent.PortProxy = *flagPortProxy
-	config.KernelCurrent.PortPrometheus = *flagPortPrometheus
 
 	if *flagUsername == "" {
 		*flagUsername = os.Getenv("USER")
@@ -178,17 +169,8 @@ func buildVertex() {
 	log.Info("Build completed in " + end.Sub(start).String())
 }
 
-func initRouter() {
-	gin.SetMode(gin.ReleaseMode)
-	ctx = types.NewVertexContext(types.About{}, true)
-	r = router.New()
-	r.Use(ginutils.ErrorHandler())
-	r.Use(ginutils.Logger("KERNEL"))
-	r.Use(gin.Recovery())
-}
-
 func initServices() {
-	service.NewAppsService(ctx, true, r, []app.Interface{
+	service.NewAppsService(ctx, true, []app.Interface{
 		admin.NewApp(),
 		auth.NewApp(),
 		sql.NewApp(),
@@ -198,39 +180,4 @@ func initServices() {
 		reverseproxy.NewApp(),
 		serviceeditor.NewApp(),
 	})
-}
-
-func initRoutes() {
-	// docapi:k title Vertex Kernel
-	// docapi:k description A platform to manage your self-hosted server.
-	// docapi:k version 0.0.0
-	// docapi:k filename kernel
-
-	// docapi:k url http://{ip}:{port-kernel}/api
-	// docapi:k urlvar ip localhost The IP address of the kernel.
-	// docapi:k urlvar port-kernel 6131 The port of the server.
-}
-
-func startRouter() {
-	log.Info("vertex-kernel started", vlog.String("url", config.KernelCurrent.KernelURL()))
-	addr := fmt.Sprintf(":%s", config.KernelCurrent.PortKernel)
-
-	err := r.Start(addr)
-	if err != nil {
-		log.Error(err)
-		os.Exit(1)
-	}
-}
-
-func stopRouter() {
-	ctx.DispatchEvent(types.EventServerStop{})
-
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()
-	err := r.Stop(ctx)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-	log.Info("kernel server closed")
 }

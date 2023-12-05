@@ -21,6 +21,7 @@ func runVertex(args ...string) (*exec.Cmd, error) {
 	)
 
 	cmd := exec.Command("./vertex", args...)
+	cmd.Env = os.Environ()
 	cmd.SysProcAttr = &syscall.SysProcAttr{}
 	cmd.SysProcAttr.Credential = &syscall.Credential{Uid: uid, Gid: gid}
 	cmd.Stdout = os.Stdout

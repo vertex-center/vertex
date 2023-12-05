@@ -25,6 +25,7 @@ func (a *App) Meta() apptypes.Meta {
 		Name:        "Vertex Tunnels",
 		Description: "Create and manage tunnels.",
 		Icon:        "subway",
+		DefaultPort: "7514",
 	}
 }
 

@@ -1,10 +1,14 @@
 package app
 
 import (
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/gin-contrib/sse"
+	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/core/types/server"
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -25,6 +29,12 @@ type Meta struct {
 
 	// Category is the category of the app.
 	Category string `json:"category"`
+
+	// DefaultPort is the default port of the app.
+	DefaultPort string `json:"port"`
+
+	// DefaultKernelPort is the default port of the app in kernel mode.
+	DefaultKernelPort string `json:"kernel_port"`
 
 	// Hidden is a flag that indicates if the app does only backend work and should be hidden from the frontend.
 	Hidden bool `json:"hidden"`
@@ -84,21 +94,28 @@ func RunStandalone(app Interface) {
 	ctx := NewContext(vertexCtx)
 	app.Load(ctx)
 
-	r := router.New()
+	portName := strings.ToUpper(app.Meta().ID)
+	port, ok := config.Current.Ports[portName]
+	if !ok {
+		port = app.Meta().DefaultPort
+	}
+	addr := fmt.Sprintf(":%s", port)
+
+	srv := server.New(app.Meta().ID, addr, vertexCtx)
 	id := app.Meta().ID
 
 	if a, ok := app.(Initializable); ok {
-		err := a.Initialize(r.Group("/api/app/" + id))
+		err := a.Initialize(srv.Router.Group("/api"))
 		if err != nil {
 			log.Error(err)
 			os.Exit(1)
 		}
+		srv.Router.GET("/api/ping", func(c *router.Context) {
+			c.JSON(fmt.Sprintf("pong from %s", id))
+		})
 	}
 
-	err := r.Run(":6130")
-	if err != nil {
-		log.Error(err)
-	}
+	_ = srv.StartAsync()
 
 	if a, ok := app.(Uninitializable); ok {
 		err := a.Uninitialize()
@@ -116,21 +133,28 @@ func RunStandaloneKernel(app Interface) {
 	ctx := NewContext(vertexCtx)
 	app.Load(ctx)
 
-	r := router.New()
+	portName := strings.ToUpper(app.Meta().ID) + "_KERNEL"
+	port, ok := config.Current.Ports[portName]
+	if !ok {
+		port = app.Meta().DefaultKernelPort
+	}
+	addr := fmt.Sprintf(":%s", port)
+
+	srv := server.New(app.Meta().ID, addr, vertexCtx)
 	id := app.Meta().ID
 
 	if a, ok := app.(KernelInitializable); ok {
-		err := a.InitializeKernel(r.Group("/api/app/" + id))
+		err := a.InitializeKernel(srv.Router.Group("/api/app/" + id))
 		if err != nil {
 			log.Error(err)
 			os.Exit(1)
 		}
+		srv.Router.GET("/api/ping", func(c *router.Context) {
+			c.OK()
+		})
 	}
 
-	err := r.Run(":6131")
-	if err != nil {
-		log.Error(err)
-	}
+	_ = srv.StartAsync()
 
 	if a, ok := app.(KernelUninitializable); ok {
 		err := a.UninitializeKernel()
