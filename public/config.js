@@ -1,1 +1,1 @@
-window.apiURL = "http://localhost:6130";
+window.apiURL = "http://localhost";

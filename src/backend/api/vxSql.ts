@@ -1,13 +1,13 @@
-import { server } from "./backend";
+import { createServer } from "../server";
 
-const BASE_URL = "/app/sql";
+const server = createServer("7512");
 
 const installDbms = (dbms: string) => {
-    return server.post(`${BASE_URL}/dbms/${dbms}/install`);
+    return server.post(`/dbms/${dbms}/install`);
 };
 
 const getContainer = async (uuid: string) => {
-    const { data } = await server.get(`${BASE_URL}/container/${uuid}`);
+    const { data } = await server.get(`/container/${uuid}`);
     return data;
 };
 

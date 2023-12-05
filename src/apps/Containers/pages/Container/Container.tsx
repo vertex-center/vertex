@@ -32,9 +32,9 @@ export default function ContainerDetails() {
 
     const [showDeletePopup, setShowDeletePopup] = useState<boolean>();
 
-    const route = uuid ? `/app/containers/container/${uuid}/events` : "";
+    const route = uuid ? `/container/${uuid}/events` : "";
 
-    useServerEvent(route, {
+    useServerEvent("7504", route, {
         status_change: (e) => {
             queryClient.setQueryData(
                 ["containers", uuid],

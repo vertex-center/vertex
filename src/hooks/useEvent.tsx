@@ -10,6 +10,7 @@ import { Console } from "../logging/logging";
 type ServerEvent = (e: MessageEvent) => void;
 
 export function useServerEvent(
+    port: string,
     route: string,
     events: {
         [name: string]: ServerEvent;
@@ -21,7 +22,7 @@ export function useServerEvent(
             return;
         }
 
-        const sse = registerSSE(route);
+        const sse = registerSSE(port, route);
 
         Console.event("SSE connected\n%O", { id: sse });
 

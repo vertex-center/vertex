@@ -22,6 +22,7 @@ export default function SettingsChecks() {
     const [checks, setChecks] = useState({});
 
     useServerEvent(
+        "7500",
         "/admin/checks",
         {
             check: (e) => {

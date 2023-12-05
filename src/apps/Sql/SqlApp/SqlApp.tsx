@@ -60,7 +60,7 @@ export default function SqlApp() {
         </Sidebar>
     );
 
-    useServerEvent("/app/containers/containers/events", {
+    useServerEvent("7504", "/containers/events", {
         change: () => {
             queryClient.invalidateQueries({
                 queryKey: ["containers"],

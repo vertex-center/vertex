@@ -73,9 +73,9 @@ export default function ContainerLogs() {
         });
     };
 
-    const route = uuid ? `/app/containers/container/${uuid}/events` : "";
+    const route = uuid ? `/container/${uuid}/events` : "";
 
-    useServerEvent(route, {
+    useServerEvent("7504", route, {
         stdout: onStdout,
         stderr: onStderr,
         download: onDownload,

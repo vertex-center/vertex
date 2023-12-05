@@ -79,11 +79,9 @@ export default function ContainerInstaller(props: Readonly<Props>) {
         await api.vxContainers.container(inst.uuid).stop();
     };
 
-    const route = container?.uuid
-        ? `/app/containers/container/${container?.uuid}/events`
-        : "";
+    const route = container?.uuid ? `/container/${container?.uuid}/events` : "";
 
-    useServerEvent(route, {
+    useServerEvent("7504", route, {
         status_change: (e) => {
             setContainer((container) => ({ ...container, status: e.data }));
         },

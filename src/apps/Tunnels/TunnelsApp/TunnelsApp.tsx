@@ -21,7 +21,7 @@ export default function TunnelsApp() {
 
     const container = Object.values(containers || {})?.[0];
 
-    useServerEvent("/app/containers/containers/events", {
+    useServerEvent("7504", "/containers/events", {
         change: (e) => {
             queryClient.invalidateQueries({
                 queryKey: ["containers"],

@@ -57,9 +57,9 @@ export default function SqlDatabase() {
         await api.vxContainers.container(inst.uuid).stop();
     };
 
-    const route = uuid ? `/app/containers/container/${uuid}/events` : "";
+    const route = uuid ? `/container/${uuid}/events` : "";
 
-    useServerEvent(route, {
+    useServerEvent("7504", route, {
         status_change: () => {
             queryClient.invalidateQueries({
                 queryKey: ["containers", uuid],

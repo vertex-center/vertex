@@ -1,9 +1,9 @@
-import { server } from "./backend";
+import { createServer } from "../server";
 
-const BASE_URL = "/app/tunnels";
+const server = createServer("7514");
 
 const installProvider = (provider: string) => {
-    return server.post(`${BASE_URL}/provider/${provider}/install`);
+    return server.post(`/provider/${provider}/install`);
 };
 
 const providerRoutes = (provider: string) => ({

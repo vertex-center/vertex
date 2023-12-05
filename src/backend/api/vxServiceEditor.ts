@@ -1,10 +1,11 @@
 import { Service } from "../../models/service";
-import { server } from "./backend";
 
-const BASE_URL = `/app/devtools-service-editor`;
+import { createServer } from "../server";
+
+const server = createServer("7510");
 
 const toYaml = async (service: Service) => {
-    const { data } = await server.post(`${BASE_URL}/editor/to-yaml`, service);
+    const { data } = await server.post(`/editor/to-yaml`, service);
     return data;
 };
 

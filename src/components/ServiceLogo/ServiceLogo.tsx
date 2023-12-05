@@ -9,8 +9,8 @@ export default function ServiceLogo(props: Readonly<Props>) {
     const { service } = props;
 
     // @ts-ignore
-    const iconURL = new URL(window.apiURL);
-    iconURL.pathname = `/api/app/containers/services/icons/${service?.icon}`;
+    const iconURL = new URL(window.apiURL + ":7504");
+    iconURL.pathname = `/api/services/icons/${service?.icon}`;
 
     if (!service?.icon) {
         return <MaterialIcon icon="extension" style={{ opacity: 0.8 }} />;
