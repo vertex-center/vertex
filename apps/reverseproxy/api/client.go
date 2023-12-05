@@ -10,9 +10,9 @@ type Client struct {
 	*rest.Client
 }
 
-func NewReverseProxyClient() *Client {
+func NewReverseProxyClient(token string) *Client {
 	port := config.Current.GetPort(reverseproxy.Meta.ID, reverseproxy.Meta.DefaultPort)
 	return &Client{
-		Client: rest.NewClient(config.Current.Host, port, "/api"),
+		Client: rest.NewClient(config.Current.Host, port, token),
 	}
 }

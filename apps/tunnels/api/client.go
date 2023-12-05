@@ -10,9 +10,9 @@ type Client struct {
 	*rest.Client
 }
 
-func NewTunnelsClient() *Client {
+func NewTunnelsClient(token string) *Client {
 	port := config.Current.GetPort(tunnels.Meta.ID, tunnels.Meta.DefaultPort)
 	return &Client{
-		Client: rest.NewClient(config.Current.Host, port, "/api"),
+		Client: rest.NewClient(config.Current.Host, port, token),
 	}
 }

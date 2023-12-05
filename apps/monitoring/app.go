@@ -41,6 +41,8 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
+	r.Use(middleware.ReadAuth)
+
 	prometheusAdapter = adapter.NewMetricsPrometheusAdapter()
 
 	metricsService = service.NewMetricsService(a.ctx, prometheusAdapter)

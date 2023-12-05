@@ -2,7 +2,6 @@ package config
 
 import (
 	"crypto/rand"
-	"encoding/base64"
 	"fmt"
 	"os"
 	"path"
@@ -25,10 +24,9 @@ const (
 )
 
 type Config struct {
-	mode         Mode
-	Host         string `json:"host"`
-	Ports        map[string]string
-	MasterApiKey string `json:"master_api_key"`
+	mode  Mode
+	Host  string `json:"host"`
+	Ports map[string]string
 }
 
 func New() Config {
@@ -53,7 +51,6 @@ func New() Config {
 			"VERTEX_KERNEL": "6131",
 			"VERTEX_PROXY":  "80",
 		},
-		MasterApiKey: base64.StdEncoding.EncodeToString(token),
 	}
 
 	env := os.Environ()

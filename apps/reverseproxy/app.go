@@ -43,6 +43,8 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
+	r.Use(middleware.ReadAuth)
+
 	proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
 
 	proxyService = service.NewProxyService(proxyFSAdapter)

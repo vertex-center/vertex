@@ -10,9 +10,9 @@ type Client struct {
 	*rest.Client
 }
 
-func NewMonitoringClient() *Client {
+func NewMonitoringClient(token string) *Client {
 	port := config.Current.GetPort(monitoring.Meta.ID, monitoring.Meta.DefaultPort)
 	return &Client{
-		Client: rest.NewClient(config.Current.Host, port, "/api"),
+		Client: rest.NewClient(config.Current.Host, port, token),
 	}
 }

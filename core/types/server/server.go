@@ -52,7 +52,7 @@ func (s *Server) initRouter() {
 
 	s.Router.Use(cors.New(cfg))
 	s.Router.Use(ginutils.ErrorHandler())
-	s.Router.Use(ginutils.Logger(s.id))
+	s.Router.Use(ginutils.Logger(s.id, s.addr))
 	s.Router.Use(gin.Recovery())
 }
 

@@ -33,7 +33,9 @@ func (r *ProviderHandler) Install(c *router.Context) {
 		return
 	}
 
-	client := containersapi.NewContainersClient()
+	token := c.MustGet("token").(string)
+
+	client := containersapi.NewContainersClient(token)
 
 	serv, apiError := client.GetService(c, provider)
 	if apiError != nil {

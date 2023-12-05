@@ -10,9 +10,9 @@ type Client struct {
 	*rest.Client
 }
 
-func NewSqlClient() *Client {
+func NewSqlClient(token string) *Client {
 	port := config.Current.GetPort(sql.Meta.ID, sql.Meta.DefaultPort)
 	return &Client{
-		Client: rest.NewClient(config.Current.Host, port, "/api"),
+		Client: rest.NewClient(config.Current.Host, port, token),
 	}
 }

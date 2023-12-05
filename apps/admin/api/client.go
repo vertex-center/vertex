@@ -10,10 +10,10 @@ type Client struct {
 	*rest.Client
 }
 
-func NewAdminClient() *Client {
+func NewAdminClient(token string) *Client {
 	port := config.Current.GetPort(meta.Meta.ID, meta.Meta.DefaultPort)
 	return &Client{
-		Client: rest.NewClient(config.Current.Host, port, "/api"),
+		Client: rest.NewClient(config.Current.Host, port, token),
 	}
 }
 
@@ -24,6 +24,6 @@ type KernelClient struct {
 func NewAdminKernelClient() *KernelClient {
 	port := config.Current.GetPort(meta.Meta.ID, meta.Meta.DefaultKernelPort)
 	return &KernelClient{
-		Client: rest.NewClient(config.Current.Host, port, "/api"),
+		Client: rest.NewClient(config.Current.Host, port, ""),
 	}
 }

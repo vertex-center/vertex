@@ -55,6 +55,8 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
+	r.Use(middleware.ReadAuth)
+
 	containerAdapter = adapter.NewContainerFSAdapter(nil)
 	containerEnvAdapter = adapter.NewContainerEnvFSAdapter(nil)
 	containerLogsAdapter = adapter.NewContainerLogsFSAdapter(nil)

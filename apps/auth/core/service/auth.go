@@ -8,7 +8,6 @@ import (
 
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
-	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 	"golang.org/x/crypto/argon2"
@@ -114,12 +113,6 @@ func (s *AuthService) Logout(token string) error {
 }
 
 func (s *AuthService) Verify(token string) (*types.Session, error) {
-	if token == config.Current.MasterApiKey {
-		log.Debug("master key used for authentication")
-		return &types.Session{
-			Token: token,
-		}, nil
-	}
 	session, err := s.adapter.GetSession(token)
 	if err != nil {
 		return nil, types.ErrTokenInvalid

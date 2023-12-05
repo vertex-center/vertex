@@ -32,6 +32,8 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
+	r.Use(middleware.ReadAuth)
+
 	providerHandler := handler.NewProviderHandler()
 	// docapi:v route /app/tunnels/provider/{provider}/install vx_tunnels_install_provider
 	r.POST("/provider/:provider/install", middleware.Authenticated, providerHandler.Install)

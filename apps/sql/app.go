@@ -38,6 +38,8 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
+	r.Use(middleware.ReadAuth)
+
 	sqlService = service.New(a.ctx)
 
 	dbmsHandler := handler.NewDBMSHandler(sqlService)

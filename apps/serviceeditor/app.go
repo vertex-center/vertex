@@ -34,6 +34,8 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
+	r.Use(middleware.ReadAuth)
+
 	editorService := service.NewEditorService()
 
 	editorHandler := handler.NewEditorHandler(editorService)

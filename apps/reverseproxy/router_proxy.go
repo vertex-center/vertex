@@ -34,7 +34,7 @@ func NewProxyRouter(proxyService port.ProxyService) *ProxyRouter {
 	}
 
 	r.Use(cors.Default())
-	r.Use(ginutils.Logger("PROXY"))
+	r.Use(ginutils.Logger("PROXY", config.Current.GetPort("VERTEX_PROXY", "80")))
 	r.Use(gin.Recovery())
 
 	r.initAPIRoutes()

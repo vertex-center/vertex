@@ -8,7 +8,7 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-func Logger(router string) gin.HandlerFunc {
+func Logger(router, port string) gin.HandlerFunc {
 	return gin.LoggerWithFormatter(func(params gin.LogFormatterParams) string {
 		if params.ErrorMessage != "" {
 			errorMessage := strings.TrimSuffix(params.ErrorMessage, "\n")
@@ -16,6 +16,7 @@ func Logger(router string) gin.HandlerFunc {
 
 			log.Request("request",
 				vlog.String("router", router),
+				vlog.String("port", port),
 				vlog.String("method", params.Method),
 				vlog.Int("status", params.StatusCode),
 				vlog.String("path", params.Path),
@@ -27,6 +28,7 @@ func Logger(router string) gin.HandlerFunc {
 		} else {
 			log.Request("request",
 				vlog.String("router", router),
+				vlog.String("port", port),
 				vlog.String("method", params.Method),
 				vlog.Int("status", params.StatusCode),
 				vlog.String("path", params.Path),

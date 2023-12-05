@@ -45,6 +45,8 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
+	r.Use(middleware.ReadAuth)
+
 	db, err := storage.NewDB(storage.DBParams{
 		ID:         meta.Meta.ID,
 		SchemaFunc: database.GetSchema,
