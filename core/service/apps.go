@@ -2,14 +2,18 @@ package service
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
+
+	"github.com/charmbracelet/lipgloss/table"
 )
 
 type AppsService struct {
@@ -63,14 +67,28 @@ func (s *AppsService) LoadApps() {
 func (s *AppsService) StartApps() {
 	log.Info("initializing apps", vlog.Int("count", len(s.registry.Apps())))
 
+	type appInfo struct {
+		name string
+		port string
+	}
+	var ports []appInfo
+
 	for _, a := range s.registry.Apps() {
 		if s.kernel {
 			if a, ok := a.(app.KernelInitializable); ok {
 				app.RunStandaloneKernel(a)
+				ports = append(ports, appInfo{
+					name: a.Meta().Name + " (Kernel)",
+					port: config.Current.GetPort(a.Meta().ID+"_KERNEL", a.Meta().DefaultKernelPort),
+				})
 			}
 		} else {
 			if a, ok := a.(app.Initializable); ok {
 				app.RunStandalone(a)
+				ports = append(ports, appInfo{
+					name: a.Meta().Name,
+					port: config.Current.GetPort(a.Meta().ID, a.Meta().DefaultPort),
+				})
 			}
 		}
 		s.ctx.DispatchEvent(types.EventAppReady{
@@ -79,6 +97,12 @@ func (s *AppsService) StartApps() {
 	}
 
 	s.ctx.DispatchEvent(types.EventAllAppsReady{})
+
+	t := table.New().Headers("App", "Port")
+	for _, p := range ports {
+		t.Row(p.name, p.port)
+	}
+	fmt.Println(t)
 
 	log.Info("apps initialized")
 }

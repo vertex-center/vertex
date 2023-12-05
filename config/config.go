@@ -82,6 +82,7 @@ func (c Config) KernelURL() string {
 }
 
 func (c Config) GetPort(name string, fallback string) string {
+	name = strings.ToUpper(name)
 	if port, ok := c.Ports[name]; ok {
 		return port
 	}
