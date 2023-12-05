@@ -62,9 +62,8 @@ var (
 	srv *server.Server
 	ctx *types.VertexContext
 
-	appsService   port.AppsService
-	debugService  port.DebugService
-	checksService port.ChecksService
+	appsService  port.AppsService
+	debugService port.DebugService
 )
 
 func main() {
@@ -149,7 +148,6 @@ func initServices() {
 		serviceeditor.NewApp(),
 	})
 	debugService = service.NewDebugService(ctx)
-	checksService = service.NewChecksService()
 }
 
 func initRoutes(about types.About) {
@@ -176,9 +174,4 @@ func initRoutes(about types.About) {
 	apps := a.Group("/apps", middleware.Authenticated)
 	// docapi:v route /apps get_apps
 	apps.GET("", appsHandler.Get)
-
-	checksHandler := handler.NewChecksHandler(checksService)
-	checks := a.Group("/admin/checks", middleware.Authenticated)
-	// docapi:v route /admin/checks admin_checks
-	checks.GET("", app.HeadersSSE, checksHandler.Check)
 }

@@ -3,6 +3,11 @@ package port
 import "github.com/vertex-center/vertex/pkg/router"
 
 type (
+	ChecksHandler interface {
+		// Check handles the check of all components.
+		Check(c *router.Context)
+	}
+
 	DatabaseHandler interface {
 		// GetCurrentDbms handles the retrieval of the current database management system
 		// that Vertex is using.

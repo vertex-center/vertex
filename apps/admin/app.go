@@ -60,6 +60,7 @@ func (a *App) Initialize(r *router.Group) error {
 	hardwareAdapter := adapter.NewHardwareApiAdapter()
 	sshAdapter := adapter.NewSshKernelApiAdapter()
 
+	checksService := service.NewChecksService()
 	settingsService := service.NewAdminSettingsService(settingsAdapter)
 	hardwareService := service.NewHardwareService(hardwareAdapter)
 	sshService := service.NewSshService(sshAdapter)
@@ -99,6 +100,11 @@ func (a *App) Initialize(r *router.Group) error {
 	update.GET("", updateHandler.Get)
 	// docapi:v route /app/admin/update install_update
 	update.POST("", updateHandler.Install)
+
+	checksHandler := handler.NewChecksHandler(checksService)
+	checks := r.Group("/admin/checks", middleware.Authenticated)
+	// docapi:v route /admin/checks admin_checks
+	checks.GET("", apptypes.HeadersSSE, checksHandler.Check)
 
 	return nil
 }

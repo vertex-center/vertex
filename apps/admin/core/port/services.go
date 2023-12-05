@@ -17,6 +17,10 @@ type (
 		SetChannel(channel types.UpdatesChannel) error
 	}
 
+	ChecksService interface {
+		CheckAll(ctx context.Context) <-chan types.CheckResponse
+	}
+
 	DbService interface {
 		GetCurrentDbms() string
 		MigrateTo(dbms string) error
