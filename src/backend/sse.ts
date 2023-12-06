@@ -22,7 +22,7 @@ export function registerSSE(url: string, route: string): string {
     uuid = uuidv4();
     const eventSource = new EventSourcePolyfill(
         // @ts-ignore
-        `${url}/api${route}`,
+        `${url}${route}`,
         {
             headers: {
                 Authorization: `Bearer ${getAuthToken()}`,
