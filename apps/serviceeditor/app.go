@@ -1,6 +1,7 @@
 package serviceeditor
 
 import (
+	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/serviceeditor/core/service"
 	"github.com/vertex-center/vertex/apps/serviceeditor/handler"
@@ -15,8 +16,8 @@ var Meta = apptypes.Meta{
 	Icon:        "frame_source",
 	Category:    "devtools",
 	DefaultPort: "7510",
-	Dependencies: []string{
-		"auth",
+	Dependencies: []*apptypes.Meta{
+		&authmeta.Meta,
 	},
 }
 

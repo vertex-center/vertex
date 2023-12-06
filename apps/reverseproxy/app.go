@@ -1,6 +1,7 @@
 package reverseproxy
 
 import (
+	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/reverseproxy/adapter"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
@@ -23,8 +24,8 @@ var Meta = apptypes.Meta{
 	Description: "Redirect traffic to your containers.",
 	Icon:        "router",
 	DefaultPort: "7508",
-	Dependencies: []string{
-		"auth",
+	Dependencies: []*apptypes.Meta{
+		&authmeta.Meta,
 	},
 }
 

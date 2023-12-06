@@ -1,7 +1,9 @@
 package monitoring
 
 import (
+	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
+	containersmeta "github.com/vertex-center/vertex/apps/containers/meta"
 	"github.com/vertex-center/vertex/apps/monitoring/adapter"
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	"github.com/vertex-center/vertex/apps/monitoring/core/service"
@@ -22,9 +24,9 @@ var Meta = apptypes.Meta{
 	Description: "Create and manage containers.",
 	Icon:        "monitoring",
 	DefaultPort: "7506",
-	Dependencies: []string{
-		"auth",
-		"containers",
+	Dependencies: []*apptypes.Meta{
+		&authmeta.Meta,
+		&containersmeta.Meta,
 	},
 }
 

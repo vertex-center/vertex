@@ -1,7 +1,9 @@
 package sql
 
 import (
+	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
+	containersmeta "github.com/vertex-center/vertex/apps/containers/meta"
 	"github.com/vertex-center/vertex/apps/sql/core/port"
 	"github.com/vertex-center/vertex/apps/sql/core/service"
 	"github.com/vertex-center/vertex/apps/sql/handler"
@@ -19,9 +21,9 @@ var Meta = apptypes.Meta{
 	Description: "Create and manage SQL databases.",
 	Icon:        "database",
 	DefaultPort: "7512",
-	Dependencies: []string{
-		"auth",
-		"containers",
+	Dependencies: []*apptypes.Meta{
+		&authmeta.Meta,
+		&containersmeta.Meta,
 	},
 }
 

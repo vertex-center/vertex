@@ -1,6 +1,9 @@
 package meta
 
-import "github.com/vertex-center/vertex/core/types/app"
+import (
+	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
+	"github.com/vertex-center/vertex/core/types/app"
+)
 
 var Meta = app.Meta{
 	ID:                "containers",
@@ -9,7 +12,7 @@ var Meta = app.Meta{
 	Icon:              "deployed_code",
 	DefaultPort:       "7504",
 	DefaultKernelPort: "7505",
-	Dependencies: []string{
-		"auth",
+	Dependencies: []*app.Meta{
+		&authmeta.Meta,
 	},
 }

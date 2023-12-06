@@ -1,7 +1,9 @@
 package tunnels
 
 import (
+	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
+	containersmeta "github.com/vertex-center/vertex/apps/containers/meta"
 	"github.com/vertex-center/vertex/apps/tunnels/handler"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -13,9 +15,9 @@ var Meta = apptypes.Meta{
 	Description: "Create and manage tunnels.",
 	Icon:        "subway",
 	DefaultPort: "7514",
-	Dependencies: []string{
-		"auth",
-		"containers",
+	Dependencies: []*apptypes.Meta{
+		&authmeta.Meta,
+		&containersmeta.Meta,
 	},
 }
 
