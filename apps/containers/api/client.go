@@ -14,3 +14,13 @@ func NewContainersClient(token string) *Client {
 		Client: rest.NewClient(meta.Meta.ApiURL(), token),
 	}
 }
+
+type KernelClient struct {
+	*rest.Client
+}
+
+func NewContainersKernelClient() *KernelClient {
+	return &KernelClient{
+		Client: rest.NewClient(meta.Meta.ApiKernelURL(), ""),
+	}
+}
