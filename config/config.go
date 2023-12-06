@@ -1,7 +1,6 @@
 package config
 
 import (
-	"crypto/rand"
 	"fmt"
 	"os"
 	"path"
@@ -34,13 +33,6 @@ func New() Config {
 	if err != nil {
 		log.Error(err)
 		host = "127.0.0.1"
-	}
-
-	// Generate a random master key token
-	token := make([]byte, 32)
-	_, err = rand.Read(token)
-	if err != nil {
-		log.Error(fmt.Errorf("failed to generate master key token: %w", err))
 	}
 
 	c := Config{
