@@ -1,33 +1,12 @@
 package database
 
 import (
-	"time"
-
-	"github.com/vertex-center/vertex/database/migration"
 	"github.com/vertex-center/vertex/pkg/vsql"
 )
 
 func GetSchema(driver vsql.Driver) string {
 	return vsql.BuildSchema(driver,
-		vsql.CreateTable("admin_settings").
-			WithID().
-			WithField("updates_channel", "VARCHAR(255)", "NOT NULL DEFAULT 'stable'").
-			WithField("webhook", "VARCHAR(255)").
-			WithCreatedAt().
-			WithUpdatedAt().
-			WithDeletedAt(),
-
-		vsql.InsertInto("admin_settings").
-			Columns("updates_channel", "created_at", "updated_at").
-			Values("stable", time.Now().Unix(), time.Now().Unix()),
-
-		vsql.CreateTable("migrations").
-			WithID().
-			WithField("version", "INTEGER", "NOT NULL"),
-
-		vsql.InsertInto("migrations").
-			Columns("version").
-			Values(len(migration.Migrations)),
+		vsql.CreateMigrationTable(Migrations),
 
 		vsql.CreateTable("users").
 			WithID().

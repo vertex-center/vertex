@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/vertex-center/vertex/config"
+	"github.com/vertex-center/vertex/apps/admin/meta"
 	"github.com/vertex-center/vertex/pkg/rest"
 )
 
@@ -9,9 +9,9 @@ type Client struct {
 	*rest.Client
 }
 
-func NewAdminClient() *Client {
+func NewAdminClient(token string) *Client {
 	return &Client{
-		Client: rest.NewClient(config.Current.VertexURL(), "/api/app/admin/"),
+		Client: rest.NewClient(meta.Meta.ApiURL(), token),
 	}
 }
 
@@ -21,6 +21,6 @@ type KernelClient struct {
 
 func NewAdminKernelClient() *KernelClient {
 	return &KernelClient{
-		Client: rest.NewClient(config.Current.KernelURL(), "/api/app/admin/"),
+		Client: rest.NewClient(meta.Meta.ApiKernelURL(), ""),
 	}
 }

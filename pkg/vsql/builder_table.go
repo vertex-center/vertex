@@ -16,6 +16,29 @@ func CreateTable(name string) *QueryCreateTable {
 	}
 }
 
+type QueryCreateMigrationTable struct {
+	table  Builder
+	insert Builder
+}
+
+func CreateMigrationTable(migrations []Migration) Builder {
+	return &QueryCreateMigrationTable{
+		table: CreateTable("migrations").
+			WithID().
+			WithField("version", "INTEGER", "NOT NULL"),
+		insert: InsertInto("migrations").
+			Columns("version").
+			Values(len(migrations)),
+	}
+}
+
+func (q *QueryCreateMigrationTable) Build(driver Driver) string {
+	return BuildSchema(driver,
+		q.table,
+		q.insert,
+	)
+}
+
 func (q *QueryCreateTable) WithID() *QueryCreateTable {
 	q.fields = append(q.fields, &QueryWithID{})
 	return q

@@ -1,7 +1,9 @@
 package monitoring
 
 import (
+	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
+	containersmeta "github.com/vertex-center/vertex/apps/containers/meta"
 	"github.com/vertex-center/vertex/apps/monitoring/adapter"
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	"github.com/vertex-center/vertex/apps/monitoring/core/service"
@@ -16,6 +18,18 @@ var (
 	metricsService port.MetricsService
 )
 
+var Meta = apptypes.Meta{
+	ID:          "monitoring",
+	Name:        "Vertex Monitoring",
+	Description: "Create and manage containers.",
+	Icon:        "monitoring",
+	DefaultPort: "7506",
+	Dependencies: []*apptypes.Meta{
+		&authmeta.Meta,
+		&containersmeta.Meta,
+	},
+}
+
 type App struct {
 	ctx *apptypes.Context
 }
@@ -29,15 +43,12 @@ func (a *App) Load(ctx *apptypes.Context) {
 }
 
 func (a *App) Meta() apptypes.Meta {
-	return apptypes.Meta{
-		ID:          "monitoring",
-		Name:        "Vertex Monitoring",
-		Description: "Create and manage containers.",
-		Icon:        "monitoring",
-	}
+	return Meta
 }
 
 func (a *App) Initialize(r *router.Group) error {
+	r.Use(middleware.ReadAuth)
+
 	prometheusAdapter = adapter.NewMetricsPrometheusAdapter()
 
 	metricsService = service.NewMetricsService(a.ctx, prometheusAdapter)

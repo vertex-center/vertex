@@ -1,6 +1,7 @@
 package reverseproxy
 
 import (
+	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/reverseproxy/adapter"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
@@ -17,6 +18,17 @@ var (
 	proxyService port.ProxyService
 )
 
+var Meta = apptypes.Meta{
+	ID:          "reverse-proxy",
+	Name:        "Vertex Reverse Proxy",
+	Description: "Redirect traffic to your containers.",
+	Icon:        "router",
+	DefaultPort: "7508",
+	Dependencies: []*apptypes.Meta{
+		&authmeta.Meta,
+	},
+}
+
 type App struct {
 	ctx   *apptypes.Context
 	proxy *ProxyRouter
@@ -31,15 +43,12 @@ func (a *App) Load(ctx *apptypes.Context) {
 }
 
 func (a *App) Meta() apptypes.Meta {
-	return apptypes.Meta{
-		ID:          "reverse-proxy",
-		Name:        "Vertex Reverse Proxy",
-		Description: "Redirect traffic to your containers.",
-		Icon:        "router",
-	}
+	return Meta
 }
 
 func (a *App) Initialize(r *router.Group) error {
+	r.Use(middleware.ReadAuth)
+
 	proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
 
 	proxyService = service.NewProxyService(proxyFSAdapter)

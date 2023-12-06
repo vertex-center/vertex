@@ -7,11 +7,13 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/service"
 	types2 "github.com/vertex-center/vertex/apps/admin/core/types"
+	"github.com/vertex-center/vertex/apps/admin/database"
 	"github.com/vertex-center/vertex/apps/admin/handler"
+	"github.com/vertex-center/vertex/apps/admin/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vertex/updates"
 )
 
@@ -32,31 +34,34 @@ func (a *App) Load(ctx *apptypes.Context) {
 		baselinesApiAdapter := adapter.NewBaselinesApiAdapter()
 		updateService = service.NewUpdateService(a.ctx, baselinesApiAdapter, []types2.Updater{
 			updates.NewVertexUpdater(a.ctx.About()),
-			updates.NewVertexClientUpdater(path.Join(storage.Path, "client")),
-			updates.NewRepositoryUpdater("vertex_services", path.Join(storage.Path, "services"), "vertex-center", "services"),
+			updates.NewVertexClientUpdater(path.Join(storage.FSPath, "client")),
+			updates.NewRepositoryUpdater("vertex_services", path.Join(storage.FSPath, "services"), "vertex-center", "services"),
 		})
 	}
 }
 
 func (a *App) Meta() apptypes.Meta {
-	return apptypes.Meta{
-		ID:          "admin",
-		Name:        "Vertex Admin",
-		Description: "Administer Vertex",
-		Icon:        "admin_panel_settings",
-	}
+	return meta.Meta
 }
 
 func (a *App) Initialize(r *router.Group) error {
-	dbAdapter := adapter.NewDbAdapter(nil)
-	a.ctx.SetDb(dbAdapter.Get())
+	r.Use(middleware.ReadAuth)
 
-	settingsAdapter := adapter.NewAdminSettingsDbAdapter(dbAdapter)
+	db, err := storage.NewDB(storage.DBParams{
+		ID:         meta.Meta.ID,
+		SchemaFunc: database.GetSchema,
+		Migrations: database.Migrations,
+	})
+	if err != nil {
+		return err
+	}
+
+	settingsAdapter := adapter.NewAdminSettingsDbAdapter(db)
 	hardwareAdapter := adapter.NewHardwareApiAdapter()
 	sshAdapter := adapter.NewSshKernelApiAdapter()
 
+	checksService := service.NewChecksService()
 	settingsService := service.NewAdminSettingsService(settingsAdapter)
-	dbService := service.NewDbService(a.ctx, dbAdapter)
 	hardwareService := service.NewHardwareService(hardwareAdapter)
 	sshService := service.NewSshService(sshAdapter)
 
@@ -82,13 +87,6 @@ func (a *App) Initialize(r *router.Group) error {
 	// docapi:v route /app/admin/ssh/users get_ssh_users
 	ssh.GET("/users", sshHandler.GetUsers)
 
-	dbHandler := handler.NewDatabaseHandler(dbService)
-	db := r.Group("/db", middleware.Authenticated)
-	// docapi:v route /app/admin/db/dbms get_current_dbms
-	db.GET("/dbms", dbHandler.GetCurrentDbms)
-	// docapi:v route /app/admin/db/dbms migrate_to_dbms
-	db.POST("/dbms", dbHandler.MigrateTo)
-
 	settingsHandler := handler.NewSettingsHandler(settingsService)
 	settings := r.Group("/settings", middleware.Authenticated)
 	// docapi:v route /app/admin/settings get_settings
@@ -102,6 +100,11 @@ func (a *App) Initialize(r *router.Group) error {
 	update.GET("", updateHandler.Get)
 	// docapi:v route /app/admin/update install_update
 	update.POST("", updateHandler.Install)
+
+	checksHandler := handler.NewChecksHandler(checksService)
+	checks := r.Group("/admin/checks", middleware.Authenticated)
+	// docapi:v route /admin/checks admin_checks
+	checks.GET("", apptypes.HeadersSSE, checksHandler.Check)
 
 	return nil
 }

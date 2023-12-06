@@ -2,7 +2,6 @@ package adapter
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"path"
@@ -13,7 +12,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 	"gopkg.in/yaml.v3"
@@ -63,8 +61,6 @@ func (a *PrometheusAdapter) ConfigureContainer(uuid uuid.UUID) error {
 		return err
 	}
 
-	url := fmt.Sprintf("%s:%s", config.Current.Host, config.Current.PortPrometheus)
-
 	data := map[string]interface{}{
 		"scrape_configs": []map[string]interface{}{
 			{
@@ -72,7 +68,7 @@ func (a *PrometheusAdapter) ConfigureContainer(uuid uuid.UUID) error {
 				"scrape_interval": "5s",
 				"static_configs": []map[string]interface{}{
 					{
-						"targets": []string{url},
+						"targets": []string{"localhost:2112"},
 					},
 				},
 			},

@@ -43,3 +43,7 @@ func (g *Group) HEAD(path string, handlers ...HandlerFunc) {
 func (g *Group) Any(path string, handlers ...HandlerFunc) {
 	g.RouterGroup.Any(path, wrapHandlers(handlers...)...)
 }
+
+func (g *Group) Use(handlers ...HandlerFunc) {
+	g.RouterGroup.Use(wrapHandlers(handlers...)...)
+}

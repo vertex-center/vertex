@@ -3,7 +3,6 @@ package reverseproxy
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -34,7 +33,7 @@ func NewProxyRouter(proxyService port.ProxyService) *ProxyRouter {
 	}
 
 	r.Use(cors.Default())
-	r.Use(ginutils.Logger("PROXY"))
+	r.Use(ginutils.Logger("PROXY", config.Current.URL("proxy").String()))
 	r.Use(gin.Recovery())
 
 	r.initAPIRoutes()
@@ -43,9 +42,9 @@ func NewProxyRouter(proxyService port.ProxyService) *ProxyRouter {
 }
 
 func (r *ProxyRouter) Start() error {
-	log.Info("Vertex-Proxy started", vlog.String("url", config.Current.ProxyURL()))
-	addr := fmt.Sprintf(":%s", config.Current.PortProxy)
-	return r.Router.Start(addr)
+	proxyURL := config.Current.URL("proxy")
+	log.Info("Vertex-Proxy started", vlog.String("url", proxyURL.String()))
+	return r.Router.Start(":" + proxyURL.Port())
 }
 
 func (r *ProxyRouter) Stop() error {

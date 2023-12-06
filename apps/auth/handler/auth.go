@@ -98,6 +98,32 @@ func (h AuthHandler) Register(c *router.Context) {
 	c.JSON(token)
 }
 
+// docapi begin auth_verify
+// docapi method POST
+// docapi summary Verify
+// docapi description Verify a token
+// docapi tags Authentication
+// docapi response 200 {Token} The auth token
+// docapi response 400
+// docapi response 500
+// docapi end
+
+func (h AuthHandler) Verify(c *router.Context) {
+	token := c.MustGet("token").(string)
+
+	session, err := h.authService.Verify(token)
+	if err != nil {
+		c.Abort(router.Error{
+			Code:           types.ErrCodeInvalidCredentials,
+			PublicMessage:  "Invalid credentials",
+			PrivateMessage: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(session)
+}
+
 // docapi begin auth_logout
 // docapi method POST
 // docapi summary Logout

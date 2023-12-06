@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
-	"github.com/vertex-center/vertex/config"
 )
 
 type AuthServiceTestSuite struct {
@@ -116,12 +115,6 @@ func (suite *AuthServiceTestSuite) TestVerify() {
 	_, err := suite.service.Verify("valid_token")
 	suite.Require().NoError(err)
 	suite.adapter.AssertExpectations(suite.T())
-}
-
-func (suite *AuthServiceTestSuite) TestVerifyMasterKey() {
-	suite.Require().Len(config.Current.MasterApiKey, 44)
-	_, err := suite.service.Verify(config.Current.MasterApiKey)
-	suite.Require().NoError(err)
 }
 
 func (suite *AuthServiceTestSuite) TestVerifyInvalidToken() {

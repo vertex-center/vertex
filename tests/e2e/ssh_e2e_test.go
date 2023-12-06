@@ -21,8 +21,8 @@ func TestE2ESshTestSuite(t *testing.T) {
 }
 
 func (suite *SshE2ETestSuite) SetupSuite() {
-	config.Current.Port = "7130"
-	config.Current.PortKernel = "7131"
+	config.Current.Ports["VERTEX"] = "7130"
+	config.Current.Ports["VERTEX_KERNEL"] = "7131"
 }
 
 func (suite *SshE2ETestSuite) TestSsh() {

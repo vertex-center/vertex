@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
+	"github.com/vertex-center/vertex/apps/admin/core/port"
+	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/net"
 	"github.com/vertex-center/vlog"
@@ -69,11 +69,11 @@ func (s *ChecksService) checkInternet(ctx context.Context) types.CheckResponse {
 }
 
 func (s *ChecksService) checkVertex(ctx context.Context) types.CheckResponse {
-	return s.checkURL(ctx, "api_vertex", "Vertex API", config.Current.VertexURL())
+	return s.checkURL(ctx, "api_vertex", "Vertex API", config.Current.URL("vertex").String())
 }
 
 func (s *ChecksService) checkKernel(ctx context.Context) types.CheckResponse {
-	return s.checkURL(ctx, "api_kernel", "Vertex Kernel API", config.Current.KernelURL())
+	return s.checkURL(ctx, "api_kernel", "Vertex Kernel API", config.Current.KernelURL("vertex").String())
 }
 
 func (s *ChecksService) checkURL(ctx context.Context, id, name, url string) types.CheckResponse {

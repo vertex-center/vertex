@@ -7,11 +7,10 @@ import (
 	"path"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
-
-	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/pkg/storage"
+	"github.com/vertex-center/vertex/core/types/storage"
 )
 
 const ContainerEnvPath = ".env"
@@ -29,7 +28,7 @@ func NewContainerEnvFSAdapter(params *ContainerEnvFSAdapterParams) port.Containe
 		params = &ContainerEnvFSAdapterParams{}
 	}
 	if params.containersPath == "" {
-		params.containersPath = path.Join(storage.Path, "apps", "containers", "containers")
+		params.containersPath = path.Join(storage.FSPath, "apps", "containers", "containers")
 	}
 
 	adapter := &ContainerEnvFSAdapter{

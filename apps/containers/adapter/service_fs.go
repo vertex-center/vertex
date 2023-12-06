@@ -7,16 +7,15 @@ import (
 	"path"
 
 	"github.com/vertex-center/vertex/apps/containers/core/port"
-	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
-
+	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/pkg/storage"
 	"gopkg.in/yaml.v3"
 )
 
 type ServiceFSAdapter struct {
 	servicesPath string
-	services     []containerstypes.Service
+	services     []types.Service
 }
 
 type ServiceFSAdapterParams struct {
@@ -28,7 +27,7 @@ func NewServiceFSAdapter(params *ServiceFSAdapterParams) port.ServiceAdapter {
 		params = &ServiceFSAdapterParams{}
 	}
 	if params.servicesPath == "" {
-		params.servicesPath = path.Join(storage.Path, "services")
+		params.servicesPath = path.Join(storage.FSPath, "services")
 	}
 
 	adapter := &ServiceFSAdapter{
@@ -41,14 +40,14 @@ func NewServiceFSAdapter(params *ServiceFSAdapterParams) port.ServiceAdapter {
 	return adapter
 }
 
-func (a *ServiceFSAdapter) Get(id string) (containerstypes.Service, error) {
+func (a *ServiceFSAdapter) Get(id string) (types.Service, error) {
 	for _, service := range a.services {
 		if service.ID == id {
 			return service, nil
 		}
 	}
 
-	return containerstypes.Service{}, containerstypes.ErrServiceNotFound
+	return types.Service{}, types.ErrServiceNotFound
 }
 
 func (a *ServiceFSAdapter) GetRaw(id string) (interface{}, error) {
@@ -56,7 +55,7 @@ func (a *ServiceFSAdapter) GetRaw(id string) (interface{}, error) {
 
 	data, err := os.ReadFile(servicePath)
 	if err != nil && os.IsNotExist(err) {
-		return nil, containerstypes.ErrServiceNotFound
+		return nil, types.ErrServiceNotFound
 	} else if err != nil {
 		return nil, err
 	}
@@ -79,14 +78,14 @@ func (a *ServiceFSAdapter) GetScript(id string) ([]byte, error) {
 	return os.ReadFile(path.Join(a.servicesPath, "services", id, service.Methods.Script.Filename))
 }
 
-func (a *ServiceFSAdapter) GetAll() []containerstypes.Service {
+func (a *ServiceFSAdapter) GetAll() []types.Service {
 	return a.services
 }
 
 func (a *ServiceFSAdapter) Reload() error {
 	servicesPath := path.Join(a.servicesPath, "services")
 
-	a.services = []containerstypes.Service{}
+	a.services = []types.Service{}
 
 	entries, err := os.ReadDir(servicesPath)
 	if err != nil {
@@ -105,7 +104,7 @@ func (a *ServiceFSAdapter) Reload() error {
 			return err
 		}
 
-		var service containerstypes.Service
+		var service types.Service
 		err = yaml.Unmarshal(file, &service)
 		if err != nil {
 			return err

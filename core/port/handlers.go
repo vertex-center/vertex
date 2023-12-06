@@ -17,11 +17,6 @@ type (
 		Logout(c *router.Context)
 	}
 
-	ChecksHandler interface {
-		// Check handles the check of all components.
-		Check(c *router.Context)
-	}
-
 	DebugHandler interface {
 		// HardReset do a hard reset of Vertex.
 		HardReset(c *router.Context)

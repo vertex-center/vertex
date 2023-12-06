@@ -6,14 +6,14 @@ import (
 
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
-	vtypes "github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/core/types/storage"
 )
 
 type AuthDbAdapter struct {
-	db *vtypes.DB
+	db storage.DB
 }
 
-func NewAuthDbAdapter(db *vtypes.DB) port.AuthAdapter {
+func NewAuthDbAdapter(db storage.DB) port.AuthAdapter {
 	return &AuthDbAdapter{
 		db: db,
 	}

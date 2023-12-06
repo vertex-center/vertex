@@ -1,18 +1,19 @@
 package config
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"fmt"
+	"net/url"
 	"os"
 	"path"
+	"strings"
 
+	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/net"
-	"github.com/vertex-center/vertex/pkg/storage"
+	"github.com/vertex-center/vlog"
 )
 
-const urlFormat = "http://%s:%s"
+const DefaultApiURLFormat = "http://%s:%s/api"
 
 var Current = New()
 
@@ -24,39 +25,46 @@ const (
 )
 
 type Config struct {
-	mode Mode
-
-	Host           string `json:"host"`
-	Port           string `json:"port"`
-	PortKernel     string `json:"port_kernel"`
-	PortProxy      string `json:"port_proxy"`
-	PortPrometheus string `json:"port_prometheus"`
-	MasterApiKey   string `json:"master_api_key"`
+	mode       Mode
+	localIP    string
+	urls       map[string]string
+	kernelUrls map[string]string
 }
 
 func New() Config {
-	host, err := net.LocalIP()
+	localIP, err := net.LocalIP()
 	if err != nil {
 		log.Error(err)
-		host = "127.0.0.1"
-	}
-
-	// Generate a random master key token
-	token := make([]byte, 32)
-	_, err = rand.Read(token)
-	if err != nil {
-		log.Error(fmt.Errorf("failed to generate master key token: %w", err))
+		localIP = "127.0.0.1"
 	}
 
 	c := Config{
-		mode: ProductionMode,
+		mode:    ProductionMode,
+		localIP: localIP,
+		urls: map[string]string{
+			"vertex": fmt.Sprintf(DefaultApiURLFormat, localIP, "6130"),
+		},
+		kernelUrls: map[string]string{
+			"vertex": fmt.Sprintf(DefaultApiURLFormat, localIP, "6131"),
+		},
+	}
 
-		Host:           host,
-		Port:           "6130",
-		PortKernel:     "6131",
-		PortProxy:      "80",
-		PortPrometheus: "2112",
-		MasterApiKey:   base64.StdEncoding.EncodeToString(token),
+	env := os.Environ()
+	for _, e := range env {
+		pair := strings.SplitN(e, "=", 2)
+		if len(pair) == 2 {
+			key, value := pair[0], pair[1]
+			if strings.HasPrefix(key, "VERTEX_URL_") {
+				name := strings.TrimPrefix(key, "VERTEX_URL_")
+				name = strings.ToLower(name)
+				if strings.HasSuffix(key, "_kernel") {
+					name = strings.TrimSuffix(name, "_kernel")
+					c.kernelUrls[name] = value
+				} else {
+					c.urls[name] = value
+				}
+			}
+		}
 	}
 
 	if os.Getenv("DEBUG") == "1" {
@@ -67,16 +75,48 @@ func New() Config {
 	return c
 }
 
-func (c Config) VertexURL() string {
-	return fmt.Sprintf(urlFormat, c.Host, c.Port)
+func (c Config) KernelURL(id string) *url.URL {
+	if u, ok := c.kernelUrls[id]; ok {
+		p, err := url.Parse(u)
+		if err != nil {
+			log.Error(err)
+			return &url.URL{}
+		}
+		return p
+	}
+	log.Error(fmt.Errorf("no url configured for this kernel app"), vlog.String("app_id", id))
+	return &url.URL{}
 }
 
-func (c Config) KernelURL() string {
-	return fmt.Sprintf(urlFormat, c.Host, c.PortKernel)
+func (c Config) URL(id string) *url.URL {
+	if u, ok := c.urls[id]; ok {
+		p, err := url.Parse(u)
+		if err != nil {
+			log.Error(err)
+			return &url.URL{}
+		}
+		return p
+	}
+	log.Error(fmt.Errorf("no url configured for this app"), vlog.String("app_id", id))
+	return &url.URL{}
 }
 
-func (c Config) ProxyURL() string {
-	return fmt.Sprintf(urlFormat, c.Host, c.PortProxy)
+func (c Config) RegisterApiURL(id string, url string) {
+	if _, ok := c.urls[id]; ok {
+		return
+	}
+	c.urls[id] = url
+}
+
+func (c Config) RegisterKernelApiURL(id string, url string) {
+	if _, ok := c.kernelUrls[id]; ok {
+		return
+	}
+	c.kernelUrls[id] = url
+}
+
+func (c Config) LocalIP() string {
+	return c.localIP
 }
 
 func (c Config) Debug() bool {
@@ -84,6 +124,12 @@ func (c Config) Debug() bool {
 }
 
 func (c Config) Apply() error {
-	configJsContent := fmt.Sprintf("window.apiURL = \"%s\";", c.VertexURL())
-	return os.WriteFile(path.Join(storage.Path, "client", "dist", "config.js"), []byte(configJsContent), os.ModePerm)
+	cfg := "window.api_urls = {\n"
+	// Only for the non-kernel apps
+	for name, u := range c.urls {
+		name = strings.ReplaceAll(name, "-", "_")
+		cfg += fmt.Sprintf("\t%s: '%s',\n", name, u)
+	}
+	cfg += "};\n"
+	return os.WriteFile(path.Join(storage.FSPath, "client", "dist", "config.js"), []byte(cfg), os.ModePerm)
 }

@@ -13,9 +13,10 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/pkg/storage"
+	vstorage "github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"
 )
 
@@ -36,9 +37,9 @@ func (s *ContainerRunnerService) Install(uuid uuid.UUID, service types.Service) 
 		return ErrInstallMethodDoesNotExists
 	}
 
-	dir := path.Join(storage.Path, uuid.String())
+	dir := path.Join(storage.FSPath, uuid.String())
 	if service.Methods.Docker.Clone != nil {
-		err := storage.CloneRepository(dir, service.Methods.Docker.Clone.Repository)
+		err := vstorage.CloneRepository(dir, service.Methods.Docker.Clone.Repository)
 		if err != nil {
 			return err
 		}

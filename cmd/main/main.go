@@ -1,18 +1,13 @@
 package main
 
 import (
-	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"net/http"
 	"os"
-	"os/signal"
 	"path"
 	"runtime"
-	"time"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/apps/admin"
@@ -29,15 +24,34 @@ import (
 	"github.com/vertex-center/vertex/core/service"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/core/types/server"
+	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/handler"
-	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/storage"
-	"github.com/vertex-center/vlog"
 )
 
-// version, commit and date will be overridden by goreleaser
+// docapi:v title Vertex
+// docapi:v description A platform to manage your self-hosted server.
+// docapi:v version 0.0.0
+// docapi:v filename vertex
+
+// docapi:v url http://{ip}:{port}/api
+// docapi:v urlvar ip localhost The IP address of the server.
+// docapi:v urlvar port 6130 The port of the server.
+
+// docapi code 200 Success
+// docapi code 201 Created
+// docapi code 204 No content
+// docapi code 304 Not modified
+// docapi code 400 {Error} Bad request
+// docapi code 401 {Error} Unauthorized
+// docapi code 404 {Error} Resource not found
+// docapi code 409 {Error} Conflict
+// docapi code 422 {Error} Unprocessable entity
+// docapi code 500 {Error} Internal error
+
+// goreleaser will override version, commit and date
 var (
 	version = "dev"
 	commit  = "none"
@@ -45,12 +59,11 @@ var (
 )
 
 var (
-	r   *router.Router
+	srv *server.Server
 	ctx *types.VertexContext
 
-	appsService   port.AppsService
-	debugService  port.DebugService
-	checksService port.ChecksService
+	appsService  port.AppsService
+	debugService port.DebugService
 )
 
 func main() {
@@ -71,39 +84,30 @@ func main() {
 		Arch: runtime.GOARCH,
 	}
 
-	initRouter()
-	initAdapters(about)
+	ctx = types.NewVertexContext(about, false)
+	url := config.Current.URL("vertex")
+
+	srv = server.New("main", url, ctx)
 	initServices()
 	initRoutes(about)
-	handleSignals()
 
-	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.Path, "client", "dist"), true)))
+	srv.Router.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.FSPath, "client", "dist"), true)))
 
-	startRouter()
-}
+	exitChan := srv.StartAsync()
 
-func handleSignals() {
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	go func() {
-		<-c
-		log.Info("shutdown signal sent")
-		stopRouter()
-		os.Exit(0)
-	}()
+	for err := range exitChan {
+		if err != nil {
+			log.Error(err)
+		}
+	}
 }
 
 func parseArgs() {
 	var (
-		flagVersion        = flag.Bool("version", false, "Print vertex version")
-		flagV              = flag.Bool("v", false, "Print vertex version")
-		flagDate           = flag.Bool("date", false, "Print the release date")
-		flagCommit         = flag.Bool("commit", false, "Print the commit hash")
-		flagHost           = flag.String("host", config.Current.Host, "The Vertex access url")
-		flagPort           = flag.String("port", config.Current.Port, "The Vertex port")
-		flagPortKernel     = flag.String("port-kernel", config.Current.PortKernel, "The Vertex Kernel port")
-		flagPortProxy      = flag.String("port-proxy", config.Current.PortProxy, "The Vertex Proxy port")
-		flagPortPrometheus = flag.String("port-prometheus", config.Current.PortPrometheus, "The Prometheus port")
+		flagVersion = flag.Bool("version", false, "Print vertex version")
+		flagV       = flag.Bool("v", false, "Print vertex version")
+		flagDate    = flag.Bool("date", false, "Print the release date")
+		flagCommit  = flag.Bool("commit", false, "Print the commit hash")
 	)
 
 	flag.Parse()
@@ -120,11 +124,6 @@ func parseArgs() {
 		fmt.Println(commit)
 		os.Exit(0)
 	}
-	config.Current.Host = *flagHost
-	config.Current.Port = *flagPort
-	config.Current.PortKernel = *flagPortKernel
-	config.Current.PortProxy = *flagPortProxy
-	config.Current.PortPrometheus = *flagPortPrometheus
 }
 
 func checkNotRoot() {
@@ -133,28 +132,10 @@ func checkNotRoot() {
 	}
 }
 
-func initRouter() {
-	gin.SetMode(gin.ReleaseMode)
-	r = router.New()
-
-	cfg := cors.DefaultConfig()
-	cfg.AllowAllOrigins = true
-	cfg.AddAllowHeaders("Authorization")
-
-	r.Use(cors.New(cfg))
-	r.Use(ginutils.ErrorHandler())
-	r.Use(ginutils.Logger("MAIN"))
-	r.Use(gin.Recovery())
-}
-
-func initAdapters(about types.About) {
-	ctx = types.NewVertexContext(about, false)
-}
-
 func initServices() {
 	// Update service must be initialized before all other services, because it
 	// is responsible for downloading dependencies for other services.
-	appsService = service.NewAppsService(ctx, false, r, []app.Interface{
+	appsService = service.NewAppsService(ctx, false, []app.Interface{
 		admin.NewApp(),
 		auth.NewApp(),
 		sql.NewApp(),
@@ -165,38 +146,17 @@ func initServices() {
 		serviceeditor.NewApp(),
 	})
 	debugService = service.NewDebugService(ctx)
-	checksService = service.NewChecksService()
 }
 
 func initRoutes(about types.About) {
-	// docapi:v title Vertex
-	// docapi:v description A platform to manage your self-hosted server.
-	// docapi:v version 0.0.0
-	// docapi:v filename vertex
-
-	// docapi:v url http://{ip}:{port}/api
-	// docapi:v urlvar ip localhost The IP address of the server.
-	// docapi:v urlvar port 6130 The port of the server.
-
-	// docapi code 200 Success
-	// docapi code 201 Created
-	// docapi code 204 No content
-	// docapi code 304 Not modified
-	// docapi code 400 {Error} Bad request
-	// docapi code 401 {Error} Unauthorized
-	// docapi code 404 {Error} Resource not found
-	// docapi code 409 {Error} Conflict
-	// docapi code 422 {Error} Unprocessable entity
-	// docapi code 500 {Error} Internal error
-
-	r.NoRoute(func(c *gin.Context) {
+	srv.Router.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, router.Error{
 			Code:          "resource_not_found",
 			PublicMessage: "Resource not found.",
 		})
 	})
 
-	a := r.Group("/api", middleware.ReadAuth)
+	a := srv.Router.Group("/api", middleware.ReadAuth)
 	a.GET("/about", func(c *router.Context) {
 		c.JSON(about)
 	})
@@ -212,61 +172,4 @@ func initRoutes(about types.About) {
 	apps := a.Group("/apps", middleware.Authenticated)
 	// docapi:v route /apps get_apps
 	apps.GET("", appsHandler.Get)
-
-	checksHandler := handler.NewChecksHandler(checksService)
-	checks := a.Group("/admin/checks", middleware.Authenticated)
-	// docapi:v route /admin/checks admin_checks
-	checks.GET("", app.HeadersSSE, checksHandler.Check)
-}
-
-func startRouter() {
-	url := config.Current.VertexURL()
-	fmt.Printf("\n-- Vertex Client :: %s\n\n", url)
-	log.Info("Vertex started", vlog.String("url", url))
-
-	stopChan := make(chan struct{})
-	defer close(stopChan)
-
-	go func() {
-		err := r.Start(fmt.Sprintf(":%s", config.Current.Port))
-		if errors.Is(err, http.ErrServerClosed) {
-			log.Info("server closed")
-		} else if err != nil {
-			log.Error(err)
-		}
-
-		stopChan <- struct{}{}
-	}()
-
-	timeout, cancelTimeout := context.WithTimeout(context.Background(), 60*time.Second)
-	resCh := checksService.CheckAll(timeout)
-	for res := range resCh {
-		if res.Error != "" {
-			os.Exit(1)
-		}
-	}
-	cancelTimeout()
-
-	ctx.DispatchEvent(types.EventServerLoad{})
-	ctx.DispatchEvent(types.EventServerStart{})
-
-	<-stopChan
-}
-
-func stopRouter() {
-	// TODO: Stop() must also stop handleSignals()
-
-	log.Info("gracefully stopping Vertex")
-
-	ctx.DispatchEvent(types.EventServerStop{})
-
-	cancelCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()
-
-	err := r.Stop(cancelCtx)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-	log.Info("vertex server closed")
 }

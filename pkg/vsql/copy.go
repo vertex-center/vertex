@@ -1,4 +1,4 @@
-package service
+package vsql
 
 import (
 	"fmt"
@@ -9,23 +9,16 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-func (s *DbService) copyDb(from *sqlx.DB, to *sqlx.DB) error {
-	tables := []string{
-		"admin_settings",
-		"migrations",
-		"users",
-		"credentials_argon2",
-		"credentials_argon2_users",
-		"sessions",
-	}
-
+// CopyTables copies the tables from one database to another.
+// The tables are copied in one unique transaction.
+func CopyTables(from *sqlx.DB, to *sqlx.DB, tables []string) error {
 	toTx, err := to.Beginx()
 	if err != nil {
 		return err
 	}
 
 	for _, t := range tables {
-		err := s.copyDbTable(t, from, toTx)
+		err := CopyTable(from, toTx, t)
 		if err != nil {
 			_ = toTx.Rollback()
 			return err
@@ -35,7 +28,8 @@ func (s *DbService) copyDb(from *sqlx.DB, to *sqlx.DB) error {
 	return toTx.Commit()
 }
 
-func (s *DbService) copyDbTable(name string, from *sqlx.DB, to *sqlx.Tx) error {
+// CopyTable copies the given table from one database to another.
+func CopyTable(from *sqlx.DB, to *sqlx.Tx, name string) error {
 	log.Info("copying table",
 		vlog.String("table", name),
 		vlog.String("from", from.DriverName()),

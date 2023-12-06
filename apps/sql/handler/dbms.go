@@ -39,7 +39,9 @@ func (r *DBMSHandler) Get(c *router.Context) {
 		return
 	}
 
-	client := containersapi.NewContainersClient()
+	token := c.MustGet("token").(string)
+
+	client := containersapi.NewContainersClient(token)
 
 	inst, apiError := client.GetContainer(c, uuid)
 	if apiError != nil {
@@ -77,7 +79,9 @@ func (r *DBMSHandler) Install(c *router.Context) {
 		return
 	}
 
-	client := containersapi.NewContainersClient()
+	token := c.MustGet("token").(string)
+
+	client := containersapi.NewContainersClient(token)
 
 	serv, apiError := client.GetService(c, dbms)
 	if apiError != nil {

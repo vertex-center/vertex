@@ -1,7 +1,9 @@
 package sql
 
 import (
+	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
+	containersmeta "github.com/vertex-center/vertex/apps/containers/meta"
 	"github.com/vertex-center/vertex/apps/sql/core/port"
 	"github.com/vertex-center/vertex/apps/sql/core/service"
 	"github.com/vertex-center/vertex/apps/sql/handler"
@@ -12,6 +14,18 @@ import (
 var (
 	sqlService port.SqlService
 )
+
+var Meta = apptypes.Meta{
+	ID:          "sql",
+	Name:        "Vertex SQL",
+	Description: "Create and manage SQL databases.",
+	Icon:        "database",
+	DefaultPort: "7512",
+	Dependencies: []*apptypes.Meta{
+		&authmeta.Meta,
+		&containersmeta.Meta,
+	},
+}
 
 type App struct {
 	ctx *apptypes.Context
@@ -26,15 +40,12 @@ func (a *App) Load(ctx *apptypes.Context) {
 }
 
 func (a *App) Meta() apptypes.Meta {
-	return apptypes.Meta{
-		ID:          "sql",
-		Name:        "Vertex SQL",
-		Description: "Create and manage SQL databases.",
-		Icon:        "database",
-	}
+	return Meta
 }
 
 func (a *App) Initialize(r *router.Group) error {
+	r.Use(middleware.ReadAuth)
+
 	sqlService = service.New(a.ctx)
 
 	dbmsHandler := handler.NewDBMSHandler(sqlService)

@@ -73,7 +73,9 @@ func (r *MetricsHandler) InstallCollector(c *router.Context) {
 		return
 	}
 
-	err = r.metricsService.InstallCollector(c, collector)
+	token := c.MustGet("token").(string)
+
+	err = r.metricsService.InstallCollector(c, token, collector)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           types.ErrCodeFailedToInstallCollector,
@@ -103,7 +105,9 @@ func (r *MetricsHandler) InstallVisualizer(c *router.Context) {
 		return
 	}
 
-	err = r.metricsService.InstallVisualizer(c, visualizer)
+	token := c.MustGet("token").(string)
+
+	err = r.metricsService.InstallVisualizer(c, token, visualizer)
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           types.ErrCodeFailedToInstallVisualizer,

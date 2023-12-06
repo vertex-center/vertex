@@ -1,11 +1,7 @@
 package handler
 
 import (
-	"errors"
-
 	"github.com/vertex-center/vertex/apps/admin/core/port"
-	"github.com/vertex-center/vertex/apps/admin/core/service"
-	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
 )
@@ -55,11 +51,11 @@ func (h *DatabaseHandler) MigrateTo(c *router.Context) {
 		return
 	}
 
-	err = h.dataService.MigrateTo(types.DbmsName(body.Dbms))
-	if err != nil && errors.Is(err, service.ErrDbmsAlreadySet) {
-		c.NotModified()
-		return
-	}
+	err = h.dataService.MigrateTo(body.Dbms)
+	//if err != nil && errors.Is(err, service.ErrDbmsAlreadySet) {
+	//	c.NotModified()
+	//	return
+	//}
 	if err != nil {
 		c.Abort(router.Error{
 			Code:           api.ErrFailedToMigrateToNewDbms,

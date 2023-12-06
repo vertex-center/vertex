@@ -17,8 +17,6 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-const Path = "live"
-
 var (
 	ErrNoReleasesPublished = errors.New("this repository has no existing releases")
 	ErrNoReleasesForThisOS = errors.New("this repository has no releases appropriate for this OS")

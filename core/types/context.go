@@ -12,7 +12,6 @@ import (
 type VertexContext struct {
 	about  About
 	bus    event.Bus
-	db     *DB
 	kernel bool
 }
 
@@ -51,14 +50,6 @@ func (c *VertexContext) AddListener(l event.Listener) {
 
 func (c *VertexContext) RemoveListener(l event.Listener) {
 	c.bus.RemoveListener(l)
-}
-
-func (c *VertexContext) SetDb(db *DB) {
-	c.db = db
-}
-
-func (c *VertexContext) Db() *DB {
-	return c.db
 }
 
 func (c *VertexContext) About() About {

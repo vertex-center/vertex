@@ -7,6 +7,7 @@ type (
 		Login(c *router.Context)
 		Register(c *router.Context)
 		Logout(c *router.Context)
+		Verify(c *router.Context)
 	}
 
 	EmailHandler interface {

@@ -8,12 +8,11 @@ import (
 	"path"
 	"sync"
 
+	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/types"
-
-	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"
 )
 
@@ -39,7 +38,7 @@ func NewProxyFSAdapter(params *ProxyFSAdapterParams) port.ProxyAdapter {
 		params = &ProxyFSAdapterParams{}
 	}
 	if params.proxyPath == "" {
-		params.proxyPath = path.Join(storage.Path, "proxy")
+		params.proxyPath = path.Join(storage.FSPath, "proxy")
 	}
 
 	err := os.MkdirAll(params.proxyPath, os.ModePerm)

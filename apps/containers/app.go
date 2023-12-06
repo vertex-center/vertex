@@ -6,6 +6,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/service"
 	"github.com/vertex-center/vertex/apps/containers/handler"
+	"github.com/vertex-center/vertex/apps/containers/meta"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/router"
 )
@@ -42,15 +43,12 @@ func (a *App) Load(ctx *apptypes.Context) {
 }
 
 func (a *App) Meta() apptypes.Meta {
-	return apptypes.Meta{
-		ID:          "containers",
-		Name:        "Vertex Containers",
-		Description: "Create and manage containers.",
-		Icon:        "deployed_code",
-	}
+	return meta.Meta
 }
 
 func (a *App) Initialize(r *router.Group) error {
+	r.Use(middleware.ReadAuth)
+
 	containerAdapter = adapter.NewContainerFSAdapter(nil)
 	containerEnvAdapter = adapter.NewContainerEnvFSAdapter(nil)
 	containerLogsAdapter = adapter.NewContainerLogsFSAdapter(nil)

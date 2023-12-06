@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/gin-contrib/sse"
-	"github.com/vertex-center/vertex/core/port"
+	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/pkg/router"
 	"golang.org/x/net/context"
 )

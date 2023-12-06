@@ -34,8 +34,8 @@ func (s *MetricsService) GetMetrics() []types.Metric {
 	return s.metrics
 }
 
-func (s *MetricsService) InstallCollector(ctx context.Context, collector string) error {
-	c := containersapi.NewContainersClient()
+func (s *MetricsService) InstallCollector(ctx context.Context, token string, collector string) error {
+	c := containersapi.NewContainersClient(token)
 
 	serv, apiError := c.GetService(ctx, collector)
 	if apiError != nil {
@@ -69,8 +69,8 @@ func (s *MetricsService) ConfigureCollector(inst *containerstypes.Container) err
 	return nil
 }
 
-func (s *MetricsService) InstallVisualizer(ctx context.Context, visualizer string) error {
-	c := containersapi.NewContainersClient()
+func (s *MetricsService) InstallVisualizer(ctx context.Context, token string, visualizer string) error {
+	c := containersapi.NewContainersClient(token)
 
 	serv, apiError := c.GetService(ctx, visualizer)
 	if apiError != nil {
