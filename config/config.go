@@ -110,6 +110,7 @@ func (c Config) Apply() error {
 	cfg := ""
 	// Only for the non-kernel apps
 	for name, url := range c.urls {
+		name = strings.ReplaceAll(name, "-", "_")
 		cfg += fmt.Sprintf("window.api_url_%s = \"%s\";\n", name, url)
 	}
 	return os.WriteFile(path.Join(storage.FSPath, "client", "dist", "config.js"), []byte(cfg), os.ModePerm)
