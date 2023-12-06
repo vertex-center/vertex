@@ -40,7 +40,7 @@ type Meta struct {
 	Hidden bool `json:"hidden"`
 
 	// Dependencies is a list of app IDs that this app depends on.
-	Dependencies []*Meta `json:"dependencies"`
+	Dependencies []*Meta `json:"-"`
 }
 
 type Interface interface {
