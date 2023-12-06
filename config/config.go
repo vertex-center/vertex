@@ -102,10 +102,16 @@ func (c Config) URL(id string) *url.URL {
 }
 
 func (c Config) RegisterApiURL(id string, url string) {
+	if _, ok := c.urls[id]; ok {
+		return
+	}
 	c.urls[id] = url
 }
 
 func (c Config) RegisterKernelApiURL(id string, url string) {
+	if _, ok := c.kernelUrls[id]; ok {
+		return
+	}
 	c.kernelUrls[id] = url
 }
 
