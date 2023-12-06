@@ -58,9 +58,9 @@ func (a *App) Initialize(r *router.Group) error {
 	sqlService = service.New(a.ctx)
 
 	dbmsHandler := handler.NewDBMSHandler(sqlService)
-	// docapi:sql route /app/sql/container/{container_uuid} vx_sql_get_dbms
+	// docapi:sql route /container/{container_uuid} vx_sql_get_dbms
 	r.GET("/container/:container_uuid", middleware.Authenticated, dbmsHandler.Get)
-	// docapi:sql route /app/sql/dbms/{dbms}/install vx_sql_install_dbms
+	// docapi:sql route /dbms/{dbms}/install vx_sql_install_dbms
 	r.POST("/dbms/:dbms/install", middleware.Authenticated, dbmsHandler.Install)
 
 	return nil

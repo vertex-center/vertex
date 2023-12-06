@@ -53,7 +53,7 @@ func (a *App) Initialize(r *router.Group) error {
 
 	editorHandler := handler.NewEditorHandler(editorService)
 	editor := r.Group("/editor", middleware.Authenticated)
-	// docapi:service_editor route /app/devtools-service-editor/editor/to-yaml vx_devtools_service_editor_to_yaml
+	// docapi:service_editor route /editor/to-yaml vx_devtools_service_editor_to_yaml
 	editor.POST("/to-yaml", editorHandler.ToYaml)
 
 	return nil

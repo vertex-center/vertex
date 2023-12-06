@@ -50,7 +50,7 @@ func (a *App) Initialize(r *router.Group) error {
 	r.Use(middleware.ReadAuth)
 
 	providerHandler := handler.NewProviderHandler()
-	// docapi:tunnels route /app/tunnels/provider/{provider}/install vx_tunnels_install_provider
+	// docapi:tunnels route /provider/{provider}/install vx_tunnels_install_provider
 	r.POST("/provider/:provider/install", middleware.Authenticated, providerHandler.Install)
 
 	return nil

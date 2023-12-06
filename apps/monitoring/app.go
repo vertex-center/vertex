@@ -63,11 +63,11 @@ func (a *App) Initialize(r *router.Group) error {
 	metricsService = service.NewMetricsService(a.ctx, prometheusAdapter)
 
 	metricsHandler := handler.NewMetricsHandler(metricsService)
-	// docapi:monitoring route /app/monitoring/metrics vx_monitoring_get_metrics
+	// docapi:monitoring route /metrics vx_monitoring_get_metrics
 	r.GET("/metrics", middleware.Authenticated, metricsHandler.Get)
-	// docapi:monitoring route /app/monitoring/collector/{collector}/install vx_monitoring_install_collector
+	// docapi:monitoring route /collector/{collector}/install vx_monitoring_install_collector
 	r.POST("/collector/:collector/install", metricsHandler.InstallCollector)
-	// docapi:monitoring route /app/monitoring/visualizer/{visualizer}/install vx_monitoring_install_visualizer
+	// docapi:monitoring route /visualizer/{visualizer}/install vx_monitoring_install_visualizer
 	r.POST("/visualizer/:visualizer/install", metricsHandler.InstallVisualizer)
 
 	return nil

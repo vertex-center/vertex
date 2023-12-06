@@ -57,33 +57,33 @@ func (a *App) Initialize(r *router.Group) error {
 	userService := service.NewUserService(authAdapter)
 
 	authHandler := handler.NewAuthHandler(authService)
-	// docapi:auth route /app/auth/login auth_login
+	// docapi:auth route /login auth_login
 	r.POST("/login", authHandler.Login)
-	// docapi:auth route /app/auth/register auth_register
+	// docapi:auth route /register auth_register
 	r.POST("/register", authHandler.Register)
-	// docapi:auth route /app/auth/logout auth_logout
+	// docapi:auth route /logout auth_logout
 	r.POST("/logout", middleware.Authenticated, authHandler.Logout)
-	// docapi:auth route /app/auth/verify auth_verify
+	// docapi:auth route /verify auth_verify
 	r.POST("/verify", authHandler.Verify)
 
 	userHandler := handler.NewUserHandler(userService)
 	user := r.Group("/user", middleware.Authenticated)
-	// docapi:auth route /app/auth/user auth_get_current_user
+	// docapi:auth route /user auth_get_current_user
 	user.GET("", userHandler.GetCurrentUser)
-	// docapi:auth route /app/auth/user auth_patch_current_user
+	// docapi:auth route /user auth_patch_current_user
 	user.PATCH("", userHandler.PatchCurrentUser)
-	// docapi:auth route /app/auth/credentials auth_get_current_user_credentials
+	// docapi:auth route /credentials auth_get_current_user_credentials
 	user.GET("/credentials", userHandler.GetCurrentUserCredentials)
 
 	emailHandler := handler.NewEmailHandler(emailService)
 	email := user.Group("/email", middleware.Authenticated)
-	// docapi:auth route /app/auth/user/email auth_current_user_create_email
+	// docapi:auth route /user/email auth_current_user_create_email
 	email.POST("", emailHandler.CreateCurrentUserEmail)
-	// docapi:auth route /app/auth/user/email auth_current_user_delete_email
+	// docapi:auth route /user/email auth_current_user_delete_email
 	email.DELETE("", emailHandler.DeleteCurrentUserEmail)
 
 	emails := user.Group("/emails", middleware.Authenticated)
-	// docapi:auth route /app/auth/user/emails auth_current_user_get_emails
+	// docapi:auth route /user/emails auth_current_user_get_emails
 	emails.GET("", emailHandler.GetCurrentUserEmails)
 
 	return nil

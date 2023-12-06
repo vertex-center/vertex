@@ -102,56 +102,56 @@ func (a *App) Initialize(r *router.Group) error {
 		ServiceService:           serviceService,
 	})
 	container := r.Group("/container/:container_uuid", middleware.Authenticated)
-	// docapi:containers route /app/containers/container/{container_uuid} vx_containers_get_container
+	// docapi:containers route /container/{container_uuid} vx_containers_get_container
 	container.GET("", containerHandler.Get)
-	// docapi:containers route /app/containers/container/{container_uuid} vx_containers_delete_container
+	// docapi:containers route /container/{container_uuid} vx_containers_delete_container
 	container.DELETE("", containerHandler.Delete)
-	// docapi:containers route /app/containers/container/{container_uuid} vx_containers_patch_container
+	// docapi:containers route /container/{container_uuid} vx_containers_patch_container
 	container.PATCH("", containerHandler.Patch)
-	// docapi:containers route /app/containers/container/{container_uuid}/start vx_containers_start_container
+	// docapi:containers route /container/{container_uuid}/start vx_containers_start_container
 	container.POST("/start", containerHandler.Start)
-	// docapi:containers route /app/containers/container/{container_uuid}/stop vx_containers_stop_container
+	// docapi:containers route /container/{container_uuid}/stop vx_containers_stop_container
 	container.POST("/stop", containerHandler.Stop)
-	// docapi:containers route /app/containers/container/{container_uuid}/environment vx_containers_patch_environment
+	// docapi:containers route /container/{container_uuid}/environment vx_containers_patch_environment
 	container.PATCH("/environment", containerHandler.PatchEnvironment)
-	// docapi:containers route /app/containers/container/{container_uuid}/events vx_containers_events_container
+	// docapi:containers route /container/{container_uuid}/events vx_containers_events_container
 	container.GET("/events", apptypes.HeadersSSE, containerHandler.Events)
-	// docapi:containers route /app/containers/container/{container_uuid}/docker vx_containers_get_docker
+	// docapi:containers route /container/{container_uuid}/docker vx_containers_get_docker
 	container.GET("/docker", containerHandler.GetDocker)
-	// docapi:containers route /app/containers/container/{container_uuid}/docker/recreate vx_containers_recreate_docker
+	// docapi:containers route /container/{container_uuid}/docker/recreate vx_containers_recreate_docker
 	container.POST("/docker/recreate", containerHandler.RecreateDocker)
-	// docapi:containers route /app/containers/container/{container_uuid}/logs vx_containers_get_logs
+	// docapi:containers route /container/{container_uuid}/logs vx_containers_get_logs
 	container.GET("/logs", containerHandler.GetLogs)
-	// docapi:containers route /app/containers/container/{container_uuid}/update/service vx_containers_update_service
+	// docapi:containers route /container/{container_uuid}/update/service vx_containers_update_service
 	container.POST("/update/service", containerHandler.UpdateService)
-	// docapi:containers route /app/containers/container/{container_uuid}/versions vx_containers_get_versions
+	// docapi:containers route /container/{container_uuid}/versions vx_containers_get_versions
 	container.GET("/versions", containerHandler.GetVersions)
-	// docapi:containers route /app/containers/container/{container_uuid}/wait vx_containers_wait_status
+	// docapi:containers route /container/{container_uuid}/wait vx_containers_wait_status
 	container.GET("/wait", containerHandler.WaitStatus)
 
 	containersHandler := handler.NewContainersHandler(a.ctx, containerService)
 	containers := r.Group("/containers", middleware.Authenticated)
-	// docapi:containers route /app/containers/containers vx_containers_get_containers
+	// docapi:containers route /containers vx_containers_get_containers
 	containers.GET("", containersHandler.Get)
-	// docapi:containers route /app/containers/containers/tags vx_containers_get_tags
+	// docapi:containers route /containers/tags vx_containers_get_tags
 	containers.GET("/tags", containersHandler.GetTags)
-	// docapi:containers route /app/containers/containers/search vx_containers_search
+	// docapi:containers route /containers/search vx_containers_search
 	containers.GET("/search", containersHandler.Search)
-	// docapi:containers route /app/containers/containers/checkupdates vx_containers_check_updates
+	// docapi:containers route /containers/checkupdates vx_containers_check_updates
 	containers.GET("/checkupdates", containersHandler.CheckForUpdates)
-	// docapi:containers route /app/containers/containers/events vx_containers_events
+	// docapi:containers route /containers/events vx_containers_events
 	containers.GET("/events", apptypes.HeadersSSE, containersHandler.Events)
 
 	serviceHandler := handler.NewServiceHandler(serviceService, containerService)
 	serv := r.Group("/service/:service_id", middleware.Authenticated)
-	// docapi:containers route /app/containers/service/{service_id} vx_containers_get_service
+	// docapi:containers route /service/{service_id} vx_containers_get_service
 	serv.GET("", serviceHandler.Get)
-	// docapi:containers route /app/containers/service/{service_id}/install vx_containers_install_service
+	// docapi:containers route /service/{service_id}/install vx_containers_install_service
 	serv.POST("/install", serviceHandler.Install)
 
 	servicesHandler := handler.NewServicesHandler(serviceService)
 	services := r.Group("/services")
-	// docapi:containers route /app/containers/services vx_containers_get_services
+	// docapi:containers route /services vx_containers_get_services
 	services.GET("", middleware.Authenticated, servicesHandler.Get)
 	services.Static("/icons", "./live/services/icons")
 
@@ -165,32 +165,32 @@ func (a *App) InitializeKernel(r *router.Group) error {
 
 	dockerHandler := handler.NewDockerKernelHandler(dockerKernelService)
 	docker := r.Group("/docker")
-	// docapi:containers_kernel route /app/containers/docker/containers vx_containers_kernel_get_containers
+	// docapi:containers_kernel route /docker/containers vx_containers_kernel_get_containers
 	docker.GET("/containers", dockerHandler.GetContainers)
-	// docapi:containers_kernel route /app/containers/docker/containers vx_containers_kernel_create_container
+	// docapi:containers_kernel route /docker/containers vx_containers_kernel_create_container
 	docker.POST("/container", dockerHandler.CreateContainer)
-	// docapi:containers_kernel route /app/containers/docker/containers/{id} vx_containers_kernel_delete_container
+	// docapi:containers_kernel route /docker/containers/{id} vx_containers_kernel_delete_container
 	docker.DELETE("/container/:id", dockerHandler.DeleteContainer)
-	// docapi:containers_kernel route /app/containers/docker/containers/{id}/start vx_containers_kernel_start_container
+	// docapi:containers_kernel route /docker/containers/{id}/start vx_containers_kernel_start_container
 	docker.POST("/container/:id/start", dockerHandler.StartContainer)
-	// docapi:containers_kernel route /app/containers/docker/containers/{id}/stop vx_containers_kernel_stop_container
+	// docapi:containers_kernel route /docker/containers/{id}/stop vx_containers_kernel_stop_container
 	docker.POST("/container/:id/stop", dockerHandler.StopContainer)
-	// docapi:containers_kernel route /app/containers/docker/containers/{id}/info vx_containers_kernel_info_container
+	// docapi:containers_kernel route /docker/containers/{id}/info vx_containers_kernel_info_container
 	docker.GET("/container/:id/info", dockerHandler.InfoContainer)
-	// docapi:containers_kernel route /app/containers/docker/containers/{id}/logs/stdout vx_containers_kernel_logs_stdout_container
+	// docapi:containers_kernel route /docker/containers/{id}/logs/stdout vx_containers_kernel_logs_stdout_container
 	docker.GET("/container/:id/logs/stdout", dockerHandler.LogsStdoutContainer)
-	// docapi:containers_kernel route /app/containers/docker/containers/{id}/logs/stderr vx_containers_kernel_logs_stderr_container
+	// docapi:containers_kernel route /docker/containers/{id}/logs/stderr vx_containers_kernel_logs_stderr_container
 	docker.GET("/container/:id/logs/stderr", dockerHandler.LogsStderrContainer)
-	// docapi:containers_kernel route /app/containers/docker/containers/{id}/wait/{cond} vx_containers_kernel_wait_container
+	// docapi:containers_kernel route /docker/containers/{id}/wait/{cond} vx_containers_kernel_wait_container
 	docker.GET("/container/:id/wait/:cond", dockerHandler.WaitContainer)
-	// docapi:containers_kernel route /app/containers/docker/containers/mounts/{id} vx_containers_kernel_delete_mounts
+	// docapi:containers_kernel route /docker/containers/mounts/{id} vx_containers_kernel_delete_mounts
 	docker.DELETE("/container/:id/mounts", dockerHandler.DeleteMounts)
 
-	// docapi:containers_kernel route /app/containers/docker/image/{id}/info vx_containers_kernel_info_image
+	// docapi:containers_kernel route /docker/image/{id}/info vx_containers_kernel_info_image
 	docker.GET("/image/:id/info", dockerHandler.InfoImage)
-	// docapi:containers_kernel route /app/containers/docker/image/pull vx_containers_kernel_pull_image
+	// docapi:containers_kernel route /docker/image/pull vx_containers_kernel_pull_image
 	docker.POST("/image/pull", dockerHandler.PullImage)
-	// docapi:containers_kernel route /app/containers/docker/image/build vx_containers_kernel_build_image
+	// docapi:containers_kernel route /docker/image/build vx_containers_kernel_build_image
 	docker.POST("/image/build", dockerHandler.BuildImage)
 
 	return nil
