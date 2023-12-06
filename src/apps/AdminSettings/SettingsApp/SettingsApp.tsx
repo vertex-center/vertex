@@ -26,11 +26,11 @@ export default function SettingsApp() {
                     icon={<MaterialIcon icon="hard_drive" />}
                     link={l("/app/admin/hardware")}
                 />
-                <Sidebar.Item
-                    label="Database"
-                    icon={<MaterialIcon icon="database" />}
-                    link={l("/app/admin/database")}
-                />
+                {/*<Sidebar.Item*/}
+                {/*    label="Database"*/}
+                {/*    icon={<MaterialIcon icon="database" />}*/}
+                {/*    link={l("/app/admin/database")}*/}
+                {/*/>*/}
                 <Sidebar.Item
                     label="Security"
                     icon={<MaterialIcon icon="key" />}
