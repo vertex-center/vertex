@@ -1,11 +1,8 @@
 import axios from "axios";
 import { Console } from "../logging/logging";
 
-export const createServer = (url: string) => {
-    const s = axios.create({
-        // @ts-ignore
-        baseURL: `${url}/api`,
-    });
+export const createServer = (baseURL: string) => {
+    const s = axios.create({ baseURL });
 
     s.interceptors.request.use(async (config) => {
         if (!config.headers.Authorization) {
