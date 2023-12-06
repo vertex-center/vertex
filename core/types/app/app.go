@@ -38,6 +38,9 @@ type Meta struct {
 
 	// Hidden is a flag that indicates if the app does only backend work and should be hidden from the frontend.
 	Hidden bool `json:"hidden"`
+
+	// Dependencies is a list of app IDs that this app depends on.
+	Dependencies []string `json:"dependencies"`
 }
 
 type Interface interface {

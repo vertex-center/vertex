@@ -9,4 +9,7 @@ var Meta = app.Meta{
 	Icon:              "admin_panel_settings",
 	DefaultPort:       "7500",
 	DefaultKernelPort: "7501",
+	Dependencies: []string{
+		"auth",
+	},
 }

@@ -9,4 +9,7 @@ var Meta = app.Meta{
 	Icon:              "deployed_code",
 	DefaultPort:       "7504",
 	DefaultKernelPort: "7505",
+	Dependencies: []string{
+		"auth",
+	},
 }

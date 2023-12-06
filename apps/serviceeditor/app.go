@@ -15,6 +15,9 @@ var Meta = apptypes.Meta{
 	Icon:        "frame_source",
 	Category:    "devtools",
 	DefaultPort: "7510",
+	Dependencies: []string{
+		"auth",
+	},
 }
 
 type App struct {

@@ -23,6 +23,9 @@ var Meta = apptypes.Meta{
 	Description: "Redirect traffic to your containers.",
 	Icon:        "router",
 	DefaultPort: "7508",
+	Dependencies: []string{
+		"auth",
+	},
 }
 
 type App struct {

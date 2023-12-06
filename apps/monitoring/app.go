@@ -22,6 +22,10 @@ var Meta = apptypes.Meta{
 	Description: "Create and manage containers.",
 	Icon:        "monitoring",
 	DefaultPort: "7506",
+	Dependencies: []string{
+		"auth",
+		"containers",
+	},
 }
 
 type App struct {

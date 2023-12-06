@@ -13,6 +13,10 @@ var Meta = apptypes.Meta{
 	Description: "Create and manage tunnels.",
 	Icon:        "subway",
 	DefaultPort: "7514",
+	Dependencies: []string{
+		"auth",
+		"containers",
+	},
 }
 
 type App struct {

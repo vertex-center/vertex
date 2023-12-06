@@ -19,6 +19,10 @@ var Meta = apptypes.Meta{
 	Description: "Create and manage SQL databases.",
 	Icon:        "database",
 	DefaultPort: "7512",
+	Dependencies: []string{
+		"auth",
+		"containers",
+	},
 }
 
 type App struct {
