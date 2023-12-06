@@ -7,6 +7,7 @@ import remarkDirective from "remark-directive";
 import remarkMermaid from "remark-mermaidjs";
 import yaml from "@rollup/plugin-yaml";
 import { visit } from "unist-util-visit";
+import SwaggerParser from "@apidevtools/swagger-parser";
 
 const remarkDirectiveBlocks = () => {
     return (tree) => {
@@ -23,30 +24,25 @@ const remarkDirectiveBlocks = () => {
     };
 };
 
-function transformYaml(data, filePath) {
-    if (filePath.endsWith("_category_.yml")) {
-        return data;
-    }
-    // Commented for now as it causes issues.
-    //
-    // const regex = /\{"\$ref":"#\/(.*?)"}/g;
-    // let dataString = JSON.stringify(data);
-    // let match = null;
-    // while ((match = regex.exec(dataString)) !== null) {
-    //     if (match.index === regex.lastIndex) {
-    //         regex.lastIndex++;
-    //     }
-    //     const ref = match[1];
-    //     const refPath = ref.split("/");
-    //     const refData = refPath.reduce((d, key) => d[key], data);
-    //     dataString = dataString.replace(match[0], JSON.stringify(refData));
-    //     data = JSON.parse(dataString);
-    //     regex.lastIndex = 0;
-    // }
-    return JSON.parse(JSON.stringify(data));
-}
+async function transformYaml(data, filePath) {}
 
-export default defineConfig({
+const openapi = async () => {
+    return {
+        name: "openapi",
+        transform: async (src, id) => {
+            if (!id.endsWith(".yml") && !id.endsWith(".yaml")) {
+                return src;
+            }
+            if (id.endsWith("_category_.yml")) {
+                return src;
+            }
+            const api = await SwaggerParser.dereference(id);
+            return `export default ${JSON.stringify(api)}`;
+        },
+    };
+};
+
+export default defineConfig(async () => ({
     plugins: [
         react(),
         mdx({
@@ -65,6 +61,7 @@ export default defineConfig({
                 ],
             ],
         }),
-        yaml({ transform: transformYaml }),
+        yaml(),
+        await openapi(),
     ],
-});
+}));

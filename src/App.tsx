@@ -117,7 +117,7 @@ function Docs() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const app = location.pathname.split("/")?.[1];
+    let app = location.pathname.split("/")?.[1];
     const version = location.pathname.split("/")?.[2];
     if (version === undefined || version === "") navigate(`/${app}/next/`);
 

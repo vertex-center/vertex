@@ -53,9 +53,9 @@ export function Api(props: Readonly<ApiProps>) {
     const location = useLocation();
 
     const app = location.pathname.split("/")?.[1];
-    const doc: any = docs?.[`/api/${app}/api.json`];
+    const doc: any = docs?.[`/api/${app.replace("api-", "")}/api.json`];
 
-    useTitle(doc?.title ?? "-");
+    useTitle(doc?.title + " API");
 
     const routes = useMemo(() => {
         if (api === undefined) return [];

@@ -18,15 +18,12 @@ export default class APIs {
         Object.entries(imported ?? {}).forEach(
             ([fsPath, api]: [string, any]) => {
                 this.files[fsPath] = api.default;
-            }
+            },
         );
 
         this.apis = {};
         this.hierarchy = {};
         this.populate();
-
-        console.log(this.hierarchy);
-        console.log(this.apis);
     }
 
     private populate() {
@@ -42,6 +39,7 @@ export default class APIs {
         });
 
         Object.entries(apps ?? {}).forEach(([app, versions]) => {
+            app = "api-" + app;
             Object.entries(versions ?? {}).forEach(([version, api]) => {
                 const tags = this.getTags(api);
 
@@ -117,7 +115,7 @@ export default class APIs {
                             api: api,
                         });
                     });
-                }
+                },
             );
         });
         return routes;

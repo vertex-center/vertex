@@ -1,33 +1,36 @@
 import {
-    List,
     ListDescription,
     ListIcon,
     ListInfo,
     ListItem,
     ListTitle,
     Logo,
-    useTitle,
+    MaterialIcon,
+    Title,
 } from "@vertex-center/components";
 import styles from "./AllDocs.module.sass";
 import { useNavigate } from "react-router-dom";
 
-// const docs = import.meta.glob("/{docs,api}/*/{doc,api}.json", {
-//     eager: true,
-// });
-const docs = import.meta.glob("/docs/*/doc.json", {
+const docs = import.meta.glob("/{docs,api}/*/{doc,api}.json", {
     eager: true,
 });
 
-export default function AllDocs() {
-    useTitle("All documentation");
+type DocsCategoryProps = {
+    category: string;
+    title: string;
+};
 
+function DocsCategory({ category, title }: DocsCategoryProps) {
     const navigate = useNavigate();
 
     return (
-        <div className={styles.all}>
-            <List>
+        <div className={styles.category}>
+            <Title variant="h2">{title}</Title>
+            <div className={styles.grid}>
                 {Object.entries(docs).map(([path, doc]: [string, any]) => {
+                    if (!path.startsWith("/" + category + "/")) return null;
                     let slug = path.split("/")[2];
+                    if (category === "api") slug = "api-" + slug;
                     if (doc.version) slug = slug + "/" + doc.version;
                     if (doc.main) slug = slug + "/" + doc.main;
                     return (
@@ -36,7 +39,11 @@ export default function AllDocs() {
                             onClick={() => navigate(`/${slug}`)}
                         >
                             <ListIcon>
-                                <Logo />
+                                {category === "docs" ? (
+                                    <Logo />
+                                ) : (
+                                    <MaterialIcon icon="api" />
+                                )}
                             </ListIcon>
                             <ListInfo>
                                 <ListTitle>{doc.title}</ListTitle>
@@ -47,7 +54,16 @@ export default function AllDocs() {
                         </ListItem>
                     );
                 })}
-            </List>
+            </div>
+        </div>
+    );
+}
+
+export default function AllDocs() {
+    return (
+        <div className={styles.all}>
+            <DocsCategory category="docs" title="Documentations" />
+            <DocsCategory category="api" title="Rest APIs" />
         </div>
     );
 }
