@@ -2,7 +2,7 @@ const createContainerAndNavigate = (to: string) => {
     cy.visit("/app/containers");
     cy.request(
         "POST",
-        "http://localhost:6130/api/app/containers/service/postgres/install"
+        "http://localhost:6130/api/service/postgres/install"
     ).then((res: any) => {
         cy.visit(`/app/containers/${res.body.uuid}${to}`);
     });

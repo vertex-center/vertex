@@ -27,7 +27,8 @@ export default function MonitoringApp() {
         });
     const grafanaContainer = Object.values(grafanaContainers ?? {})[0];
 
-    useServerEvent("/app/containers/containers/events", {
+    // @ts-ignore
+    useServerEvent(window.api_urls.containers, "/containers/events", {
         change: (e) => {
             queryClient.invalidateQueries({
                 queryKey: ["containers"],

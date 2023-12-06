@@ -22,6 +22,8 @@ export default function SettingsChecks() {
     const [checks, setChecks] = useState({});
 
     useServerEvent(
+        // @ts-ignore
+        window.api_urls.admin,
         "/admin/checks",
         {
             check: (e) => {

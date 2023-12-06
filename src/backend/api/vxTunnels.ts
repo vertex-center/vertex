@@ -1,9 +1,10 @@
-import { server } from "./backend";
+import { createServer } from "../server";
 
-const BASE_URL = "/app/tunnels";
+// @ts-ignore
+const server = createServer(window.api_urls.tunnels);
 
 const installProvider = (provider: string) => {
-    return server.post(`${BASE_URL}/provider/${provider}/install`);
+    return server.post(`/provider/${provider}/install`);
 };
 
 const providerRoutes = (provider: string) => ({

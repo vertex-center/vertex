@@ -1,18 +1,21 @@
-import { server } from "../../../backend/api/backend";
 import { CPU, Host, SSHKey, Update } from "./models";
+import { createServer } from "../../../backend/server";
+
+// @ts-ignore
+const server = createServer(window.api_urls.admin);
 
 const getHost = async () => {
-    const { data } = await server.get<Host>("/app/admin/hardware/host");
+    const { data } = await server.get<Host>("/hardware/host");
     return data;
 };
 
 const getCPUs = async () => {
-    const { data } = await server.get<CPU[]>("/app/admin/hardware/cpus");
+    const { data } = await server.get<CPU[]>("/hardware/cpus");
     return data;
 };
 
 const getSSHKeys = async () => {
-    const { data } = await server.get<SSHKey[]>("/app/admin/ssh");
+    const { data } = await server.get<SSHKey[]>("/ssh");
     return data;
 };
 
@@ -22,7 +25,7 @@ export type AddSSHKeyBody = {
 };
 
 const addSSHKey = async (body: AddSSHKeyBody) => {
-    const { data } = await server.post("/app/admin/ssh", body);
+    const { data } = await server.post("/ssh", body);
     return data;
 };
 
@@ -32,48 +35,48 @@ export type DeleteSSHKeyBody = {
 };
 
 const deleteSSHKey = async (body: DeleteSSHKeyBody) => {
-    const { data } = await server.delete("/app/admin/ssh", { data: body });
+    const { data } = await server.delete("/ssh", { data: body });
     return data;
 };
 
 const getSSHUsers = async () => {
-    const { data } = await server.get<string[]>("/app/admin/ssh/users");
+    const { data } = await server.get<string[]>("/ssh/users");
     return data;
 };
 
 const getSettings = async () => {
-    const { data } = await server.get<Settings>("/app/admin/settings");
+    const { data } = await server.get<Settings>("/settings");
     return data;
 };
 
 const patchSettings = async (settings: Partial<Settings>) => {
-    const { data } = await server.patch("/app/admin/settings", settings);
+    const { data } = await server.patch("/settings", settings);
     return data;
 };
 
 const getUpdate = async () => {
-    const { data } = await server.get<Update>("/app/admin/update");
+    const { data } = await server.get<Update>("/update");
     return data;
 };
 
 const installUpdate = async () => {
-    const { data } = await server.post("/app/admin/update");
+    const { data } = await server.post("/update");
     return data;
 };
 
 const getDatabases = async () => {
-    const { data } = await server.get<string>("/app/admin/db/dbms");
+    const { data } = await server.get<string>("/db/dbms");
     return data;
 };
 
 const migrateDatabase = async (dbms: string) => {
     const body = { dbms };
-    const { data } = await server.post("/app/admin/db/dbms", body);
+    const { data } = await server.post("/db/dbms", body);
     return data;
 };
 
 const reboot = async () => {
-    const { data } = await server.post("/app/admin/hardware/reboot");
+    const { data } = await server.post("/hardware/reboot");
     return data;
 };
 

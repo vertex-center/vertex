@@ -1,19 +1,21 @@
 import { Metric } from "../../models/metrics";
-import { server } from "./backend";
 
-const BASE_URL = "/app/monitoring";
+import { createServer } from "../server";
+
+// @ts-ignore
+const server = createServer(window.api_urls.monitoring);
 
 const getMetrics = async () => {
-    const { data } = await server.get<Metric[]>(`${BASE_URL}/metrics`);
+    const { data } = await server.get<Metric[]>(`/metrics`);
     return data;
 };
 
 const installCollector = (collector: string) => {
-    return server.post(`${BASE_URL}/collector/${collector}/install`);
+    return server.post(`/collector/${collector}/install`);
 };
 
 const installVisualizer = (visualizer: string) => {
-    return server.post(`${BASE_URL}/visualizer/${visualizer}/install`);
+    return server.post(`/visualizer/${visualizer}/install`);
 };
 
 const collectorRoutes = (collector: string) => ({

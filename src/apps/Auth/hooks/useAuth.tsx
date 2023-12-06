@@ -1,4 +1,4 @@
-import { getAuthToken } from "../../../backend/api/backend";
+import { getAuthToken } from "../../../backend/server";
 
 export default function useAuth(uuid?: string) {
     const token = getAuthToken();

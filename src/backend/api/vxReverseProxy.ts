@@ -1,19 +1,20 @@
-import { server } from "./backend";
+import { createServer } from "../server";
 
-const BASE_URL = `/app/reverse-proxy`;
+// @ts-ignore
+const server = createServer(window.api_urls.reverse_proxy);
 
 const getRedirects = async () => {
-    const { data } = await server.get<ProxyRedirects>(`${BASE_URL}/redirects`);
+    const { data } = await server.get<ProxyRedirects>(`/redirects`);
     return data;
 };
 
 const addRedirect = (source: string, target: string) => {
     const data = { source, target };
-    return server.post(`${BASE_URL}/redirect`, data);
+    return server.post(`/redirect`, data);
 };
 
 const deleteRedirect = (id: string) => {
-    return server.delete(`${BASE_URL}/redirect/${id}`);
+    return server.delete(`/redirect/${id}`);
 };
 
 const redirectsRoutes = {

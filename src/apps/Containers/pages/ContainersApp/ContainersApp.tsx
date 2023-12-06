@@ -72,7 +72,8 @@ export default function ContainersApp() {
         },
     });
 
-    useServerEvent("/app/containers/containers/events", {
+    // @ts-ignore
+    useServerEvent(window.api_urls.containers, "/containers/events", {
         change: () => {
             queryClient.invalidateQueries({
                 queryKey: ["containers"],

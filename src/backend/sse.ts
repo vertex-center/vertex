@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { EventSourcePolyfill } from "event-source-polyfill";
-import { getAuthToken } from "./api/backend";
+
+import { getAuthToken } from "./server";
 
 type SSE = {
     eventSource: EventSourcePolyfill;
@@ -10,7 +11,7 @@ type SSE = {
 
 const allSSE: { [uuid: string]: SSE } = {};
 
-export function registerSSE(url: string): string {
+export function registerSSE(url: string, route: string): string {
     let uuid = Object.keys(allSSE).find((uuid) => allSSE[uuid].url === url);
 
     if (uuid !== undefined) {
@@ -19,12 +20,15 @@ export function registerSSE(url: string): string {
     }
 
     uuid = uuidv4();
-    // @ts-ignore
-    const eventSource = new EventSourcePolyfill(`${window.apiURL}/api${url}`, {
-        headers: {
-            Authorization: `Bearer ${getAuthToken()}`,
-        },
-    });
+    const eventSource = new EventSourcePolyfill(
+        // @ts-ignore
+        `${url}${route}`,
+        {
+            headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+            },
+        }
+    );
     allSSE[uuid] = { url, eventSource, watchers: 1 };
 
     return uuid;

@@ -3,9 +3,9 @@ import {
     UseMutationOptions,
     useQueryClient,
 } from "@tanstack/react-query";
-import { setAuthToken } from "../../../backend/api/backend";
 import { API } from "../backend/api";
 import { AuthCredentials } from "../backend/models";
+import { setAuthToken } from "../../../backend/server";
 
 export const useRegister = (
     options: UseMutationOptions<unknown, unknown, AuthCredentials>

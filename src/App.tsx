@@ -47,12 +47,12 @@ import SettingsDb from "./apps/AdminSettings/SettingsData/SettingsDb";
 import SettingsChecks from "./apps/AdminSettings/SettingsChecks/SettingsChecks";
 import Register from "./apps/Auth/pages/Register/Register";
 import Logout from "./apps/Auth/pages/Logout/Logout";
-import { getAuthToken } from "./backend/api/backend";
 import Account from "./apps/Auth/pages/Account/Account";
 import AccountInfo from "./apps/Auth/pages/Account/AccountInfo";
 import AccountSecurity from "./apps/Auth/pages/Account/AccountSecurity";
 import useUser from "./apps/Auth/hooks/useUser";
 import AccountEmails from "./apps/Auth/pages/Account/AccountEmails";
+import { getAuthToken } from "./backend/server";
 
 const queryClient = new QueryClient();
 
