@@ -1,7 +1,9 @@
 package rest
 
 import (
+	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/carlmjohnson/requests"
 	"github.com/vertex-center/vertex/pkg/log"
@@ -12,12 +14,12 @@ type Client struct {
 	config requests.Config
 }
 
-func NewClient(url, token string) *Client {
+func NewClient(u *url.URL, token string) *Client {
 	return &Client{
 		config: func(rb *requests.Builder) {
 			rb.
-				BaseURL(url).
-				Path("/api/").
+				BaseURL(fmt.Sprintf("%s://%s", u.Scheme, u.Host)).
+				Path(u.Path + "/").
 				AddValidator(func(response *http.Response) error {
 					log.Request("request from app", vlog.String("path", response.Request.URL.Path))
 					return nil

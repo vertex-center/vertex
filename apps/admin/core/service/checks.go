@@ -69,11 +69,11 @@ func (s *ChecksService) checkInternet(ctx context.Context) types.CheckResponse {
 }
 
 func (s *ChecksService) checkVertex(ctx context.Context) types.CheckResponse {
-	return s.checkURL(ctx, "api_vertex", "Vertex API", config.Current.URL("vertex"))
+	return s.checkURL(ctx, "api_vertex", "Vertex API", config.Current.URL("vertex").String())
 }
 
 func (s *ChecksService) checkKernel(ctx context.Context) types.CheckResponse {
-	return s.checkURL(ctx, "api_kernel", "Vertex Kernel API", config.Current.KernelURL("vertex"))
+	return s.checkURL(ctx, "api_kernel", "Vertex Kernel API", config.Current.KernelURL("vertex").String())
 }
 
 func (s *ChecksService) checkURL(ctx context.Context, id, name, url string) types.CheckResponse {

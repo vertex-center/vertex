@@ -33,7 +33,7 @@ func NewProxyRouter(proxyService port.ProxyService) *ProxyRouter {
 	}
 
 	r.Use(cors.Default())
-	r.Use(ginutils.Logger("PROXY", config.Current.URL("proxy")))
+	r.Use(ginutils.Logger("PROXY", config.Current.URL("proxy").String()))
 	r.Use(gin.Recovery())
 
 	r.initAPIRoutes()
@@ -43,8 +43,8 @@ func NewProxyRouter(proxyService port.ProxyService) *ProxyRouter {
 
 func (r *ProxyRouter) Start() error {
 	proxyURL := config.Current.URL("proxy")
-	log.Info("Vertex-Proxy started", vlog.String("url", proxyURL))
-	return r.Router.Start(proxyURL)
+	log.Info("Vertex-Proxy started", vlog.String("url", proxyURL.String()))
+	return r.Router.Start(":" + proxyURL.Port())
 }
 
 func (r *ProxyRouter) Stop() error {

@@ -2,9 +2,8 @@ package server
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	url2 "net/url"
+	"net/url"
 	"os"
 	"time"
 
@@ -22,22 +21,16 @@ var InternetOK = false
 
 type Server struct {
 	id     string
-	url    string
+	url    *url.URL
 	ctx    *types.VertexContext
 	Router *router.Router
 }
 
-func New(id, addr string, ctx *types.VertexContext) *Server {
+func New(id string, u *url.URL, ctx *types.VertexContext) *Server {
 	gin.SetMode(gin.ReleaseMode)
-
-	if addr == "" || addr == ":" {
-		log.Error(errors.New("server address is empty"), vlog.String("id", id))
-		os.Exit(1)
-	}
-
 	s := Server{
 		id:     id,
-		url:    addr,
+		url:    u,
 		ctx:    ctx,
 		Router: router.New(),
 	}
@@ -52,7 +45,7 @@ func (s *Server) initRouter() {
 
 	s.Router.Use(cors.New(cfg))
 	s.Router.Use(ginutils.ErrorHandler())
-	s.Router.Use(ginutils.Logger(s.id, s.url))
+	s.Router.Use(ginutils.Logger(s.id, s.url.String()))
 	s.Router.Use(gin.Recovery())
 }
 
@@ -60,17 +53,8 @@ func (s *Server) StartAsync() chan error {
 	exitChan := make(chan error)
 	go func() {
 		defer close(exitChan)
-		log.Info("starting server", vlog.String("url", s.url))
-
-		url, err := url2.Parse(s.url)
-		if err != nil {
-			log.Error(err)
-			exitChan <- err
-			return
-		}
-
-		port := url.Port()
-		exitChan <- s.Router.Start(":" + port)
+		log.Info("starting server", vlog.String("port", s.url.Port()))
+		exitChan <- s.Router.Start(":" + s.url.Port())
 	}()
 
 	s.waitInternet()
@@ -114,7 +98,7 @@ func (s *Server) waitInternet() {
 }
 
 func (s *Server) waitServerReady() {
-	pingURL := fmt.Sprintf("%s/api/ping", s.url)
+	pingURL := fmt.Sprintf("%s/ping", s.url.String())
 
 	log.Info("waiting for router to be ready...", vlog.String("ping_url", pingURL))
 

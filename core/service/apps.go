@@ -99,10 +99,10 @@ func (s *AppsService) StartApps() {
 				kernelURL string
 			)
 			if _, ok := a.(app.Initializable); ok {
-				apiURL = a.Meta().ApiURL()
+				apiURL = a.Meta().ApiURL().String()
 			}
 			if _, ok := a.(app.KernelInitializable); ok {
-				kernelURL = a.Meta().ApiKernelURL()
+				kernelURL = a.Meta().ApiKernelURL().String()
 			}
 			t.Row(a.Meta().Name, apiURL, kernelURL)
 		}

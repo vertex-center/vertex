@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"path"
 	"strings"
@@ -12,7 +13,7 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-const urlFormat = "http://%s:%s"
+const DefaultApiURLFormat = "http://%s:%s/api"
 
 var Current = New()
 
@@ -41,10 +42,10 @@ func New() Config {
 		mode:    ProductionMode,
 		localIP: localIP,
 		urls: map[string]string{
-			"vertex": fmt.Sprintf(urlFormat, localIP, "6130"),
+			"vertex": fmt.Sprintf(DefaultApiURLFormat, localIP, "6130"),
 		},
 		kernelUrls: map[string]string{
-			"vertex": fmt.Sprintf(urlFormat, localIP, "6131"),
+			"vertex": fmt.Sprintf(DefaultApiURLFormat, localIP, "6131"),
 		},
 	}
 
@@ -74,20 +75,30 @@ func New() Config {
 	return c
 }
 
-func (c Config) KernelURL(id string) string {
-	if url, ok := c.kernelUrls[id]; ok {
-		return url
+func (c Config) KernelURL(id string) *url.URL {
+	if u, ok := c.kernelUrls[id]; ok {
+		p, err := url.Parse(u)
+		if err != nil {
+			log.Error(err)
+			return &url.URL{}
+		}
+		return p
 	}
 	log.Error(fmt.Errorf("no url configured for this kernel app"), vlog.String("app_id", id))
-	return ""
+	return &url.URL{}
 }
 
-func (c Config) URL(id string) string {
-	if url, ok := c.urls[id]; ok {
-		return url
+func (c Config) URL(id string) *url.URL {
+	if u, ok := c.urls[id]; ok {
+		p, err := url.Parse(u)
+		if err != nil {
+			log.Error(err)
+			return &url.URL{}
+		}
+		return p
 	}
 	log.Error(fmt.Errorf("no url configured for this app"), vlog.String("app_id", id))
-	return ""
+	return &url.URL{}
 }
 
 func (c Config) RegisterApiURL(id string, url string) {
@@ -107,11 +118,12 @@ func (c Config) Debug() bool {
 }
 
 func (c Config) Apply() error {
-	cfg := ""
+	cfg := "window.api_urls = {\n"
 	// Only for the non-kernel apps
-	for name, url := range c.urls {
+	for name, u := range c.urls {
 		name = strings.ReplaceAll(name, "-", "_")
-		cfg += fmt.Sprintf("window.api_url_%s = \"%s\";\n", name, url)
+		cfg += fmt.Sprintf("\t%s: '%s',\n", name, u)
 	}
+	cfg += "};\n"
 	return os.WriteFile(path.Join(storage.FSPath, "client", "dist", "config.js"), []byte(cfg), os.ModePerm)
 }

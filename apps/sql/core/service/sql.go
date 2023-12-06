@@ -103,7 +103,7 @@ func (s *SqlService) createDbmsAdapter(inst *types.Container) (port.DBMSAdapter,
 	case "postgres":
 		log.Info("found postgres DBMS", vlog.String("uuid", inst.UUID.String()))
 		params := &sqladapter.SqlDBMSPostgresAdapterParams{
-			Host: config.Current.URL("vertex"),
+			Host: config.Current.URL("vertex").String(),
 		}
 
 		params.Port, err = strconv.Atoi(inst.Env[feature.Port])

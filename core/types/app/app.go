@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 
 	"github.com/gin-contrib/sse"
@@ -89,20 +90,20 @@ func HeadersSSE(c *router.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 }
 
-func (a Meta) ApiURL() string {
+func (a Meta) ApiURL() *url.URL {
 	return config.Current.URL(a.ID)
 }
 
-func (a Meta) ApiKernelURL() string {
+func (a Meta) ApiKernelURL() *url.URL {
 	return config.Current.KernelURL(a.ID)
 }
 
 func (a Meta) DefaultApiURL() string {
-	return fmt.Sprintf("http://%s:%s", config.Current.LocalIP(), a.DefaultPort)
+	return fmt.Sprintf(config.DefaultApiURLFormat, config.Current.LocalIP(), a.DefaultPort)
 }
 
 func (a Meta) DefaultApiKernelURL() string {
-	return fmt.Sprintf("http://%s:%s", config.Current.LocalIP(), a.DefaultKernelPort)
+	return fmt.Sprintf(config.DefaultApiURLFormat, config.Current.LocalIP(), a.DefaultKernelPort)
 }
 
 // RunStandalone runs the app as a standalone service.
@@ -112,19 +113,21 @@ func RunStandalone(app Interface) {
 	ctx := NewContext(vertexCtx)
 	app.Load(ctx)
 
-	url := app.Meta().ApiURL()
+	u := app.Meta().ApiURL()
 
-	srv := server.New(app.Meta().ID, url, vertexCtx)
-	id := app.Meta().ID
+	srv := server.New(app.Meta().ID, u, vertexCtx)
 
 	if a, ok := app.(Initializable); ok {
-		err := a.Initialize(srv.Router.Group("/api"))
+		base := srv.Router.Group(u.Path)
+
+		err := a.Initialize(base)
 		if err != nil {
 			log.Error(err)
 			os.Exit(1)
 		}
-		srv.Router.GET("/api/ping", func(c *router.Context) {
-			c.JSON(fmt.Sprintf("pong from %s", id))
+
+		base.GET("/ping", func(c *router.Context) {
+			c.OK()
 		})
 	}
 
@@ -146,17 +149,20 @@ func RunStandaloneKernel(app Interface) {
 	ctx := NewContext(vertexCtx)
 	app.Load(ctx)
 
-	url := app.Meta().ApiKernelURL()
+	u := app.Meta().ApiKernelURL()
 
-	srv := server.New(app.Meta().ID, url, vertexCtx)
+	srv := server.New(app.Meta().ID, u, vertexCtx)
 
 	if a, ok := app.(KernelInitializable); ok {
-		err := a.InitializeKernel(srv.Router.Group("/api"))
+		base := srv.Router.Group(u.Path)
+
+		err := a.InitializeKernel(base)
 		if err != nil {
 			log.Error(err)
 			os.Exit(1)
 		}
-		srv.Router.GET("/api/ping", func(c *router.Context) {
+
+		base.GET("/ping", func(c *router.Context) {
 			c.OK()
 		})
 	}
