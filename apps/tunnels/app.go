@@ -9,6 +9,15 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
+// docapi:tunnels title Vertex Tunnels
+// docapi:tunnels description A tunnel manager.
+// docapi:tunnels version 0.0.0
+// docapi:tunnels filename tunnels
+
+// docapi:tunnels url http://{ip}:{port-kernel}/api
+// docapi:tunnels urlvar ip localhost The IP address of the server.
+// docapi:tunnels urlvar port-kernel 7514 The port of the server.
+
 var Meta = apptypes.Meta{
 	ID:          "tunnels",
 	Name:        "Vertex Tunnels",
@@ -41,7 +50,7 @@ func (a *App) Initialize(r *router.Group) error {
 	r.Use(middleware.ReadAuth)
 
 	providerHandler := handler.NewProviderHandler()
-	// docapi:v route /app/tunnels/provider/{provider}/install vx_tunnels_install_provider
+	// docapi:tunnels route /app/tunnels/provider/{provider}/install vx_tunnels_install_provider
 	r.POST("/provider/:provider/install", middleware.Authenticated, providerHandler.Install)
 
 	return nil

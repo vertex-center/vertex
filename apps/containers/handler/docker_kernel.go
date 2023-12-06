@@ -25,7 +25,7 @@ func NewDockerKernelHandler(dockerKernelService port.DockerService) port.DockerK
 // docapi begin vx_containers_kernel_get_containers
 // docapi method GET
 // docapi summary Get containers
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi response 200 {[]Container} The containers.
 // docapi response 500
 // docapi end
@@ -47,7 +47,7 @@ func (h *DockerKernelHandler) GetContainers(c *router.Context) {
 // docapi begin vx_containers_kernel_create_container
 // docapi method POST
 // docapi summary Create container
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi body CreateContainerOptions
 // docapi response 200 {Container} The container.
 // docapi response 500
@@ -76,7 +76,7 @@ func (h *DockerKernelHandler) CreateContainer(c *router.Context) {
 // docapi begin vx_containers_kernel_delete_container
 // docapi method DELETE
 // docapi summary Delete container
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi query id {string} The container id.
 // docapi response 200
 // docapi response 404
@@ -109,7 +109,7 @@ func (h *DockerKernelHandler) DeleteContainer(c *router.Context) {
 // docapi begin vx_containers_kernel_start_container
 // docapi method POST
 // docapi summary Start container
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi query id {string} The container id.
 // docapi response 200
 // docapi response 500
@@ -134,7 +134,7 @@ func (h *DockerKernelHandler) StartContainer(c *router.Context) {
 // docapi begin vx_containers_kernel_stop_container
 // docapi method POST
 // docapi summary Stop container
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi query id {string} The container id.
 // docapi response 200
 // docapi response 500
@@ -159,7 +159,7 @@ func (h *DockerKernelHandler) StopContainer(c *router.Context) {
 // docapi begin vx_containers_kernel_patch_container
 // docapi method PATCH
 // docapi summary Patch container
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi query id {string} The container id.
 // docapi body PatchContainerOptions
 // docapi response 200
@@ -186,7 +186,7 @@ func (h *DockerKernelHandler) InfoContainer(c *router.Context) {
 // docapi method GET
 // docapi summary Get container stdout logs
 // docapi desc Get container stdout logs as a stream.
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi query id {string} The container id.
 // docapi response 200
 // docapi response 500
@@ -229,7 +229,7 @@ func (h *DockerKernelHandler) LogsStdoutContainer(c *router.Context) {
 // docapi method GET
 // docapi summary Get container stderr logs
 // docapi desc Get container stderr logs as a stream.
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi query id {string} The container id.
 // docapi response 200
 // docapi response 500
@@ -271,7 +271,7 @@ func (h *DockerKernelHandler) LogsStderrContainer(c *router.Context) {
 // docapi begin vx_containers_kernel_wait_container
 // docapi method GET
 // docapi summary Wait container
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi query id {string} The container id.
 // docapi query cond {string} The condition to wait for.
 // docapi response 200
@@ -298,7 +298,7 @@ func (h *DockerKernelHandler) WaitContainer(c *router.Context) {
 // docapi begin vx_containers_kernel_delete_mounts
 // docapi method DELETE
 // docapi summary Delete mounts
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi query id {string} The container uuid.
 // docapi response 200
 // docapi response 500
@@ -323,7 +323,7 @@ func (h *DockerKernelHandler) DeleteMounts(c *router.Context) {
 // docapi begin vx_containers_kernel_info_image
 // docapi method GET
 // docapi summary Get image info
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi query id {string} The image id.
 // docapi response 200 {InfoImageResponse} The image.
 // docapi response 500
@@ -349,7 +349,7 @@ func (h *DockerKernelHandler) InfoImage(c *router.Context) {
 // docapi method POST
 // docapi summary Pull image
 // docapi desc Pull an image from a registry. The response is a stream of the logs.
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi body {PullImageOptions} The options to pull the image.
 // docapi response 200
 // docapi response 500
@@ -396,7 +396,7 @@ func (h *DockerKernelHandler) PullImage(c *router.Context) {
 // docapi method POST
 // docapi summary Build image
 // docapi desc Build an image from a Dockerfile. The response is a stream of the logs.
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi body {BuildImageOptions} The options to build the image.
 // docapi response 200
 // docapi response 500

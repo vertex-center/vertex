@@ -23,7 +23,7 @@ func NewEmailHandler(emailService port.EmailService) port.EmailHandler {
 // docapi method GET
 // docapi summary Get emails
 // docapi description Retrieve the emails of the logged-in user
-// docapi tags Authentication
+// docapi tags Emails
 // docapi response 200 {[]Email} The emails
 // docapi response 500
 // docapi end
@@ -48,7 +48,7 @@ func (h *EmailHandler) GetCurrentUserEmails(c *router.Context) {
 // docapi method POST
 // docapi summary Create email
 // docapi description Create a new email for the logged-in user
-// docapi tags Authentication
+// docapi tags Emails
 // docapi response 200 {Email} The email
 // docapi response 400
 // docapi response 409 {Error} Email already exists
@@ -109,7 +109,7 @@ func (h *EmailHandler) CreateCurrentUserEmail(c *router.Context) {
 // docapi method DELETE
 // docapi summary Delete email
 // docapi description Delete an email from the logged-in user
-// docapi tags Authentication
+// docapi tags Emails
 // docapi response 204
 // docapi response 500
 // docapi end

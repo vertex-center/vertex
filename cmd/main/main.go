@@ -31,14 +31,14 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-// docapi:v title Vertex
-// docapi:v description A platform to manage your self-hosted server.
-// docapi:v version 0.0.0
-// docapi:v filename vertex
+// docapi:vertex title Vertex
+// docapi:vertex description A platform to manage your self-hosted server.
+// docapi:vertex version 0.0.0
+// docapi:vertex filename vertex
 
-// docapi:v url http://{ip}:{port}/api
-// docapi:v urlvar ip localhost The IP address of the server.
-// docapi:v urlvar port 6130 The port of the server.
+// docapi:vertex url http://{ip}:{port}/api
+// docapi:vertex urlvar ip localhost The IP address of the server.
+// docapi:vertex urlvar port 6130 The port of the server.
 
 // docapi code 200 Success
 // docapi code 201 Created
@@ -164,12 +164,12 @@ func initRoutes(about types.About) {
 	if config.Current.Debug() {
 		debugHandler := handler.NewDebugHandler(debugService)
 		debug := a.Group("/debug", middleware.Authenticated)
-		// docapi:v route /debug/hard-reset hard_reset
+		// docapi:vertex route /debug/hard-reset hard_reset
 		debug.POST("/hard-reset", debugHandler.HardReset)
 	}
 
 	appsHandler := handler.NewAppsHandler(appsService)
 	apps := a.Group("/apps", middleware.Authenticated)
-	// docapi:v route /apps get_apps
+	// docapi:vertex route /apps get_apps
 	apps.GET("", appsHandler.Get)
 }

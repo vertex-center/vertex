@@ -19,7 +19,7 @@ func NewHardwareKernelHandler(service port.HardwareKernelService) port.HardwareK
 // docapi begin reboot_kernel
 // docapi method POST
 // docapi summary Reboot
-// docapi tags Apps/Admin/Hardware
+// docapi tags Hardware
 // docapi response 204
 // docapi response 500
 // docapi end

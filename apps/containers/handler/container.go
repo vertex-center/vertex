@@ -104,7 +104,7 @@ func (h *ContainerHandler) getContainer(c *router.Context) *types.Container {
 // docapi begin vx_containers_get_container
 // docapi method GET
 // docapi summary Get a container
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi response 200 {Container} The container.
 // docapi response 404
 // docapi response 500
@@ -121,7 +121,7 @@ func (h *ContainerHandler) Get(c *router.Context) {
 // docapi begin vx_containers_delete_container
 // docapi method DELETE
 // docapi summary Delete a container
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi response 204
 // docapi response 404
 // docapi response 409 {Error} The container is still running.
@@ -171,7 +171,7 @@ type PatchBodyDatabase struct {
 // docapi begin vx_containers_patch_container
 // docapi method PATCH
 // docapi summary Patch a container
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi body {PatchBody} The container patch.
 // docapi response 204
 // docapi response 400
@@ -267,7 +267,7 @@ func (h *ContainerHandler) Patch(c *router.Context) {
 // docapi begin vx_containers_start_container
 // docapi method POST
 // docapi summary Start a container
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi response 204
 // docapi response 404
 // docapi response 409 {Error} The container is already running.
@@ -310,7 +310,7 @@ func (h *ContainerHandler) Start(c *router.Context) {
 // docapi begin vx_containers_stop_container
 // docapi method POST
 // docapi summary Stop a container
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi response 204
 // docapi response 404
 // docapi response 409 {Error} The container is not running.
@@ -348,7 +348,7 @@ type PatchEnvironmentBody map[string]string
 // docapi begin vx_containers_patch_environment
 // docapi method PATCH
 // docapi summary Patch a container environment
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi body {PatchEnvironmentBody} The environment variables to set.
 // docapi response 204
 // docapi response 400
@@ -395,7 +395,7 @@ func (h *ContainerHandler) PatchEnvironment(c *router.Context) {
 // docapi method GET
 // docapi summary Get container events
 // docapi desc Get events for a container, sent as Server-Sent Events (SSE).
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi response 200
 // docapi response 404
 // docapi response 500
@@ -486,7 +486,7 @@ type DockerContainerInfo map[string]any
 // docapi begin vx_containers_get_docker
 // docapi method GET
 // docapi summary Get Docker container info
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi response 200 {DockerContainerInfo} The Docker container info.
 // docapi response 404
 // docapi response 500
@@ -514,7 +514,7 @@ func (h *ContainerHandler) GetDocker(c *router.Context) {
 // docapi begin vx_containers_recreate_docker
 // docapi method POST
 // docapi summary Recreate Docker container
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi response 204
 // docapi response 404
 // docapi response 500
@@ -542,7 +542,7 @@ func (h *ContainerHandler) RecreateDocker(c *router.Context) {
 // docapi begin vx_containers_get_logs
 // docapi method GET
 // docapi summary Get container logs
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi response 200 {[]LogLine} The logs.
 // docapi response 404
 // docapi response 500
@@ -570,7 +570,7 @@ func (h *ContainerHandler) GetLogs(c *router.Context) {
 // docapi begin vx_containers_update_service
 // docapi method POST
 // docapi summary Update service
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi response 204
 // docapi response 404
 // docapi response 500
@@ -608,7 +608,7 @@ func (h *ContainerHandler) UpdateService(c *router.Context) {
 // docapi begin vx_containers_get_versions
 // docapi method GET
 // docapi summary Get container versions
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi query reload {bool} Whether to reload the versions from the registry or use the cache.
 // docapi response 200 {[]string} The versions.
 // docapi response 404
@@ -639,7 +639,7 @@ func (h *ContainerHandler) GetVersions(c *router.Context) {
 // docapi begin vx_containers_wait_status
 // docapi method GET
 // docapi summary Wait for a status change
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi query status {string} The status to wait for.
 // docapi response 204
 // docapi response 404

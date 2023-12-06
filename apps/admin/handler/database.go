@@ -20,7 +20,7 @@ func NewDatabaseHandler(dataService port.DbService) port.DatabaseHandler {
 // docapi method GET
 // docapi summary Get the current DBMS
 // docapi desc Get the current database management system that Vertex is using.
-// docapi tags Apps/Admin/Database
+// docapi tags Database
 // docapi response 200 {string} The current DBMS.
 // docapi end
 
@@ -32,7 +32,7 @@ func (h *DatabaseHandler) GetCurrentDbms(c *router.Context) {
 // docapi method POST
 // docapi summary Migrate to a DBMS
 // docapi desc Migrate Vertex to the given database management system.
-// docapi tags Apps/Admin/Database
+// docapi tags Database
 // docapi body {MigrateToBody} The DBMS to migrate to.
 // docapi response 204
 // docapi response 304

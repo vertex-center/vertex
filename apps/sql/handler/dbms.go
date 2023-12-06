@@ -24,7 +24,7 @@ func NewDBMSHandler(sqlService port.SqlService) port.DBMSHandler {
 // docapi begin vx_sql_get_dbms
 // docapi method GET
 // docapi summary Get an installed DBMS
-// docapi tags Apps/SQL
+// docapi tags SQL
 // docapi query container_uuid {string} The UUID of the container hosting the database.
 // docapi response 200 {DBMS} The DBMS.
 // docapi response 400
@@ -65,7 +65,7 @@ func (r *DBMSHandler) Get(c *router.Context) {
 // docapi begin vx_sql_install_dbms
 // docapi method POST
 // docapi summary Install a DBMS
-// docapi tags Apps/SQL
+// docapi tags SQL
 // docapi query dbms {string} The DBMS to install.
 // docapi response 200 {Container} The installed DBMS.
 // docapi response 400

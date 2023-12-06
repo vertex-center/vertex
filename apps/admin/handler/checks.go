@@ -24,7 +24,7 @@ func NewChecksHandler(checksService port.ChecksService) port.ChecksHandler {
 // docapi method GET
 // docapi summary Get all checks
 // docapi desc Check that all vertex requirements are met.
-// docapi tags Admin/Checks
+// docapi tags Checks
 // docapi response 200
 // docapi end
 

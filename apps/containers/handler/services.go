@@ -18,7 +18,7 @@ func NewServicesHandler(serviceService port.ServiceService) port.ServicesHandler
 // docapi begin vx_containers_get_services
 // docapi method GET
 // docapi summary Get services
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi response 200 {[]Service} The services.
 // docapi end
 

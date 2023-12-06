@@ -27,7 +27,7 @@ func NewContainersHandler(ctx *apptypes.Context, containerService port.Container
 // docapi begin vx_containers_get_containers
 // docapi method GET
 // docapi summary Get containers
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi response 200 {[]Container} The containers.
 // docapi end
 
@@ -39,7 +39,7 @@ func (h *ContainersHandler) Get(c *router.Context) {
 // docapi begin vx_containers_get_tags
 // docapi method GET
 // docapi summary Get tags
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi response 200 {[]string} The tags.
 // docapi end
 
@@ -51,7 +51,7 @@ func (h *ContainersHandler) GetTags(c *router.Context) {
 // docapi begin vx_containers_search
 // docapi method GET
 // docapi summary Search containers
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi query features {[]string} The features.
 // docapi query tags {[]string} The tags.
 // docapi response 200 {[]Container} The containers.
@@ -77,7 +77,7 @@ func (h *ContainersHandler) Search(c *router.Context) {
 // docapi begin vx_containers_check_updates
 // docapi method GET
 // docapi summary Check for updates
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi response 200 {[]Container} The containers.
 // docapi response 500
 // docapi end
@@ -100,7 +100,7 @@ func (h *ContainersHandler) CheckForUpdates(c *router.Context) {
 // docapi method GET
 // docapi summary Get events
 // docapi desc Get events for containers, sent as Server-Sent Events (SSE).
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi response 200
 // docapi response 500
 // docapi end

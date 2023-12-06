@@ -31,14 +31,14 @@ var (
 	ctx *types.VertexContext
 )
 
-// docapi:k title Vertex Kernel
-// docapi:k description A platform to manage your self-hosted server.
-// docapi:k version 0.0.0
-// docapi:k filename kernel
+// docapi:vertex_kernel title Vertex Kernel
+// docapi:vertex_kernel description A platform to manage your self-hosted server.
+// docapi:vertex_kernel version 0.0.0
+// docapi:vertex_kernel filename kernel
 
-// docapi:k url http://{ip}:{port-kernel}/api
-// docapi:k urlvar ip localhost The IP address of the kernel.
-// docapi:k urlvar port-kernel 6131 The port of the server.
+// docapi:vertex_kernel url http://{ip}:{port-kernel}/api
+// docapi:vertex_kernel urlvar ip localhost The IP address of the kernel.
+// docapi:vertex_kernel urlvar port-kernel 6131 The port of the server.
 
 func main() {
 	ensureRoot()

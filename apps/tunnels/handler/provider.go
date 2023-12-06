@@ -21,7 +21,7 @@ func NewProviderHandler() port.ProviderHandler {
 // docapi begin vx_tunnels_install_provider
 // docapi method POST
 // docapi summary Install a tunnel provider
-// docapi tags Apps/Tunnels
+// docapi tags Tunnels
 // docapi query provider {string} The provider to install.
 // docapi response 204
 // docapi response 500

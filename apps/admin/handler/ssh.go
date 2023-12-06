@@ -24,7 +24,7 @@ func NewSshHandler(sshService port.SshService) port.SshHandler {
 // docapi begin get_ssh_keys
 // docapi method GET
 // docapi summary Get all SSH keys
-// docapi tags Apps/Admin/SSH
+// docapi tags SSH
 // docapi response 200 {[]PublicKey} The list of SSH keys.
 // docapi response 500
 // docapi end
@@ -46,7 +46,7 @@ func (h *SshHandler) Get(c *router.Context) {
 // docapi begin add_ssh_key
 // docapi method POST
 // docapi summary Add an SSH key
-// docapi tags Apps/Admin/SSH
+// docapi tags SSH
 // docapi body {AddSSHKeyBody} The SSH key to add.
 // docapi response 201
 // docapi response 400
@@ -95,7 +95,7 @@ func (h *SshHandler) Add(c *router.Context) {
 // docapi begin delete_ssh_key
 // docapi method DELETE
 // docapi summary Delete SSH key
-// docapi tags Apps/Admin/SSH
+// docapi tags SSH
 // docapi query fingerprint {DeleteSSHKeyBody} The fingerprint of the SSH key to delete.
 // docapi response 204
 // docapi response 400
@@ -130,7 +130,7 @@ func (h *SshHandler) Delete(c *router.Context) {
 // docapi begin get_ssh_users
 // docapi method GET
 // docapi summary Get all users that can have SSH keys
-// docapi tags Apps/Admin/SSH
+// docapi tags SSH
 // docapi response 200 {[]User} The list of users.
 // docapi response 500
 // docapi end

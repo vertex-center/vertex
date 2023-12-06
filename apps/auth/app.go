@@ -12,6 +12,15 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
+// docapi:auth title Vertex Auth
+// docapi:auth description An authentication service for Vertex.
+// docapi:auth version 0.0.0
+// docapi:auth filename auth
+
+// docapi:auth url http://{ip}:{port-kernel}/api
+// docapi:auth urlvar ip localhost The IP address of the server.
+// docapi:auth urlvar port-kernel 7502 The port of the server.
+
 type App struct {
 	ctx *apptypes.Context
 }
@@ -48,33 +57,33 @@ func (a *App) Initialize(r *router.Group) error {
 	userService := service.NewUserService(authAdapter)
 
 	authHandler := handler.NewAuthHandler(authService)
-	// docapi:v route /app/auth/login auth_login
+	// docapi:auth route /app/auth/login auth_login
 	r.POST("/login", authHandler.Login)
-	// docapi:v route /app/auth/register auth_register
+	// docapi:auth route /app/auth/register auth_register
 	r.POST("/register", authHandler.Register)
-	// docapi:v route /app/auth/logout auth_logout
+	// docapi:auth route /app/auth/logout auth_logout
 	r.POST("/logout", middleware.Authenticated, authHandler.Logout)
-	// docapi:v route /app/auth/verify auth_verify
+	// docapi:auth route /app/auth/verify auth_verify
 	r.POST("/verify", authHandler.Verify)
 
 	userHandler := handler.NewUserHandler(userService)
 	user := r.Group("/user", middleware.Authenticated)
-	// docapi:v route /app/auth/user auth_get_current_user
+	// docapi:auth route /app/auth/user auth_get_current_user
 	user.GET("", userHandler.GetCurrentUser)
-	// docapi:v route /app/auth/user auth_patch_current_user
+	// docapi:auth route /app/auth/user auth_patch_current_user
 	user.PATCH("", userHandler.PatchCurrentUser)
-	// docapi:v route /app/auth/credentials auth_get_current_user_credentials
+	// docapi:auth route /app/auth/credentials auth_get_current_user_credentials
 	user.GET("/credentials", userHandler.GetCurrentUserCredentials)
 
 	emailHandler := handler.NewEmailHandler(emailService)
 	email := user.Group("/email", middleware.Authenticated)
-	// docapi:v route /app/auth/user/email auth_current_user_create_email
+	// docapi:auth route /app/auth/user/email auth_current_user_create_email
 	email.POST("", emailHandler.CreateCurrentUserEmail)
-	// docapi:v route /app/auth/user/email auth_current_user_delete_email
+	// docapi:auth route /app/auth/user/email auth_current_user_delete_email
 	email.DELETE("", emailHandler.DeleteCurrentUserEmail)
 
 	emails := user.Group("/emails", middleware.Authenticated)
-	// docapi:v route /app/auth/user/emails auth_current_user_get_emails
+	// docapi:auth route /app/auth/user/emails auth_current_user_get_emails
 	emails.GET("", emailHandler.GetCurrentUserEmails)
 
 	return nil

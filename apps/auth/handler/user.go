@@ -20,7 +20,7 @@ func NewUserHandler(userService port.UserService) port.UserHandler {
 // docapi method GET
 // docapi summary Get user
 // docapi description Retrieve the logged-in user
-// docapi tags Authentication/Users
+// docapi tags Users
 // docapi response 200 {User} The user
 // docapi response 500
 // docapi end
@@ -45,7 +45,7 @@ func (h *UserHandler) GetCurrentUser(c *router.Context) {
 // docapi method PATCH
 // docapi summary Patch user
 // docapi description Patch the logged-in user
-// docapi tags Authentication/Users
+// docapi tags Users
 // docapi response 200 {User} The user
 // docapi response 500
 // docapi end
@@ -77,7 +77,7 @@ func (h *UserHandler) PatchCurrentUser(c *router.Context) {
 // docapi method GET
 // docapi summary Get user credentials
 // docapi description Retrieve the logged-in user credentials
-// docapi tags Authentication/Users
+// docapi tags Users
 // docapi response 200 {UserCredentials} The user credentials
 // docapi response 500
 // docapi end

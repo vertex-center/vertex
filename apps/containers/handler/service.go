@@ -24,7 +24,7 @@ func NewServiceHandler(serviceService port.ServiceService, containerService port
 // docapi begin vx_containers_get_service
 // docapi method GET
 // docapi summary Get service
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi query service_id {string} The service ID.
 // docapi response 200 {Service} The service.
 // docapi response 400
@@ -58,7 +58,7 @@ func (h *ServiceHandler) Get(c *router.Context) {
 // docapi begin vx_containers_install_service
 // docapi method POST
 // docapi summary Install a service
-// docapi tags Apps/Containers
+// docapi tags Containers
 // docapi query service_id {string} The service ID.
 // docapi response 200 {Container} The container.
 // docapi response 400

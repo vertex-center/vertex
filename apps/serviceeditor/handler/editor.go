@@ -21,7 +21,7 @@ func NewEditorHandler(editorService port.EditorService) port.EditorHandler {
 // docapi method POST
 // docapi summary Convert service to yaml
 // docapi desc Convert service description to a reusable yaml file.
-// docapi tags Apps/Service Editor
+// docapi tags Service Editor
 // docapi body {Service} The service to convert.
 // docapi response 200 {string} The yaml file.
 // docapi response 400

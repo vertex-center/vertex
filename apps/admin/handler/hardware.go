@@ -19,7 +19,7 @@ func NewHardwareHandler(service port.HardwareService) port.HardwareHandler {
 // docapi begin get_host
 // docapi method GET
 // docapi summary Get host
-// docapi tags Apps/Admin/Hardware
+// docapi tags Hardware
 // docapi response 200 {Host} The host information.
 // docapi response 500
 // docapi end
@@ -40,7 +40,7 @@ func (h *HardwareHandler) GetHost(c *router.Context) {
 // docapi begin get_cpus
 // docapi method GET
 // docapi summary Get CPUs
-// docapi tags Apps/Admin/Hardware
+// docapi tags Hardware
 // docapi response 200 {[]CPU} The CPUs information.
 // docapi response 500
 // docapi end
@@ -61,7 +61,7 @@ func (h *HardwareHandler) GetCPUs(c *router.Context) {
 // docapi begin reboot
 // docapi method POST
 // docapi summary Reboot
-// docapi tags Apps/Admin/Hardware
+// docapi tags Hardware
 // docapi response 204
 // docapi response 500
 // docapi end

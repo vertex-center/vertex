@@ -24,7 +24,7 @@ func NewAuthHandler(authService port.AuthService) port.AuthHandler {
 // docapi method POST
 // docapi summary Login
 // docapi description Login with username and password
-// docapi tags Authentication
+// docapi tags Auth
 // docapi response 200 {Token} The auth token
 // docapi response 400
 // docapi response 500
@@ -53,7 +53,7 @@ func (h AuthHandler) Login(c *router.Context) {
 // docapi method POST
 // docapi summary Register
 // docapi description Register a new user with username and password
-// docapi tags Authentication
+// docapi tags Auth
 // docapi response 200 {Token} The auth token
 // docapi response 400
 // docapi response 500
@@ -127,7 +127,7 @@ func (h AuthHandler) Verify(c *router.Context) {
 // docapi begin auth_logout
 // docapi method POST
 // docapi summary Logout
-// docapi tags Authentication
+// docapi tags Auth
 // docapi response 204
 // docapi response 500
 // docapi end

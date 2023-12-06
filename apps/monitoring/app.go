@@ -12,6 +12,15 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
+// docapi:monitoring title Vertex Monitoring
+// docapi:monitoring description A monitoring service for Vertex.
+// docapi:monitoring version 0.0.0
+// docapi:monitoring filename monitoring
+
+// docapi:monitoring url http://{ip}:{port-kernel}/api
+// docapi:monitoring urlvar ip localhost The IP address of the server.
+// docapi:monitoring urlvar port-kernel 7506 The port of the server.
+
 var (
 	prometheusAdapter port.MetricsAdapter
 
@@ -54,11 +63,11 @@ func (a *App) Initialize(r *router.Group) error {
 	metricsService = service.NewMetricsService(a.ctx, prometheusAdapter)
 
 	metricsHandler := handler.NewMetricsHandler(metricsService)
-	// docapi:v route /app/monitoring/metrics vx_monitoring_get_metrics
+	// docapi:monitoring route /app/monitoring/metrics vx_monitoring_get_metrics
 	r.GET("/metrics", middleware.Authenticated, metricsHandler.Get)
-	// docapi:v route /app/monitoring/collector/{collector}/install vx_monitoring_install_collector
+	// docapi:monitoring route /app/monitoring/collector/{collector}/install vx_monitoring_install_collector
 	r.POST("/collector/:collector/install", metricsHandler.InstallCollector)
-	// docapi:v route /app/monitoring/visualizer/{visualizer}/install vx_monitoring_install_visualizer
+	// docapi:monitoring route /app/monitoring/visualizer/{visualizer}/install vx_monitoring_install_visualizer
 	r.POST("/visualizer/:visualizer/install", metricsHandler.InstallVisualizer)
 
 	return nil

@@ -17,6 +17,24 @@ import (
 	"github.com/vertex-center/vertex/updates"
 )
 
+// docapi:admin title Vertex Admin
+// docapi:admin description An admin panel to manage the Vertex platform.
+// docapi:admin version 0.0.0
+// docapi:admin filename admin
+
+// docapi:admin url http://{ip}:{port-kernel}/api
+// docapi:admin urlvar ip localhost The IP address of the server.
+// docapi:admin urlvar port-kernel 7500 The port of the server.
+
+// docapi:admin_kernel title Vertex Admin Kernel
+// docapi:admin_kernel description An admin panel to manage the Vertex platform.
+// docapi:admin_kernel version 0.0.0
+// docapi:admin_kernel filename admin_kernel
+
+// docapi:admin_kernel url http://{ip}:{port-kernel}/api
+// docapi:admin_kernel urlvar ip localhost The IP address of the server.
+// docapi:admin_kernel urlvar port-kernel 7501 The port of the server.
+
 var updateService port.UpdateService
 
 type App struct {
@@ -69,41 +87,41 @@ func (a *App) Initialize(r *router.Group) error {
 
 	hardwareHandler := handler.NewHardwareHandler(hardwareService)
 	hardware := r.Group("/hardware", middleware.Authenticated)
-	// docapi:v route /app/admin/hardware/host get_host
+	// docapi:admin route /app/admin/hardware/host get_host
 	hardware.GET("/host", hardwareHandler.GetHost)
-	// docapi:v route /app/admin/hardware/cpus get_cpus
+	// docapi:admin route /app/admin/hardware/cpus get_cpus
 	hardware.GET("/cpus", hardwareHandler.GetCPUs)
-	// docapi:v route /app/admin/hardware/reboot reboot
+	// docapi:admin route /app/admin/hardware/reboot reboot
 	hardware.POST("/reboot", hardwareHandler.Reboot)
 
 	sshHandler := handler.NewSshHandler(sshService)
 	ssh := r.Group("/ssh", middleware.Authenticated)
-	// docapi:v route /app/admin/ssh get_ssh_keys
+	// docapi:admin route /app/admin/ssh get_ssh_keys
 	ssh.GET("", sshHandler.Get)
-	// docapi:v route /app/admin/ssh add_ssh_key
+	// docapi:admin route /app/admin/ssh add_ssh_key
 	ssh.POST("", sshHandler.Add)
-	// docapi:v route /app/admin/ssh delete_ssh_key
+	// docapi:admin route /app/admin/ssh delete_ssh_key
 	ssh.DELETE("", sshHandler.Delete)
-	// docapi:v route /app/admin/ssh/users get_ssh_users
+	// docapi:admin route /app/admin/ssh/users get_ssh_users
 	ssh.GET("/users", sshHandler.GetUsers)
 
 	settingsHandler := handler.NewSettingsHandler(settingsService)
 	settings := r.Group("/settings", middleware.Authenticated)
-	// docapi:v route /app/admin/settings get_settings
+	// docapi:admin route /app/admin/settings get_settings
 	settings.GET("", settingsHandler.Get)
-	// docapi:v route /app/admin/settings patch_settings
+	// docapi:admin route /app/admin/settings patch_settings
 	settings.PATCH("", settingsHandler.Patch)
 
 	updateHandler := handler.NewUpdateHandler(updateService, settingsService)
 	update := r.Group("/update", middleware.Authenticated)
-	// docapi:v route /app/admin/update get_updates
+	// docapi:admin route /app/admin/update get_updates
 	update.GET("", updateHandler.Get)
-	// docapi:v route /app/admin/update install_update
+	// docapi:admin route /app/admin/update install_update
 	update.POST("", updateHandler.Install)
 
 	checksHandler := handler.NewChecksHandler(checksService)
 	checks := r.Group("/admin/checks", middleware.Authenticated)
-	// docapi:v route /admin/checks admin_checks
+	// docapi:admin route /admin/checks admin_checks
 	checks.GET("", apptypes.HeadersSSE, checksHandler.Check)
 
 	return nil
@@ -118,18 +136,18 @@ func (a *App) InitializeKernel(r *router.Group) error {
 
 	hardwareHandler := handler.NewHardwareKernelHandler(hardwareService)
 	hardware := r.Group("/hardware")
-	// docapi:k route /app/admin/hardware/reboot reboot_kernel
+	// docapi:admin_kernel route /app/admin/hardware/reboot reboot_kernel
 	hardware.POST("/reboot", hardwareHandler.Reboot)
 
 	sshHandler := handler.NewSshKernelHandler(sshService)
 	ssh := r.Group("/ssh")
-	// docapi:k route /app/admin/ssh get_ssh_keys_kernel
+	// docapi:admin_kernel route /app/admin/ssh get_ssh_keys_kernel
 	ssh.GET("", sshHandler.Get)
-	// docapi:k route /app/admin/ssh add_ssh_key_kernel
+	// docapi:admin_kernel route /app/admin/ssh add_ssh_key_kernel
 	ssh.POST("", sshHandler.Add)
-	// docapi:k route /app/admin/ssh delete_ssh_key_kernel
+	// docapi:admin_kernel route /app/admin/ssh delete_ssh_key_kernel
 	ssh.DELETE("", sshHandler.Delete)
-	// docapi:k route /app/admin/ssh/users get_ssh_users_kernel
+	// docapi:admin_kernel route /app/admin/ssh/users get_ssh_users_kernel
 	ssh.GET("/users", sshHandler.GetUsers)
 
 	return nil

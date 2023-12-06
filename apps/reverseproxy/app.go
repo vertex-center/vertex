@@ -12,6 +12,15 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
+// docapi:proxy title Vertex Reverse Proxy
+// docapi:proxy description A reverse proxy manager.
+// docapi:proxy version 0.0.0
+// docapi:proxy filename proxy
+
+// docapi:proxy url http://{ip}:{port-kernel}/api
+// docapi:proxy urlvar ip localhost The IP address of the server.
+// docapi:proxy urlvar port-kernel 7508 The port of the server.
+
 var (
 	proxyFSAdapter port.ProxyAdapter
 
@@ -63,11 +72,11 @@ func (a *App) Initialize(r *router.Group) error {
 	}()
 
 	proxyHandler := handler.NewProxyHandler(proxyService)
-	// docapi:v route /app/reverse-proxy/redirects vx_reverse_proxy_get_redirects
+	// docapi:proxy route /app/reverse-proxy/redirects vx_reverse_proxy_get_redirects
 	r.GET("/redirects", middleware.Authenticated, proxyHandler.GetRedirects)
-	// docapi:v route /app/reverse-proxy/redirect vx_reverse_proxy_add_redirect
+	// docapi:proxy route /app/reverse-proxy/redirect vx_reverse_proxy_add_redirect
 	r.POST("/redirect", middleware.Authenticated, proxyHandler.AddRedirect)
-	// docapi:v route /app/reverse-proxy/redirect/{id} vx_reverse_proxy_remove_redirect
+	// docapi:proxy route /app/reverse-proxy/redirect/{id} vx_reverse_proxy_remove_redirect
 	r.DELETE("/redirect/:id", middleware.Authenticated, proxyHandler.RemoveRedirect)
 
 	return nil
