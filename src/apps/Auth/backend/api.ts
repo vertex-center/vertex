@@ -2,7 +2,8 @@ import { AuthCredentials, Credentials, Email, User } from "./models";
 
 import { createServer } from "../../../backend/server";
 
-const server = createServer("7502");
+// @ts-ignore
+const server = createServer(window.api_urls.auth);
 
 const login = async (credentials: AuthCredentials) => {
     const Authorization = `Basic ${btoa(

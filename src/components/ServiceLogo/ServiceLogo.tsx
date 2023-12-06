@@ -9,7 +9,7 @@ export default function ServiceLogo(props: Readonly<Props>) {
     const { service } = props;
 
     // @ts-ignore
-    const iconURL = new URL(window.apiURL + ":7504");
+    const iconURL = new URL(window.api_urls.containers);
     iconURL.pathname = `/api/services/icons/${service?.icon}`;
 
     if (!service?.icon) {

@@ -11,7 +11,7 @@ type SSE = {
 
 const allSSE: { [uuid: string]: SSE } = {};
 
-export function registerSSE(port: string, url: string): string {
+export function registerSSE(url: string, route: string): string {
     let uuid = Object.keys(allSSE).find((uuid) => allSSE[uuid].url === url);
 
     if (uuid !== undefined) {
@@ -22,7 +22,7 @@ export function registerSSE(port: string, url: string): string {
     uuid = uuidv4();
     const eventSource = new EventSourcePolyfill(
         // @ts-ignore
-        `${window.apiURL}:${port}/api${url}`,
+        `${url}/api${route}`,
         {
             headers: {
                 Authorization: `Bearer ${getAuthToken()}`,

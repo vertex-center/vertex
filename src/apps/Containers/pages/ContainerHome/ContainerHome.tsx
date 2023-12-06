@@ -29,7 +29,7 @@ export default function ContainerHome() {
                             const disabled = container.status !== "running";
 
                             // @ts-ignore
-                            let url = new URL(window.apiURL);
+                            let url = new URL(window.api_urls.vertex);
                             url.port = port;
                             url.pathname = u.home ?? "";
 

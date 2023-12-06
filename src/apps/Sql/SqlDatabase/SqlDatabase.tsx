@@ -59,7 +59,8 @@ export default function SqlDatabase() {
 
     const route = uuid ? `/container/${uuid}/events` : "";
 
-    useServerEvent("7504", route, {
+    // @ts-ignore
+    useServerEvent(window.api_urls.containers, route, {
         status_change: () => {
             queryClient.invalidateQueries({
                 queryKey: ["containers", uuid],

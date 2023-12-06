@@ -9,7 +9,7 @@ import { vxServiceEditorRoutes } from "./vxServiceEditor";
 import { createServer } from "../server";
 
 // @ts-ignore
-export const server = createServer(window?.apiPortVertex ?? "6130");
+export const server = createServer(window.api_urls.vertex);
 
 const getAbout = async () => {
     const { data } = await server.get<About>("/about");

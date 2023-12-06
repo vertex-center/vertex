@@ -4,7 +4,8 @@ import { DockerContainerInfo } from "../../models/docker";
 
 import { createServer } from "../server";
 
-const server = createServer("7504");
+// @ts-ignore
+const server = createServer(window.api_urls.containers);
 
 const getAllContainers = async () => {
     const { data } = await server.get<Containers>(`/containers`);

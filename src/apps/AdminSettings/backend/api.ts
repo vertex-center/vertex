@@ -1,7 +1,8 @@
 import { CPU, Host, SSHKey, Update } from "./models";
 import { createServer } from "../../../backend/server";
 
-const server = createServer("7500");
+// @ts-ignore
+const server = createServer(window.api_urls.admin);
 
 const getHost = async () => {
     const { data } = await server.get<Host>("/hardware/host");

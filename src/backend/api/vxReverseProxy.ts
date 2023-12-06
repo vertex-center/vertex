@@ -1,6 +1,7 @@
 import { createServer } from "../server";
 
-const server = createServer("7508");
+// @ts-ignore
+const server = createServer(window.api_urls.reverse_proxy);
 
 const getRedirects = async () => {
     const { data } = await server.get<ProxyRedirects>(`/redirects`);

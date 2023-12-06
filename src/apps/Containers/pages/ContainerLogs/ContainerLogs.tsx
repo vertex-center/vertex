@@ -75,7 +75,8 @@ export default function ContainerLogs() {
 
     const route = uuid ? `/container/${uuid}/events` : "";
 
-    useServerEvent("7504", route, {
+    // @ts-ignore
+    useServerEvent(window.api_urls.containers, route, {
         stdout: onStdout,
         stderr: onStderr,
         download: onDownload,

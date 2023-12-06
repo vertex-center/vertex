@@ -2,7 +2,8 @@ import { Metric } from "../../models/metrics";
 
 import { createServer } from "../server";
 
-const server = createServer("7506");
+// @ts-ignore
+const server = createServer(window.api_urls.monitoring);
 
 const getMetrics = async () => {
     const { data } = await server.get<Metric[]>(`/metrics`);

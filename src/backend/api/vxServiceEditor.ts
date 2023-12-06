@@ -2,7 +2,8 @@ import { Service } from "../../models/service";
 
 import { createServer } from "../server";
 
-const server = createServer("7510");
+// @ts-ignore
+const server = createServer(window.api_urls.devtools_service_editor);
 
 const toYaml = async (service: Service) => {
     const { data } = await server.post(`/editor/to-yaml`, service);

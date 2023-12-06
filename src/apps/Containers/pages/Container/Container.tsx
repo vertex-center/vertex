@@ -34,7 +34,8 @@ export default function ContainerDetails() {
 
     const route = uuid ? `/container/${uuid}/events` : "";
 
-    useServerEvent("7504", route, {
+    // @ts-ignore
+    useServerEvent(window.api_urls.containers, route, {
         status_change: (e) => {
             queryClient.setQueryData(
                 ["containers", uuid],

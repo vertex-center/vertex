@@ -1,6 +1,7 @@
 import { createServer } from "../server";
 
-const server = createServer("7512");
+// @ts-ignore
+const server = createServer(window.api_urls.sql);
 
 const installDbms = (dbms: string) => {
     return server.post(`/dbms/${dbms}/install`);

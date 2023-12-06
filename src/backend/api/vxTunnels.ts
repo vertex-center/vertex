@@ -1,6 +1,7 @@
 import { createServer } from "../server";
 
-const server = createServer("7514");
+// @ts-ignore
+const server = createServer(window.api_urls.tunnels);
 
 const installProvider = (provider: string) => {
     return server.post(`/provider/${provider}/install`);

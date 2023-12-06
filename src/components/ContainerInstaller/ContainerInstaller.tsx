@@ -81,7 +81,8 @@ export default function ContainerInstaller(props: Readonly<Props>) {
 
     const route = container?.uuid ? `/container/${container?.uuid}/events` : "";
 
-    useServerEvent("7504", route, {
+    // @ts-ignore
+    useServerEvent(window.api_urls.containers, route, {
         status_change: (e) => {
             setContainer((container) => ({ ...container, status: e.data }));
         },
