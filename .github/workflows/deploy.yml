@@ -20,11 +20,21 @@ jobs:
       - name: Install Playwright
         run: npx playwright@1.39.0 install --with-deps
 
-      - name: Download OpenAPI specs
-        run: |
-          git clone https://github.com/vertex-center/openapi.git vertex-openapi
-          cp vertex-openapi/openapi.vertex.dev.yaml api/api/next/openapi.yml
-          cp vertex-openapi/openapi.kernel.dev.yaml api/kernel-api/next/openapi.yml
+      #      - name: Download OpenAPI specs
+      #        run: |
+      #          git clone https://github.com/vertex-center/openapi.git vertex-openapi
+      #          cp vertex-openapi/openapi.vertex.dev.yaml api/vertex/next/openapi.yml
+      #          cp vertex-openapi/openapi.kernel.dev.yaml api/vertex-kernel/next/openapi.yml
+      #          cp vertex-openapi/openapi.admin.dev.yaml api/admin/next/openapi.yml
+      #          cp vertex-openapi/openapi.admin_kernel.dev.yaml api/admin-kernel/next/openapi.yml
+      #          cp vertex-openapi/openapi.auth.dev.yaml api/auth/next/openapi.yml
+      #          cp vertex-openapi/openapi.containers.dev.yaml api/containers/next/openapi.yml
+      #          cp vertex-openapi/openapi.containers_kernel.dev.yaml api/containers-kernel/next/openapi.yml
+      #          cp vertex-openapi/openapi.monitoring.dev.yaml api/monitoring/next/openapi.yml
+      #          cp vertex-openapi/openapi.proxy.dev.yaml api/proxy/next/openapi.yml
+      #          cp vertex-openapi/openapi.service_editor.dev.yaml api/service-editor/next/openapi.yml
+      #          cp vertex-openapi/openapi.sql.dev.yaml api/sql/next/openapi.yml
+      #          cp vertex-openapi/openapi.tunnels.dev.yaml api/tunnels/next/openapi.yml
 
       - name: Build
         run: npm run build

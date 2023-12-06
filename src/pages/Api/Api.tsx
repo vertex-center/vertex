@@ -35,7 +35,7 @@ function ApiMethods(props: Readonly<ApiMethodsProps>) {
                                 <td>{resp.description}</td>
                             </tr>
                         );
-                    }
+                    },
                 )}
             </tbody>
         </Table>
@@ -68,9 +68,9 @@ export function Api(props: Readonly<ApiProps>) {
                         if (operation.tags === undefined) return;
                         if (!operation.tags.includes(tag)) return;
                         routes.push({ path, method, operation });
-                    }
+                    },
                 );
-            }
+            },
         );
         return routes;
     }, [api, tag]);
