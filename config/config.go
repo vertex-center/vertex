@@ -9,6 +9,7 @@ import (
 	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/net"
+	"github.com/vertex-center/vlog"
 )
 
 const urlFormat = "http://%s:%s"
@@ -23,25 +24,27 @@ const (
 )
 
 type Config struct {
-	mode  Mode
-	Host  string `json:"host"`
-	Ports map[string]string
+	mode       Mode
+	localIP    string
+	urls       map[string]string
+	kernelUrls map[string]string
 }
 
 func New() Config {
-	host, err := net.LocalIP()
+	localIP, err := net.LocalIP()
 	if err != nil {
 		log.Error(err)
-		host = "127.0.0.1"
+		localIP = "127.0.0.1"
 	}
 
 	c := Config{
-		mode: ProductionMode,
-		Host: host,
-		Ports: map[string]string{
-			"VERTEX":        "6130",
-			"VERTEX_KERNEL": "6131",
-			"VERTEX_PROXY":  "80",
+		mode:    ProductionMode,
+		localIP: localIP,
+		urls: map[string]string{
+			"vertex": fmt.Sprintf(urlFormat, localIP, "6130"),
+		},
+		kernelUrls: map[string]string{
+			"vertex": fmt.Sprintf(urlFormat, localIP, "6131"),
 		},
 	}
 
@@ -50,9 +53,15 @@ func New() Config {
 		pair := strings.SplitN(e, "=", 2)
 		if len(pair) == 2 {
 			key, value := pair[0], pair[1]
-			if strings.HasPrefix(key, "VERTEX_PORT_") {
-				name := strings.TrimPrefix(key, "VERTEX_PORT_")
-				c.Ports[name] = value
+			if strings.HasPrefix(key, "VERTEX_URL_") {
+				name := strings.TrimPrefix(key, "VERTEX_URL_")
+				name = strings.ToLower(name)
+				if strings.HasSuffix(key, "_kernel") {
+					name = strings.TrimSuffix(name, "_kernel")
+					c.kernelUrls[name] = value
+				} else {
+					c.urls[name] = value
+				}
 			}
 		}
 	}
@@ -65,20 +74,32 @@ func New() Config {
 	return c
 }
 
-func (c Config) VertexURL() string {
-	return fmt.Sprintf(urlFormat, c.Host, c.Ports["VERTEX"])
-}
-
-func (c Config) KernelURL() string {
-	return fmt.Sprintf(urlFormat, c.Host, c.Ports["VERTEX_KERNEL"])
-}
-
-func (c Config) GetPort(name string, fallback string) string {
-	name = strings.ToUpper(name)
-	if port, ok := c.Ports[name]; ok {
-		return port
+func (c Config) KernelURL(id string) string {
+	if url, ok := c.kernelUrls[id]; ok {
+		return url
 	}
-	return fallback
+	log.Error(fmt.Errorf("no url configured for this kernel app"), vlog.String("app_id", id))
+	return ""
+}
+
+func (c Config) URL(id string) string {
+	if url, ok := c.urls[id]; ok {
+		return url
+	}
+	log.Error(fmt.Errorf("no url configured for this app"), vlog.String("app_id", id))
+	return ""
+}
+
+func (c Config) RegisterApiURL(id string, url string) {
+	c.urls[id] = url
+}
+
+func (c Config) RegisterKernelApiURL(id string, url string) {
+	c.kernelUrls[id] = url
+}
+
+func (c Config) LocalIP() string {
+	return c.localIP
 }
 
 func (c Config) Debug() bool {
@@ -86,9 +107,10 @@ func (c Config) Debug() bool {
 }
 
 func (c Config) Apply() error {
-	configJsContent := fmt.Sprintf("window.apiURL = \"%s\";", c.Host)
-	configJsContent += fmt.Sprintf("window.apiPort_VERTEX = \"%s\";", c.Ports["VERTEX"])
-	configJsContent += fmt.Sprintf("window.apiPort_VERTEX_PROXY = \"%s\";", c.Ports["VERTEX_PROXY"])
-
-	return os.WriteFile(path.Join(storage.FSPath, "client", "dist", "config.js"), []byte(configJsContent), os.ModePerm)
+	cfg := ""
+	// Only for the non-kernel apps
+	for name, url := range c.urls {
+		cfg += fmt.Sprintf("window.api_url_%s = \"%s\";\n", name, url)
+	}
+	return os.WriteFile(path.Join(storage.FSPath, "client", "dist", "config.js"), []byte(cfg), os.ModePerm)
 }

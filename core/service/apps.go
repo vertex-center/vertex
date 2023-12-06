@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
@@ -54,10 +55,17 @@ func (s *AppsService) OnEvent(e event.Event) error {
 func (s *AppsService) LoadApps() {
 	log.Info("loading apps")
 
-	for i := range s.apps {
+	for i, a := range s.apps {
 		ctx := app.NewContext(s.ctx)
 		s.apps[i].Load(ctx)
 		s.registry.RegisterApp(s.apps[i])
+
+		if _, ok := a.(app.Initializable); ok {
+			config.Current.RegisterApiURL(a.Meta().ID, a.Meta().DefaultApiURL())
+		}
+		if _, ok := a.(app.KernelInitializable); ok {
+			config.Current.RegisterKernelApiURL(a.Meta().ID, a.Meta().DefaultApiKernelURL())
+		}
 	}
 
 	log.Info("apps loaded")
@@ -86,7 +94,17 @@ func (s *AppsService) StartApps() {
 	if !s.kernel {
 		t := table.New().Headers("App", "API", "Kernel API")
 		for _, a := range s.registry.Apps() {
-			t.Row(a.Meta().Name, a.Meta().ApiURL(), a.Meta().ApiKernelURL())
+			var (
+				apiURL    string
+				kernelURL string
+			)
+			if _, ok := a.(app.Initializable); ok {
+				apiURL = a.Meta().ApiURL()
+			}
+			if _, ok := a.(app.KernelInitializable); ok {
+				kernelURL = a.Meta().ApiKernelURL()
+			}
+			t.Row(a.Meta().Name, apiURL, kernelURL)
 		}
 		fmt.Println(t)
 	}

@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	url2 "net/url"
 	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
@@ -22,7 +22,7 @@ var InternetOK = false
 
 type Server struct {
 	id     string
-	addr   string
+	url    string
 	ctx    *types.VertexContext
 	Router *router.Router
 }
@@ -37,7 +37,7 @@ func New(id, addr string, ctx *types.VertexContext) *Server {
 
 	s := Server{
 		id:     id,
-		addr:   addr,
+		url:    addr,
 		ctx:    ctx,
 		Router: router.New(),
 	}
@@ -52,7 +52,7 @@ func (s *Server) initRouter() {
 
 	s.Router.Use(cors.New(cfg))
 	s.Router.Use(ginutils.ErrorHandler())
-	s.Router.Use(ginutils.Logger(s.id, s.addr))
+	s.Router.Use(ginutils.Logger(s.id, s.url))
 	s.Router.Use(gin.Recovery())
 }
 
@@ -60,8 +60,17 @@ func (s *Server) StartAsync() chan error {
 	exitChan := make(chan error)
 	go func() {
 		defer close(exitChan)
-		log.Info("starting server", vlog.String("addr", s.addr))
-		exitChan <- s.Router.Start(s.addr)
+		log.Info("starting server", vlog.String("url", s.url))
+
+		url, err := url2.Parse(s.url)
+		if err != nil {
+			log.Error(err)
+			exitChan <- err
+			return
+		}
+
+		port := url.Port()
+		exitChan <- s.Router.Start(":" + port)
 	}()
 
 	s.waitInternet()
@@ -105,12 +114,13 @@ func (s *Server) waitInternet() {
 }
 
 func (s *Server) waitServerReady() {
-	log.Info("waiting for router to be ready...")
+	pingURL := fmt.Sprintf("%s/api/ping", s.url)
+
+	log.Info("waiting for router to be ready...", vlog.String("ping_url", pingURL))
 
 	timeout, cancelTimeout := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancelTimeout()
-	url := fmt.Sprintf("http://%s%s/api/ping", config.Current.Host, s.addr)
-	err := net.Wait(timeout, url)
+	err := net.Wait(timeout, pingURL)
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)

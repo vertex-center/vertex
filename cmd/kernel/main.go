@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"os/exec"
 	"os/user"
@@ -58,9 +57,9 @@ func main() {
 	}
 
 	ctx = types.NewVertexContext(types.About{}, true)
-	addr := fmt.Sprintf(":%s", config.KernelCurrent.Ports["VERTEX_KERNEL"])
+	url := config.Current.KernelURL("vertex")
 
-	srv = server.New("kernel", addr, ctx)
+	srv = server.New("kernel", url, ctx)
 	initServices()
 
 	ctx.DispatchEvent(types.EventServerLoad{})
@@ -111,12 +110,9 @@ func parseArgs() {
 		flagUsername = flag.String("user", "", "username of the unprivileged user")
 		flagUID      = flag.Uint("uid", 0, "uid of the unprivileged user")
 		flagGID      = flag.Uint("gid", 0, "gid of the unprivileged user")
-		flagHost     = flag.String("host", config.Current.Host, "The Vertex access url")
 	)
 
 	flag.Parse()
-
-	config.KernelCurrent.Host = *flagHost
 
 	if *flagUsername == "" {
 		*flagUsername = os.Getenv("USER")

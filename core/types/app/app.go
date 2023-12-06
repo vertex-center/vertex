@@ -3,7 +3,6 @@ package app
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/gin-contrib/sse"
 	"github.com/vertex-center/vertex/config"
@@ -91,29 +90,19 @@ func HeadersSSE(c *router.Context) {
 }
 
 func (a Meta) ApiURL() string {
-	if a.DefaultPort == "" {
-		// The app does not support non-kernel extensions.
-		return ""
-	}
-	var (
-		portName = strings.ToUpper(a.ID)
-		port     = config.Current.GetPort(portName, a.DefaultPort)
-		host     = config.Current.Host
-	)
-	return fmt.Sprintf("http://%s:%s/api", host, port)
+	return config.Current.URL(a.ID)
 }
 
 func (a Meta) ApiKernelURL() string {
-	if a.DefaultKernelPort == "" {
-		// The app does not support kernel extensions.
-		return ""
-	}
-	var (
-		portName = strings.ToUpper(a.ID)
-		port     = config.Current.GetPort(portName+"_KERNEL", a.DefaultKernelPort)
-		host     = config.Current.Host
-	)
-	return fmt.Sprintf("http://%s:%s/api", host, port)
+	return config.Current.KernelURL(a.ID)
+}
+
+func (a Meta) DefaultApiURL() string {
+	return fmt.Sprintf("http://%s:%s", config.Current.LocalIP(), a.DefaultPort)
+}
+
+func (a Meta) DefaultApiKernelURL() string {
+	return fmt.Sprintf("http://%s:%s", config.Current.LocalIP(), a.DefaultKernelPort)
 }
 
 // RunStandalone runs the app as a standalone service.
@@ -123,14 +112,9 @@ func RunStandalone(app Interface) {
 	ctx := NewContext(vertexCtx)
 	app.Load(ctx)
 
-	portName := strings.ToUpper(app.Meta().ID)
-	port, ok := config.Current.Ports[portName]
-	if !ok {
-		port = app.Meta().DefaultPort
-	}
-	addr := fmt.Sprintf(":%s", port)
+	url := app.Meta().ApiURL()
 
-	srv := server.New(app.Meta().ID, addr, vertexCtx)
+	srv := server.New(app.Meta().ID, url, vertexCtx)
 	id := app.Meta().ID
 
 	if a, ok := app.(Initializable); ok {
@@ -162,14 +146,9 @@ func RunStandaloneKernel(app Interface) {
 	ctx := NewContext(vertexCtx)
 	app.Load(ctx)
 
-	portName := strings.ToUpper(app.Meta().ID) + "_KERNEL"
-	port, ok := config.Current.Ports[portName]
-	if !ok {
-		port = app.Meta().DefaultKernelPort
-	}
-	addr := fmt.Sprintf(":%s", port)
+	url := app.Meta().ApiKernelURL()
 
-	srv := server.New(app.Meta().ID, addr, vertexCtx)
+	srv := server.New(app.Meta().ID, url, vertexCtx)
 
 	if a, ok := app.(KernelInitializable); ok {
 		err := a.InitializeKernel(srv.Router.Group("/api"))

@@ -401,7 +401,7 @@ func (s *ContainerService) remapDatabaseEnv(inst *types.Container, options map[s
 			return err
 		}
 
-		host := config.Current.Host
+		host := config.Current.URL("vertex")
 
 		dbEnvNames := (*db.Service.Features.Databases)[0]
 		iEnvNames := inst.Service.Databases[databaseID].Names

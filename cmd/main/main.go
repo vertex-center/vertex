@@ -85,9 +85,9 @@ func main() {
 	}
 
 	ctx = types.NewVertexContext(about, false)
-	addr := fmt.Sprintf(":%s", config.Current.Ports["VERTEX"])
+	url := config.Current.URL("vertex")
 
-	srv = server.New("main", addr, ctx)
+	srv = server.New("main", url, ctx)
 	initServices()
 	initRoutes(about)
 
@@ -108,7 +108,6 @@ func parseArgs() {
 		flagV       = flag.Bool("v", false, "Print vertex version")
 		flagDate    = flag.Bool("date", false, "Print the release date")
 		flagCommit  = flag.Bool("commit", false, "Print the commit hash")
-		flagHost    = flag.String("host", config.Current.Host, "The Vertex access url")
 	)
 
 	flag.Parse()
@@ -125,7 +124,6 @@ func parseArgs() {
 		fmt.Println(commit)
 		os.Exit(0)
 	}
-	config.Current.Host = *flagHost
 }
 
 func checkNotRoot() {
