@@ -20,9 +20,9 @@ require (
 	github.com/google/uuid v1.4.0
 	github.com/h2non/gock v1.2.0
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/lib/pq v1.2.0
+	github.com/lib/pq v1.10.9
 	github.com/prometheus/client_golang v1.17.0
-	github.com/shirou/gopsutil/v3 v3.23.10
+	github.com/shirou/gopsutil/v3 v3.23.11
 	github.com/stretchr/testify v1.8.4
 	github.com/vertex-center/vlog v1.0.2
 	go.uber.org/atomic v1.11.0
