@@ -7,10 +7,10 @@ import (
 )
 
 type DatabaseHandler struct {
-	dataService port.DbService
+	dataService port.DatabaseService
 }
 
-func NewDatabaseHandler(dataService port.DbService) port.DatabaseHandler {
+func NewDatabaseHandler(dataService port.DatabaseService) port.DatabaseHandler {
 	return &DatabaseHandler{
 		dataService: dataService,
 	}

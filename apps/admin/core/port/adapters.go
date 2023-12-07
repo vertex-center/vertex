@@ -8,12 +8,6 @@ import (
 )
 
 type (
-	SettingsAdapter interface {
-		Get() (types.AdminSettings, error)
-		SetChannel(channel types.UpdatesChannel) error
-		SetWebhook(webhook string) error
-	}
-
 	BaselinesAdapter interface {
 		// GetLatest returns the latest available Baseline. This
 		// will typically fetch the latest Baseline from a remote source.
@@ -26,6 +20,12 @@ type (
 
 	HardwareKernelAdapter interface {
 		Reboot() error
+	}
+
+	SettingsAdapter interface {
+		Get() (types.AdminSettings, error)
+		SetChannel(channel types.UpdatesChannel) error
+		SetWebhook(webhook string) error
 	}
 
 	SshAdapter interface {

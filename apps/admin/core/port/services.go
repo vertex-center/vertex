@@ -8,20 +8,11 @@ import (
 )
 
 type (
-	SettingsService interface {
-		Get() (types.AdminSettings, error)
-		Update(settings types.AdminSettings) error
-		GetWebhook() (*string, error)
-		SetWebhook(webhook string) error
-		GetChannel() (types.UpdatesChannel, error)
-		SetChannel(channel types.UpdatesChannel) error
-	}
-
 	ChecksService interface {
 		CheckAll(ctx context.Context) <-chan types.CheckResponse
 	}
 
-	DbService interface {
+	DatabaseService interface {
 		GetCurrentDbms() string
 		MigrateTo(dbms string) error
 	}
@@ -34,6 +25,15 @@ type (
 
 	HardwareKernelService interface {
 		Reboot() error
+	}
+
+	SettingsService interface {
+		Get() (types.AdminSettings, error)
+		Update(settings types.AdminSettings) error
+		GetWebhook() (*string, error)
+		SetWebhook(webhook string) error
+		GetChannel() (types.UpdatesChannel, error)
+		SetChannel(channel types.UpdatesChannel) error
 	}
 
 	SshService interface {
