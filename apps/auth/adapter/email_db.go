@@ -7,17 +7,17 @@ import (
 	"github.com/vertex-center/vertex/core/types/storage"
 )
 
-type EmailDbAdapter struct {
+type emailDbAdapter struct {
 	db storage.DB
 }
 
-func NewEmailDbAdapter(db storage.DB) *EmailDbAdapter {
-	return &EmailDbAdapter{
+func NewEmailDbAdapter(db storage.DB) *emailDbAdapter {
+	return &emailDbAdapter{
 		db: db,
 	}
 }
 
-func (a *EmailDbAdapter) CreateEmail(email *types.Email) error {
+func (a *emailDbAdapter) CreateEmail(email *types.Email) error {
 	tx, err := a.db.Beginx()
 	if err != nil {
 		return err
@@ -61,7 +61,7 @@ func (a *EmailDbAdapter) CreateEmail(email *types.Email) error {
 	return tx.Commit()
 }
 
-func (a *EmailDbAdapter) GetEmails(userID uint) ([]types.Email, error) {
+func (a *emailDbAdapter) GetEmails(userID uint) ([]types.Email, error) {
 	var emails []types.Email
 	err := a.db.Select(&emails, `
 		SELECT id, user_id, email, created_at, updated_at
@@ -71,7 +71,7 @@ func (a *EmailDbAdapter) GetEmails(userID uint) ([]types.Email, error) {
 	return emails, err
 }
 
-func (a *EmailDbAdapter) DeleteEmail(userID uint, email string) error {
+func (a *emailDbAdapter) DeleteEmail(userID uint, email string) error {
 	_, err := a.db.Exec(`
 		UPDATE emails
 		SET deleted_at = $1

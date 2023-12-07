@@ -7,25 +7,25 @@ import (
 	"github.com/google/uuid"
 )
 
-type ProxyService struct {
+type proxyService struct {
 	proxyAdapter port.ProxyAdapter
 }
 
 func NewProxyService(proxyAdapter port.ProxyAdapter) port.ProxyService {
-	return &ProxyService{
+	return &proxyService{
 		proxyAdapter: proxyAdapter,
 	}
 }
 
-func (s *ProxyService) GetRedirects() types.ProxyRedirects {
+func (s *proxyService) GetRedirects() types.ProxyRedirects {
 	return s.proxyAdapter.GetRedirects()
 }
 
-func (s *ProxyService) GetRedirectByHost(host string) *types.ProxyRedirect {
+func (s *proxyService) GetRedirectByHost(host string) *types.ProxyRedirect {
 	return s.proxyAdapter.GetRedirectByHost(host)
 }
 
-func (s *ProxyService) AddRedirect(redirect types.ProxyRedirect) error {
+func (s *proxyService) AddRedirect(redirect types.ProxyRedirect) error {
 	id := uuid.New()
 
 	if redirect.Source == "" {
@@ -39,6 +39,6 @@ func (s *ProxyService) AddRedirect(redirect types.ProxyRedirect) error {
 	return s.proxyAdapter.AddRedirect(id, redirect)
 }
 
-func (s *ProxyService) RemoveRedirect(id uuid.UUID) error {
+func (s *proxyService) RemoveRedirect(id uuid.UUID) error {
 	return s.proxyAdapter.RemoveRedirect(id)
 }

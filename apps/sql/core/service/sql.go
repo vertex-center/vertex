@@ -16,14 +16,14 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-type SqlService struct {
+type sqlService struct {
 	uuid      uuid.UUID
 	dbms      map[uuid.UUID]port.DBMSAdapter
 	dbmsMutex *sync.RWMutex
 }
 
 func New(ctx *app.Context) port.SqlService {
-	s := &SqlService{
+	s := &sqlService{
 		uuid:      uuid.New(),
 		dbms:      map[uuid.UUID]port.DBMSAdapter{},
 		dbmsMutex: &sync.RWMutex{},
@@ -32,7 +32,7 @@ func New(ctx *app.Context) port.SqlService {
 	return s
 }
 
-func (s *SqlService) getDbFeature(inst *types.Container) (types.DatabaseFeature, error) {
+func (s *sqlService) getDbFeature(inst *types.Container) (types.DatabaseFeature, error) {
 	if inst.Service.Features == nil || inst.Service.Features.Databases == nil {
 		return types.DatabaseFeature{}, errors.New("no databases found")
 	}
@@ -47,7 +47,7 @@ func (s *SqlService) getDbFeature(inst *types.Container) (types.DatabaseFeature,
 	return types.DatabaseFeature{}, errors.New("no sql database found")
 }
 
-func (s *SqlService) Get(inst *types.Container) (sqltypes.DBMS, error) {
+func (s *sqlService) Get(inst *types.Container) (sqltypes.DBMS, error) {
 	db := sqltypes.DBMS{}
 
 	feature, err := s.getDbFeature(inst)
@@ -75,7 +75,7 @@ func (s *SqlService) Get(inst *types.Container) (sqltypes.DBMS, error) {
 	return db, nil
 }
 
-func (s *SqlService) EnvCredentials(inst *types.Container, user string, pass string) (types.ContainerEnvVariables, error) {
+func (s *sqlService) EnvCredentials(inst *types.Container, user string, pass string) (types.ContainerEnvVariables, error) {
 	env := inst.Env
 
 	feature, err := s.getDbFeature(inst)
@@ -93,7 +93,7 @@ func (s *SqlService) EnvCredentials(inst *types.Container, user string, pass str
 	return env, nil
 }
 
-func (s *SqlService) createDbmsAdapter(inst *types.Container) (port.DBMSAdapter, error) {
+func (s *sqlService) createDbmsAdapter(inst *types.Container) (port.DBMSAdapter, error) {
 	feature, err := s.getDbFeature(inst)
 	if err != nil {
 		return nil, err

@@ -10,12 +10,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type AuthHandler struct {
+type authHandler struct {
 	authService port.AuthService
 }
 
 func NewAuthHandler(authService port.AuthService) port.AuthHandler {
-	return &AuthHandler{
+	return &authHandler{
 		authService: authService,
 	}
 }
@@ -30,7 +30,7 @@ func NewAuthHandler(authService port.AuthService) port.AuthHandler {
 // docapi response 500
 // docapi end
 
-func (h AuthHandler) Login(c *router.Context) {
+func (h authHandler) Login(c *router.Context) {
 	login, pass, err := h.getUserPassFromHeader(c)
 	if err != nil {
 		return
@@ -58,7 +58,7 @@ func (h AuthHandler) Login(c *router.Context) {
 // docapi response 400
 // docapi response 500
 
-func (h AuthHandler) Register(c *router.Context) {
+func (h authHandler) Register(c *router.Context) {
 	login, pass, err := h.getUserPassFromHeader(c)
 	if err != nil {
 		return
@@ -108,7 +108,7 @@ func (h AuthHandler) Register(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h AuthHandler) Verify(c *router.Context) {
+func (h authHandler) Verify(c *router.Context) {
 	token := c.MustGet("token").(string)
 
 	session, err := h.authService.Verify(token)
@@ -132,7 +132,7 @@ func (h AuthHandler) Verify(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h AuthHandler) Logout(c *router.Context) {
+func (h authHandler) Logout(c *router.Context) {
 	token := c.MustGet("token").(string)
 
 	err := h.authService.Logout(token)
@@ -148,7 +148,7 @@ func (h AuthHandler) Logout(c *router.Context) {
 	c.OK()
 }
 
-func (h AuthHandler) getUserPassFromHeader(c *router.Context) (string, string, error) {
+func (h authHandler) getUserPassFromHeader(c *router.Context) (string, string, error) {
 	authorization := c.Request.Header.Get("Authorization")
 
 	userpass := strings.TrimPrefix(authorization, "Basic ")

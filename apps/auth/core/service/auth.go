@@ -13,12 +13,12 @@ import (
 	"golang.org/x/crypto/argon2"
 )
 
-type AuthService struct {
+type authService struct {
 	adapter port.AuthAdapter
 }
 
 func NewAuthService(adapter port.AuthAdapter) port.AuthService {
-	return &AuthService{
+	return &authService{
 		adapter: adapter,
 	}
 }
@@ -26,7 +26,7 @@ func NewAuthService(adapter port.AuthAdapter) port.AuthService {
 // Login checks the provided login and password against the database. If the login is
 // valid and the password matches, it returns a token that can be used to authenticate
 // future requests.
-func (s *AuthService) Login(login, password string) (types.Session, error) {
+func (s *authService) Login(login, password string) (types.Session, error) {
 	creds, err := s.adapter.GetCredentials(login)
 	if err != nil {
 		return types.Session{}, err
@@ -67,7 +67,7 @@ func (s *AuthService) Login(login, password string) (types.Session, error) {
 
 // Register creates a new user account. It can return ErrLoginEmpty, ErrPasswordEmpty, or
 // ErrPasswordLength if the login or password is too short.
-func (s *AuthService) Register(login, password string) (types.Session, error) {
+func (s *authService) Register(login, password string) (types.Session, error) {
 	// TODO: make these settings configurable in the admin settings
 	// https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#argon2id
 
@@ -108,11 +108,11 @@ func (s *AuthService) Register(login, password string) (types.Session, error) {
 	return s.Login(login, password)
 }
 
-func (s *AuthService) Logout(token string) error {
+func (s *authService) Logout(token string) error {
 	return s.adapter.DeleteSession(token)
 }
 
-func (s *AuthService) Verify(token string) (*types.Session, error) {
+func (s *authService) Verify(token string) (*types.Session, error) {
 	session, err := s.adapter.GetSession(token)
 	if err != nil {
 		return nil, types.ErrTokenInvalid
@@ -120,7 +120,7 @@ func (s *AuthService) Verify(token string) (*types.Session, error) {
 	return session, nil
 }
 
-func (s *AuthService) generateToken() (types.Session, error) {
+func (s *authService) generateToken() (types.Session, error) {
 	token := make([]byte, 32)
 	_, err := rand.Read(token)
 	if err != nil {

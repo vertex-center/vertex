@@ -6,12 +6,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type HardwareHandler struct {
+type hardwareHandler struct {
 	service port.HardwareService
 }
 
 func NewHardwareHandler(service port.HardwareService) port.HardwareHandler {
-	return &HardwareHandler{
+	return &hardwareHandler{
 		service: service,
 	}
 }
@@ -24,7 +24,7 @@ func NewHardwareHandler(service port.HardwareService) port.HardwareHandler {
 // docapi response 500
 // docapi end
 
-func (h *HardwareHandler) GetHost(c *router.Context) {
+func (h *hardwareHandler) GetHost(c *router.Context) {
 	host, err := h.service.GetHost()
 	if err != nil {
 		c.Abort(router.Error{
@@ -45,7 +45,7 @@ func (h *HardwareHandler) GetHost(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *HardwareHandler) GetCPUs(c *router.Context) {
+func (h *hardwareHandler) GetCPUs(c *router.Context) {
 	cpus, err := h.service.GetCPUs()
 	if err != nil {
 		c.Abort(router.Error{
@@ -66,7 +66,7 @@ func (h *HardwareHandler) GetCPUs(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *HardwareHandler) Reboot(c *router.Context) {
+func (h *hardwareHandler) Reboot(c *router.Context) {
 	err := h.service.Reboot(c)
 	if err != nil {
 		c.Abort(router.Error{

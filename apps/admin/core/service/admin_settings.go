@@ -7,21 +7,21 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 )
 
-type SettingsService struct {
+type settingsService struct {
 	adapter port.SettingsAdapter
 }
 
 func NewSettingsService(adapter port.SettingsAdapter) port.SettingsService {
-	return &SettingsService{
+	return &settingsService{
 		adapter: adapter,
 	}
 }
 
-func (s *SettingsService) Get() (types.AdminSettings, error) {
+func (s *settingsService) Get() (types.AdminSettings, error) {
 	return s.adapter.Get()
 }
 
-func (s *SettingsService) Update(settings types.AdminSettings) error {
+func (s *settingsService) Update(settings types.AdminSettings) error {
 	var errs []error
 	if settings.Webhook != nil {
 		if err := s.SetWebhook(*settings.Webhook); err != nil {
@@ -36,7 +36,7 @@ func (s *SettingsService) Update(settings types.AdminSettings) error {
 	return errors.Join(errs...)
 }
 
-func (s *SettingsService) GetWebhook() (*string, error) {
+func (s *settingsService) GetWebhook() (*string, error) {
 	settings, err := s.Get()
 	if err != nil {
 		return nil, err
@@ -44,11 +44,11 @@ func (s *SettingsService) GetWebhook() (*string, error) {
 	return settings.Webhook, nil
 }
 
-func (s *SettingsService) SetWebhook(webhook string) error {
+func (s *settingsService) SetWebhook(webhook string) error {
 	return s.adapter.SetWebhook(webhook)
 }
 
-func (s *SettingsService) GetChannel() (types.UpdatesChannel, error) {
+func (s *settingsService) GetChannel() (types.UpdatesChannel, error) {
 	settings, err := s.Get()
 	if err != nil {
 		return types.UpdatesChannelStable, err
@@ -56,6 +56,6 @@ func (s *SettingsService) GetChannel() (types.UpdatesChannel, error) {
 	return settings.UpdatesChannel, nil
 }
 
-func (s *SettingsService) SetChannel(channel types.UpdatesChannel) error {
+func (s *settingsService) SetChannel(channel types.UpdatesChannel) error {
 	return s.adapter.SetChannel(channel)
 }

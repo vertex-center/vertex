@@ -15,7 +15,7 @@ type AuthHandlerTestSuite struct {
 	suite.Suite
 
 	service     port.MockAuthService
-	handler     *AuthHandler
+	handler     *authHandler
 	testSession types.Session
 }
 
@@ -25,7 +25,7 @@ func TestAuthHandlerTestSuite(t *testing.T) {
 
 func (suite *AuthHandlerTestSuite) SetupTest() {
 	suite.service = port.MockAuthService{}
-	suite.handler = NewAuthHandler(&suite.service).(*AuthHandler)
+	suite.handler = NewAuthHandler(&suite.service).(*authHandler)
 	suite.testSession = types.Session{
 		Token: "test_token",
 	}

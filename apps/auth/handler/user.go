@@ -6,12 +6,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type UserHandler struct {
+type userHandler struct {
 	service port.UserService
 }
 
 func NewUserHandler(userService port.UserService) port.UserHandler {
-	return &UserHandler{
+	return &userHandler{
 		service: userService,
 	}
 }
@@ -25,7 +25,7 @@ func NewUserHandler(userService port.UserService) port.UserHandler {
 // docapi response 500
 // docapi end
 
-func (h *UserHandler) GetCurrentUser(c *router.Context) {
+func (h *userHandler) GetCurrentUser(c *router.Context) {
 	userID := c.GetInt("user_id")
 
 	user, err := h.service.GetUserByID(uint(userID))
@@ -50,7 +50,7 @@ func (h *UserHandler) GetCurrentUser(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *UserHandler) PatchCurrentUser(c *router.Context) {
+func (h *userHandler) PatchCurrentUser(c *router.Context) {
 	userID := c.GetInt("user_id")
 
 	var user types.User
@@ -82,7 +82,7 @@ func (h *UserHandler) PatchCurrentUser(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *UserHandler) GetCurrentUserCredentials(c *router.Context) {
+func (h *userHandler) GetCurrentUserCredentials(c *router.Context) {
 	userID := c.GetInt("user_id")
 
 	credentials, err := h.service.GetUserCredentialsMethods(uint(userID))

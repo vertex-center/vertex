@@ -7,12 +7,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type EditorHandler struct {
+type editorHandler struct {
 	editorService port.EditorService
 }
 
 func NewEditorHandler(editorService port.EditorService) port.EditorHandler {
-	return &EditorHandler{
+	return &editorHandler{
 		editorService: editorService,
 	}
 }
@@ -27,7 +27,7 @@ func NewEditorHandler(editorService port.EditorService) port.EditorHandler {
 // docapi response 400
 // docapi end
 
-func (h *EditorHandler) ToYaml(c *router.Context) {
+func (h *editorHandler) ToYaml(c *router.Context) {
 	var serv containerstypes.Service
 	err := c.BindJSON(&serv)
 	if err != nil {

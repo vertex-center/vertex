@@ -9,35 +9,35 @@ import (
 	"github.com/vertex-center/vertex/pkg/event"
 )
 
-type ServiceService struct {
+type serviceService struct {
 	uuid           uuid.UUID
 	serviceAdapter port.ServiceAdapter
 }
 
-func NewServiceService() *ServiceService {
-	return &ServiceService{
+func NewServiceService() port.ServiceService {
+	return &serviceService{
 		uuid:           uuid.New(),
 		serviceAdapter: adapter.NewServiceFSAdapter(nil),
 	}
 }
 
-func (s *ServiceService) GetById(id string) (types.Service, error) {
+func (s *serviceService) GetById(id string) (types.Service, error) {
 	return s.serviceAdapter.Get(id)
 }
 
-func (s *ServiceService) GetAll() []types.Service {
+func (s *serviceService) GetAll() []types.Service {
 	return s.serviceAdapter.GetAll()
 }
 
-func (s *ServiceService) reload() error {
+func (s *serviceService) reload() error {
 	return s.serviceAdapter.Reload()
 }
 
-func (s *ServiceService) GetUUID() uuid.UUID {
+func (s *serviceService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *ServiceService) OnEvent(e event.Event) error {
+func (s *serviceService) OnEvent(e event.Event) error {
 	switch e.(type) {
 	case vtypes.EventVertexUpdated:
 		return s.reload()

@@ -14,7 +14,7 @@ const baseURL = "https://bl.vx.arra.red/"
 
 type BaselinesApiAdapterTestSuite struct {
 	suite.Suite
-	adapter BaselinesApiAdapter
+	adapter baselinesApiAdapter
 }
 
 func TestBaselinesApiAdapterTestSuite(t *testing.T) {
@@ -22,7 +22,7 @@ func TestBaselinesApiAdapterTestSuite(t *testing.T) {
 }
 
 func (suite *BaselinesApiAdapterTestSuite) SetupTest() {
-	suite.adapter = *NewBaselinesApiAdapter().(*BaselinesApiAdapter)
+	suite.adapter = *NewBaselinesApiAdapter().(*baselinesApiAdapter)
 }
 
 func (suite *BaselinesApiAdapterTestSuite) TestGetLatest() {

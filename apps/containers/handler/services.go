@@ -5,12 +5,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type ServicesHandler struct {
+type servicesHandler struct {
 	serviceService port.ServiceService
 }
 
 func NewServicesHandler(serviceService port.ServiceService) port.ServicesHandler {
-	return &ServicesHandler{
+	return &servicesHandler{
 		serviceService: serviceService,
 	}
 }
@@ -22,6 +22,6 @@ func NewServicesHandler(serviceService port.ServiceService) port.ServicesHandler
 // docapi response 200 {[]Service} The services.
 // docapi end
 
-func (h *ServicesHandler) Get(c *router.Context) {
+func (h *servicesHandler) Get(c *router.Context) {
 	c.JSON(h.serviceService.GetAll())
 }

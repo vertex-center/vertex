@@ -5,12 +5,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type DebugHandler struct {
+type debugHandler struct {
 	debugService port.DebugService
 }
 
 func NewDebugHandler(debugService port.DebugService) port.DebugHandler {
-	return &DebugHandler{
+	return &debugHandler{
 		debugService: debugService,
 	}
 }
@@ -23,7 +23,7 @@ func NewDebugHandler(debugService port.DebugService) port.DebugHandler {
 // docapi response 204
 // docapi end
 
-func (h *DebugHandler) HardReset(c *router.Context) {
+func (h *debugHandler) HardReset(c *router.Context) {
 	h.debugService.HardReset()
 	c.OK()
 }

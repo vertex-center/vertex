@@ -5,29 +5,29 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 )
 
-type SshService struct {
+type sshService struct {
 	adapter port.SshAdapter
 }
 
 func NewSshService(sshAdapter port.SshAdapter) port.SshService {
-	return &SshService{
+	return &sshService{
 		adapter: sshAdapter,
 	}
 }
 
-func (s *SshService) GetAll() ([]types.PublicKey, error) {
+func (s *sshService) GetAll() ([]types.PublicKey, error) {
 	return s.adapter.GetAll()
 }
 
-func (s *SshService) Add(key string, username string) error {
+func (s *sshService) Add(key string, username string) error {
 	return s.adapter.Add(key, username)
 }
 
-func (s *SshService) Delete(fingerprint string, username string) error {
+func (s *sshService) Delete(fingerprint string, username string) error {
 	return s.adapter.Remove(fingerprint, username)
 }
 
-func (s *SshService) GetUsers() ([]string, error) {
+func (s *sshService) GetUsers() ([]string, error) {
 	users, err := s.adapter.GetUsers()
 	if err != nil {
 		return nil, err

@@ -35,7 +35,7 @@ type SshKernelServiceTestSuite struct {
 	testUser  user.User
 	testUsers []user.User
 
-	service *SshKernelService
+	service *sshKernelService
 	adapter *port.MockSshKernelAdapter
 }
 
@@ -49,7 +49,7 @@ func (suite *SshKernelServiceTestSuite) SetupTest() {
 	}
 	suite.testUsers = []user.User{suite.testUser}
 	suite.adapter = &port.MockSshKernelAdapter{}
-	suite.service = NewSshKernelService(suite.adapter).(*SshKernelService)
+	suite.service = NewSshKernelService(suite.adapter).(*sshKernelService)
 }
 
 func (suite *SshKernelServiceTestSuite) TestGetAll() {

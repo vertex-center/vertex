@@ -7,12 +7,12 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 )
 
-type HardwareApiAdapter struct{}
+type hardwareApiAdapter struct{}
 
 func NewHardwareApiAdapter() port.HardwareAdapter {
-	return HardwareApiAdapter{}
+	return hardwareApiAdapter{}
 }
 
-func (HardwareApiAdapter) Reboot(ctx context.Context) error {
+func (hardwareApiAdapter) Reboot(ctx context.Context) error {
 	return api.NewAdminKernelClient().Reboot(ctx)
 }

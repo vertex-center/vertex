@@ -17,7 +17,7 @@ const (
 	ContainerServicePath = ".vertex/service.yml"
 )
 
-type ContainerServiceFSAdapter struct {
+type containerServiceFSAdapter struct {
 	containersPath string
 }
 
@@ -33,14 +33,14 @@ func NewContainerServiceFSAdapter(params *ContainerServiceFSAdapterParams) port.
 		params.containersPath = path.Join(storage.FSPath, "apps", "containers", "containers")
 	}
 
-	adapter := &ContainerServiceFSAdapter{
+	adapter := &containerServiceFSAdapter{
 		containersPath: params.containersPath,
 	}
 
 	return adapter
 }
 
-func (a *ContainerServiceFSAdapter) Save(uuid uuid.UUID, service types.Service) error {
+func (a *containerServiceFSAdapter) Save(uuid uuid.UUID, service types.Service) error {
 	servicePath := path.Join(a.containersPath, uuid.String(), ContainerServicePath)
 
 	err := os.MkdirAll(path.Join(a.containersPath, uuid.String(), ".vertex"), os.ModePerm)
@@ -61,7 +61,7 @@ func (a *ContainerServiceFSAdapter) Save(uuid uuid.UUID, service types.Service) 
 	return nil
 }
 
-func (a *ContainerServiceFSAdapter) Load(uuid uuid.UUID) (types.Service, error) {
+func (a *containerServiceFSAdapter) Load(uuid uuid.UUID) (types.Service, error) {
 	servicePath := path.Join(a.containersPath, uuid.String(), ContainerServicePath)
 
 	data, err := os.ReadFile(servicePath)
@@ -75,7 +75,7 @@ func (a *ContainerServiceFSAdapter) Load(uuid uuid.UUID) (types.Service, error) 
 	return service, err
 }
 
-func (a *ContainerServiceFSAdapter) LoadRaw(uuid uuid.UUID) (interface{}, error) {
+func (a *containerServiceFSAdapter) LoadRaw(uuid uuid.UUID) (interface{}, error) {
 	servicePath := path.Join(a.containersPath, uuid.String(), ContainerServicePath)
 
 	data, err := os.ReadFile(servicePath)

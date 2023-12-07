@@ -9,12 +9,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type EmailHandler struct {
+type emailHandler struct {
 	service port.EmailService
 }
 
 func NewEmailHandler(emailService port.EmailService) port.EmailHandler {
-	return &EmailHandler{
+	return &emailHandler{
 		service: emailService,
 	}
 }
@@ -28,7 +28,7 @@ func NewEmailHandler(emailService port.EmailService) port.EmailHandler {
 // docapi response 500
 // docapi end
 
-func (h *EmailHandler) GetCurrentUserEmails(c *router.Context) {
+func (h *emailHandler) GetCurrentUserEmails(c *router.Context) {
 	userID := c.GetInt("user_id")
 
 	emails, err := h.service.GetEmails(uint(userID))
@@ -59,7 +59,7 @@ type CreateCurrentUserEmailBody struct {
 	Email string `json:"email"`
 }
 
-func (h *EmailHandler) CreateCurrentUserEmail(c *router.Context) {
+func (h *emailHandler) CreateCurrentUserEmail(c *router.Context) {
 	userID := c.GetInt("user_id")
 
 	var body CreateCurrentUserEmailBody
@@ -114,7 +114,7 @@ func (h *EmailHandler) CreateCurrentUserEmail(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *EmailHandler) DeleteCurrentUserEmail(c *router.Context) {
+func (h *emailHandler) DeleteCurrentUserEmail(c *router.Context) {
 	userID := c.GetInt("user_id")
 
 	var body CreateCurrentUserEmailBody

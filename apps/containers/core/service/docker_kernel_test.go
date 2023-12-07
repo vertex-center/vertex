@@ -14,7 +14,7 @@ import (
 type DockerKernelServiceTestSuite struct {
 	suite.Suite
 
-	service *DockerKernelService
+	service *dockerKernelService
 	adapter MockDockerAdapter
 }
 
@@ -24,7 +24,7 @@ func TestDockerKernelServiceTestSuite(t *testing.T) {
 
 func (suite *DockerKernelServiceTestSuite) SetupSuite() {
 	suite.adapter = MockDockerAdapter{}
-	suite.service = NewDockerKernelService(&suite.adapter).(*DockerKernelService)
+	suite.service = NewDockerKernelService(&suite.adapter).(*dockerKernelService)
 }
 
 func (suite *DockerKernelServiceTestSuite) TestListContainers() {

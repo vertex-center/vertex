@@ -12,7 +12,7 @@ import (
 type AuthServiceTestSuite struct {
 	suite.Suite
 
-	service  *AuthService
+	service  *authService
 	adapter  port.MockAuthAdapter
 	testCred types.CredentialsArgon2id
 	testUser types.User
@@ -24,7 +24,7 @@ func TestAuthServiceTestSuite(t *testing.T) {
 
 func (suite *AuthServiceTestSuite) SetupTest() {
 	suite.adapter = port.MockAuthAdapter{}
-	suite.service = NewAuthService(&suite.adapter).(*AuthService)
+	suite.service = NewAuthService(&suite.adapter).(*authService)
 	suite.testCred = types.CredentialsArgon2id{
 		Login:       "test_login",
 		Hash:        "N6WEEZ++Gh54U9jqEwSmFAWz9Ls+8iyHar4mOU7M71Y=",

@@ -16,7 +16,7 @@ import (
 	"github.com/charmbracelet/lipgloss/table"
 )
 
-type AppsService struct {
+type appsService struct {
 	uuid     uuid.UUID
 	kernel   bool
 	ctx      *types.VertexContext
@@ -25,7 +25,7 @@ type AppsService struct {
 }
 
 func NewAppsService(ctx *types.VertexContext, kernel bool, apps []app.Interface) port.AppsService {
-	s := &AppsService{
+	s := &appsService{
 		uuid:     uuid.New(),
 		kernel:   kernel,
 		ctx:      ctx,
@@ -36,11 +36,11 @@ func NewAppsService(ctx *types.VertexContext, kernel bool, apps []app.Interface)
 	return s
 }
 
-func (s *AppsService) GetUUID() uuid.UUID {
+func (s *appsService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *AppsService) OnEvent(e event.Event) error {
+func (s *appsService) OnEvent(e event.Event) error {
 	switch e.(type) {
 	case types.EventServerLoad:
 		s.LoadApps()
@@ -52,7 +52,7 @@ func (s *AppsService) OnEvent(e event.Event) error {
 	return nil
 }
 
-func (s *AppsService) LoadApps() {
+func (s *appsService) LoadApps() {
 	log.Info("loading apps")
 
 	for i, a := range s.apps {
@@ -71,7 +71,7 @@ func (s *AppsService) LoadApps() {
 	log.Info("apps loaded")
 }
 
-func (s *AppsService) StartApps() {
+func (s *appsService) StartApps() {
 	log.Info("initializing apps", vlog.Int("count", len(s.registry.Apps())))
 
 	for _, a := range s.registry.Apps() {
@@ -112,7 +112,7 @@ func (s *AppsService) StartApps() {
 	log.Info("apps initialized")
 }
 
-func (s *AppsService) StopApps() {
+func (s *appsService) StopApps() {
 	log.Info("uninitializing apps")
 
 	for _, a := range s.registry.Apps() {
@@ -141,7 +141,7 @@ func (s *AppsService) StopApps() {
 	log.Info("apps uninitialized")
 }
 
-func (s *AppsService) All() []app.Meta {
+func (s *appsService) All() []app.Meta {
 	var apps []app.Meta
 	for _, a := range s.registry.Apps() {
 		apps = append(apps, a.Meta())

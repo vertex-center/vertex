@@ -5,13 +5,13 @@ import (
 	"github.com/vertex-center/vertex/apps/sql/core/types"
 )
 
-type SqlDBMSAdapter struct{}
+type sqlDBMSAdapter struct{}
 
 func NewSqlDBMSAdapter() port.DBMSAdapter {
-	return &SqlDBMSAdapter{}
+	return &sqlDBMSAdapter{}
 }
 
-func (a *SqlDBMSAdapter) GetDatabases() (*[]types.DB, error) {
+func (a *sqlDBMSAdapter) GetDatabases() (*[]types.DB, error) {
 	// By default, return an empty list of databases. This should
 	// be implemented by the specific adapter.
 	return nil, nil

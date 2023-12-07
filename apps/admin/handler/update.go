@@ -9,13 +9,13 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type UpdateHandler struct {
+type updateHandler struct {
 	updateService   port.UpdateService
 	settingsService port.SettingsService
 }
 
 func NewUpdateHandler(updateService port.UpdateService, settingsService port.SettingsService) port.UpdateHandler {
-	return &UpdateHandler{
+	return &updateHandler{
 		updateService:   updateService,
 		settingsService: settingsService,
 	}
@@ -29,7 +29,7 @@ func NewUpdateHandler(updateService port.UpdateService, settingsService port.Set
 // docapi response 500
 // docapi end
 
-func (h *UpdateHandler) Get(c *router.Context) {
+func (h *updateHandler) Get(c *router.Context) {
 	channel, err := h.settingsService.GetChannel()
 	if err != nil {
 		c.Abort(router.Error{
@@ -69,7 +69,7 @@ func (h *UpdateHandler) Get(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *UpdateHandler) Install(c *router.Context) {
+func (h *updateHandler) Install(c *router.Context) {
 	channel, err := h.settingsService.GetChannel()
 	if err != nil {
 		c.Abort(router.Error{

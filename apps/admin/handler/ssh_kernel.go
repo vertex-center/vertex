@@ -11,12 +11,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type SshKernelHandler struct {
+type sshKernelHandler struct {
 	sshService port.SshKernelService
 }
 
 func NewSshKernelHandler(sshKernelService port.SshKernelService) port.SshKernelHandler {
-	return &SshKernelHandler{
+	return &sshKernelHandler{
 		sshService: sshKernelService,
 	}
 }
@@ -29,7 +29,7 @@ func NewSshKernelHandler(sshKernelService port.SshKernelService) port.SshKernelH
 // docapi response 500
 // docapi end
 
-func (h *SshKernelHandler) Get(c *router.Context) {
+func (h *sshKernelHandler) Get(c *router.Context) {
 	keys, err := h.sshService.GetAll()
 	if err != nil {
 		c.Abort(router.Error{
@@ -54,7 +54,7 @@ func (h *SshKernelHandler) Get(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *SshKernelHandler) Add(c *router.Context) {
+func (h *sshKernelHandler) Add(c *router.Context) {
 	var body AddSSHKeyBody
 	err := c.ParseBody(&body)
 	if err != nil {
@@ -104,7 +104,7 @@ func (h *SshKernelHandler) Add(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *SshKernelHandler) Delete(c *router.Context) {
+func (h *sshKernelHandler) Delete(c *router.Context) {
 	var body DeleteSSHKeyBody
 	err := c.ParseBody(&body)
 	if err != nil {
@@ -139,7 +139,7 @@ func (h *SshKernelHandler) Delete(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *SshKernelHandler) GetUsers(c *router.Context) {
+func (h *sshKernelHandler) GetUsers(c *router.Context) {
 	users, err := h.sshService.GetUsers()
 	if err != nil {
 		c.Abort(router.Error{

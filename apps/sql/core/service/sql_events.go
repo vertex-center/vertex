@@ -6,11 +6,11 @@ import (
 	"github.com/vertex-center/vertex/pkg/event"
 )
 
-func (s *SqlService) GetUUID() uuid.UUID {
+func (s *sqlService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *SqlService) OnEvent(e event.Event) error {
+func (s *sqlService) OnEvent(e event.Event) error {
 	switch e := e.(type) {
 	case types.EventContainerStatusChange:
 		if e.Status == types.ContainerStatusRunning {
@@ -22,7 +22,7 @@ func (s *SqlService) OnEvent(e event.Event) error {
 	return nil
 }
 
-func (s *SqlService) onContainerStart(inst *types.Container) {
+func (s *sqlService) onContainerStart(inst *types.Container) {
 	_, err := s.getDbFeature(inst)
 	if err != nil {
 		// Not a SQL database
@@ -44,7 +44,7 @@ func (s *SqlService) onContainerStart(inst *types.Container) {
 	s.dbms[inst.UUID] = dbms
 }
 
-func (s *SqlService) onContainerStop(uuid uuid.UUID) {
+func (s *sqlService) onContainerStop(uuid uuid.UUID) {
 	s.dbmsMutex.Lock()
 	defer s.dbmsMutex.Unlock()
 

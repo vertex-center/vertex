@@ -6,22 +6,22 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 )
 
-type ContainerSettingsService struct {
+type containerSettingsService struct {
 	adapter port.ContainerSettingsAdapter
 }
 
-func NewContainerSettingsService(adapter port.ContainerSettingsAdapter) *ContainerSettingsService {
-	return &ContainerSettingsService{
+func NewContainerSettingsService(adapter port.ContainerSettingsAdapter) *containerSettingsService {
+	return &containerSettingsService{
 		adapter: adapter,
 	}
 }
 
-func (s *ContainerSettingsService) Save(inst *types.Container, settings types.ContainerSettings) error {
+func (s *containerSettingsService) Save(inst *types.Container, settings types.ContainerSettings) error {
 	inst.ContainerSettings = settings
 	return s.adapter.Save(inst.UUID, settings)
 }
 
-func (s *ContainerSettingsService) Load(inst *types.Container) error {
+func (s *containerSettingsService) Load(inst *types.Container) error {
 	settings, err := s.adapter.Load(inst.UUID)
 	if err != nil {
 		return err
@@ -33,27 +33,27 @@ func (s *ContainerSettingsService) Load(inst *types.Container) error {
 	return nil
 }
 
-func (s *ContainerSettingsService) SetLaunchOnStartup(inst *types.Container, value bool) error {
+func (s *containerSettingsService) SetLaunchOnStartup(inst *types.Container, value bool) error {
 	inst.ContainerSettings.LaunchOnStartup = &value
 	return s.adapter.Save(inst.UUID, inst.ContainerSettings)
 }
 
-func (s *ContainerSettingsService) SetDisplayName(inst *types.Container, value string) error {
+func (s *containerSettingsService) SetDisplayName(inst *types.Container, value string) error {
 	inst.ContainerSettings.DisplayName = value
 	return s.adapter.Save(inst.UUID, inst.ContainerSettings)
 }
 
-func (s *ContainerSettingsService) SetDatabases(inst *types.Container, databases map[string]uuid.UUID) error {
+func (s *containerSettingsService) SetDatabases(inst *types.Container, databases map[string]uuid.UUID) error {
 	inst.Databases = databases
 	return s.adapter.Save(inst.UUID, inst.ContainerSettings)
 }
 
-func (s *ContainerSettingsService) SetVersion(inst *types.Container, value string) error {
+func (s *containerSettingsService) SetVersion(inst *types.Container, value string) error {
 	inst.Version = &value
 	return s.adapter.Save(inst.UUID, inst.ContainerSettings)
 }
 
-func (s *ContainerSettingsService) SetTags(inst *types.Container, tags []string) error {
+func (s *containerSettingsService) SetTags(inst *types.Container, tags []string) error {
 	inst.Tags = tags
 	return s.adapter.Save(inst.UUID, inst.ContainerSettings)
 }

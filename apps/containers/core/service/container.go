@@ -25,7 +25,7 @@ var (
 	ErrInstallMethodDoesNotExists = errors.New("this install method doesn't exist for this service")
 )
 
-type ContainerService struct {
+type containerService struct {
 	uuid uuid.UUID
 	ctx  *app.Context
 
@@ -54,7 +54,7 @@ type ContainerServiceParams struct {
 }
 
 func NewContainerService(params ContainerServiceParams) port.ContainerService {
-	s := &ContainerService{
+	s := &containerService{
 		uuid: uuid.New(),
 		ctx:  params.Ctx,
 
@@ -75,7 +75,7 @@ func NewContainerService(params ContainerServiceParams) port.ContainerService {
 	return s
 }
 
-func (s *ContainerService) Get(uuid uuid.UUID) (*types.Container, error) {
+func (s *containerService) Get(uuid uuid.UUID) (*types.Container, error) {
 	s.containersMutex.RLock()
 	defer s.containersMutex.RUnlock()
 
@@ -86,14 +86,14 @@ func (s *ContainerService) Get(uuid uuid.UUID) (*types.Container, error) {
 	return container, nil
 }
 
-func (s *ContainerService) GetAll() map[uuid.UUID]*types.Container {
+func (s *containerService) GetAll() map[uuid.UUID]*types.Container {
 	s.containersMutex.RLock()
 	defer s.containersMutex.RUnlock()
 
 	return s.containers
 }
 
-func (s *ContainerService) GetTags() []string {
+func (s *containerService) GetTags() []string {
 	var tags []string
 
 	s.containersMutex.RLock()
@@ -118,7 +118,7 @@ func (s *ContainerService) GetTags() []string {
 }
 
 // Search returns all containers that match the query.
-func (s *ContainerService) Search(query types.ContainerSearchQuery) map[uuid.UUID]*types.Container {
+func (s *containerService) Search(query types.ContainerSearchQuery) map[uuid.UUID]*types.Container {
 	containers := map[uuid.UUID]*types.Container{}
 
 	s.containersMutex.RLock()
@@ -141,7 +141,7 @@ func (s *ContainerService) Search(query types.ContainerSearchQuery) map[uuid.UUI
 	return containers
 }
 
-func (s *ContainerService) Exists(uuid uuid.UUID) bool {
+func (s *containerService) Exists(uuid uuid.UUID) bool {
 	s.containersMutex.RLock()
 	defer s.containersMutex.RUnlock()
 
@@ -150,7 +150,7 @@ func (s *ContainerService) Exists(uuid uuid.UUID) bool {
 
 // Delete deletes a container by its UUID.
 // If the container is still running, it returns ErrContainerStillRunning.
-func (s *ContainerService) Delete(inst *types.Container) error {
+func (s *containerService) Delete(inst *types.Container) error {
 	serviceID := inst.Service.ID
 
 	if inst.IsRunning() {
@@ -181,7 +181,7 @@ func (s *ContainerService) Delete(inst *types.Container) error {
 	return nil
 }
 
-func (s *ContainerService) StartAll() {
+func (s *containerService) StartAll() {
 	s.containersMutex.RLock()
 	defer s.containersMutex.RUnlock()
 
@@ -229,7 +229,7 @@ func (s *ContainerService) StartAll() {
 	}
 }
 
-func (s *ContainerService) StopAll() {
+func (s *containerService) StopAll() {
 	s.containersMutex.RLock()
 	defer s.containersMutex.RUnlock()
 
@@ -243,7 +243,7 @@ func (s *ContainerService) StopAll() {
 	s.ctx.DispatchEvent(types.EventContainersStopped{})
 }
 
-func (s *ContainerService) LoadAll() {
+func (s *containerService) LoadAll() {
 	uuids, err := s.containerAdapter.GetAll()
 	if err != nil {
 		return
@@ -264,7 +264,7 @@ func (s *ContainerService) LoadAll() {
 	})
 }
 
-func (s *ContainerService) DeleteAll() {
+func (s *containerService) DeleteAll() {
 	all := s.GetAll()
 	for _, inst := range all {
 		err := s.Delete(inst)
@@ -274,7 +274,7 @@ func (s *ContainerService) DeleteAll() {
 	}
 }
 
-func (s *ContainerService) Install(service types.Service, method string) (*types.Container, error) {
+func (s *containerService) Install(service types.Service, method string) (*types.Container, error) {
 	id := uuid.New()
 	err := s.containerAdapter.Create(id)
 	if err != nil {
@@ -324,7 +324,7 @@ func (s *ContainerService) Install(service types.Service, method string) (*types
 	return inst, nil
 }
 
-func (s *ContainerService) CheckForUpdates() (map[uuid.UUID]*types.Container, error) {
+func (s *containerService) CheckForUpdates() (map[uuid.UUID]*types.Container, error) {
 	for _, inst := range s.GetAll() {
 		err := s.containerRunnerService.CheckForUpdates(inst)
 		if err != nil {
@@ -335,7 +335,7 @@ func (s *ContainerService) CheckForUpdates() (map[uuid.UUID]*types.Container, er
 	return s.GetAll(), nil
 }
 
-func (s *ContainerService) load(uuid uuid.UUID) error {
+func (s *containerService) load(uuid uuid.UUID) error {
 	service, err := s.containerServiceService.Load(uuid)
 	if err != nil {
 		return err
@@ -378,7 +378,7 @@ func (s *ContainerService) load(uuid uuid.UUID) error {
 	return nil
 }
 
-func (s *ContainerService) SetDatabases(inst *types.Container, databases map[string]uuid.UUID, options map[string]*types.SetDatabasesOptions) error {
+func (s *containerService) SetDatabases(inst *types.Container, databases map[string]uuid.UUID, options map[string]*types.SetDatabasesOptions) error {
 	for db := range databases {
 		if _, ok := inst.Service.Databases[db]; !ok {
 			return types.ErrDatabaseIDNotFound
@@ -394,7 +394,7 @@ func (s *ContainerService) SetDatabases(inst *types.Container, databases map[str
 }
 
 // remapDatabaseEnv remaps the environment variables of a container.
-func (s *ContainerService) remapDatabaseEnv(inst *types.Container, options map[string]*types.SetDatabasesOptions) error {
+func (s *containerService) remapDatabaseEnv(inst *types.Container, options map[string]*types.SetDatabasesOptions) error {
 	for databaseID, databaseContainerUUID := range inst.Databases {
 		db, err := s.Get(databaseContainerUUID)
 		if err != nil {

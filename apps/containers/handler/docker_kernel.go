@@ -12,12 +12,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type DockerKernelHandler struct {
+type dockerKernelHandler struct {
 	dockerService port.DockerService
 }
 
 func NewDockerKernelHandler(dockerKernelService port.DockerService) port.DockerKernelHandler {
-	return &DockerKernelHandler{
+	return &dockerKernelHandler{
 		dockerService: dockerKernelService,
 	}
 }
@@ -30,7 +30,7 @@ func NewDockerKernelHandler(dockerKernelService port.DockerService) port.DockerK
 // docapi response 500
 // docapi end
 
-func (h *DockerKernelHandler) GetContainers(c *router.Context) {
+func (h *dockerKernelHandler) GetContainers(c *router.Context) {
 	containers, err := h.dockerService.ListContainers()
 	if err != nil {
 		c.Abort(router.Error{
@@ -53,7 +53,7 @@ func (h *DockerKernelHandler) GetContainers(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *DockerKernelHandler) CreateContainer(c *router.Context) {
+func (h *dockerKernelHandler) CreateContainer(c *router.Context) {
 	var options types.CreateContainerOptions
 	err := c.ParseBody(&options)
 	if err != nil {
@@ -83,7 +83,7 @@ func (h *DockerKernelHandler) CreateContainer(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *DockerKernelHandler) DeleteContainer(c *router.Context) {
+func (h *dockerKernelHandler) DeleteContainer(c *router.Context) {
 	id := c.Param("id")
 
 	err := h.dockerService.DeleteContainer(id)
@@ -115,7 +115,7 @@ func (h *DockerKernelHandler) DeleteContainer(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *DockerKernelHandler) StartContainer(c *router.Context) {
+func (h *dockerKernelHandler) StartContainer(c *router.Context) {
 	id := c.Param("id")
 
 	err := h.dockerService.StartContainer(id)
@@ -140,7 +140,7 @@ func (h *DockerKernelHandler) StartContainer(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *DockerKernelHandler) StopContainer(c *router.Context) {
+func (h *dockerKernelHandler) StopContainer(c *router.Context) {
 	id := c.Param("id")
 
 	err := h.dockerService.StopContainer(id)
@@ -166,7 +166,7 @@ func (h *DockerKernelHandler) StopContainer(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *DockerKernelHandler) InfoContainer(c *router.Context) {
+func (h *dockerKernelHandler) InfoContainer(c *router.Context) {
 	id := c.Param("id")
 
 	info, err := h.dockerService.InfoContainer(id)
@@ -192,7 +192,7 @@ func (h *DockerKernelHandler) InfoContainer(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *DockerKernelHandler) LogsStdoutContainer(c *router.Context) {
+func (h *dockerKernelHandler) LogsStdoutContainer(c *router.Context) {
 	id := c.Param("id")
 
 	stdout, err := h.dockerService.LogsStdoutContainer(id)
@@ -235,7 +235,7 @@ func (h *DockerKernelHandler) LogsStdoutContainer(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *DockerKernelHandler) LogsStderrContainer(c *router.Context) {
+func (h *dockerKernelHandler) LogsStderrContainer(c *router.Context) {
 	id := c.Param("id")
 
 	stderr, err := h.dockerService.LogsStderrContainer(id)
@@ -278,7 +278,7 @@ func (h *DockerKernelHandler) LogsStderrContainer(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *DockerKernelHandler) WaitContainer(c *router.Context) {
+func (h *dockerKernelHandler) WaitContainer(c *router.Context) {
 	id := c.Param("id")
 	cond := c.Param("cond")
 
@@ -304,7 +304,7 @@ func (h *DockerKernelHandler) WaitContainer(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *DockerKernelHandler) DeleteMounts(c *router.Context) {
+func (h *dockerKernelHandler) DeleteMounts(c *router.Context) {
 	id := c.Param("id")
 
 	err := h.dockerService.DeleteMounts(id)
@@ -329,7 +329,7 @@ func (h *DockerKernelHandler) DeleteMounts(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *DockerKernelHandler) InfoImage(c *router.Context) {
+func (h *dockerKernelHandler) InfoImage(c *router.Context) {
 	id := c.Param("id")
 
 	info, err := h.dockerService.InfoImage(id)
@@ -355,7 +355,7 @@ func (h *DockerKernelHandler) InfoImage(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *DockerKernelHandler) PullImage(c *router.Context) {
+func (h *dockerKernelHandler) PullImage(c *router.Context) {
 	var options types.PullImageOptions
 	err := c.ParseBody(&options)
 	if err != nil {
@@ -402,7 +402,7 @@ func (h *DockerKernelHandler) PullImage(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *DockerKernelHandler) BuildImage(c *router.Context) {
+func (h *dockerKernelHandler) BuildImage(c *router.Context) {
 	var options types.BuildImageOptions
 	err := c.ParseBody(&options)
 	if err != nil {

@@ -17,13 +17,13 @@ const (
 	MetricIDContainersCount = "vertex_containers_count"
 )
 
-type MetricsService struct {
+type metricsService struct {
 	uuid uuid.UUID
 	ctx  *apptypes.Context
 }
 
 func NewMetricsService(ctx *apptypes.Context) port.MetricsService {
-	s := &MetricsService{
+	s := &metricsService{
 		uuid: uuid.New(),
 		ctx:  ctx,
 	}
@@ -31,11 +31,11 @@ func NewMetricsService(ctx *apptypes.Context) port.MetricsService {
 	return s
 }
 
-func (s *MetricsService) GetUUID() uuid.UUID {
+func (s *metricsService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *MetricsService) OnEvent(e event.Event) error {
+func (s *metricsService) OnEvent(e event.Event) error {
 	switch e := e.(type) {
 	case vtypes.EventServerStart:
 		return s.ctx.DispatchEventWithErr(monitoringtypes.EventRegisterMetrics{
@@ -82,7 +82,7 @@ func (s *MetricsService) OnEvent(e event.Event) error {
 	return nil
 }
 
-func (s *MetricsService) updateStatus(uuid uuid.UUID, serviceId string, status string) error {
+func (s *metricsService) updateStatus(uuid uuid.UUID, serviceId string, status string) error {
 	switch status {
 	case types.ContainerStatusRunning:
 		return s.ctx.DispatchEventWithErr(monitoringtypes.EventSetMetric{

@@ -13,12 +13,12 @@ import (
 	"go.uber.org/atomic"
 )
 
-// ChecksService is a service used to check if
+// checksService is a service used to check if
 // Vertex is ready to serve or not.
-type ChecksService struct{}
+type checksService struct{}
 
 func NewChecksService() port.ChecksService {
-	return &ChecksService{}
+	return &checksService{}
 }
 
 // CheckAll checks if Vertex is ready to serve, by doing
@@ -26,7 +26,7 @@ func NewChecksService() port.ChecksService {
 // It returns a channel of CheckResponse, which contains
 // the result of each check. The channel is closed when all
 // checks are done.
-func (s *ChecksService) CheckAll(ctx context.Context) <-chan types.CheckResponse {
+func (s *checksService) CheckAll(ctx context.Context) <-chan types.CheckResponse {
 	checks := []func(ctx context.Context) types.CheckResponse{
 		s.checkInternet,
 		s.checkVertex,
@@ -56,7 +56,7 @@ func (s *ChecksService) CheckAll(ctx context.Context) <-chan types.CheckResponse
 	return resChan
 }
 
-func (s *ChecksService) checkInternet(ctx context.Context) types.CheckResponse {
+func (s *checksService) checkInternet(ctx context.Context) types.CheckResponse {
 	res := types.CheckResponse{
 		ID:   "internet",
 		Name: "Internet connection",
@@ -68,15 +68,15 @@ func (s *ChecksService) checkInternet(ctx context.Context) types.CheckResponse {
 	return res
 }
 
-func (s *ChecksService) checkVertex(ctx context.Context) types.CheckResponse {
+func (s *checksService) checkVertex(ctx context.Context) types.CheckResponse {
 	return s.checkURL(ctx, "api_vertex", "Vertex API", config.Current.URL("vertex").String())
 }
 
-func (s *ChecksService) checkKernel(ctx context.Context) types.CheckResponse {
+func (s *checksService) checkKernel(ctx context.Context) types.CheckResponse {
 	return s.checkURL(ctx, "api_kernel", "Vertex Kernel API", config.Current.KernelURL("vertex").String())
 }
 
-func (s *ChecksService) checkURL(ctx context.Context, id, name, url string) types.CheckResponse {
+func (s *checksService) checkURL(ctx context.Context, id, name, url string) types.CheckResponse {
 	res := types.CheckResponse{
 		ID:   id,
 		Name: name,
@@ -89,7 +89,7 @@ func (s *ChecksService) checkURL(ctx context.Context, id, name, url string) type
 }
 
 // Disabled for now, since ping requires access to the socket, which needs root.
-// func (s *ChecksService) checkDocker(ctx context.Context) types.CheckResponse {
+// func (s *checksService) checkDocker(ctx context.Context) types.CheckResponse {
 // 	res := types.CheckResponse{
 // 		ID:   "docker",
 // 		Name: "Docker",

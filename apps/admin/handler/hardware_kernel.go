@@ -6,12 +6,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type HardwareKernelHandler struct {
+type hardwareKernelHandler struct {
 	service port.HardwareKernelService
 }
 
 func NewHardwareKernelHandler(service port.HardwareKernelService) port.HardwareKernelHandler {
-	return &HardwareKernelHandler{
+	return &hardwareKernelHandler{
 		service: service,
 	}
 }
@@ -24,7 +24,7 @@ func NewHardwareKernelHandler(service port.HardwareKernelService) port.HardwareK
 // docapi response 500
 // docapi end
 
-func (h *HardwareKernelHandler) Reboot(c *router.Context) {
+func (h *hardwareKernelHandler) Reboot(c *router.Context) {
 	err := h.service.Reboot()
 	if err != nil {
 		c.Abort(router.Error{

@@ -7,12 +7,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type SettingsHandler struct {
+type settingsHandler struct {
 	service port.SettingsService
 }
 
 func NewSettingsHandler(settingsService port.SettingsService) port.SettingsHandler {
-	return &SettingsHandler{
+	return &settingsHandler{
 		service: settingsService,
 	}
 }
@@ -25,7 +25,7 @@ func NewSettingsHandler(settingsService port.SettingsService) port.SettingsHandl
 // docapi response 500
 // docapi end
 
-func (h *SettingsHandler) Get(c *router.Context) {
+func (h *settingsHandler) Get(c *router.Context) {
 	settings, err := h.service.Get()
 	if err != nil {
 		c.Abort(router.Error{
@@ -48,7 +48,7 @@ func (h *SettingsHandler) Get(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *SettingsHandler) Patch(c *router.Context) {
+func (h *settingsHandler) Patch(c *router.Context) {
 	var settings types.AdminSettings
 	err := c.ParseBody(&settings)
 	if err != nil {

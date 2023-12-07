@@ -19,7 +19,7 @@ import (
 
 var ErrMetricNotFound = errors.New("metric not found")
 
-type PrometheusAdapter struct {
+type prometheusAdapter struct {
 	gauges    map[string]prometheus.Gauge
 	gaugeVecs map[string]*prometheus.GaugeVec
 
@@ -29,10 +29,10 @@ type PrometheusAdapter struct {
 	reg *prometheus.Registry
 }
 
-func NewMetricsPrometheusAdapter() *PrometheusAdapter {
+func NewMetricsPrometheusAdapter() *prometheusAdapter {
 	reg := prometheus.NewRegistry()
 
-	a := &PrometheusAdapter{
+	a := &prometheusAdapter{
 		gauges:    map[string]prometheus.Gauge{},
 		gaugeVecs: map[string]*prometheus.GaugeVec{},
 
@@ -52,7 +52,7 @@ func NewMetricsPrometheusAdapter() *PrometheusAdapter {
 	return a
 }
 
-func (a *PrometheusAdapter) ConfigureContainer(uuid uuid.UUID) error {
+func (a *prometheusAdapter) ConfigureContainer(uuid uuid.UUID) error {
 	dir := path.Join("live_docker", "apps", "containers", "volumes", uuid.String(), "config")
 	p := path.Join(dir, "prometheus.yml")
 
@@ -83,7 +83,7 @@ func (a *PrometheusAdapter) ConfigureContainer(uuid uuid.UUID) error {
 	return os.WriteFile(p, bytes, 0644)
 }
 
-func (a *PrometheusAdapter) RegisterMetrics(metrics []metricstypes.Metric) {
+func (a *prometheusAdapter) RegisterMetrics(metrics []metricstypes.Metric) {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
@@ -113,7 +113,7 @@ func (a *PrometheusAdapter) RegisterMetrics(metrics []metricstypes.Metric) {
 	}
 }
 
-func (a *PrometheusAdapter) Set(metricID string, value interface{}, labels ...string) {
+func (a *prometheusAdapter) Set(metricID string, value interface{}, labels ...string) {
 	a.mutex.RLock()
 	defer a.mutex.RUnlock()
 
@@ -126,7 +126,7 @@ func (a *PrometheusAdapter) Set(metricID string, value interface{}, labels ...st
 	}
 }
 
-func (a *PrometheusAdapter) Inc(metricID string, labels ...string) {
+func (a *prometheusAdapter) Inc(metricID string, labels ...string) {
 	a.mutex.RLock()
 	defer a.mutex.RUnlock()
 
@@ -139,7 +139,7 @@ func (a *PrometheusAdapter) Inc(metricID string, labels ...string) {
 	}
 }
 
-func (a *PrometheusAdapter) Dec(metricID string, labels ...string) {
+func (a *prometheusAdapter) Dec(metricID string, labels ...string) {
 	a.mutex.RLock()
 	defer a.mutex.RUnlock()
 

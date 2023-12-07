@@ -12,7 +12,7 @@ import (
 
 type ContainerServiceTestSuite struct {
 	suite.Suite
-	service *ContainerService
+	service *containerService
 
 	containerA types.Container
 	containerB types.Container
@@ -25,7 +25,7 @@ func TestContainerServiceTestSuite(t *testing.T) {
 func (suite *ContainerServiceTestSuite) SetupTest() {
 	suite.service = NewContainerService(ContainerServiceParams{
 		Ctx: app.NewContext(vtypes.NewVertexContext(vtypes.About{}, false)),
-	}).(*ContainerService)
+	}).(*containerService)
 
 	suite.containerA = types.Container{
 		UUID: uuid.New(),

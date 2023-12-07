@@ -13,22 +13,22 @@ import (
 
 // TODO: Move webhooks use to a Discord adapter
 
-type NotificationsService struct {
+type notificationsService struct {
 	uuid            uuid.UUID
 	ctx             *apptypes.Context
 	settingsAdapter port.SettingsAdapter
 	client          webhook.Client
 }
 
-func NewNotificationsService(ctx *apptypes.Context, settingsAdapter port.SettingsAdapter) NotificationsService {
-	return NotificationsService{
+func NewNotificationsService(ctx *apptypes.Context, settingsAdapter port.SettingsAdapter) notificationsService {
+	return notificationsService{
 		uuid:            uuid.New(),
 		ctx:             ctx,
 		settingsAdapter: settingsAdapter,
 	}
 }
 
-func (s *NotificationsService) StartWebhook() error {
+func (s *notificationsService) StartWebhook() error {
 	adminSetting, err := s.settingsAdapter.Get()
 	if err != nil {
 		return err
@@ -49,15 +49,15 @@ func (s *NotificationsService) StartWebhook() error {
 	return nil
 }
 
-func (s *NotificationsService) StopWebhook() {
+func (s *notificationsService) StopWebhook() {
 	s.ctx.RemoveListener(s)
 }
 
-func (s *NotificationsService) GetUUID() uuid.UUID {
+func (s *notificationsService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *NotificationsService) OnEvent(e event.Event) error {
+func (s *notificationsService) OnEvent(e event.Event) error {
 	switch e := e.(type) {
 	case types.EventServerSetupCompleted:
 		return s.StartWebhook()
@@ -69,7 +69,7 @@ func (s *NotificationsService) OnEvent(e event.Event) error {
 	return nil
 }
 
-func (s *NotificationsService) sendStatus(name string, status string) {
+func (s *notificationsService) sendStatus(name string, status string) {
 	var color int
 
 	switch status {

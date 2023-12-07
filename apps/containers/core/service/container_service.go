@@ -11,19 +11,19 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-type ContainerServiceService struct {
+type containerServiceService struct {
 	adapter port.ContainerServiceAdapter
 }
 
 func NewContainerServiceService(adapter port.ContainerServiceAdapter) port.ContainerServiceService {
-	return &ContainerServiceService{
+	return &containerServiceService{
 		adapter: adapter,
 	}
 }
 
 // CheckForUpdate checks if the service of a container has an update.
 // If it has, it sets the container's ServiceUpdate field.
-func (s *ContainerServiceService) CheckForUpdate(inst *types.Container, latest types.Service) error {
+func (s *containerServiceService) CheckForUpdate(inst *types.Container, latest types.Service) error {
 	current := inst.Service
 	upToDate := reflect.DeepEqual(latest, current)
 	log.Debug("service up-to-date", vlog.Bool("up_to_date", upToDate))
@@ -33,7 +33,7 @@ func (s *ContainerServiceService) CheckForUpdate(inst *types.Container, latest t
 
 // Update updates the service of a container.
 // The service passed is the latest version of the service.
-func (s *ContainerServiceService) Update(inst *types.Container, service types.Service) error {
+func (s *containerServiceService) Update(inst *types.Container, service types.Service) error {
 	if service.Version > types.MaxSupportedVersion {
 		log.Info("service version is not supported, skipping",
 			vlog.String("uuid", inst.UUID.String()),
@@ -56,11 +56,11 @@ func (s *ContainerServiceService) Update(inst *types.Container, service types.Se
 	return nil
 }
 
-func (s *ContainerServiceService) Save(inst *types.Container, service types.Service) error {
+func (s *containerServiceService) Save(inst *types.Container, service types.Service) error {
 	inst.Service = service
 	return s.adapter.Save(inst.UUID, service)
 }
 
-func (s *ContainerServiceService) Load(uuid uuid.UUID) (types.Service, error) {
+func (s *containerServiceService) Load(uuid uuid.UUID) (types.Service, error) {
 	return s.adapter.Load(uuid)
 }

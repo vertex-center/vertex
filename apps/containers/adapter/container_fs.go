@@ -19,7 +19,7 @@ var (
 	ErrContainerNotFound = errors.New("container not found")
 )
 
-type ContainerFSAdapter struct {
+type containerFSAdapter struct {
 	containersPath string
 }
 
@@ -35,7 +35,7 @@ func NewContainerFSAdapter(params *ContainerFSAdapterParams) port.ContainerAdapt
 		params.containersPath = path.Join(storage.FSPath, "apps", "containers", "containers")
 	}
 
-	adapter := &ContainerFSAdapter{
+	adapter := &containerFSAdapter{
 		containersPath: params.containersPath,
 	}
 
@@ -51,11 +51,11 @@ func NewContainerFSAdapter(params *ContainerFSAdapterParams) port.ContainerAdapt
 	return adapter
 }
 
-func (a *ContainerFSAdapter) GetPath(uuid uuid.UUID) string {
+func (a *containerFSAdapter) GetPath(uuid uuid.UUID) string {
 	return path.Join(a.containersPath, uuid.String())
 }
 
-func (a *ContainerFSAdapter) Create(uuid uuid.UUID) error {
+func (a *containerFSAdapter) Create(uuid uuid.UUID) error {
 	err := os.MkdirAll(a.GetPath(uuid), os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("failed to create server: %w", err)
@@ -63,7 +63,7 @@ func (a *ContainerFSAdapter) Create(uuid uuid.UUID) error {
 	return nil
 }
 
-func (a *ContainerFSAdapter) Delete(uuid uuid.UUID) error {
+func (a *containerFSAdapter) Delete(uuid uuid.UUID) error {
 	err := os.RemoveAll(a.GetPath(uuid))
 	if err != nil {
 		return fmt.Errorf("failed to delete server: %w", err)
@@ -71,7 +71,7 @@ func (a *ContainerFSAdapter) Delete(uuid uuid.UUID) error {
 	return nil
 }
 
-func (a *ContainerFSAdapter) GetAll() ([]uuid.UUID, error) {
+func (a *containerFSAdapter) GetAll() ([]uuid.UUID, error) {
 	entries, err := os.ReadDir(a.containersPath)
 	if err != nil {
 		log.Error(err)

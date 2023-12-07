@@ -18,19 +18,20 @@ import (
 	"github.com/google/go-containerregistry/pkg/crane"
 	"github.com/google/uuid"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
+	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/vdocker"
 	"github.com/vertex-center/vlog"
 )
 
-type ContainerRunnerDockerAdapter struct{}
+type containerRunnerDockerAdapter struct{}
 
-func NewContainerRunnerFSAdapter() ContainerRunnerDockerAdapter {
-	return ContainerRunnerDockerAdapter{}
+func NewContainerRunnerFSAdapter() port.ContainerRunnerAdapter {
+	return containerRunnerDockerAdapter{}
 }
 
-func (a ContainerRunnerDockerAdapter) DeleteContainer(inst *types.Container) error {
+func (a containerRunnerDockerAdapter) DeleteContainer(inst *types.Container) error {
 	id, err := a.getContainerID(*inst)
 	if err != nil {
 		return err
@@ -44,7 +45,7 @@ func (a ContainerRunnerDockerAdapter) DeleteContainer(inst *types.Container) err
 	return nil
 }
 
-func (a ContainerRunnerDockerAdapter) DeleteMounts(inst *types.Container) error {
+func (a containerRunnerDockerAdapter) DeleteMounts(inst *types.Container) error {
 	id, err := a.getContainerID(*inst)
 	if err != nil {
 		return err
@@ -58,7 +59,7 @@ func (a ContainerRunnerDockerAdapter) DeleteMounts(inst *types.Container) error 
 	return nil
 }
 
-func (a ContainerRunnerDockerAdapter) Start(inst *types.Container, setStatus func(status string)) (io.ReadCloser, io.ReadCloser, error) {
+func (a containerRunnerDockerAdapter) Start(inst *types.Container, setStatus func(status string)) (io.ReadCloser, io.ReadCloser, error) {
 	rErr, wErr := io.Pipe()
 	rOut, wOut := io.Pipe()
 
@@ -297,7 +298,7 @@ func (a ContainerRunnerDockerAdapter) Start(inst *types.Container, setStatus fun
 	return rOut, rErr, nil
 }
 
-func (a ContainerRunnerDockerAdapter) Stop(inst *types.Container) error {
+func (a containerRunnerDockerAdapter) Stop(inst *types.Container) error {
 	id, err := a.getContainerID(*inst)
 	if err != nil {
 		return err
@@ -311,7 +312,7 @@ func (a ContainerRunnerDockerAdapter) Stop(inst *types.Container) error {
 	return nil
 }
 
-func (a ContainerRunnerDockerAdapter) Info(inst types.Container) (map[string]any, error) {
+func (a containerRunnerDockerAdapter) Info(inst types.Container) (map[string]any, error) {
 	id, err := a.getContainerID(inst)
 	if err != nil {
 		return nil, err
@@ -334,7 +335,7 @@ func (a ContainerRunnerDockerAdapter) Info(inst types.Container) (map[string]any
 	}, nil
 }
 
-func (a ContainerRunnerDockerAdapter) CheckForUpdates(inst *types.Container) error {
+func (a containerRunnerDockerAdapter) CheckForUpdates(inst *types.Container) error {
 	service := inst.Service
 
 	if service.Methods.Docker.Image == nil {
@@ -381,7 +382,7 @@ func (a ContainerRunnerDockerAdapter) CheckForUpdates(inst *types.Container) err
 	return nil
 }
 
-func (a ContainerRunnerDockerAdapter) GetAllVersions(inst types.Container) ([]string, error) {
+func (a containerRunnerDockerAdapter) GetAllVersions(inst types.Container) ([]string, error) {
 	if inst.Service.Methods.Docker == nil {
 		return nil, errors.New("no Docker methods found")
 	}
@@ -392,12 +393,12 @@ func (a ContainerRunnerDockerAdapter) GetAllVersions(inst types.Container) ([]st
 	return crane.ListTags(image)
 }
 
-func (a ContainerRunnerDockerAdapter) HasUpdateAvailable(inst types.Container) (bool, error) {
+func (a containerRunnerDockerAdapter) HasUpdateAvailable(inst types.Container) (bool, error) {
 	//TODO implement me
 	return false, nil
 }
 
-func (a ContainerRunnerDockerAdapter) WaitCondition(inst *types.Container, cond types.WaitContainerCondition) error {
+func (a containerRunnerDockerAdapter) WaitCondition(inst *types.Container, cond types.WaitContainerCondition) error {
 	id, err := a.getContainerID(*inst)
 	if err != nil {
 		return err
@@ -411,7 +412,7 @@ func (a ContainerRunnerDockerAdapter) WaitCondition(inst *types.Container, cond 
 	return nil
 }
 
-func (a ContainerRunnerDockerAdapter) getContainer(inst types.Container) (types.DockerContainer, error) {
+func (a containerRunnerDockerAdapter) getContainer(inst types.Container) (types.DockerContainer, error) {
 	cli := containersapi.NewContainersKernelClient()
 	containers, apiError := cli.GetContainers(context.Background())
 	if apiError != nil {
@@ -434,7 +435,7 @@ func (a ContainerRunnerDockerAdapter) getContainer(inst types.Container) (types.
 	return *dockerContainer, nil
 }
 
-func (a ContainerRunnerDockerAdapter) getContainerID(inst types.Container) (string, error) {
+func (a containerRunnerDockerAdapter) getContainerID(inst types.Container) (string, error) {
 	c, err := a.getContainer(inst)
 	if err != nil {
 		return "", err
@@ -442,7 +443,7 @@ func (a ContainerRunnerDockerAdapter) getContainerID(inst types.Container) (stri
 	return c.ID, nil
 }
 
-func (a ContainerRunnerDockerAdapter) getImageID(inst types.Container) (string, error) {
+func (a containerRunnerDockerAdapter) getImageID(inst types.Container) (string, error) {
 	c, err := a.getContainer(inst)
 	if err != nil {
 		return "", err
@@ -450,7 +451,7 @@ func (a ContainerRunnerDockerAdapter) getImageID(inst types.Container) (string, 
 	return c.ImageID, nil
 }
 
-func (a ContainerRunnerDockerAdapter) pullImage(imageName string) (io.ReadCloser, error) {
+func (a containerRunnerDockerAdapter) pullImage(imageName string) (io.ReadCloser, error) {
 	options := types.PullImageOptions{Image: imageName}
 
 	cli := containersapi.NewContainersKernelClient()
@@ -461,7 +462,7 @@ func (a ContainerRunnerDockerAdapter) pullImage(imageName string) (io.ReadCloser
 	return res, nil
 }
 
-func (a ContainerRunnerDockerAdapter) buildImageFromName(imageName string) (io.ReadCloser, error) {
+func (a containerRunnerDockerAdapter) buildImageFromName(imageName string) (io.ReadCloser, error) {
 	res, err := a.pullImage(imageName)
 	if err != nil {
 		return nil, err
@@ -469,7 +470,7 @@ func (a ContainerRunnerDockerAdapter) buildImageFromName(imageName string) (io.R
 	return res, nil
 }
 
-func (a ContainerRunnerDockerAdapter) buildImageFromDockerfile(containerPath string, imageName string) (io.ReadCloser, error) {
+func (a containerRunnerDockerAdapter) buildImageFromDockerfile(containerPath string, imageName string) (io.ReadCloser, error) {
 	options := types.BuildImageOptions{
 		Dir:        containerPath,
 		Name:       imageName,
@@ -484,7 +485,7 @@ func (a ContainerRunnerDockerAdapter) buildImageFromDockerfile(containerPath str
 	return res, nil
 }
 
-func (a ContainerRunnerDockerAdapter) createContainer(options types.CreateContainerOptions) (string, error) {
+func (a containerRunnerDockerAdapter) createContainer(options types.CreateContainerOptions) (string, error) {
 	cli := containersapi.NewContainersKernelClient()
 	res, apiError := cli.CreateContainer(context.Background(), options)
 	if apiError != nil {
@@ -499,7 +500,7 @@ func (a ContainerRunnerDockerAdapter) createContainer(options types.CreateContai
 	return res.ID, nil
 }
 
-func (a ContainerRunnerDockerAdapter) readLogs(containerID string) (stdout io.ReadCloser, stderr io.ReadCloser, err error) {
+func (a containerRunnerDockerAdapter) readLogs(containerID string) (stdout io.ReadCloser, stderr io.ReadCloser, err error) {
 	cli := containersapi.NewContainersKernelClient()
 
 	stdout, apiError := cli.GetContainerStdout(context.Background(), containerID)
@@ -515,17 +516,17 @@ func (a ContainerRunnerDockerAdapter) readLogs(containerID string) (stdout io.Re
 	return stdout, stderr, nil
 }
 
-func (a ContainerRunnerDockerAdapter) getVolumePath(uuid uuid.UUID) string {
+func (a containerRunnerDockerAdapter) getVolumePath(uuid uuid.UUID) string {
 	appPath := a.getAppPath("live_docker")
 	return path.Join(appPath, "volumes", uuid.String())
 }
 
-func (a ContainerRunnerDockerAdapter) getContainerPath(uuid uuid.UUID) string {
+func (a containerRunnerDockerAdapter) getContainerPath(uuid uuid.UUID) string {
 	appPath := a.getAppPath("live")
 	return path.Join(appPath, "containers", uuid.String())
 }
 
-func (a ContainerRunnerDockerAdapter) getAppPath(base string) string {
+func (a containerRunnerDockerAdapter) getAppPath(base string) string {
 	// If Vertex is running itself inside Docker, the containers are stored in the Vertex container volume.
 	if vdocker.RunningInDocker() {
 		cli := containersapi.NewContainersKernelClient()

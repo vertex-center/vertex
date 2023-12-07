@@ -13,7 +13,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type ServiceFSAdapter struct {
+type serviceFSAdapter struct {
 	servicesPath string
 	services     []types.Service
 }
@@ -30,7 +30,7 @@ func NewServiceFSAdapter(params *ServiceFSAdapterParams) port.ServiceAdapter {
 		params.servicesPath = path.Join(storage.FSPath, "services")
 	}
 
-	adapter := &ServiceFSAdapter{
+	adapter := &serviceFSAdapter{
 		servicesPath: params.servicesPath,
 	}
 	err := adapter.Reload()
@@ -40,7 +40,7 @@ func NewServiceFSAdapter(params *ServiceFSAdapterParams) port.ServiceAdapter {
 	return adapter
 }
 
-func (a *ServiceFSAdapter) Get(id string) (types.Service, error) {
+func (a *serviceFSAdapter) Get(id string) (types.Service, error) {
 	for _, service := range a.services {
 		if service.ID == id {
 			return service, nil
@@ -50,7 +50,7 @@ func (a *ServiceFSAdapter) Get(id string) (types.Service, error) {
 	return types.Service{}, types.ErrServiceNotFound
 }
 
-func (a *ServiceFSAdapter) GetRaw(id string) (interface{}, error) {
+func (a *serviceFSAdapter) GetRaw(id string) (interface{}, error) {
 	servicePath := path.Join(a.servicesPath, "services", id, "service.yml")
 
 	data, err := os.ReadFile(servicePath)
@@ -65,7 +65,7 @@ func (a *ServiceFSAdapter) GetRaw(id string) (interface{}, error) {
 	return service, err
 }
 
-func (a *ServiceFSAdapter) GetScript(id string) ([]byte, error) {
+func (a *serviceFSAdapter) GetScript(id string) ([]byte, error) {
 	service, err := a.Get(id)
 	if err != nil {
 		return nil, err
@@ -78,11 +78,11 @@ func (a *ServiceFSAdapter) GetScript(id string) ([]byte, error) {
 	return os.ReadFile(path.Join(a.servicesPath, "services", id, service.Methods.Script.Filename))
 }
 
-func (a *ServiceFSAdapter) GetAll() []types.Service {
+func (a *serviceFSAdapter) GetAll() []types.Service {
 	return a.services
 }
 
-func (a *ServiceFSAdapter) Reload() error {
+func (a *serviceFSAdapter) Reload() error {
 	servicesPath := path.Join(a.servicesPath, "services")
 
 	a.services = []types.Service{}

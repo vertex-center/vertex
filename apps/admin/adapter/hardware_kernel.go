@@ -5,12 +5,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/reboot"
 )
 
-type HardwareKernelAdapter struct{}
+type hardwareKernelAdapter struct{}
 
 func NewHardwareKernelAdapter() port.HardwareKernelAdapter {
-	return HardwareKernelAdapter{}
+	return hardwareKernelAdapter{}
 }
 
-func (HardwareKernelAdapter) Reboot() error {
+func (hardwareKernelAdapter) Reboot() error {
 	return reboot.Reboot()
 }

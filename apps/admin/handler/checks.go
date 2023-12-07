@@ -10,12 +10,12 @@ import (
 	"golang.org/x/net/context"
 )
 
-type ChecksHandler struct {
+type checksHandler struct {
 	checksService port.ChecksService
 }
 
 func NewChecksHandler(checksService port.ChecksService) port.ChecksHandler {
-	return &ChecksHandler{
+	return &checksHandler{
 		checksService: checksService,
 	}
 }
@@ -28,7 +28,7 @@ func NewChecksHandler(checksService port.ChecksService) port.ChecksHandler {
 // docapi response 200
 // docapi end
 
-func (h *ChecksHandler) Check(c *router.Context) {
+func (h *checksHandler) Check(c *router.Context) {
 	timeout, cancelTimeout := context.WithTimeout(c, 10*time.Second)
 	resCh := h.checksService.CheckAll(timeout)
 	defer cancelTimeout()

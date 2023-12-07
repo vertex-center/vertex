@@ -16,7 +16,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type ContainerHandler struct {
+type containerHandler struct {
 	ctx                      *apptypes.Context
 	containerService         port.ContainerService
 	containerSettingsService port.ContainerSettingsService
@@ -39,7 +39,7 @@ type ContainerHandlerParams struct {
 }
 
 func NewContainerHandler(params ContainerHandlerParams) port.ContainerHandler {
-	return &ContainerHandler{
+	return &containerHandler{
 		ctx:                      params.Ctx,
 		containerService:         params.ContainerService,
 		containerSettingsService: params.ContainerSettingsService,
@@ -51,7 +51,7 @@ func NewContainerHandler(params ContainerHandlerParams) port.ContainerHandler {
 	}
 }
 
-func (h *ContainerHandler) getParamContainerUUID(c *router.Context) *uuid.UUID {
+func (h *containerHandler) getParamContainerUUID(c *router.Context) *uuid.UUID {
 	p := c.Param("container_uuid")
 	if p == "" {
 		c.BadRequest(router.Error{
@@ -75,7 +75,7 @@ func (h *ContainerHandler) getParamContainerUUID(c *router.Context) *uuid.UUID {
 	return &uid
 }
 
-func (h *ContainerHandler) getContainer(c *router.Context) *types.Container {
+func (h *containerHandler) getContainer(c *router.Context) *types.Container {
 	containerUUID := h.getParamContainerUUID(c)
 	if containerUUID == nil {
 		return nil
@@ -110,7 +110,7 @@ func (h *ContainerHandler) getContainer(c *router.Context) *types.Container {
 // docapi response 500
 // docapi end
 
-func (h *ContainerHandler) Get(c *router.Context) {
+func (h *containerHandler) Get(c *router.Context) {
 	inst := h.getContainer(c)
 	if inst == nil {
 		return
@@ -128,7 +128,7 @@ func (h *ContainerHandler) Get(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *ContainerHandler) Delete(c *router.Context) {
+func (h *containerHandler) Delete(c *router.Context) {
 	inst := h.getContainer(c)
 	if inst == nil {
 		return
@@ -179,7 +179,7 @@ type PatchBodyDatabase struct {
 // docapi response 500
 // docapi end
 
-func (h *ContainerHandler) Patch(c *router.Context) {
+func (h *containerHandler) Patch(c *router.Context) {
 	inst := h.getContainer(c)
 	if inst == nil {
 		return
@@ -274,7 +274,7 @@ func (h *ContainerHandler) Patch(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *ContainerHandler) Start(c *router.Context) {
+func (h *containerHandler) Start(c *router.Context) {
 	inst := h.getContainer(c)
 	if inst == nil {
 		return
@@ -317,7 +317,7 @@ func (h *ContainerHandler) Start(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *ContainerHandler) Stop(c *router.Context) {
+func (h *containerHandler) Stop(c *router.Context) {
 	inst := h.getContainer(c)
 	if inst == nil {
 		return
@@ -356,7 +356,7 @@ type PatchEnvironmentBody map[string]string
 // docapi response 500
 // docapi end
 
-func (h *ContainerHandler) PatchEnvironment(c *router.Context) {
+func (h *containerHandler) PatchEnvironment(c *router.Context) {
 	var environment PatchEnvironmentBody
 	err := c.ParseBody(&environment)
 	if err != nil {
@@ -401,7 +401,7 @@ func (h *ContainerHandler) PatchEnvironment(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *ContainerHandler) Events(c *router.Context) {
+func (h *containerHandler) Events(c *router.Context) {
 	inst := h.getContainer(c)
 	if inst == nil {
 		return
@@ -492,7 +492,7 @@ type DockerContainerInfo map[string]any
 // docapi response 500
 // docapi end
 
-func (h *ContainerHandler) GetDocker(c *router.Context) {
+func (h *containerHandler) GetDocker(c *router.Context) {
 	inst := h.getContainer(c)
 	if inst == nil {
 		return
@@ -520,7 +520,7 @@ func (h *ContainerHandler) GetDocker(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *ContainerHandler) RecreateDocker(c *router.Context) {
+func (h *containerHandler) RecreateDocker(c *router.Context) {
 	inst := h.getContainer(c)
 	if inst == nil {
 		return
@@ -548,7 +548,7 @@ func (h *ContainerHandler) RecreateDocker(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *ContainerHandler) GetLogs(c *router.Context) {
+func (h *containerHandler) GetLogs(c *router.Context) {
 	uid := h.getParamContainerUUID(c)
 	if uid == nil {
 		return
@@ -576,7 +576,7 @@ func (h *ContainerHandler) GetLogs(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *ContainerHandler) UpdateService(c *router.Context) {
+func (h *containerHandler) UpdateService(c *router.Context) {
 	inst := h.getContainer(c)
 	if inst == nil {
 		return
@@ -615,7 +615,7 @@ func (h *ContainerHandler) UpdateService(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *ContainerHandler) GetVersions(c *router.Context) {
+func (h *containerHandler) GetVersions(c *router.Context) {
 	inst := h.getContainer(c)
 	if inst == nil {
 		return
@@ -646,7 +646,7 @@ func (h *ContainerHandler) GetVersions(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *ContainerHandler) WaitStatus(c *router.Context) {
+func (h *containerHandler) WaitStatus(c *router.Context) {
 	status := c.Query("status")
 
 	inst := h.getContainer(c)

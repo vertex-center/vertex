@@ -18,7 +18,7 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-type UpdateService struct {
+type updateService struct {
 	uuid     uuid.UUID
 	ctx      *apptypes.Context
 	adapter  port.BaselinesAdapter
@@ -27,7 +27,7 @@ type UpdateService struct {
 }
 
 func NewUpdateService(ctx *apptypes.Context, adapter port.BaselinesAdapter, updaters []types.Updater) port.UpdateService {
-	s := &UpdateService{
+	s := &updateService{
 		uuid:     uuid.New(),
 		ctx:      ctx,
 		adapter:  adapter,
@@ -37,7 +37,7 @@ func NewUpdateService(ctx *apptypes.Context, adapter port.BaselinesAdapter, upda
 	return s
 }
 
-func (s *UpdateService) GetUpdate(channel types.UpdatesChannel) (*types.Update, error) {
+func (s *updateService) GetUpdate(channel types.UpdatesChannel) (*types.Update, error) {
 	available := false
 	update := types.Update{}
 
@@ -78,7 +78,7 @@ func (s *UpdateService) GetUpdate(channel types.UpdatesChannel) (*types.Update, 
 	return &update, nil
 }
 
-func (s *UpdateService) InstallLatest(channel types.UpdatesChannel) error {
+func (s *updateService) InstallLatest(channel types.UpdatesChannel) error {
 	if !s.updating.CompareAndSwap(false, true) {
 		return types.ErrAlreadyUpdating
 	}
@@ -105,7 +105,7 @@ func (s *UpdateService) InstallLatest(channel types.UpdatesChannel) error {
 	return nil
 }
 
-func (s *UpdateService) firstSetup() error {
+func (s *updateService) firstSetup() error {
 	var missingDeps []types.Updater
 	for _, updater := range s.updaters {
 		if !updater.IsInstalled() {
@@ -140,7 +140,7 @@ func (s *UpdateService) firstSetup() error {
 	return nil
 }
 
-func (s *UpdateService) OnEvent(e event.Event) error {
+func (s *updateService) OnEvent(e event.Event) error {
 	switch e.(type) {
 	case coretypes.EventServerLoad:
 		err := s.firstSetup()
@@ -159,6 +159,6 @@ func (s *UpdateService) OnEvent(e event.Event) error {
 	return nil
 }
 
-func (s *UpdateService) GetUUID() uuid.UUID {
+func (s *updateService) GetUUID() uuid.UUID {
 	return s.uuid
 }

@@ -11,12 +11,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type DBMSHandler struct {
+type dbmsHandler struct {
 	sqlService port.SqlService
 }
 
 func NewDBMSHandler(sqlService port.SqlService) port.DBMSHandler {
-	return &DBMSHandler{
+	return &dbmsHandler{
 		sqlService: sqlService,
 	}
 }
@@ -32,7 +32,7 @@ func NewDBMSHandler(sqlService port.SqlService) port.DBMSHandler {
 // docapi response 500
 // docapi end
 
-func (r *DBMSHandler) Get(c *router.Context) {
+func (r *dbmsHandler) Get(c *router.Context) {
 	uuid, apiError := containersapi.GetContainerUUIDParam(c)
 	if apiError != nil {
 		c.BadRequest(apiError.RouterError())
@@ -73,7 +73,7 @@ func (r *DBMSHandler) Get(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (r *DBMSHandler) Install(c *router.Context) {
+func (r *dbmsHandler) Install(c *router.Context) {
 	dbms, err := r.getDBMS(c)
 	if err != nil {
 		return
@@ -122,7 +122,7 @@ func (r *DBMSHandler) Install(c *router.Context) {
 	c.JSON(inst)
 }
 
-func (r *DBMSHandler) getDBMS(c *router.Context) (string, error) {
+func (r *dbmsHandler) getDBMS(c *router.Context) (string, error) {
 	db := c.Param("dbms")
 	if db != "postgres" {
 		c.NotFound(router.Error{

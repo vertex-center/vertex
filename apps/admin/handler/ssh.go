@@ -11,12 +11,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type SshHandler struct {
+type sshHandler struct {
 	sshService port.SshService
 }
 
 func NewSshHandler(sshService port.SshService) port.SshHandler {
-	return &SshHandler{
+	return &sshHandler{
 		sshService: sshService,
 	}
 }
@@ -29,7 +29,7 @@ func NewSshHandler(sshService port.SshService) port.SshHandler {
 // docapi response 500
 // docapi end
 
-func (h *SshHandler) Get(c *router.Context) {
+func (h *sshHandler) Get(c *router.Context) {
 	keys, err := h.sshService.GetAll()
 	if err != nil {
 		c.Abort(router.Error{
@@ -58,7 +58,7 @@ type AddSSHKeyBody struct {
 	Username      string `json:"username"`
 }
 
-func (h *SshHandler) Add(c *router.Context) {
+func (h *sshHandler) Add(c *router.Context) {
 	var body AddSSHKeyBody
 	err := c.ParseBody(&body)
 	if err != nil {
@@ -107,7 +107,7 @@ type DeleteSSHKeyBody struct {
 	Username    string `json:"username"`
 }
 
-func (h *SshHandler) Delete(c *router.Context) {
+func (h *sshHandler) Delete(c *router.Context) {
 	var body DeleteSSHKeyBody
 	err := c.ParseBody(&body)
 	if err != nil {
@@ -135,7 +135,7 @@ func (h *SshHandler) Delete(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *SshHandler) GetUsers(c *router.Context) {
+func (h *sshHandler) GetUsers(c *router.Context) {
 	users, err := h.sshService.GetUsers()
 	if err != nil {
 		c.Abort(router.Error{

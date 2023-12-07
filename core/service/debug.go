@@ -5,16 +5,16 @@ import (
 	"github.com/vertex-center/vertex/core/types"
 )
 
-type DebugService struct {
+type debugService struct {
 	ctx *types.VertexContext
 }
 
 func NewDebugService(ctx *types.VertexContext) port.DebugService {
-	return &DebugService{
+	return &debugService{
 		ctx: ctx,
 	}
 }
 
-func (s *DebugService) HardReset() {
+func (s *debugService) HardReset() {
 	s.ctx.DispatchEvent(types.EventServerHardReset{})
 }

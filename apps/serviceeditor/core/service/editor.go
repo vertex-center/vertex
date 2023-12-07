@@ -6,12 +6,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type EditorService struct{}
+type editorService struct{}
 
 func NewEditorService() port.EditorService {
-	return &EditorService{}
+	return &editorService{}
 }
 
-func (s *EditorService) ToYaml(serv containerstypes.Service) ([]byte, error) {
+func (s *editorService) ToYaml(serv containerstypes.Service) ([]byte, error) {
 	return yaml.Marshal(serv)
 }

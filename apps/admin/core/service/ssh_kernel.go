@@ -15,18 +15,18 @@ var (
 	ErrFailedToAddKey   = errors.New("failed to add key")
 )
 
-type SshKernelService struct {
+type sshKernelService struct {
 	sshAdapter port.SshKernelAdapter
 }
 
 func NewSshKernelService(sshAdapter port.SshKernelAdapter) port.SshKernelService {
-	return &SshKernelService{
+	return &sshKernelService{
 		sshAdapter: sshAdapter,
 	}
 }
 
 // GetAll returns all SSH keys from the authorized keys files.
-func (s *SshKernelService) GetAll() ([]types.PublicKey, error) {
+func (s *sshKernelService) GetAll() ([]types.PublicKey, error) {
 	users, err := s.sshAdapter.GetUsers()
 	if err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func (s *SshKernelService) GetAll() ([]types.PublicKey, error) {
 
 // Add adds an SSH key to the authorized keys file. The key must
 // be a valid SSH public key, otherwise ErrInvalidPublicKey is returned.
-func (s *SshKernelService) Add(authorizedKey string, username string) error {
+func (s *sshKernelService) Add(authorizedKey string, username string) error {
 	u, err := s.GetUser(username)
 	if err != nil {
 		return err
@@ -50,7 +50,7 @@ func (s *SshKernelService) Add(authorizedKey string, username string) error {
 }
 
 // Delete deletes an SSH key from the authorized keys file.
-func (s *SshKernelService) Delete(fingerprint string, username string) error {
+func (s *sshKernelService) Delete(fingerprint string, username string) error {
 	u, err := s.GetUser(username)
 	if err != nil {
 		return err
@@ -60,11 +60,11 @@ func (s *SshKernelService) Delete(fingerprint string, username string) error {
 }
 
 // GetUsers returns all users on the system that can have SSH keys.
-func (s *SshKernelService) GetUsers() ([]user.User, error) {
+func (s *sshKernelService) GetUsers() ([]user.User, error) {
 	return s.sshAdapter.GetUsers()
 }
 
-func (s *SshKernelService) GetUser(username string) (user.User, error) {
+func (s *sshKernelService) GetUser(username string) (user.User, error) {
 	users, err := s.GetUsers()
 	if err != nil {
 		return user.User{}, err

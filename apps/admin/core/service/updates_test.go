@@ -13,7 +13,7 @@ import (
 
 type UpdateServiceTestSuite struct {
 	suite.Suite
-	service *UpdateService
+	service *updateService
 
 	latestBaseline types.Baseline
 	betaBaseline   types.Baseline
@@ -56,7 +56,7 @@ func (suite *UpdateServiceTestSuite) SetupTest() {
 	suite.adapter = &port.MockBaselinesAdapter{}
 	suite.adapter.On("GetLatest", mock.Anything, types.UpdatesChannelStable).Return(suite.latestBaseline, nil)
 	suite.adapter.On("GetLatest", mock.Anything, types.UpdatesChannelBeta).Return(suite.betaBaseline, nil)
-	suite.service = NewUpdateService(apptypes.NewContext(ctx), suite.adapter, updaters).(*UpdateService)
+	suite.service = NewUpdateService(apptypes.NewContext(ctx), suite.adapter, updaters).(*updateService)
 }
 
 func (suite *UpdateServiceTestSuite) TestGetUpdate() {

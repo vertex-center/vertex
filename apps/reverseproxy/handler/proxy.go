@@ -10,12 +10,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type ProxyHandler struct {
+type proxyHandler struct {
 	proxyService port.ProxyService
 }
 
 func NewProxyHandler(proxyService port.ProxyService) port.ProxyHandler {
-	return &ProxyHandler{
+	return &proxyHandler{
 		proxyService: proxyService,
 	}
 }
@@ -27,7 +27,7 @@ func NewProxyHandler(proxyService port.ProxyService) port.ProxyHandler {
 // docapi response 200 {[]Redirect} The redirects.
 // docapi end
 
-func (r *ProxyHandler) GetRedirects(c *router.Context) {
+func (r *proxyHandler) GetRedirects(c *router.Context) {
 	redirects := r.proxyService.GetRedirects()
 	c.JSON(redirects)
 }
@@ -47,7 +47,7 @@ type AddRedirectBody struct {
 // docapi response 500
 // docapi end
 
-func (r *ProxyHandler) AddRedirect(c *router.Context) {
+func (r *proxyHandler) AddRedirect(c *router.Context) {
 	var body AddRedirectBody
 	err := c.ParseBody(&body)
 	if err != nil {
@@ -96,7 +96,7 @@ func (r *ProxyHandler) AddRedirect(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (r *ProxyHandler) RemoveRedirect(c *router.Context) {
+func (r *proxyHandler) RemoveRedirect(c *router.Context) {
 	idString := c.Param("id")
 	if idString == "" {
 		c.BadRequest(router.Error{

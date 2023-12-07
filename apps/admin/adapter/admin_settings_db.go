@@ -9,7 +9,7 @@ import (
 	"github.com/vertex-center/vertex/core/types/storage"
 )
 
-type SettingsDbAdapter struct {
+type settingsDbAdapter struct {
 	db storage.DB
 	// dbMutex is used to prevent concurrent access to the settings table.
 	// This is also needed to ensure that there is only one row in the table.
@@ -17,12 +17,12 @@ type SettingsDbAdapter struct {
 }
 
 func NewSettingsDbAdapter(db storage.DB) port.SettingsAdapter {
-	return &SettingsDbAdapter{
+	return &settingsDbAdapter{
 		db: db,
 	}
 }
 
-func (a *SettingsDbAdapter) Get() (types.AdminSettings, error) {
+func (a *settingsDbAdapter) Get() (types.AdminSettings, error) {
 	a.dbMutex.Lock()
 	defer a.dbMutex.Unlock()
 
@@ -34,7 +34,7 @@ func (a *SettingsDbAdapter) Get() (types.AdminSettings, error) {
 	return settings, err
 }
 
-func (a *SettingsDbAdapter) SetChannel(channel types.UpdatesChannel) error {
+func (a *settingsDbAdapter) SetChannel(channel types.UpdatesChannel) error {
 	a.dbMutex.Lock()
 	defer a.dbMutex.Unlock()
 
@@ -46,7 +46,7 @@ func (a *SettingsDbAdapter) SetChannel(channel types.UpdatesChannel) error {
 	return err
 }
 
-func (a *SettingsDbAdapter) SetWebhook(webhook string) error {
+func (a *settingsDbAdapter) SetWebhook(webhook string) error {
 	a.dbMutex.Lock()
 	defer a.dbMutex.Unlock()
 

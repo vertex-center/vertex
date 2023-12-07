@@ -30,7 +30,7 @@ type SshFsAdapterTestSuite struct {
 
 	testUser user.User
 
-	adapter            SshFsAdapter
+	adapter            sshFsAdapter
 	authorizedKeysFile *os.File
 }
 
@@ -63,7 +63,7 @@ func (suite *SshFsAdapterTestSuite) SetupTest() {
 		}
 	}
 
-	suite.adapter = *NewSshFsAdapter().(*SshFsAdapter)
+	suite.adapter = *NewSshFsAdapter().(*sshFsAdapter)
 }
 
 func (suite *SshFsAdapterTestSuite) TearDownTest() {

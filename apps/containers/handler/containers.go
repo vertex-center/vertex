@@ -12,13 +12,13 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type ContainersHandler struct {
+type containersHandler struct {
 	ctx              *apptypes.Context
 	containerService port.ContainerService
 }
 
 func NewContainersHandler(ctx *apptypes.Context, containerService port.ContainerService) port.ContainersHandler {
-	return &ContainersHandler{
+	return &containersHandler{
 		ctx:              ctx,
 		containerService: containerService,
 	}
@@ -31,7 +31,7 @@ func NewContainersHandler(ctx *apptypes.Context, containerService port.Container
 // docapi response 200 {[]Container} The containers.
 // docapi end
 
-func (h *ContainersHandler) Get(c *router.Context) {
+func (h *containersHandler) Get(c *router.Context) {
 	installed := h.containerService.GetAll()
 	c.JSON(installed)
 }
@@ -43,7 +43,7 @@ func (h *ContainersHandler) Get(c *router.Context) {
 // docapi response 200 {[]string} The tags.
 // docapi end
 
-func (h *ContainersHandler) GetTags(c *router.Context) {
+func (h *containersHandler) GetTags(c *router.Context) {
 	tags := h.containerService.GetTags()
 	c.JSON(tags)
 }
@@ -57,7 +57,7 @@ func (h *ContainersHandler) GetTags(c *router.Context) {
 // docapi response 200 {[]Container} The containers.
 // docapi end
 
-func (h *ContainersHandler) Search(c *router.Context) {
+func (h *containersHandler) Search(c *router.Context) {
 	query := types.ContainerSearchQuery{}
 
 	features := c.QueryArray("features[]")
@@ -82,7 +82,7 @@ func (h *ContainersHandler) Search(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *ContainersHandler) CheckForUpdates(c *router.Context) {
+func (h *containersHandler) CheckForUpdates(c *router.Context) {
 	containers, err := h.containerService.CheckForUpdates()
 	if err != nil {
 		c.Abort(router.Error{
@@ -105,7 +105,7 @@ func (h *ContainersHandler) CheckForUpdates(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *ContainersHandler) Events(c *router.Context) {
+func (h *containersHandler) Events(c *router.Context) {
 	eventsChan := make(chan sse.Event)
 	defer close(eventsChan)
 

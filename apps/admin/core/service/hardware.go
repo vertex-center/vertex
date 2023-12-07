@@ -9,17 +9,17 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 )
 
-type HardwareService struct {
+type hardwareService struct {
 	adapter port.HardwareAdapter
 }
 
 func NewHardwareService(adapter port.HardwareAdapter) port.HardwareService {
-	return &HardwareService{
+	return &hardwareService{
 		adapter: adapter,
 	}
 }
 
-func (s HardwareService) GetHost() (types.Host, error) {
+func (s hardwareService) GetHost() (types.Host, error) {
 	info, err := host.Info()
 	if err != nil {
 		return types.Host{}, err
@@ -42,7 +42,7 @@ func (s HardwareService) GetHost() (types.Host, error) {
 	}, nil
 }
 
-func (s HardwareService) GetCPUs() ([]types.CPU, error) {
+func (s hardwareService) GetCPUs() ([]types.CPU, error) {
 	info, err := cpu.Info()
 	if err != nil {
 		return nil, err
@@ -69,6 +69,6 @@ func (s HardwareService) GetCPUs() ([]types.CPU, error) {
 	return cpus, nil
 }
 
-func (s HardwareService) Reboot(ctx context.Context) error {
+func (s hardwareService) Reboot(ctx context.Context) error {
 	return s.adapter.Reboot(ctx)
 }

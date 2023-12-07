@@ -5,12 +5,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type AppsHandler struct {
+type appsHandler struct {
 	appsService port.AppsService
 }
 
 func NewAppsHandler(appsService port.AppsService) port.AppsHandler {
-	return &AppsHandler{
+	return &appsHandler{
 		appsService: appsService,
 	}
 }
@@ -22,6 +22,6 @@ func NewAppsHandler(appsService port.AppsService) port.AppsHandler {
 // docapi response 200 {[]Meta} The list of apps.
 // docapi end
 
-func (h *AppsHandler) GetApps(c *router.Context) {
+func (h *appsHandler) GetApps(c *router.Context) {
 	c.JSON(h.appsService.All())
 }

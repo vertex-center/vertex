@@ -14,13 +14,13 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-type SshFsAdapter struct{}
+type sshFsAdapter struct{}
 
 func NewSshFsAdapter() port.SshKernelAdapter {
-	return &SshFsAdapter{}
+	return &sshFsAdapter{}
 }
 
-func (a *SshFsAdapter) GetAll(users []user.User) ([]types.PublicKey, error) {
+func (a *sshFsAdapter) GetAll(users []user.User) ([]types.PublicKey, error) {
 	var keys []types.PublicKey
 	for _, u := range users {
 		p := getAuthorizedKeysPath(u.HomeDir)
@@ -53,7 +53,7 @@ func (a *SshFsAdapter) GetAll(users []user.User) ([]types.PublicKey, error) {
 	return keys, nil
 }
 
-func (a *SshFsAdapter) Add(key string, user user.User) error {
+func (a *sshFsAdapter) Add(key string, user user.User) error {
 	p := getAuthorizedKeysPath(user.HomeDir)
 
 	err := os.MkdirAll(path.Dir(p), 0755)
@@ -71,7 +71,7 @@ func (a *SshFsAdapter) Add(key string, user user.User) error {
 	return err
 }
 
-func (a *SshFsAdapter) Remove(fingerprint string, user user.User) error {
+func (a *sshFsAdapter) Remove(fingerprint string, user user.User) error {
 	p := getAuthorizedKeysPath(user.HomeDir)
 
 	content, err := os.ReadFile(p)
@@ -97,7 +97,7 @@ func (a *SshFsAdapter) Remove(fingerprint string, user user.User) error {
 	return os.WriteFile(p, []byte(strings.Join(lines, "\n")), 0644)
 }
 
-func (a *SshFsAdapter) GetUsers() ([]user.User, error) {
+func (a *sshFsAdapter) GetUsers() ([]user.User, error) {
 	return user.GetAll()
 }
 

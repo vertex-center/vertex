@@ -9,17 +9,17 @@ import (
 	"github.com/vertex-center/vertex/core/types/storage"
 )
 
-type AuthDbAdapter struct {
+type authDbAdapter struct {
 	db storage.DB
 }
 
 func NewAuthDbAdapter(db storage.DB) port.AuthAdapter {
-	return &AuthDbAdapter{
+	return &authDbAdapter{
 		db: db,
 	}
 }
 
-func (a *AuthDbAdapter) CreateAccount(username string, credential types.CredentialsArgon2id) error {
+func (a *authDbAdapter) CreateAccount(username string, credential types.CredentialsArgon2id) error {
 	user := types.User{
 		Username:  username,
 		CreatedAt: time.Now().Unix(),
@@ -78,7 +78,7 @@ func (a *AuthDbAdapter) CreateAccount(username string, credential types.Credenti
 	return tx.Commit()
 }
 
-func (a *AuthDbAdapter) GetCredentials(login string) ([]types.CredentialsArgon2id, error) {
+func (a *authDbAdapter) GetCredentials(login string) ([]types.CredentialsArgon2id, error) {
 	var creds []types.CredentialsArgon2id
 
 	rows, err := a.db.Queryx(`
@@ -102,7 +102,7 @@ func (a *AuthDbAdapter) GetCredentials(login string) ([]types.CredentialsArgon2i
 	return creds, nil
 }
 
-func (a *AuthDbAdapter) GetUsersByCredential(credentialID uint) ([]types.User, error) {
+func (a *authDbAdapter) GetUsersByCredential(credentialID uint) ([]types.User, error) {
 	var users []types.User
 	err := a.db.Select(&users, `
 		SELECT users.id, users.username, users.created_at, users.updated_at, users.deleted_at
@@ -113,7 +113,7 @@ func (a *AuthDbAdapter) GetUsersByCredential(credentialID uint) ([]types.User, e
 	return users, err
 }
 
-func (a *AuthDbAdapter) SaveSession(session *types.Session) error {
+func (a *authDbAdapter) SaveSession(session *types.Session) error {
 	tx, err := a.db.Beginx()
 	if err != nil {
 		return err
@@ -147,12 +147,12 @@ func (a *AuthDbAdapter) SaveSession(session *types.Session) error {
 	return tx.Commit()
 }
 
-func (a *AuthDbAdapter) DeleteSession(token string) error {
+func (a *authDbAdapter) DeleteSession(token string) error {
 	_, err := a.db.Exec("UPDATE sessions SET deleted_at = $1 WHERE token = $2", time.Now().Unix(), token)
 	return err
 }
 
-func (a *AuthDbAdapter) GetSession(token string) (*types.Session, error) {
+func (a *authDbAdapter) GetSession(token string) (*types.Session, error) {
 	var session types.Session
 	err := a.db.Get(&session, `
 		SELECT sessions.id, sessions.token, sessions.user_id, sessions.created_at, sessions.updated_at, sessions.deleted_at
@@ -162,7 +162,7 @@ func (a *AuthDbAdapter) GetSession(token string) (*types.Session, error) {
 	return &session, err
 }
 
-func (a *AuthDbAdapter) GetUser(username string) (types.User, error) {
+func (a *authDbAdapter) GetUser(username string) (types.User, error) {
 	var user types.User
 	err := a.db.Get(&user, `
 		SELECT users.id, users.username, users.created_at, users.updated_at, users.deleted_at
@@ -172,7 +172,7 @@ func (a *AuthDbAdapter) GetUser(username string) (types.User, error) {
 	return user, err
 }
 
-func (a *AuthDbAdapter) GetUserByID(id uint) (types.User, error) {
+func (a *authDbAdapter) GetUserByID(id uint) (types.User, error) {
 	var user types.User
 	err := a.db.Get(&user, `
 		SELECT users.id, users.username, users.created_at, users.updated_at, users.deleted_at
@@ -182,7 +182,7 @@ func (a *AuthDbAdapter) GetUserByID(id uint) (types.User, error) {
 	return user, err
 }
 
-func (a *AuthDbAdapter) PatchUser(user types.User) (types.User, error) {
+func (a *authDbAdapter) PatchUser(user types.User) (types.User, error) {
 	user.UpdatedAt = time.Now().Unix()
 
 	tx, err := a.db.Beginx()
@@ -213,7 +213,7 @@ func (a *AuthDbAdapter) PatchUser(user types.User) (types.User, error) {
 	return user, tx.Commit()
 }
 
-func (a *AuthDbAdapter) GetUserCredentialsMethods(userID uint) ([]types.CredentialsMethods, error) {
+func (a *authDbAdapter) GetUserCredentialsMethods(userID uint) ([]types.CredentialsMethods, error) {
 	var credsArgon2id []types.CredentialsArgon2id
 	err := a.db.Select(&credsArgon2id, `
 		SELECT credentials_argon2.id, credentials_argon2.login, credentials_argon2.hash, credentials_argon2.type, credentials_argon2.iterations, credentials_argon2.memory, credentials_argon2.parallelism, credentials_argon2.salt, credentials_argon2.key_len, credentials_argon2.created_at, credentials_argon2.updated_at, credentials_argon2.deleted_at

@@ -12,7 +12,7 @@ import (
 
 type AppsServiceTestSuite struct {
 	suite.Suite
-	service *AppsService
+	service *appsService
 	app     *MockApp
 }
 
@@ -25,7 +25,7 @@ func (suite *AppsServiceTestSuite) SetupTest() {
 	suite.app = &MockApp{}
 	suite.service = NewAppsService(ctx, false, []app.Interface{
 		suite.app,
-	}).(*AppsService)
+	}).(*appsService)
 }
 
 func (suite *AppsServiceTestSuite) TestLoadApps() {

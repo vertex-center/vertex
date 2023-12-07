@@ -6,11 +6,11 @@ import (
 	"github.com/vertex-center/vertex/pkg/event"
 )
 
-func (s *ContainerService) GetUUID() uuid.UUID {
+func (s *containerService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *ContainerService) OnEvent(e event.Event) error {
+func (s *containerService) OnEvent(e event.Event) error {
 	switch e.(type) {
 	case types.EventServerStart:
 		s.LoadAll()

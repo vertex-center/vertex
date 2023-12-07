@@ -12,10 +12,10 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type ProviderHandler struct{}
+type providerHandler struct{}
 
 func NewProviderHandler() port.ProviderHandler {
-	return &ProviderHandler{}
+	return &providerHandler{}
 }
 
 // docapi begin vx_tunnels_install_provider
@@ -27,7 +27,7 @@ func NewProviderHandler() port.ProviderHandler {
 // docapi response 500
 // docapi end
 
-func (r *ProviderHandler) Install(c *router.Context) {
+func (r *providerHandler) Install(c *router.Context) {
 	provider, err := getTunnelProvider(c)
 	if err != nil {
 		return

@@ -13,7 +13,7 @@ import (
 )
 
 type SqlDBMSPostgresAdapter struct {
-	*SqlDBMSAdapter
+	*sqlDBMSAdapter
 
 	db *gorm.DB
 }
@@ -27,7 +27,7 @@ type SqlDBMSPostgresAdapterParams struct {
 
 func NewSqlDBMSPostgresAdapter(params *SqlDBMSPostgresAdapterParams) port.DBMSAdapter {
 	adapter := &SqlDBMSPostgresAdapter{
-		SqlDBMSAdapter: NewSqlDBMSAdapter().(*SqlDBMSAdapter),
+		sqlDBMSAdapter: NewSqlDBMSAdapter().(*sqlDBMSAdapter),
 	}
 
 	go func() {

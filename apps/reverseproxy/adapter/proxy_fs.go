@@ -22,7 +22,7 @@ var (
 	errReverseProxyFailedToDecode = errors.New("failed to decode redirects.json")
 )
 
-type ProxyFSAdapter struct {
+type proxyFSAdapter struct {
 	redirects      types.ProxyRedirects
 	redirectsMutex sync.RWMutex
 
@@ -50,7 +50,7 @@ func NewProxyFSAdapter(params *ProxyFSAdapterParams) port.ProxyAdapter {
 		os.Exit(1)
 	}
 
-	adapter := &ProxyFSAdapter{
+	adapter := &proxyFSAdapter{
 		redirects:      types.ProxyRedirects{},
 		redirectsMutex: sync.RWMutex{},
 
@@ -65,14 +65,14 @@ func NewProxyFSAdapter(params *ProxyFSAdapterParams) port.ProxyAdapter {
 	return adapter
 }
 
-func (a *ProxyFSAdapter) GetRedirects() types.ProxyRedirects {
+func (a *proxyFSAdapter) GetRedirects() types.ProxyRedirects {
 	a.redirectsMutex.RLock()
 	defer a.redirectsMutex.RUnlock()
 
 	return a.redirects
 }
 
-func (a *ProxyFSAdapter) GetRedirectByHost(host string) *types.ProxyRedirect {
+func (a *proxyFSAdapter) GetRedirectByHost(host string) *types.ProxyRedirect {
 	a.redirectsMutex.RLock()
 	defer a.redirectsMutex.RUnlock()
 
@@ -84,7 +84,7 @@ func (a *ProxyFSAdapter) GetRedirectByHost(host string) *types.ProxyRedirect {
 	return nil
 }
 
-func (a *ProxyFSAdapter) AddRedirect(id uuid.UUID, redirect types.ProxyRedirect) error {
+func (a *proxyFSAdapter) AddRedirect(id uuid.UUID, redirect types.ProxyRedirect) error {
 	func() {
 		a.redirectsMutex.Lock()
 		defer a.redirectsMutex.Unlock()
@@ -93,7 +93,7 @@ func (a *ProxyFSAdapter) AddRedirect(id uuid.UUID, redirect types.ProxyRedirect)
 	return a.write()
 }
 
-func (a *ProxyFSAdapter) RemoveRedirect(id uuid.UUID) error {
+func (a *proxyFSAdapter) RemoveRedirect(id uuid.UUID) error {
 	func() {
 		a.redirectsMutex.Lock()
 		defer a.redirectsMutex.Unlock()
@@ -102,7 +102,7 @@ func (a *ProxyFSAdapter) RemoveRedirect(id uuid.UUID) error {
 	return a.write()
 }
 
-func (a *ProxyFSAdapter) read() error {
+func (a *proxyFSAdapter) read() error {
 	p := path.Join(a.proxyPath, "redirects.json")
 	file, err := os.ReadFile(p)
 
@@ -123,7 +123,7 @@ func (a *ProxyFSAdapter) read() error {
 	return nil
 }
 
-func (a *ProxyFSAdapter) write() error {
+func (a *proxyFSAdapter) write() error {
 	p := path.Join(a.proxyPath, "redirects.json")
 
 	a.redirectsMutex.RLock()

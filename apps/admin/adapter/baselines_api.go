@@ -11,19 +11,19 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-type BaselinesApiAdapter struct {
+type baselinesApiAdapter struct {
 	config requests.Config
 }
 
 func NewBaselinesApiAdapter() port.BaselinesAdapter {
-	return &BaselinesApiAdapter{
+	return &baselinesApiAdapter{
 		config: func(rb *requests.Builder) {
 			rb.BaseURL("https://bl.vx.arra.red/")
 		},
 	}
 }
 
-func (a *BaselinesApiAdapter) GetLatest(ctx context.Context, channel types.UpdatesChannel) (types.Baseline, error) {
+func (a *baselinesApiAdapter) GetLatest(ctx context.Context, channel types.UpdatesChannel) (types.Baseline, error) {
 	var baseline types.Baseline
 	builder := requests.New(a.config).
 		Pathf("%s.json", channel).

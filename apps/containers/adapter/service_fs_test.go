@@ -13,7 +13,7 @@ const (
 type AvailableTestSuite struct {
 	suite.Suite
 
-	adapter ServiceFSAdapter
+	adapter serviceFSAdapter
 }
 
 func TestAvailableTestSuite(t *testing.T) {
@@ -23,7 +23,7 @@ func TestAvailableTestSuite(t *testing.T) {
 func (suite *AvailableTestSuite) SetupSuite() {
 	suite.adapter = *NewServiceFSAdapter(&ServiceFSAdapterParams{
 		servicesPath: PathServices,
-	}).(*ServiceFSAdapter)
+	}).(*serviceFSAdapter)
 
 	err := suite.adapter.Reload()
 	suite.Require().NoError(err)

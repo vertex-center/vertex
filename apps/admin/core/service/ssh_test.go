@@ -10,7 +10,7 @@ import (
 type SshServiceTestSuite struct {
 	suite.Suite
 
-	service *SshService
+	service *sshService
 	adapter *port.MockSshAdapter
 }
 
@@ -20,7 +20,7 @@ func TestSshServiceTestSuite(t *testing.T) {
 
 func (suite *SshServiceTestSuite) SetupTest() {
 	suite.adapter = &port.MockSshAdapter{}
-	suite.service = NewSshService(suite.adapter).(*SshService)
+	suite.service = NewSshService(suite.adapter).(*sshService)
 }
 
 func (suite *SshServiceTestSuite) TestGetAll() {

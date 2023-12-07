@@ -14,14 +14,14 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-type MetricsService struct {
+type metricsService struct {
 	uuid    uuid.UUID
 	adapter port.MetricsAdapter
 	metrics []types.Metric
 }
 
 func NewMetricsService(ctx *app.Context, metricsAdapter port.MetricsAdapter) port.MetricsService {
-	s := &MetricsService{
+	s := &metricsService{
 		uuid:    uuid.New(),
 		adapter: metricsAdapter,
 		metrics: []types.Metric{},
@@ -30,11 +30,11 @@ func NewMetricsService(ctx *app.Context, metricsAdapter port.MetricsAdapter) por
 	return s
 }
 
-func (s *MetricsService) GetMetrics() []types.Metric {
+func (s *metricsService) GetMetrics() []types.Metric {
 	return s.metrics
 }
 
-func (s *MetricsService) InstallCollector(ctx context.Context, token string, collector string) error {
+func (s *metricsService) InstallCollector(ctx context.Context, token string, collector string) error {
 	c := containersapi.NewContainersClient(token)
 
 	serv, apiError := c.GetService(ctx, collector)
@@ -63,13 +63,13 @@ func (s *MetricsService) InstallCollector(ctx context.Context, token string, col
 }
 
 // ConfigureCollector will configure a container to monitor the metrics of Vertex.
-func (s *MetricsService) ConfigureCollector(inst *containerstypes.Container) error {
+func (s *metricsService) ConfigureCollector(inst *containerstypes.Container) error {
 	// TODO: Enable again, but permissions are not set correctly
 	// return s.adapter.ConfigureContainer(inst.UUID)
 	return nil
 }
 
-func (s *MetricsService) InstallVisualizer(ctx context.Context, token string, visualizer string) error {
+func (s *metricsService) InstallVisualizer(ctx context.Context, token string, visualizer string) error {
 	c := containersapi.NewContainersClient(token)
 
 	serv, apiError := c.GetService(ctx, visualizer)
@@ -97,16 +97,16 @@ func (s *MetricsService) InstallVisualizer(ctx context.Context, token string, vi
 	return nil
 }
 
-func (s *MetricsService) ConfigureVisualizer(inst *containerstypes.Container) error {
+func (s *metricsService) ConfigureVisualizer(inst *containerstypes.Container) error {
 	// TODO: Implement
 	return nil
 }
 
-func (s *MetricsService) GetUUID() uuid.UUID {
+func (s *metricsService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *MetricsService) OnEvent(e event.Event) error {
+func (s *metricsService) OnEvent(e event.Event) error {
 	switch e := e.(type) {
 	case types.EventRegisterMetrics:
 		log.Info("registering metrics", vlog.Int("count", len(e.Metrics)))

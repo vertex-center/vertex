@@ -15,7 +15,7 @@ import (
 
 const ContainerEnvPath = ".env"
 
-type ContainerEnvFSAdapter struct {
+type containerEnvFSAdapter struct {
 	containersPath string
 }
 
@@ -31,14 +31,14 @@ func NewContainerEnvFSAdapter(params *ContainerEnvFSAdapterParams) port.Containe
 		params.containersPath = path.Join(storage.FSPath, "apps", "containers", "containers")
 	}
 
-	adapter := &ContainerEnvFSAdapter{
+	adapter := &containerEnvFSAdapter{
 		containersPath: params.containersPath,
 	}
 
 	return adapter
 }
 
-func (a *ContainerEnvFSAdapter) Save(uuid uuid.UUID, env containerstypes.ContainerEnvVariables) error {
+func (a *containerEnvFSAdapter) Save(uuid uuid.UUID, env containerstypes.ContainerEnvVariables) error {
 	envPath := path.Join(a.containersPath, uuid.String(), ContainerEnvPath)
 
 	file, err := os.OpenFile(envPath, os.O_WRONLY|os.O_CREATE, os.ModePerm)
@@ -61,7 +61,7 @@ func (a *ContainerEnvFSAdapter) Save(uuid uuid.UUID, env containerstypes.Contain
 	return nil
 }
 
-func (a *ContainerEnvFSAdapter) Load(uuid uuid.UUID) (containerstypes.ContainerEnvVariables, error) {
+func (a *containerEnvFSAdapter) Load(uuid uuid.UUID) (containerstypes.ContainerEnvVariables, error) {
 	envPath := path.Join(a.containersPath, uuid.String(), ContainerEnvPath)
 
 	file, err := os.Open(envPath)

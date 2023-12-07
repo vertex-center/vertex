@@ -15,7 +15,7 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-type DockerCliAdapter struct {
+type dockerCliAdapter struct {
 	cli *client.Client
 }
 
@@ -26,15 +26,15 @@ func NewDockerCliAdapter() port.DockerAdapter {
 			vlog.String("error", err.Error()),
 		)
 
-		return DockerCliAdapter{}
+		return dockerCliAdapter{}
 	}
 
-	return DockerCliAdapter{
+	return dockerCliAdapter{
 		cli: cli,
 	}
 }
 
-func (a DockerCliAdapter) ListContainers() ([]types.DockerContainer, error) {
+func (a dockerCliAdapter) ListContainers() ([]types.DockerContainer, error) {
 	res, err := a.cli.ContainerList(context.Background(), dockertypes.ContainerListOptions{All: true})
 	if err != nil {
 		return nil, err
@@ -47,11 +47,11 @@ func (a DockerCliAdapter) ListContainers() ([]types.DockerContainer, error) {
 	return containers, nil
 }
 
-func (a DockerCliAdapter) DeleteContainer(id string) error {
+func (a dockerCliAdapter) DeleteContainer(id string) error {
 	return a.cli.ContainerRemove(context.Background(), id, dockertypes.ContainerRemoveOptions{})
 }
 
-func (a DockerCliAdapter) CreateContainer(options types.CreateContainerOptions) (types.CreateContainerResponse, error) {
+func (a dockerCliAdapter) CreateContainer(options types.CreateContainerOptions) (types.CreateContainerResponse, error) {
 	config := container.Config{
 		Image:        options.ImageName,
 		ExposedPorts: options.ExposedPorts,
@@ -80,15 +80,15 @@ func (a DockerCliAdapter) CreateContainer(options types.CreateContainerOptions) 
 	}, nil
 }
 
-func (a DockerCliAdapter) StartContainer(id string) error {
+func (a dockerCliAdapter) StartContainer(id string) error {
 	return a.cli.ContainerStart(context.Background(), id, dockertypes.ContainerStartOptions{})
 }
 
-func (a DockerCliAdapter) StopContainer(id string) error {
+func (a dockerCliAdapter) StopContainer(id string) error {
 	return a.cli.ContainerStop(context.Background(), id, container.StopOptions{})
 }
 
-func (a DockerCliAdapter) InfoContainer(id string) (types.InfoContainerResponse, error) {
+func (a dockerCliAdapter) InfoContainer(id string) (types.InfoContainerResponse, error) {
 	info, err := a.cli.ContainerInspect(context.Background(), id)
 	if err != nil {
 		return types.InfoContainerResponse{}, err
@@ -108,7 +108,7 @@ func (a DockerCliAdapter) InfoContainer(id string) (types.InfoContainerResponse,
 	}, nil
 }
 
-func (a DockerCliAdapter) LogsStdoutContainer(id string) (io.ReadCloser, error) {
+func (a dockerCliAdapter) LogsStdoutContainer(id string) (io.ReadCloser, error) {
 	return a.cli.ContainerLogs(context.Background(), id, dockertypes.ContainerLogsOptions{
 		ShowStdout: true,
 		Timestamps: false,
@@ -117,7 +117,7 @@ func (a DockerCliAdapter) LogsStdoutContainer(id string) (io.ReadCloser, error) 
 	})
 }
 
-func (a DockerCliAdapter) LogsStderrContainer(id string) (io.ReadCloser, error) {
+func (a dockerCliAdapter) LogsStderrContainer(id string) (io.ReadCloser, error) {
 	return a.cli.ContainerLogs(context.Background(), id, dockertypes.ContainerLogsOptions{
 		ShowStderr: true,
 		Timestamps: false,
@@ -126,7 +126,7 @@ func (a DockerCliAdapter) LogsStderrContainer(id string) (io.ReadCloser, error) 
 	})
 }
 
-func (a DockerCliAdapter) WaitContainer(id string, cond types.WaitContainerCondition) error {
+func (a dockerCliAdapter) WaitContainer(id string, cond types.WaitContainerCondition) error {
 	statusCh, errCh := a.cli.ContainerWait(context.Background(), id, container.WaitCondition(cond))
 
 	select {
@@ -140,7 +140,7 @@ func (a DockerCliAdapter) WaitContainer(id string, cond types.WaitContainerCondi
 	return nil
 }
 
-func (a DockerCliAdapter) InfoImage(id string) (types.InfoImageResponse, error) {
+func (a dockerCliAdapter) InfoImage(id string) (types.InfoImageResponse, error) {
 	info, _, err := a.cli.ImageInspectWithRaw(context.Background(), id)
 	if err != nil {
 		return types.InfoImageResponse{}, err
@@ -154,11 +154,11 @@ func (a DockerCliAdapter) InfoImage(id string) (types.InfoImageResponse, error) 
 	}, nil
 }
 
-func (a DockerCliAdapter) PullImage(options types.PullImageOptions) (io.ReadCloser, error) {
+func (a dockerCliAdapter) PullImage(options types.PullImageOptions) (io.ReadCloser, error) {
 	return a.cli.ImagePull(context.Background(), options.Image, dockertypes.ImagePullOptions{})
 }
 
-func (a DockerCliAdapter) BuildImage(options types.BuildImageOptions) (dockertypes.ImageBuildResponse, error) {
+func (a dockerCliAdapter) BuildImage(options types.BuildImageOptions) (dockertypes.ImageBuildResponse, error) {
 	buildOptions := dockertypes.ImageBuildOptions{
 		Dockerfile: options.Dockerfile,
 		Tags:       []string{options.Name},

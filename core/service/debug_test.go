@@ -10,12 +10,12 @@ import (
 type DebugServiceTestSuite struct {
 	suite.Suite
 
-	service *DebugService
+	service *debugService
 }
 
 func (suite *DebugServiceTestSuite) SetupSuite() {
 	ctx := types.NewVertexContext(types.About{}, false)
-	suite.service = NewDebugService(ctx).(*DebugService)
+	suite.service = NewDebugService(ctx).(*debugService)
 }
 
 func TestDebugServiceTestSuite(t *testing.T) {

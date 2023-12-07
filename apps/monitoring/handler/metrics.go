@@ -9,12 +9,12 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type MetricsHandler struct {
+type metricsHandler struct {
 	metricsService port.MetricsService
 }
 
-func NewMetricsHandler(metricsService port.MetricsService) *MetricsHandler {
-	return &MetricsHandler{
+func NewMetricsHandler(metricsService port.MetricsService) port.MetricsHandler {
+	return &metricsHandler{
 		metricsService: metricsService,
 	}
 }
@@ -52,7 +52,7 @@ func getVisualizer(c *router.Context) (string, error) {
 // docapi response 200 {Metrics} The metrics.
 // docapi end
 
-func (r *MetricsHandler) Get(c *router.Context) {
+func (r *metricsHandler) Get(c *router.Context) {
 	c.JSON(r.metricsService.GetMetrics())
 }
 
@@ -67,7 +67,7 @@ func (r *MetricsHandler) Get(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (r *MetricsHandler) InstallCollector(c *router.Context) {
+func (r *metricsHandler) InstallCollector(c *router.Context) {
 	collector, err := getCollector(c)
 	if err != nil {
 		return
@@ -99,7 +99,7 @@ func (r *MetricsHandler) InstallCollector(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (r *MetricsHandler) InstallVisualizer(c *router.Context) {
+func (r *metricsHandler) InstallVisualizer(c *router.Context) {
 	visualizer, err := getVisualizer(c)
 	if err != nil {
 		return

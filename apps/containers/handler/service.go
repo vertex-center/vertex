@@ -9,13 +9,13 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-type ServiceHandler struct {
+type serviceHandler struct {
 	serviceService   port.ServiceService
 	containerService port.ContainerService
 }
 
 func NewServiceHandler(serviceService port.ServiceService, containerService port.ContainerService) port.ServiceHandler {
-	return &ServiceHandler{
+	return &serviceHandler{
 		serviceService:   serviceService,
 		containerService: containerService,
 	}
@@ -31,7 +31,7 @@ func NewServiceHandler(serviceService port.ServiceService, containerService port
 // docapi response 404
 // docapi end
 
-func (h *ServiceHandler) Get(c *router.Context) {
+func (h *serviceHandler) Get(c *router.Context) {
 	serviceID := c.Param("service_id")
 	if serviceID == "" {
 		c.BadRequest(router.Error{
@@ -66,7 +66,7 @@ func (h *ServiceHandler) Get(c *router.Context) {
 // docapi response 500
 // docapi end
 
-func (h *ServiceHandler) Install(c *router.Context) {
+func (h *serviceHandler) Install(c *router.Context) {
 	serviceID := c.Param("service_id")
 	if serviceID == "" {
 		c.BadRequest(router.Error{
