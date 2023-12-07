@@ -14,7 +14,7 @@ type RequestOptions struct {
 
 func Request(method string, handler router.HandlerFunc, opts RequestOptions) *httptest.ResponseRecorder {
 	// Setup
-	r := router.New()
+	r := router.New(nil)
 	r.Handle(method, "/", []oapi.Info{}, handler)
 	w := httptest.NewRecorder()
 
