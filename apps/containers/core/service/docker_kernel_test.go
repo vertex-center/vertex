@@ -143,9 +143,7 @@ func (suite *DockerKernelServiceTestSuite) TestBuildImage() {
 	suite.adapter.AssertExpectations(suite.T())
 }
 
-type MockDockerAdapter struct {
-	mock.Mock
-}
+type MockDockerAdapter struct{ mock.Mock }
 
 func (m *MockDockerAdapter) ListContainers() ([]types.DockerContainer, error) {
 	args := m.Called()

@@ -5,9 +5,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type MockListener struct {
-	mock.Mock
-}
+type MockListener struct{ mock.Mock }
 
 func (m *MockListener) OnEvent(e Event) error {
 	args := m.Called(e)

@@ -5,9 +5,7 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 )
 
-type MockAuthAdapter struct {
-	mock.Mock
-}
+type MockAuthAdapter struct{ mock.Mock }
 
 func (m *MockAuthAdapter) CreateAccount(username string, credentials types.CredentialsArgon2id) error {
 	args := m.Called(username, credentials)

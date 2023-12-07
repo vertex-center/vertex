@@ -88,9 +88,7 @@ func (suite *UpdateServiceTestSuite) TestGetUpdateBeta() {
 	suite.Equal(suite.betaBaseline, update.Baseline)
 }
 
-type MockUpdater struct {
-	mock.Mock
-}
+type MockUpdater struct{ mock.Mock }
 
 func (u *MockUpdater) CurrentVersion() (string, error) {
 	args := u.Called()

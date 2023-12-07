@@ -48,9 +48,7 @@ func (suite *ContainerEnvServiceTestSuite) TestLoad() {
 	suite.adapter.AssertExpectations(suite.T())
 }
 
-type MockContainerEnvAdapter struct {
-	mock.Mock
-}
+type MockContainerEnvAdapter struct{ mock.Mock }
 
 func (m *MockContainerEnvAdapter) Save(uuid uuid.UUID, env types.ContainerEnvVariables) error {
 	args := m.Called(uuid, env)

@@ -2,9 +2,7 @@ package event
 
 import "github.com/stretchr/testify/mock"
 
-type MockBus struct {
-	mock.Mock
-}
+type MockBus struct{ mock.Mock }
 
 func (m *MockBus) AddListener(l Listener) {
 	m.Called(l)

@@ -5,11 +5,7 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 )
 
-type (
-	MockAuthService struct {
-		mock.Mock
-	}
-)
+type MockAuthService struct{ mock.Mock }
 
 func (m *MockAuthService) Login(login, password string) (types.Session, error) {
 	args := m.Called(login, password)

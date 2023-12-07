@@ -9,21 +9,10 @@ import (
 )
 
 type (
-	MockAdminSettingsAdapter struct {
-		mock.Mock
-	}
-
-	MockBaselinesAdapter struct {
-		mock.Mock
-	}
-
-	MockSshAdapter struct {
-		mock.Mock
-	}
-
-	MockSshKernelAdapter struct {
-		mock.Mock
-	}
+	MockAdminSettingsAdapter struct{ mock.Mock }
+	MockBaselinesAdapter     struct{ mock.Mock }
+	MockSshAdapter           struct{ mock.Mock }
+	MockSshKernelAdapter     struct{ mock.Mock }
 )
 
 func (m *MockSshAdapter) GetAll() ([]types.PublicKey, error) {

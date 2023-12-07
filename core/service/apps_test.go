@@ -35,9 +35,7 @@ func (suite *AppsServiceTestSuite) TestLoadApps() {
 	suite.app.AssertExpectations(suite.T())
 }
 
-type MockApp struct {
-	mock.Mock
-}
+type MockApp struct{ mock.Mock }
 
 func (m *MockApp) Load(ctx *app.Context) {
 	m.Called(ctx)
