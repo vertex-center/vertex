@@ -5,7 +5,6 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	containersmeta "github.com/vertex-center/vertex/apps/containers/meta"
 	"github.com/vertex-center/vertex/apps/monitoring/adapter"
-	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	"github.com/vertex-center/vertex/apps/monitoring/core/service"
 	"github.com/vertex-center/vertex/apps/monitoring/handler"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
@@ -20,12 +19,6 @@ import (
 // docapi:monitoring url http://{ip}:{port-kernel}/api
 // docapi:monitoring urlvar ip localhost The IP address of the server.
 // docapi:monitoring urlvar port-kernel 7506 The port of the server.
-
-var (
-	prometheusAdapter port.MetricsAdapter
-
-	metricsService port.MetricsService
-)
 
 var Meta = apptypes.Meta{
 	ID:          "monitoring",
@@ -58,11 +51,12 @@ func (a *App) Meta() apptypes.Meta {
 func (a *App) Initialize(r *router.Group) error {
 	r.Use(middleware.ReadAuth)
 
-	prometheusAdapter = adapter.NewMetricsPrometheusAdapter()
+	var (
+		prometheusAdapter = adapter.NewMetricsPrometheusAdapter()
+		metricsService    = service.NewMetricsService(a.ctx, prometheusAdapter)
+		metricsHandler    = handler.NewMetricsHandler(metricsService)
+	)
 
-	metricsService = service.NewMetricsService(a.ctx, prometheusAdapter)
-
-	metricsHandler := handler.NewMetricsHandler(metricsService)
 	// docapi:monitoring route /metrics vx_monitoring_get_metrics
 	r.GET("/metrics", middleware.Authenticated, metricsHandler.Get)
 	// docapi:monitoring route /collector/{collector}/install vx_monitoring_install_collector

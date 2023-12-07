@@ -4,7 +4,6 @@ import (
 	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	containersmeta "github.com/vertex-center/vertex/apps/containers/meta"
-	"github.com/vertex-center/vertex/apps/sql/core/port"
 	"github.com/vertex-center/vertex/apps/sql/core/service"
 	"github.com/vertex-center/vertex/apps/sql/handler"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
@@ -19,10 +18,6 @@ import (
 // docapi:sql url http://{ip}:{port-kernel}/api
 // docapi:sql urlvar ip localhost The IP address of the server.
 // docapi:sql urlvar port-kernel 7512 The port of the server.
-
-var (
-	sqlService port.SqlService
-)
 
 var Meta = apptypes.Meta{
 	ID:          "sql",
@@ -55,9 +50,11 @@ func (a *App) Meta() apptypes.Meta {
 func (a *App) Initialize(r *router.Group) error {
 	r.Use(middleware.ReadAuth)
 
-	sqlService = service.New(a.ctx)
+	var (
+		sqlService  = service.New(a.ctx)
+		dbmsHandler = handler.NewDBMSHandler(sqlService)
+	)
 
-	dbmsHandler := handler.NewDBMSHandler(sqlService)
 	// docapi:sql route /container/{container_uuid} vx_sql_get_dbms
 	r.GET("/container/:container_uuid", middleware.Authenticated, dbmsHandler.Get)
 	// docapi:sql route /dbms/{dbms}/install vx_sql_install_dbms

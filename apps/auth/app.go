@@ -49,14 +49,23 @@ func (a *App) Initialize(r *router.Group) error {
 		return err
 	}
 
-	authAdapter := adapter.NewAuthDbAdapter(db)
-	emailAdapter := adapter.NewEmailDbAdapter(db)
+	var (
+		authAdapter  = adapter.NewAuthDbAdapter(db)
+		emailAdapter = adapter.NewEmailDbAdapter(db)
 
-	authService := service.NewAuthService(authAdapter)
-	emailService := service.NewEmailService(emailAdapter)
-	userService := service.NewUserService(authAdapter)
+		authService  = service.NewAuthService(authAdapter)
+		emailService = service.NewEmailService(emailAdapter)
+		userService  = service.NewUserService(authAdapter)
 
-	authHandler := handler.NewAuthHandler(authService)
+		authHandler  = handler.NewAuthHandler(authService)
+		userHandler  = handler.NewUserHandler(userService)
+		emailHandler = handler.NewEmailHandler(emailService)
+
+		user   = r.Group("/user", middleware.Authenticated)
+		email  = user.Group("/email", middleware.Authenticated)
+		emails = user.Group("/emails", middleware.Authenticated)
+	)
+
 	// docapi:auth route /login auth_login
 	r.POST("/login", authHandler.Login)
 	// docapi:auth route /register auth_register
@@ -66,8 +75,6 @@ func (a *App) Initialize(r *router.Group) error {
 	// docapi:auth route /verify auth_verify
 	r.POST("/verify", authHandler.Verify)
 
-	userHandler := handler.NewUserHandler(userService)
-	user := r.Group("/user", middleware.Authenticated)
 	// docapi:auth route /user auth_get_current_user
 	user.GET("", userHandler.GetCurrentUser)
 	// docapi:auth route /user auth_patch_current_user
@@ -75,14 +82,11 @@ func (a *App) Initialize(r *router.Group) error {
 	// docapi:auth route /credentials auth_get_current_user_credentials
 	user.GET("/credentials", userHandler.GetCurrentUserCredentials)
 
-	emailHandler := handler.NewEmailHandler(emailService)
-	email := user.Group("/email", middleware.Authenticated)
 	// docapi:auth route /user/email auth_current_user_create_email
 	email.POST("", emailHandler.CreateCurrentUserEmail)
 	// docapi:auth route /user/email auth_current_user_delete_email
 	email.DELETE("", emailHandler.DeleteCurrentUserEmail)
 
-	emails := user.Group("/emails", middleware.Authenticated)
 	// docapi:auth route /user/emails auth_current_user_get_emails
 	emails.GET("", emailHandler.GetCurrentUserEmails)
 

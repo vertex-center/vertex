@@ -49,10 +49,12 @@ func (a *App) Meta() apptypes.Meta {
 func (a *App) Initialize(r *router.Group) error {
 	r.Use(middleware.ReadAuth)
 
-	editorService := service.NewEditorService()
+	var (
+		editorService = service.NewEditorService()
+		editorHandler = handler.NewEditorHandler(editorService)
+		editor        = r.Group("/editor", middleware.Authenticated)
+	)
 
-	editorHandler := handler.NewEditorHandler(editorService)
-	editor := r.Group("/editor", middleware.Authenticated)
 	// docapi:service_editor route /editor/to-yaml vx_devtools_service_editor_to_yaml
 	editor.POST("/to-yaml", editorHandler.ToYaml)
 

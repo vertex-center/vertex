@@ -4,7 +4,6 @@ import (
 	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/reverseproxy/adapter"
-	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/service"
 	"github.com/vertex-center/vertex/apps/reverseproxy/handler"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
@@ -20,12 +19,6 @@ import (
 // docapi:proxy url http://{ip}:{port-kernel}/api
 // docapi:proxy urlvar ip localhost The IP address of the server.
 // docapi:proxy urlvar port-kernel 7508 The port of the server.
-
-var (
-	proxyFSAdapter port.ProxyAdapter
-
-	proxyService port.ProxyService
-)
 
 var Meta = apptypes.Meta{
 	ID:          "reverse-proxy",
@@ -58,9 +51,11 @@ func (a *App) Meta() apptypes.Meta {
 func (a *App) Initialize(r *router.Group) error {
 	r.Use(middleware.ReadAuth)
 
-	proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
-
-	proxyService = service.NewProxyService(proxyFSAdapter)
+	var (
+		proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
+		proxyService   = service.NewProxyService(proxyFSAdapter)
+		proxyHandler   = handler.NewProxyHandler(proxyService)
+	)
 
 	a.proxy = NewProxyRouter(proxyService)
 
@@ -71,7 +66,6 @@ func (a *App) Initialize(r *router.Group) error {
 		}
 	}()
 
-	proxyHandler := handler.NewProxyHandler(proxyService)
 	// docapi:proxy route /redirects vx_reverse_proxy_get_redirects
 	r.GET("/redirects", middleware.Authenticated, proxyHandler.GetRedirects)
 	// docapi:proxy route /redirect vx_reverse_proxy_add_redirect

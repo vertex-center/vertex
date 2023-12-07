@@ -3,7 +3,6 @@ package containers
 import (
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/containers/adapter"
-	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/service"
 	"github.com/vertex-center/vertex/apps/containers/handler"
 	"github.com/vertex-center/vertex/apps/containers/meta"
@@ -29,25 +28,6 @@ import (
 // docapi:containers_kernel urlvar ip localhost The IP address of the server.
 // docapi:containers_kernel urlvar port-kernel 7505 The port of the server.
 
-var (
-	containerAdapter         port.ContainerAdapter
-	containerEnvAdapter      port.ContainerEnvAdapter
-	containerLogsAdapter     port.ContainerLogsAdapter
-	containerRunnerAdapter   port.ContainerRunnerAdapter
-	containerServiceAdapter  port.ContainerServiceAdapter
-	containerSettingsAdapter port.ContainerSettingsAdapter
-	dockerKernelAdapter      port.DockerAdapter
-
-	containerService         port.ContainerService
-	containerEnvService      port.ContainerEnvService
-	containerLogsService     port.ContainerLogsService
-	containerRunnerService   port.ContainerRunnerService
-	containerServiceService  port.ContainerServiceService
-	containerSettingsService port.ContainerSettingsService
-	serviceService           port.ServiceService
-	dockerKernelService      port.DockerService
-)
-
 type App struct {
 	ctx *apptypes.Context
 }
@@ -67,41 +47,51 @@ func (a *App) Meta() apptypes.Meta {
 func (a *App) Initialize(r *router.Group) error {
 	r.Use(middleware.ReadAuth)
 
-	containerAdapter = adapter.NewContainerFSAdapter(nil)
-	containerEnvAdapter = adapter.NewContainerEnvFSAdapter(nil)
-	containerLogsAdapter = adapter.NewContainerLogsFSAdapter(nil)
-	containerRunnerAdapter = adapter.NewContainerRunnerFSAdapter()
-	containerServiceAdapter = adapter.NewContainerServiceFSAdapter(nil)
-	containerSettingsAdapter = adapter.NewContainerSettingsFSAdapter(nil)
+	var (
+		containerAdapter         = adapter.NewContainerFSAdapter(nil)
+		containerEnvAdapter      = adapter.NewContainerEnvFSAdapter(nil)
+		containerLogsAdapter     = adapter.NewContainerLogsFSAdapter(nil)
+		containerRunnerAdapter   = adapter.NewContainerRunnerFSAdapter()
+		containerServiceAdapter  = adapter.NewContainerServiceFSAdapter(nil)
+		containerSettingsAdapter = adapter.NewContainerSettingsFSAdapter(nil)
 
-	serviceService = service.NewServiceService()
-	containerEnvService = service.NewContainerEnvService(containerEnvAdapter)
-	containerLogsService = service.NewContainerLogsService(a.ctx, containerLogsAdapter)
-	containerRunnerService = service.NewContainerRunnerService(a.ctx, containerRunnerAdapter)
-	containerServiceService = service.NewContainerServiceService(containerServiceAdapter)
-	containerSettingsService = service.NewContainerSettingsService(containerSettingsAdapter)
-	containerService = service.NewContainerService(service.ContainerServiceParams{
-		Ctx:                      a.ctx,
-		ContainerAdapter:         containerAdapter,
-		ContainerRunnerService:   containerRunnerService,
-		ContainerServiceService:  containerServiceService,
-		ContainerEnvService:      containerEnvService,
-		ContainerSettingsService: containerSettingsService,
-		ServiceService:           serviceService,
-	})
-	service.NewMetricsService(a.ctx)
+		serviceService           = service.NewServiceService()
+		containerEnvService      = service.NewContainerEnvService(containerEnvAdapter)
+		containerLogsService     = service.NewContainerLogsService(a.ctx, containerLogsAdapter)
+		containerRunnerService   = service.NewContainerRunnerService(a.ctx, containerRunnerAdapter)
+		containerServiceService  = service.NewContainerServiceService(containerServiceAdapter)
+		containerSettingsService = service.NewContainerSettingsService(containerSettingsAdapter)
+		containerService         = service.NewContainerService(service.ContainerServiceParams{
+			Ctx:                      a.ctx,
+			ContainerAdapter:         containerAdapter,
+			ContainerRunnerService:   containerRunnerService,
+			ContainerServiceService:  containerServiceService,
+			ContainerEnvService:      containerEnvService,
+			ContainerSettingsService: containerSettingsService,
+			ServiceService:           serviceService,
+		})
+		_ = service.NewMetricsService(a.ctx)
 
-	containerHandler := handler.NewContainerHandler(handler.ContainerHandlerParams{
-		Ctx:                      a.ctx,
-		ContainerService:         containerService,
-		ContainerSettingsService: containerSettingsService,
-		ContainerRunnerService:   containerRunnerService,
-		ContainerEnvService:      containerEnvService,
-		ContainerServiceService:  containerServiceService,
-		ContainerLogsService:     containerLogsService,
-		ServiceService:           serviceService,
-	})
-	container := r.Group("/container/:container_uuid", middleware.Authenticated)
+		servicesHandler   = handler.NewServicesHandler(serviceService)
+		serviceHandler    = handler.NewServiceHandler(serviceService, containerService)
+		containersHandler = handler.NewContainersHandler(a.ctx, containerService)
+		containerHandler  = handler.NewContainerHandler(handler.ContainerHandlerParams{
+			Ctx:                      a.ctx,
+			ContainerService:         containerService,
+			ContainerSettingsService: containerSettingsService,
+			ContainerRunnerService:   containerRunnerService,
+			ContainerEnvService:      containerEnvService,
+			ContainerServiceService:  containerServiceService,
+			ContainerLogsService:     containerLogsService,
+			ServiceService:           serviceService,
+		})
+
+		container  = r.Group("/container/:container_uuid", middleware.Authenticated)
+		containers = r.Group("/containers", middleware.Authenticated)
+		serv       = r.Group("/service/:service_id", middleware.Authenticated)
+		services   = r.Group("/services")
+	)
+
 	// docapi:containers route /container/{container_uuid} vx_containers_get_container
 	container.GET("", containerHandler.Get)
 	// docapi:containers route /container/{container_uuid} vx_containers_delete_container
@@ -129,8 +119,6 @@ func (a *App) Initialize(r *router.Group) error {
 	// docapi:containers route /container/{container_uuid}/wait vx_containers_wait_status
 	container.GET("/wait", containerHandler.WaitStatus)
 
-	containersHandler := handler.NewContainersHandler(a.ctx, containerService)
-	containers := r.Group("/containers", middleware.Authenticated)
 	// docapi:containers route /containers vx_containers_get_containers
 	containers.GET("", containersHandler.Get)
 	// docapi:containers route /containers/tags vx_containers_get_tags
@@ -142,15 +130,11 @@ func (a *App) Initialize(r *router.Group) error {
 	// docapi:containers route /containers/events vx_containers_events
 	containers.GET("/events", apptypes.HeadersSSE, containersHandler.Events)
 
-	serviceHandler := handler.NewServiceHandler(serviceService, containerService)
-	serv := r.Group("/service/:service_id", middleware.Authenticated)
 	// docapi:containers route /service/{service_id} vx_containers_get_service
 	serv.GET("", serviceHandler.Get)
 	// docapi:containers route /service/{service_id}/install vx_containers_install_service
 	serv.POST("/install", serviceHandler.Install)
 
-	servicesHandler := handler.NewServicesHandler(serviceService)
-	services := r.Group("/services")
 	// docapi:containers route /services vx_containers_get_services
 	services.GET("", middleware.Authenticated, servicesHandler.Get)
 	services.Static("/icons", "./live/services/icons")
@@ -159,12 +143,13 @@ func (a *App) Initialize(r *router.Group) error {
 }
 
 func (a *App) InitializeKernel(r *router.Group) error {
-	dockerKernelAdapter = adapter.NewDockerCliAdapter()
+	var (
+		dockerKernelAdapter = adapter.NewDockerCliAdapter()
+		dockerKernelService = service.NewDockerKernelService(dockerKernelAdapter)
+		dockerHandler       = handler.NewDockerKernelHandler(dockerKernelService)
+		docker              = r.Group("/docker")
+	)
 
-	dockerKernelService = service.NewDockerKernelService(dockerKernelAdapter)
-
-	dockerHandler := handler.NewDockerKernelHandler(dockerKernelService)
-	docker := r.Group("/docker")
 	// docapi:containers_kernel route /docker/containers vx_containers_kernel_get_containers
 	docker.GET("/containers", dockerHandler.GetContainers)
 	// docapi:containers_kernel route /docker/containers vx_containers_kernel_create_container

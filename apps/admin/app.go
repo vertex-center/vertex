@@ -74,19 +74,30 @@ func (a *App) Initialize(r *router.Group) error {
 		return err
 	}
 
-	settingsAdapter := adapter.NewSettingsDbAdapter(db)
-	hardwareAdapter := adapter.NewHardwareApiAdapter()
-	sshAdapter := adapter.NewSshKernelApiAdapter()
+	var (
+		settingsAdapter = adapter.NewSettingsDbAdapter(db)
+		hardwareAdapter = adapter.NewHardwareApiAdapter()
+		sshAdapter      = adapter.NewSshKernelApiAdapter()
 
-	checksService := service.NewChecksService()
-	settingsService := service.NewSettingsService(settingsAdapter)
-	hardwareService := service.NewHardwareService(hardwareAdapter)
-	sshService := service.NewSshService(sshAdapter)
+		checksService   = service.NewChecksService()
+		settingsService = service.NewSettingsService(settingsAdapter)
+		hardwareService = service.NewHardwareService(hardwareAdapter)
+		sshService      = service.NewSshService(sshAdapter)
+		_               = service.NewNotificationsService(a.ctx, settingsAdapter)
 
-	service.NewNotificationsService(a.ctx, settingsAdapter)
+		hardwareHandler = handler.NewHardwareHandler(hardwareService)
+		sshHandler      = handler.NewSshHandler(sshService)
+		settingsHandler = handler.NewSettingsHandler(settingsService)
+		updateHandler   = handler.NewUpdateHandler(updateService, settingsService)
+		checksHandler   = handler.NewChecksHandler(checksService)
 
-	hardwareHandler := handler.NewHardwareHandler(hardwareService)
-	hardware := r.Group("/hardware", middleware.Authenticated)
+		hardware = r.Group("/hardware", middleware.Authenticated)
+		ssh      = r.Group("/ssh", middleware.Authenticated)
+		settings = r.Group("/settings", middleware.Authenticated)
+		update   = r.Group("/update", middleware.Authenticated)
+		checks   = r.Group("/admin/checks", middleware.Authenticated)
+	)
+
 	// docapi:admin route /hardware/host get_host
 	hardware.GET("/host", hardwareHandler.GetHost)
 	// docapi:admin route /hardware/cpus get_cpus
@@ -94,8 +105,6 @@ func (a *App) Initialize(r *router.Group) error {
 	// docapi:admin route /hardware/reboot reboot
 	hardware.POST("/reboot", hardwareHandler.Reboot)
 
-	sshHandler := handler.NewSshHandler(sshService)
-	ssh := r.Group("/ssh", middleware.Authenticated)
 	// docapi:admin route /ssh get_ssh_keys
 	ssh.GET("", sshHandler.Get)
 	// docapi:admin route /ssh add_ssh_key
@@ -105,22 +114,16 @@ func (a *App) Initialize(r *router.Group) error {
 	// docapi:admin route /ssh/users get_ssh_users
 	ssh.GET("/users", sshHandler.GetUsers)
 
-	settingsHandler := handler.NewSettingsHandler(settingsService)
-	settings := r.Group("/settings", middleware.Authenticated)
 	// docapi:admin route /settings get_settings
 	settings.GET("", settingsHandler.Get)
 	// docapi:admin route /settings patch_settings
 	settings.PATCH("", settingsHandler.Patch)
 
-	updateHandler := handler.NewUpdateHandler(updateService, settingsService)
-	update := r.Group("/update", middleware.Authenticated)
 	// docapi:admin route /update get_updates
 	update.GET("", updateHandler.Get)
 	// docapi:admin route /update install_update
 	update.POST("", updateHandler.Install)
 
-	checksHandler := handler.NewChecksHandler(checksService)
-	checks := r.Group("/admin/checks", middleware.Authenticated)
 	// docapi:admin route /admin/checks admin_checks
 	checks.GET("", apptypes.HeadersSSE, checksHandler.Check)
 
