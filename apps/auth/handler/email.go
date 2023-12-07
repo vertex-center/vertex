@@ -1,10 +1,9 @@
 package handler
 
 import (
-	"errors"
-	"net/http"
 	"net/mail"
 
+	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -21,118 +20,65 @@ func NewEmailHandler(emailService port.EmailService) port.EmailHandler {
 	}
 }
 
-func (h *emailHandler) GetCurrentUserEmails(c *router.Context) {
-	userID := c.GetInt("user_id")
+type GetCurrentUserEmailsParams struct {
+	Email string `path:"email"`
+}
 
-	emails, err := h.service.GetEmails(uint(userID))
-	if err != nil {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToGetUserEmails,
-			PublicMessage:  "Failed to retrieve your email addresses",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(emails)
+func (h *emailHandler) GetCurrentUserEmails() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context, params *GetCurrentUserEmailsParams) ([]types.Email, error) {
+		return h.service.GetEmails(uint(c.GetInt("user_id")))
+	})
 }
 
 func (h *emailHandler) GetCurrentUserEmailsInfo() []oapi.Info {
 	return []oapi.Info{
+		oapi.ID("getCurrentUserEmails"),
 		oapi.Summary("Get emails"),
 		oapi.Description("Retrieve the emails of the logged-in user"),
-		oapi.Response(http.StatusOK,
-			oapi.WithResponseModel([]types.Email{}),
-		),
 	}
 }
 
-type CreateCurrentUserEmailBody struct {
+type CreateCurrentUserEmailParams struct {
 	Email string `json:"email"`
 }
 
-func (h *emailHandler) CreateCurrentUserEmail(c *router.Context) {
-	userID := c.GetInt("user_id")
+func (h *emailHandler) CreateCurrentUserEmail() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context, params *CreateCurrentUserEmailParams) (*types.Email, error) {
+		userID := c.GetInt("user_id")
 
-	var body CreateCurrentUserEmailBody
-	err := c.ParseBody(&body)
-	if err != nil {
-		return
-	}
+		addr, err := mail.ParseAddress(params.Email)
+		if err != nil {
+			return nil, err
+		}
 
-	addr, err := mail.ParseAddress(body.Email)
-	if err != nil {
-		c.BadRequest(router.Error{
-			Code:           types.ErrCodeInvalidEmail,
-			PublicMessage:  "This email address is not a valid email address",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	email, err := h.service.CreateEmail(uint(userID), addr.Address)
-	if errors.Is(err, types.ErrEmailAlreadyExists) {
-		c.Conflict(router.Error{
-			Code:           types.ErrCodeEmailAlreadyExists,
-			PublicMessage:  "This email address is already registered on your account",
-			PrivateMessage: err.Error(),
-		})
-		return
-	} else if errors.Is(err, types.ErrEmailEmpty) {
-		c.BadRequest(router.Error{
-			Code:           types.ErrCodeEmailEmpty,
-			PublicMessage:  "Email address must not be empty",
-			PrivateMessage: err.Error(),
-		})
-		return
-	} else if err != nil {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToCreateEmail,
-			PublicMessage:  "Failed to add this email address",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(email)
+		email, err := h.service.CreateEmail(uint(userID), addr.Address)
+		return &email, nil
+	})
 }
 
 func (h *emailHandler) CreateCurrentUserEmailInfo() []oapi.Info {
 	return []oapi.Info{
+		oapi.ID("createCurrentUserEmail"),
 		oapi.Summary("Create email"),
 		oapi.Description("Create a new email for the logged-in user"),
-		oapi.Response(http.StatusOK,
-			oapi.WithResponseModel(types.Email{}),
-		),
 	}
 }
 
-func (h *emailHandler) DeleteCurrentUserEmail(c *router.Context) {
-	userID := c.GetInt("user_id")
+type DeleteCurrentUserEmailParams struct {
+	Email string `path:"email"`
+}
 
-	var body CreateCurrentUserEmailBody
-	err := c.ParseBody(&body)
-	if err != nil {
-		return
-	}
-
-	err = h.service.DeleteEmail(uint(userID), body.Email)
-	if err != nil {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToDeleteEmail,
-			PublicMessage:  "Failed to delete this email address",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.OK()
+func (h *emailHandler) DeleteCurrentUserEmail() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context, params *DeleteCurrentUserEmailParams) error {
+		userID := c.GetInt("user_id")
+		return h.service.DeleteEmail(uint(userID), params.Email)
+	})
 }
 
 func (h *emailHandler) DeleteCurrentUserEmailInfo() []oapi.Info {
 	return []oapi.Info{
+		oapi.ID("deleteCurrentUserEmail"),
 		oapi.Summary("Delete email"),
 		oapi.Description("Delete an email from the logged-in user"),
-		oapi.Response(http.StatusNoContent),
 	}
 }

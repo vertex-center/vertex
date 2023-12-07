@@ -144,23 +144,21 @@ func initRoutes(about types.About) {
 		})
 	})
 
-	a := srv.Router.Group("/api", "API", "Main API group", middleware.ReadAuth)
+	a := srv.Router.Group("/api", "API", "Main API group", middleware.ReadAuth())
 	a.GET("/about", []oapi.Info{
+		oapi.ID("getAbout"),
 		oapi.Summary("Get server info"),
-		oapi.Response(http.StatusOK,
-			oapi.WithResponseModel(types.About{}),
-		),
-	}, func(c *router.Context) {
-		c.JSON(about)
-	})
+	}, router.Handler(func(c *gin.Context) (*types.About, error) {
+		return &about, nil
+	}))
 
 	if config.Current.Debug() {
 		debugHandler := handler.NewDebugHandler(debugService)
-		debug := a.Group("/debug", "Debug", "Routes only available with DEBUG=1", middleware.Authenticated)
-		debug.POST("/hard-reset", debugHandler.HardResetInfo(), debugHandler.HardReset)
+		debug := a.Group("/debug", "Debug", "Routes only available with DEBUG=1", middleware.Authenticated())
+		debug.POST("/hard-reset", debugHandler.HardResetInfo(), router.Handler(debugHandler.HardReset))
 	}
 
 	appsHandler := handler.NewAppsHandler(appsService)
-	apps := a.Group("/apps", "Apps", "Apps", middleware.Authenticated)
-	apps.GET("", appsHandler.GetAppsInfo(), appsHandler.GetApps)
+	apps := a.Group("/apps", "Apps", "Apps", middleware.Authenticated())
+	apps.GET("", appsHandler.GetAppsInfo(), router.Handler(appsHandler.GetApps))
 }

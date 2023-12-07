@@ -1,8 +1,7 @@
 package handler
 
 import (
-	"net/http"
-
+	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -19,15 +18,15 @@ func NewServicesHandler(serviceService port.ServiceService) port.ServicesHandler
 	}
 }
 
-func (h *servicesHandler) Get(c *router.Context) {
-	c.JSON(h.serviceService.GetAll())
+func (h *servicesHandler) Get() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) ([]types.Service, error) {
+		return h.serviceService.GetAll(), nil
+	})
 }
 
 func (h *servicesHandler) GetInfo() []oapi.Info {
 	return []oapi.Info{
+		oapi.ID("getServices"),
 		oapi.Summary("Get services"),
-		oapi.Response(http.StatusOK,
-			oapi.WithResponseModel([]types.Service{}),
-		),
 	}
 }

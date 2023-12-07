@@ -1,19 +1,19 @@
 package port
 
 import (
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type (
 	MetricsHandler interface {
-		Get(c *router.Context)
+		Get() gin.HandlerFunc
 		GetInfo() []oapi.Info
 
-		InstallCollector(c *router.Context)
+		InstallCollector() gin.HandlerFunc
 		InstallCollectorInfo() []oapi.Info
 
-		InstallVisualizer(c *router.Context)
+		InstallVisualizer() gin.HandlerFunc
 		InstallVisualizerInfo() []oapi.Info
 	}
 )

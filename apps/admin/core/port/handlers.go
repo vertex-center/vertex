@@ -1,81 +1,81 @@
 package port
 
 import (
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type (
 	ChecksHandler interface {
-		Check(c *router.Context)
+		Check() gin.HandlerFunc
 		CheckInfo() []oapi.Info
 	}
 
 	DatabaseHandler interface {
-		GetCurrentDbms(c *router.Context)
+		GetCurrentDbms() gin.HandlerFunc
 		GetCurrentDbmsInfo() []oapi.Info
 
-		MigrateTo(c *router.Context)
+		MigrateTo() gin.HandlerFunc
 		MigrateToInfo() []oapi.Info
 	}
 
 	HardwareHandler interface {
-		GetHost(c *router.Context)
+		GetHost() gin.HandlerFunc
 		GetHostInfo() []oapi.Info
 
-		GetCPUs(c *router.Context)
+		GetCPUs() gin.HandlerFunc
 		GetCPUsInfo() []oapi.Info
 
-		Reboot(c *router.Context)
+		Reboot() gin.HandlerFunc
 		RebootInfo() []oapi.Info
 	}
 
 	HardwareKernelHandler interface {
-		Reboot(c *router.Context)
+		Reboot() gin.HandlerFunc
 		RebootInfo() []oapi.Info
 	}
 
 	SettingsHandler interface {
-		Get(c *router.Context)
+		Get() gin.HandlerFunc
 		GetInfo() []oapi.Info
 
-		Patch(c *router.Context)
+		Patch() gin.HandlerFunc
 		PatchInfo() []oapi.Info
 	}
 
 	SshHandler interface {
-		Get(c *router.Context)
+		Get() gin.HandlerFunc
 		GetInfo() []oapi.Info
 
-		Add(c *router.Context)
+		Add() gin.HandlerFunc
 		AddInfo() []oapi.Info
 
-		Delete(c *router.Context)
+		Delete() gin.HandlerFunc
 		DeleteInfo() []oapi.Info
 
-		GetUsers(c *router.Context)
+		GetUsers() gin.HandlerFunc
 		GetUsersInfo() []oapi.Info
 	}
 
 	SshKernelHandler interface {
-		Get(c *router.Context)
+		Get() gin.HandlerFunc
 		GetInfo() []oapi.Info
 
-		Add(c *router.Context)
+		Add() gin.HandlerFunc
 		AddInfo() []oapi.Info
 
-		Delete(c *router.Context)
+		Delete() gin.HandlerFunc
 		DeleteInfo() []oapi.Info
 
-		GetUsers(c *router.Context)
+		GetUsers() gin.HandlerFunc
 		GetUsersInfo() []oapi.Info
 	}
 
 	UpdateHandler interface {
-		Get(c *router.Context)
+		Get() gin.HandlerFunc
 		GetInfo() []oapi.Info
 
-		Install(c *router.Context)
+		Install() gin.HandlerFunc
 		InstallInfo() []oapi.Info
 	}
 )

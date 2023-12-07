@@ -1,19 +1,19 @@
 package port
 
 import (
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type (
 	ProxyHandler interface {
-		GetRedirects(c *router.Context)
+		GetRedirects() gin.HandlerFunc
 		GetRedirectsInfo() []oapi.Info
 
-		AddRedirect(c *router.Context)
+		AddRedirect() gin.HandlerFunc
 		AddRedirectInfo() []oapi.Info
 
-		RemoveRedirect(c *router.Context)
+		RemoveRedirect() gin.HandlerFunc
 		RemoveRedirectInfo() []oapi.Info
 	}
 )

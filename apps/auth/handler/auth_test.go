@@ -4,10 +4,10 @@ import (
 	"encoding/base64"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
-	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/pkg/router/routertest"
 )
 
@@ -36,7 +36,7 @@ func (suite *AuthHandlerTestSuite) TestLogin() {
 
 	auth := base64.StdEncoding.EncodeToString([]byte("test_login:test_password"))
 
-	res := routertest.Request("POST", suite.handler.Login, routertest.RequestOptions{
+	res := routertest.Request("POST", suite.handler.Login(), routertest.RequestOptions{
 		Headers: map[string]string{
 			"Authorization": "Basic " + auth,
 		},
@@ -52,23 +52,22 @@ func (suite *AuthHandlerTestSuite) TestLoginInvalidCredentials() {
 
 	auth := base64.StdEncoding.EncodeToString([]byte("test_login:invalid_password"))
 
-	res := routertest.Request("POST", suite.handler.Login, routertest.RequestOptions{
+	res := routertest.Request("POST", suite.handler.Login(), routertest.RequestOptions{
 		Headers: map[string]string{
 			"Authorization": "Basic " + auth,
 		},
 	})
 
-	suite.Equal(500, res.Code)
+	suite.Equal(400, res.Code)
 	suite.service.AssertExpectations(suite.T())
 }
 
 func (suite *AuthHandlerTestSuite) TestRegister() {
-
 	suite.service.On("Register", "test_login", "test_password").Return(suite.testSession, nil)
 
 	auth := base64.StdEncoding.EncodeToString([]byte("test_login:test_password"))
 
-	res := routertest.Request("POST", suite.handler.Register, routertest.RequestOptions{
+	res := routertest.Request("POST", suite.handler.Register(), routertest.RequestOptions{
 		Headers: map[string]string{
 			"Authorization": "Basic " + auth,
 		},
@@ -82,9 +81,9 @@ func (suite *AuthHandlerTestSuite) TestRegister() {
 func (suite *AuthHandlerTestSuite) TestLogout() {
 	suite.service.On("Logout", "test_token").Return(nil)
 
-	handle := func(c *router.Context) {
+	handle := func(c *gin.Context) {
 		c.Set("token", "test_token")
-		suite.handler.Logout(c)
+		suite.handler.Logout()(c)
 	}
 
 	res := routertest.Request("POST", handle, routertest.RequestOptions{
@@ -93,6 +92,6 @@ func (suite *AuthHandlerTestSuite) TestLogout() {
 		},
 	})
 
-	suite.Equal(204, res.Code)
+	suite.Equal(200, res.Code)
 	suite.service.AssertExpectations(suite.T())
 }

@@ -35,6 +35,7 @@ func New(info *openapi.Info, opts ...Option) *Router {
 	f := fizz.NewFromEngine(e)
 	if info != nil {
 		f.GET("/openapi.yaml", nil, f.OpenAPI(info, "yaml"))
+		f.GET("/openapi.json", nil, f.OpenAPI(info, "json"))
 	}
 	if len(f.Errors()) > 0 {
 		log.Error(errors.Join(f.Errors()...))
@@ -72,44 +73,44 @@ func (r *Router) Stop(ctx context.Context) error {
 	return err
 }
 
-func (r *Router) Group(path, name, description string, handlers ...HandlerFunc) *Group {
+func (r *Router) Group(path, name, description string, handlers ...gin.HandlerFunc) *Group {
 	return &Group{
-		RouterGroup: r.Fizz.Group(path, name, description, wrapHandlers(handlers...)...),
+		RouterGroup: r.Fizz.Group(path, name, description, handlers...),
 	}
 }
 
-func (r *Router) GET(path string, infos []oapi.Info, handlers ...HandlerFunc) {
-	r.RouterGroup.GET(path, oapi.WrapInfos(infos...), wrapHandlers(handlers...)...)
+func (r *Router) GET(path string, infos []oapi.Info, handlers ...gin.HandlerFunc) {
+	r.RouterGroup.GET(path, oapi.WrapInfos(infos...), handlers...)
 }
 
-func (r *Router) POST(path string, infos []oapi.Info, handlers ...HandlerFunc) {
-	r.RouterGroup.POST(path, oapi.WrapInfos(infos...), wrapHandlers(handlers...)...)
+func (r *Router) POST(path string, infos []oapi.Info, handlers ...gin.HandlerFunc) {
+	r.RouterGroup.POST(path, oapi.WrapInfos(infos...), handlers...)
 }
 
-func (r *Router) PUT(path string, infos []oapi.Info, handlers ...HandlerFunc) {
-	r.RouterGroup.PUT(path, oapi.WrapInfos(infos...), wrapHandlers(handlers...)...)
+func (r *Router) PUT(path string, infos []oapi.Info, handlers ...gin.HandlerFunc) {
+	r.RouterGroup.PUT(path, oapi.WrapInfos(infos...), handlers...)
 }
 
-func (r *Router) PATCH(path string, infos []oapi.Info, handlers ...HandlerFunc) {
-	r.RouterGroup.PATCH(path, oapi.WrapInfos(infos...), wrapHandlers(handlers...)...)
+func (r *Router) PATCH(path string, infos []oapi.Info, handlers ...gin.HandlerFunc) {
+	r.RouterGroup.PATCH(path, oapi.WrapInfos(infos...), handlers...)
 }
 
-func (r *Router) DELETE(path string, infos []oapi.Info, handlers ...HandlerFunc) {
-	r.RouterGroup.DELETE(path, oapi.WrapInfos(infos...), wrapHandlers(handlers...)...)
+func (r *Router) DELETE(path string, infos []oapi.Info, handlers ...gin.HandlerFunc) {
+	r.RouterGroup.DELETE(path, oapi.WrapInfos(infos...), handlers...)
 }
 
-func (r *Router) OPTIONS(path string, infos []oapi.Info, handlers ...HandlerFunc) {
-	r.RouterGroup.OPTIONS(path, oapi.WrapInfos(infos...), wrapHandlers(handlers...)...)
+func (r *Router) OPTIONS(path string, infos []oapi.Info, handlers ...gin.HandlerFunc) {
+	r.RouterGroup.OPTIONS(path, oapi.WrapInfos(infos...), handlers...)
 }
 
-func (r *Router) HEAD(path string, infos []oapi.Info, handlers ...HandlerFunc) {
-	r.RouterGroup.HEAD(path, oapi.WrapInfos(infos...), wrapHandlers(handlers...)...)
+func (r *Router) HEAD(path string, infos []oapi.Info, handlers ...gin.HandlerFunc) {
+	r.RouterGroup.HEAD(path, oapi.WrapInfos(infos...), handlers...)
 }
 
-func (r *Router) Handle(method, path string, infos []oapi.Info, handlers ...HandlerFunc) {
-	r.RouterGroup.Handle(path, method, oapi.WrapInfos(infos...), wrapHandlers(handlers...)...)
+func (r *Router) Handle(method, path string, infos []oapi.Info, handlers ...gin.HandlerFunc) {
+	r.RouterGroup.Handle(path, method, oapi.WrapInfos(infos...), handlers...)
 }
 
-func (r *Router) Any(path string, handlers ...HandlerFunc) {
-	r.Engine().Any(path, wrapHandlers(handlers...)...)
+func (r *Router) Any(path string, handlers ...gin.HandlerFunc) {
+	r.Engine().Any(path, handlers...)
 }

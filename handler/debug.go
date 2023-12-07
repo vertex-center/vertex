@@ -1,10 +1,8 @@
 package handler
 
 import (
-	"net/http"
-
+	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
@@ -18,15 +16,15 @@ func NewDebugHandler(debugService port.DebugService) port.DebugHandler {
 	}
 }
 
-func (h *debugHandler) HardReset(c *router.Context) {
+func (h *debugHandler) HardReset(c *gin.Context) error {
 	h.debugService.HardReset()
-	c.OK()
+	return nil
 }
 
 func (h *debugHandler) HardResetInfo() []oapi.Info {
 	return []oapi.Info{
+		oapi.ID("hardReset"),
 		oapi.Summary("Hard reset"),
 		oapi.Description("This route allows deleting all the server data, which can be useful for debugging purposes."),
-		oapi.Response(http.StatusNoContent),
 	}
 }

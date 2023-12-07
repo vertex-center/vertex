@@ -2,10 +2,9 @@ package handler
 
 import (
 	"encoding/base64"
-	"errors"
-	"net/http"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -22,155 +21,87 @@ func NewAuthHandler(authService port.AuthService) port.AuthHandler {
 	}
 }
 
-func (h authHandler) Login(c *router.Context) {
-	login, pass, err := h.getUserPassFromHeader(c)
-	if err != nil {
-		return
-	}
-
-	token, err := h.authService.Login(login, pass)
-	if errors.Is(err, types.ErrLoginFailed) {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeInvalidCredentials,
-			PublicMessage:  "Invalid credentials",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(token)
+func (h authHandler) Login() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) (*types.Session, error) {
+		login, pass, err := h.getUserPassFromHeader(c)
+		if err != nil {
+			return nil, err
+		}
+		token, err := h.authService.Login(login, pass)
+		return &token, err
+	})
 }
 
 func (h authHandler) LoginInfo() []oapi.Info {
 	return []oapi.Info{
+		oapi.ID("login"),
 		oapi.Summary("Login"),
 		oapi.Description("Login with username and password"),
-		oapi.Response(http.StatusOK,
-			oapi.WithResponseModel(types.Session{}),
-		),
 	}
 }
 
-func (h authHandler) Register(c *router.Context) {
-	login, pass, err := h.getUserPassFromHeader(c)
-	if err != nil {
-		return
-	}
+func (h authHandler) Register() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) (*types.Session, error) {
+		login, pass, err := h.getUserPassFromHeader(c)
+		if err != nil {
+			return nil, err
+		}
 
-	token, err := h.authService.Register(login, pass)
-	if errors.Is(err, types.ErrLoginEmpty) {
-		c.BadRequest(router.Error{
-			Code:           types.ErrCodeLoginEmpty,
-			PublicMessage:  "Login must not be empty",
-			PrivateMessage: err.Error(),
-		})
-		return
-	} else if errors.Is(err, types.ErrPasswordEmpty) {
-		c.BadRequest(router.Error{
-			Code:           types.ErrCodePasswordEmpty,
-			PublicMessage:  "Password must not be empty",
-			PrivateMessage: err.Error(),
-		})
-		return
-	} else if errors.Is(err, types.ErrPasswordLength) {
-		c.BadRequest(router.Error{
-			Code:           types.ErrCodePasswordLength,
-			PublicMessage:  "Password must be at least 8 characters long",
-			PrivateMessage: err.Error(),
-		})
-		return
-	} else if err != nil {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeInvalidCredentials,
-			PublicMessage:  "Invalid credentials",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(token)
+		token, err := h.authService.Register(login, pass)
+		return &token, err
+	})
 }
 
 func (h authHandler) RegisterInfo() []oapi.Info {
 	return []oapi.Info{
+		oapi.ID("register"),
 		oapi.Summary("Register"),
 		oapi.Description("Register a new user with username and password"),
-		oapi.Response(http.StatusOK,
-			oapi.WithResponseModel(types.Session{}),
-		),
 	}
 }
 
-func (h authHandler) Verify(c *router.Context) {
-	token := c.MustGet("token").(string)
-
-	session, err := h.authService.Verify(token)
-	if err != nil {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeInvalidCredentials,
-			PublicMessage:  "Invalid credentials",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(session)
+func (h authHandler) Verify() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) (*types.Session, error) {
+		token := c.MustGet("token").(string)
+		session, err := h.authService.Verify(token)
+		return session, err
+	})
 }
 
 func (h authHandler) VerifyInfo() []oapi.Info {
 	return []oapi.Info{
+		oapi.ID("verify"),
 		oapi.Summary("Verify"),
 		oapi.Description("Verify a token"),
-		oapi.Response(http.StatusOK,
-			oapi.WithResponseModel(types.Session{}),
-		),
 	}
 }
 
-func (h authHandler) Logout(c *router.Context) {
-	token := c.MustGet("token").(string)
-
-	err := h.authService.Logout(token)
-	if err != nil {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToLogout,
-			PublicMessage:  "Failed to logout",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.OK()
+func (h authHandler) Logout() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) error {
+		token := c.MustGet("token").(string)
+		return h.authService.Logout(token)
+	})
 }
 
 func (h authHandler) LogoutInfo() []oapi.Info {
 	return []oapi.Info{
+		oapi.ID("logout"),
 		oapi.Summary("Logout"),
 		oapi.Description("Logout a user"),
 	}
 }
 
-func (h authHandler) getUserPassFromHeader(c *router.Context) (string, string, error) {
+func (h authHandler) getUserPassFromHeader(c *gin.Context) (string, string, error) {
 	authorization := c.Request.Header.Get("Authorization")
 
 	userpass := strings.TrimPrefix(authorization, "Basic ")
 	userpassBytes, err := base64.StdEncoding.DecodeString(userpass)
 	if err != nil {
-		c.BadRequest(router.Error{
-			Code:           types.ErrCodeInvalidCredentials,
-			PublicMessage:  "Invalid credentials",
-			PrivateMessage: "Expected base64 encoded login:password",
-		})
 		return "", "", err
 	}
 	userpass = string(userpassBytes)
 	creds := strings.Split(userpass, ":")
 	if len(creds) != 2 {
-		c.BadRequest(router.Error{
-			Code:           types.ErrCodeInvalidCredentials,
-			PublicMessage:  "Invalid credentials",
-			PrivateMessage: "Expected login:password",
-		})
 		return "", "", err
 	}
 	return creds[0], creds[1], nil

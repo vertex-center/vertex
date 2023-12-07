@@ -38,11 +38,11 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
-	r.Use(middleware.ReadAuth)
+	r.Use(middleware.ReadAuth())
 
 	providerHandler := handler.NewProviderHandler()
 
-	r.POST("/provider/:provider/install", providerHandler.InstallInfo(), middleware.Authenticated, providerHandler.Install)
+	r.POST("/provider/:provider/install", providerHandler.InstallInfo(), middleware.Authenticated(), providerHandler.Install())
 
 	return nil
 }

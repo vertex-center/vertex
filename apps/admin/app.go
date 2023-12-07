@@ -45,7 +45,7 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
-	r.Use(middleware.ReadAuth)
+	r.Use(middleware.ReadAuth())
 
 	db, err := storage.NewDB(storage.DBParams{
 		ID:         meta.Meta.ID,
@@ -73,29 +73,29 @@ func (a *App) Initialize(r *router.Group) error {
 		updateHandler   = handler.NewUpdateHandler(updateService, settingsService)
 		checksHandler   = handler.NewChecksHandler(checksService)
 
-		hardware = r.Group("/hardware", "Hardware", "", middleware.Authenticated)
-		ssh      = r.Group("/ssh", "SSH", "", middleware.Authenticated)
-		settings = r.Group("/settings", "Settings", "", middleware.Authenticated)
-		update   = r.Group("/update", "Update", "", middleware.Authenticated)
-		checks   = r.Group("/admin/checks", "Checks", "", middleware.Authenticated)
+		hardware = r.Group("/hardware", "Hardware", "", middleware.Authenticated())
+		ssh      = r.Group("/ssh", "SSH", "", middleware.Authenticated())
+		settings = r.Group("/settings", "Settings", "", middleware.Authenticated())
+		update   = r.Group("/update", "Update", "", middleware.Authenticated())
+		checks   = r.Group("/admin/checks", "Checks", "", middleware.Authenticated())
 	)
 
-	hardware.GET("/host", hardwareHandler.GetHostInfo(), hardwareHandler.GetHost)
-	hardware.GET("/cpus", hardwareHandler.GetCPUsInfo(), hardwareHandler.GetCPUs)
-	hardware.POST("/reboot", hardwareHandler.RebootInfo(), hardwareHandler.Reboot)
+	hardware.GET("/host", hardwareHandler.GetHostInfo(), hardwareHandler.GetHost())
+	hardware.GET("/cpus", hardwareHandler.GetCPUsInfo(), hardwareHandler.GetCPUs())
+	hardware.POST("/reboot", hardwareHandler.RebootInfo(), hardwareHandler.Reboot())
 
-	ssh.GET("", sshHandler.GetInfo(), sshHandler.Get)
-	ssh.POST("", sshHandler.AddInfo(), sshHandler.Add)
-	ssh.DELETE("", sshHandler.DeleteInfo(), sshHandler.Delete)
-	ssh.GET("/users", sshHandler.GetUsersInfo(), sshHandler.GetUsers)
+	ssh.GET("", sshHandler.GetInfo(), sshHandler.Get())
+	ssh.POST("", sshHandler.AddInfo(), sshHandler.Add())
+	ssh.DELETE("", sshHandler.DeleteInfo(), sshHandler.Delete())
+	ssh.GET("/users", sshHandler.GetUsersInfo(), sshHandler.GetUsers())
 
-	settings.GET("", settingsHandler.GetInfo(), settingsHandler.Get)
-	settings.PATCH("", settingsHandler.PatchInfo(), settingsHandler.Patch)
+	settings.GET("", settingsHandler.GetInfo(), settingsHandler.Get())
+	settings.PATCH("", settingsHandler.PatchInfo(), settingsHandler.Patch())
 
-	update.GET("", updateHandler.GetInfo(), updateHandler.Get)
-	update.POST("", updateHandler.InstallInfo(), updateHandler.Install)
+	update.GET("", updateHandler.GetInfo(), updateHandler.Get())
+	update.POST("", updateHandler.InstallInfo(), updateHandler.Install())
 
-	checks.GET("", checksHandler.CheckInfo(), apptypes.HeadersSSE, checksHandler.Check)
+	checks.GET("", checksHandler.CheckInfo(), apptypes.HeadersSSE(), checksHandler.Check())
 
 	return nil
 }
@@ -115,12 +115,12 @@ func (a *App) InitializeKernel(r *router.Group) error {
 		ssh      = r.Group("/ssh", "SSH", "")
 	)
 
-	hardware.POST("/reboot", hardwareHandler.RebootInfo(), hardwareHandler.Reboot)
+	hardware.POST("/reboot", hardwareHandler.RebootInfo(), hardwareHandler.Reboot())
 
-	ssh.GET("", sshHandler.GetInfo(), sshHandler.Get)
-	ssh.POST("", sshHandler.AddInfo(), sshHandler.Add)
-	ssh.DELETE("", sshHandler.DeleteInfo(), sshHandler.Delete)
-	ssh.GET("/users", sshHandler.GetUsersInfo(), sshHandler.GetUsers)
+	ssh.GET("", sshHandler.GetInfo(), sshHandler.Get())
+	ssh.POST("", sshHandler.AddInfo(), sshHandler.Add())
+	ssh.DELETE("", sshHandler.DeleteInfo(), sshHandler.Delete())
+	ssh.GET("/users", sshHandler.GetUsersInfo(), sshHandler.GetUsers())
 
 	return nil
 }

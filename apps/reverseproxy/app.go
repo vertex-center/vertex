@@ -40,7 +40,7 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
-	r.Use(middleware.ReadAuth)
+	r.Use(middleware.ReadAuth())
 
 	var (
 		proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
@@ -57,9 +57,9 @@ func (a *App) Initialize(r *router.Group) error {
 		}
 	}()
 
-	r.GET("/redirects", proxyHandler.GetRedirectsInfo(), middleware.Authenticated, proxyHandler.GetRedirects)
-	r.POST("/redirect", proxyHandler.AddRedirectInfo(), middleware.Authenticated, proxyHandler.AddRedirect)
-	r.DELETE("/redirect/:id", proxyHandler.RemoveRedirectInfo(), middleware.Authenticated, proxyHandler.RemoveRedirect)
+	r.GET("/redirects", proxyHandler.GetRedirectsInfo(), middleware.Authenticated(), proxyHandler.GetRedirects())
+	r.POST("/redirect", proxyHandler.AddRedirectInfo(), middleware.Authenticated(), proxyHandler.AddRedirect())
+	r.DELETE("/redirect/:id", proxyHandler.RemoveRedirectInfo(), middleware.Authenticated(), proxyHandler.RemoveRedirect())
 
 	return nil
 }

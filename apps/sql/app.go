@@ -39,15 +39,15 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
-	r.Use(middleware.ReadAuth)
+	r.Use(middleware.ReadAuth())
 
 	var (
 		sqlService  = service.New(a.ctx)
 		dbmsHandler = handler.NewDBMSHandler(sqlService)
 	)
 
-	r.GET("/container/:container_uuid", dbmsHandler.GetInfo(), middleware.Authenticated, dbmsHandler.Get)
-	r.POST("/dbms/:dbms/install", dbmsHandler.InstallInfo(), middleware.Authenticated, dbmsHandler.Install)
+	r.GET("/container/:container_uuid", dbmsHandler.GetInfo(), middleware.Authenticated(), dbmsHandler.Get())
+	r.POST("/dbms/:dbms/install", dbmsHandler.InstallInfo(), middleware.Authenticated(), dbmsHandler.Install())
 
 	return nil
 }

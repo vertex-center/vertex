@@ -20,6 +20,12 @@ func WrapInfos(infos ...Info) []fizz.OperationOption {
 	return wrapped
 }
 
+func ID(id string) Info {
+	return Info{
+		OperationOption: fizz.ID(id),
+	}
+}
+
 func Summary(summary string) Info {
 	return Info{
 		OperationOption: fizz.Summary(summary),

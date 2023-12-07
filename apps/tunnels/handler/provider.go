@@ -1,12 +1,8 @@
 package handler
 
 import (
-	"errors"
-	"fmt"
-	"net/http"
-
+	"github.com/gin-gonic/gin"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/apps/monitoring/core/types"
 	"github.com/vertex-center/vertex/apps/tunnels/core/port"
 	"github.com/vertex-center/vertex/pkg/router/oapi"
 
@@ -20,55 +16,40 @@ func NewProviderHandler() port.ProviderHandler {
 	return &providerHandler{}
 }
 
-func (r *providerHandler) Install(c *router.Context) {
-	provider, err := getTunnelProvider(c)
-	if err != nil {
-		return
-	}
+type InstallParams struct {
+	Provider string `path:"provider"`
+}
 
-	token := c.MustGet("token").(string)
+func (r *providerHandler) Install() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context, params *InstallParams) error {
+		token := c.MustGet("token").(string)
 
-	client := containersapi.NewContainersClient(token)
+		client := containersapi.NewContainersClient(token)
 
-	serv, apiError := client.GetService(c, provider)
-	if apiError != nil {
-		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
-		return
-	}
+		serv, apiError := client.GetService(c, params.Provider)
+		if apiError != nil {
+			return apiError.RouterError()
+		}
 
-	inst, apiError := client.InstallService(c, serv.ID)
-	if apiError != nil {
-		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
-		return
-	}
+		inst, apiError := client.InstallService(c, serv.ID)
+		if apiError != nil {
+			return apiError.RouterError()
+		}
 
-	apiError = client.PatchContainer(c, inst.UUID, containerstypes.ContainerSettings{
-		Tags: []string{"Vertex Tunnels", "Vertex Tunnels - Cloudflare"},
+		apiError = client.PatchContainer(c, inst.UUID, containerstypes.ContainerSettings{
+			Tags: []string{"Vertex Tunnels", "Vertex Tunnels - Cloudflare"},
+		})
+		if apiError != nil {
+			return apiError.RouterError()
+		}
+
+		return nil
 	})
-	if apiError != nil {
-		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
-		return
-	}
-
-	c.OK()
 }
 
 func (r *providerHandler) InstallInfo() []oapi.Info {
 	return []oapi.Info{
+		oapi.ID("installProvider"),
 		oapi.Summary("Install a tunnel provider"),
-		oapi.Response(http.StatusNoContent),
 	}
-}
-
-func getTunnelProvider(c *router.Context) (string, error) {
-	provider := c.Param("provider")
-	if provider != "cloudflared" {
-		c.NotFound(router.Error{
-			Code:           types.ErrCodeCollectorNotFound,
-			PublicMessage:  fmt.Sprintf("Provider not found: %s.", provider),
-			PrivateMessage: "The provider is not supported. It should be 'cloudflared'.",
-		})
-		return "", errors.New("collector not found")
-	}
-	return provider, nil
 }

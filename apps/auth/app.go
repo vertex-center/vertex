@@ -29,7 +29,7 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
-	r.Use(middleware.ReadAuth)
+	r.Use(middleware.ReadAuth())
 
 	db, err := storage.NewDB(storage.DBParams{
 		ID:         meta.Meta.ID,
@@ -52,24 +52,24 @@ func (a *App) Initialize(r *router.Group) error {
 		userHandler  = handler.NewUserHandler(userService)
 		emailHandler = handler.NewEmailHandler(emailService)
 
-		user   = r.Group("/user", "User", "", middleware.Authenticated)
-		email  = user.Group("/email", "Email", "User emails", middleware.Authenticated)
-		emails = user.Group("/emails", "Emails", "User emails", middleware.Authenticated)
+		user   = r.Group("/user", "User", "", middleware.Authenticated())
+		email  = user.Group("/email", "Email", "User emails", middleware.Authenticated())
+		emails = user.Group("/emails", "Emails", "User emails", middleware.Authenticated())
 	)
 
-	r.POST("/login", authHandler.LoginInfo(), authHandler.Login)
-	r.POST("/register", authHandler.RegisterInfo(), authHandler.Register)
-	r.POST("/logout", authHandler.LogoutInfo(), middleware.Authenticated, authHandler.Logout)
-	r.POST("/verify", authHandler.VerifyInfo(), authHandler.Verify)
+	r.POST("/login", authHandler.LoginInfo(), authHandler.Login())
+	r.POST("/register", authHandler.RegisterInfo(), authHandler.Register())
+	r.POST("/logout", authHandler.LogoutInfo(), middleware.Authenticated(), authHandler.Logout())
+	r.POST("/verify", authHandler.VerifyInfo(), authHandler.Verify())
 
-	user.GET("", userHandler.GetCurrentUserInfo(), userHandler.GetCurrentUser)
-	user.PATCH("", userHandler.PatchCurrentUserInfo(), userHandler.PatchCurrentUser)
-	user.GET("/credentials", userHandler.GetCurrentUserCredentialsInfo(), userHandler.GetCurrentUserCredentials)
+	user.GET("", userHandler.GetCurrentUserInfo(), userHandler.GetCurrentUser())
+	user.PATCH("", userHandler.PatchCurrentUserInfo(), userHandler.PatchCurrentUser())
+	user.GET("/credentials", userHandler.GetCurrentUserCredentialsInfo(), userHandler.GetCurrentUserCredentials())
 
-	email.POST("", emailHandler.CreateCurrentUserEmailInfo(), emailHandler.CreateCurrentUserEmail)
-	email.DELETE("", emailHandler.DeleteCurrentUserEmailInfo(), emailHandler.DeleteCurrentUserEmail)
+	email.POST("", emailHandler.CreateCurrentUserEmailInfo(), emailHandler.CreateCurrentUserEmail())
+	email.DELETE("", emailHandler.DeleteCurrentUserEmailInfo(), emailHandler.DeleteCurrentUserEmail())
 
-	emails.GET("", emailHandler.GetCurrentUserEmailsInfo(), emailHandler.GetCurrentUserEmails)
+	emails.GET("", emailHandler.GetCurrentUserEmailsInfo(), emailHandler.GetCurrentUserEmails())
 
 	return nil
 }

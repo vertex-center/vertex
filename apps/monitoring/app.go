@@ -40,7 +40,7 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
-	r.Use(middleware.ReadAuth)
+	r.Use(middleware.ReadAuth())
 
 	var (
 		prometheusAdapter = adapter.NewMetricsPrometheusAdapter()
@@ -48,9 +48,9 @@ func (a *App) Initialize(r *router.Group) error {
 		metricsHandler    = handler.NewMetricsHandler(metricsService)
 	)
 
-	r.GET("/metrics", metricsHandler.GetInfo(), middleware.Authenticated, metricsHandler.Get)
-	r.POST("/collector/:collector/install", metricsHandler.InstallCollectorInfo(), metricsHandler.InstallCollector)
-	r.POST("/visualizer/:visualizer/install", metricsHandler.InstallVisualizerInfo(), metricsHandler.InstallVisualizer)
+	r.GET("/metrics", metricsHandler.GetInfo(), middleware.Authenticated(), metricsHandler.Get())
+	r.POST("/collector/:collector/install", metricsHandler.InstallCollectorInfo(), metricsHandler.InstallCollector())
+	r.POST("/visualizer/:visualizer/install", metricsHandler.InstallVisualizerInfo(), metricsHandler.InstallVisualizer())
 
 	return nil
 }

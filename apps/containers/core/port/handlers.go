@@ -1,120 +1,120 @@
 package port
 
 import (
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type (
 	ContainerHandler interface {
-		Get(c *router.Context)
+		Get() gin.HandlerFunc
 		GetInfo() []oapi.Info
 
-		Delete(c *router.Context)
+		Delete() gin.HandlerFunc
 		DeleteInfo() []oapi.Info
 
-		Patch(c *router.Context)
+		Patch() gin.HandlerFunc
 		PatchInfo() []oapi.Info
 
-		Start(c *router.Context)
+		Start() gin.HandlerFunc
 		StartInfo() []oapi.Info
 
-		Stop(c *router.Context)
+		Stop() gin.HandlerFunc
 		StopInfo() []oapi.Info
 
-		PatchEnvironment(c *router.Context)
+		PatchEnvironment() gin.HandlerFunc
 		PatchEnvironmentInfo() []oapi.Info
 
-		GetDocker(c *router.Context)
+		GetDocker() gin.HandlerFunc
 		GetDockerInfo() []oapi.Info
 
-		RecreateDocker(c *router.Context)
+		RecreateDocker() gin.HandlerFunc
 		RecreateDockerInfo() []oapi.Info
 
-		GetLogs(c *router.Context)
+		GetLogs() gin.HandlerFunc
 		GetLogsInfo() []oapi.Info
 
-		UpdateService(c *router.Context)
+		UpdateService() gin.HandlerFunc
 		UpdateServiceInfo() []oapi.Info
 
-		GetVersions(c *router.Context)
+		GetVersions() gin.HandlerFunc
 		GetVersionsInfo() []oapi.Info
 
-		WaitStatus(c *router.Context)
+		WaitStatus() gin.HandlerFunc
 		WaitStatusInfo() []oapi.Info
 
-		Events(c *router.Context)
+		Events() gin.HandlerFunc
 		EventsInfo() []oapi.Info
 	}
 
 	ContainersHandler interface {
-		Get(c *router.Context)
+		Get() gin.HandlerFunc
 		GetInfo() []oapi.Info
 
-		GetTags(c *router.Context)
+		GetTags() gin.HandlerFunc
 		GetTagsInfo() []oapi.Info
 
-		Search(c *router.Context)
+		Search() gin.HandlerFunc
 		SearchInfo() []oapi.Info
 
-		CheckForUpdates(c *router.Context)
+		CheckForUpdates() gin.HandlerFunc
 		CheckForUpdatesInfo() []oapi.Info
 
-		Events(c *router.Context)
+		Events() gin.HandlerFunc
 		EventsInfo() []oapi.Info
 	}
 
 	ServiceHandler interface {
-		Get(c *router.Context)
+		Get() gin.HandlerFunc
 		GetInfo() []oapi.Info
 
-		Install(c *router.Context)
+		Install() gin.HandlerFunc
 		InstallInfo() []oapi.Info
 	}
 
 	ServicesHandler interface {
-		Get(c *router.Context)
+		Get() gin.HandlerFunc
 		GetInfo() []oapi.Info
 	}
 
 	DockerKernelHandler interface {
-		GetContainers(c *router.Context)
+		GetContainers() gin.HandlerFunc
 		GetContainersInfo() []oapi.Info
 
-		CreateContainer(c *router.Context)
+		CreateContainer() gin.HandlerFunc
 		CreateContainerInfo() []oapi.Info
 
-		DeleteContainer(c *router.Context)
+		DeleteContainer() gin.HandlerFunc
 		DeleteContainerInfo() []oapi.Info
 
-		StartContainer(c *router.Context)
+		StartContainer() gin.HandlerFunc
 		StartContainerInfo() []oapi.Info
 
-		StopContainer(c *router.Context)
+		StopContainer() gin.HandlerFunc
 		StopContainerInfo() []oapi.Info
 
-		InfoContainer(c *router.Context)
+		InfoContainer() gin.HandlerFunc
 		InfoContainerInfo() []oapi.Info
 
-		LogsStdoutContainer(c *router.Context)
+		LogsStdoutContainer() gin.HandlerFunc
 		LogsStdoutContainerInfo() []oapi.Info
 
-		LogsStderrContainer(c *router.Context)
+		LogsStderrContainer() gin.HandlerFunc
 		LogsStderrContainerInfo() []oapi.Info
 
-		WaitContainer(c *router.Context)
+		WaitContainer() gin.HandlerFunc
 		WaitContainerInfo() []oapi.Info
 
-		DeleteMounts(c *router.Context)
+		DeleteMounts() gin.HandlerFunc
 		DeleteMountsInfo() []oapi.Info
 
-		InfoImage(c *router.Context)
+		InfoImage() gin.HandlerFunc
 		InfoImageInfo() []oapi.Info
 
-		PullImage(c *router.Context)
+		PullImage() gin.HandlerFunc
 		PullImageInfo() []oapi.Info
 
-		BuildImage(c *router.Context)
+		BuildImage() gin.HandlerFunc
 		BuildImageInfo() []oapi.Info
 	}
 )

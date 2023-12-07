@@ -27,7 +27,7 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *router.Group) error {
-	r.Use(middleware.ReadAuth)
+	r.Use(middleware.ReadAuth())
 
 	var (
 		containerAdapter         = adapter.NewContainerFSAdapter(nil)
@@ -68,36 +68,36 @@ func (a *App) Initialize(r *router.Group) error {
 			ServiceService:           serviceService,
 		})
 
-		container  = r.Group("/container/:container_uuid", "Container", "", middleware.Authenticated)
-		containers = r.Group("/containers", "Containers", "", middleware.Authenticated)
-		serv       = r.Group("/service/:service_id", "Service", "", middleware.Authenticated)
+		container  = r.Group("/container/:container_uuid", "Container", "", middleware.Authenticated())
+		containers = r.Group("/containers", "Containers", "", middleware.Authenticated())
+		serv       = r.Group("/service/:service_id", "Service", "", middleware.Authenticated())
 		services   = r.Group("/services", "Services", "")
 	)
 
-	container.GET("", containerHandler.GetInfo(), containerHandler.Get)
-	container.DELETE("", containerHandler.DeleteInfo(), containerHandler.Delete)
-	container.PATCH("", containerHandler.PatchInfo(), containerHandler.Patch)
-	container.POST("/start", containerHandler.StartInfo(), containerHandler.Start)
-	container.POST("/stop", containerHandler.StopInfo(), containerHandler.Stop)
-	container.PATCH("/environment", containerHandler.PatchEnvironmentInfo(), containerHandler.PatchEnvironment)
-	container.GET("/events", containerHandler.EventsInfo(), apptypes.HeadersSSE, containerHandler.Events)
-	container.GET("/docker", containerHandler.GetDockerInfo(), containerHandler.GetDocker)
-	container.POST("/docker/recreate", containerHandler.RecreateDockerInfo(), containerHandler.RecreateDocker)
-	container.GET("/logs", containerHandler.GetLogsInfo(), containerHandler.GetLogs)
-	container.POST("/update/service", containerHandler.UpdateServiceInfo(), containerHandler.UpdateService)
-	container.GET("/versions", containerHandler.GetVersionsInfo(), containerHandler.GetVersions)
-	container.GET("/wait", containerHandler.WaitStatusInfo(), containerHandler.WaitStatus)
+	container.GET("", containerHandler.GetInfo(), containerHandler.Get())
+	container.DELETE("", containerHandler.DeleteInfo(), containerHandler.Delete())
+	container.PATCH("", containerHandler.PatchInfo(), containerHandler.Patch())
+	container.POST("/start", containerHandler.StartInfo(), containerHandler.Start())
+	container.POST("/stop", containerHandler.StopInfo(), containerHandler.Stop())
+	container.PATCH("/environment", containerHandler.PatchEnvironmentInfo(), containerHandler.PatchEnvironment())
+	container.GET("/events", containerHandler.EventsInfo(), apptypes.HeadersSSE(), containerHandler.Events())
+	container.GET("/docker", containerHandler.GetDockerInfo(), containerHandler.GetDocker())
+	container.POST("/docker/recreate", containerHandler.RecreateDockerInfo(), containerHandler.RecreateDocker())
+	container.GET("/logs", containerHandler.GetLogsInfo(), containerHandler.GetLogs())
+	container.POST("/update/service", containerHandler.UpdateServiceInfo(), containerHandler.UpdateService())
+	container.GET("/versions", containerHandler.GetVersionsInfo(), containerHandler.GetVersions())
+	container.GET("/wait", containerHandler.WaitStatusInfo(), containerHandler.WaitStatus())
 
-	containers.GET("", containersHandler.GetInfo(), containersHandler.Get)
-	containers.GET("/tags", containersHandler.GetTagsInfo(), containersHandler.GetTags)
-	containers.GET("/search", containersHandler.SearchInfo(), containersHandler.Search)
-	containers.GET("/checkupdates", containersHandler.CheckForUpdatesInfo(), containersHandler.CheckForUpdates)
-	containers.GET("/events", containersHandler.EventsInfo(), apptypes.HeadersSSE, containersHandler.Events)
+	containers.GET("", containersHandler.GetInfo(), containersHandler.Get())
+	containers.GET("/tags", containersHandler.GetTagsInfo(), containersHandler.GetTags())
+	containers.GET("/search", containersHandler.SearchInfo(), containersHandler.Search())
+	containers.GET("/checkupdates", containersHandler.CheckForUpdatesInfo(), containersHandler.CheckForUpdates())
+	containers.GET("/events", containersHandler.EventsInfo(), apptypes.HeadersSSE(), containersHandler.Events())
 
-	serv.GET("", serviceHandler.GetInfo(), serviceHandler.Get)
-	serv.POST("/install", serviceHandler.InstallInfo(), serviceHandler.Install)
+	serv.GET("", serviceHandler.GetInfo(), serviceHandler.Get())
+	serv.POST("/install", serviceHandler.InstallInfo(), serviceHandler.Install())
 
-	services.GET("", servicesHandler.GetInfo(), middleware.Authenticated, servicesHandler.Get)
+	services.GET("", servicesHandler.GetInfo(), middleware.Authenticated(), servicesHandler.Get())
 	services.GinRouterGroup().Static("/icons", "./live/services/icons")
 
 	return nil
@@ -111,20 +111,20 @@ func (a *App) InitializeKernel(r *router.Group) error {
 		docker              = r.Group("/docker", "Docker", "Docker wrapper")
 	)
 
-	docker.GET("/containers", dockerHandler.GetContainersInfo(), dockerHandler.GetContainers)
-	docker.POST("/container", dockerHandler.CreateContainerInfo(), dockerHandler.CreateContainer)
-	docker.DELETE("/container/:id", dockerHandler.DeleteContainerInfo(), dockerHandler.DeleteContainer)
-	docker.POST("/container/:id/start", dockerHandler.StartContainerInfo(), dockerHandler.StartContainer)
-	docker.POST("/container/:id/stop", dockerHandler.StopContainerInfo(), dockerHandler.StopContainer)
-	docker.GET("/container/:id/info", dockerHandler.InfoContainerInfo(), dockerHandler.InfoContainer)
-	docker.GET("/container/:id/logs/stdout", dockerHandler.LogsStdoutContainerInfo(), dockerHandler.LogsStdoutContainer)
-	docker.GET("/container/:id/logs/stderr", dockerHandler.LogsStderrContainerInfo(), dockerHandler.LogsStderrContainer)
-	docker.GET("/container/:id/wait/:cond", dockerHandler.WaitContainerInfo(), dockerHandler.WaitContainer)
-	docker.DELETE("/container/:id/mounts", dockerHandler.DeleteMountsInfo(), dockerHandler.DeleteMounts)
+	docker.GET("/containers", dockerHandler.GetContainersInfo(), dockerHandler.GetContainers())
+	docker.POST("/container", dockerHandler.CreateContainerInfo(), dockerHandler.CreateContainer())
+	docker.DELETE("/container/:id", dockerHandler.DeleteContainerInfo(), dockerHandler.DeleteContainer())
+	docker.POST("/container/:id/start", dockerHandler.StartContainerInfo(), dockerHandler.StartContainer())
+	docker.POST("/container/:id/stop", dockerHandler.StopContainerInfo(), dockerHandler.StopContainer())
+	docker.GET("/container/:id/info", dockerHandler.InfoContainerInfo(), dockerHandler.InfoContainer())
+	docker.GET("/container/:id/logs/stdout", dockerHandler.LogsStdoutContainerInfo(), dockerHandler.LogsStdoutContainer())
+	docker.GET("/container/:id/logs/stderr", dockerHandler.LogsStderrContainerInfo(), dockerHandler.LogsStderrContainer())
+	docker.GET("/container/:id/wait/:cond", dockerHandler.WaitContainerInfo(), dockerHandler.WaitContainer())
+	docker.DELETE("/container/:id/mounts", dockerHandler.DeleteMountsInfo(), dockerHandler.DeleteMounts())
 
-	docker.GET("/image/:id/info", dockerHandler.InfoImageInfo(), dockerHandler.InfoImage)
-	docker.POST("/image/pull", dockerHandler.PullImageInfo(), dockerHandler.PullImage)
-	docker.POST("/image/build", dockerHandler.BuildImageInfo(), dockerHandler.BuildImage)
+	docker.GET("/image/:id/info", dockerHandler.InfoImageInfo(), dockerHandler.InfoImage())
+	docker.POST("/image/pull", dockerHandler.PullImageInfo(), dockerHandler.PullImage())
+	docker.POST("/image/build", dockerHandler.BuildImageInfo(), dockerHandler.BuildImage())
 
 	return nil
 }

@@ -1,18 +1,19 @@
 package port
 
 import (
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type (
 	AppsHandler interface {
-		GetApps(c *router.Context)
+		GetApps(c *gin.Context) ([]app.Meta, error)
 		GetAppsInfo() []oapi.Info
 	}
 
 	DebugHandler interface {
-		HardReset(c *router.Context)
+		HardReset(c *gin.Context) error
 		HardResetInfo() []oapi.Info
 	}
 )

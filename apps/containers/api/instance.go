@@ -7,7 +7,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
-	"github.com/vertex-center/vertex/pkg/router"
 )
 
 func (c *Client) GetContainer(ctx context.Context, uuid uuid.UUID) (*types.Container, *api.Error) {
@@ -134,26 +133,4 @@ func (c *Client) WaitCondition(ctx context.Context, uuid uuid.UUID, condition co
 		ErrorJSON(&apiError).
 		Fetch(ctx)
 	return api.HandleError(err, apiError)
-}
-
-// Helpers
-
-func GetContainerUUIDParam(c *router.Context) (uuid.UUID, *api.Error) {
-	p := c.Param("container_uuid")
-	if p == "" {
-		return uuid.UUID{}, &api.Error{
-			Code:    types.ErrCodeContainerUuidMissing,
-			Message: "The request was missing the container UUID.",
-		}
-	}
-
-	uid, err := uuid.Parse(p)
-	if err != nil {
-		return uuid.UUID{}, &api.Error{
-			Code:    types.ErrCodeContainerUuidInvalid,
-			Message: "The container UUID is invalid.",
-		}
-	}
-
-	return uid, nil
 }

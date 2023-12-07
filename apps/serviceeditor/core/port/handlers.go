@@ -1,13 +1,13 @@
 package port
 
 import (
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type (
 	EditorHandler interface {
-		ToYaml(c *router.Context)
+		ToYaml() gin.HandlerFunc
 		ToYamlInfo() []oapi.Info
 	}
 )

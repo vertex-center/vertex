@@ -21,7 +21,9 @@ require (
 	github.com/google/uuid v1.4.0
 	github.com/h2non/gock v1.2.0
 	github.com/jmoiron/sqlx v1.3.5
+	github.com/juju/errors v0.0.0-20190930114154-d42613fe1ab9
 	github.com/lib/pq v1.10.9
+	github.com/loopfz/gadgeto v0.9.0
 	github.com/prometheus/client_golang v1.17.0
 	github.com/shirou/gopsutil/v3 v3.23.11
 	github.com/stretchr/testify v1.8.4
@@ -89,7 +91,6 @@ require (
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
-	github.com/loopfz/gadgeto v0.9.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect

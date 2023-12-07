@@ -54,7 +54,7 @@ func (r *ProxyRouter) initAPIRoutes() {
 	r.Any("/*path", r.HandleProxy)
 }
 
-func (r *ProxyRouter) HandleProxy(c *router.Context) {
+func (r *ProxyRouter) HandleProxy(c *gin.Context) {
 	host := c.Request.Host
 
 	redirect := r.proxyService.GetRedirectByHost(host)

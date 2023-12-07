@@ -1,10 +1,8 @@
 package handler
 
 import (
-	"net/http"
-
+	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/apps/admin/core/port"
-	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
@@ -19,50 +17,35 @@ func NewDatabaseHandler(dataService port.DatabaseService) port.DatabaseHandler {
 	}
 }
 
-func (h *databaseHandler) GetCurrentDbms(c *router.Context) {
-	c.JSON(h.dataService.GetCurrentDbms())
+func (h *databaseHandler) GetCurrentDbms() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) (*string, error) {
+		dbms := h.dataService.GetCurrentDbms()
+		return &dbms, nil
+	})
 }
 
 func (h *databaseHandler) GetCurrentDbmsInfo() []oapi.Info {
 	return []oapi.Info{
+		oapi.ID("getCurrentDbms"),
 		oapi.Summary("Get the current DBMS"),
 		oapi.Description("Get the current database management system that Vertex is using."),
-		oapi.Response(http.StatusOK),
 	}
 }
 
-type MigrateToBody struct {
+type MigrateToParams struct {
 	Dbms string `json:"dbms"`
 }
 
-func (h *databaseHandler) MigrateTo(c *router.Context) {
-	var body MigrateToBody
-	err := c.ParseBody(&body)
-	if err != nil {
-		return
-	}
-
-	err = h.dataService.MigrateTo(body.Dbms)
-	//if err != nil && errors.Is(err, service.ErrDbmsAlreadySet) {
-	//	c.NotModified()
-	//	return
-	//}
-	if err != nil {
-		c.Abort(router.Error{
-			Code:           api.ErrFailedToMigrateToNewDbms,
-			PublicMessage:  "Migration to the new DBMS failed.",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.OK()
+func (h *databaseHandler) MigrateTo() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context, params *MigrateToParams) error {
+		return h.dataService.MigrateTo(params.Dbms)
+	})
 }
 
 func (h *databaseHandler) MigrateToInfo() []oapi.Info {
 	return []oapi.Info{
+		oapi.ID("migrateTo"),
 		oapi.Summary("Migrate to a DBMS"),
 		oapi.Description("Migrate Vertex to the given database management system."),
-		oapi.Response(http.StatusNoContent),
 	}
 }

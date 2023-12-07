@@ -1,44 +1,44 @@
 package port
 
 import (
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type (
 	AuthHandler interface {
-		Login(c *router.Context)
+		Login() gin.HandlerFunc
 		LoginInfo() []oapi.Info
 
-		Register(c *router.Context)
+		Register() gin.HandlerFunc
 		RegisterInfo() []oapi.Info
 
-		Logout(c *router.Context)
+		Logout() gin.HandlerFunc
 		LogoutInfo() []oapi.Info
 
-		Verify(c *router.Context)
+		Verify() gin.HandlerFunc
 		VerifyInfo() []oapi.Info
 	}
 
 	EmailHandler interface {
-		CreateCurrentUserEmail(c *router.Context)
+		CreateCurrentUserEmail() gin.HandlerFunc
 		CreateCurrentUserEmailInfo() []oapi.Info
 
-		GetCurrentUserEmails(c *router.Context)
+		GetCurrentUserEmails() gin.HandlerFunc
 		GetCurrentUserEmailsInfo() []oapi.Info
 
-		DeleteCurrentUserEmail(c *router.Context)
+		DeleteCurrentUserEmail() gin.HandlerFunc
 		DeleteCurrentUserEmailInfo() []oapi.Info
 	}
 
 	UserHandler interface {
-		GetCurrentUser(c *router.Context)
+		GetCurrentUser() gin.HandlerFunc
 		GetCurrentUserInfo() []oapi.Info
 
-		PatchCurrentUser(c *router.Context)
+		PatchCurrentUser() gin.HandlerFunc
 		PatchCurrentUserInfo() []oapi.Info
 
-		GetCurrentUserCredentials(c *router.Context)
+		GetCurrentUserCredentials() gin.HandlerFunc
 		GetCurrentUserCredentialsInfo() []oapi.Info
 	}
 )

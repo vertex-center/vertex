@@ -2,9 +2,10 @@ package handler
 
 import (
 	"io"
-	"net/http"
 
 	"github.com/gin-contrib/sse"
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
@@ -26,134 +27,125 @@ func NewContainersHandler(ctx *apptypes.Context, containerService port.Container
 	}
 }
 
-func (h *containersHandler) Get(c *router.Context) {
-	installed := h.containerService.GetAll()
-	c.JSON(installed)
+func (h *containersHandler) Get() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) (map[uuid.UUID]*types.Container, error) {
+		return h.containerService.GetAll(), nil
+	})
 }
 
 func (h *containersHandler) GetInfo() []oapi.Info {
 	return []oapi.Info{
+		oapi.ID("getContainers"),
 		oapi.Summary("Get containers"),
-		oapi.Response(http.StatusOK,
-			oapi.WithResponseModel([]types.Container{}),
-		),
 	}
 }
 
-func (h *containersHandler) GetTags(c *router.Context) {
-	tags := h.containerService.GetTags()
-	c.JSON(tags)
+func (h *containersHandler) GetTags() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) ([]string, error) {
+		return h.containerService.GetTags(), nil
+	})
 }
 
 func (h *containersHandler) GetTagsInfo() []oapi.Info {
 	return []oapi.Info{
+		oapi.ID("getTags"),
 		oapi.Summary("Get tags"),
-		oapi.Response(http.StatusOK,
-			oapi.WithResponseModel([]string{}),
-		),
 	}
 }
 
-func (h *containersHandler) Search(c *router.Context) {
-	query := types.ContainerSearchQuery{}
+func (h *containersHandler) Search() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) (map[uuid.UUID]*types.Container, error) {
+		query := types.ContainerSearchQuery{}
 
-	features := c.QueryArray("features[]")
-	if len(features) > 0 {
-		query.Features = &features
-	}
+		features := c.QueryArray("features[]")
+		if len(features) > 0 {
+			query.Features = &features
+		}
 
-	tags := c.QueryArray("tags[]")
-	if len(tags) > 0 {
-		query.Tags = &tags
-	}
+		tags := c.QueryArray("tags[]")
+		if len(tags) > 0 {
+			query.Tags = &tags
+		}
 
-	installed := h.containerService.Search(query)
-	c.JSON(installed)
+		return h.containerService.Search(query), nil
+	})
 }
 
 func (h *containersHandler) SearchInfo() []oapi.Info {
 	return []oapi.Info{
+		oapi.ID("searchContainers"),
 		oapi.Summary("Search containers"),
-		oapi.Response(http.StatusOK,
-			oapi.WithResponseModel([]types.Container{}),
-		),
 	}
 }
 
-func (h *containersHandler) CheckForUpdates(c *router.Context) {
-	containers, err := h.containerService.CheckForUpdates()
-	if err != nil {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToCheckForUpdates,
-			PublicMessage:  "Failed to check for updates.",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(containers)
+func (h *containersHandler) CheckForUpdates() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) (map[uuid.UUID]*types.Container, error) {
+		return h.containerService.CheckForUpdates()
+	})
 }
 
 func (h *containersHandler) CheckForUpdatesInfo() []oapi.Info {
 	return []oapi.Info{
+		oapi.ID("checkForUpdates"),
 		oapi.Summary("Check for updates"),
-		oapi.Response(http.StatusOK,
-			oapi.WithResponseModel([]types.Container{}),
-		),
 	}
 }
 
-func (h *containersHandler) Events(c *router.Context) {
-	eventsChan := make(chan sse.Event)
-	defer close(eventsChan)
+func (h *containersHandler) Events() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) error {
+		eventsChan := make(chan sse.Event)
+		defer close(eventsChan)
 
-	done := c.Request.Context().Done()
+		done := c.Request.Context().Done()
 
-	listener := event.NewTempListener(func(e event.Event) error {
-		switch e.(type) {
-		case types.EventContainersChange:
-			eventsChan <- sse.Event{
-				Event: types.EventNameContainersChange,
+		listener := event.NewTempListener(func(e event.Event) error {
+			switch e.(type) {
+			case types.EventContainersChange:
+				eventsChan <- sse.Event{
+					Event: types.EventNameContainersChange,
+				}
 			}
-		}
-		return nil
-	})
+			return nil
+		})
 
-	h.ctx.AddListener(listener)
-	defer h.ctx.RemoveListener(listener)
+		h.ctx.AddListener(listener)
+		defer h.ctx.RemoveListener(listener)
 
-	first := true
+		first := true
 
-	c.Stream(func(w io.Writer) bool {
-		if first {
-			err := sse.Encode(w, sse.Event{
-				Event: "open",
-			})
+		c.Stream(func(w io.Writer) bool {
+			if first {
+				err := sse.Encode(w, sse.Event{
+					Event: "open",
+				})
 
-			if err != nil {
-				log.Error(err)
+				if err != nil {
+					log.Error(err)
+					return false
+				}
+				first = false
+				return true
+			}
+
+			select {
+			case e := <-eventsChan:
+				err := sse.Encode(w, e)
+				if err != nil {
+					log.Error(err)
+				}
+				return true
+			case <-done:
 				return false
 			}
-			first = false
-			return true
-		}
+		})
 
-		select {
-		case e := <-eventsChan:
-			err := sse.Encode(w, e)
-			if err != nil {
-				log.Error(err)
-			}
-			return true
-		case <-done:
-			return false
-		}
+		return nil
 	})
 }
 
 func (h *containersHandler) EventsInfo() []oapi.Info {
 	return []oapi.Info{
+		oapi.ID("events"),
 		oapi.Summary("Get events"),
-		oapi.Response(http.StatusOK),
 	}
 }

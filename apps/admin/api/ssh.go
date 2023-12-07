@@ -37,7 +37,7 @@ func (c *Client) AddSSHKey(ctx context.Context, key string, username string) err
 	err := c.Request().
 		Pathf("./ssh").
 		Post().
-		BodyJSON(&handler.AddSSHKeyBody{
+		BodyJSON(&handler.AddSSHKeyParams{
 			AuthorizedKey: key,
 			Username:      username,
 		}).
@@ -58,7 +58,7 @@ func (c *KernelClient) AddSSHKey(ctx context.Context, key string, username strin
 	err := c.Request().
 		Pathf("./ssh").
 		Post().
-		BodyJSON(&handler.AddSSHKeyBody{
+		BodyJSON(&handler.AddSSHKeyParams{
 			AuthorizedKey: key,
 			Username:      username,
 		}).
@@ -78,7 +78,7 @@ func (c *Client) DeleteSSHKey(ctx context.Context, key string, username string) 
 	var apiError api.Error
 	err := c.Request().
 		Pathf("./ssh").
-		BodyJSON(&handler.DeleteSSHKeyBody{
+		BodyJSON(&handler.DeleteSSHKeyParams{
 			Fingerprint: key,
 			Username:    username,
 		}).
@@ -96,7 +96,7 @@ func (c *KernelClient) DeleteSSHKey(ctx context.Context, key string, username st
 	var apiError api.Error
 	err := c.Request().
 		Pathf("./ssh").
-		BodyJSON(&handler.DeleteSSHKeyBody{
+		BodyJSON(&handler.DeleteSSHKeyParams{
 			Fingerprint: key,
 			Username:    username,
 		}).

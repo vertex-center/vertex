@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http/httptest"
 
+	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
@@ -12,7 +13,7 @@ type RequestOptions struct {
 	Headers map[string]string
 }
 
-func Request(method string, handler router.HandlerFunc, opts RequestOptions) *httptest.ResponseRecorder {
+func Request(method string, handler gin.HandlerFunc, opts RequestOptions) *httptest.ResponseRecorder {
 	// Setup
 	r := router.New(nil)
 	r.Handle(method, "/", []oapi.Info{}, handler)

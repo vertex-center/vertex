@@ -1,11 +1,11 @@
 package port
 
 import (
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type ProviderHandler interface {
-	Install(c *router.Context)
+	Install() gin.HandlerFunc
 	InstallInfo() []oapi.Info
 }
