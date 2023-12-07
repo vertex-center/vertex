@@ -27,7 +27,7 @@ type ProxyRouter struct {
 func NewProxyRouter(proxyService port.ProxyService) *ProxyRouter {
 	gin.SetMode(gin.ReleaseMode)
 	r := &ProxyRouter{
-		Router: router.New(
+		Router: router.New(nil,
 			router.WithMiddleware(cors.Default()),
 			router.WithMiddleware(ginutils.Logger("PROXY", config.Current.URL("proxy").String())),
 			router.WithMiddleware(gin.Recovery()),

@@ -24,6 +24,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/netcap"
 	"github.com/vertex-center/vlog"
+	"github.com/wI2L/fizz/openapi"
 )
 
 var (
@@ -50,7 +51,13 @@ func main() {
 	ctx = types.NewVertexContext(types.About{}, true)
 	url := config.Current.KernelURL("vertex")
 
-	srv = server.New("kernel", url, ctx)
+	info := openapi.Info{
+		Title:       "Vertex Kernel",
+		Description: "Create your self-hosted lab in one click.",
+		Version:     ctx.About().Version,
+	}
+
+	srv = server.New("kernel", &info, url, ctx)
 	initServices()
 
 	ctx.DispatchEvent(types.EventServerLoad{})

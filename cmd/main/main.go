@@ -30,6 +30,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz/openapi"
 )
 
 // goreleaser will override version, commit and date
@@ -68,7 +69,13 @@ func main() {
 	ctx = types.NewVertexContext(about, false)
 	url := config.Current.URL("vertex")
 
-	srv = server.New("main", url, ctx)
+	info := openapi.Info{
+		Title:       "Vertex",
+		Description: "Create your self-hosted lab in one click.",
+		Version:     ctx.About().Version,
+	}
+
+	srv = server.New("main", &info, url, ctx)
 	initServices()
 	initRoutes(about)
 

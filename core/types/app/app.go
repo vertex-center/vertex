@@ -14,6 +14,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz/openapi"
 )
 
 type Meta struct {
@@ -117,7 +118,13 @@ func RunStandalone(app Interface) {
 
 	u := app.Meta().ApiURL()
 
-	srv := server.New(app.Meta().ID, u, vertexCtx)
+	info := openapi.Info{
+		Title:       app.Meta().Name,
+		Description: app.Meta().Description,
+		Version:     ctx.About().Version,
+	}
+
+	srv := server.New(app.Meta().ID, &info, u, vertexCtx)
 
 	if a, ok := app.(Initializable); ok {
 		base := srv.Router.Group(u.Path, "", "")
@@ -156,7 +163,13 @@ func RunStandaloneKernel(app Interface) {
 
 	u := app.Meta().ApiKernelURL()
 
-	srv := server.New(app.Meta().ID, u, vertexCtx)
+	info := openapi.Info{
+		Title:       app.Meta().Name,
+		Description: app.Meta().Description,
+		Version:     ctx.About().Version,
+	}
+
+	srv := server.New(app.Meta().ID, &info, u, vertexCtx)
 
 	if a, ok := app.(KernelInitializable); ok {
 		base := srv.Router.Group(u.Path, "", "")

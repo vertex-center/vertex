@@ -15,6 +15,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/net"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vlog"
+	"github.com/wI2L/fizz/openapi"
 )
 
 var InternetOK = false
@@ -26,7 +27,7 @@ type Server struct {
 	Router *router.Router
 }
 
-func New(id string, u *url.URL, ctx *types.VertexContext) *Server {
+func New(id string, info *openapi.Info, u *url.URL, ctx *types.VertexContext) *Server {
 	gin.SetMode(gin.ReleaseMode)
 
 	cfg := cors.DefaultConfig()
@@ -37,7 +38,7 @@ func New(id string, u *url.URL, ctx *types.VertexContext) *Server {
 		id:  id,
 		url: u,
 		ctx: ctx,
-		Router: router.New(
+		Router: router.New(info,
 			router.WithMiddleware(cors.New(cfg)),
 			router.WithMiddleware(ginutils.ErrorHandler()),
 			router.WithMiddleware(ginutils.Logger(id, u.String())),
