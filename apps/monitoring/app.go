@@ -11,15 +11,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-// docapi:monitoring title Vertex Monitoring
-// docapi:monitoring description A monitoring service for Vertex.
-// docapi:monitoring version 0.0.0
-// docapi:monitoring filename monitoring
-
-// docapi:monitoring url http://{ip}:{port-kernel}/api
-// docapi:monitoring urlvar ip localhost The IP address of the server.
-// docapi:monitoring urlvar port-kernel 7506 The port of the server.
-
 var Meta = apptypes.Meta{
 	ID:          "monitoring",
 	Name:        "Vertex Monitoring",
@@ -57,12 +48,9 @@ func (a *App) Initialize(r *router.Group) error {
 		metricsHandler    = handler.NewMetricsHandler(metricsService)
 	)
 
-	// docapi:monitoring route /metrics vx_monitoring_get_metrics
-	r.GET("/metrics", middleware.Authenticated, metricsHandler.Get)
-	// docapi:monitoring route /collector/{collector}/install vx_monitoring_install_collector
-	r.POST("/collector/:collector/install", metricsHandler.InstallCollector)
-	// docapi:monitoring route /visualizer/{visualizer}/install vx_monitoring_install_visualizer
-	r.POST("/visualizer/:visualizer/install", metricsHandler.InstallVisualizer)
+	r.GET("/metrics", metricsHandler.GetInfo(), middleware.Authenticated, metricsHandler.Get)
+	r.POST("/collector/:collector/install", metricsHandler.InstallCollectorInfo(), metricsHandler.InstallCollector)
+	r.POST("/visualizer/:visualizer/install", metricsHandler.InstallVisualizerInfo(), metricsHandler.InstallVisualizer)
 
 	return nil
 }

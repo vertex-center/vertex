@@ -3,6 +3,7 @@ module github.com/vertex-center/vertex
 go 1.21
 
 require (
+	github.com/brianvoe/gofakeit/v6 v6.26.0
 	github.com/carlmjohnson/requests v0.23.5
 	github.com/charmbracelet/lipgloss v0.9.1
 	github.com/disgoorg/disgo v0.17.0
@@ -25,6 +26,7 @@ require (
 	github.com/shirou/gopsutil/v3 v3.23.11
 	github.com/stretchr/testify v1.8.4
 	github.com/vertex-center/vlog v1.0.2
+	github.com/wI2L/fizz v0.22.0
 	go.uber.org/atomic v1.11.0
 	golang.org/x/crypto v0.16.0
 	golang.org/x/net v0.19.0
@@ -67,6 +69,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.15.5 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
+	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
@@ -86,6 +89,7 @@ require (
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
+	github.com/loopfz/gadgeto v0.9.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -140,6 +144,7 @@ require (
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
+	gopkg.in/go-playground/validator.v9 v9.30.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gotest.tools/v3 v3.4.0 // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect

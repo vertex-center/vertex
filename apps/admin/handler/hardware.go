@@ -1,9 +1,13 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/vertex-center/vertex/apps/admin/core/port"
+	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type hardwareHandler struct {
@@ -15,14 +19,6 @@ func NewHardwareHandler(service port.HardwareService) port.HardwareHandler {
 		service: service,
 	}
 }
-
-// docapi begin get_host
-// docapi method GET
-// docapi summary Get host
-// docapi tags Hardware
-// docapi response 200 {Host} The host information.
-// docapi response 500
-// docapi end
 
 func (h *hardwareHandler) GetHost(c *router.Context) {
 	host, err := h.service.GetHost()
@@ -37,13 +33,15 @@ func (h *hardwareHandler) GetHost(c *router.Context) {
 	c.JSON(host)
 }
 
-// docapi begin get_cpus
-// docapi method GET
-// docapi summary Get CPUs
-// docapi tags Hardware
-// docapi response 200 {[]CPU} The CPUs information.
-// docapi response 500
-// docapi end
+func (h *hardwareHandler) GetHostInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get host"),
+		oapi.Description("Get host information."),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.Host{}),
+		),
+	}
+}
 
 func (h *hardwareHandler) GetCPUs(c *router.Context) {
 	cpus, err := h.service.GetCPUs()
@@ -58,13 +56,15 @@ func (h *hardwareHandler) GetCPUs(c *router.Context) {
 	c.JSON(cpus)
 }
 
-// docapi begin reboot
-// docapi method POST
-// docapi summary Reboot
-// docapi tags Hardware
-// docapi response 204
-// docapi response 500
-// docapi end
+func (h *hardwareHandler) GetCPUsInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get CPUs"),
+		oapi.Description("Get CPUs information."),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel([]types.CPU{}),
+		),
+	}
+}
 
 func (h *hardwareHandler) Reboot(c *router.Context) {
 	err := h.service.Reboot(c)
@@ -77,4 +77,12 @@ func (h *hardwareHandler) Reboot(c *router.Context) {
 		return
 	}
 	c.OK()
+}
+
+func (h *hardwareHandler) RebootInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Reboot"),
+		oapi.Description("Reboot the host."),
+		oapi.Response(http.StatusNoContent),
+	}
 }

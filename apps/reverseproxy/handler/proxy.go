@@ -3,11 +3,13 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"net/http"
 
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type proxyHandler struct {
@@ -20,32 +22,24 @@ func NewProxyHandler(proxyService port.ProxyService) port.ProxyHandler {
 	}
 }
 
-// docapi begin vx_reverse_proxy_get_redirects
-// docapi method GET
-// docapi summary Get redirects
-// docapi tags Reverse Proxy
-// docapi response 200 {[]Redirect} The redirects.
-// docapi end
-
 func (r *proxyHandler) GetRedirects(c *router.Context) {
 	redirects := r.proxyService.GetRedirects()
 	c.JSON(redirects)
+}
+
+func (r *proxyHandler) GetRedirectsInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get redirects"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.ProxyRedirects{}),
+		),
+	}
 }
 
 type AddRedirectBody struct {
 	Source string `json:"source"`
 	Target string `json:"target"`
 }
-
-// docapi begin vx_reverse_proxy_add_redirect
-// docapi method POST
-// docapi summary Add redirect
-// docapi tags Reverse Proxy
-// docapi body {AddRedirectBody} The redirect to add.
-// docapi response 204
-// docapi response 400
-// docapi response 500
-// docapi end
 
 func (r *proxyHandler) AddRedirect(c *router.Context) {
 	var body AddRedirectBody
@@ -86,15 +80,12 @@ func (r *proxyHandler) AddRedirect(c *router.Context) {
 	c.OK()
 }
 
-// docapi begin vx_reverse_proxy_remove_redirect
-// docapi method DELETE
-// docapi summary Remove redirect
-// docapi tags Reverse Proxy
-// docapi query id {string} The redirect UUID.
-// docapi response 204
-// docapi response 400
-// docapi response 500
-// docapi end
+func (r *proxyHandler) AddRedirectInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Add redirect"),
+		oapi.Response(http.StatusNoContent),
+	}
+}
 
 func (r *proxyHandler) RemoveRedirect(c *router.Context) {
 	idString := c.Param("id")
@@ -128,4 +119,11 @@ func (r *proxyHandler) RemoveRedirect(c *router.Context) {
 	}
 
 	c.OK()
+}
+
+func (r *proxyHandler) RemoveRedirectInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Remove redirect"),
+		oapi.Response(http.StatusNoContent),
+	}
 }

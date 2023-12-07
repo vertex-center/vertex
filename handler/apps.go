@@ -1,8 +1,12 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/vertex-center/vertex/core/port"
+	"github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type appsHandler struct {
@@ -15,13 +19,17 @@ func NewAppsHandler(appsService port.AppsService) port.AppsHandler {
 	}
 }
 
-// docapi begin get_apps
-// docapi method GET
-// docapi summary Get all apps
-// docapi tags Apps
-// docapi response 200 {[]Meta} The list of apps.
-// docapi end
-
 func (h *appsHandler) GetApps(c *router.Context) {
 	c.JSON(h.appsService.All())
+}
+
+func (h *appsHandler) GetAppsInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get apps"),
+		oapi.Description("Get all the apps installed on the server."),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseDesc("All apps installed on the server"),
+			oapi.WithResponseModel([]app.Meta{}),
+		),
+	}
 }

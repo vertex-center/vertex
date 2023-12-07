@@ -1,8 +1,12 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/vertex-center/vertex/apps/containers/core/port"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type servicesHandler struct {
@@ -15,13 +19,15 @@ func NewServicesHandler(serviceService port.ServiceService) port.ServicesHandler
 	}
 }
 
-// docapi begin vx_containers_get_services
-// docapi method GET
-// docapi summary Get services
-// docapi tags Containers
-// docapi response 200 {[]Service} The services.
-// docapi end
-
 func (h *servicesHandler) Get(c *router.Context) {
 	c.JSON(h.serviceService.GetAll())
+}
+
+func (h *servicesHandler) GetInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get services"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel([]types.Service{}),
+		),
+	}
 }

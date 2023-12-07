@@ -12,15 +12,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-// docapi:auth title Vertex Auth
-// docapi:auth description An authentication service for Vertex.
-// docapi:auth version 0.0.0
-// docapi:auth filename auth
-
-// docapi:auth url http://{ip}:{port-kernel}/api
-// docapi:auth urlvar ip localhost The IP address of the server.
-// docapi:auth urlvar port-kernel 7502 The port of the server.
-
 type App struct {
 	ctx *apptypes.Context
 }
@@ -61,34 +52,24 @@ func (a *App) Initialize(r *router.Group) error {
 		userHandler  = handler.NewUserHandler(userService)
 		emailHandler = handler.NewEmailHandler(emailService)
 
-		user   = r.Group("/user", middleware.Authenticated)
-		email  = user.Group("/email", middleware.Authenticated)
-		emails = user.Group("/emails", middleware.Authenticated)
+		user   = r.Group("/user", "User", "", middleware.Authenticated)
+		email  = user.Group("/email", "Email", "User emails", middleware.Authenticated)
+		emails = user.Group("/emails", "Emails", "User emails", middleware.Authenticated)
 	)
 
-	// docapi:auth route /login auth_login
-	r.POST("/login", authHandler.Login)
-	// docapi:auth route /register auth_register
-	r.POST("/register", authHandler.Register)
-	// docapi:auth route /logout auth_logout
-	r.POST("/logout", middleware.Authenticated, authHandler.Logout)
-	// docapi:auth route /verify auth_verify
-	r.POST("/verify", authHandler.Verify)
+	r.POST("/login", authHandler.LoginInfo(), authHandler.Login)
+	r.POST("/register", authHandler.RegisterInfo(), authHandler.Register)
+	r.POST("/logout", authHandler.LogoutInfo(), middleware.Authenticated, authHandler.Logout)
+	r.POST("/verify", authHandler.VerifyInfo(), authHandler.Verify)
 
-	// docapi:auth route /user auth_get_current_user
-	user.GET("", userHandler.GetCurrentUser)
-	// docapi:auth route /user auth_patch_current_user
-	user.PATCH("", userHandler.PatchCurrentUser)
-	// docapi:auth route /credentials auth_get_current_user_credentials
-	user.GET("/credentials", userHandler.GetCurrentUserCredentials)
+	user.GET("", userHandler.GetCurrentUserInfo(), userHandler.GetCurrentUser)
+	user.PATCH("", userHandler.PatchCurrentUserInfo(), userHandler.PatchCurrentUser)
+	user.GET("/credentials", userHandler.GetCurrentUserCredentialsInfo(), userHandler.GetCurrentUserCredentials)
 
-	// docapi:auth route /user/email auth_current_user_create_email
-	email.POST("", emailHandler.CreateCurrentUserEmail)
-	// docapi:auth route /user/email auth_current_user_delete_email
-	email.DELETE("", emailHandler.DeleteCurrentUserEmail)
+	email.POST("", emailHandler.CreateCurrentUserEmailInfo(), emailHandler.CreateCurrentUserEmail)
+	email.DELETE("", emailHandler.DeleteCurrentUserEmailInfo(), emailHandler.DeleteCurrentUserEmail)
 
-	// docapi:auth route /user/emails auth_current_user_get_emails
-	emails.GET("", emailHandler.GetCurrentUserEmails)
+	emails.GET("", emailHandler.GetCurrentUserEmailsInfo(), emailHandler.GetCurrentUserEmails)
 
 	return nil
 }

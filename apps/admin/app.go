@@ -17,24 +17,6 @@ import (
 	"github.com/vertex-center/vertex/updates"
 )
 
-// docapi:admin title Vertex Admin
-// docapi:admin description An admin panel to manage the Vertex platform.
-// docapi:admin version 0.0.0
-// docapi:admin filename admin
-
-// docapi:admin url http://{ip}:{port-kernel}/api
-// docapi:admin urlvar ip localhost The IP address of the server.
-// docapi:admin urlvar port-kernel 7500 The port of the server.
-
-// docapi:admin_kernel title Vertex Admin Kernel
-// docapi:admin_kernel description An admin panel to manage the Vertex platform.
-// docapi:admin_kernel version 0.0.0
-// docapi:admin_kernel filename admin_kernel
-
-// docapi:admin_kernel url http://{ip}:{port-kernel}/api
-// docapi:admin_kernel urlvar ip localhost The IP address of the server.
-// docapi:admin_kernel urlvar port-kernel 7501 The port of the server.
-
 var updateService port.UpdateService
 
 type App struct {
@@ -91,67 +73,54 @@ func (a *App) Initialize(r *router.Group) error {
 		updateHandler   = handler.NewUpdateHandler(updateService, settingsService)
 		checksHandler   = handler.NewChecksHandler(checksService)
 
-		hardware = r.Group("/hardware", middleware.Authenticated)
-		ssh      = r.Group("/ssh", middleware.Authenticated)
-		settings = r.Group("/settings", middleware.Authenticated)
-		update   = r.Group("/update", middleware.Authenticated)
-		checks   = r.Group("/admin/checks", middleware.Authenticated)
+		hardware = r.Group("/hardware", "Hardware", "", middleware.Authenticated)
+		ssh      = r.Group("/ssh", "SSH", "", middleware.Authenticated)
+		settings = r.Group("/settings", "Settings", "", middleware.Authenticated)
+		update   = r.Group("/update", "Update", "", middleware.Authenticated)
+		checks   = r.Group("/admin/checks", "Checks", "", middleware.Authenticated)
 	)
 
-	// docapi:admin route /hardware/host get_host
-	hardware.GET("/host", hardwareHandler.GetHost)
-	// docapi:admin route /hardware/cpus get_cpus
-	hardware.GET("/cpus", hardwareHandler.GetCPUs)
-	// docapi:admin route /hardware/reboot reboot
-	hardware.POST("/reboot", hardwareHandler.Reboot)
+	hardware.GET("/host", hardwareHandler.GetHostInfo(), hardwareHandler.GetHost)
+	hardware.GET("/cpus", hardwareHandler.GetCPUsInfo(), hardwareHandler.GetCPUs)
+	hardware.POST("/reboot", hardwareHandler.RebootInfo(), hardwareHandler.Reboot)
 
-	// docapi:admin route /ssh get_ssh_keys
-	ssh.GET("", sshHandler.Get)
-	// docapi:admin route /ssh add_ssh_key
-	ssh.POST("", sshHandler.Add)
-	// docapi:admin route /ssh delete_ssh_key
-	ssh.DELETE("", sshHandler.Delete)
-	// docapi:admin route /ssh/users get_ssh_users
-	ssh.GET("/users", sshHandler.GetUsers)
+	ssh.GET("", sshHandler.GetInfo(), sshHandler.Get)
+	ssh.POST("", sshHandler.AddInfo(), sshHandler.Add)
+	ssh.DELETE("", sshHandler.DeleteInfo(), sshHandler.Delete)
+	ssh.GET("/users", sshHandler.GetUsersInfo(), sshHandler.GetUsers)
 
-	// docapi:admin route /settings get_settings
-	settings.GET("", settingsHandler.Get)
-	// docapi:admin route /settings patch_settings
-	settings.PATCH("", settingsHandler.Patch)
+	settings.GET("", settingsHandler.GetInfo(), settingsHandler.Get)
+	settings.PATCH("", settingsHandler.PatchInfo(), settingsHandler.Patch)
 
-	// docapi:admin route /update get_updates
-	update.GET("", updateHandler.Get)
-	// docapi:admin route /update install_update
-	update.POST("", updateHandler.Install)
+	update.GET("", updateHandler.GetInfo(), updateHandler.Get)
+	update.POST("", updateHandler.InstallInfo(), updateHandler.Install)
 
-	// docapi:admin route /admin/checks admin_checks
-	checks.GET("", apptypes.HeadersSSE, checksHandler.Check)
+	checks.GET("", checksHandler.CheckInfo(), apptypes.HeadersSSE, checksHandler.Check)
 
 	return nil
 }
 
 func (a *App) InitializeKernel(r *router.Group) error {
-	hardwareAdapter := adapter.NewHardwareKernelAdapter()
-	sshAdapter := adapter.NewSshFsAdapter()
+	var (
+		hardwareAdapter = adapter.NewHardwareKernelAdapter()
+		sshAdapter      = adapter.NewSshFsAdapter()
 
-	hardwareService := service.NewHardwareKernelService(hardwareAdapter)
-	sshService := service.NewSshKernelService(sshAdapter)
+		hardwareService = service.NewHardwareKernelService(hardwareAdapter)
+		sshService      = service.NewSshKernelService(sshAdapter)
 
-	hardwareHandler := handler.NewHardwareKernelHandler(hardwareService)
-	hardware := r.Group("/hardware")
-	// docapi:admin_kernel route /hardware/reboot reboot_kernel
-	hardware.POST("/reboot", hardwareHandler.Reboot)
+		hardwareHandler = handler.NewHardwareKernelHandler(hardwareService)
+		sshHandler      = handler.NewSshKernelHandler(sshService)
 
-	sshHandler := handler.NewSshKernelHandler(sshService)
-	ssh := r.Group("/ssh")
-	// docapi:admin_kernel route /ssh get_ssh_keys_kernel
-	ssh.GET("", sshHandler.Get)
-	// docapi:admin_kernel route /ssh add_ssh_key_kernel
-	ssh.POST("", sshHandler.Add)
-	// docapi:admin_kernel route /ssh delete_ssh_key_kernel
-	ssh.DELETE("", sshHandler.Delete)
-	// docapi:admin_kernel route /ssh/users get_ssh_users_kernel
-	ssh.GET("/users", sshHandler.GetUsers)
+		hardware = r.Group("/hardware", "Hardware", "")
+		ssh      = r.Group("/ssh", "SSH", "")
+	)
+
+	hardware.POST("/reboot", hardwareHandler.RebootInfo(), hardwareHandler.Reboot)
+
+	ssh.GET("", sshHandler.GetInfo(), sshHandler.Get)
+	ssh.POST("", sshHandler.AddInfo(), sshHandler.Add)
+	ssh.DELETE("", sshHandler.DeleteInfo(), sshHandler.Delete)
+	ssh.GET("/users", sshHandler.GetUsersInfo(), sshHandler.GetUsers)
 
 	return nil
 }

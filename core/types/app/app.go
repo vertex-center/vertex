@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 	"os"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type Meta struct {
@@ -118,7 +120,7 @@ func RunStandalone(app Interface) {
 	srv := server.New(app.Meta().ID, u, vertexCtx)
 
 	if a, ok := app.(Initializable); ok {
-		base := srv.Router.Group(u.Path)
+		base := srv.Router.Group(u.Path, "", "")
 
 		err := a.Initialize(base)
 		if err != nil {
@@ -126,7 +128,10 @@ func RunStandalone(app Interface) {
 			os.Exit(1)
 		}
 
-		base.GET("/ping", func(c *router.Context) {
+		base.GET("/ping", []oapi.Info{
+			oapi.Summary("Ping the app"),
+			oapi.Response(http.StatusOK),
+		}, func(c *router.Context) {
 			c.OK()
 		})
 	}
@@ -154,7 +159,7 @@ func RunStandaloneKernel(app Interface) {
 	srv := server.New(app.Meta().ID, u, vertexCtx)
 
 	if a, ok := app.(KernelInitializable); ok {
-		base := srv.Router.Group(u.Path)
+		base := srv.Router.Group(u.Path, "", "")
 
 		err := a.InitializeKernel(base)
 		if err != nil {
@@ -162,7 +167,10 @@ func RunStandaloneKernel(app Interface) {
 			os.Exit(1)
 		}
 
-		base.GET("/ping", func(c *router.Context) {
+		base.GET("/ping", []oapi.Info{
+			oapi.Summary("Ping the app"),
+			oapi.Response(http.StatusOK),
+		}, func(c *router.Context) {
 			c.OK()
 		})
 	}

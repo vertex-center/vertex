@@ -28,25 +28,22 @@ type Server struct {
 
 func New(id string, u *url.URL, ctx *types.VertexContext) *Server {
 	gin.SetMode(gin.ReleaseMode)
-	s := Server{
-		id:     id,
-		url:    u,
-		ctx:    ctx,
-		Router: router.New(),
-	}
-	s.initRouter()
-	return &s
-}
 
-func (s *Server) initRouter() {
 	cfg := cors.DefaultConfig()
 	cfg.AllowAllOrigins = true
 	cfg.AddAllowHeaders("Authorization")
 
-	s.Router.Use(cors.New(cfg))
-	s.Router.Use(ginutils.ErrorHandler())
-	s.Router.Use(ginutils.Logger(s.id, s.url.String()))
-	s.Router.Use(gin.Recovery())
+	return &Server{
+		id:  id,
+		url: u,
+		ctx: ctx,
+		Router: router.New(
+			router.WithMiddleware(cors.New(cfg)),
+			router.WithMiddleware(ginutils.ErrorHandler()),
+			router.WithMiddleware(ginutils.Logger(id, u.String())),
+			router.WithMiddleware(gin.Recovery()),
+		),
+	}
 }
 
 func (s *Server) StartAsync() chan error {

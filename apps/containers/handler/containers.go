@@ -2,6 +2,7 @@ package handler
 
 import (
 	"io"
+	"net/http"
 
 	"github.com/gin-contrib/sse"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
@@ -10,6 +11,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type containersHandler struct {
@@ -24,38 +26,33 @@ func NewContainersHandler(ctx *apptypes.Context, containerService port.Container
 	}
 }
 
-// docapi begin vx_containers_get_containers
-// docapi method GET
-// docapi summary Get containers
-// docapi tags Containers
-// docapi response 200 {[]Container} The containers.
-// docapi end
-
 func (h *containersHandler) Get(c *router.Context) {
 	installed := h.containerService.GetAll()
 	c.JSON(installed)
 }
 
-// docapi begin vx_containers_get_tags
-// docapi method GET
-// docapi summary Get tags
-// docapi tags Containers
-// docapi response 200 {[]string} The tags.
-// docapi end
+func (h *containersHandler) GetInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get containers"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel([]types.Container{}),
+		),
+	}
+}
 
 func (h *containersHandler) GetTags(c *router.Context) {
 	tags := h.containerService.GetTags()
 	c.JSON(tags)
 }
 
-// docapi begin vx_containers_search
-// docapi method GET
-// docapi summary Search containers
-// docapi tags Containers
-// docapi query features {[]string} The features.
-// docapi query tags {[]string} The tags.
-// docapi response 200 {[]Container} The containers.
-// docapi end
+func (h *containersHandler) GetTagsInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get tags"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel([]string{}),
+		),
+	}
+}
 
 func (h *containersHandler) Search(c *router.Context) {
 	query := types.ContainerSearchQuery{}
@@ -74,13 +71,14 @@ func (h *containersHandler) Search(c *router.Context) {
 	c.JSON(installed)
 }
 
-// docapi begin vx_containers_check_updates
-// docapi method GET
-// docapi summary Check for updates
-// docapi tags Containers
-// docapi response 200 {[]Container} The containers.
-// docapi response 500
-// docapi end
+func (h *containersHandler) SearchInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Search containers"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel([]types.Container{}),
+		),
+	}
+}
 
 func (h *containersHandler) CheckForUpdates(c *router.Context) {
 	containers, err := h.containerService.CheckForUpdates()
@@ -96,14 +94,14 @@ func (h *containersHandler) CheckForUpdates(c *router.Context) {
 	c.JSON(containers)
 }
 
-// docapi begin vx_containers_events
-// docapi method GET
-// docapi summary Get events
-// docapi desc Get events for containers, sent as Server-Sent Events (SSE).
-// docapi tags Containers
-// docapi response 200
-// docapi response 500
-// docapi end
+func (h *containersHandler) CheckForUpdatesInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Check for updates"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel([]types.Container{}),
+		),
+	}
+}
 
 func (h *containersHandler) Events(c *router.Context) {
 	eventsChan := make(chan sse.Event)
@@ -151,4 +149,11 @@ func (h *containersHandler) Events(c *router.Context) {
 			return false
 		}
 	})
+}
+
+func (h *containersHandler) EventsInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get events"),
+		oapi.Response(http.StatusOK),
+	}
 }

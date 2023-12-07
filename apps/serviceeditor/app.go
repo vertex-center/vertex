@@ -9,15 +9,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-// docapi:service_editor title Vertex Devtools Service Editor
-// docapi:service_editor description A service editor for Vertex.
-// docapi:service_editor version 0.0.0
-// docapi:service_editor filename service_editor
-
-// docapi:service_editor url http://{ip}:{port-kernel}/api
-// docapi:service_editor urlvar ip localhost The IP address of the server.
-// docapi:service_editor urlvar port-kernel 7510 The port of the server.
-
 var Meta = apptypes.Meta{
 	ID:          "devtools-service-editor",
 	Name:        "Vertex Service Editor",
@@ -52,11 +43,10 @@ func (a *App) Initialize(r *router.Group) error {
 	var (
 		editorService = service.NewEditorService()
 		editorHandler = handler.NewEditorHandler(editorService)
-		editor        = r.Group("/editor", middleware.Authenticated)
+		editor        = r.Group("/editor", "Editor", "Service editor routes", middleware.Authenticated)
 	)
 
-	// docapi:service_editor route /editor/to-yaml vx_devtools_service_editor_to_yaml
-	editor.POST("/to-yaml", editorHandler.ToYaml)
+	editor.POST("/to-yaml", editorHandler.ToYamlInfo(), editorHandler.ToYaml)
 
 	return nil
 }

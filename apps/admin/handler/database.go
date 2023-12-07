@@ -1,9 +1,12 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type databaseHandler struct {
@@ -16,29 +19,17 @@ func NewDatabaseHandler(dataService port.DatabaseService) port.DatabaseHandler {
 	}
 }
 
-// docapi begin get_current_dbms
-// docapi method GET
-// docapi summary Get the current DBMS
-// docapi desc Get the current database management system that Vertex is using.
-// docapi tags Database
-// docapi response 200 {string} The current DBMS.
-// docapi end
-
 func (h *databaseHandler) GetCurrentDbms(c *router.Context) {
 	c.JSON(h.dataService.GetCurrentDbms())
 }
 
-// docapi begin migrate_to_dbms
-// docapi method POST
-// docapi summary Migrate to a DBMS
-// docapi desc Migrate Vertex to the given database management system.
-// docapi tags Database
-// docapi body {MigrateToBody} The DBMS to migrate to.
-// docapi response 204
-// docapi response 304
-// docapi response 400
-// docapi response 500
-// docapi end
+func (h *databaseHandler) GetCurrentDbmsInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get the current DBMS"),
+		oapi.Description("Get the current database management system that Vertex is using."),
+		oapi.Response(http.StatusOK),
+	}
+}
 
 type MigrateToBody struct {
 	Dbms string `json:"dbms"`
@@ -66,4 +57,12 @@ func (h *databaseHandler) MigrateTo(c *router.Context) {
 	}
 
 	c.OK()
+}
+
+func (h *databaseHandler) MigrateToInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Migrate to a DBMS"),
+		oapi.Description("Migrate Vertex to the given database management system."),
+		oapi.Response(http.StatusNoContent),
+	}
 }

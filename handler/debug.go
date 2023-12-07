@@ -1,8 +1,11 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type debugHandler struct {
@@ -15,15 +18,15 @@ func NewDebugHandler(debugService port.DebugService) port.DebugHandler {
 	}
 }
 
-// docapi begin hard_reset
-// docapi method POST
-// docapi summary Hard reset
-// docapi desc This route allows deleting all the server data, which can be useful for debugging purposes.
-// docapi tags Debug
-// docapi response 204
-// docapi end
-
 func (h *debugHandler) HardReset(c *router.Context) {
 	h.debugService.HardReset()
 	c.OK()
+}
+
+func (h *debugHandler) HardResetInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Hard reset"),
+		oapi.Description("This route allows deleting all the server data, which can be useful for debugging purposes."),
+		oapi.Response(http.StatusNoContent),
+	}
 }

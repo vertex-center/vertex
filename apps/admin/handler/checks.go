@@ -2,11 +2,13 @@ package handler
 
 import (
 	"io"
+	"net/http"
 	"time"
 
 	"github.com/gin-contrib/sse"
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 	"golang.org/x/net/context"
 )
 
@@ -19,14 +21,6 @@ func NewChecksHandler(checksService port.ChecksService) port.ChecksHandler {
 		checksService: checksService,
 	}
 }
-
-// docapi begin admin_checks
-// docapi method GET
-// docapi summary Get all checks
-// docapi desc Check that all vertex requirements are met.
-// docapi tags Checks
-// docapi response 200
-// docapi end
 
 func (h *checksHandler) Check(c *router.Context) {
 	timeout, cancelTimeout := context.WithTimeout(c, 10*time.Second)
@@ -47,4 +41,12 @@ func (h *checksHandler) Check(c *router.Context) {
 		})
 		return err == nil
 	})
+}
+
+func (h *checksHandler) CheckInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get all checks"),
+		oapi.Description("Check that all vertex requirements are met."),
+		oapi.Response(http.StatusOK),
+	}
 }

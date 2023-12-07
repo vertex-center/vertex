@@ -3,12 +3,15 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"net/http"
 
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
+	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/sql/core/port"
 	"github.com/vertex-center/vertex/apps/sql/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type dbmsHandler struct {
@@ -20,17 +23,6 @@ func NewDBMSHandler(sqlService port.SqlService) port.DBMSHandler {
 		sqlService: sqlService,
 	}
 }
-
-// docapi begin vx_sql_get_dbms
-// docapi method GET
-// docapi summary Get an installed DBMS
-// docapi tags SQL
-// docapi query container_uuid {string} The UUID of the container hosting the database.
-// docapi response 200 {DBMS} The DBMS.
-// docapi response 400
-// docapi response 404
-// docapi response 500
-// docapi end
 
 func (r *dbmsHandler) Get(c *router.Context) {
 	uuid, apiError := containersapi.GetContainerUUIDParam(c)
@@ -62,16 +54,14 @@ func (r *dbmsHandler) Get(c *router.Context) {
 	c.JSON(dbms)
 }
 
-// docapi begin vx_sql_install_dbms
-// docapi method POST
-// docapi summary Install a DBMS
-// docapi tags SQL
-// docapi query dbms {string} The DBMS to install.
-// docapi response 200 {Container} The installed DBMS.
-// docapi response 400
-// docapi response 404
-// docapi response 500
-// docapi end
+func (r *dbmsHandler) GetInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get an installed DBMS"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.DBMS{}),
+		),
+	}
+}
 
 func (r *dbmsHandler) Install(c *router.Context) {
 	dbms, err := r.getDBMS(c)
@@ -120,6 +110,15 @@ func (r *dbmsHandler) Install(c *router.Context) {
 	}
 
 	c.JSON(inst)
+}
+
+func (r *dbmsHandler) InstallInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Install a DBMS"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(containerstypes.Container{}),
+		),
+	}
 }
 
 func (r *dbmsHandler) getDBMS(c *router.Context) (string, error) {

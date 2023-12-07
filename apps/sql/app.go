@@ -10,15 +10,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
-// docapi:sql title Vertex SQL
-// docapi:sql description A SQL database manager.
-// docapi:sql version 0.0.0
-// docapi:sql filename sql
-
-// docapi:sql url http://{ip}:{port-kernel}/api
-// docapi:sql urlvar ip localhost The IP address of the server.
-// docapi:sql urlvar port-kernel 7512 The port of the server.
-
 var Meta = apptypes.Meta{
 	ID:          "sql",
 	Name:        "Vertex SQL",
@@ -55,10 +46,8 @@ func (a *App) Initialize(r *router.Group) error {
 		dbmsHandler = handler.NewDBMSHandler(sqlService)
 	)
 
-	// docapi:sql route /container/{container_uuid} vx_sql_get_dbms
-	r.GET("/container/:container_uuid", middleware.Authenticated, dbmsHandler.Get)
-	// docapi:sql route /dbms/{dbms}/install vx_sql_install_dbms
-	r.POST("/dbms/:dbms/install", middleware.Authenticated, dbmsHandler.Install)
+	r.GET("/container/:container_uuid", dbmsHandler.GetInfo(), middleware.Authenticated, dbmsHandler.Get)
+	r.POST("/dbms/:dbms/install", dbmsHandler.InstallInfo(), middleware.Authenticated, dbmsHandler.Install)
 
 	return nil
 }

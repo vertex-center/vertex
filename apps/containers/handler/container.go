@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
 
 	"github.com/gin-contrib/sse"
 	"github.com/google/uuid"
@@ -14,6 +15,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type containerHandler struct {
@@ -101,15 +103,6 @@ func (h *containerHandler) getContainer(c *router.Context) *types.Container {
 	return container
 }
 
-// docapi begin vx_containers_get_container
-// docapi method GET
-// docapi summary Get a container
-// docapi tags Containers
-// docapi response 200 {Container} The container.
-// docapi response 404
-// docapi response 500
-// docapi end
-
 func (h *containerHandler) Get(c *router.Context) {
 	inst := h.getContainer(c)
 	if inst == nil {
@@ -118,15 +111,14 @@ func (h *containerHandler) Get(c *router.Context) {
 	c.JSON(inst)
 }
 
-// docapi begin vx_containers_delete_container
-// docapi method DELETE
-// docapi summary Delete a container
-// docapi tags Containers
-// docapi response 204
-// docapi response 404
-// docapi response 409 {Error} The container is still running.
-// docapi response 500
-// docapi end
+func (h *containerHandler) GetInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get a container"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.Container{}),
+		),
+	}
+}
 
 func (h *containerHandler) Delete(c *router.Context) {
 	inst := h.getContainer(c)
@@ -154,6 +146,13 @@ func (h *containerHandler) Delete(c *router.Context) {
 	c.OK()
 }
 
+func (h *containerHandler) DeleteInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Delete a container"),
+		oapi.Response(http.StatusNoContent),
+	}
+}
+
 type PatchBody struct {
 	LaunchOnStartup *bool                        `json:"launch_on_startup,omitempty"`
 	DisplayName     *string                      `json:"display_name,omitempty"`
@@ -167,17 +166,6 @@ type PatchBodyDatabase struct {
 	ContainerID  uuid.UUID `json:"container_id"`
 	DatabaseName *string   `json:"db_name"`
 }
-
-// docapi begin vx_containers_patch_container
-// docapi method PATCH
-// docapi summary Patch a container
-// docapi tags Containers
-// docapi body {PatchBody} The container patch.
-// docapi response 204
-// docapi response 400
-// docapi response 404
-// docapi response 500
-// docapi end
 
 func (h *containerHandler) Patch(c *router.Context) {
 	inst := h.getContainer(c)
@@ -264,15 +252,12 @@ func (h *containerHandler) Patch(c *router.Context) {
 	c.OK()
 }
 
-// docapi begin vx_containers_start_container
-// docapi method POST
-// docapi summary Start a container
-// docapi tags Containers
-// docapi response 204
-// docapi response 404
-// docapi response 409 {Error} The container is already running.
-// docapi response 500
-// docapi end
+func (h *containerHandler) PatchInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Patch a container"),
+		oapi.Response(http.StatusNoContent),
+	}
+}
 
 func (h *containerHandler) Start(c *router.Context) {
 	inst := h.getContainer(c)
@@ -307,15 +292,12 @@ func (h *containerHandler) Start(c *router.Context) {
 	c.OK()
 }
 
-// docapi begin vx_containers_stop_container
-// docapi method POST
-// docapi summary Stop a container
-// docapi tags Containers
-// docapi response 204
-// docapi response 404
-// docapi response 409 {Error} The container is not running.
-// docapi response 500
-// docapi end
+func (h *containerHandler) StartInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Start a container"),
+		oapi.Response(http.StatusNoContent),
+	}
+}
 
 func (h *containerHandler) Stop(c *router.Context) {
 	inst := h.getContainer(c)
@@ -343,18 +325,14 @@ func (h *containerHandler) Stop(c *router.Context) {
 	c.OK()
 }
 
-type PatchEnvironmentBody map[string]string
+func (h *containerHandler) StopInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Stop a container"),
+		oapi.Response(http.StatusNoContent),
+	}
+}
 
-// docapi begin vx_containers_patch_environment
-// docapi method PATCH
-// docapi summary Patch a container environment
-// docapi tags Containers
-// docapi body {PatchEnvironmentBody} The environment variables to set.
-// docapi response 204
-// docapi response 400
-// docapi response 404
-// docapi response 500
-// docapi end
+type PatchEnvironmentBody map[string]string
 
 func (h *containerHandler) PatchEnvironment(c *router.Context) {
 	var environment PatchEnvironmentBody
@@ -391,15 +369,12 @@ func (h *containerHandler) PatchEnvironment(c *router.Context) {
 	c.OK()
 }
 
-// docapi begin vx_containers_events_container
-// docapi method GET
-// docapi summary Get container events
-// docapi desc Get events for a container, sent as Server-Sent Events (SSE).
-// docapi tags Containers
-// docapi response 200
-// docapi response 404
-// docapi response 500
-// docapi end
+func (h *containerHandler) PatchEnvironmentInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Patch a container environment"),
+		oapi.Response(http.StatusNoContent),
+	}
+}
 
 func (h *containerHandler) Events(c *router.Context) {
 	inst := h.getContainer(c)
@@ -481,16 +456,15 @@ func (h *containerHandler) Events(c *router.Context) {
 	})
 }
 
-type DockerContainerInfo map[string]any
+func (h *containerHandler) EventsInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get container events"),
+		oapi.Description("Get events for a container, sent as Server-Sent Events (SSE)."),
+		oapi.Response(http.StatusOK),
+	}
+}
 
-// docapi begin vx_containers_get_docker
-// docapi method GET
-// docapi summary Get Docker container info
-// docapi tags Containers
-// docapi response 200 {DockerContainerInfo} The Docker container info.
-// docapi response 404
-// docapi response 500
-// docapi end
+type DockerContainerInfo map[string]any
 
 func (h *containerHandler) GetDocker(c *router.Context) {
 	inst := h.getContainer(c)
@@ -511,14 +485,14 @@ func (h *containerHandler) GetDocker(c *router.Context) {
 	c.JSON(info)
 }
 
-// docapi begin vx_containers_recreate_docker
-// docapi method POST
-// docapi summary Recreate Docker container
-// docapi tags Containers
-// docapi response 204
-// docapi response 404
-// docapi response 500
-// docapi end
+func (h *containerHandler) GetDockerInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get Docker container info"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(DockerContainerInfo{}),
+		),
+	}
+}
 
 func (h *containerHandler) RecreateDocker(c *router.Context) {
 	inst := h.getContainer(c)
@@ -539,14 +513,12 @@ func (h *containerHandler) RecreateDocker(c *router.Context) {
 	c.OK()
 }
 
-// docapi begin vx_containers_get_logs
-// docapi method GET
-// docapi summary Get container logs
-// docapi tags Containers
-// docapi response 200 {[]LogLine} The logs.
-// docapi response 404
-// docapi response 500
-// docapi end
+func (h *containerHandler) RecreateDockerInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Recreate Docker container"),
+		oapi.Response(http.StatusNoContent),
+	}
+}
 
 func (h *containerHandler) GetLogs(c *router.Context) {
 	uid := h.getParamContainerUUID(c)
@@ -567,14 +539,14 @@ func (h *containerHandler) GetLogs(c *router.Context) {
 	c.JSON(logs)
 }
 
-// docapi begin vx_containers_update_service
-// docapi method POST
-// docapi summary Update service
-// docapi tags Containers
-// docapi response 204
-// docapi response 404
-// docapi response 500
-// docapi end
+func (h *containerHandler) GetLogsInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get container logs"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel([]types.LogLine{}),
+		),
+	}
+}
 
 func (h *containerHandler) UpdateService(c *router.Context) {
 	inst := h.getContainer(c)
@@ -605,15 +577,12 @@ func (h *containerHandler) UpdateService(c *router.Context) {
 	c.OK()
 }
 
-// docapi begin vx_containers_get_versions
-// docapi method GET
-// docapi summary Get container versions
-// docapi tags Containers
-// docapi query reload {bool} Whether to reload the versions from the registry or use the cache.
-// docapi response 200 {[]string} The versions.
-// docapi response 404
-// docapi response 500
-// docapi end
+func (h *containerHandler) UpdateServiceInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Update service"),
+		oapi.Response(http.StatusNoContent),
+	}
+}
 
 func (h *containerHandler) GetVersions(c *router.Context) {
 	inst := h.getContainer(c)
@@ -636,15 +605,14 @@ func (h *containerHandler) GetVersions(c *router.Context) {
 	c.JSON(versions)
 }
 
-// docapi begin vx_containers_wait_status
-// docapi method GET
-// docapi summary Wait for a status change
-// docapi tags Containers
-// docapi query status {string} The status to wait for.
-// docapi response 204
-// docapi response 404
-// docapi response 500
-// docapi end
+func (h *containerHandler) GetVersionsInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get container versions"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel([]string{}),
+		),
+	}
+}
 
 func (h *containerHandler) WaitStatus(c *router.Context) {
 	status := c.Query("status")
@@ -665,4 +633,11 @@ func (h *containerHandler) WaitStatus(c *router.Context) {
 	}
 
 	c.OK()
+}
+
+func (h *containerHandler) WaitStatusInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Wait for a status change"),
+		oapi.Response(http.StatusNoContent),
+	}
 }

@@ -2,11 +2,13 @@ package handler
 
 import (
 	"errors"
+	"net/http"
 
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type updateHandler struct {
@@ -20,14 +22,6 @@ func NewUpdateHandler(updateService port.UpdateService, settingsService port.Set
 		settingsService: settingsService,
 	}
 }
-
-// docapi begin get_updates
-// docapi method GET
-// docapi summary Get the latest version info
-// docapi tags Updates
-// docapi response 200 {Update} The latest version information.
-// docapi response 500
-// docapi end
 
 func (h *updateHandler) Get(c *router.Context) {
 	channel, err := h.settingsService.GetChannel()
@@ -60,14 +54,14 @@ func (h *updateHandler) Get(c *router.Context) {
 	c.JSON(update)
 }
 
-// docapi begin install_update
-// docapi method POST
-// docapi summary Install the latest version
-// docapi tags Updates
-// docapi response 204
-// docapi response 400
-// docapi response 500
-// docapi end
+func (h *updateHandler) GetInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get the latest update information"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.Update{}),
+		),
+	}
+}
 
 func (h *updateHandler) Install(c *router.Context) {
 	channel, err := h.settingsService.GetChannel()
@@ -105,4 +99,12 @@ func (h *updateHandler) Install(c *router.Context) {
 	}
 
 	c.OK()
+}
+
+func (h *updateHandler) InstallInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Install the latest version"),
+		oapi.Description("This endpoint will install the latest version of Vertex."),
+		oapi.Response(http.StatusNoContent),
+	}
 }

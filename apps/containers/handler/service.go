@@ -3,10 +3,12 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"net/http"
 
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type serviceHandler struct {
@@ -20,16 +22,6 @@ func NewServiceHandler(serviceService port.ServiceService, containerService port
 		containerService: containerService,
 	}
 }
-
-// docapi begin vx_containers_get_service
-// docapi method GET
-// docapi summary Get service
-// docapi tags Containers
-// docapi query service_id {string} The service ID.
-// docapi response 200 {Service} The service.
-// docapi response 400
-// docapi response 404
-// docapi end
 
 func (h *serviceHandler) Get(c *router.Context) {
 	serviceID := c.Param("service_id")
@@ -55,16 +47,14 @@ func (h *serviceHandler) Get(c *router.Context) {
 	c.JSON(service)
 }
 
-// docapi begin vx_containers_install_service
-// docapi method POST
-// docapi summary Install a service
-// docapi tags Containers
-// docapi query service_id {string} The service ID.
-// docapi response 200 {Container} The container.
-// docapi response 400
-// docapi response 404
-// docapi response 500
-// docapi end
+func (h *serviceHandler) GetInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get service"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.Service{}),
+		),
+	}
+}
 
 func (h *serviceHandler) Install(c *router.Context) {
 	serviceID := c.Param("service_id")
@@ -105,4 +95,13 @@ func (h *serviceHandler) Install(c *router.Context) {
 	}
 
 	c.JSON(inst)
+}
+
+func (h *serviceHandler) InstallInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Install service"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.Container{}),
+		),
+	}
 }

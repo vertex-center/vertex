@@ -7,8 +7,11 @@ import (
 
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/service"
+	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/vertex-center/vertex/pkg/user"
 )
 
 type sshHandler struct {
@@ -20,14 +23,6 @@ func NewSshHandler(sshService port.SshService) port.SshHandler {
 		sshService: sshService,
 	}
 }
-
-// docapi begin get_ssh_keys
-// docapi method GET
-// docapi summary Get all SSH keys
-// docapi tags SSH
-// docapi response 200 {[]PublicKey} The list of SSH keys.
-// docapi response 500
-// docapi end
 
 func (h *sshHandler) Get(c *router.Context) {
 	keys, err := h.sshService.GetAll()
@@ -43,15 +38,14 @@ func (h *sshHandler) Get(c *router.Context) {
 	c.JSON(keys)
 }
 
-// docapi begin add_ssh_key
-// docapi method POST
-// docapi summary Add an SSH key
-// docapi tags SSH
-// docapi body {AddSSHKeyBody} The SSH key to add.
-// docapi response 201
-// docapi response 400
-// docapi response 500
-// docapi end
+func (h *sshHandler) GetInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get all SSH keys"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel([]types.PublicKey{}),
+		),
+	}
+}
 
 type AddSSHKeyBody struct {
 	AuthorizedKey string `json:"authorized_key"`
@@ -89,18 +83,15 @@ func (h *sshHandler) Add(c *router.Context) {
 		return
 	}
 
-	c.Status(http.StatusCreated)
+	c.Created()
 }
 
-// docapi begin delete_ssh_key
-// docapi method DELETE
-// docapi summary Delete SSH key
-// docapi tags SSH
-// docapi query fingerprint {DeleteSSHKeyBody} The fingerprint of the SSH key to delete.
-// docapi response 204
-// docapi response 400
-// docapi response 500
-// docapi end
+func (h *sshHandler) AddInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Add an SSH key"),
+		oapi.Response(http.StatusCreated),
+	}
+}
 
 type DeleteSSHKeyBody struct {
 	Fingerprint string `json:"fingerprint"`
@@ -127,13 +118,12 @@ func (h *sshHandler) Delete(c *router.Context) {
 	c.OK()
 }
 
-// docapi begin get_ssh_users
-// docapi method GET
-// docapi summary Get all users that can have SSH keys
-// docapi tags SSH
-// docapi response 200 {[]User} The list of users.
-// docapi response 500
-// docapi end
+func (h *sshHandler) DeleteInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Delete SSH key"),
+		oapi.Response(http.StatusNoContent),
+	}
+}
 
 func (h *sshHandler) GetUsers(c *router.Context) {
 	users, err := h.sshService.GetUsers()
@@ -146,4 +136,13 @@ func (h *sshHandler) GetUsers(c *router.Context) {
 		return
 	}
 	c.JSON(users)
+}
+
+func (h *sshHandler) GetUsersInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get all users that can have SSH keys"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel([]user.User{}),
+		),
+	}
 }

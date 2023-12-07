@@ -1,10 +1,13 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/core/types/api"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type settingsHandler struct {
@@ -16,14 +19,6 @@ func NewSettingsHandler(settingsService port.SettingsService) port.SettingsHandl
 		service: settingsService,
 	}
 }
-
-// docapi begin get_settings
-// docapi method GET
-// docapi summary Get settings
-// docapi tags Settings
-// docapi response 200 {Settings} The settings.
-// docapi response 500
-// docapi end
 
 func (h *settingsHandler) Get(c *router.Context) {
 	settings, err := h.service.Get()
@@ -38,15 +33,14 @@ func (h *settingsHandler) Get(c *router.Context) {
 	c.JSON(settings)
 }
 
-// docapi begin patch_settings
-// docapi method PATCH
-// docapi summary Patch settings
-// docapi tags Settings
-// docapi body {Settings} The settings to update.
-// docapi response 200
-// docapi response 400
-// docapi response 500
-// docapi end
+func (h *settingsHandler) GetInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get settings"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.AdminSettings{}),
+		),
+	}
+}
 
 func (h *settingsHandler) Patch(c *router.Context) {
 	var settings types.AdminSettings
@@ -66,4 +60,11 @@ func (h *settingsHandler) Patch(c *router.Context) {
 	}
 
 	c.OK()
+}
+
+func (h *settingsHandler) PatchInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Patch settings"),
+		oapi.Response(http.StatusNoContent),
+	}
 }

@@ -3,10 +3,12 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"net/http"
 
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type metricsHandler struct {
@@ -45,27 +47,18 @@ func getVisualizer(c *router.Context) (string, error) {
 	return visualizer, nil
 }
 
-// docapi begin vx_monitoring_get_metrics
-// docapi method GET
-// docapi summary Get metrics
-// docapi tags Monitoring
-// docapi response 200 {Metrics} The metrics.
-// docapi end
-
 func (r *metricsHandler) Get(c *router.Context) {
 	c.JSON(r.metricsService.GetMetrics())
 }
 
-// docapi begin vx_monitoring_install_collector
-// docapi method POST
-// docapi summary Install a collector
-// docapi tags Monitoring
-// docapi query collector {string} The collector to install.
-// docapi response 200
-// docapi response 400
-// docapi response 404
-// docapi response 500
-// docapi end
+func (r *metricsHandler) GetInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get metrics"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.Metric{}),
+		),
+	}
+}
 
 func (r *metricsHandler) InstallCollector(c *router.Context) {
 	collector, err := getCollector(c)
@@ -88,16 +81,12 @@ func (r *metricsHandler) InstallCollector(c *router.Context) {
 	c.OK()
 }
 
-// docapi begin vx_monitoring_install_visualizer
-// docapi method POST
-// docapi summary Install a visualizer
-// docapi tags Monitoring
-// docapi query visualizer {string} The visualizer to install.
-// docapi response 200
-// docapi response 400
-// docapi response 404
-// docapi response 500
-// docapi end
+func (r *metricsHandler) InstallCollectorInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Install a collector"),
+		oapi.Response(http.StatusOK),
+	}
+}
 
 func (r *metricsHandler) InstallVisualizer(c *router.Context) {
 	visualizer, err := getVisualizer(c)
@@ -118,4 +107,11 @@ func (r *metricsHandler) InstallVisualizer(c *router.Context) {
 	}
 
 	c.OK()
+}
+
+func (r *metricsHandler) InstallVisualizerInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Install a visualizer"),
+		oapi.Response(http.StatusNoContent),
+	}
 }

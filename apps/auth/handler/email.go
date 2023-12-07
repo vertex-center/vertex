@@ -2,11 +2,13 @@ package handler
 
 import (
 	"errors"
+	"net/http"
 	"net/mail"
 
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type emailHandler struct {
@@ -18,15 +20,6 @@ func NewEmailHandler(emailService port.EmailService) port.EmailHandler {
 		service: emailService,
 	}
 }
-
-// docapi begin auth_current_user_get_emails
-// docapi method GET
-// docapi summary Get emails
-// docapi description Retrieve the emails of the logged-in user
-// docapi tags Emails
-// docapi response 200 {[]Email} The emails
-// docapi response 500
-// docapi end
 
 func (h *emailHandler) GetCurrentUserEmails(c *router.Context) {
 	userID := c.GetInt("user_id")
@@ -44,16 +37,15 @@ func (h *emailHandler) GetCurrentUserEmails(c *router.Context) {
 	c.JSON(emails)
 }
 
-// docapi begin auth_current_user_create_email
-// docapi method POST
-// docapi summary Create email
-// docapi description Create a new email for the logged-in user
-// docapi tags Emails
-// docapi response 200 {Email} The email
-// docapi response 400
-// docapi response 409 {Error} Email already exists
-// docapi response 500
-// docapi end
+func (h *emailHandler) GetCurrentUserEmailsInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get emails"),
+		oapi.Description("Retrieve the emails of the logged-in user"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel([]types.Email{}),
+		),
+	}
+}
 
 type CreateCurrentUserEmailBody struct {
 	Email string `json:"email"`
@@ -105,14 +97,15 @@ func (h *emailHandler) CreateCurrentUserEmail(c *router.Context) {
 	c.JSON(email)
 }
 
-// docapi begin auth_current_user_delete_email
-// docapi method DELETE
-// docapi summary Delete email
-// docapi description Delete an email from the logged-in user
-// docapi tags Emails
-// docapi response 204
-// docapi response 500
-// docapi end
+func (h *emailHandler) CreateCurrentUserEmailInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Create email"),
+		oapi.Description("Create a new email for the logged-in user"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.Email{}),
+		),
+	}
+}
 
 func (h *emailHandler) DeleteCurrentUserEmail(c *router.Context) {
 	userID := c.GetInt("user_id")
@@ -134,4 +127,12 @@ func (h *emailHandler) DeleteCurrentUserEmail(c *router.Context) {
 	}
 
 	c.OK()
+}
+
+func (h *emailHandler) DeleteCurrentUserEmailInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Delete email"),
+		oapi.Description("Delete an email from the logged-in user"),
+		oapi.Response(http.StatusNoContent),
+	}
 }

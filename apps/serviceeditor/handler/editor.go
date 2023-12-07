@@ -1,10 +1,13 @@
 package handler
 
 import (
+	"net/http"
+
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/serviceeditor/core/port"
 	"github.com/vertex-center/vertex/apps/serviceeditor/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type editorHandler struct {
@@ -16,16 +19,6 @@ func NewEditorHandler(editorService port.EditorService) port.EditorHandler {
 		editorService: editorService,
 	}
 }
-
-// docapi begin vx_devtools_service_editor_to_yaml
-// docapi method POST
-// docapi summary Convert service to yaml
-// docapi desc Convert service description to a reusable yaml file.
-// docapi tags Service Editor
-// docapi body {Service} The service to convert.
-// docapi response 200 {string} The yaml file.
-// docapi response 400
-// docapi end
 
 func (h *editorHandler) ToYaml(c *router.Context) {
 	var serv containerstypes.Service
@@ -50,4 +43,12 @@ func (h *editorHandler) ToYaml(c *router.Context) {
 	}
 
 	c.Data(200, "yaml", yaml)
+}
+
+func (h *editorHandler) ToYamlInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Convert service to yaml"),
+		oapi.Description("Convert service description to a reusable yaml file."),
+		oapi.Response(http.StatusOK),
+	}
 }

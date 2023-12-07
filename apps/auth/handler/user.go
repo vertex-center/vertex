@@ -1,9 +1,12 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type userHandler struct {
@@ -15,15 +18,6 @@ func NewUserHandler(userService port.UserService) port.UserHandler {
 		service: userService,
 	}
 }
-
-// docapi begin auth_get_current_user
-// docapi method GET
-// docapi summary Get user
-// docapi description Retrieve the logged-in user
-// docapi tags Users
-// docapi response 200 {User} The user
-// docapi response 500
-// docapi end
 
 func (h *userHandler) GetCurrentUser(c *router.Context) {
 	userID := c.GetInt("user_id")
@@ -41,14 +35,15 @@ func (h *userHandler) GetCurrentUser(c *router.Context) {
 	c.JSON(user)
 }
 
-// docapi begin auth_patch_current_user
-// docapi method PATCH
-// docapi summary Patch user
-// docapi description Patch the logged-in user
-// docapi tags Users
-// docapi response 200 {User} The user
-// docapi response 500
-// docapi end
+func (h *userHandler) GetCurrentUserInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get user"),
+		oapi.Description("Retrieve the logged-in user"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.User{}),
+		),
+	}
+}
 
 func (h *userHandler) PatchCurrentUser(c *router.Context) {
 	userID := c.GetInt("user_id")
@@ -73,14 +68,15 @@ func (h *userHandler) PatchCurrentUser(c *router.Context) {
 	c.JSON(user)
 }
 
-// docapi begin auth_get_current_user_credentials
-// docapi method GET
-// docapi summary Get user credentials
-// docapi description Retrieve the logged-in user credentials
-// docapi tags Users
-// docapi response 200 {UserCredentials} The user credentials
-// docapi response 500
-// docapi end
+func (h *userHandler) PatchCurrentUserInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Patch user"),
+		oapi.Description("Update the logged-in user"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.User{}),
+		),
+	}
+}
 
 func (h *userHandler) GetCurrentUserCredentials(c *router.Context) {
 	userID := c.GetInt("user_id")
@@ -96,4 +92,14 @@ func (h *userHandler) GetCurrentUserCredentials(c *router.Context) {
 	}
 
 	c.JSON(credentials)
+}
+
+func (h *userHandler) GetCurrentUserCredentialsInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get user credentials"),
+		oapi.Description("Retrieve the logged-in user credentials"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.CredentialsMethods{}),
+		),
+	}
 }

@@ -4,12 +4,14 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"net/http"
 
 	"github.com/docker/docker/client"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type dockerKernelHandler struct {
@@ -21,14 +23,6 @@ func NewDockerKernelHandler(dockerKernelService port.DockerService) port.DockerK
 		dockerService: dockerKernelService,
 	}
 }
-
-// docapi begin vx_containers_kernel_get_containers
-// docapi method GET
-// docapi summary Get containers
-// docapi tags Containers
-// docapi response 200 {[]Container} The containers.
-// docapi response 500
-// docapi end
 
 func (h *dockerKernelHandler) GetContainers(c *router.Context) {
 	containers, err := h.dockerService.ListContainers()
@@ -44,14 +38,14 @@ func (h *dockerKernelHandler) GetContainers(c *router.Context) {
 	c.JSON(containers)
 }
 
-// docapi begin vx_containers_kernel_create_container
-// docapi method POST
-// docapi summary Create container
-// docapi tags Containers
-// docapi body CreateContainerOptions
-// docapi response 200 {Container} The container.
-// docapi response 500
-// docapi end
+func (h *dockerKernelHandler) GetContainersInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get containers"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel([]types.Container{}),
+		),
+	}
+}
 
 func (h *dockerKernelHandler) CreateContainer(c *router.Context) {
 	var options types.CreateContainerOptions
@@ -73,15 +67,14 @@ func (h *dockerKernelHandler) CreateContainer(c *router.Context) {
 	c.JSON(res)
 }
 
-// docapi begin vx_containers_kernel_delete_container
-// docapi method DELETE
-// docapi summary Delete container
-// docapi tags Containers
-// docapi query id {string} The container id.
-// docapi response 200
-// docapi response 404
-// docapi response 500
-// docapi end
+func (h *dockerKernelHandler) CreateContainerInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Create container"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.Container{}),
+		),
+	}
+}
 
 func (h *dockerKernelHandler) DeleteContainer(c *router.Context) {
 	id := c.Param("id")
@@ -106,14 +99,12 @@ func (h *dockerKernelHandler) DeleteContainer(c *router.Context) {
 	c.OK()
 }
 
-// docapi begin vx_containers_kernel_start_container
-// docapi method POST
-// docapi summary Start container
-// docapi tags Containers
-// docapi query id {string} The container id.
-// docapi response 200
-// docapi response 500
-// docapi end
+func (h *dockerKernelHandler) DeleteContainerInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Delete container"),
+		oapi.Response(http.StatusNoContent),
+	}
+}
 
 func (h *dockerKernelHandler) StartContainer(c *router.Context) {
 	id := c.Param("id")
@@ -131,14 +122,12 @@ func (h *dockerKernelHandler) StartContainer(c *router.Context) {
 	c.OK()
 }
 
-// docapi begin vx_containers_kernel_stop_container
-// docapi method POST
-// docapi summary Stop container
-// docapi tags Containers
-// docapi query id {string} The container id.
-// docapi response 200
-// docapi response 500
-// docapi end
+func (h *dockerKernelHandler) StartContainerInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Start container"),
+		oapi.Response(http.StatusNoContent),
+	}
+}
 
 func (h *dockerKernelHandler) StopContainer(c *router.Context) {
 	id := c.Param("id")
@@ -156,15 +145,12 @@ func (h *dockerKernelHandler) StopContainer(c *router.Context) {
 	c.OK()
 }
 
-// docapi begin vx_containers_kernel_patch_container
-// docapi method PATCH
-// docapi summary Patch container
-// docapi tags Containers
-// docapi query id {string} The container id.
-// docapi body PatchContainerOptions
-// docapi response 200
-// docapi response 500
-// docapi end
+func (h *dockerKernelHandler) StopContainerInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Stop container"),
+		oapi.Response(http.StatusNoContent),
+	}
+}
 
 func (h *dockerKernelHandler) InfoContainer(c *router.Context) {
 	id := c.Param("id")
@@ -182,15 +168,14 @@ func (h *dockerKernelHandler) InfoContainer(c *router.Context) {
 	c.JSON(info)
 }
 
-// docapi begin vx_containers_kernel_logs_stdout_container
-// docapi method GET
-// docapi summary Get container stdout logs
-// docapi desc Get container stdout logs as a stream.
-// docapi tags Containers
-// docapi query id {string} The container id.
-// docapi response 200
-// docapi response 500
-// docapi end
+func (h *dockerKernelHandler) InfoContainerInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get container info"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.Container{}),
+		),
+	}
+}
 
 func (h *dockerKernelHandler) LogsStdoutContainer(c *router.Context) {
 	id := c.Param("id")
@@ -225,15 +210,13 @@ func (h *dockerKernelHandler) LogsStdoutContainer(c *router.Context) {
 	})
 }
 
-// docapi begin vx_containers_kernel_logs_stderr_container
-// docapi method GET
-// docapi summary Get container stderr logs
-// docapi desc Get container stderr logs as a stream.
-// docapi tags Containers
-// docapi query id {string} The container id.
-// docapi response 200
-// docapi response 500
-// docapi end
+func (h *dockerKernelHandler) LogsStdoutContainerInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get container stdout logs"),
+		oapi.Description("Get container stdout logs as a stream."),
+		oapi.Response(http.StatusOK),
+	}
+}
 
 func (h *dockerKernelHandler) LogsStderrContainer(c *router.Context) {
 	id := c.Param("id")
@@ -268,15 +251,13 @@ func (h *dockerKernelHandler) LogsStderrContainer(c *router.Context) {
 	})
 }
 
-// docapi begin vx_containers_kernel_wait_container
-// docapi method GET
-// docapi summary Wait container
-// docapi tags Containers
-// docapi query id {string} The container id.
-// docapi query cond {string} The condition to wait for.
-// docapi response 200
-// docapi response 500
-// docapi end
+func (h *dockerKernelHandler) LogsStderrContainerInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get container stderr logs"),
+		oapi.Description("Get container stderr logs as a stream."),
+		oapi.Response(http.StatusOK),
+	}
+}
 
 func (h *dockerKernelHandler) WaitContainer(c *router.Context) {
 	id := c.Param("id")
@@ -295,14 +276,12 @@ func (h *dockerKernelHandler) WaitContainer(c *router.Context) {
 	c.OK()
 }
 
-// docapi begin vx_containers_kernel_delete_mounts
-// docapi method DELETE
-// docapi summary Delete mounts
-// docapi tags Containers
-// docapi query id {string} The container uuid.
-// docapi response 200
-// docapi response 500
-// docapi end
+func (h *dockerKernelHandler) WaitContainerInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Wait container"),
+		oapi.Response(http.StatusNoContent),
+	}
+}
 
 func (h *dockerKernelHandler) DeleteMounts(c *router.Context) {
 	id := c.Param("id")
@@ -320,14 +299,12 @@ func (h *dockerKernelHandler) DeleteMounts(c *router.Context) {
 	c.OK()
 }
 
-// docapi begin vx_containers_kernel_info_image
-// docapi method GET
-// docapi summary Get image info
-// docapi tags Containers
-// docapi query id {string} The image id.
-// docapi response 200 {InfoImageResponse} The image.
-// docapi response 500
-// docapi end
+func (h *dockerKernelHandler) DeleteMountsInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Delete mounts"),
+		oapi.Response(http.StatusNoContent),
+	}
+}
 
 func (h *dockerKernelHandler) InfoImage(c *router.Context) {
 	id := c.Param("id")
@@ -345,15 +322,14 @@ func (h *dockerKernelHandler) InfoImage(c *router.Context) {
 	c.JSON(info)
 }
 
-// docapi begin vx_containers_kernel_pull_image
-// docapi method POST
-// docapi summary Pull image
-// docapi desc Pull an image from a registry. The response is a stream of the logs.
-// docapi tags Containers
-// docapi body {PullImageOptions} The options to pull the image.
-// docapi response 200
-// docapi response 500
-// docapi end
+func (h *dockerKernelHandler) InfoImageInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Get image info"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.InfoImageResponse{}),
+		),
+	}
+}
 
 func (h *dockerKernelHandler) PullImage(c *router.Context) {
 	var options types.PullImageOptions
@@ -392,15 +368,12 @@ func (h *dockerKernelHandler) PullImage(c *router.Context) {
 	})
 }
 
-// docapi begin vx_containers_kernel_build_image
-// docapi method POST
-// docapi summary Build image
-// docapi desc Build an image from a Dockerfile. The response is a stream of the logs.
-// docapi tags Containers
-// docapi body {BuildImageOptions} The options to build the image.
-// docapi response 200
-// docapi response 500
-// docapi end
+func (h *dockerKernelHandler) PullImageInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Pull image"),
+		oapi.Response(http.StatusOK),
+	}
+}
 
 func (h *dockerKernelHandler) BuildImage(c *router.Context) {
 	var options types.BuildImageOptions
@@ -439,4 +412,11 @@ func (h *dockerKernelHandler) BuildImage(c *router.Context) {
 		}
 		return true
 	})
+}
+
+func (h *dockerKernelHandler) BuildImageInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Build image"),
+		oapi.Response(http.StatusOK),
+	}
 }

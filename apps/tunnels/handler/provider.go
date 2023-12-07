@@ -3,10 +3,12 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"net/http"
 
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types"
 	"github.com/vertex-center/vertex/apps/tunnels/core/port"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -17,15 +19,6 @@ type providerHandler struct{}
 func NewProviderHandler() port.ProviderHandler {
 	return &providerHandler{}
 }
-
-// docapi begin vx_tunnels_install_provider
-// docapi method POST
-// docapi summary Install a tunnel provider
-// docapi tags Tunnels
-// docapi query provider {string} The provider to install.
-// docapi response 204
-// docapi response 500
-// docapi end
 
 func (r *providerHandler) Install(c *router.Context) {
 	provider, err := getTunnelProvider(c)
@@ -58,6 +51,13 @@ func (r *providerHandler) Install(c *router.Context) {
 	}
 
 	c.OK()
+}
+
+func (r *providerHandler) InstallInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Install a tunnel provider"),
+		oapi.Response(http.StatusNoContent),
+	}
 }
 
 func getTunnelProvider(c *router.Context) (string, error) {

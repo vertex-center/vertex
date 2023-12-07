@@ -29,27 +29,8 @@ import (
 	"github.com/vertex-center/vertex/handler"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
-
-// docapi:vertex title Vertex
-// docapi:vertex description A platform to manage your self-hosted server.
-// docapi:vertex version 0.0.0
-// docapi:vertex filename vertex
-
-// docapi:vertex url http://{ip}:{port}/api
-// docapi:vertex urlvar ip localhost The IP address of the server.
-// docapi:vertex urlvar port 6130 The port of the server.
-
-// docapi code 200 Success
-// docapi code 201 Created
-// docapi code 204 No content
-// docapi code 304 Not modified
-// docapi code 400 {Error} Bad request
-// docapi code 401 {Error} Unauthorized
-// docapi code 404 {Error} Resource not found
-// docapi code 409 {Error} Conflict
-// docapi code 422 {Error} Unprocessable entity
-// docapi code 500 {Error} Internal error
 
 // goreleaser will override version, commit and date
 var (
@@ -149,27 +130,30 @@ func initServices() {
 }
 
 func initRoutes(about types.About) {
-	srv.Router.NoRoute(func(c *gin.Context) {
+	srv.Router.Engine().NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, router.Error{
 			Code:          "resource_not_found",
 			PublicMessage: "Resource not found.",
 		})
 	})
 
-	a := srv.Router.Group("/api", middleware.ReadAuth)
-	a.GET("/about", func(c *router.Context) {
+	a := srv.Router.Group("/api", "API", "Main API group", middleware.ReadAuth)
+	a.GET("/about", []oapi.Info{
+		oapi.Summary("Get server info"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.About{}),
+		),
+	}, func(c *router.Context) {
 		c.JSON(about)
 	})
 
 	if config.Current.Debug() {
 		debugHandler := handler.NewDebugHandler(debugService)
-		debug := a.Group("/debug", middleware.Authenticated)
-		// docapi:vertex route /debug/hard-reset hard_reset
-		debug.POST("/hard-reset", debugHandler.HardReset)
+		debug := a.Group("/debug", "Debug", "Routes only available with DEBUG=1", middleware.Authenticated)
+		debug.POST("/hard-reset", debugHandler.HardResetInfo(), debugHandler.HardReset)
 	}
 
 	appsHandler := handler.NewAppsHandler(appsService)
-	apps := a.Group("/apps", middleware.Authenticated)
-	// docapi:vertex route /apps get_apps
-	apps.GET("", appsHandler.GetApps)
+	apps := a.Group("/apps", "Apps", "Apps", middleware.Authenticated)
+	apps.GET("", appsHandler.GetAppsInfo(), appsHandler.GetApps)
 }

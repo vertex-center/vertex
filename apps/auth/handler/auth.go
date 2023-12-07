@@ -3,11 +3,13 @@ package handler
 import (
 	"encoding/base64"
 	"errors"
+	"net/http"
 	"strings"
 
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/pkg/router/oapi"
 )
 
 type authHandler struct {
@@ -19,16 +21,6 @@ func NewAuthHandler(authService port.AuthService) port.AuthHandler {
 		authService: authService,
 	}
 }
-
-// docapi begin auth_login
-// docapi method POST
-// docapi summary Login
-// docapi description Login with username and password
-// docapi tags Auth
-// docapi response 200 {Token} The auth token
-// docapi response 400
-// docapi response 500
-// docapi end
 
 func (h authHandler) Login(c *router.Context) {
 	login, pass, err := h.getUserPassFromHeader(c)
@@ -49,14 +41,15 @@ func (h authHandler) Login(c *router.Context) {
 	c.JSON(token)
 }
 
-// docapi begin auth_register
-// docapi method POST
-// docapi summary Register
-// docapi description Register a new user with username and password
-// docapi tags Auth
-// docapi response 200 {Token} The auth token
-// docapi response 400
-// docapi response 500
+func (h authHandler) LoginInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Login"),
+		oapi.Description("Login with username and password"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.Session{}),
+		),
+	}
+}
 
 func (h authHandler) Register(c *router.Context) {
 	login, pass, err := h.getUserPassFromHeader(c)
@@ -98,15 +91,15 @@ func (h authHandler) Register(c *router.Context) {
 	c.JSON(token)
 }
 
-// docapi begin auth_verify
-// docapi method POST
-// docapi summary Verify
-// docapi description Verify a token
-// docapi tags Authentication
-// docapi response 200 {Token} The auth token
-// docapi response 400
-// docapi response 500
-// docapi end
+func (h authHandler) RegisterInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Register"),
+		oapi.Description("Register a new user with username and password"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.Session{}),
+		),
+	}
+}
 
 func (h authHandler) Verify(c *router.Context) {
 	token := c.MustGet("token").(string)
@@ -124,13 +117,15 @@ func (h authHandler) Verify(c *router.Context) {
 	c.JSON(session)
 }
 
-// docapi begin auth_logout
-// docapi method POST
-// docapi summary Logout
-// docapi tags Auth
-// docapi response 204
-// docapi response 500
-// docapi end
+func (h authHandler) VerifyInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Verify"),
+		oapi.Description("Verify a token"),
+		oapi.Response(http.StatusOK,
+			oapi.WithResponseModel(types.Session{}),
+		),
+	}
+}
 
 func (h authHandler) Logout(c *router.Context) {
 	token := c.MustGet("token").(string)
@@ -146,6 +141,13 @@ func (h authHandler) Logout(c *router.Context) {
 	}
 
 	c.OK()
+}
+
+func (h authHandler) LogoutInfo() []oapi.Info {
+	return []oapi.Info{
+		oapi.Summary("Logout"),
+		oapi.Description("Logout a user"),
+	}
 }
 
 func (h authHandler) getUserPassFromHeader(c *router.Context) (string, string, error) {

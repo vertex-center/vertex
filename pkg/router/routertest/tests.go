@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/wI2L/fizz"
 )
 
 type RequestOptions struct {
@@ -14,7 +15,7 @@ type RequestOptions struct {
 func Request(method string, handler router.HandlerFunc, opts RequestOptions) *httptest.ResponseRecorder {
 	// Setup
 	r := router.New()
-	r.Handle(method, "/", handler)
+	r.Handle(method, "/", []fizz.OperationOption{}, handler)
 	w := httptest.NewRecorder()
 
 	// Make the request
