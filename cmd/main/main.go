@@ -171,5 +171,5 @@ func initRoutes(about types.About) {
 	appsHandler := handler.NewAppsHandler(appsService)
 	apps := a.Group("/apps", middleware.Authenticated)
 	// docapi:vertex route /apps get_apps
-	apps.GET("", appsHandler.Get)
+	apps.GET("", appsHandler.GetApps)
 }
