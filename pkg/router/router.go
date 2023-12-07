@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router/oapi"
 	"github.com/wI2L/fizz"
 	"github.com/wI2L/fizz/openapi"
@@ -34,6 +35,9 @@ func New(info *openapi.Info, opts ...Option) *Router {
 	f := fizz.NewFromEngine(e)
 	if info != nil {
 		f.GET("/openapi.yaml", nil, f.OpenAPI(info, "yaml"))
+	}
+	if len(f.Errors()) > 0 {
+		log.Error(errors.Join(f.Errors()...))
 	}
 	return &Router{
 		Fizz: f,
