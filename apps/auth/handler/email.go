@@ -52,7 +52,7 @@ func (h *emailHandler) CreateCurrentUserEmail() gin.HandlerFunc {
 		}
 
 		email, err := h.service.CreateEmail(uint(userID), addr.Address)
-		return &email, nil
+		return &email, err
 	})
 }
 
