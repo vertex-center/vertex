@@ -8,10 +8,10 @@ import (
 )
 
 type SettingsHandler struct {
-	service port.AdminSettingsService
+	service port.SettingsService
 }
 
-func NewSettingsHandler(settingsService port.AdminSettingsService) port.SettingsHandler {
+func NewSettingsHandler(settingsService port.SettingsService) port.SettingsHandler {
 	return &SettingsHandler{
 		service: settingsService,
 	}

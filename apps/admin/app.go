@@ -74,12 +74,12 @@ func (a *App) Initialize(r *router.Group) error {
 		return err
 	}
 
-	settingsAdapter := adapter.NewAdminSettingsDbAdapter(db)
+	settingsAdapter := adapter.NewSettingsDbAdapter(db)
 	hardwareAdapter := adapter.NewHardwareApiAdapter()
 	sshAdapter := adapter.NewSshKernelApiAdapter()
 
 	checksService := service.NewChecksService()
-	settingsService := service.NewAdminSettingsService(settingsAdapter)
+	settingsService := service.NewSettingsService(settingsAdapter)
 	hardwareService := service.NewHardwareService(hardwareAdapter)
 	sshService := service.NewSshService(sshAdapter)
 

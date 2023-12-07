@@ -8,7 +8,7 @@ import (
 )
 
 type (
-	AdminSettingsAdapter interface {
+	SettingsAdapter interface {
 		Get() (types.AdminSettings, error)
 		SetChannel(channel types.UpdatesChannel) error
 		SetWebhook(webhook string) error

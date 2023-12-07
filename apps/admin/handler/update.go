@@ -11,10 +11,10 @@ import (
 
 type UpdateHandler struct {
 	updateService   port.UpdateService
-	settingsService port.AdminSettingsService
+	settingsService port.SettingsService
 }
 
-func NewUpdateHandler(updateService port.UpdateService, settingsService port.AdminSettingsService) port.UpdateHandler {
+func NewUpdateHandler(updateService port.UpdateService, settingsService port.SettingsService) port.UpdateHandler {
 	return &UpdateHandler{
 		updateService:   updateService,
 		settingsService: settingsService,

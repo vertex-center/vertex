@@ -16,11 +16,11 @@ import (
 type NotificationsService struct {
 	uuid            uuid.UUID
 	ctx             *apptypes.Context
-	settingsAdapter port.AdminSettingsAdapter
+	settingsAdapter port.SettingsAdapter
 	client          webhook.Client
 }
 
-func NewNotificationsService(ctx *apptypes.Context, settingsAdapter port.AdminSettingsAdapter) NotificationsService {
+func NewNotificationsService(ctx *apptypes.Context, settingsAdapter port.SettingsAdapter) NotificationsService {
 	return NotificationsService{
 		uuid:            uuid.New(),
 		ctx:             ctx,

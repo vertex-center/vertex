@@ -8,7 +8,7 @@ import (
 )
 
 type (
-	AdminSettingsService interface {
+	SettingsService interface {
 		Get() (types.AdminSettings, error)
 		Update(settings types.AdminSettings) error
 		GetWebhook() (*string, error)
