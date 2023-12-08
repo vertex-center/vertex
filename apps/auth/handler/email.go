@@ -19,12 +19,8 @@ func NewEmailHandler(emailService port.EmailService) port.EmailHandler {
 	}
 }
 
-type GetCurrentUserEmailsParams struct {
-	Email string `path:"email"`
-}
-
 func (h *emailHandler) GetCurrentUserEmails() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *GetCurrentUserEmailsParams) ([]types.Email, error) {
+	return router.Handler(func(c *gin.Context) ([]types.Email, error) {
 		return h.service.GetEmails(uint(c.GetInt("user_id")))
 	})
 }
