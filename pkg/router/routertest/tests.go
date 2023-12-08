@@ -16,7 +16,7 @@ type RequestOptions struct {
 func Request(method string, handler gin.HandlerFunc, opts RequestOptions) *httptest.ResponseRecorder {
 	// Setup
 	r := router.New(nil)
-	r.Handle(method, "/", []fizz.OperationOption{}, handler)
+	r.Handle("/", method, []fizz.OperationOption{}, handler)
 	w := httptest.NewRecorder()
 
 	// Make the request
