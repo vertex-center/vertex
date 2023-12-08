@@ -4,10 +4,15 @@ import (
 	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	containersmeta "github.com/vertex-center/vertex/apps/containers/meta"
+	"github.com/vertex-center/vertex/apps/sql/core/port"
 	"github.com/vertex-center/vertex/apps/sql/core/service"
 	"github.com/vertex-center/vertex/apps/sql/handler"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/wI2L/fizz"
+)
+
+var (
+	sqlService port.SqlService
 )
 
 var Meta = apptypes.Meta{
@@ -38,13 +43,15 @@ func (a *App) Meta() apptypes.Meta {
 	return Meta
 }
 
-func (a *App) Initialize(r *fizz.RouterGroup) error {
+func (a *App) Initialize() error {
+	sqlService = service.New(a.ctx)
+	return nil
+}
+
+func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	r.Use(middleware.ReadAuth)
 
-	var (
-		sqlService  = service.New(a.ctx)
-		dbmsHandler = handler.NewDBMSHandler(sqlService)
-	)
+	dbmsHandler := handler.NewDBMSHandler(sqlService)
 
 	r.GET("/container/:container_uuid", []fizz.OperationOption{
 		fizz.ID("getDBMS"),

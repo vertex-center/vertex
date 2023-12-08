@@ -44,9 +44,17 @@ func (a *App) Meta() apptypes.Meta {
 	return meta.Meta
 }
 
-func (a *App) Initialize(r *fizz.RouterGroup) error {
-	r.Use(middleware.ReadAuth)
+var (
+	checksService   port.ChecksService
+	settingsService port.SettingsService
+	hardwareService port.HardwareService
+	sshService      port.SshService
 
+	hardwareKernelService port.HardwareKernelService
+	sshKernelService      port.SshKernelService
+)
+
+func (a *App) Initialize() error {
 	db, err := storage.NewDB(storage.DBParams{
 		ID:         meta.Meta.ID,
 		SchemaFunc: database.GetSchema,
@@ -60,13 +68,21 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 		settingsAdapter = adapter.NewSettingsDbAdapter(db)
 		hardwareAdapter = adapter.NewHardwareApiAdapter()
 		sshAdapter      = adapter.NewSshKernelApiAdapter()
+	)
 
-		checksService   = service.NewChecksService()
-		settingsService = service.NewSettingsService(settingsAdapter)
-		hardwareService = service.NewHardwareService(hardwareAdapter)
-		sshService      = service.NewSshService(sshAdapter)
-		_               = service.NewNotificationsService(a.ctx, settingsAdapter)
+	checksService = service.NewChecksService()
+	settingsService = service.NewSettingsService(settingsAdapter)
+	hardwareService = service.NewHardwareService(hardwareAdapter)
+	sshService = service.NewSshService(sshAdapter)
+	_ = service.NewNotificationsService(a.ctx, settingsAdapter)
 
+	return nil
+}
+
+func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
+	r.Use(middleware.ReadAuth)
+
+	var (
 		hardwareHandler = handler.NewHardwareHandler(hardwareService)
 		sshHandler      = handler.NewSshHandler(sshService)
 		settingsHandler = handler.NewSettingsHandler(settingsService)
@@ -148,16 +164,22 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 	return nil
 }
 
-func (a *App) InitializeKernel(r *fizz.RouterGroup) error {
+func (a *App) InitializeKernel() error {
 	var (
 		hardwareAdapter = adapter.NewHardwareKernelAdapter()
 		sshAdapter      = adapter.NewSshFsAdapter()
+	)
 
-		hardwareService = service.NewHardwareKernelService(hardwareAdapter)
-		sshService      = service.NewSshKernelService(sshAdapter)
+	hardwareKernelService = service.NewHardwareKernelService(hardwareAdapter)
+	sshKernelService = service.NewSshKernelService(sshAdapter)
 
-		hardwareHandler = handler.NewHardwareKernelHandler(hardwareService)
-		sshHandler      = handler.NewSshKernelHandler(sshService)
+	return nil
+}
+
+func (a *App) InitializeKernelRouter(r *fizz.RouterGroup) error {
+	var (
+		hardwareHandler = handler.NewHardwareKernelHandler(hardwareKernelService)
+		sshHandler      = handler.NewSshKernelHandler(sshKernelService)
 
 		hardware = r.Group("/hardware", "Hardware", "")
 		ssh      = r.Group("/ssh", "SSH", "")

@@ -4,6 +4,7 @@ import (
 	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/reverseproxy/adapter"
+	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/service"
 	"github.com/vertex-center/vertex/apps/reverseproxy/handler"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
@@ -39,13 +40,14 @@ func (a *App) Meta() apptypes.Meta {
 	return Meta
 }
 
-func (a *App) Initialize(r *fizz.RouterGroup) error {
-	r.Use(middleware.ReadAuth)
+var (
+	proxyService port.ProxyService
+)
 
+func (a *App) Initialize() error {
 	var (
 		proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
 		proxyService   = service.NewProxyService(proxyFSAdapter)
-		proxyHandler   = handler.NewProxyHandler(proxyService)
 	)
 
 	a.proxy = NewProxyRouter(proxyService)
@@ -56,6 +58,14 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 			log.Error(err)
 		}
 	}()
+
+	return nil
+}
+
+func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
+	r.Use(middleware.ReadAuth)
+
+	proxyHandler := handler.NewProxyHandler(proxyService)
 
 	r.GET("/redirects", []fizz.OperationOption{
 		fizz.ID("getRedirects"),

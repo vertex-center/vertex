@@ -37,7 +37,11 @@ func (a *App) Meta() apptypes.Meta {
 	return Meta
 }
 
-func (a *App) Initialize(r *fizz.RouterGroup) error {
+func (a *App) Initialize() error {
+	return nil
+}
+
+func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	r.Use(middleware.ReadAuth)
 
 	providerHandler := handler.NewProviderHandler()

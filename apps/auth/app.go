@@ -2,6 +2,7 @@ package auth
 
 import (
 	"github.com/vertex-center/vertex/apps/auth/adapter"
+	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/service"
 	"github.com/vertex-center/vertex/apps/auth/database"
 	"github.com/vertex-center/vertex/apps/auth/handler"
@@ -10,6 +11,12 @@ import (
 	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/wI2L/fizz"
+)
+
+var (
+	authService  port.AuthService
+	emailService port.EmailService
+	userService  port.UserService
 )
 
 type App struct {
@@ -28,9 +35,7 @@ func (a *App) Meta() apptypes.Meta {
 	return meta.Meta
 }
 
-func (a *App) Initialize(r *fizz.RouterGroup) error {
-	r.Use(middleware.ReadAuth)
-
+func (a *App) Initialize() error {
 	db, err := storage.NewDB(storage.DBParams{
 		ID:         meta.Meta.ID,
 		SchemaFunc: database.GetSchema,
@@ -43,11 +48,19 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 	var (
 		authAdapter  = adapter.NewAuthDbAdapter(db)
 		emailAdapter = adapter.NewEmailDbAdapter(db)
+	)
 
-		authService  = service.NewAuthService(authAdapter)
-		emailService = service.NewEmailService(emailAdapter)
-		userService  = service.NewUserService(authAdapter)
+	authService = service.NewAuthService(authAdapter)
+	emailService = service.NewEmailService(emailAdapter)
+	userService = service.NewUserService(authAdapter)
 
+	return nil
+}
+
+func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
+	r.Use(middleware.ReadAuth)
+
+	var (
 		authHandler  = handler.NewAuthHandler(authService)
 		userHandler  = handler.NewUserHandler(userService)
 		emailHandler = handler.NewEmailHandler(emailService)

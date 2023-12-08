@@ -58,12 +58,22 @@ type InterfaceKernel interface {
 
 type Initializable interface {
 	Interface
-	Initialize(r *fizz.RouterGroup) error
+	Initialize() error
+}
+
+type InitializableRouter interface {
+	Interface
+	InitializeRouter(r *fizz.RouterGroup) error
 }
 
 type KernelInitializable interface {
 	Interface
-	InitializeKernel(r *fizz.RouterGroup) error
+	InitializeKernel() error
+}
+
+type KernelInitializableRouter interface {
+	Interface
+	InitializeKernelRouter(r *fizz.RouterGroup) error
 }
 
 type Uninitializable interface {
@@ -129,9 +139,17 @@ func RunStandalone(app Interface) {
 	srv := server.New(app.Meta().ID, &info, u, vertexCtx)
 
 	if a, ok := app.(Initializable); ok {
+		err := a.Initialize()
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+	}
+
+	if a, ok := app.(InitializableRouter); ok {
 		base := srv.Router.Group(u.Path, "", "")
 
-		err := a.Initialize(base)
+		err := a.InitializeRouter(base)
 		if err != nil {
 			log.Error(err)
 			os.Exit(1)
@@ -173,9 +191,17 @@ func RunStandaloneKernel(app Interface) {
 	srv := server.New(app.Meta().ID, &info, u, vertexCtx)
 
 	if a, ok := app.(KernelInitializable); ok {
+		err := a.InitializeKernel()
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+	}
+
+	if a, ok := app.(KernelInitializableRouter); ok {
 		base := srv.Router.Group(u.Path, "", "")
 
-		err := a.InitializeKernel(base)
+		err := a.InitializeKernelRouter(base)
 		if err != nil {
 			log.Error(err)
 			os.Exit(1)

@@ -3,11 +3,24 @@ package containers
 import (
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/containers/adapter"
+	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/service"
 	"github.com/vertex-center/vertex/apps/containers/handler"
 	"github.com/vertex-center/vertex/apps/containers/meta"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/wI2L/fizz"
+)
+
+var (
+	serviceService           port.ServiceService
+	containerEnvService      port.ContainerEnvService
+	containerLogsService     port.ContainerLogsService
+	containerRunnerService   port.ContainerRunnerService
+	containerServiceService  port.ContainerServiceService
+	containerSettingsService port.ContainerSettingsService
+	containerService         port.ContainerService
+
+	dockerKernelService port.DockerService
 )
 
 type App struct {
@@ -26,9 +39,7 @@ func (a *App) Meta() apptypes.Meta {
 	return meta.Meta
 }
 
-func (a *App) Initialize(r *fizz.RouterGroup) error {
-	r.Use(middleware.ReadAuth)
-
+func (a *App) Initialize() error {
 	var (
 		containerAdapter         = adapter.NewContainerFSAdapter(nil)
 		containerEnvAdapter      = adapter.NewContainerEnvFSAdapter(nil)
@@ -36,24 +47,32 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 		containerRunnerAdapter   = adapter.NewContainerRunnerFSAdapter()
 		containerServiceAdapter  = adapter.NewContainerServiceFSAdapter(nil)
 		containerSettingsAdapter = adapter.NewContainerSettingsFSAdapter(nil)
+	)
 
-		serviceService           = service.NewServiceService()
-		containerEnvService      = service.NewContainerEnvService(containerEnvAdapter)
-		containerLogsService     = service.NewContainerLogsService(a.ctx, containerLogsAdapter)
-		containerRunnerService   = service.NewContainerRunnerService(a.ctx, containerRunnerAdapter)
-		containerServiceService  = service.NewContainerServiceService(containerServiceAdapter)
-		containerSettingsService = service.NewContainerSettingsService(containerSettingsAdapter)
-		containerService         = service.NewContainerService(service.ContainerServiceParams{
-			Ctx:                      a.ctx,
-			ContainerAdapter:         containerAdapter,
-			ContainerRunnerService:   containerRunnerService,
-			ContainerServiceService:  containerServiceService,
-			ContainerEnvService:      containerEnvService,
-			ContainerSettingsService: containerSettingsService,
-			ServiceService:           serviceService,
-		})
-		_ = service.NewMetricsService(a.ctx)
+	serviceService = service.NewServiceService()
+	containerEnvService = service.NewContainerEnvService(containerEnvAdapter)
+	containerLogsService = service.NewContainerLogsService(a.ctx, containerLogsAdapter)
+	containerRunnerService = service.NewContainerRunnerService(a.ctx, containerRunnerAdapter)
+	containerServiceService = service.NewContainerServiceService(containerServiceAdapter)
+	containerSettingsService = service.NewContainerSettingsService(containerSettingsAdapter)
+	containerService = service.NewContainerService(service.ContainerServiceParams{
+		Ctx:                      a.ctx,
+		ContainerAdapter:         containerAdapter,
+		ContainerRunnerService:   containerRunnerService,
+		ContainerServiceService:  containerServiceService,
+		ContainerEnvService:      containerEnvService,
+		ContainerSettingsService: containerSettingsService,
+		ServiceService:           serviceService,
+	})
+	_ = service.NewMetricsService(a.ctx)
 
+	return nil
+}
+
+func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
+	r.Use(middleware.ReadAuth)
+
+	var (
 		servicesHandler   = handler.NewServicesHandler(serviceService)
 		serviceHandler    = handler.NewServiceHandler(serviceService, containerService)
 		containersHandler = handler.NewContainersHandler(a.ctx, containerService)
@@ -193,12 +212,16 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 	return nil
 }
 
-func (a *App) InitializeKernel(r *fizz.RouterGroup) error {
+func (a *App) InitializeKernel() error {
+	dockerKernelAdapter := adapter.NewDockerCliAdapter()
+	dockerKernelService = service.NewDockerKernelService(dockerKernelAdapter)
+	return nil
+}
+
+func (a *App) InitializeKernelRouter(r *fizz.RouterGroup) error {
 	var (
-		dockerKernelAdapter = adapter.NewDockerCliAdapter()
-		dockerKernelService = service.NewDockerKernelService(dockerKernelAdapter)
-		dockerHandler       = handler.NewDockerKernelHandler(dockerKernelService)
-		docker              = r.Group("/docker", "Docker", "Docker wrapper")
+		dockerHandler = handler.NewDockerKernelHandler(dockerKernelService)
+		docker        = r.Group("/docker", "Docker", "Docker wrapper")
 	)
 
 	docker.GET("/containers", []fizz.OperationOption{

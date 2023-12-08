@@ -3,10 +3,15 @@ package serviceeditor
 import (
 	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
+	"github.com/vertex-center/vertex/apps/serviceeditor/core/port"
 	"github.com/vertex-center/vertex/apps/serviceeditor/core/service"
 	"github.com/vertex-center/vertex/apps/serviceeditor/handler"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/wI2L/fizz"
+)
+
+var (
+	editorService port.EditorService
 )
 
 var Meta = apptypes.Meta{
@@ -37,14 +42,16 @@ func (a *App) Meta() apptypes.Meta {
 	return Meta
 }
 
-func (a *App) Initialize(r *fizz.RouterGroup) error {
+func (a *App) Initialize() error {
+	editorService = service.NewEditorService()
+	return nil
+}
+
+func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	r.Use(middleware.ReadAuth)
 
-	var (
-		editorService = service.NewEditorService()
-		editorHandler = handler.NewEditorHandler(editorService)
-		editor        = r.Group("/editor", "Editor", "Service editor routes", middleware.Authenticated)
-	)
+	editorHandler := handler.NewEditorHandler(editorService)
+	editor := r.Group("/editor", "Editor", "Service editor routes", middleware.Authenticated)
 
 	editor.POST("/to-yaml", []fizz.OperationOption{
 		fizz.ID("toYaml"),
