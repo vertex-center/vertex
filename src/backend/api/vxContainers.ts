@@ -61,7 +61,7 @@ const getLogs = async (id: string) => {
 };
 
 const saveEnv = (id: string, env: Env) => {
-    return server.patch(`/container/${id}/environment`, env);
+    return server.patch(`/container/${id}/environment`, { env });
 };
 
 const getDocker = async (id: string) => {
