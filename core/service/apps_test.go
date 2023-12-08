@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
+	"github.com/wI2L/fizz"
 )
 
 type AppsServiceTestSuite struct {

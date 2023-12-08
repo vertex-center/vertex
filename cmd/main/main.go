@@ -3,13 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"net/http"
 	"os"
 	"path"
 	"runtime"
 
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/juju/errors"
 	"github.com/vertex-center/vertex/apps/admin"
 	"github.com/vertex-center/vertex/apps/auth"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
@@ -137,12 +137,9 @@ func initServices() {
 }
 
 func initRoutes(about types.About) {
-	srv.Router.Engine().NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, router.Error{
-			Code:          "resource_not_found",
-			PublicMessage: "Resource not found.",
-		})
-	})
+	srv.Router.Engine().NoRoute(router.Handler(func(c *gin.Context) error {
+		return errors.NewNotFound(nil, "route not found")
+	}))
 
 	a := srv.Router.Group("/api", "API", "Main API group", middleware.ReadAuth())
 	a.GET("/about", []fizz.OperationOption{

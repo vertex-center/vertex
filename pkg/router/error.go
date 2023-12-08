@@ -4,10 +4,6 @@ import "errors"
 
 type ErrCode string
 
-const (
-	ErrFailedToParseBody ErrCode = "failed_to_parse_body"
-)
-
 var (
 	ErrFailedToStopServer = errors.New("failed to stop the server")
 )
