@@ -141,7 +141,7 @@ func initRoutes(about types.About) {
 		return errors.NewNotFound(nil, "route not found")
 	}))
 
-	a := srv.Router.Group("/api", "API", "Main API group", middleware.ReadAuth())
+	a := srv.Router.Group("/api", "API", "Main API group", middleware.ReadAuth)
 	a.GET("/about", []fizz.OperationOption{
 		fizz.ID("getAbout"),
 		fizz.Summary("Get server info"),
@@ -151,11 +151,11 @@ func initRoutes(about types.About) {
 
 	if config.Current.Debug() {
 		debugHandler := handler.NewDebugHandler(debugService)
-		debug := a.Group("/debug", "Debug", "Routes only available with DEBUG=1", middleware.Authenticated())
+		debug := a.Group("/debug", "Debug", "Routes only available with DEBUG=1", middleware.Authenticated)
 		debug.POST("/hard-reset", debugHandler.HardResetInfo(), router.Handler(debugHandler.HardReset))
 	}
 
 	appsHandler := handler.NewAppsHandler(appsService)
-	apps := a.Group("/apps", "Apps", "Apps", middleware.Authenticated())
+	apps := a.Group("/apps", "Apps", "Apps", middleware.Authenticated)
 	apps.GET("", appsHandler.GetAppsInfo(), router.Handler(appsHandler.GetApps))
 }

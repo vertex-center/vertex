@@ -38,12 +38,12 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *fizz.RouterGroup) error {
-	r.Use(middleware.ReadAuth())
+	r.Use(middleware.ReadAuth)
 
 	var (
 		editorService = service.NewEditorService()
 		editorHandler = handler.NewEditorHandler(editorService)
-		editor        = r.Group("/editor", "Editor", "Service editor routes", middleware.Authenticated())
+		editor        = r.Group("/editor", "Editor", "Service editor routes", middleware.Authenticated)
 	)
 
 	editor.POST("/to-yaml", []fizz.OperationOption{

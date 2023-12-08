@@ -39,7 +39,7 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *fizz.RouterGroup) error {
-	r.Use(middleware.ReadAuth())
+	r.Use(middleware.ReadAuth)
 
 	var (
 		sqlService  = service.New(a.ctx)
@@ -49,12 +49,12 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 	r.GET("/container/:container_uuid", []fizz.OperationOption{
 		fizz.ID("getDBMS"),
 		fizz.Summary("Get an installed DBMS"),
-	}, middleware.Authenticated(), dbmsHandler.Get())
+	}, middleware.Authenticated, dbmsHandler.Get())
 
 	r.POST("/dbms/:dbms/install", []fizz.OperationOption{
 		fizz.ID("installDBMS"),
 		fizz.Summary("Install a DBMS"),
-	}, middleware.Authenticated(), dbmsHandler.Install())
+	}, middleware.Authenticated, dbmsHandler.Install())
 
 	return nil
 }

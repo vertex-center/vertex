@@ -27,7 +27,7 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *fizz.RouterGroup) error {
-	r.Use(middleware.ReadAuth())
+	r.Use(middleware.ReadAuth)
 
 	var (
 		containerAdapter         = adapter.NewContainerFSAdapter(nil)
@@ -68,9 +68,9 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 			ServiceService:           serviceService,
 		})
 
-		container  = r.Group("/container/:container_uuid", "Container", "", middleware.Authenticated())
-		containers = r.Group("/containers", "Containers", "", middleware.Authenticated())
-		serv       = r.Group("/service/:service_id", "Service", "", middleware.Authenticated())
+		container  = r.Group("/container/:container_uuid", "Container", "", middleware.Authenticated)
+		containers = r.Group("/containers", "Containers", "", middleware.Authenticated)
+		serv       = r.Group("/service/:service_id", "Service", "", middleware.Authenticated)
 		services   = r.Group("/services", "Services", "")
 	)
 
@@ -186,7 +186,7 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 	services.GET("", []fizz.OperationOption{
 		fizz.ID("getServices"),
 		fizz.Summary("Get services"),
-	}, middleware.Authenticated(), servicesHandler.Get())
+	}, middleware.Authenticated, servicesHandler.Get())
 
 	services.GinRouterGroup().Static("/icons", "./live/services/icons")
 

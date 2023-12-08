@@ -38,14 +38,14 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *fizz.RouterGroup) error {
-	r.Use(middleware.ReadAuth())
+	r.Use(middleware.ReadAuth)
 
 	providerHandler := handler.NewProviderHandler()
 
 	r.POST("/provider/:provider/install", []fizz.OperationOption{
 		fizz.ID("installProvider"),
 		fizz.Summary("Install a tunnel provider"),
-	}, middleware.Authenticated(), providerHandler.Install())
+	}, middleware.Authenticated, providerHandler.Install())
 
 	return nil
 }

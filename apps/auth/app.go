@@ -29,7 +29,7 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *fizz.RouterGroup) error {
-	r.Use(middleware.ReadAuth())
+	r.Use(middleware.ReadAuth)
 
 	db, err := storage.NewDB(storage.DBParams{
 		ID:         meta.Meta.ID,
@@ -52,9 +52,9 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 		userHandler  = handler.NewUserHandler(userService)
 		emailHandler = handler.NewEmailHandler(emailService)
 
-		user   = r.Group("/user", "User", "", middleware.Authenticated())
-		email  = user.Group("/email", "Email", "User emails", middleware.Authenticated())
-		emails = user.Group("/emails", "Emails", "User emails", middleware.Authenticated())
+		user   = r.Group("/user", "User", "", middleware.Authenticated)
+		email  = user.Group("/email", "Email", "User emails", middleware.Authenticated)
+		emails = user.Group("/emails", "Emails", "User emails", middleware.Authenticated)
 	)
 
 	// Auth
@@ -81,7 +81,7 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 		fizz.ID("logout"),
 		fizz.Summary("Logout"),
 		fizz.Description("Logout a user"),
-	}, middleware.Authenticated(), authHandler.Logout())
+	}, middleware.Authenticated, authHandler.Logout())
 
 	// User
 

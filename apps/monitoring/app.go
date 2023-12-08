@@ -40,7 +40,7 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *fizz.RouterGroup) error {
-	r.Use(middleware.ReadAuth())
+	r.Use(middleware.ReadAuth)
 
 	var (
 		prometheusAdapter = adapter.NewMetricsPrometheusAdapter()
@@ -51,7 +51,7 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 	r.GET("/metrics", []fizz.OperationOption{
 		fizz.ID("getMetrics"),
 		fizz.Summary("Get metrics"),
-	}, middleware.Authenticated(), metricsHandler.Get())
+	}, middleware.Authenticated, metricsHandler.Get())
 
 	r.POST("/collector/:collector/install", []fizz.OperationOption{
 		fizz.ID("installCollector"),

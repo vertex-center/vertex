@@ -45,7 +45,7 @@ func (a *App) Meta() apptypes.Meta {
 }
 
 func (a *App) Initialize(r *fizz.RouterGroup) error {
-	r.Use(middleware.ReadAuth())
+	r.Use(middleware.ReadAuth)
 
 	db, err := storage.NewDB(storage.DBParams{
 		ID:         meta.Meta.ID,
@@ -73,11 +73,11 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 		updateHandler   = handler.NewUpdateHandler(updateService, settingsService)
 		checksHandler   = handler.NewChecksHandler(checksService)
 
-		hardware = r.Group("/hardware", "Hardware", "", middleware.Authenticated())
-		ssh      = r.Group("/ssh", "SSH", "", middleware.Authenticated())
-		settings = r.Group("/settings", "Settings", "", middleware.Authenticated())
-		update   = r.Group("/update", "Update", "", middleware.Authenticated())
-		checks   = r.Group("/admin/checks", "Checks", "", middleware.Authenticated())
+		hardware = r.Group("/hardware", "Hardware", "", middleware.Authenticated)
+		ssh      = r.Group("/ssh", "SSH", "", middleware.Authenticated)
+		settings = r.Group("/settings", "Settings", "", middleware.Authenticated)
+		update   = r.Group("/update", "Update", "", middleware.Authenticated)
+		checks   = r.Group("/admin/checks", "Checks", "", middleware.Authenticated)
 	)
 
 	hardware.GET("/host", []fizz.OperationOption{
