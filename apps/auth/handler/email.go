@@ -48,7 +48,7 @@ func (h *emailHandler) CreateCurrentUserEmail() gin.HandlerFunc {
 }
 
 type DeleteCurrentUserEmailParams struct {
-	Email string `path:"email"`
+	Email string `json:"email"`
 }
 
 func (h *emailHandler) DeleteCurrentUserEmail() gin.HandlerFunc {
