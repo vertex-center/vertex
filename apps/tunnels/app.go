@@ -42,7 +42,10 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 
 	providerHandler := handler.NewProviderHandler()
 
-	r.POST("/provider/:provider/install", providerHandler.InstallInfo(), middleware.Authenticated(), providerHandler.Install())
+	r.POST("/provider/:provider/install", []fizz.OperationOption{
+		fizz.ID("installProvider"),
+		fizz.Summary("Install a tunnel provider"),
+	}, middleware.Authenticated(), providerHandler.Install())
 
 	return nil
 }

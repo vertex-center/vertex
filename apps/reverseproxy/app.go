@@ -57,9 +57,20 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 		}
 	}()
 
-	r.GET("/redirects", proxyHandler.GetRedirectsInfo(), middleware.Authenticated(), proxyHandler.GetRedirects())
-	r.POST("/redirect", proxyHandler.AddRedirectInfo(), middleware.Authenticated(), proxyHandler.AddRedirect())
-	r.DELETE("/redirect/:id", proxyHandler.RemoveRedirectInfo(), middleware.Authenticated(), proxyHandler.RemoveRedirect())
+	r.GET("/redirects", []fizz.OperationOption{
+		fizz.ID("getRedirects"),
+		fizz.Summary("Get redirects"),
+	}, middleware.Authenticated(), proxyHandler.GetRedirects())
+
+	r.POST("/redirect", []fizz.OperationOption{
+		fizz.ID("addRedirect"),
+		fizz.Summary("Add redirect"),
+	}, middleware.Authenticated(), proxyHandler.AddRedirect())
+
+	r.DELETE("/redirect/:id", []fizz.OperationOption{
+		fizz.ID("removeRedirect"),
+		fizz.Summary("Remove redirect"),
+	}, middleware.Authenticated(), proxyHandler.RemoveRedirect())
 
 	return nil
 }

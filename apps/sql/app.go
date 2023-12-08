@@ -46,8 +46,15 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 		dbmsHandler = handler.NewDBMSHandler(sqlService)
 	)
 
-	r.GET("/container/:container_uuid", dbmsHandler.GetInfo(), middleware.Authenticated(), dbmsHandler.Get())
-	r.POST("/dbms/:dbms/install", dbmsHandler.InstallInfo(), middleware.Authenticated(), dbmsHandler.Install())
+	r.GET("/container/:container_uuid", []fizz.OperationOption{
+		fizz.ID("getDBMS"),
+		fizz.Summary("Get an installed DBMS"),
+	}, middleware.Authenticated(), dbmsHandler.Get())
+
+	r.POST("/dbms/:dbms/install", []fizz.OperationOption{
+		fizz.ID("installDBMS"),
+		fizz.Summary("Install a DBMS"),
+	}, middleware.Authenticated(), dbmsHandler.Install())
 
 	return nil
 }

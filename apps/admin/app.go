@@ -80,22 +80,70 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 		checks   = r.Group("/admin/checks", "Checks", "", middleware.Authenticated())
 	)
 
-	hardware.GET("/host", hardwareHandler.GetHostInfo(), hardwareHandler.GetHost())
-	hardware.GET("/cpus", hardwareHandler.GetCPUsInfo(), hardwareHandler.GetCPUs())
-	hardware.POST("/reboot", hardwareHandler.RebootInfo(), hardwareHandler.Reboot())
+	hardware.GET("/host", []fizz.OperationOption{
+		fizz.ID("getHost"),
+		fizz.Summary("Get host"),
+		fizz.Description("Get host information."),
+	}, hardwareHandler.GetHost())
 
-	ssh.GET("", sshHandler.GetInfo(), sshHandler.Get())
-	ssh.POST("", sshHandler.AddInfo(), sshHandler.Add())
-	ssh.DELETE("", sshHandler.DeleteInfo(), sshHandler.Delete())
-	ssh.GET("/users", sshHandler.GetUsersInfo(), sshHandler.GetUsers())
+	hardware.GET("/cpus", []fizz.OperationOption{
+		fizz.ID("getCPUs"),
+		fizz.Summary("Get CPUs"),
+		fizz.Description("Get CPUs information."),
+	}, hardwareHandler.GetCPUs())
 
-	settings.GET("", settingsHandler.GetInfo(), settingsHandler.Get())
-	settings.PATCH("", settingsHandler.PatchInfo(), settingsHandler.Patch())
+	hardware.POST("/reboot", []fizz.OperationOption{
+		fizz.ID("reboot"),
+		fizz.Summary("Reboot"),
+		fizz.Description("Reboot the host."),
+	}, hardwareHandler.Reboot())
 
-	update.GET("", updateHandler.GetInfo(), updateHandler.Get())
-	update.POST("", updateHandler.InstallInfo(), updateHandler.Install())
+	ssh.GET("", []fizz.OperationOption{
+		fizz.ID("getSSHKeys"),
+		fizz.Summary("Get all SSH keys"),
+	}, sshHandler.Get())
 
-	checks.GET("", checksHandler.CheckInfo(), apptypes.HeadersSSE(), checksHandler.Check())
+	ssh.POST("", []fizz.OperationOption{
+		fizz.ID("addSSHKey"),
+		fizz.Summary("Add an SSH key"),
+	}, sshHandler.Add())
+
+	ssh.DELETE("", []fizz.OperationOption{
+		fizz.ID("deleteSSHKey"),
+		fizz.Summary("Delete SSH key"),
+	}, sshHandler.Delete())
+
+	ssh.GET("/users", []fizz.OperationOption{
+		fizz.ID("getSSHUsers"),
+		fizz.Summary("Get all users that can have SSH keys"),
+	}, sshHandler.GetUsers())
+
+	settings.GET("", []fizz.OperationOption{
+		fizz.ID("getSettings"),
+		fizz.Summary("Get settings"),
+	}, settingsHandler.Get())
+
+	settings.PATCH("", []fizz.OperationOption{
+		fizz.ID("patchSettings"),
+		fizz.Summary("Patch settings"),
+	}, settingsHandler.Patch())
+
+	update.GET("", []fizz.OperationOption{
+		fizz.ID("getUpdate"),
+		fizz.Summary("Get the latest update information"),
+	}, updateHandler.Get())
+
+	update.POST("", []fizz.OperationOption{
+		fizz.ID("installUpdate"),
+		fizz.Summary("Install the latest version"),
+		fizz.Description("This endpoint will install the latest version of Vertex."),
+	}, updateHandler.Install())
+
+	checks.GET("", []fizz.OperationOption{
+		fizz.ID("check"),
+		fizz.Summary("Get all checks"),
+		fizz.Description("Check that all vertex requirements are met."),
+	}, apptypes.HeadersSSE(), checksHandler.Check())
 
 	return nil
 }
@@ -115,12 +163,31 @@ func (a *App) InitializeKernel(r *fizz.RouterGroup) error {
 		ssh      = r.Group("/ssh", "SSH", "")
 	)
 
-	hardware.POST("/reboot", hardwareHandler.RebootInfo(), hardwareHandler.Reboot())
+	hardware.POST("/reboot", []fizz.OperationOption{
+		fizz.ID("reboot"),
+		fizz.Summary("Reboot"),
+		fizz.Description("Reboot the host."),
+	}, hardwareHandler.Reboot())
 
-	ssh.GET("", sshHandler.GetInfo(), sshHandler.Get())
-	ssh.POST("", sshHandler.AddInfo(), sshHandler.Add())
-	ssh.DELETE("", sshHandler.DeleteInfo(), sshHandler.Delete())
-	ssh.GET("/users", sshHandler.GetUsersInfo(), sshHandler.GetUsers())
+	ssh.GET("", []fizz.OperationOption{
+		fizz.ID("getSSHKeys"),
+		fizz.Summary("Get all SSH keys"),
+	}, sshHandler.Get())
+
+	ssh.POST("", []fizz.OperationOption{
+		fizz.ID("addSSHKey"),
+		fizz.Summary("Add an SSH key to the authorized_keys file"),
+	}, sshHandler.Add())
+
+	ssh.DELETE("", []fizz.OperationOption{
+		fizz.ID("deleteSSHKey"),
+		fizz.Summary("Delete an SSH key from the authorized_keys file"),
+	}, sshHandler.Delete())
+
+	ssh.GET("/users", []fizz.OperationOption{
+		fizz.ID("getSSHUsers"),
+		fizz.Summary("Get all users that can have SSH keys"),
+	}, sshHandler.GetUsers())
 
 	return nil
 }

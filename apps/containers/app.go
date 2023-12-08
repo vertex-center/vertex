@@ -74,30 +74,120 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 		services   = r.Group("/services", "Services", "")
 	)
 
-	container.GET("", containerHandler.GetInfo(), containerHandler.Get())
-	container.DELETE("", containerHandler.DeleteInfo(), containerHandler.Delete())
-	container.PATCH("", containerHandler.PatchInfo(), containerHandler.Patch())
-	container.POST("/start", containerHandler.StartInfo(), containerHandler.Start())
-	container.POST("/stop", containerHandler.StopInfo(), containerHandler.Stop())
-	container.PATCH("/environment", containerHandler.PatchEnvironmentInfo(), containerHandler.PatchEnvironment())
-	container.GET("/events", containerHandler.EventsInfo(), apptypes.HeadersSSE(), containerHandler.Events())
-	container.GET("/docker", containerHandler.GetDockerInfo(), containerHandler.GetDocker())
-	container.POST("/docker/recreate", containerHandler.RecreateDockerInfo(), containerHandler.RecreateDocker())
-	container.GET("/logs", containerHandler.GetLogsInfo(), containerHandler.GetLogs())
-	container.POST("/update/service", containerHandler.UpdateServiceInfo(), containerHandler.UpdateService())
-	container.GET("/versions", containerHandler.GetVersionsInfo(), containerHandler.GetVersions())
-	container.GET("/wait", containerHandler.WaitStatusInfo(), containerHandler.WaitStatus())
+	// Container
 
-	containers.GET("", containersHandler.GetInfo(), containersHandler.Get())
-	containers.GET("/tags", containersHandler.GetTagsInfo(), containersHandler.GetTags())
-	containers.GET("/search", containersHandler.SearchInfo(), containersHandler.Search())
-	containers.GET("/checkupdates", containersHandler.CheckForUpdatesInfo(), containersHandler.CheckForUpdates())
-	containers.GET("/events", containersHandler.EventsInfo(), apptypes.HeadersSSE(), containersHandler.Events())
+	container.GET("", []fizz.OperationOption{
+		fizz.ID("getContainer"),
+		fizz.Summary("Get a container"),
+	}, containerHandler.Get())
 
-	serv.GET("", serviceHandler.GetInfo(), serviceHandler.Get())
-	serv.POST("/install", serviceHandler.InstallInfo(), serviceHandler.Install())
+	container.DELETE("", []fizz.OperationOption{
+		fizz.ID("deleteContainer"),
+		fizz.Summary("Delete a container"),
+	}, containerHandler.Delete())
 
-	services.GET("", servicesHandler.GetInfo(), middleware.Authenticated(), servicesHandler.Get())
+	container.PATCH("", []fizz.OperationOption{
+		fizz.ID("patchContainer"),
+		fizz.Summary("Patch a container"),
+	}, containerHandler.Patch())
+
+	container.POST("/start", []fizz.OperationOption{
+		fizz.ID("startContainer"),
+		fizz.Summary("Start a container"),
+	}, containerHandler.Start())
+
+	container.POST("/stop", []fizz.OperationOption{
+		fizz.ID("stopContainer"),
+		fizz.Summary("Stop a container"),
+	}, containerHandler.Stop())
+
+	container.PATCH("/environment", []fizz.OperationOption{
+		fizz.ID("patchContainerEnvironment"),
+		fizz.Summary("Patch a container environment"),
+	}, containerHandler.PatchEnvironment())
+
+	container.GET("/events", []fizz.OperationOption{
+		fizz.ID("eventsContainer"),
+		fizz.Summary("Get container events"),
+		fizz.Description("Get events for a container, sent as Server-Sent Events (SSE)."),
+	}, apptypes.HeadersSSE(), containerHandler.Events())
+
+	container.GET("/docker", []fizz.OperationOption{
+		fizz.ID("getDockerContainer"),
+		fizz.Summary("Get Docker container info"),
+	}, containerHandler.GetDocker())
+
+	container.POST("/docker/recreate", []fizz.OperationOption{
+		fizz.ID("recreateDockerContainer"),
+		fizz.Summary("Recreate Docker container"),
+	}, containerHandler.RecreateDocker())
+
+	container.GET("/logs", []fizz.OperationOption{
+		fizz.ID("getContainerLogs"),
+		fizz.Summary("Get container logs"),
+	}, containerHandler.GetLogs())
+
+	container.POST("/update/service", []fizz.OperationOption{
+		fizz.ID("updateService"),
+		fizz.Summary("Update service"),
+	}, containerHandler.UpdateService())
+
+	container.GET("/versions", []fizz.OperationOption{
+		fizz.ID("getContainerVersions"),
+		fizz.Summary("Get container versions"),
+	}, containerHandler.GetVersions())
+
+	container.GET("/wait", []fizz.OperationOption{
+		fizz.ID("waitContainerStatus"),
+		fizz.Summary("Wait for a status change"),
+	}, containerHandler.WaitStatus())
+
+	// Containers
+
+	containers.GET("", []fizz.OperationOption{
+		fizz.ID("getContainers"),
+		fizz.Summary("Get containers"),
+	}, containersHandler.Get())
+
+	containers.GET("/tags", []fizz.OperationOption{
+		fizz.ID("getTags"),
+		fizz.Summary("Get tags"),
+	}, containersHandler.GetTags())
+
+	containers.GET("/search", []fizz.OperationOption{
+		fizz.ID("searchContainers"),
+		fizz.Summary("Search containers"),
+	}, containersHandler.Search())
+
+	containers.GET("/checkupdates", []fizz.OperationOption{
+		fizz.ID("checkForUpdates"),
+		fizz.Summary("Check for updates"),
+	}, containersHandler.CheckForUpdates())
+
+	containers.GET("/events", []fizz.OperationOption{
+		fizz.ID("events"),
+		fizz.Summary("Get events"),
+	}, apptypes.HeadersSSE(), containersHandler.Events())
+
+	// Service
+
+	serv.GET("", []fizz.OperationOption{
+		fizz.ID("getService"),
+		fizz.Summary("Get service"),
+	}, serviceHandler.Get())
+
+	serv.POST("/install", []fizz.OperationOption{
+		fizz.ID("installService"),
+		fizz.Summary("Install service"),
+	}, serviceHandler.Install())
+
+	// Services
+
+	services.GET("", []fizz.OperationOption{
+		fizz.ID("getServices"),
+		fizz.Summary("Get services"),
+	}, middleware.Authenticated(), servicesHandler.Get())
+
 	services.GinRouterGroup().Static("/icons", "./live/services/icons")
 
 	return nil
@@ -111,20 +201,72 @@ func (a *App) InitializeKernel(r *fizz.RouterGroup) error {
 		docker              = r.Group("/docker", "Docker", "Docker wrapper")
 	)
 
-	docker.GET("/containers", dockerHandler.GetContainersInfo(), dockerHandler.GetContainers())
-	docker.POST("/container", dockerHandler.CreateContainerInfo(), dockerHandler.CreateContainer())
-	docker.DELETE("/container/:id", dockerHandler.DeleteContainerInfo(), dockerHandler.DeleteContainer())
-	docker.POST("/container/:id/start", dockerHandler.StartContainerInfo(), dockerHandler.StartContainer())
-	docker.POST("/container/:id/stop", dockerHandler.StopContainerInfo(), dockerHandler.StopContainer())
-	docker.GET("/container/:id/info", dockerHandler.InfoContainerInfo(), dockerHandler.InfoContainer())
-	docker.GET("/container/:id/logs/stdout", dockerHandler.LogsStdoutContainerInfo(), dockerHandler.LogsStdoutContainer())
-	docker.GET("/container/:id/logs/stderr", dockerHandler.LogsStderrContainerInfo(), dockerHandler.LogsStderrContainer())
-	docker.GET("/container/:id/wait/:cond", dockerHandler.WaitContainerInfo(), dockerHandler.WaitContainer())
-	docker.DELETE("/container/:id/mounts", dockerHandler.DeleteMountsInfo(), dockerHandler.DeleteMounts())
+	docker.GET("/containers", []fizz.OperationOption{
+		fizz.ID("getContainers"),
+		fizz.Summary("Get containers"),
+	}, dockerHandler.GetContainers())
 
-	docker.GET("/image/:id/info", dockerHandler.InfoImageInfo(), dockerHandler.InfoImage())
-	docker.POST("/image/pull", dockerHandler.PullImageInfo(), dockerHandler.PullImage())
-	docker.POST("/image/build", dockerHandler.BuildImageInfo(), dockerHandler.BuildImage())
+	docker.POST("/container", []fizz.OperationOption{
+		fizz.ID("createContainer"),
+		fizz.Summary("Create container"),
+	}, dockerHandler.CreateContainer())
+
+	docker.DELETE("/container/:id", []fizz.OperationOption{
+		fizz.ID("deleteContainer"),
+		fizz.Summary("Delete container"),
+	}, dockerHandler.DeleteContainer())
+
+	docker.POST("/container/:id/start", []fizz.OperationOption{
+		fizz.ID("startContainer"),
+		fizz.Summary("Start container"),
+	}, dockerHandler.StartContainer())
+
+	docker.POST("/container/:id/stop", []fizz.OperationOption{
+		fizz.ID("stopContainer"),
+		fizz.Summary("Stop container"),
+	}, dockerHandler.StopContainer())
+
+	docker.GET("/container/:id/info", []fizz.OperationOption{
+		fizz.ID("infoContainer"),
+		fizz.Summary("Get container info"),
+	}, dockerHandler.InfoContainer())
+
+	docker.GET("/container/:id/logs/stdout", []fizz.OperationOption{
+		fizz.ID("logsStdoutContainer"),
+		fizz.Summary("Get container stdout logs"),
+		fizz.Description("Get container stdout logs as a stream."),
+	}, dockerHandler.LogsStdoutContainer())
+
+	docker.GET("/container/:id/logs/stderr", []fizz.OperationOption{
+		fizz.ID("logsStderrContainer"),
+		fizz.Summary("Get container stderr logs"),
+		fizz.Description("Get container stderr logs as a stream."),
+	}, dockerHandler.LogsStderrContainer())
+
+	docker.GET("/container/:id/wait/:cond", []fizz.OperationOption{
+		fizz.ID("waitContainer"),
+		fizz.Summary("Wait container"),
+	}, dockerHandler.WaitContainer())
+
+	docker.DELETE("/container/:id/mounts", []fizz.OperationOption{
+		fizz.ID("deleteMounts"),
+		fizz.Summary("Delete mounts"),
+	}, dockerHandler.DeleteMounts())
+
+	docker.GET("/image/:id/info", []fizz.OperationOption{
+		fizz.ID("infoImage"),
+		fizz.Summary("Get image info"),
+	}, dockerHandler.InfoImage())
+
+	docker.POST("/image/pull", []fizz.OperationOption{
+		fizz.ID("pullImage"),
+		fizz.Summary("Pull image"),
+	}, dockerHandler.PullImage())
+
+	docker.POST("/image/build", []fizz.OperationOption{
+		fizz.ID("buildImage"),
+		fizz.Summary("Build image"),
+	}, dockerHandler.BuildImage())
 
 	return nil
 }

@@ -5,7 +5,6 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/wI2L/fizz"
 )
 
 type userHandler struct {
@@ -26,14 +25,6 @@ func (h *userHandler) GetCurrentUser() gin.HandlerFunc {
 	})
 }
 
-func (h *userHandler) GetCurrentUserInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("getCurrentUser"),
-		fizz.Summary("Get user"),
-		fizz.Description("Retrieve the logged-in user"),
-	}
-}
-
 type PatchCurrentUserParams struct {
 	types.User
 }
@@ -52,25 +43,9 @@ func (h *userHandler) PatchCurrentUser() gin.HandlerFunc {
 
 }
 
-func (h *userHandler) PatchCurrentUserInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("patchCurrentUser"),
-		fizz.Summary("Patch user"),
-		fizz.Description("Update the logged-in user"),
-	}
-}
-
 func (h *userHandler) GetCurrentUserCredentials() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context) ([]types.CredentialsMethods, error) {
 		userID := c.GetInt("user_id")
 		return h.service.GetUserCredentialsMethods(uint(userID))
 	})
-}
-
-func (h *userHandler) GetCurrentUserCredentialsInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("getCurrentUserCredentials"),
-		fizz.Summary("Get user credentials"),
-		fizz.Description("Retrieve the logged-in user credentials"),
-	}
 }

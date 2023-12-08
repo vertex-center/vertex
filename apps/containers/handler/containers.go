@@ -12,7 +12,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/wI2L/fizz"
 )
 
 type containersHandler struct {
@@ -33,24 +32,10 @@ func (h *containersHandler) Get() gin.HandlerFunc {
 	})
 }
 
-func (h *containersHandler) GetInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("getContainers"),
-		fizz.Summary("Get containers"),
-	}
-}
-
 func (h *containersHandler) GetTags() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context) ([]string, error) {
 		return h.containerService.GetTags(), nil
 	})
-}
-
-func (h *containersHandler) GetTagsInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("getTags"),
-		fizz.Summary("Get tags"),
-	}
 }
 
 func (h *containersHandler) Search() gin.HandlerFunc {
@@ -71,24 +56,10 @@ func (h *containersHandler) Search() gin.HandlerFunc {
 	})
 }
 
-func (h *containersHandler) SearchInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("searchContainers"),
-		fizz.Summary("Search containers"),
-	}
-}
-
 func (h *containersHandler) CheckForUpdates() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context) (map[uuid.UUID]*types.Container, error) {
 		return h.containerService.CheckForUpdates()
 	})
-}
-
-func (h *containersHandler) CheckForUpdatesInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("checkForUpdates"),
-		fizz.Summary("Check for updates"),
-	}
 }
 
 func (h *containersHandler) Events() gin.HandlerFunc {
@@ -141,11 +112,4 @@ func (h *containersHandler) Events() gin.HandlerFunc {
 
 		return nil
 	})
-}
-
-func (h *containersHandler) EventsInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("events"),
-		fizz.Summary("Get events"),
-	}
 }

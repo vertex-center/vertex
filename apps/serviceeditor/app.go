@@ -46,7 +46,11 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 		editor        = r.Group("/editor", "Editor", "Service editor routes", middleware.Authenticated())
 	)
 
-	editor.POST("/to-yaml", editorHandler.ToYamlInfo(), editorHandler.ToYaml())
+	editor.POST("/to-yaml", []fizz.OperationOption{
+		fizz.ID("toYaml"),
+		fizz.Summary("Convert service to yaml"),
+		fizz.Description("Convert service description to a reusable yaml file."),
+	}, editorHandler.ToYaml())
 
 	return nil
 }

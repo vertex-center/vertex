@@ -25,37 +25,16 @@ func (h *sshKernelHandler) Get() gin.HandlerFunc {
 	})
 }
 
-func (h *sshKernelHandler) GetInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("getSSHKeys"),
-		fizz.Summary("Get all SSH keys"),
-	}
-}
-
 func (h *sshKernelHandler) Add() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *AddSSHKeyParams) error {
 		return h.sshService.Add(params.AuthorizedKey, params.Username)
 	})
 }
 
-func (h *sshKernelHandler) AddInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("addSSHKey"),
-		fizz.Summary("Add an SSH key to the authorized_keys file"),
-	}
-}
-
 func (h *sshKernelHandler) Delete() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *DeleteSSHKeyParams) error {
 		return h.sshService.Delete(params.Fingerprint, params.Username)
 	})
-}
-
-func (h *sshKernelHandler) DeleteInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("deleteSSHKey"),
-		fizz.Summary("Delete an SSH key from the authorized_keys file"),
-	}
 }
 
 func (h *sshKernelHandler) GetUsers() gin.HandlerFunc {

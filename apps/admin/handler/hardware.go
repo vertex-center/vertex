@@ -5,7 +5,6 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/wI2L/fizz"
 )
 
 type hardwareHandler struct {
@@ -28,14 +27,6 @@ func (h *hardwareHandler) GetHost() gin.HandlerFunc {
 	})
 }
 
-func (h *hardwareHandler) GetHostInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("getHost"),
-		fizz.Summary("Get host"),
-		fizz.Description("Get host information."),
-	}
-}
-
 func (h *hardwareHandler) GetCPUs() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context) ([]types.CPU, error) {
 		cpus, err := h.service.GetCPUs()
@@ -46,24 +37,8 @@ func (h *hardwareHandler) GetCPUs() gin.HandlerFunc {
 	})
 }
 
-func (h *hardwareHandler) GetCPUsInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("getCPUs"),
-		fizz.Summary("Get CPUs"),
-		fizz.Description("Get CPUs information."),
-	}
-}
-
 func (h *hardwareHandler) Reboot() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context) error {
 		return h.service.Reboot(c)
 	})
-}
-
-func (h *hardwareHandler) RebootInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("reboot"),
-		fizz.Summary("Reboot"),
-		fizz.Description("Reboot the host."),
-	}
 }

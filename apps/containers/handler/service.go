@@ -8,7 +8,6 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/wI2L/fizz"
 )
 
 type serviceHandler struct {
@@ -37,13 +36,6 @@ func (h *serviceHandler) Get() gin.HandlerFunc {
 	})
 }
 
-func (h *serviceHandler) GetInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("getService"),
-		fizz.Summary("Get service"),
-	}
-}
-
 type InstallServiceParams struct {
 	ServiceID string `path:"service_id"`
 }
@@ -63,11 +55,4 @@ func (h *serviceHandler) Install() gin.HandlerFunc {
 		}
 		return inst, nil
 	})
-}
-
-func (h *serviceHandler) InstallInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("installService"),
-		fizz.Summary("Install service"),
-	}
 }

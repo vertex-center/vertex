@@ -2,11 +2,9 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/tunnels/core/port"
-	"github.com/wI2L/fizz"
-
-	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
@@ -45,11 +43,4 @@ func (r *providerHandler) Install() gin.HandlerFunc {
 
 		return nil
 	})
-}
-
-func (r *providerHandler) InstallInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("installProvider"),
-		fizz.Summary("Install a tunnel provider"),
-	}
 }

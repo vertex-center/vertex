@@ -5,7 +5,6 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/wI2L/fizz"
 )
 
 type settingsHandler struct {
@@ -28,13 +27,6 @@ func (h *settingsHandler) Get() gin.HandlerFunc {
 	})
 }
 
-func (h *settingsHandler) GetInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("getSettings"),
-		fizz.Summary("Get settings"),
-	}
-}
-
 type PatchSettingsParams struct {
 	Settings types.AdminSettings `json:"settings"`
 }
@@ -43,11 +35,4 @@ func (h *settingsHandler) Patch() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *PatchSettingsParams) error {
 		return h.service.Update(params.Settings)
 	})
-}
-
-func (h *settingsHandler) PatchInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("patchSettings"),
-		fizz.Summary("Patch settings"),
-	}
 }

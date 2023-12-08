@@ -12,7 +12,6 @@ import (
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/wI2L/fizz"
 )
 
 type containerHandler struct {
@@ -60,13 +59,6 @@ func (h *containerHandler) Get() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) GetInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("getContainer"),
-		fizz.Summary("Get a container"),
-	}
-}
-
 type DeleteContainerParams struct {
 	ContainerUUID *uuid.UUID `path:"container_uuid"`
 }
@@ -79,13 +71,6 @@ func (h *containerHandler) Delete() gin.HandlerFunc {
 		}
 		return h.containerService.Delete(inst)
 	})
-}
-
-func (h *containerHandler) DeleteInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("deleteContainer"),
-		fizz.Summary("Delete a container"),
-	}
 }
 
 // User can also add alternate username,password
@@ -160,13 +145,6 @@ func (h *containerHandler) Patch() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) PatchInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("patchContainer"),
-		fizz.Summary("Patch a container"),
-	}
-}
-
 type StartContainerParams struct {
 	ContainerUUID *uuid.UUID `path:"container_uuid"`
 }
@@ -181,13 +159,6 @@ func (h *containerHandler) Start() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) StartInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("startContainer"),
-		fizz.Summary("Start a container"),
-	}
-}
-
 type StopContainerParams struct {
 	ContainerUUID *uuid.UUID `path:"container_uuid"`
 }
@@ -200,13 +171,6 @@ func (h *containerHandler) Stop() gin.HandlerFunc {
 		}
 		return h.containerRunnerService.Stop(inst)
 	})
-}
-
-func (h *containerHandler) StopInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("stopContainer"),
-		fizz.Summary("Stop a container"),
-	}
 }
 
 type PatchEnvironmentBody map[string]string
@@ -235,13 +199,6 @@ func (h *containerHandler) PatchEnvironment() gin.HandlerFunc {
 		}
 		return nil
 	})
-}
-
-func (h *containerHandler) PatchEnvironmentInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("patchContainerEnvironment"),
-		fizz.Summary("Patch a container environment"),
-	}
 }
 
 type EventsContainerParams struct {
@@ -332,14 +289,6 @@ func (h *containerHandler) Events() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) EventsInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("eventsContainer"),
-		fizz.Summary("Get container events"),
-		fizz.Description("Get events for a container, sent as Server-Sent Events (SSE)."),
-	}
-}
-
 type DockerContainerInfo map[string]any
 
 func (h *containerHandler) GetDocker() gin.HandlerFunc {
@@ -351,13 +300,6 @@ func (h *containerHandler) GetDocker() gin.HandlerFunc {
 
 		return h.containerRunnerService.GetDockerContainerInfo(*inst)
 	})
-}
-
-func (h *containerHandler) GetDockerInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("getDockerContainer"),
-		fizz.Summary("Get Docker container info"),
-	}
 }
 
 type RecreateContainerParams struct {
@@ -374,13 +316,6 @@ func (h *containerHandler) RecreateDocker() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) RecreateDockerInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("recreateDockerContainer"),
-		fizz.Summary("Recreate Docker container"),
-	}
-}
-
 type LogsContainerParams struct {
 	ContainerUUID *uuid.UUID `path:"container_uuid"`
 }
@@ -389,13 +324,6 @@ func (h *containerHandler) GetLogs() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *LogsContainerParams) ([]types.LogLine, error) {
 		return h.containerLogsService.GetLatestLogs(*params.ContainerUUID)
 	})
-}
-
-func (h *containerHandler) GetLogsInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("getContainerLogs"),
-		fizz.Summary("Get container logs"),
-	}
 }
 
 type UpdateServiceParams struct {
@@ -418,13 +346,6 @@ func (h *containerHandler) UpdateService() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) UpdateServiceInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("updateService"),
-		fizz.Summary("Update service"),
-	}
-}
-
 type GetVersionsParams struct {
 	ContainerUUID *uuid.UUID `path:"container_uuid"`
 }
@@ -439,13 +360,6 @@ func (h *containerHandler) GetVersions() gin.HandlerFunc {
 		}
 		return h.containerRunnerService.GetAllVersions(inst, useCache)
 	})
-}
-
-func (h *containerHandler) GetVersionsInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("getContainerVersions"),
-		fizz.Summary("Get container versions"),
-	}
 }
 
 type WaitStatusParams struct {
@@ -463,11 +377,4 @@ func (h *containerHandler) WaitStatus() gin.HandlerFunc {
 
 		return h.containerRunnerService.WaitStatus(inst, status)
 	})
-}
-
-func (h *containerHandler) WaitStatusInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("waitContainerStatus"),
-		fizz.Summary("Wait for a status change"),
-	}
 }

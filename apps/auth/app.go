@@ -57,19 +57,71 @@ func (a *App) Initialize(r *fizz.RouterGroup) error {
 		emails = user.Group("/emails", "Emails", "User emails", middleware.Authenticated())
 	)
 
-	r.POST("/login", authHandler.LoginInfo(), authHandler.Login())
-	r.POST("/register", authHandler.RegisterInfo(), authHandler.Register())
-	r.POST("/logout", authHandler.LogoutInfo(), middleware.Authenticated(), authHandler.Logout())
-	r.POST("/verify", authHandler.VerifyInfo(), authHandler.Verify())
+	// Auth
 
-	user.GET("", userHandler.GetCurrentUserInfo(), userHandler.GetCurrentUser())
-	user.PATCH("", userHandler.PatchCurrentUserInfo(), userHandler.PatchCurrentUser())
-	user.GET("/credentials", userHandler.GetCurrentUserCredentialsInfo(), userHandler.GetCurrentUserCredentials())
+	r.POST("/login", []fizz.OperationOption{
+		fizz.ID("login"),
+		fizz.Summary("Login"),
+		fizz.Description("Login with username and password"),
+	}, authHandler.Login())
 
-	email.POST("", emailHandler.CreateCurrentUserEmailInfo(), emailHandler.CreateCurrentUserEmail())
-	email.DELETE("", emailHandler.DeleteCurrentUserEmailInfo(), emailHandler.DeleteCurrentUserEmail())
+	r.POST("/register", []fizz.OperationOption{
+		fizz.ID("register"),
+		fizz.Summary("Register"),
+		fizz.Description("Register a new user with username and password"),
+	}, authHandler.Register())
 
-	emails.GET("", emailHandler.GetCurrentUserEmailsInfo(), emailHandler.GetCurrentUserEmails())
+	r.POST("/verify", []fizz.OperationOption{
+		fizz.ID("verify"),
+		fizz.Summary("Verify"),
+		fizz.Description("Verify a token"),
+	}, authHandler.Verify())
+
+	r.POST("/logout", []fizz.OperationOption{
+		fizz.ID("logout"),
+		fizz.Summary("Logout"),
+		fizz.Description("Logout a user"),
+	}, middleware.Authenticated(), authHandler.Logout())
+
+	// User
+
+	user.GET("", []fizz.OperationOption{
+		fizz.ID("getCurrentUser"),
+		fizz.Summary("Get user"),
+		fizz.Description("Retrieve the logged-in user"),
+	}, userHandler.GetCurrentUser())
+
+	user.PATCH("", []fizz.OperationOption{
+		fizz.ID("patchCurrentUser"),
+		fizz.Summary("Patch user"),
+		fizz.Description("Update the logged-in user"),
+	}, userHandler.PatchCurrentUser())
+
+	user.GET("/credentials", []fizz.OperationOption{
+		fizz.ID("getCurrentUserCredentials"),
+		fizz.Summary("Get user credentials"),
+		fizz.Description("Retrieve the logged-in user credentials"),
+	}, userHandler.GetCurrentUserCredentials())
+
+	// Emails
+
+	emails.GET("", []fizz.OperationOption{
+		fizz.ID("getCurrentUserEmails"),
+		fizz.Summary("Get emails"),
+		fizz.Description("Retrieve the emails of the logged-in user"),
+	}, emailHandler.GetCurrentUserEmails())
+
+	email.POST("", []fizz.OperationOption{
+		fizz.ID("createCurrentUserEmail"),
+		fizz.Summary("Create email"),
+		fizz.Description("Create a new email for the logged-in user"),
+	}, emailHandler.CreateCurrentUserEmail())
+
+	email.DELETE("", []fizz.OperationOption{
+		fizz.ID("deleteCurrentUserEmail"),
+		fizz.Summary("Delete email"),
+		fizz.Description("Delete an email from the logged-in user"),
+	}, emailHandler.DeleteCurrentUserEmail())
 
 	return nil
 }

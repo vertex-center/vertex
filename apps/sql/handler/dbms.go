@@ -11,7 +11,6 @@ import (
 	"github.com/vertex-center/vertex/apps/sql/core/port"
 	"github.com/vertex-center/vertex/apps/sql/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/wI2L/fizz"
 )
 
 type dbmsHandler struct {
@@ -44,13 +43,6 @@ func (r *dbmsHandler) Get() gin.HandlerFunc {
 		}
 		return &dbms, nil
 	})
-}
-
-func (r *dbmsHandler) GetInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("getDBMS"),
-		fizz.Summary("Get an installed DBMS"),
-	}
 }
 
 type InstallParams struct {
@@ -90,11 +82,4 @@ func (r *dbmsHandler) Install() gin.HandlerFunc {
 		}
 		return inst, nil
 	})
-}
-
-func (r *dbmsHandler) InstallInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("installDBMS"),
-		fizz.Summary("Install a DBMS"),
-	}
 }

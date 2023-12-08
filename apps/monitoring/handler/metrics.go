@@ -5,7 +5,6 @@ import (
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/wI2L/fizz"
 )
 
 type metricsHandler struct {
@@ -24,13 +23,6 @@ func (r *metricsHandler) Get() gin.HandlerFunc {
 	})
 }
 
-func (r *metricsHandler) GetInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("getMetrics"),
-		fizz.Summary("Get metrics"),
-	}
-}
-
 type InstallCollectorParams struct {
 	Collector string `path:"collector"`
 }
@@ -42,13 +34,6 @@ func (r *metricsHandler) InstallCollector() gin.HandlerFunc {
 	})
 }
 
-func (r *metricsHandler) InstallCollectorInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("installCollector"),
-		fizz.Summary("Install a collector"),
-	}
-}
-
 type InstallVisualizerParams struct {
 	Visualizer string `path:"visualizer"`
 }
@@ -58,11 +43,4 @@ func (r *metricsHandler) InstallVisualizer() gin.HandlerFunc {
 		token := c.MustGet("token").(string)
 		return r.metricsService.InstallVisualizer(c, token, params.Visualizer)
 	})
-}
-
-func (r *metricsHandler) InstallVisualizerInfo() []fizz.OperationOption {
-	return []fizz.OperationOption{
-		fizz.ID("installVisualizer"),
-		fizz.Summary("Install a visualizer"),
-	}
 }
