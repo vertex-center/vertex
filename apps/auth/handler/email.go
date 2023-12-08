@@ -7,7 +7,7 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type emailHandler struct {
@@ -30,11 +30,11 @@ func (h *emailHandler) GetCurrentUserEmails() gin.HandlerFunc {
 	})
 }
 
-func (h *emailHandler) GetCurrentUserEmailsInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getCurrentUserEmails"),
-		oapi.Summary("Get emails"),
-		oapi.Description("Retrieve the emails of the logged-in user"),
+func (h *emailHandler) GetCurrentUserEmailsInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getCurrentUserEmails"),
+		fizz.Summary("Get emails"),
+		fizz.Description("Retrieve the emails of the logged-in user"),
 	}
 }
 
@@ -56,11 +56,11 @@ func (h *emailHandler) CreateCurrentUserEmail() gin.HandlerFunc {
 	})
 }
 
-func (h *emailHandler) CreateCurrentUserEmailInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("createCurrentUserEmail"),
-		oapi.Summary("Create email"),
-		oapi.Description("Create a new email for the logged-in user"),
+func (h *emailHandler) CreateCurrentUserEmailInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("createCurrentUserEmail"),
+		fizz.Summary("Create email"),
+		fizz.Description("Create a new email for the logged-in user"),
 	}
 }
 
@@ -75,10 +75,10 @@ func (h *emailHandler) DeleteCurrentUserEmail() gin.HandlerFunc {
 	})
 }
 
-func (h *emailHandler) DeleteCurrentUserEmailInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("deleteCurrentUserEmail"),
-		oapi.Summary("Delete email"),
-		oapi.Description("Delete an email from the logged-in user"),
+func (h *emailHandler) DeleteCurrentUserEmailInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("deleteCurrentUserEmail"),
+		fizz.Summary("Delete email"),
+		fizz.Description("Delete an email from the logged-in user"),
 	}
 }

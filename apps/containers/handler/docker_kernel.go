@@ -12,7 +12,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type dockerKernelHandler struct {
@@ -31,10 +31,10 @@ func (h *dockerKernelHandler) GetContainers() gin.HandlerFunc {
 	})
 }
 
-func (h *dockerKernelHandler) GetContainersInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getContainers"),
-		oapi.Summary("Get containers"),
+func (h *dockerKernelHandler) GetContainersInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getContainers"),
+		fizz.Summary("Get containers"),
 	}
 }
 
@@ -45,10 +45,10 @@ func (h *dockerKernelHandler) CreateContainer() gin.HandlerFunc {
 	})
 }
 
-func (h *dockerKernelHandler) CreateContainerInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("createContainer"),
-		oapi.Summary("Create container"),
+func (h *dockerKernelHandler) CreateContainerInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("createContainer"),
+		fizz.Summary("Create container"),
 	}
 }
 
@@ -66,10 +66,10 @@ func (h *dockerKernelHandler) DeleteContainer() gin.HandlerFunc {
 	})
 }
 
-func (h *dockerKernelHandler) DeleteContainerInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("deleteContainer"),
-		oapi.Summary("Delete container"),
+func (h *dockerKernelHandler) DeleteContainerInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("deleteContainer"),
+		fizz.Summary("Delete container"),
 	}
 }
 
@@ -87,10 +87,10 @@ func (h *dockerKernelHandler) StartContainer() gin.HandlerFunc {
 	})
 }
 
-func (h *dockerKernelHandler) StartContainerInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("startContainer"),
-		oapi.Summary("Start container"),
+func (h *dockerKernelHandler) StartContainerInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("startContainer"),
+		fizz.Summary("Start container"),
 	}
 }
 
@@ -108,10 +108,10 @@ func (h *dockerKernelHandler) StopContainer() gin.HandlerFunc {
 	})
 }
 
-func (h *dockerKernelHandler) StopContainerInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("stopContainer"),
-		oapi.Summary("Stop container"),
+func (h *dockerKernelHandler) StopContainerInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("stopContainer"),
+		fizz.Summary("Stop container"),
 	}
 }
 
@@ -129,10 +129,10 @@ func (h *dockerKernelHandler) InfoContainer() gin.HandlerFunc {
 	})
 }
 
-func (h *dockerKernelHandler) InfoContainerInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("infoContainer"),
-		oapi.Summary("Get container info"),
+func (h *dockerKernelHandler) InfoContainerInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("infoContainer"),
+		fizz.Summary("Get container info"),
 	}
 }
 
@@ -169,11 +169,11 @@ func (h *dockerKernelHandler) LogsStdoutContainer() gin.HandlerFunc {
 	})
 }
 
-func (h *dockerKernelHandler) LogsStdoutContainerInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("logsStdoutContainer"),
-		oapi.Summary("Get container stdout logs"),
-		oapi.Description("Get container stdout logs as a stream."),
+func (h *dockerKernelHandler) LogsStdoutContainerInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("logsStdoutContainer"),
+		fizz.Summary("Get container stdout logs"),
+		fizz.Description("Get container stdout logs as a stream."),
 	}
 }
 
@@ -210,11 +210,11 @@ func (h *dockerKernelHandler) LogsStderrContainer() gin.HandlerFunc {
 	})
 }
 
-func (h *dockerKernelHandler) LogsStderrContainerInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("logsStderrContainer"),
-		oapi.Summary("Get container stderr logs"),
-		oapi.Description("Get container stderr logs as a stream."),
+func (h *dockerKernelHandler) LogsStderrContainerInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("logsStderrContainer"),
+		fizz.Summary("Get container stderr logs"),
+		fizz.Description("Get container stderr logs as a stream."),
 	}
 }
 
@@ -229,10 +229,10 @@ func (h *dockerKernelHandler) WaitContainer() gin.HandlerFunc {
 	})
 }
 
-func (h *dockerKernelHandler) WaitContainerInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("waitContainer"),
-		oapi.Summary("Wait container"),
+func (h *dockerKernelHandler) WaitContainerInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("waitContainer"),
+		fizz.Summary("Wait container"),
 	}
 }
 
@@ -246,10 +246,10 @@ func (h *dockerKernelHandler) DeleteMounts() gin.HandlerFunc {
 	})
 }
 
-func (h *dockerKernelHandler) DeleteMountsInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("deleteMounts"),
-		oapi.Summary("Delete mounts"),
+func (h *dockerKernelHandler) DeleteMountsInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("deleteMounts"),
+		fizz.Summary("Delete mounts"),
 	}
 }
 
@@ -264,10 +264,10 @@ func (h *dockerKernelHandler) InfoImage() gin.HandlerFunc {
 	})
 }
 
-func (h *dockerKernelHandler) InfoImageInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("infoImage"),
-		oapi.Summary("Get image info"),
+func (h *dockerKernelHandler) InfoImageInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("infoImage"),
+		fizz.Summary("Get image info"),
 	}
 }
 
@@ -301,10 +301,10 @@ func (h *dockerKernelHandler) PullImage() gin.HandlerFunc {
 	})
 }
 
-func (h *dockerKernelHandler) PullImageInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("pullImage"),
-		oapi.Summary("Pull image"),
+func (h *dockerKernelHandler) PullImageInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("pullImage"),
+		fizz.Summary("Pull image"),
 	}
 }
 
@@ -340,9 +340,9 @@ func (h *dockerKernelHandler) BuildImage() gin.HandlerFunc {
 	})
 }
 
-func (h *dockerKernelHandler) BuildImageInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("buildImage"),
-		oapi.Summary("Build image"),
+func (h *dockerKernelHandler) BuildImageInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("buildImage"),
+		fizz.Summary("Build image"),
 	}
 }

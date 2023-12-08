@@ -2,15 +2,15 @@ package port
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type (
 	DBMSHandler interface {
 		Get() gin.HandlerFunc
-		GetInfo() []oapi.Info
+		GetInfo() []fizz.OperationOption
 
 		Install() gin.HandlerFunc
-		InstallInfo() []oapi.Info
+		InstallInfo() []fizz.OperationOption
 	}
 )

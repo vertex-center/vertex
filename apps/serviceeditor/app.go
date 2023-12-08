@@ -6,7 +6,7 @@ import (
 	"github.com/vertex-center/vertex/apps/serviceeditor/core/service"
 	"github.com/vertex-center/vertex/apps/serviceeditor/handler"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/wI2L/fizz"
 )
 
 var Meta = apptypes.Meta{
@@ -37,7 +37,7 @@ func (a *App) Meta() apptypes.Meta {
 	return Meta
 }
 
-func (a *App) Initialize(r *router.Group) error {
+func (a *App) Initialize(r *fizz.RouterGroup) error {
 	r.Use(middleware.ReadAuth())
 
 	var (

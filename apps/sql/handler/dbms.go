@@ -11,7 +11,7 @@ import (
 	"github.com/vertex-center/vertex/apps/sql/core/port"
 	"github.com/vertex-center/vertex/apps/sql/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type dbmsHandler struct {
@@ -46,10 +46,10 @@ func (r *dbmsHandler) Get() gin.HandlerFunc {
 	})
 }
 
-func (r *dbmsHandler) GetInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getDBMS"),
-		oapi.Summary("Get an installed DBMS"),
+func (r *dbmsHandler) GetInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getDBMS"),
+		fizz.Summary("Get an installed DBMS"),
 	}
 }
 
@@ -92,9 +92,9 @@ func (r *dbmsHandler) Install() gin.HandlerFunc {
 	})
 }
 
-func (r *dbmsHandler) InstallInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("installDBMS"),
-		oapi.Summary("Install a DBMS"),
+func (r *dbmsHandler) InstallInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("installDBMS"),
+		fizz.Summary("Install a DBMS"),
 	}
 }

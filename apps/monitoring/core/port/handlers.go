@@ -2,18 +2,18 @@ package port
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type (
 	MetricsHandler interface {
 		Get() gin.HandlerFunc
-		GetInfo() []oapi.Info
+		GetInfo() []fizz.OperationOption
 
 		InstallCollector() gin.HandlerFunc
-		InstallCollectorInfo() []oapi.Info
+		InstallCollectorInfo() []fizz.OperationOption
 
 		InstallVisualizer() gin.HandlerFunc
-		InstallVisualizerInfo() []oapi.Info
+		InstallVisualizerInfo() []fizz.OperationOption
 	}
 )

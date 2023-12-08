@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
-	"github.com/vertex-center/vertex/pkg/router"
 )
 
 type AppsServiceTestSuite struct {
@@ -46,7 +45,7 @@ func (m *MockApp) Meta() app.Meta {
 	return args.Get(0).(app.Meta)
 }
 
-func (m *MockApp) Initialize(r *router.Group) error {
+func (m *MockApp) Initialize(r *fizz.RouterGroup) error {
 	args := m.Called(r)
 	return args.Error(0)
 }

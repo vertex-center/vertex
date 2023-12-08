@@ -2,18 +2,18 @@ package port
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type (
 	ProxyHandler interface {
 		GetRedirects() gin.HandlerFunc
-		GetRedirectsInfo() []oapi.Info
+		GetRedirectsInfo() []fizz.OperationOption
 
 		AddRedirect() gin.HandlerFunc
-		AddRedirectInfo() []oapi.Info
+		AddRedirectInfo() []fizz.OperationOption
 
 		RemoveRedirect() gin.HandlerFunc
-		RemoveRedirectInfo() []oapi.Info
+		RemoveRedirectInfo() []fizz.OperationOption
 	}
 )

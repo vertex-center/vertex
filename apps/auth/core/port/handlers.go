@@ -2,43 +2,43 @@ package port
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type (
 	AuthHandler interface {
 		Login() gin.HandlerFunc
-		LoginInfo() []oapi.Info
+		LoginInfo() []fizz.OperationOption
 
 		Register() gin.HandlerFunc
-		RegisterInfo() []oapi.Info
+		RegisterInfo() []fizz.OperationOption
 
 		Logout() gin.HandlerFunc
-		LogoutInfo() []oapi.Info
+		LogoutInfo() []fizz.OperationOption
 
 		Verify() gin.HandlerFunc
-		VerifyInfo() []oapi.Info
+		VerifyInfo() []fizz.OperationOption
 	}
 
 	EmailHandler interface {
 		CreateCurrentUserEmail() gin.HandlerFunc
-		CreateCurrentUserEmailInfo() []oapi.Info
+		CreateCurrentUserEmailInfo() []fizz.OperationOption
 
 		GetCurrentUserEmails() gin.HandlerFunc
-		GetCurrentUserEmailsInfo() []oapi.Info
+		GetCurrentUserEmailsInfo() []fizz.OperationOption
 
 		DeleteCurrentUserEmail() gin.HandlerFunc
-		DeleteCurrentUserEmailInfo() []oapi.Info
+		DeleteCurrentUserEmailInfo() []fizz.OperationOption
 	}
 
 	UserHandler interface {
 		GetCurrentUser() gin.HandlerFunc
-		GetCurrentUserInfo() []oapi.Info
+		GetCurrentUserInfo() []fizz.OperationOption
 
 		PatchCurrentUser() gin.HandlerFunc
-		PatchCurrentUserInfo() []oapi.Info
+		PatchCurrentUserInfo() []fizz.OperationOption
 
 		GetCurrentUserCredentials() gin.HandlerFunc
-		GetCurrentUserCredentialsInfo() []oapi.Info
+		GetCurrentUserCredentialsInfo() []fizz.OperationOption
 	}
 )

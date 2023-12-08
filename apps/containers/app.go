@@ -7,7 +7,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/handler"
 	"github.com/vertex-center/vertex/apps/containers/meta"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/wI2L/fizz"
 )
 
 type App struct {
@@ -26,7 +26,7 @@ func (a *App) Meta() apptypes.Meta {
 	return meta.Meta
 }
 
-func (a *App) Initialize(r *router.Group) error {
+func (a *App) Initialize(r *fizz.RouterGroup) error {
 	r.Use(middleware.ReadAuth())
 
 	var (
@@ -103,7 +103,7 @@ func (a *App) Initialize(r *router.Group) error {
 	return nil
 }
 
-func (a *App) InitializeKernel(r *router.Group) error {
+func (a *App) InitializeKernel(r *fizz.RouterGroup) error {
 	var (
 		dockerKernelAdapter = adapter.NewDockerCliAdapter()
 		dockerKernelService = service.NewDockerKernelService(dockerKernelAdapter)

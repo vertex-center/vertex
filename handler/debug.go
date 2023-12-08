@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type debugHandler struct {
@@ -21,10 +21,10 @@ func (h *debugHandler) HardReset(c *gin.Context) error {
 	return nil
 }
 
-func (h *debugHandler) HardResetInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("hardReset"),
-		oapi.Summary("Hard reset"),
-		oapi.Description("This route allows deleting all the server data, which can be useful for debugging purposes."),
+func (h *debugHandler) HardResetInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("hardReset"),
+		fizz.Summary("Hard reset"),
+		fizz.Description("This route allows deleting all the server data, which can be useful for debugging purposes."),
 	}
 }

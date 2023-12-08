@@ -5,7 +5,7 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type updateHandler struct {
@@ -34,10 +34,10 @@ func (h *updateHandler) Get() gin.HandlerFunc {
 	})
 }
 
-func (h *updateHandler) GetInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getUpdate"),
-		oapi.Summary("Get the latest update information"),
+func (h *updateHandler) GetInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getUpdate"),
+		fizz.Summary("Get the latest update information"),
 	}
 }
 
@@ -51,10 +51,10 @@ func (h *updateHandler) Install() gin.HandlerFunc {
 	})
 }
 
-func (h *updateHandler) InstallInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("installUpdate"),
-		oapi.Summary("Install the latest version"),
-		oapi.Description("This endpoint will install the latest version of Vertex."),
+func (h *updateHandler) InstallInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("installUpdate"),
+		fizz.Summary("Install the latest version"),
+		fizz.Description("This endpoint will install the latest version of Vertex."),
 	}
 }

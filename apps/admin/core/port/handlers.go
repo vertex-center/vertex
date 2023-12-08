@@ -2,80 +2,80 @@ package port
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type (
 	ChecksHandler interface {
 		Check() gin.HandlerFunc
-		CheckInfo() []oapi.Info
+		CheckInfo() []fizz.OperationOption
 	}
 
 	DatabaseHandler interface {
 		GetCurrentDbms() gin.HandlerFunc
-		GetCurrentDbmsInfo() []oapi.Info
+		GetCurrentDbmsInfo() []fizz.OperationOption
 
 		MigrateTo() gin.HandlerFunc
-		MigrateToInfo() []oapi.Info
+		MigrateToInfo() []fizz.OperationOption
 	}
 
 	HardwareHandler interface {
 		GetHost() gin.HandlerFunc
-		GetHostInfo() []oapi.Info
+		GetHostInfo() []fizz.OperationOption
 
 		GetCPUs() gin.HandlerFunc
-		GetCPUsInfo() []oapi.Info
+		GetCPUsInfo() []fizz.OperationOption
 
 		Reboot() gin.HandlerFunc
-		RebootInfo() []oapi.Info
+		RebootInfo() []fizz.OperationOption
 	}
 
 	HardwareKernelHandler interface {
 		Reboot() gin.HandlerFunc
-		RebootInfo() []oapi.Info
+		RebootInfo() []fizz.OperationOption
 	}
 
 	SettingsHandler interface {
 		Get() gin.HandlerFunc
-		GetInfo() []oapi.Info
+		GetInfo() []fizz.OperationOption
 
 		Patch() gin.HandlerFunc
-		PatchInfo() []oapi.Info
+		PatchInfo() []fizz.OperationOption
 	}
 
 	SshHandler interface {
 		Get() gin.HandlerFunc
-		GetInfo() []oapi.Info
+		GetInfo() []fizz.OperationOption
 
 		Add() gin.HandlerFunc
-		AddInfo() []oapi.Info
+		AddInfo() []fizz.OperationOption
 
 		Delete() gin.HandlerFunc
-		DeleteInfo() []oapi.Info
+		DeleteInfo() []fizz.OperationOption
 
 		GetUsers() gin.HandlerFunc
-		GetUsersInfo() []oapi.Info
+		GetUsersInfo() []fizz.OperationOption
 	}
 
 	SshKernelHandler interface {
 		Get() gin.HandlerFunc
-		GetInfo() []oapi.Info
+		GetInfo() []fizz.OperationOption
 
 		Add() gin.HandlerFunc
-		AddInfo() []oapi.Info
+		AddInfo() []fizz.OperationOption
 
 		Delete() gin.HandlerFunc
-		DeleteInfo() []oapi.Info
+		DeleteInfo() []fizz.OperationOption
 
 		GetUsers() gin.HandlerFunc
-		GetUsersInfo() []oapi.Info
+		GetUsersInfo() []fizz.OperationOption
 	}
 
 	UpdateHandler interface {
 		Get() gin.HandlerFunc
-		GetInfo() []oapi.Info
+		GetInfo() []fizz.OperationOption
 
 		Install() gin.HandlerFunc
-		InstallInfo() []oapi.Info
+		InstallInfo() []fizz.OperationOption
 	}
 )

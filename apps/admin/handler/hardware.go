@@ -5,7 +5,7 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type hardwareHandler struct {
@@ -28,11 +28,11 @@ func (h *hardwareHandler) GetHost() gin.HandlerFunc {
 	})
 }
 
-func (h *hardwareHandler) GetHostInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getHost"),
-		oapi.Summary("Get host"),
-		oapi.Description("Get host information."),
+func (h *hardwareHandler) GetHostInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getHost"),
+		fizz.Summary("Get host"),
+		fizz.Description("Get host information."),
 	}
 }
 
@@ -46,11 +46,11 @@ func (h *hardwareHandler) GetCPUs() gin.HandlerFunc {
 	})
 }
 
-func (h *hardwareHandler) GetCPUsInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getCPUs"),
-		oapi.Summary("Get CPUs"),
-		oapi.Description("Get CPUs information."),
+func (h *hardwareHandler) GetCPUsInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getCPUs"),
+		fizz.Summary("Get CPUs"),
+		fizz.Description("Get CPUs information."),
 	}
 }
 
@@ -60,10 +60,10 @@ func (h *hardwareHandler) Reboot() gin.HandlerFunc {
 	})
 }
 
-func (h *hardwareHandler) RebootInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("reboot"),
-		oapi.Summary("Reboot"),
-		oapi.Description("Reboot the host."),
+func (h *hardwareHandler) RebootInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("reboot"),
+		fizz.Summary("Reboot"),
+		fizz.Description("Reboot the host."),
 	}
 }

@@ -5,7 +5,7 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type settingsHandler struct {
@@ -28,10 +28,10 @@ func (h *settingsHandler) Get() gin.HandlerFunc {
 	})
 }
 
-func (h *settingsHandler) GetInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getSettings"),
-		oapi.Summary("Get settings"),
+func (h *settingsHandler) GetInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getSettings"),
+		fizz.Summary("Get settings"),
 	}
 }
 
@@ -45,9 +45,9 @@ func (h *settingsHandler) Patch() gin.HandlerFunc {
 	})
 }
 
-func (h *settingsHandler) PatchInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("patchSettings"),
-		oapi.Summary("Patch settings"),
+func (h *settingsHandler) PatchInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("patchSettings"),
+		fizz.Summary("Patch settings"),
 	}
 }

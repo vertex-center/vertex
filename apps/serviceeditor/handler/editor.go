@@ -5,7 +5,7 @@ import (
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/serviceeditor/core/port"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type editorHandler struct {
@@ -24,10 +24,10 @@ func (h *editorHandler) ToYaml() gin.HandlerFunc {
 	})
 }
 
-func (h *editorHandler) ToYamlInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("toYaml"),
-		oapi.Summary("Convert service to yaml"),
-		oapi.Description("Convert service description to a reusable yaml file."),
+func (h *editorHandler) ToYamlInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("toYaml"),
+		fizz.Summary("Convert service to yaml"),
+		fizz.Description("Convert service description to a reusable yaml file."),
 	}
 }

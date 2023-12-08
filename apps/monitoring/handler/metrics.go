@@ -5,7 +5,7 @@ import (
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type metricsHandler struct {
@@ -24,10 +24,10 @@ func (r *metricsHandler) Get() gin.HandlerFunc {
 	})
 }
 
-func (r *metricsHandler) GetInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getMetrics"),
-		oapi.Summary("Get metrics"),
+func (r *metricsHandler) GetInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getMetrics"),
+		fizz.Summary("Get metrics"),
 	}
 }
 
@@ -42,10 +42,10 @@ func (r *metricsHandler) InstallCollector() gin.HandlerFunc {
 	})
 }
 
-func (r *metricsHandler) InstallCollectorInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("installCollector"),
-		oapi.Summary("Install a collector"),
+func (r *metricsHandler) InstallCollectorInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("installCollector"),
+		fizz.Summary("Install a collector"),
 	}
 }
 
@@ -60,9 +60,9 @@ func (r *metricsHandler) InstallVisualizer() gin.HandlerFunc {
 	})
 }
 
-func (r *metricsHandler) InstallVisualizerInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("installVisualizer"),
-		oapi.Summary("Install a visualizer"),
+func (r *metricsHandler) InstallVisualizerInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("installVisualizer"),
+		fizz.Summary("Install a visualizer"),
 	}
 }

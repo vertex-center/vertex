@@ -5,7 +5,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type servicesHandler struct {
@@ -24,9 +24,9 @@ func (h *servicesHandler) Get() gin.HandlerFunc {
 	})
 }
 
-func (h *servicesHandler) GetInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getServices"),
-		oapi.Summary("Get services"),
+func (h *servicesHandler) GetInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getServices"),
+		fizz.Summary("Get services"),
 	}
 }

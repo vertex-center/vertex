@@ -5,8 +5,8 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
 	"github.com/vertex-center/vertex/pkg/user"
+	"github.com/wI2L/fizz"
 )
 
 type sshKernelHandler struct {
@@ -25,10 +25,10 @@ func (h *sshKernelHandler) Get() gin.HandlerFunc {
 	})
 }
 
-func (h *sshKernelHandler) GetInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getSSHKeys"),
-		oapi.Summary("Get all SSH keys"),
+func (h *sshKernelHandler) GetInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getSSHKeys"),
+		fizz.Summary("Get all SSH keys"),
 	}
 }
 
@@ -38,10 +38,10 @@ func (h *sshKernelHandler) Add() gin.HandlerFunc {
 	})
 }
 
-func (h *sshKernelHandler) AddInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("addSSHKey"),
-		oapi.Summary("Add an SSH key to the authorized_keys file"),
+func (h *sshKernelHandler) AddInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("addSSHKey"),
+		fizz.Summary("Add an SSH key to the authorized_keys file"),
 	}
 }
 
@@ -51,10 +51,10 @@ func (h *sshKernelHandler) Delete() gin.HandlerFunc {
 	})
 }
 
-func (h *sshKernelHandler) DeleteInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("deleteSSHKey"),
-		oapi.Summary("Delete an SSH key from the authorized_keys file"),
+func (h *sshKernelHandler) DeleteInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("deleteSSHKey"),
+		fizz.Summary("Delete an SSH key from the authorized_keys file"),
 	}
 }
 
@@ -64,9 +64,9 @@ func (h *sshKernelHandler) GetUsers() gin.HandlerFunc {
 	})
 }
 
-func (h *sshKernelHandler) GetUsersInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getSSHUsers"),
-		oapi.Summary("Get all users that can have SSH keys"),
+func (h *sshKernelHandler) GetUsersInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getSSHUsers"),
+		fizz.Summary("Get all users that can have SSH keys"),
 	}
 }

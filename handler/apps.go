@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types/app"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type appsHandler struct {
@@ -21,10 +21,10 @@ func (h *appsHandler) GetApps(*gin.Context) ([]app.Meta, error) {
 	return h.appsService.All(), nil
 }
 
-func (h *appsHandler) GetAppsInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getApps"),
-		oapi.Summary("Get apps"),
-		oapi.Description("Get all the apps installed on the server."),
+func (h *appsHandler) GetAppsInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getApps"),
+		fizz.Summary("Get apps"),
+		fizz.Description("Get all the apps installed on the server."),
 	}
 }

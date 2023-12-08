@@ -12,7 +12,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type containerHandler struct {
@@ -60,10 +60,10 @@ func (h *containerHandler) Get() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) GetInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getContainer"),
-		oapi.Summary("Get a container"),
+func (h *containerHandler) GetInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getContainer"),
+		fizz.Summary("Get a container"),
 	}
 }
 
@@ -81,10 +81,10 @@ func (h *containerHandler) Delete() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) DeleteInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("deleteContainer"),
-		oapi.Summary("Delete a container"),
+func (h *containerHandler) DeleteInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("deleteContainer"),
+		fizz.Summary("Delete a container"),
 	}
 }
 
@@ -160,10 +160,10 @@ func (h *containerHandler) Patch() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) PatchInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("patchContainer"),
-		oapi.Summary("Patch a container"),
+func (h *containerHandler) PatchInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("patchContainer"),
+		fizz.Summary("Patch a container"),
 	}
 }
 
@@ -181,10 +181,10 @@ func (h *containerHandler) Start() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) StartInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("startContainer"),
-		oapi.Summary("Start a container"),
+func (h *containerHandler) StartInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("startContainer"),
+		fizz.Summary("Start a container"),
 	}
 }
 
@@ -202,10 +202,10 @@ func (h *containerHandler) Stop() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) StopInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("stopContainer"),
-		oapi.Summary("Stop a container"),
+func (h *containerHandler) StopInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("stopContainer"),
+		fizz.Summary("Stop a container"),
 	}
 }
 
@@ -237,10 +237,10 @@ func (h *containerHandler) PatchEnvironment() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) PatchEnvironmentInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("patchContainerEnvironment"),
-		oapi.Summary("Patch a container environment"),
+func (h *containerHandler) PatchEnvironmentInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("patchContainerEnvironment"),
+		fizz.Summary("Patch a container environment"),
 	}
 }
 
@@ -332,11 +332,11 @@ func (h *containerHandler) Events() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) EventsInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("eventsContainer"),
-		oapi.Summary("Get container events"),
-		oapi.Description("Get events for a container, sent as Server-Sent Events (SSE)."),
+func (h *containerHandler) EventsInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("eventsContainer"),
+		fizz.Summary("Get container events"),
+		fizz.Description("Get events for a container, sent as Server-Sent Events (SSE)."),
 	}
 }
 
@@ -353,10 +353,10 @@ func (h *containerHandler) GetDocker() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) GetDockerInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getDockerContainer"),
-		oapi.Summary("Get Docker container info"),
+func (h *containerHandler) GetDockerInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getDockerContainer"),
+		fizz.Summary("Get Docker container info"),
 	}
 }
 
@@ -374,10 +374,10 @@ func (h *containerHandler) RecreateDocker() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) RecreateDockerInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("recreateDockerContainer"),
-		oapi.Summary("Recreate Docker container"),
+func (h *containerHandler) RecreateDockerInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("recreateDockerContainer"),
+		fizz.Summary("Recreate Docker container"),
 	}
 }
 
@@ -391,10 +391,10 @@ func (h *containerHandler) GetLogs() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) GetLogsInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getContainerLogs"),
-		oapi.Summary("Get container logs"),
+func (h *containerHandler) GetLogsInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getContainerLogs"),
+		fizz.Summary("Get container logs"),
 	}
 }
 
@@ -418,10 +418,10 @@ func (h *containerHandler) UpdateService() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) UpdateServiceInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("updateService"),
-		oapi.Summary("Update service"),
+func (h *containerHandler) UpdateServiceInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("updateService"),
+		fizz.Summary("Update service"),
 	}
 }
 
@@ -441,10 +441,10 @@ func (h *containerHandler) GetVersions() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) GetVersionsInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getContainerVersions"),
-		oapi.Summary("Get container versions"),
+func (h *containerHandler) GetVersionsInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getContainerVersions"),
+		fizz.Summary("Get container versions"),
 	}
 }
 
@@ -465,9 +465,9 @@ func (h *containerHandler) WaitStatus() gin.HandlerFunc {
 	})
 }
 
-func (h *containerHandler) WaitStatusInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("waitContainerStatus"),
-		oapi.Summary("Wait for a status change"),
+func (h *containerHandler) WaitStatusInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("waitContainerStatus"),
+		fizz.Summary("Wait for a status change"),
 	}
 }

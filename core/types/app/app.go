@@ -13,7 +13,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 	"github.com/wI2L/fizz/openapi"
 )
 
@@ -58,12 +58,12 @@ type InterfaceKernel interface {
 
 type Initializable interface {
 	Interface
-	Initialize(r *router.Group) error
+	Initialize(r *fizz.RouterGroup) error
 }
 
 type KernelInitializable interface {
 	Interface
-	InitializeKernel(r *router.Group) error
+	InitializeKernel(r *fizz.RouterGroup) error
 }
 
 type Uninitializable interface {
@@ -80,7 +80,7 @@ type DependenciesProvider interface {
 	DownloadDependencies() error
 }
 
-type HttpHandler func(r *router.Group)
+type HttpHandler func(r *fizz.RouterGroup)
 
 type Service interface {
 	OnEvent(e event.Event) error
@@ -137,8 +137,8 @@ func RunStandalone(app Interface) {
 			os.Exit(1)
 		}
 
-		base.GET("/ping", []oapi.Info{
-			oapi.Summary("Ping the app"),
+		base.GET("/ping", []fizz.OperationOption{
+			fizz.Summary("Ping the app"),
 		}, router.Handler(func(c *gin.Context) error {
 			return nil
 		}))
@@ -181,8 +181,8 @@ func RunStandaloneKernel(app Interface) {
 			os.Exit(1)
 		}
 
-		base.GET("/ping", []oapi.Info{
-			oapi.Summary("Ping the app"),
+		base.GET("/ping", []fizz.OperationOption{
+			fizz.Summary("Ping the app"),
 		}, router.Handler(func(c *gin.Context) error {
 			return nil
 		}))

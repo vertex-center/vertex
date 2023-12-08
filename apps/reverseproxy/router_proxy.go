@@ -51,7 +51,7 @@ func (r *ProxyRouter) Stop() error {
 }
 
 func (r *ProxyRouter) initAPIRoutes() {
-	r.Any("/*path", r.HandleProxy)
+	r.Engine().Any("/*path", r.HandleProxy)
 }
 
 func (r *ProxyRouter) HandleProxy(c *gin.Context) {

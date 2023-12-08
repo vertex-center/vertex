@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type databaseHandler struct {
@@ -24,11 +24,11 @@ func (h *databaseHandler) GetCurrentDbms() gin.HandlerFunc {
 	})
 }
 
-func (h *databaseHandler) GetCurrentDbmsInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getCurrentDbms"),
-		oapi.Summary("Get the current DBMS"),
-		oapi.Description("Get the current database management system that Vertex is using."),
+func (h *databaseHandler) GetCurrentDbmsInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getCurrentDbms"),
+		fizz.Summary("Get the current DBMS"),
+		fizz.Description("Get the current database management system that Vertex is using."),
 	}
 }
 
@@ -42,10 +42,10 @@ func (h *databaseHandler) MigrateTo() gin.HandlerFunc {
 	})
 }
 
-func (h *databaseHandler) MigrateToInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("migrateTo"),
-		oapi.Summary("Migrate to a DBMS"),
-		oapi.Description("Migrate Vertex to the given database management system."),
+func (h *databaseHandler) MigrateToInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("migrateTo"),
+		fizz.Summary("Migrate to a DBMS"),
+		fizz.Description("Migrate Vertex to the given database management system."),
 	}
 }

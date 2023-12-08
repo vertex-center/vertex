@@ -2,119 +2,119 @@ package port
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type (
 	ContainerHandler interface {
 		Get() gin.HandlerFunc
-		GetInfo() []oapi.Info
+		GetInfo() []fizz.OperationOption
 
 		Delete() gin.HandlerFunc
-		DeleteInfo() []oapi.Info
+		DeleteInfo() []fizz.OperationOption
 
 		Patch() gin.HandlerFunc
-		PatchInfo() []oapi.Info
+		PatchInfo() []fizz.OperationOption
 
 		Start() gin.HandlerFunc
-		StartInfo() []oapi.Info
+		StartInfo() []fizz.OperationOption
 
 		Stop() gin.HandlerFunc
-		StopInfo() []oapi.Info
+		StopInfo() []fizz.OperationOption
 
 		PatchEnvironment() gin.HandlerFunc
-		PatchEnvironmentInfo() []oapi.Info
+		PatchEnvironmentInfo() []fizz.OperationOption
 
 		GetDocker() gin.HandlerFunc
-		GetDockerInfo() []oapi.Info
+		GetDockerInfo() []fizz.OperationOption
 
 		RecreateDocker() gin.HandlerFunc
-		RecreateDockerInfo() []oapi.Info
+		RecreateDockerInfo() []fizz.OperationOption
 
 		GetLogs() gin.HandlerFunc
-		GetLogsInfo() []oapi.Info
+		GetLogsInfo() []fizz.OperationOption
 
 		UpdateService() gin.HandlerFunc
-		UpdateServiceInfo() []oapi.Info
+		UpdateServiceInfo() []fizz.OperationOption
 
 		GetVersions() gin.HandlerFunc
-		GetVersionsInfo() []oapi.Info
+		GetVersionsInfo() []fizz.OperationOption
 
 		WaitStatus() gin.HandlerFunc
-		WaitStatusInfo() []oapi.Info
+		WaitStatusInfo() []fizz.OperationOption
 
 		Events() gin.HandlerFunc
-		EventsInfo() []oapi.Info
+		EventsInfo() []fizz.OperationOption
 	}
 
 	ContainersHandler interface {
 		Get() gin.HandlerFunc
-		GetInfo() []oapi.Info
+		GetInfo() []fizz.OperationOption
 
 		GetTags() gin.HandlerFunc
-		GetTagsInfo() []oapi.Info
+		GetTagsInfo() []fizz.OperationOption
 
 		Search() gin.HandlerFunc
-		SearchInfo() []oapi.Info
+		SearchInfo() []fizz.OperationOption
 
 		CheckForUpdates() gin.HandlerFunc
-		CheckForUpdatesInfo() []oapi.Info
+		CheckForUpdatesInfo() []fizz.OperationOption
 
 		Events() gin.HandlerFunc
-		EventsInfo() []oapi.Info
+		EventsInfo() []fizz.OperationOption
 	}
 
 	ServiceHandler interface {
 		Get() gin.HandlerFunc
-		GetInfo() []oapi.Info
+		GetInfo() []fizz.OperationOption
 
 		Install() gin.HandlerFunc
-		InstallInfo() []oapi.Info
+		InstallInfo() []fizz.OperationOption
 	}
 
 	ServicesHandler interface {
 		Get() gin.HandlerFunc
-		GetInfo() []oapi.Info
+		GetInfo() []fizz.OperationOption
 	}
 
 	DockerKernelHandler interface {
 		GetContainers() gin.HandlerFunc
-		GetContainersInfo() []oapi.Info
+		GetContainersInfo() []fizz.OperationOption
 
 		CreateContainer() gin.HandlerFunc
-		CreateContainerInfo() []oapi.Info
+		CreateContainerInfo() []fizz.OperationOption
 
 		DeleteContainer() gin.HandlerFunc
-		DeleteContainerInfo() []oapi.Info
+		DeleteContainerInfo() []fizz.OperationOption
 
 		StartContainer() gin.HandlerFunc
-		StartContainerInfo() []oapi.Info
+		StartContainerInfo() []fizz.OperationOption
 
 		StopContainer() gin.HandlerFunc
-		StopContainerInfo() []oapi.Info
+		StopContainerInfo() []fizz.OperationOption
 
 		InfoContainer() gin.HandlerFunc
-		InfoContainerInfo() []oapi.Info
+		InfoContainerInfo() []fizz.OperationOption
 
 		LogsStdoutContainer() gin.HandlerFunc
-		LogsStdoutContainerInfo() []oapi.Info
+		LogsStdoutContainerInfo() []fizz.OperationOption
 
 		LogsStderrContainer() gin.HandlerFunc
-		LogsStderrContainerInfo() []oapi.Info
+		LogsStderrContainerInfo() []fizz.OperationOption
 
 		WaitContainer() gin.HandlerFunc
-		WaitContainerInfo() []oapi.Info
+		WaitContainerInfo() []fizz.OperationOption
 
 		DeleteMounts() gin.HandlerFunc
-		DeleteMountsInfo() []oapi.Info
+		DeleteMountsInfo() []fizz.OperationOption
 
 		InfoImage() gin.HandlerFunc
-		InfoImageInfo() []oapi.Info
+		InfoImageInfo() []fizz.OperationOption
 
 		PullImage() gin.HandlerFunc
-		PullImageInfo() []oapi.Info
+		PullImageInfo() []fizz.OperationOption
 
 		BuildImage() gin.HandlerFunc
-		BuildImageInfo() []oapi.Info
+		BuildImageInfo() []fizz.OperationOption
 	}
 )

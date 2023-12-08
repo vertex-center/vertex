@@ -5,7 +5,7 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type userHandler struct {
@@ -26,11 +26,11 @@ func (h *userHandler) GetCurrentUser() gin.HandlerFunc {
 	})
 }
 
-func (h *userHandler) GetCurrentUserInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getCurrentUser"),
-		oapi.Summary("Get user"),
-		oapi.Description("Retrieve the logged-in user"),
+func (h *userHandler) GetCurrentUserInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getCurrentUser"),
+		fizz.Summary("Get user"),
+		fizz.Description("Retrieve the logged-in user"),
 	}
 }
 
@@ -52,11 +52,11 @@ func (h *userHandler) PatchCurrentUser() gin.HandlerFunc {
 
 }
 
-func (h *userHandler) PatchCurrentUserInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("patchCurrentUser"),
-		oapi.Summary("Patch user"),
-		oapi.Description("Update the logged-in user"),
+func (h *userHandler) PatchCurrentUserInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("patchCurrentUser"),
+		fizz.Summary("Patch user"),
+		fizz.Description("Update the logged-in user"),
 	}
 }
 
@@ -67,10 +67,10 @@ func (h *userHandler) GetCurrentUserCredentials() gin.HandlerFunc {
 	})
 }
 
-func (h *userHandler) GetCurrentUserCredentialsInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getCurrentUserCredentials"),
-		oapi.Summary("Get user credentials"),
-		oapi.Description("Retrieve the logged-in user credentials"),
+func (h *userHandler) GetCurrentUserCredentialsInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getCurrentUserCredentials"),
+		fizz.Summary("Get user credentials"),
+		fizz.Description("Retrieve the logged-in user credentials"),
 	}
 }

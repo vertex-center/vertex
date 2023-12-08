@@ -5,7 +5,7 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type sshHandler struct {
@@ -24,10 +24,10 @@ func (h *sshHandler) Get() gin.HandlerFunc {
 	})
 }
 
-func (h *sshHandler) GetInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getSSHKeys"),
-		oapi.Summary("Get all SSH keys"),
+func (h *sshHandler) GetInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getSSHKeys"),
+		fizz.Summary("Get all SSH keys"),
 	}
 }
 
@@ -42,10 +42,10 @@ func (h *sshHandler) Add() gin.HandlerFunc {
 	})
 }
 
-func (h *sshHandler) AddInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("addSSHKey"),
-		oapi.Summary("Add an SSH key"),
+func (h *sshHandler) AddInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("addSSHKey"),
+		fizz.Summary("Add an SSH key"),
 	}
 }
 
@@ -60,10 +60,10 @@ func (h *sshHandler) Delete() gin.HandlerFunc {
 	})
 }
 
-func (h *sshHandler) DeleteInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("deleteSSHKey"),
-		oapi.Summary("Delete SSH key"),
+func (h *sshHandler) DeleteInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("deleteSSHKey"),
+		fizz.Summary("Delete SSH key"),
 	}
 }
 
@@ -73,9 +73,9 @@ func (h *sshHandler) GetUsers() gin.HandlerFunc {
 	})
 }
 
-func (h *sshHandler) GetUsersInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getSSHUsers"),
-		oapi.Summary("Get all users that can have SSH keys"),
+func (h *sshHandler) GetUsersInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getSSHUsers"),
+		fizz.Summary("Get all users that can have SSH keys"),
 	}
 }

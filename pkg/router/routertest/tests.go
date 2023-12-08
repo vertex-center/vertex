@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type RequestOptions struct {
@@ -16,7 +16,7 @@ type RequestOptions struct {
 func Request(method string, handler gin.HandlerFunc, opts RequestOptions) *httptest.ResponseRecorder {
 	// Setup
 	r := router.New(nil)
-	r.Handle(method, "/", []oapi.Info{}, handler)
+	r.Handle(method, "/", []fizz.OperationOption{}, handler)
 	w := httptest.NewRecorder()
 
 	// Make the request

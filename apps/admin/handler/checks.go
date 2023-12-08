@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 	"golang.org/x/net/context"
 )
 
@@ -47,10 +47,10 @@ func (h *checksHandler) Check() gin.HandlerFunc {
 	})
 }
 
-func (h *checksHandler) CheckInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("check"),
-		oapi.Summary("Get all checks"),
-		oapi.Description("Check that all vertex requirements are met."),
+func (h *checksHandler) CheckInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("check"),
+		fizz.Summary("Get all checks"),
+		fizz.Description("Check that all vertex requirements are met."),
 	}
 }

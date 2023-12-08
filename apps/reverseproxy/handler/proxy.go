@@ -9,7 +9,7 @@ import (
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type proxyHandler struct {
@@ -28,10 +28,10 @@ func (r *proxyHandler) GetRedirects() gin.HandlerFunc {
 	})
 }
 
-func (r *proxyHandler) GetRedirectsInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getRedirects"),
-		oapi.Summary("Get redirects"),
+func (r *proxyHandler) GetRedirectsInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getRedirects"),
+		fizz.Summary("Get redirects"),
 	}
 }
 
@@ -45,10 +45,10 @@ func (r *proxyHandler) AddRedirect() gin.HandlerFunc {
 	})
 }
 
-func (r *proxyHandler) AddRedirectInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("addRedirect"),
-		oapi.Summary("Add redirect"),
+func (r *proxyHandler) AddRedirectInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("addRedirect"),
+		fizz.Summary("Add redirect"),
 	}
 }
 
@@ -66,9 +66,9 @@ func (r *proxyHandler) RemoveRedirect() gin.HandlerFunc {
 	})
 }
 
-func (r *proxyHandler) RemoveRedirectInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("removeRedirect"),
-		oapi.Summary("Remove redirect"),
+func (r *proxyHandler) RemoveRedirectInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("removeRedirect"),
+		fizz.Summary("Remove redirect"),
 	}
 }

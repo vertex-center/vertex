@@ -2,12 +2,12 @@ package port
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type (
 	EditorHandler interface {
 		ToYaml() gin.HandlerFunc
-		ToYamlInfo() []oapi.Info
+		ToYamlInfo() []fizz.OperationOption
 	}
 )

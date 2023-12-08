@@ -13,8 +13,8 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/core/types/storage"
-	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/updates"
+	"github.com/wI2L/fizz"
 )
 
 var updateService port.UpdateService
@@ -44,7 +44,7 @@ func (a *App) Meta() apptypes.Meta {
 	return meta.Meta
 }
 
-func (a *App) Initialize(r *router.Group) error {
+func (a *App) Initialize(r *fizz.RouterGroup) error {
 	r.Use(middleware.ReadAuth())
 
 	db, err := storage.NewDB(storage.DBParams{
@@ -100,7 +100,7 @@ func (a *App) Initialize(r *router.Group) error {
 	return nil
 }
 
-func (a *App) InitializeKernel(r *router.Group) error {
+func (a *App) InitializeKernel(r *fizz.RouterGroup) error {
 	var (
 		hardwareAdapter = adapter.NewHardwareKernelAdapter()
 		sshAdapter      = adapter.NewSshFsAdapter()

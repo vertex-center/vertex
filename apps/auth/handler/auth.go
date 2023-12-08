@@ -8,7 +8,7 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type authHandler struct {
@@ -32,11 +32,11 @@ func (h authHandler) Login() gin.HandlerFunc {
 	})
 }
 
-func (h authHandler) LoginInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("login"),
-		oapi.Summary("Login"),
-		oapi.Description("Login with username and password"),
+func (h authHandler) LoginInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("login"),
+		fizz.Summary("Login"),
+		fizz.Description("Login with username and password"),
 	}
 }
 
@@ -52,11 +52,11 @@ func (h authHandler) Register() gin.HandlerFunc {
 	})
 }
 
-func (h authHandler) RegisterInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("register"),
-		oapi.Summary("Register"),
-		oapi.Description("Register a new user with username and password"),
+func (h authHandler) RegisterInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("register"),
+		fizz.Summary("Register"),
+		fizz.Description("Register a new user with username and password"),
 	}
 }
 
@@ -68,11 +68,11 @@ func (h authHandler) Verify() gin.HandlerFunc {
 	})
 }
 
-func (h authHandler) VerifyInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("verify"),
-		oapi.Summary("Verify"),
-		oapi.Description("Verify a token"),
+func (h authHandler) VerifyInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("verify"),
+		fizz.Summary("Verify"),
+		fizz.Description("Verify a token"),
 	}
 }
 
@@ -83,11 +83,11 @@ func (h authHandler) Logout() gin.HandlerFunc {
 	})
 }
 
-func (h authHandler) LogoutInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("logout"),
-		oapi.Summary("Logout"),
-		oapi.Description("Logout a user"),
+func (h authHandler) LogoutInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("logout"),
+		fizz.Summary("Logout"),
+		fizz.Description("Logout a user"),
 	}
 }
 

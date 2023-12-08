@@ -12,7 +12,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 )
 
 type containersHandler struct {
@@ -33,10 +33,10 @@ func (h *containersHandler) Get() gin.HandlerFunc {
 	})
 }
 
-func (h *containersHandler) GetInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getContainers"),
-		oapi.Summary("Get containers"),
+func (h *containersHandler) GetInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getContainers"),
+		fizz.Summary("Get containers"),
 	}
 }
 
@@ -46,10 +46,10 @@ func (h *containersHandler) GetTags() gin.HandlerFunc {
 	})
 }
 
-func (h *containersHandler) GetTagsInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("getTags"),
-		oapi.Summary("Get tags"),
+func (h *containersHandler) GetTagsInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getTags"),
+		fizz.Summary("Get tags"),
 	}
 }
 
@@ -71,10 +71,10 @@ func (h *containersHandler) Search() gin.HandlerFunc {
 	})
 }
 
-func (h *containersHandler) SearchInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("searchContainers"),
-		oapi.Summary("Search containers"),
+func (h *containersHandler) SearchInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("searchContainers"),
+		fizz.Summary("Search containers"),
 	}
 }
 
@@ -84,10 +84,10 @@ func (h *containersHandler) CheckForUpdates() gin.HandlerFunc {
 	})
 }
 
-func (h *containersHandler) CheckForUpdatesInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("checkForUpdates"),
-		oapi.Summary("Check for updates"),
+func (h *containersHandler) CheckForUpdatesInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("checkForUpdates"),
+		fizz.Summary("Check for updates"),
 	}
 }
 
@@ -143,9 +143,9 @@ func (h *containersHandler) Events() gin.HandlerFunc {
 	})
 }
 
-func (h *containersHandler) EventsInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("events"),
-		oapi.Summary("Get events"),
+func (h *containersHandler) EventsInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("events"),
+		fizz.Summary("Get events"),
 	}
 }

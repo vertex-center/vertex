@@ -29,7 +29,7 @@ import (
 	"github.com/vertex-center/vertex/handler"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 	"github.com/wI2L/fizz/openapi"
 )
 
@@ -145,9 +145,9 @@ func initRoutes(about types.About) {
 	})
 
 	a := srv.Router.Group("/api", "API", "Main API group", middleware.ReadAuth())
-	a.GET("/about", []oapi.Info{
-		oapi.ID("getAbout"),
-		oapi.Summary("Get server info"),
+	a.GET("/about", []fizz.OperationOption{
+		fizz.ID("getAbout"),
+		fizz.Summary("Get server info"),
 	}, router.Handler(func(c *gin.Context) (*types.About, error) {
 		return &about, nil
 	}))

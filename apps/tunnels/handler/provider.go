@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/tunnels/core/port"
-	"github.com/vertex-center/vertex/pkg/router/oapi"
+	"github.com/wI2L/fizz"
 
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -47,9 +47,9 @@ func (r *providerHandler) Install() gin.HandlerFunc {
 	})
 }
 
-func (r *providerHandler) InstallInfo() []oapi.Info {
-	return []oapi.Info{
-		oapi.ID("installProvider"),
-		oapi.Summary("Install a tunnel provider"),
+func (r *providerHandler) InstallInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("installProvider"),
+		fizz.Summary("Install a tunnel provider"),
 	}
 }
