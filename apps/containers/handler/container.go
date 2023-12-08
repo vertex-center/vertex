@@ -173,22 +173,19 @@ func (h *containerHandler) Stop() gin.HandlerFunc {
 	})
 }
 
-type PatchEnvironmentBody map[string]string
+type PatchEnvironmentParams struct {
+	ContainerUUID uuid.NullUUID               `path:"container_uuid"`
+	Env           types.ContainerEnvVariables `body:"env"`
+}
 
 func (h *containerHandler) PatchEnvironment() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *PatchContainerParams) error {
-		var environment PatchEnvironmentBody
-		err := c.BindJSON(&environment)
-		if err != nil {
-			return err
-		}
-
+	return router.Handler(func(c *gin.Context, params *PatchEnvironmentParams) error {
 		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}
 
-		err = h.containerEnvService.Save(inst, types.ContainerEnvVariables(environment))
+		err = h.containerEnvService.Save(inst, params.Env)
 		if err != nil {
 			return err
 		}
@@ -288,8 +285,6 @@ func (h *containerHandler) Events() gin.HandlerFunc {
 		return nil
 	})
 }
-
-type DockerContainerInfo map[string]any
 
 func (h *containerHandler) GetDocker() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *GetContainerParams) (map[string]any, error) {
