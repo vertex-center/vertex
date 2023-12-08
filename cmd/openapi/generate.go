@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/url"
 	"os"
@@ -99,29 +97,17 @@ func runServer(initRoutes func(r *fizz.RouterGroup) error, meta app.Meta, u *url
 }
 
 func downloadOpenAPI(id string, u *url.URL) {
-	var specs string
-	err := requests.New().
-		BaseURL(u.String()).
-		Path("/openapi.json").
-		ToString(&specs).
-		Fetch(context.Background())
-	if err != nil {
-		panic(err)
-	}
-
-	w, err := os.Create(path.Join("openapi", "openapi."+id+".json"))
+	w, err := os.Create(path.Join("openapi", "openapi."+id+".yaml"))
 	if err != nil {
 		panic(err)
 	}
 	defer w.Close()
 
-	var out bytes.Buffer
-	err = json.Indent(&out, []byte(specs), "", "\t")
-	if err != nil {
-		panic(err)
-	}
-
-	_, err = out.WriteTo(w)
+	err = requests.New().
+		BaseURL(u.String()).
+		Path("/openapi.yaml").
+		ToWriter(w).
+		Fetch(context.Background())
 	if err != nil {
 		panic(err)
 	}
