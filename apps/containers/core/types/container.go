@@ -15,10 +15,6 @@ const (
 	ContainerStatusError    = "error"
 )
 
-const (
-	ContainerInstallMethodDocker = "docker"
-)
-
 var (
 	ErrContainerNotFound     = errors.New("container not found")
 	ErrContainerStillRunning = errors.New("container still running")

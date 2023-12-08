@@ -32,9 +32,9 @@ func (r *dbmsHandler) Get() gin.HandlerFunc {
 		token := c.MustGet("token").(string)
 		client := containersapi.NewContainersClient(token)
 
-		inst, apiError := client.GetContainer(c, params.UUID.UUID)
-		if apiError != nil {
-			return nil, apiError.RouterError()
+		inst, err := client.GetContainer(c, params.UUID.UUID)
+		if err != nil {
+			return nil, err
 		}
 
 		dbms, err := r.sqlService.Get(inst)
@@ -54,31 +54,30 @@ func (r *dbmsHandler) Install() gin.HandlerFunc {
 		token := c.MustGet("token").(string)
 		client := containersapi.NewContainersClient(token)
 
-		serv, apiError := client.GetService(c, params.DBMS)
-		if apiError != nil {
-			return nil, apiError.RouterError()
+		serv, err := client.GetService(c, params.DBMS)
+		if err != nil {
+			return nil, err
 		}
 
-		inst, apiError := client.InstallService(c, serv.ID)
-		if apiError != nil {
-			return nil, apiError.RouterError()
+		inst, err := client.InstallService(c, serv.ID)
+		if err != nil {
+			return nil, err
 		}
 
 		inst.ContainerSettings.Tags = []string{"Vertex SQL", "Vertex SQL - Postgres Database"}
-		apiError = client.PatchContainer(c, inst.UUID, inst.ContainerSettings)
-		if apiError != nil {
-			return nil, apiError.RouterError()
+		err = client.PatchContainer(c, inst.UUID, inst.ContainerSettings)
+		if err != nil {
+			return nil, err
 		}
 
-		var err error
 		inst.Env, err = r.sqlService.EnvCredentials(inst, "postgres", "postgres")
 		if err != nil {
 			return nil, fmt.Errorf("setup credentials: %w", err)
 		}
 
-		apiError = client.PatchContainerEnvironment(c, inst.UUID, inst.Env)
-		if apiError != nil {
-			return nil, apiError.RouterError()
+		err = client.PatchContainerEnvironment(c, inst.UUID, inst.Env)
+		if err != nil {
+			return nil, err
 		}
 		return inst, nil
 	})

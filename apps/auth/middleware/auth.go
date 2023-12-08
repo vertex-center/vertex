@@ -24,7 +24,7 @@ func Authenticated(c *gin.Context) {
 	authClient := api.NewAuthClient(tokenStr)
 	session, err := authClient.Verify(c)
 	if err != nil {
-		_ = c.AbortWithError(401, errors.NewUnauthorized(err.RouterError(), "invalid token"))
+		_ = c.AbortWithError(401, errors.NewUnauthorized(err, "invalid token"))
 		return
 	}
 

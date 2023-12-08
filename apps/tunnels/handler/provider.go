@@ -24,23 +24,18 @@ func (r *providerHandler) Install() gin.HandlerFunc {
 
 		client := containersapi.NewContainersClient(token)
 
-		serv, apiError := client.GetService(c, params.Provider)
-		if apiError != nil {
-			return apiError.RouterError()
+		serv, err := client.GetService(c, params.Provider)
+		if err != nil {
+			return err
 		}
 
-		inst, apiError := client.InstallService(c, serv.ID)
-		if apiError != nil {
-			return apiError.RouterError()
+		inst, err := client.InstallService(c, serv.ID)
+		if err != nil {
+			return err
 		}
 
-		apiError = client.PatchContainer(c, inst.UUID, containerstypes.ContainerSettings{
+		return client.PatchContainer(c, inst.UUID, containerstypes.ContainerSettings{
 			Tags: []string{"Vertex Tunnels", "Vertex Tunnels - Cloudflare"},
 		})
-		if apiError != nil {
-			return apiError.RouterError()
-		}
-
-		return nil
 	})
 }

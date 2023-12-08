@@ -40,7 +40,6 @@ func New(id string, info *openapi.Info, u *url.URL, ctx *types.VertexContext) *S
 		ctx: ctx,
 		Router: router.New(info,
 			router.WithMiddleware(cors.New(cfg)),
-			router.WithMiddleware(ginutils.ErrorHandler()),
 			router.WithMiddleware(ginutils.Logger(id, u.String())),
 			router.WithMiddleware(gin.Recovery()),
 		),

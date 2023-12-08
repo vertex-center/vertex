@@ -37,29 +37,24 @@ func (s *metricsService) GetMetrics() []types.Metric {
 func (s *metricsService) InstallCollector(ctx context.Context, token string, collector string) error {
 	c := containersapi.NewContainersClient(token)
 
-	serv, apiError := c.GetService(ctx, collector)
-	if apiError != nil {
-		return apiError.RouterError()
-	}
-
-	inst, apiError := c.InstallService(ctx, serv.ID)
-	if apiError != nil {
-		return apiError.RouterError()
-	}
-
-	err := s.ConfigureCollector(inst)
+	serv, err := c.GetService(ctx, collector)
 	if err != nil {
 		return err
 	}
 
-	apiError = c.PatchContainer(ctx, inst.UUID, containerstypes.ContainerSettings{
-		Tags: []string{"Vertex Monitoring", "Vertex Monitoring - Prometheus Collector"},
-	})
-	if apiError != nil {
-		return apiError.RouterError()
+	inst, err := c.InstallService(ctx, serv.ID)
+	if err != nil {
+		return err
 	}
 
-	return nil
+	err = s.ConfigureCollector(inst)
+	if err != nil {
+		return err
+	}
+
+	return c.PatchContainer(ctx, inst.UUID, containerstypes.ContainerSettings{
+		Tags: []string{"Vertex Monitoring", "Vertex Monitoring - Prometheus Collector"},
+	})
 }
 
 // ConfigureCollector will configure a container to monitor the metrics of Vertex.
@@ -72,29 +67,24 @@ func (s *metricsService) ConfigureCollector(inst *containerstypes.Container) err
 func (s *metricsService) InstallVisualizer(ctx context.Context, token string, visualizer string) error {
 	c := containersapi.NewContainersClient(token)
 
-	serv, apiError := c.GetService(ctx, visualizer)
-	if apiError != nil {
-		return apiError.RouterError()
-	}
-
-	inst, apiError := c.InstallService(ctx, serv.ID)
-	if apiError != nil {
-		return apiError.RouterError()
-	}
-
-	err := s.ConfigureVisualizer(inst)
+	serv, err := c.GetService(ctx, visualizer)
 	if err != nil {
 		return err
 	}
 
-	apiError = c.PatchContainer(ctx, inst.UUID, containerstypes.ContainerSettings{
-		Tags: []string{"Vertex Monitoring", "Vertex Monitoring - Grafana Visualizer"},
-	})
-	if apiError != nil {
-		return apiError.RouterError()
+	inst, err := c.InstallService(ctx, serv.ID)
+	if err != nil {
+		return err
 	}
 
-	return nil
+	err = s.ConfigureVisualizer(inst)
+	if err != nil {
+		return err
+	}
+
+	return c.PatchContainer(ctx, inst.UUID, containerstypes.ContainerSettings{
+		Tags: []string{"Vertex Monitoring", "Vertex Monitoring - Grafana Visualizer"},
+	})
 }
 
 func (s *metricsService) ConfigureVisualizer(inst *containerstypes.Container) error {
