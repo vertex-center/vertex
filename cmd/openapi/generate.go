@@ -9,14 +9,7 @@ import (
 
 	"github.com/carlmjohnson/requests"
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/apps/admin"
-	"github.com/vertex-center/vertex/apps/auth"
-	"github.com/vertex-center/vertex/apps/containers"
-	"github.com/vertex-center/vertex/apps/monitoring"
-	"github.com/vertex-center/vertex/apps/reverseproxy"
-	"github.com/vertex-center/vertex/apps/serviceeditor"
-	"github.com/vertex-center/vertex/apps/sql"
-	"github.com/vertex-center/vertex/apps/tunnels"
+	"github.com/vertex-center/vertex/apps"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/core/types/server"
@@ -26,17 +19,6 @@ import (
 )
 
 func main() {
-	apps := []app.Interface{
-		admin.NewApp(),
-		auth.NewApp(),
-		containers.NewApp(),
-		monitoring.NewApp(),
-		reverseproxy.NewApp(),
-		serviceeditor.NewApp(),
-		sql.NewApp(),
-		tunnels.NewApp(),
-	}
-
 	err := os.MkdirAll("openapi", 0755)
 	if err != nil {
 		panic(err)
@@ -52,7 +34,7 @@ func main() {
 		panic(err)
 	}
 
-	for _, a := range apps {
+	for _, a := range apps.Apps {
 		if a, ok := a.(app.InitializableRouter); ok {
 			srv := runServer(a.InitializeRouter, a.Meta(), u)
 			downloadOpenAPI(a.Meta().ID, u)

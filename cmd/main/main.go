@@ -10,20 +10,12 @@ import (
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/juju/errors"
-	"github.com/vertex-center/vertex/apps/admin"
-	"github.com/vertex-center/vertex/apps/auth"
+	"github.com/vertex-center/vertex/apps"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
-	"github.com/vertex-center/vertex/apps/containers"
-	"github.com/vertex-center/vertex/apps/monitoring"
-	"github.com/vertex-center/vertex/apps/reverseproxy"
-	"github.com/vertex-center/vertex/apps/serviceeditor"
-	"github.com/vertex-center/vertex/apps/sql"
-	"github.com/vertex-center/vertex/apps/tunnels"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/service"
 	"github.com/vertex-center/vertex/core/types"
-	"github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/core/types/server"
 	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/handler"
@@ -123,16 +115,7 @@ func checkNotRoot() {
 func initServices() {
 	// Update service must be initialized before all other services, because it
 	// is responsible for downloading dependencies for other services.
-	appsService = service.NewAppsService(ctx, false, []app.Interface{
-		admin.NewApp(),
-		auth.NewApp(),
-		sql.NewApp(),
-		tunnels.NewApp(),
-		monitoring.NewApp(),
-		containers.NewApp(),
-		reverseproxy.NewApp(),
-		serviceeditor.NewApp(),
-	})
+	appsService = service.NewAppsService(ctx, false, apps.Apps)
 	debugService = service.NewDebugService(ctx)
 }
 
