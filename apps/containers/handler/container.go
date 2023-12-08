@@ -50,22 +50,22 @@ func NewContainerHandler(params ContainerHandlerParams) port.ContainerHandler {
 }
 
 type GetContainerParams struct {
-	ContainerUUID *uuid.UUID `path:"container_uuid"`
+	ContainerUUID uuid.NullUUID `path:"container_uuid"`
 }
 
 func (h *containerHandler) Get() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *GetContainerParams) (*types.Container, error) {
-		return h.containerService.Get(*params.ContainerUUID)
+		return h.containerService.Get(params.ContainerUUID.UUID)
 	})
 }
 
 type DeleteContainerParams struct {
-	ContainerUUID *uuid.UUID `path:"container_uuid"`
+	ContainerUUID uuid.NullUUID `path:"container_uuid"`
 }
 
 func (h *containerHandler) Delete() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *DeleteContainerParams) error {
-		inst, err := h.containerService.Get(*params.ContainerUUID)
+		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}
@@ -80,7 +80,7 @@ type PatchBodyDatabase struct {
 }
 
 type PatchContainerParams struct {
-	ContainerUUID *uuid.UUID `path:"container_uuid"`
+	ContainerUUID uuid.NullUUID `path:"container_uuid"`
 
 	LaunchOnStartup *bool                        `json:"launch_on_startup,omitempty"`
 	DisplayName     *string                      `json:"display_name,omitempty"`
@@ -91,7 +91,7 @@ type PatchContainerParams struct {
 
 func (h *containerHandler) Patch() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *PatchContainerParams) error {
-		inst, err := h.containerService.Get(*params.ContainerUUID)
+		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}
@@ -146,12 +146,12 @@ func (h *containerHandler) Patch() gin.HandlerFunc {
 }
 
 type StartContainerParams struct {
-	ContainerUUID *uuid.UUID `path:"container_uuid"`
+	ContainerUUID uuid.NullUUID `path:"container_uuid"`
 }
 
 func (h *containerHandler) Start() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *StartContainerParams) error {
-		inst, err := h.containerService.Get(*params.ContainerUUID)
+		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}
@@ -160,12 +160,12 @@ func (h *containerHandler) Start() gin.HandlerFunc {
 }
 
 type StopContainerParams struct {
-	ContainerUUID *uuid.UUID `path:"container_uuid"`
+	ContainerUUID uuid.NullUUID `path:"container_uuid"`
 }
 
 func (h *containerHandler) Stop() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *StopContainerParams) error {
-		inst, err := h.containerService.Get(*params.ContainerUUID)
+		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}
@@ -183,7 +183,7 @@ func (h *containerHandler) PatchEnvironment() gin.HandlerFunc {
 			return err
 		}
 
-		inst, err := h.containerService.Get(*params.ContainerUUID)
+		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}
@@ -202,12 +202,12 @@ func (h *containerHandler) PatchEnvironment() gin.HandlerFunc {
 }
 
 type EventsContainerParams struct {
-	ContainerUUID *uuid.UUID `path:"container_uuid"`
+	ContainerUUID uuid.NullUUID `path:"container_uuid"`
 }
 
 func (h *containerHandler) Events() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *EventsContainerParams) error {
-		inst, err := h.containerService.Get(*params.ContainerUUID)
+		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}
@@ -293,7 +293,7 @@ type DockerContainerInfo map[string]any
 
 func (h *containerHandler) GetDocker() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *GetContainerParams) (map[string]any, error) {
-		inst, err := h.containerService.Get(*params.ContainerUUID)
+		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
 		if err != nil {
 			return nil, err
 		}
@@ -303,12 +303,12 @@ func (h *containerHandler) GetDocker() gin.HandlerFunc {
 }
 
 type RecreateContainerParams struct {
-	ContainerUUID *uuid.UUID `path:"container_uuid"`
+	ContainerUUID uuid.NullUUID `path:"container_uuid"`
 }
 
 func (h *containerHandler) RecreateDocker() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *RecreateContainerParams) error {
-		inst, err := h.containerService.Get(*params.ContainerUUID)
+		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}
@@ -317,22 +317,22 @@ func (h *containerHandler) RecreateDocker() gin.HandlerFunc {
 }
 
 type LogsContainerParams struct {
-	ContainerUUID *uuid.UUID `path:"container_uuid"`
+	ContainerUUID uuid.NullUUID `path:"container_uuid"`
 }
 
 func (h *containerHandler) GetLogs() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *LogsContainerParams) ([]types.LogLine, error) {
-		return h.containerLogsService.GetLatestLogs(*params.ContainerUUID)
+		return h.containerLogsService.GetLatestLogs(params.ContainerUUID.UUID)
 	})
 }
 
 type UpdateServiceParams struct {
-	ContainerUUID *uuid.UUID `path:"container_uuid"`
+	ContainerUUID uuid.NullUUID `path:"container_uuid"`
 }
 
 func (h *containerHandler) UpdateService() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *UpdateServiceParams) error {
-		inst, err := h.containerService.Get(*params.ContainerUUID)
+		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}
@@ -347,14 +347,14 @@ func (h *containerHandler) UpdateService() gin.HandlerFunc {
 }
 
 type GetVersionsParams struct {
-	ContainerUUID *uuid.UUID `path:"container_uuid"`
+	ContainerUUID uuid.NullUUID `path:"container_uuid"`
 }
 
 func (h *containerHandler) GetVersions() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *GetVersionsParams) ([]string, error) {
 		useCache := c.Query("reload") != "true"
 
-		inst, err := h.containerService.Get(*params.ContainerUUID)
+		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
 		if err != nil {
 			return nil, err
 		}
@@ -363,14 +363,14 @@ func (h *containerHandler) GetVersions() gin.HandlerFunc {
 }
 
 type WaitStatusParams struct {
-	ContainerUUID *uuid.UUID `path:"container_uuid"`
+	ContainerUUID uuid.NullUUID `path:"container_uuid"`
 }
 
 func (h *containerHandler) WaitStatus() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *WaitStatusParams) error {
 		status := c.Query("status")
 
-		inst, err := h.containerService.Get(*params.ContainerUUID)
+		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}

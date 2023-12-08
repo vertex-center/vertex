@@ -38,12 +38,12 @@ func (r *proxyHandler) AddRedirect() gin.HandlerFunc {
 }
 
 type RemoveRedirectParams struct {
-	ID uuid.UUID `path:"id"`
+	ID uuid.NullUUID `path:"id"`
 }
 
 func (r *proxyHandler) RemoveRedirect() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *RemoveRedirectParams) error {
-		err := r.proxyService.RemoveRedirect(params.ID)
+		err := r.proxyService.RemoveRedirect(params.ID.UUID)
 		if err != nil {
 			return errors.New(fmt.Sprintf("failed to remove redirect '%s'", params.ID))
 		}

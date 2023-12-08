@@ -24,7 +24,7 @@ func NewDBMSHandler(sqlService port.SqlService) port.DBMSHandler {
 }
 
 type GetParams struct {
-	UUID uuid.UUID `path:"container_uuid"`
+	UUID uuid.NullUUID `path:"container_uuid"`
 }
 
 func (r *dbmsHandler) Get() gin.HandlerFunc {
@@ -32,7 +32,7 @@ func (r *dbmsHandler) Get() gin.HandlerFunc {
 		token := c.MustGet("token").(string)
 		client := containersapi.NewContainersClient(token)
 
-		inst, apiError := client.GetContainer(c, params.UUID)
+		inst, apiError := client.GetContainer(c, params.UUID.UUID)
 		if apiError != nil {
 			return nil, apiError.RouterError()
 		}
