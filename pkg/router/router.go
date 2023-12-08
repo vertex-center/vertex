@@ -7,23 +7,47 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/wI2L/fizz"
+	"github.com/wI2L/fizz/openapi"
 )
 
 type Router struct {
-	*gin.Engine
+	*fizz.Fizz
+
 	server *http.Server
 }
 
-func New() *Router {
+type Option func(*gin.Engine)
+
+func WithMiddleware(middleware ...gin.HandlerFunc) Option {
+	return func(r *gin.Engine) {
+		r.Use(middleware...)
+	}
+}
+
+func New(info *openapi.Info, opts ...Option) *Router {
+	e := gin.New()
+	for _, opt := range opts {
+		opt(e)
+	}
+	f := fizz.NewFromEngine(e)
+	if info != nil {
+		f.GET("/openapi.yaml", nil, f.OpenAPI(info, "yaml"))
+		f.GET("/openapi.json", nil, f.OpenAPI(info, "json"))
+	}
+	if len(f.Errors()) > 0 {
+		log.Error(errors.Join(f.Errors()...))
+	}
 	return &Router{
-		Engine: gin.New(),
+		Fizz: f,
 	}
 }
 
 func (r *Router) Start(addr string) error {
 	r.server = &http.Server{
 		Addr:    addr,
-		Handler: r.Engine,
+		Handler: r.Fizz,
 	}
 	err := r.server.ListenAndServe()
 	if errors.Is(err, http.ErrServerClosed) {
@@ -46,46 +70,4 @@ func (r *Router) Stop(ctx context.Context) error {
 	}
 	r.server = nil
 	return err
-}
-
-func (r *Router) Group(path string, handlers ...HandlerFunc) *Group {
-	return &Group{
-		RouterGroup: r.Engine.Group(path, wrapHandlers(handlers...)...),
-	}
-}
-
-func (r *Router) GET(path string, handlers ...HandlerFunc) {
-	r.RouterGroup.GET(path, wrapHandlers(handlers...)...)
-}
-
-func (r *Router) POST(path string, handlers ...HandlerFunc) {
-	r.RouterGroup.POST(path, wrapHandlers(handlers...)...)
-}
-
-func (r *Router) PUT(path string, handlers ...HandlerFunc) {
-	r.RouterGroup.PUT(path, wrapHandlers(handlers...)...)
-}
-
-func (r *Router) PATCH(path string, handlers ...HandlerFunc) {
-	r.RouterGroup.PATCH(path, wrapHandlers(handlers...)...)
-}
-
-func (r *Router) DELETE(path string, handlers ...HandlerFunc) {
-	r.RouterGroup.DELETE(path, wrapHandlers(handlers...)...)
-}
-
-func (r *Router) OPTIONS(path string, handlers ...HandlerFunc) {
-	r.RouterGroup.OPTIONS(path, wrapHandlers(handlers...)...)
-}
-
-func (r *Router) HEAD(path string, handlers ...HandlerFunc) {
-	r.RouterGroup.HEAD(path, wrapHandlers(handlers...)...)
-}
-
-func (r *Router) Handle(method, path string, handlers ...HandlerFunc) {
-	r.RouterGroup.Handle(method, path, wrapHandlers(handlers...)...)
-}
-
-func (r *Router) Any(path string, handlers ...HandlerFunc) {
-	r.RouterGroup.Any(path, wrapHandlers(handlers...)...)
 }

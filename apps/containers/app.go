@@ -3,30 +3,25 @@ package containers
 import (
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/containers/adapter"
+	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/service"
 	"github.com/vertex-center/vertex/apps/containers/handler"
 	"github.com/vertex-center/vertex/apps/containers/meta"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/wI2L/fizz"
 )
 
-// docapi:containers title Vertex Containers
-// docapi:containers description An app to manage Docker containers.
-// docapi:containers version 0.0.0
-// docapi:containers filename containers
+var (
+	serviceService           port.ServiceService
+	containerEnvService      port.ContainerEnvService
+	containerLogsService     port.ContainerLogsService
+	containerRunnerService   port.ContainerRunnerService
+	containerServiceService  port.ContainerServiceService
+	containerSettingsService port.ContainerSettingsService
+	containerService         port.ContainerService
 
-// docapi:containers url http://{ip}:{port-kernel}/api
-// docapi:containers urlvar ip localhost The IP address of the server.
-// docapi:containers urlvar port-kernel 7504 The port of the server.
-
-// docapi:containers_kernel title Vertex Containers Kernel
-// docapi:containers_kernel description An app to manage Docker containers.
-// docapi:containers_kernel version 0.0.0
-// docapi:containers_kernel filename containers_kernel
-
-// docapi:containers_kernel url http://{ip}:{port-kernel}/api
-// docapi:containers_kernel urlvar ip localhost The IP address of the server.
-// docapi:containers_kernel urlvar port-kernel 7505 The port of the server.
+	dockerKernelService port.DockerService
+)
 
 type App struct {
 	ctx *apptypes.Context
@@ -44,9 +39,7 @@ func (a *App) Meta() apptypes.Meta {
 	return meta.Meta
 }
 
-func (a *App) Initialize(r *router.Group) error {
-	r.Use(middleware.ReadAuth)
-
+func (a *App) Initialize() error {
 	var (
 		containerAdapter         = adapter.NewContainerFSAdapter(nil)
 		containerEnvAdapter      = adapter.NewContainerEnvFSAdapter(nil)
@@ -54,24 +47,32 @@ func (a *App) Initialize(r *router.Group) error {
 		containerRunnerAdapter   = adapter.NewContainerRunnerFSAdapter()
 		containerServiceAdapter  = adapter.NewContainerServiceFSAdapter(nil)
 		containerSettingsAdapter = adapter.NewContainerSettingsFSAdapter(nil)
+	)
 
-		serviceService           = service.NewServiceService()
-		containerEnvService      = service.NewContainerEnvService(containerEnvAdapter)
-		containerLogsService     = service.NewContainerLogsService(a.ctx, containerLogsAdapter)
-		containerRunnerService   = service.NewContainerRunnerService(a.ctx, containerRunnerAdapter)
-		containerServiceService  = service.NewContainerServiceService(containerServiceAdapter)
-		containerSettingsService = service.NewContainerSettingsService(containerSettingsAdapter)
-		containerService         = service.NewContainerService(service.ContainerServiceParams{
-			Ctx:                      a.ctx,
-			ContainerAdapter:         containerAdapter,
-			ContainerRunnerService:   containerRunnerService,
-			ContainerServiceService:  containerServiceService,
-			ContainerEnvService:      containerEnvService,
-			ContainerSettingsService: containerSettingsService,
-			ServiceService:           serviceService,
-		})
-		_ = service.NewMetricsService(a.ctx)
+	serviceService = service.NewServiceService()
+	containerEnvService = service.NewContainerEnvService(containerEnvAdapter)
+	containerLogsService = service.NewContainerLogsService(a.ctx, containerLogsAdapter)
+	containerRunnerService = service.NewContainerRunnerService(a.ctx, containerRunnerAdapter)
+	containerServiceService = service.NewContainerServiceService(containerServiceAdapter)
+	containerSettingsService = service.NewContainerSettingsService(containerSettingsAdapter)
+	containerService = service.NewContainerService(service.ContainerServiceParams{
+		Ctx:                      a.ctx,
+		ContainerAdapter:         containerAdapter,
+		ContainerRunnerService:   containerRunnerService,
+		ContainerServiceService:  containerServiceService,
+		ContainerEnvService:      containerEnvService,
+		ContainerSettingsService: containerSettingsService,
+		ServiceService:           serviceService,
+	})
+	_ = service.NewMetricsService(a.ctx)
 
+	return nil
+}
+
+func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
+	r.Use(middleware.ReadAuth)
+
+	var (
 		servicesHandler   = handler.NewServicesHandler(serviceService)
 		serviceHandler    = handler.NewServiceHandler(serviceService, containerService)
 		containersHandler = handler.NewContainersHandler(a.ctx, containerService)
@@ -86,97 +87,209 @@ func (a *App) Initialize(r *router.Group) error {
 			ServiceService:           serviceService,
 		})
 
-		container  = r.Group("/container/:container_uuid", middleware.Authenticated)
-		containers = r.Group("/containers", middleware.Authenticated)
-		serv       = r.Group("/service/:service_id", middleware.Authenticated)
-		services   = r.Group("/services")
+		container  = r.Group("/container/:container_uuid", "Container", "", middleware.Authenticated)
+		containers = r.Group("/containers", "Containers", "", middleware.Authenticated)
+		serv       = r.Group("/service/:service_id", "Service", "", middleware.Authenticated)
+		services   = r.Group("/services", "Services", "")
 	)
 
-	// docapi:containers route /container/{container_uuid} vx_containers_get_container
-	container.GET("", containerHandler.Get)
-	// docapi:containers route /container/{container_uuid} vx_containers_delete_container
-	container.DELETE("", containerHandler.Delete)
-	// docapi:containers route /container/{container_uuid} vx_containers_patch_container
-	container.PATCH("", containerHandler.Patch)
-	// docapi:containers route /container/{container_uuid}/start vx_containers_start_container
-	container.POST("/start", containerHandler.Start)
-	// docapi:containers route /container/{container_uuid}/stop vx_containers_stop_container
-	container.POST("/stop", containerHandler.Stop)
-	// docapi:containers route /container/{container_uuid}/environment vx_containers_patch_environment
-	container.PATCH("/environment", containerHandler.PatchEnvironment)
-	// docapi:containers route /container/{container_uuid}/events vx_containers_events_container
-	container.GET("/events", apptypes.HeadersSSE, containerHandler.Events)
-	// docapi:containers route /container/{container_uuid}/docker vx_containers_get_docker
-	container.GET("/docker", containerHandler.GetDocker)
-	// docapi:containers route /container/{container_uuid}/docker/recreate vx_containers_recreate_docker
-	container.POST("/docker/recreate", containerHandler.RecreateDocker)
-	// docapi:containers route /container/{container_uuid}/logs vx_containers_get_logs
-	container.GET("/logs", containerHandler.GetLogs)
-	// docapi:containers route /container/{container_uuid}/update/service vx_containers_update_service
-	container.POST("/update/service", containerHandler.UpdateService)
-	// docapi:containers route /container/{container_uuid}/versions vx_containers_get_versions
-	container.GET("/versions", containerHandler.GetVersions)
-	// docapi:containers route /container/{container_uuid}/wait vx_containers_wait_status
-	container.GET("/wait", containerHandler.WaitStatus)
+	// Container
 
-	// docapi:containers route /containers vx_containers_get_containers
-	containers.GET("", containersHandler.Get)
-	// docapi:containers route /containers/tags vx_containers_get_tags
-	containers.GET("/tags", containersHandler.GetTags)
-	// docapi:containers route /containers/search vx_containers_search
-	containers.GET("/search", containersHandler.Search)
-	// docapi:containers route /containers/checkupdates vx_containers_check_updates
-	containers.GET("/checkupdates", containersHandler.CheckForUpdates)
-	// docapi:containers route /containers/events vx_containers_events
-	containers.GET("/events", apptypes.HeadersSSE, containersHandler.Events)
+	container.GET("", []fizz.OperationOption{
+		fizz.ID("getContainer"),
+		fizz.Summary("Get a container"),
+	}, containerHandler.Get())
 
-	// docapi:containers route /service/{service_id} vx_containers_get_service
-	serv.GET("", serviceHandler.Get)
-	// docapi:containers route /service/{service_id}/install vx_containers_install_service
-	serv.POST("/install", serviceHandler.Install)
+	container.DELETE("", []fizz.OperationOption{
+		fizz.ID("deleteContainer"),
+		fizz.Summary("Delete a container"),
+	}, containerHandler.Delete())
 
-	// docapi:containers route /services vx_containers_get_services
-	services.GET("", middleware.Authenticated, servicesHandler.Get)
-	services.Static("/icons", "./live/services/icons")
+	container.PATCH("", []fizz.OperationOption{
+		fizz.ID("patchContainer"),
+		fizz.Summary("Patch a container"),
+	}, containerHandler.Patch())
+
+	container.POST("/start", []fizz.OperationOption{
+		fizz.ID("startContainer"),
+		fizz.Summary("Start a container"),
+	}, containerHandler.Start())
+
+	container.POST("/stop", []fizz.OperationOption{
+		fizz.ID("stopContainer"),
+		fizz.Summary("Stop a container"),
+	}, containerHandler.Stop())
+
+	container.PATCH("/environment", []fizz.OperationOption{
+		fizz.ID("patchContainerEnvironment"),
+		fizz.Summary("Patch a container environment"),
+	}, containerHandler.PatchEnvironment())
+
+	container.GET("/events", []fizz.OperationOption{
+		fizz.ID("eventsContainer"),
+		fizz.Summary("Get container events"),
+		fizz.Description("Get events for a container, sent as Server-Sent Events (SSE)."),
+	}, apptypes.HeadersSSE(), containerHandler.Events())
+
+	container.GET("/docker", []fizz.OperationOption{
+		fizz.ID("getDockerContainer"),
+		fizz.Summary("Get Docker container info"),
+	}, containerHandler.GetDocker())
+
+	container.POST("/docker/recreate", []fizz.OperationOption{
+		fizz.ID("recreateDockerContainer"),
+		fizz.Summary("Recreate Docker container"),
+	}, containerHandler.RecreateDocker())
+
+	container.GET("/logs", []fizz.OperationOption{
+		fizz.ID("getContainerLogs"),
+		fizz.Summary("Get container logs"),
+	}, containerHandler.GetLogs())
+
+	container.POST("/update/service", []fizz.OperationOption{
+		fizz.ID("updateService"),
+		fizz.Summary("Update service"),
+	}, containerHandler.UpdateService())
+
+	container.GET("/versions", []fizz.OperationOption{
+		fizz.ID("getContainerVersions"),
+		fizz.Summary("Get container versions"),
+	}, containerHandler.GetVersions())
+
+	container.GET("/wait", []fizz.OperationOption{
+		fizz.ID("waitContainerStatus"),
+		fizz.Summary("Wait for a status change"),
+	}, containerHandler.WaitStatus())
+
+	// Containers
+
+	containers.GET("", []fizz.OperationOption{
+		fizz.ID("getContainers"),
+		fizz.Summary("Get containers"),
+	}, containersHandler.Get())
+
+	containers.GET("/tags", []fizz.OperationOption{
+		fizz.ID("getTags"),
+		fizz.Summary("Get tags"),
+	}, containersHandler.GetTags())
+
+	containers.GET("/search", []fizz.OperationOption{
+		fizz.ID("searchContainers"),
+		fizz.Summary("Search containers"),
+	}, containersHandler.Search())
+
+	containers.GET("/checkupdates", []fizz.OperationOption{
+		fizz.ID("checkForUpdates"),
+		fizz.Summary("Check for updates"),
+	}, containersHandler.CheckForUpdates())
+
+	containers.GET("/events", []fizz.OperationOption{
+		fizz.ID("events"),
+		fizz.Summary("Get events"),
+	}, apptypes.HeadersSSE(), containersHandler.Events())
+
+	// Service
+
+	serv.GET("", []fizz.OperationOption{
+		fizz.ID("getService"),
+		fizz.Summary("Get service"),
+	}, serviceHandler.Get())
+
+	serv.POST("/install", []fizz.OperationOption{
+		fizz.ID("installService"),
+		fizz.Summary("Install service"),
+	}, serviceHandler.Install())
+
+	// Services
+
+	services.GET("", []fizz.OperationOption{
+		fizz.ID("getServices"),
+		fizz.Summary("Get services"),
+	}, middleware.Authenticated, servicesHandler.Get())
+
+	services.GinRouterGroup().Static("/icons", "./live/services/icons")
 
 	return nil
 }
 
-func (a *App) InitializeKernel(r *router.Group) error {
+func (a *App) InitializeKernel() error {
+	dockerKernelAdapter := adapter.NewDockerCliAdapter()
+	dockerKernelService = service.NewDockerKernelService(dockerKernelAdapter)
+	return nil
+}
+
+func (a *App) InitializeKernelRouter(r *fizz.RouterGroup) error {
 	var (
-		dockerKernelAdapter = adapter.NewDockerCliAdapter()
-		dockerKernelService = service.NewDockerKernelService(dockerKernelAdapter)
-		dockerHandler       = handler.NewDockerKernelHandler(dockerKernelService)
-		docker              = r.Group("/docker")
+		dockerHandler = handler.NewDockerKernelHandler(dockerKernelService)
+		docker        = r.Group("/docker", "Docker", "Docker wrapper")
 	)
 
-	// docapi:containers_kernel route /docker/containers vx_containers_kernel_get_containers
-	docker.GET("/containers", dockerHandler.GetContainers)
-	// docapi:containers_kernel route /docker/containers vx_containers_kernel_create_container
-	docker.POST("/container", dockerHandler.CreateContainer)
-	// docapi:containers_kernel route /docker/containers/{id} vx_containers_kernel_delete_container
-	docker.DELETE("/container/:id", dockerHandler.DeleteContainer)
-	// docapi:containers_kernel route /docker/containers/{id}/start vx_containers_kernel_start_container
-	docker.POST("/container/:id/start", dockerHandler.StartContainer)
-	// docapi:containers_kernel route /docker/containers/{id}/stop vx_containers_kernel_stop_container
-	docker.POST("/container/:id/stop", dockerHandler.StopContainer)
-	// docapi:containers_kernel route /docker/containers/{id}/info vx_containers_kernel_info_container
-	docker.GET("/container/:id/info", dockerHandler.InfoContainer)
-	// docapi:containers_kernel route /docker/containers/{id}/logs/stdout vx_containers_kernel_logs_stdout_container
-	docker.GET("/container/:id/logs/stdout", dockerHandler.LogsStdoutContainer)
-	// docapi:containers_kernel route /docker/containers/{id}/logs/stderr vx_containers_kernel_logs_stderr_container
-	docker.GET("/container/:id/logs/stderr", dockerHandler.LogsStderrContainer)
-	// docapi:containers_kernel route /docker/containers/{id}/wait/{cond} vx_containers_kernel_wait_container
-	docker.GET("/container/:id/wait/:cond", dockerHandler.WaitContainer)
-	// docapi:containers_kernel route /docker/containers/mounts/{id} vx_containers_kernel_delete_mounts
-	docker.DELETE("/container/:id/mounts", dockerHandler.DeleteMounts)
+	docker.GET("/containers", []fizz.OperationOption{
+		fizz.ID("getContainers"),
+		fizz.Summary("Get containers"),
+	}, dockerHandler.GetContainers())
 
-	// docapi:containers_kernel route /docker/image/{id}/info vx_containers_kernel_info_image
-	docker.GET("/image/:id/info", dockerHandler.InfoImage)
-	// docapi:containers_kernel route /docker/image/pull vx_containers_kernel_pull_image
-	docker.POST("/image/pull", dockerHandler.PullImage)
-	// docapi:containers_kernel route /docker/image/build vx_containers_kernel_build_image
-	docker.POST("/image/build", dockerHandler.BuildImage)
+	docker.POST("/container", []fizz.OperationOption{
+		fizz.ID("createContainer"),
+		fizz.Summary("Create container"),
+	}, dockerHandler.CreateContainer())
+
+	docker.DELETE("/container/:id", []fizz.OperationOption{
+		fizz.ID("deleteContainer"),
+		fizz.Summary("Delete container"),
+	}, dockerHandler.DeleteContainer())
+
+	docker.POST("/container/:id/start", []fizz.OperationOption{
+		fizz.ID("startContainer"),
+		fizz.Summary("Start container"),
+	}, dockerHandler.StartContainer())
+
+	docker.POST("/container/:id/stop", []fizz.OperationOption{
+		fizz.ID("stopContainer"),
+		fizz.Summary("Stop container"),
+	}, dockerHandler.StopContainer())
+
+	docker.GET("/container/:id/info", []fizz.OperationOption{
+		fizz.ID("infoContainer"),
+		fizz.Summary("Get container info"),
+	}, dockerHandler.InfoContainer())
+
+	docker.GET("/container/:id/logs/stdout", []fizz.OperationOption{
+		fizz.ID("logsStdoutContainer"),
+		fizz.Summary("Get container stdout logs"),
+		fizz.Description("Get container stdout logs as a stream."),
+	}, dockerHandler.LogsStdoutContainer())
+
+	docker.GET("/container/:id/logs/stderr", []fizz.OperationOption{
+		fizz.ID("logsStderrContainer"),
+		fizz.Summary("Get container stderr logs"),
+		fizz.Description("Get container stderr logs as a stream."),
+	}, dockerHandler.LogsStderrContainer())
+
+	docker.GET("/container/:id/wait/:cond", []fizz.OperationOption{
+		fizz.ID("waitContainer"),
+		fizz.Summary("Wait container"),
+	}, dockerHandler.WaitContainer())
+
+	docker.DELETE("/container/:id/mounts", []fizz.OperationOption{
+		fizz.ID("deleteMounts"),
+		fizz.Summary("Delete mounts"),
+	}, dockerHandler.DeleteMounts())
+
+	docker.GET("/image/:id/info", []fizz.OperationOption{
+		fizz.ID("infoImage"),
+		fizz.Summary("Get image info"),
+	}, dockerHandler.InfoImage())
+
+	docker.POST("/image/pull", []fizz.OperationOption{
+		fizz.ID("pullImage"),
+		fizz.Summary("Pull image"),
+	}, dockerHandler.PullImage())
+
+	docker.POST("/image/build", []fizz.OperationOption{
+		fizz.ID("buildImage"),
+		fizz.Summary("Build image"),
+	}, dockerHandler.BuildImage())
 
 	return nil
 }

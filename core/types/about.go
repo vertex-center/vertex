@@ -1,10 +1,9 @@
 package types
 
 type About struct {
-	Version string `json:"version"`
-	Commit  string `json:"commit"`
-	Date    string `json:"date"`
-
-	OS   string `json:"os"`
-	Arch string `json:"arch"`
+	Version string `json:"version" fake:"{appversion}"`
+	Commit  string `json:"commit"  fake:"{commit}"`
+	Date    string `json:"date"    fake:"{date}"`
+	OS      string `json:"os"      fake:"linux"`
+	Arch    string `json:"arch"    fake:"amd64"`
 }

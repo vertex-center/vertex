@@ -5,27 +5,22 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/core/types/api"
 )
 
-func (c *Client) GetContainers(ctx context.Context) (map[uuid.UUID]*types.Container, *api.Error) {
+func (c *Client) GetContainers(ctx context.Context) (map[uuid.UUID]*types.Container, error) {
 	var insts map[uuid.UUID]*types.Container
-	var apiError api.Error
 	err := c.Request().
 		Path("./containers").
 		ToJSON(&insts).
-		ErrorJSON(&apiError).
 		Fetch(ctx)
-	return insts, api.HandleError(err, apiError)
+	return insts, err
 }
 
-func (c *Client) CheckForUpdates(ctx context.Context) ([]types.Container, *api.Error) {
+func (c *Client) CheckForUpdates(ctx context.Context) ([]types.Container, error) {
 	var insts []types.Container
-	var apiError api.Error
 	err := c.Request().
 		Path("./containers/checkupdates").
 		ToJSON(&insts).
-		ErrorJSON(&apiError).
 		Fetch(ctx)
-	return insts, api.HandleError(err, apiError)
+	return insts, err
 }

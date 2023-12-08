@@ -2,8 +2,9 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 
+	"github.com/gin-gonic/gin"
+	apierrors "github.com/juju/errors"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -21,88 +22,37 @@ func NewServiceHandler(serviceService port.ServiceService, containerService port
 	}
 }
 
-// docapi begin vx_containers_get_service
-// docapi method GET
-// docapi summary Get service
-// docapi tags Containers
-// docapi query service_id {string} The service ID.
-// docapi response 200 {Service} The service.
-// docapi response 400
-// docapi response 404
-// docapi end
-
-func (h *serviceHandler) Get(c *router.Context) {
-	serviceID := c.Param("service_id")
-	if serviceID == "" {
-		c.BadRequest(router.Error{
-			Code:           types.ErrCodeServiceIdMissing,
-			PublicMessage:  "The request was missing the service ID.",
-			PrivateMessage: "Field 'service_id' is required.",
-		})
-		return
-	}
-
-	service, err := h.serviceService.GetById(serviceID)
-	if err != nil {
-		c.NotFound(router.Error{
-			Code:           types.ErrCodeServiceNotFound,
-			PublicMessage:  fmt.Sprintf("Service not found: %s", serviceID),
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(service)
+type GetServiceParams struct {
+	ServiceID string `path:"service_id"`
 }
 
-// docapi begin vx_containers_install_service
-// docapi method POST
-// docapi summary Install a service
-// docapi tags Containers
-// docapi query service_id {string} The service ID.
-// docapi response 200 {Container} The container.
-// docapi response 400
-// docapi response 404
-// docapi response 500
-// docapi end
+func (h *serviceHandler) Get() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context, params *GetServiceParams) (*types.Service, error) {
+		service, err := h.serviceService.GetById(params.ServiceID)
+		if err != nil {
+			return nil, apierrors.NewNotFound(err, "service not found")
+		}
+		return &service, nil
+	})
+}
 
-func (h *serviceHandler) Install(c *router.Context) {
-	serviceID := c.Param("service_id")
-	if serviceID == "" {
-		c.BadRequest(router.Error{
-			Code:           types.ErrCodeServiceIdMissing,
-			PublicMessage:  "The request was missing the service ID.",
-			PrivateMessage: "Field 'service_id' is required.",
-		})
-		return
-	}
+type InstallServiceParams struct {
+	ServiceID string `path:"service_id"`
+}
 
-	service, err := h.serviceService.GetById(serviceID)
-	if err != nil {
-		c.NotFound(router.Error{
-			Code:           types.ErrCodeServiceNotFound,
-			PublicMessage:  fmt.Sprintf("Service not found: %s.", serviceID),
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
+func (h *serviceHandler) Install() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context, params *InstallServiceParams) (*types.Container, error) {
+		service, err := h.serviceService.GetById(params.ServiceID)
+		if err != nil {
+			return nil, apierrors.NewNotFound(err, "service not found")
+		}
 
-	inst, err := h.containerService.Install(service, "docker")
-	if err != nil && errors.Is(err, types.ErrServiceNotFound) {
-		c.NotFound(router.Error{
-			Code:           types.ErrCodeServiceNotFound,
-			PublicMessage:  fmt.Sprintf("Service not found: %s.", serviceID),
-			PrivateMessage: err.Error(),
-		})
-		return
-	} else if err != nil {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToInstallService,
-			PublicMessage:  fmt.Sprintf("Failed to install service '%s'.", service.Name),
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(inst)
+		inst, err := h.containerService.Install(service, "docker")
+		if err != nil && errors.Is(err, types.ErrServiceNotFound) {
+			return nil, apierrors.NewNotFound(err, "service not found")
+		} else if err != nil {
+			return nil, apierrors.Annotate(err, "failed to install service")
+		}
+		return inst, nil
+	})
 }

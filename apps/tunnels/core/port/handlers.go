@@ -1,7 +1,9 @@
 package port
 
-import "github.com/vertex-center/vertex/pkg/router"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 type ProviderHandler interface {
-	Install(c *router.Context)
+	Install() gin.HandlerFunc
 }

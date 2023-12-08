@@ -1,24 +1,26 @@
 package port
 
-import "github.com/vertex-center/vertex/pkg/router"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 type (
 	AuthHandler interface {
-		Login(c *router.Context)
-		Register(c *router.Context)
-		Logout(c *router.Context)
-		Verify(c *router.Context)
+		Login() gin.HandlerFunc
+		Register() gin.HandlerFunc
+		Logout() gin.HandlerFunc
+		Verify() gin.HandlerFunc
 	}
 
 	EmailHandler interface {
-		CreateCurrentUserEmail(c *router.Context)
-		GetCurrentUserEmails(c *router.Context)
-		DeleteCurrentUserEmail(c *router.Context)
+		CreateCurrentUserEmail() gin.HandlerFunc
+		GetCurrentUserEmails() gin.HandlerFunc
+		DeleteCurrentUserEmail() gin.HandlerFunc
 	}
 
 	UserHandler interface {
-		GetCurrentUser(c *router.Context)
-		PatchCurrentUser(c *router.Context)
-		GetCurrentUserCredentials(c *router.Context)
+		GetCurrentUser() gin.HandlerFunc
+		PatchCurrentUser() gin.HandlerFunc
+		GetCurrentUserCredentials() gin.HandlerFunc
 	}
 )

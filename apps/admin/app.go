@@ -13,27 +13,9 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/core/types/storage"
-	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vertex/updates"
+	"github.com/wI2L/fizz"
 )
-
-// docapi:admin title Vertex Admin
-// docapi:admin description An admin panel to manage the Vertex platform.
-// docapi:admin version 0.0.0
-// docapi:admin filename admin
-
-// docapi:admin url http://{ip}:{port-kernel}/api
-// docapi:admin urlvar ip localhost The IP address of the server.
-// docapi:admin urlvar port-kernel 7500 The port of the server.
-
-// docapi:admin_kernel title Vertex Admin Kernel
-// docapi:admin_kernel description An admin panel to manage the Vertex platform.
-// docapi:admin_kernel version 0.0.0
-// docapi:admin_kernel filename admin_kernel
-
-// docapi:admin_kernel url http://{ip}:{port-kernel}/api
-// docapi:admin_kernel urlvar ip localhost The IP address of the server.
-// docapi:admin_kernel urlvar port-kernel 7501 The port of the server.
 
 var updateService port.UpdateService
 
@@ -62,9 +44,17 @@ func (a *App) Meta() apptypes.Meta {
 	return meta.Meta
 }
 
-func (a *App) Initialize(r *router.Group) error {
-	r.Use(middleware.ReadAuth)
+var (
+	checksService   port.ChecksService
+	settingsService port.SettingsService
+	hardwareService port.HardwareService
+	sshService      port.SshService
 
+	hardwareKernelService port.HardwareKernelService
+	sshKernelService      port.SshKernelService
+)
+
+func (a *App) Initialize() error {
 	db, err := storage.NewDB(storage.DBParams{
 		ID:         meta.Meta.ID,
 		SchemaFunc: database.GetSchema,
@@ -78,80 +68,148 @@ func (a *App) Initialize(r *router.Group) error {
 		settingsAdapter = adapter.NewSettingsDbAdapter(db)
 		hardwareAdapter = adapter.NewHardwareApiAdapter()
 		sshAdapter      = adapter.NewSshKernelApiAdapter()
+	)
 
-		checksService   = service.NewChecksService()
-		settingsService = service.NewSettingsService(settingsAdapter)
-		hardwareService = service.NewHardwareService(hardwareAdapter)
-		sshService      = service.NewSshService(sshAdapter)
-		_               = service.NewNotificationsService(a.ctx, settingsAdapter)
+	checksService = service.NewChecksService()
+	settingsService = service.NewSettingsService(settingsAdapter)
+	hardwareService = service.NewHardwareService(hardwareAdapter)
+	sshService = service.NewSshService(sshAdapter)
+	_ = service.NewNotificationsService(a.ctx, settingsAdapter)
 
+	return nil
+}
+
+func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
+	r.Use(middleware.ReadAuth)
+
+	var (
 		hardwareHandler = handler.NewHardwareHandler(hardwareService)
 		sshHandler      = handler.NewSshHandler(sshService)
 		settingsHandler = handler.NewSettingsHandler(settingsService)
 		updateHandler   = handler.NewUpdateHandler(updateService, settingsService)
 		checksHandler   = handler.NewChecksHandler(checksService)
 
-		hardware = r.Group("/hardware", middleware.Authenticated)
-		ssh      = r.Group("/ssh", middleware.Authenticated)
-		settings = r.Group("/settings", middleware.Authenticated)
-		update   = r.Group("/update", middleware.Authenticated)
-		checks   = r.Group("/admin/checks", middleware.Authenticated)
+		hardware = r.Group("/hardware", "Hardware", "", middleware.Authenticated)
+		ssh      = r.Group("/ssh", "SSH", "", middleware.Authenticated)
+		settings = r.Group("/settings", "Settings", "", middleware.Authenticated)
+		update   = r.Group("/update", "Update", "", middleware.Authenticated)
+		checks   = r.Group("/admin/checks", "Checks", "", middleware.Authenticated)
 	)
 
-	// docapi:admin route /hardware/host get_host
-	hardware.GET("/host", hardwareHandler.GetHost)
-	// docapi:admin route /hardware/cpus get_cpus
-	hardware.GET("/cpus", hardwareHandler.GetCPUs)
-	// docapi:admin route /hardware/reboot reboot
-	hardware.POST("/reboot", hardwareHandler.Reboot)
+	hardware.GET("/host", []fizz.OperationOption{
+		fizz.ID("getHost"),
+		fizz.Summary("Get host"),
+		fizz.Description("Get host information."),
+	}, hardwareHandler.GetHost())
 
-	// docapi:admin route /ssh get_ssh_keys
-	ssh.GET("", sshHandler.Get)
-	// docapi:admin route /ssh add_ssh_key
-	ssh.POST("", sshHandler.Add)
-	// docapi:admin route /ssh delete_ssh_key
-	ssh.DELETE("", sshHandler.Delete)
-	// docapi:admin route /ssh/users get_ssh_users
-	ssh.GET("/users", sshHandler.GetUsers)
+	hardware.GET("/cpus", []fizz.OperationOption{
+		fizz.ID("getCPUs"),
+		fizz.Summary("Get CPUs"),
+		fizz.Description("Get CPUs information."),
+	}, hardwareHandler.GetCPUs())
 
-	// docapi:admin route /settings get_settings
-	settings.GET("", settingsHandler.Get)
-	// docapi:admin route /settings patch_settings
-	settings.PATCH("", settingsHandler.Patch)
+	hardware.POST("/reboot", []fizz.OperationOption{
+		fizz.ID("reboot"),
+		fizz.Summary("Reboot"),
+		fizz.Description("Reboot the host."),
+	}, hardwareHandler.Reboot())
 
-	// docapi:admin route /update get_updates
-	update.GET("", updateHandler.Get)
-	// docapi:admin route /update install_update
-	update.POST("", updateHandler.Install)
+	ssh.GET("", []fizz.OperationOption{
+		fizz.ID("getSSHKeys"),
+		fizz.Summary("Get all SSH keys"),
+	}, sshHandler.Get())
 
-	// docapi:admin route /admin/checks admin_checks
-	checks.GET("", apptypes.HeadersSSE, checksHandler.Check)
+	ssh.POST("", []fizz.OperationOption{
+		fizz.ID("addSSHKey"),
+		fizz.Summary("Add an SSH key"),
+	}, sshHandler.Add())
+
+	ssh.DELETE("", []fizz.OperationOption{
+		fizz.ID("deleteSSHKey"),
+		fizz.Summary("Delete SSH key"),
+	}, sshHandler.Delete())
+
+	ssh.GET("/users", []fizz.OperationOption{
+		fizz.ID("getSSHUsers"),
+		fizz.Summary("Get all users that can have SSH keys"),
+	}, sshHandler.GetUsers())
+
+	settings.GET("", []fizz.OperationOption{
+		fizz.ID("getSettings"),
+		fizz.Summary("Get settings"),
+	}, settingsHandler.Get())
+
+	settings.PATCH("", []fizz.OperationOption{
+		fizz.ID("patchSettings"),
+		fizz.Summary("Patch settings"),
+	}, settingsHandler.Patch())
+
+	update.GET("", []fizz.OperationOption{
+		fizz.ID("getUpdate"),
+		fizz.Summary("Get the latest update information"),
+	}, updateHandler.Get())
+
+	update.POST("", []fizz.OperationOption{
+		fizz.ID("installUpdate"),
+		fizz.Summary("Install the latest version"),
+		fizz.Description("This endpoint will install the latest version of Vertex."),
+	}, updateHandler.Install())
+
+	checks.GET("", []fizz.OperationOption{
+		fizz.ID("check"),
+		fizz.Summary("Get all checks"),
+		fizz.Description("Check that all vertex requirements are met."),
+	}, apptypes.HeadersSSE(), checksHandler.Check())
 
 	return nil
 }
 
-func (a *App) InitializeKernel(r *router.Group) error {
-	hardwareAdapter := adapter.NewHardwareKernelAdapter()
-	sshAdapter := adapter.NewSshFsAdapter()
+func (a *App) InitializeKernel() error {
+	var (
+		hardwareAdapter = adapter.NewHardwareKernelAdapter()
+		sshAdapter      = adapter.NewSshFsAdapter()
+	)
 
-	hardwareService := service.NewHardwareKernelService(hardwareAdapter)
-	sshService := service.NewSshKernelService(sshAdapter)
+	hardwareKernelService = service.NewHardwareKernelService(hardwareAdapter)
+	sshKernelService = service.NewSshKernelService(sshAdapter)
 
-	hardwareHandler := handler.NewHardwareKernelHandler(hardwareService)
-	hardware := r.Group("/hardware")
-	// docapi:admin_kernel route /hardware/reboot reboot_kernel
-	hardware.POST("/reboot", hardwareHandler.Reboot)
+	return nil
+}
 
-	sshHandler := handler.NewSshKernelHandler(sshService)
-	ssh := r.Group("/ssh")
-	// docapi:admin_kernel route /ssh get_ssh_keys_kernel
-	ssh.GET("", sshHandler.Get)
-	// docapi:admin_kernel route /ssh add_ssh_key_kernel
-	ssh.POST("", sshHandler.Add)
-	// docapi:admin_kernel route /ssh delete_ssh_key_kernel
-	ssh.DELETE("", sshHandler.Delete)
-	// docapi:admin_kernel route /ssh/users get_ssh_users_kernel
-	ssh.GET("/users", sshHandler.GetUsers)
+func (a *App) InitializeKernelRouter(r *fizz.RouterGroup) error {
+	var (
+		hardwareHandler = handler.NewHardwareKernelHandler(hardwareKernelService)
+		sshHandler      = handler.NewSshKernelHandler(sshKernelService)
+
+		hardware = r.Group("/hardware", "Hardware", "")
+		ssh      = r.Group("/ssh", "SSH", "")
+	)
+
+	hardware.POST("/reboot", []fizz.OperationOption{
+		fizz.ID("reboot"),
+		fizz.Summary("Reboot"),
+		fizz.Description("Reboot the host."),
+	}, hardwareHandler.Reboot())
+
+	ssh.GET("", []fizz.OperationOption{
+		fizz.ID("getSSHKeys"),
+		fizz.Summary("Get all SSH keys"),
+	}, sshHandler.Get())
+
+	ssh.POST("", []fizz.OperationOption{
+		fizz.ID("addSSHKey"),
+		fizz.Summary("Add an SSH key to the authorized_keys file"),
+	}, sshHandler.Add())
+
+	ssh.DELETE("", []fizz.OperationOption{
+		fizz.ID("deleteSSHKey"),
+		fizz.Summary("Delete an SSH key from the authorized_keys file"),
+	}, sshHandler.Delete())
+
+	ssh.GET("/users", []fizz.OperationOption{
+		fizz.ID("getSSHUsers"),
+		fizz.Summary("Get all users that can have SSH keys"),
+	}, sshHandler.GetUsers())
 
 	return nil
 }

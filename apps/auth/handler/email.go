@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"errors"
 	"net/mail"
 
+	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -19,119 +19,37 @@ func NewEmailHandler(emailService port.EmailService) port.EmailHandler {
 	}
 }
 
-// docapi begin auth_current_user_get_emails
-// docapi method GET
-// docapi summary Get emails
-// docapi description Retrieve the emails of the logged-in user
-// docapi tags Emails
-// docapi response 200 {[]Email} The emails
-// docapi response 500
-// docapi end
-
-func (h *emailHandler) GetCurrentUserEmails(c *router.Context) {
-	userID := c.GetInt("user_id")
-
-	emails, err := h.service.GetEmails(uint(userID))
-	if err != nil {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToGetUserEmails,
-			PublicMessage:  "Failed to retrieve your email addresses",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(emails)
+func (h *emailHandler) GetCurrentUserEmails() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) ([]types.Email, error) {
+		return h.service.GetEmails(uint(c.GetInt("user_id")))
+	})
 }
 
-// docapi begin auth_current_user_create_email
-// docapi method POST
-// docapi summary Create email
-// docapi description Create a new email for the logged-in user
-// docapi tags Emails
-// docapi response 200 {Email} The email
-// docapi response 400
-// docapi response 409 {Error} Email already exists
-// docapi response 500
-// docapi end
-
-type CreateCurrentUserEmailBody struct {
+type CreateCurrentUserEmailParams struct {
 	Email string `json:"email"`
 }
 
-func (h *emailHandler) CreateCurrentUserEmail(c *router.Context) {
-	userID := c.GetInt("user_id")
+func (h *emailHandler) CreateCurrentUserEmail() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context, params *CreateCurrentUserEmailParams) (*types.Email, error) {
+		userID := c.GetInt("user_id")
 
-	var body CreateCurrentUserEmailBody
-	err := c.ParseBody(&body)
-	if err != nil {
-		return
-	}
+		addr, err := mail.ParseAddress(params.Email)
+		if err != nil {
+			return nil, err
+		}
 
-	addr, err := mail.ParseAddress(body.Email)
-	if err != nil {
-		c.BadRequest(router.Error{
-			Code:           types.ErrCodeInvalidEmail,
-			PublicMessage:  "This email address is not a valid email address",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	email, err := h.service.CreateEmail(uint(userID), addr.Address)
-	if errors.Is(err, types.ErrEmailAlreadyExists) {
-		c.Conflict(router.Error{
-			Code:           types.ErrCodeEmailAlreadyExists,
-			PublicMessage:  "This email address is already registered on your account",
-			PrivateMessage: err.Error(),
-		})
-		return
-	} else if errors.Is(err, types.ErrEmailEmpty) {
-		c.BadRequest(router.Error{
-			Code:           types.ErrCodeEmailEmpty,
-			PublicMessage:  "Email address must not be empty",
-			PrivateMessage: err.Error(),
-		})
-		return
-	} else if err != nil {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToCreateEmail,
-			PublicMessage:  "Failed to add this email address",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(email)
+		email, err := h.service.CreateEmail(uint(userID), addr.Address)
+		return &email, err
+	})
 }
 
-// docapi begin auth_current_user_delete_email
-// docapi method DELETE
-// docapi summary Delete email
-// docapi description Delete an email from the logged-in user
-// docapi tags Emails
-// docapi response 204
-// docapi response 500
-// docapi end
+type DeleteCurrentUserEmailParams struct {
+	Email string `json:"email"`
+}
 
-func (h *emailHandler) DeleteCurrentUserEmail(c *router.Context) {
-	userID := c.GetInt("user_id")
-
-	var body CreateCurrentUserEmailBody
-	err := c.ParseBody(&body)
-	if err != nil {
-		return
-	}
-
-	err = h.service.DeleteEmail(uint(userID), body.Email)
-	if err != nil {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToDeleteEmail,
-			PublicMessage:  "Failed to delete this email address",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.OK()
+func (h *emailHandler) DeleteCurrentUserEmail() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context, params *DeleteCurrentUserEmailParams) error {
+		userID := c.GetInt("user_id")
+		return h.service.DeleteEmail(uint(userID), params.Email)
+	})
 }

@@ -1,9 +1,9 @@
 package handler
 
 import (
+	"github.com/gin-gonic/gin"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/serviceeditor/core/port"
-	"github.com/vertex-center/vertex/apps/serviceeditor/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
@@ -17,37 +17,8 @@ func NewEditorHandler(editorService port.EditorService) port.EditorHandler {
 	}
 }
 
-// docapi begin vx_devtools_service_editor_to_yaml
-// docapi method POST
-// docapi summary Convert service to yaml
-// docapi desc Convert service description to a reusable yaml file.
-// docapi tags Service Editor
-// docapi body {Service} The service to convert.
-// docapi response 200 {string} The yaml file.
-// docapi response 400
-// docapi end
-
-func (h *editorHandler) ToYaml(c *router.Context) {
-	var serv containerstypes.Service
-	err := c.BindJSON(&serv)
-	if err != nil {
-		c.BadRequest(router.Error{
-			Code:           types.ErrInvalidService,
-			PublicMessage:  "Invalid service.",
-			PrivateMessage: "The service is invalid.",
-		})
-		return
-	}
-
-	yaml, err := h.editorService.ToYaml(serv)
-	if err != nil {
-		c.BadRequest(router.Error{
-			Code:           types.ErrInvalidService,
-			PublicMessage:  "Invalid service.",
-			PrivateMessage: "The service is invalid.",
-		})
-		return
-	}
-
-	c.Data(200, "yaml", yaml)
+func (h *editorHandler) ToYaml() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context, serv *containerstypes.Service) ([]byte, error) {
+		return h.editorService.ToYaml(*serv)
+	})
 }

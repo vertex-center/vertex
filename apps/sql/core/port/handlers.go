@@ -1,10 +1,12 @@
 package port
 
-import "github.com/vertex-center/vertex/pkg/router"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 type (
 	DBMSHandler interface {
-		Get(c *router.Context)
-		Install(c *router.Context)
+		Get() gin.HandlerFunc
+		Install() gin.HandlerFunc
 	}
 )

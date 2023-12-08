@@ -1,16 +1,12 @@
 package api
 
 import (
-	"github.com/vertex-center/vertex/core/types/api"
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/gin-gonic/gin"
 )
 
-func (c *Client) InstallTunnel(ctx *router.Context, provider string) *api.Error {
-	var apiError api.Error
-	err := c.Request().
+func (c *Client) InstallTunnel(ctx *gin.Context, provider string) error {
+	return c.Request().
 		Pathf("./provider/%s/install", provider).
 		Post().
-		ErrorJSON(&apiError).
 		Fetch(ctx)
-	return api.HandleError(err, apiError)
 }

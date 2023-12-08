@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
@@ -15,13 +17,8 @@ func NewServicesHandler(serviceService port.ServiceService) port.ServicesHandler
 	}
 }
 
-// docapi begin vx_containers_get_services
-// docapi method GET
-// docapi summary Get services
-// docapi tags Containers
-// docapi response 200 {[]Service} The services.
-// docapi end
-
-func (h *servicesHandler) Get(c *router.Context) {
-	c.JSON(h.serviceService.GetAll())
+func (h *servicesHandler) Get() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) ([]types.Service, error) {
+		return h.serviceService.GetAll(), nil
+	})
 }

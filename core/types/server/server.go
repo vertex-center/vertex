@@ -15,6 +15,7 @@ import (
 	"github.com/vertex-center/vertex/pkg/net"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vlog"
+	"github.com/wI2L/fizz/openapi"
 )
 
 var InternetOK = false
@@ -26,27 +27,23 @@ type Server struct {
 	Router *router.Router
 }
 
-func New(id string, u *url.URL, ctx *types.VertexContext) *Server {
+func New(id string, info *openapi.Info, u *url.URL, ctx *types.VertexContext) *Server {
 	gin.SetMode(gin.ReleaseMode)
-	s := Server{
-		id:     id,
-		url:    u,
-		ctx:    ctx,
-		Router: router.New(),
-	}
-	s.initRouter()
-	return &s
-}
 
-func (s *Server) initRouter() {
 	cfg := cors.DefaultConfig()
 	cfg.AllowAllOrigins = true
 	cfg.AddAllowHeaders("Authorization")
 
-	s.Router.Use(cors.New(cfg))
-	s.Router.Use(ginutils.ErrorHandler())
-	s.Router.Use(ginutils.Logger(s.id, s.url.String()))
-	s.Router.Use(gin.Recovery())
+	return &Server{
+		id:  id,
+		url: u,
+		ctx: ctx,
+		Router: router.New(info,
+			router.WithMiddleware(cors.New(cfg)),
+			router.WithMiddleware(ginutils.Logger(id, u.String())),
+			router.WithMiddleware(gin.Recovery()),
+		),
+	}
 }
 
 func (s *Server) StartAsync() chan error {

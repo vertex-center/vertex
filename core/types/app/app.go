@@ -6,12 +6,15 @@ import (
 	"os"
 
 	"github.com/gin-contrib/sse"
+	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/server"
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/wI2L/fizz"
+	"github.com/wI2L/fizz/openapi"
 )
 
 type Meta struct {
@@ -55,12 +58,22 @@ type InterfaceKernel interface {
 
 type Initializable interface {
 	Interface
-	Initialize(r *router.Group) error
+	Initialize() error
+}
+
+type InitializableRouter interface {
+	Interface
+	InitializeRouter(r *fizz.RouterGroup) error
 }
 
 type KernelInitializable interface {
 	Interface
-	InitializeKernel(r *router.Group) error
+	InitializeKernel() error
+}
+
+type KernelInitializableRouter interface {
+	Interface
+	InitializeKernelRouter(r *fizz.RouterGroup) error
 }
 
 type Uninitializable interface {
@@ -77,17 +90,19 @@ type DependenciesProvider interface {
 	DownloadDependencies() error
 }
 
-type HttpHandler func(r *router.Group)
+type HttpHandler func(r *fizz.RouterGroup)
 
 type Service interface {
 	OnEvent(e event.Event) error
 }
 
-func HeadersSSE(c *router.Context) {
-	c.Writer.Header().Set("Content-Type", sse.ContentType)
-	c.Writer.Header().Set("Cache-Control", "no-cache")
-	c.Writer.Header().Set("Connection", "keep-alive")
-	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+func HeadersSSE() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Content-Type", sse.ContentType)
+		c.Writer.Header().Set("Cache-Control", "no-cache")
+		c.Writer.Header().Set("Connection", "keep-alive")
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+	}
 }
 
 func (a Meta) ApiURL() *url.URL {
@@ -115,20 +130,36 @@ func RunStandalone(app Interface) {
 
 	u := app.Meta().ApiURL()
 
-	srv := server.New(app.Meta().ID, u, vertexCtx)
+	info := openapi.Info{
+		Title:       app.Meta().Name,
+		Description: app.Meta().Description,
+		Version:     ctx.About().Version,
+	}
+
+	srv := server.New(app.Meta().ID, &info, u, vertexCtx)
 
 	if a, ok := app.(Initializable); ok {
-		base := srv.Router.Group(u.Path)
+		err := a.Initialize()
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+	}
 
-		err := a.Initialize(base)
+	if a, ok := app.(InitializableRouter); ok {
+		base := srv.Router.Group(u.Path, "", "")
+
+		err := a.InitializeRouter(base)
 		if err != nil {
 			log.Error(err)
 			os.Exit(1)
 		}
 
-		base.GET("/ping", func(c *router.Context) {
-			c.OK()
-		})
+		base.GET("/ping", []fizz.OperationOption{
+			fizz.Summary("Ping the app"),
+		}, router.Handler(func(c *gin.Context) error {
+			return nil
+		}))
 	}
 
 	_ = srv.StartAsync()
@@ -151,20 +182,36 @@ func RunStandaloneKernel(app Interface) {
 
 	u := app.Meta().ApiKernelURL()
 
-	srv := server.New(app.Meta().ID, u, vertexCtx)
+	info := openapi.Info{
+		Title:       app.Meta().Name,
+		Description: app.Meta().Description,
+		Version:     ctx.About().Version,
+	}
+
+	srv := server.New(app.Meta().ID, &info, u, vertexCtx)
 
 	if a, ok := app.(KernelInitializable); ok {
-		base := srv.Router.Group(u.Path)
+		err := a.InitializeKernel()
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+	}
 
-		err := a.InitializeKernel(base)
+	if a, ok := app.(KernelInitializableRouter); ok {
+		base := srv.Router.Group(u.Path, "", "")
+
+		err := a.InitializeKernelRouter(base)
 		if err != nil {
 			log.Error(err)
 			os.Exit(1)
 		}
 
-		base.GET("/ping", func(c *router.Context) {
-			c.OK()
-		})
+		base.GET("/ping", []fizz.OperationOption{
+			fizz.Summary("Ping the app"),
+		}, router.Handler(func(c *gin.Context) error {
+			return nil
+		}))
 	}
 
 	_ = srv.StartAsync()

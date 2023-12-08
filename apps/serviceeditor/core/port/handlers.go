@@ -1,9 +1,11 @@
 package port
 
-import "github.com/vertex-center/vertex/pkg/router"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 type (
 	EditorHandler interface {
-		ToYaml(c *router.Context)
+		ToYaml() gin.HandlerFunc
 	}
 )

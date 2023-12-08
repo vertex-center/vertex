@@ -1,13 +1,19 @@
 package port
 
-import "github.com/vertex-center/vertex/pkg/router"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/core/types/app"
+	"github.com/wI2L/fizz"
+)
 
 type (
 	AppsHandler interface {
-		GetApps(c *router.Context)
+		GetApps(c *gin.Context) ([]app.Meta, error)
+		GetAppsInfo() []fizz.OperationOption
 	}
 
 	DebugHandler interface {
-		HardReset(c *router.Context)
+		HardReset(c *gin.Context) error
+		HardResetInfo() []fizz.OperationOption
 	}
 )

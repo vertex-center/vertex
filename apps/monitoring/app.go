@@ -5,20 +5,16 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	containersmeta "github.com/vertex-center/vertex/apps/containers/meta"
 	"github.com/vertex-center/vertex/apps/monitoring/adapter"
+	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	"github.com/vertex-center/vertex/apps/monitoring/core/service"
 	"github.com/vertex-center/vertex/apps/monitoring/handler"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/wI2L/fizz"
 )
 
-// docapi:monitoring title Vertex Monitoring
-// docapi:monitoring description A monitoring service for Vertex.
-// docapi:monitoring version 0.0.0
-// docapi:monitoring filename monitoring
-
-// docapi:monitoring url http://{ip}:{port-kernel}/api
-// docapi:monitoring urlvar ip localhost The IP address of the server.
-// docapi:monitoring urlvar port-kernel 7506 The port of the server.
+var (
+	metricsService port.MetricsService
+)
 
 var Meta = apptypes.Meta{
 	ID:          "monitoring",
@@ -48,21 +44,32 @@ func (a *App) Meta() apptypes.Meta {
 	return Meta
 }
 
-func (a *App) Initialize(r *router.Group) error {
+func (a *App) Initialize() error {
+	prometheusAdapter := adapter.NewMetricsPrometheusAdapter()
+	metricsService = service.NewMetricsService(a.ctx, prometheusAdapter)
+
+	return nil
+}
+
+func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	r.Use(middleware.ReadAuth)
 
-	var (
-		prometheusAdapter = adapter.NewMetricsPrometheusAdapter()
-		metricsService    = service.NewMetricsService(a.ctx, prometheusAdapter)
-		metricsHandler    = handler.NewMetricsHandler(metricsService)
-	)
+	metricsHandler := handler.NewMetricsHandler(metricsService)
 
-	// docapi:monitoring route /metrics vx_monitoring_get_metrics
-	r.GET("/metrics", middleware.Authenticated, metricsHandler.Get)
-	// docapi:monitoring route /collector/{collector}/install vx_monitoring_install_collector
-	r.POST("/collector/:collector/install", metricsHandler.InstallCollector)
-	// docapi:monitoring route /visualizer/{visualizer}/install vx_monitoring_install_visualizer
-	r.POST("/visualizer/:visualizer/install", metricsHandler.InstallVisualizer)
+	r.GET("/metrics", []fizz.OperationOption{
+		fizz.ID("getMetrics"),
+		fizz.Summary("Get metrics"),
+	}, middleware.Authenticated, metricsHandler.Get())
+
+	r.POST("/collector/:collector/install", []fizz.OperationOption{
+		fizz.ID("installCollector"),
+		fizz.Summary("Install a collector"),
+	}, metricsHandler.InstallCollector())
+
+	r.POST("/visualizer/:visualizer/install", []fizz.OperationOption{
+		fizz.ID("installVisualizer"),
+		fizz.Summary("Install a visualizer"),
+	}, metricsHandler.InstallVisualizer())
 
 	return nil
 }

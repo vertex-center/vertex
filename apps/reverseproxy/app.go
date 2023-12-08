@@ -4,21 +4,13 @@ import (
 	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/reverseproxy/adapter"
+	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/service"
 	"github.com/vertex-center/vertex/apps/reverseproxy/handler"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/wI2L/fizz"
 )
-
-// docapi:proxy title Vertex Reverse Proxy
-// docapi:proxy description A reverse proxy manager.
-// docapi:proxy version 0.0.0
-// docapi:proxy filename proxy
-
-// docapi:proxy url http://{ip}:{port-kernel}/api
-// docapi:proxy urlvar ip localhost The IP address of the server.
-// docapi:proxy urlvar port-kernel 7508 The port of the server.
 
 var Meta = apptypes.Meta{
 	ID:          "reverse-proxy",
@@ -48,13 +40,14 @@ func (a *App) Meta() apptypes.Meta {
 	return Meta
 }
 
-func (a *App) Initialize(r *router.Group) error {
-	r.Use(middleware.ReadAuth)
+var (
+	proxyService port.ProxyService
+)
 
+func (a *App) Initialize() error {
 	var (
 		proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
 		proxyService   = service.NewProxyService(proxyFSAdapter)
-		proxyHandler   = handler.NewProxyHandler(proxyService)
 	)
 
 	a.proxy = NewProxyRouter(proxyService)
@@ -66,12 +59,28 @@ func (a *App) Initialize(r *router.Group) error {
 		}
 	}()
 
-	// docapi:proxy route /redirects vx_reverse_proxy_get_redirects
-	r.GET("/redirects", middleware.Authenticated, proxyHandler.GetRedirects)
-	// docapi:proxy route /redirect vx_reverse_proxy_add_redirect
-	r.POST("/redirect", middleware.Authenticated, proxyHandler.AddRedirect)
-	// docapi:proxy route /redirect/{id} vx_reverse_proxy_remove_redirect
-	r.DELETE("/redirect/:id", middleware.Authenticated, proxyHandler.RemoveRedirect)
+	return nil
+}
+
+func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
+	r.Use(middleware.ReadAuth)
+
+	proxyHandler := handler.NewProxyHandler(proxyService)
+
+	r.GET("/redirects", []fizz.OperationOption{
+		fizz.ID("getRedirects"),
+		fizz.Summary("Get redirects"),
+	}, middleware.Authenticated, proxyHandler.GetRedirects())
+
+	r.POST("/redirect", []fizz.OperationOption{
+		fizz.ID("addRedirect"),
+		fizz.Summary("Add redirect"),
+	}, middleware.Authenticated, proxyHandler.AddRedirect())
+
+	r.DELETE("/redirect/:id", []fizz.OperationOption{
+		fizz.ID("removeRedirect"),
+		fizz.Summary("Remove redirect"),
+	}, middleware.Authenticated, proxyHandler.RemoveRedirect())
 
 	return nil
 }

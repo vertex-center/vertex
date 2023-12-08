@@ -26,18 +26,15 @@ type ProxyRouter struct {
 
 func NewProxyRouter(proxyService port.ProxyService) *ProxyRouter {
 	gin.SetMode(gin.ReleaseMode)
-
 	r := &ProxyRouter{
-		Router:       router.New(),
+		Router: router.New(nil,
+			router.WithMiddleware(cors.Default()),
+			router.WithMiddleware(ginutils.Logger("PROXY", config.Current.URL("proxy").String())),
+			router.WithMiddleware(gin.Recovery()),
+		),
 		proxyService: proxyService,
 	}
-
-	r.Use(cors.Default())
-	r.Use(ginutils.Logger("PROXY", config.Current.URL("proxy").String()))
-	r.Use(gin.Recovery())
-
 	r.initAPIRoutes()
-
 	return r
 }
 
@@ -54,10 +51,10 @@ func (r *ProxyRouter) Stop() error {
 }
 
 func (r *ProxyRouter) initAPIRoutes() {
-	r.Any("/*path", r.HandleProxy)
+	r.Engine().Any("/*path", r.HandleProxy)
 }
 
-func (r *ProxyRouter) HandleProxy(c *router.Context) {
+func (r *ProxyRouter) HandleProxy(c *gin.Context) {
 	host := c.Request.Host
 
 	redirect := r.proxyService.GetRedirectByHost(host)

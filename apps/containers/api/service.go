@@ -4,28 +4,23 @@ import (
 	"context"
 
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/core/types/api"
 )
 
-func (c *Client) GetService(ctx context.Context, serviceId string) (types.Service, *api.Error) {
+func (c *Client) GetService(ctx context.Context, serviceId string) (types.Service, error) {
 	var service types.Service
-	var apiError api.Error
 	err := c.Request().
 		Pathf("./service/%s", serviceId).
 		ToJSON(&service).
-		ErrorJSON(&apiError).
 		Fetch(ctx)
-	return service, api.HandleError(err, apiError)
+	return service, err
 }
 
-func (c *Client) InstallService(ctx context.Context, serviceId string) (*types.Container, *api.Error) {
+func (c *Client) InstallService(ctx context.Context, serviceId string) (*types.Container, error) {
 	var inst *types.Container
-	var apiError api.Error
 	err := c.Request().
 		Pathf("./service/%s/install", serviceId).
 		Post().
 		ToJSON(&inst).
-		ErrorJSON(&apiError).
 		Fetch(ctx)
-	return inst, api.HandleError(err, apiError)
+	return inst, err
 }

@@ -6,17 +6,8 @@ import (
 	containersmeta "github.com/vertex-center/vertex/apps/containers/meta"
 	"github.com/vertex-center/vertex/apps/tunnels/handler"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/wI2L/fizz"
 )
-
-// docapi:tunnels title Vertex Tunnels
-// docapi:tunnels description A tunnel manager.
-// docapi:tunnels version 0.0.0
-// docapi:tunnels filename tunnels
-
-// docapi:tunnels url http://{ip}:{port-kernel}/api
-// docapi:tunnels urlvar ip localhost The IP address of the server.
-// docapi:tunnels urlvar port-kernel 7514 The port of the server.
 
 var Meta = apptypes.Meta{
 	ID:          "tunnels",
@@ -46,12 +37,19 @@ func (a *App) Meta() apptypes.Meta {
 	return Meta
 }
 
-func (a *App) Initialize(r *router.Group) error {
+func (a *App) Initialize() error {
+	return nil
+}
+
+func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	r.Use(middleware.ReadAuth)
 
 	providerHandler := handler.NewProviderHandler()
-	// docapi:tunnels route /provider/{provider}/install vx_tunnels_install_provider
-	r.POST("/provider/:provider/install", middleware.Authenticated, providerHandler.Install)
+
+	r.POST("/provider/:provider/install", []fizz.OperationOption{
+		fizz.ID("installProvider"),
+		fizz.Summary("Install a tunnel provider"),
+	}, middleware.Authenticated, providerHandler.Install())
 
 	return nil
 }

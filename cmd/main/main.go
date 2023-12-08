@@ -3,13 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"net/http"
 	"os"
 	"path"
 	"runtime"
 
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/juju/errors"
 	"github.com/vertex-center/vertex/apps/admin"
 	"github.com/vertex-center/vertex/apps/auth"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
@@ -29,27 +29,9 @@ import (
 	"github.com/vertex-center/vertex/handler"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/wI2L/fizz"
+	"github.com/wI2L/fizz/openapi"
 )
-
-// docapi:vertex title Vertex
-// docapi:vertex description A platform to manage your self-hosted server.
-// docapi:vertex version 0.0.0
-// docapi:vertex filename vertex
-
-// docapi:vertex url http://{ip}:{port}/api
-// docapi:vertex urlvar ip localhost The IP address of the server.
-// docapi:vertex urlvar port 6130 The port of the server.
-
-// docapi code 200 Success
-// docapi code 201 Created
-// docapi code 204 No content
-// docapi code 304 Not modified
-// docapi code 400 {Error} Bad request
-// docapi code 401 {Error} Unauthorized
-// docapi code 404 {Error} Resource not found
-// docapi code 409 {Error} Conflict
-// docapi code 422 {Error} Unprocessable entity
-// docapi code 500 {Error} Internal error
 
 // goreleaser will override version, commit and date
 var (
@@ -87,7 +69,13 @@ func main() {
 	ctx = types.NewVertexContext(about, false)
 	url := config.Current.URL("vertex")
 
-	srv = server.New("main", url, ctx)
+	info := openapi.Info{
+		Title:       "Vertex",
+		Description: "Create your self-hosted lab in one click.",
+		Version:     ctx.About().Version,
+	}
+
+	srv = server.New("main", &info, url, ctx)
 	initServices()
 	initRoutes(about)
 
@@ -149,27 +137,25 @@ func initServices() {
 }
 
 func initRoutes(about types.About) {
-	srv.Router.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, router.Error{
-			Code:          "resource_not_found",
-			PublicMessage: "Resource not found.",
-		})
-	})
+	srv.Router.Engine().NoRoute(router.Handler(func(c *gin.Context) error {
+		return errors.NewNotFound(nil, "route not found")
+	}))
 
-	a := srv.Router.Group("/api", middleware.ReadAuth)
-	a.GET("/about", func(c *router.Context) {
-		c.JSON(about)
-	})
+	a := srv.Router.Group("/api", "API", "Main API group", middleware.ReadAuth)
+	a.GET("/about", []fizz.OperationOption{
+		fizz.ID("getAbout"),
+		fizz.Summary("Get server info"),
+	}, router.Handler(func(c *gin.Context) (*types.About, error) {
+		return &about, nil
+	}))
 
 	if config.Current.Debug() {
 		debugHandler := handler.NewDebugHandler(debugService)
-		debug := a.Group("/debug", middleware.Authenticated)
-		// docapi:vertex route /debug/hard-reset hard_reset
-		debug.POST("/hard-reset", debugHandler.HardReset)
+		debug := a.Group("/debug", "Debug", "Routes only available with DEBUG=1", middleware.Authenticated)
+		debug.POST("/hard-reset", debugHandler.HardResetInfo(), router.Handler(debugHandler.HardReset))
 	}
 
 	appsHandler := handler.NewAppsHandler(appsService)
-	apps := a.Group("/apps", middleware.Authenticated)
-	// docapi:vertex route /apps get_apps
-	apps.GET("", appsHandler.GetApps)
+	apps := a.Group("/apps", "Apps", "Apps", middleware.Authenticated)
+	apps.GET("", appsHandler.GetAppsInfo(), router.Handler(appsHandler.GetApps))
 }

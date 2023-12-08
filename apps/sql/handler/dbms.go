@@ -1,13 +1,15 @@
 package handler
 
 import (
-	"errors"
 	"fmt"
 
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/juju/errors"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
+	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/sql/core/port"
 	"github.com/vertex-center/vertex/apps/sql/core/types"
-	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
@@ -21,117 +23,62 @@ func NewDBMSHandler(sqlService port.SqlService) port.DBMSHandler {
 	}
 }
 
-// docapi begin vx_sql_get_dbms
-// docapi method GET
-// docapi summary Get an installed DBMS
-// docapi tags SQL
-// docapi query container_uuid {string} The UUID of the container hosting the database.
-// docapi response 200 {DBMS} The DBMS.
-// docapi response 400
-// docapi response 404
-// docapi response 500
-// docapi end
-
-func (r *dbmsHandler) Get(c *router.Context) {
-	uuid, apiError := containersapi.GetContainerUUIDParam(c)
-	if apiError != nil {
-		c.BadRequest(apiError.RouterError())
-		return
-	}
-
-	token := c.MustGet("token").(string)
-
-	client := containersapi.NewContainersClient(token)
-
-	inst, apiError := client.GetContainer(c, uuid)
-	if apiError != nil {
-		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
-		return
-	}
-
-	dbms, err := r.sqlService.Get(inst)
-	if err != nil {
-		c.NotFound(router.Error{
-			Code:           types.ErrCodeSQLDatabaseNotFound,
-			PublicMessage:  "SQL Database not found.",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(dbms)
+type GetParams struct {
+	UUID uuid.NullUUID `path:"container_uuid"`
 }
 
-// docapi begin vx_sql_install_dbms
-// docapi method POST
-// docapi summary Install a DBMS
-// docapi tags SQL
-// docapi query dbms {string} The DBMS to install.
-// docapi response 200 {Container} The installed DBMS.
-// docapi response 400
-// docapi response 404
-// docapi response 500
-// docapi end
+func (r *dbmsHandler) Get() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context, params *GetParams) (*types.DBMS, error) {
+		token := c.MustGet("token").(string)
+		client := containersapi.NewContainersClient(token)
 
-func (r *dbmsHandler) Install(c *router.Context) {
-	dbms, err := r.getDBMS(c)
-	if err != nil {
-		return
-	}
+		inst, err := client.GetContainer(c, params.UUID.UUID)
+		if err != nil {
+			return nil, err
+		}
 
-	token := c.MustGet("token").(string)
-
-	client := containersapi.NewContainersClient(token)
-
-	serv, apiError := client.GetService(c, dbms)
-	if apiError != nil {
-		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
-		return
-	}
-
-	inst, apiError := client.InstallService(c, serv.ID)
-	if apiError != nil {
-		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
-		return
-	}
-
-	inst.ContainerSettings.Tags = []string{"Vertex SQL", "Vertex SQL - Postgres Database"}
-	apiError = client.PatchContainer(c, inst.UUID, inst.ContainerSettings)
-	if apiError != nil {
-		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
-		return
-	}
-
-	inst.Env, err = r.sqlService.EnvCredentials(inst, "postgres", "postgres")
-	if err != nil {
-		log.Error(err)
-		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToConfigureSQLDatabaseContainer,
-			PublicMessage:  fmt.Sprintf("Failed to configure SQL Database '%s'.", serv.Name),
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	apiError = client.PatchContainerEnvironment(c, inst.UUID, inst.Env)
-	if apiError != nil {
-		c.AbortWithCode(apiError.HttpCode, apiError.RouterError())
-		return
-	}
-
-	c.JSON(inst)
+		dbms, err := r.sqlService.Get(inst)
+		if err != nil {
+			return nil, errors.NewNotFound(err, "SQL Database not found")
+		}
+		return &dbms, nil
+	})
 }
 
-func (r *dbmsHandler) getDBMS(c *router.Context) (string, error) {
-	db := c.Param("dbms")
-	if db != "postgres" {
-		c.NotFound(router.Error{
-			Code:           types.ErrCodeSQLDatabaseNotFound,
-			PublicMessage:  fmt.Sprintf("SQL DBMS not found: %s.", db),
-			PrivateMessage: "This SQL DBMS is not supported.",
-		})
-		return "", errors.New("DBMS not found")
-	}
+type InstallParams struct {
+	DBMS string `path:"dbms"`
+}
 
-	return db, nil
+func (r *dbmsHandler) Install() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context, params *InstallParams) (*containerstypes.Container, error) {
+		token := c.MustGet("token").(string)
+		client := containersapi.NewContainersClient(token)
+
+		serv, err := client.GetService(c, params.DBMS)
+		if err != nil {
+			return nil, err
+		}
+
+		inst, err := client.InstallService(c, serv.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		inst.ContainerSettings.Tags = []string{"Vertex SQL", "Vertex SQL - Postgres Database"}
+		err = client.PatchContainer(c, inst.UUID, inst.ContainerSettings)
+		if err != nil {
+			return nil, err
+		}
+
+		inst.Env, err = r.sqlService.EnvCredentials(inst, "postgres", "postgres")
+		if err != nil {
+			return nil, fmt.Errorf("setup credentials: %w", err)
+		}
+
+		err = client.PatchContainerEnvironment(c, inst.UUID, inst.Env)
+		if err != nil {
+			return nil, err
+		}
+		return inst, nil
+	})
 }

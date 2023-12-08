@@ -4,6 +4,8 @@ import (
 	"io"
 
 	"github.com/gin-contrib/sse"
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	apptypes "github.com/vertex-center/vertex/core/types/app"
@@ -24,131 +26,90 @@ func NewContainersHandler(ctx *apptypes.Context, containerService port.Container
 	}
 }
 
-// docapi begin vx_containers_get_containers
-// docapi method GET
-// docapi summary Get containers
-// docapi tags Containers
-// docapi response 200 {[]Container} The containers.
-// docapi end
-
-func (h *containersHandler) Get(c *router.Context) {
-	installed := h.containerService.GetAll()
-	c.JSON(installed)
-}
-
-// docapi begin vx_containers_get_tags
-// docapi method GET
-// docapi summary Get tags
-// docapi tags Containers
-// docapi response 200 {[]string} The tags.
-// docapi end
-
-func (h *containersHandler) GetTags(c *router.Context) {
-	tags := h.containerService.GetTags()
-	c.JSON(tags)
-}
-
-// docapi begin vx_containers_search
-// docapi method GET
-// docapi summary Search containers
-// docapi tags Containers
-// docapi query features {[]string} The features.
-// docapi query tags {[]string} The tags.
-// docapi response 200 {[]Container} The containers.
-// docapi end
-
-func (h *containersHandler) Search(c *router.Context) {
-	query := types.ContainerSearchQuery{}
-
-	features := c.QueryArray("features[]")
-	if len(features) > 0 {
-		query.Features = &features
-	}
-
-	tags := c.QueryArray("tags[]")
-	if len(tags) > 0 {
-		query.Tags = &tags
-	}
-
-	installed := h.containerService.Search(query)
-	c.JSON(installed)
-}
-
-// docapi begin vx_containers_check_updates
-// docapi method GET
-// docapi summary Check for updates
-// docapi tags Containers
-// docapi response 200 {[]Container} The containers.
-// docapi response 500
-// docapi end
-
-func (h *containersHandler) CheckForUpdates(c *router.Context) {
-	containers, err := h.containerService.CheckForUpdates()
-	if err != nil {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToCheckForUpdates,
-			PublicMessage:  "Failed to check for updates.",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(containers)
-}
-
-// docapi begin vx_containers_events
-// docapi method GET
-// docapi summary Get events
-// docapi desc Get events for containers, sent as Server-Sent Events (SSE).
-// docapi tags Containers
-// docapi response 200
-// docapi response 500
-// docapi end
-
-func (h *containersHandler) Events(c *router.Context) {
-	eventsChan := make(chan sse.Event)
-	defer close(eventsChan)
-
-	done := c.Request.Context().Done()
-
-	listener := event.NewTempListener(func(e event.Event) error {
-		switch e.(type) {
-		case types.EventContainersChange:
-			eventsChan <- sse.Event{
-				Event: types.EventNameContainersChange,
-			}
-		}
-		return nil
+func (h *containersHandler) Get() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) (map[uuid.UUID]*types.Container, error) {
+		return h.containerService.GetAll(), nil
 	})
+}
 
-	h.ctx.AddListener(listener)
-	defer h.ctx.RemoveListener(listener)
+func (h *containersHandler) GetTags() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) ([]string, error) {
+		return h.containerService.GetTags(), nil
+	})
+}
 
-	first := true
+func (h *containersHandler) Search() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) (map[uuid.UUID]*types.Container, error) {
+		query := types.ContainerSearchQuery{}
 
-	c.Stream(func(w io.Writer) bool {
-		if first {
-			err := sse.Encode(w, sse.Event{
-				Event: "open",
-			})
+		features := c.QueryArray("features[]")
+		if len(features) > 0 {
+			query.Features = &features
+		}
 
-			if err != nil {
-				log.Error(err)
+		tags := c.QueryArray("tags[]")
+		if len(tags) > 0 {
+			query.Tags = &tags
+		}
+
+		return h.containerService.Search(query), nil
+	})
+}
+
+func (h *containersHandler) CheckForUpdates() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) (map[uuid.UUID]*types.Container, error) {
+		return h.containerService.CheckForUpdates()
+	})
+}
+
+func (h *containersHandler) Events() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) error {
+		eventsChan := make(chan sse.Event)
+		defer close(eventsChan)
+
+		done := c.Request.Context().Done()
+
+		listener := event.NewTempListener(func(e event.Event) error {
+			switch e.(type) {
+			case types.EventContainersChange:
+				eventsChan <- sse.Event{
+					Event: types.EventNameContainersChange,
+				}
+			}
+			return nil
+		})
+
+		h.ctx.AddListener(listener)
+		defer h.ctx.RemoveListener(listener)
+
+		first := true
+
+		c.Stream(func(w io.Writer) bool {
+			if first {
+				err := sse.Encode(w, sse.Event{
+					Event: "open",
+				})
+
+				if err != nil {
+					log.Error(err)
+					return false
+				}
+				first = false
+				return true
+			}
+
+			select {
+			case e := <-eventsChan:
+				err := sse.Encode(w, e)
+				if err != nil {
+					log.Error(err)
+				}
+				return true
+			case <-done:
 				return false
 			}
-			first = false
-			return true
-		}
+		})
 
-		select {
-		case e := <-eventsChan:
-			err := sse.Encode(w, e)
-			if err != nil {
-				log.Error(err)
-			}
-			return true
-		case <-done:
-			return false
-		}
+		return nil
 	})
 }

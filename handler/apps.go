@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/core/types/app"
+	"github.com/wI2L/fizz"
 )
 
 type appsHandler struct {
@@ -15,13 +17,14 @@ func NewAppsHandler(appsService port.AppsService) port.AppsHandler {
 	}
 }
 
-// docapi begin get_apps
-// docapi method GET
-// docapi summary Get all apps
-// docapi tags Apps
-// docapi response 200 {[]Meta} The list of apps.
-// docapi end
+func (h *appsHandler) GetApps(*gin.Context) ([]app.Meta, error) {
+	return h.appsService.All(), nil
+}
 
-func (h *appsHandler) GetApps(c *router.Context) {
-	c.JSON(h.appsService.All())
+func (h *appsHandler) GetAppsInfo() []fizz.OperationOption {
+	return []fizz.OperationOption{
+		fizz.ID("getApps"),
+		fizz.Summary("Get apps"),
+		fizz.Description("Get all the apps installed on the server."),
+	}
 }

@@ -1,48 +1,50 @@
 package port
 
-import "github.com/vertex-center/vertex/pkg/router"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 type (
 	ChecksHandler interface {
-		Check(c *router.Context)
+		Check() gin.HandlerFunc
 	}
 
 	DatabaseHandler interface {
-		GetCurrentDbms(c *router.Context)
-		MigrateTo(c *router.Context)
+		GetCurrentDbms() gin.HandlerFunc
+		MigrateTo() gin.HandlerFunc
 	}
 
 	HardwareHandler interface {
-		GetHost(c *router.Context)
-		GetCPUs(c *router.Context)
-		Reboot(c *router.Context)
+		GetHost() gin.HandlerFunc
+		GetCPUs() gin.HandlerFunc
+		Reboot() gin.HandlerFunc
 	}
 
 	HardwareKernelHandler interface {
-		Reboot(c *router.Context)
+		Reboot() gin.HandlerFunc
 	}
 
 	SettingsHandler interface {
-		Get(c *router.Context)
-		Patch(c *router.Context)
+		Get() gin.HandlerFunc
+		Patch() gin.HandlerFunc
 	}
 
 	SshHandler interface {
-		Get(c *router.Context)
-		Add(c *router.Context)
-		Delete(c *router.Context)
-		GetUsers(c *router.Context)
+		Get() gin.HandlerFunc
+		Add() gin.HandlerFunc
+		Delete() gin.HandlerFunc
+		GetUsers() gin.HandlerFunc
 	}
 
 	SshKernelHandler interface {
-		Get(c *router.Context)
-		Add(c *router.Context)
-		Delete(c *router.Context)
-		GetUsers(c *router.Context)
+		Get() gin.HandlerFunc
+		Add() gin.HandlerFunc
+		Delete() gin.HandlerFunc
+		GetUsers() gin.HandlerFunc
 	}
 
 	UpdateHandler interface {
-		Get(c *router.Context)
-		Install(c *router.Context)
+		Get() gin.HandlerFunc
+		Install() gin.HandlerFunc
 	}
 )

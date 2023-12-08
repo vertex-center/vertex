@@ -2,9 +2,9 @@ package handler
 
 import (
 	"encoding/base64"
-	"errors"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -20,155 +20,55 @@ func NewAuthHandler(authService port.AuthService) port.AuthHandler {
 	}
 }
 
-// docapi begin auth_login
-// docapi method POST
-// docapi summary Login
-// docapi description Login with username and password
-// docapi tags Auth
-// docapi response 200 {Token} The auth token
-// docapi response 400
-// docapi response 500
-// docapi end
-
-func (h authHandler) Login(c *router.Context) {
-	login, pass, err := h.getUserPassFromHeader(c)
-	if err != nil {
-		return
-	}
-
-	token, err := h.authService.Login(login, pass)
-	if errors.Is(err, types.ErrLoginFailed) {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeInvalidCredentials,
-			PublicMessage:  "Invalid credentials",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(token)
+func (h authHandler) Login() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) (*types.Session, error) {
+		login, pass, err := h.getUserPassFromHeader(c)
+		if err != nil {
+			return nil, err
+		}
+		token, err := h.authService.Login(login, pass)
+		return &token, err
+	})
 }
 
-// docapi begin auth_register
-// docapi method POST
-// docapi summary Register
-// docapi description Register a new user with username and password
-// docapi tags Auth
-// docapi response 200 {Token} The auth token
-// docapi response 400
-// docapi response 500
+func (h authHandler) Register() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) (*types.Session, error) {
+		login, pass, err := h.getUserPassFromHeader(c)
+		if err != nil {
+			return nil, err
+		}
 
-func (h authHandler) Register(c *router.Context) {
-	login, pass, err := h.getUserPassFromHeader(c)
-	if err != nil {
-		return
-	}
-
-	token, err := h.authService.Register(login, pass)
-	if errors.Is(err, types.ErrLoginEmpty) {
-		c.BadRequest(router.Error{
-			Code:           types.ErrCodeLoginEmpty,
-			PublicMessage:  "Login must not be empty",
-			PrivateMessage: err.Error(),
-		})
-		return
-	} else if errors.Is(err, types.ErrPasswordEmpty) {
-		c.BadRequest(router.Error{
-			Code:           types.ErrCodePasswordEmpty,
-			PublicMessage:  "Password must not be empty",
-			PrivateMessage: err.Error(),
-		})
-		return
-	} else if errors.Is(err, types.ErrPasswordLength) {
-		c.BadRequest(router.Error{
-			Code:           types.ErrCodePasswordLength,
-			PublicMessage:  "Password must be at least 8 characters long",
-			PrivateMessage: err.Error(),
-		})
-		return
-	} else if err != nil {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeInvalidCredentials,
-			PublicMessage:  "Invalid credentials",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(token)
+		token, err := h.authService.Register(login, pass)
+		return &token, err
+	})
 }
 
-// docapi begin auth_verify
-// docapi method POST
-// docapi summary Verify
-// docapi description Verify a token
-// docapi tags Authentication
-// docapi response 200 {Token} The auth token
-// docapi response 400
-// docapi response 500
-// docapi end
-
-func (h authHandler) Verify(c *router.Context) {
-	token := c.MustGet("token").(string)
-
-	session, err := h.authService.Verify(token)
-	if err != nil {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeInvalidCredentials,
-			PublicMessage:  "Invalid credentials",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(session)
+func (h authHandler) Verify() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) (*types.Session, error) {
+		token := c.MustGet("token").(string)
+		session, err := h.authService.Verify(token)
+		return session, err
+	})
 }
 
-// docapi begin auth_logout
-// docapi method POST
-// docapi summary Logout
-// docapi tags Auth
-// docapi response 204
-// docapi response 500
-// docapi end
-
-func (h authHandler) Logout(c *router.Context) {
-	token := c.MustGet("token").(string)
-
-	err := h.authService.Logout(token)
-	if err != nil {
-		c.Abort(router.Error{
-			Code:           types.ErrCodeFailedToLogout,
-			PublicMessage:  "Failed to logout",
-			PrivateMessage: err.Error(),
-		})
-		return
-	}
-
-	c.OK()
+func (h authHandler) Logout() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) error {
+		token := c.MustGet("token").(string)
+		return h.authService.Logout(token)
+	})
 }
 
-func (h authHandler) getUserPassFromHeader(c *router.Context) (string, string, error) {
+func (h authHandler) getUserPassFromHeader(c *gin.Context) (string, string, error) {
 	authorization := c.Request.Header.Get("Authorization")
 
 	userpass := strings.TrimPrefix(authorization, "Basic ")
 	userpassBytes, err := base64.StdEncoding.DecodeString(userpass)
 	if err != nil {
-		c.BadRequest(router.Error{
-			Code:           types.ErrCodeInvalidCredentials,
-			PublicMessage:  "Invalid credentials",
-			PrivateMessage: "Expected base64 encoded login:password",
-		})
 		return "", "", err
 	}
 	userpass = string(userpassBytes)
 	creds := strings.Split(userpass, ":")
 	if len(creds) != 2 {
-		c.BadRequest(router.Error{
-			Code:           types.ErrCodeInvalidCredentials,
-			PublicMessage:  "Invalid credentials",
-			PrivateMessage: "Expected login:password",
-		})
 		return "", "", err
 	}
 	return creds[0], creds[1], nil

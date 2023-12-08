@@ -1,55 +1,56 @@
 package port
 
-import "github.com/vertex-center/vertex/pkg/router"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 type (
 	ContainerHandler interface {
-		Get(c *router.Context)
-		Delete(c *router.Context)
-		Patch(c *router.Context)
-		Start(c *router.Context)
-		Stop(c *router.Context)
-		PatchEnvironment(c *router.Context)
-		GetDocker(c *router.Context)
-		RecreateDocker(c *router.Context)
-		GetLogs(c *router.Context)
-		UpdateService(c *router.Context)
-		GetVersions(c *router.Context)
-		WaitStatus(c *router.Context)
-		Events(c *router.Context)
+		Get() gin.HandlerFunc
+		Delete() gin.HandlerFunc
+		Patch() gin.HandlerFunc
+		Start() gin.HandlerFunc
+		Stop() gin.HandlerFunc
+		PatchEnvironment() gin.HandlerFunc
+		GetDocker() gin.HandlerFunc
+		RecreateDocker() gin.HandlerFunc
+		GetLogs() gin.HandlerFunc
+		UpdateService() gin.HandlerFunc
+		GetVersions() gin.HandlerFunc
+		WaitStatus() gin.HandlerFunc
+		Events() gin.HandlerFunc
 	}
 
 	ContainersHandler interface {
-		Get(c *router.Context)
-		GetTags(c *router.Context)
-		Search(c *router.Context)
-		CheckForUpdates(c *router.Context)
-		Events(c *router.Context)
+		Get() gin.HandlerFunc
+		GetTags() gin.HandlerFunc
+		Search() gin.HandlerFunc
+		CheckForUpdates() gin.HandlerFunc
+		Events() gin.HandlerFunc
 	}
 
 	ServiceHandler interface {
-		Get(c *router.Context)
-		Install(c *router.Context)
+		Get() gin.HandlerFunc
+		Install() gin.HandlerFunc
 	}
 
 	ServicesHandler interface {
-		Get(c *router.Context)
+		Get() gin.HandlerFunc
 	}
 
 	DockerKernelHandler interface {
-		GetContainers(c *router.Context)
-		CreateContainer(c *router.Context)
-		DeleteContainer(c *router.Context)
-		StartContainer(c *router.Context)
-		StopContainer(c *router.Context)
-		InfoContainer(c *router.Context)
-		LogsStdoutContainer(c *router.Context)
-		LogsStderrContainer(c *router.Context)
-		WaitContainer(c *router.Context)
-		DeleteMounts(c *router.Context)
-
-		InfoImage(c *router.Context)
-		PullImage(c *router.Context)
-		BuildImage(c *router.Context)
+		GetContainers() gin.HandlerFunc
+		CreateContainer() gin.HandlerFunc
+		DeleteContainer() gin.HandlerFunc
+		StartContainer() gin.HandlerFunc
+		StopContainer() gin.HandlerFunc
+		InfoContainer() gin.HandlerFunc
+		LogsStdoutContainer() gin.HandlerFunc
+		LogsStderrContainer() gin.HandlerFunc
+		WaitContainer() gin.HandlerFunc
+		DeleteMounts() gin.HandlerFunc
+		InfoImage() gin.HandlerFunc
+		PullImage() gin.HandlerFunc
+		BuildImage() gin.HandlerFunc
 	}
 )
