@@ -6,7 +6,7 @@ type Props = Omit<BoxProps, "type"> & {
 
 export default function ErrorBox(props: Readonly<Props>) {
     const { error, className, ...others } = props;
-    let err = error?.message ?? "An unknown error has occurred.";
+    let err = error?.error ?? "An unknown error has occurred.";
     return (
         <Box type="error" {...others}>
             <Paragraph>{err}</Paragraph>
