@@ -19,7 +19,7 @@ require (
 	github.com/google/uuid v1.4.0
 	github.com/h2non/gock v1.2.0
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/juju/errors v0.0.0-20200330140219-3fe23663418f
+	github.com/juju/errors v1.0.0
 	github.com/lib/pq v1.10.9
 	github.com/loopfz/gadgeto v0.11.3
 	github.com/prometheus/client_golang v1.17.0
