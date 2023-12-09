@@ -76,6 +76,9 @@ func (a Meta) DefaultApiKernelURL() string {
 func RunApps(apps []Interface) {
 	waitNet()
 	for _, a := range apps {
+		if _, ok := a.(Initializable); !ok {
+			continue
+		}
 		go RunStandalone(a, false)
 	}
 }
@@ -83,6 +86,9 @@ func RunApps(apps []Interface) {
 func RunKernelApps(apps []Interface) {
 	waitNet()
 	for _, a := range apps {
+		if _, ok := a.(KernelInitializable); !ok {
+			continue
+		}
 		go RunStandaloneKernel(a, false)
 	}
 }
