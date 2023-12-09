@@ -45,11 +45,12 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	r.Use(middleware.ReadAuth)
 
 	providerHandler := handler.NewProviderHandler()
+	provider := r.Group("/provider/:provider", "Provider", "", middleware.Authenticated)
 
-	r.POST("/provider/:provider/install", []fizz.OperationOption{
+	provider.POST("/install", []fizz.OperationOption{
 		fizz.ID("installProvider"),
 		fizz.Summary("Install a tunnel provider"),
-	}, middleware.Authenticated, providerHandler.Install())
+	}, providerHandler.Install())
 
 	return nil
 }
