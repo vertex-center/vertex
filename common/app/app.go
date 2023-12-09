@@ -71,6 +71,18 @@ func (a Meta) DefaultApiKernelURL() string {
 	return fmt.Sprintf(config.DefaultApiURLFormat, config.Current.LocalIP(), a.DefaultKernelPort)
 }
 
+func RunApps(app []Interface) {
+	for _, a := range app {
+		go RunStandalone(a)
+	}
+}
+
+func RunKernelApps(app []Interface) {
+	for _, a := range app {
+		go RunStandaloneKernel(a)
+	}
+}
+
 // RunStandalone runs the app as a standalone service.
 // It loads the app, initializes it and starts the HTTP server.
 func RunStandalone(app Interface) {

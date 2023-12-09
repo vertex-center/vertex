@@ -9,9 +9,8 @@ import (
 	"time"
 
 	"github.com/vertex-center/vertex/apps"
-	"github.com/vertex-center/vertex/common/event"
+	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/core/service"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/server"
 	"github.com/vertex-center/vertex/pkg/log"
@@ -26,6 +25,8 @@ var (
 )
 
 func main() {
+	defer log.Default.Close()
+
 	ensureRoot()
 	parseArgs()
 
@@ -50,11 +51,9 @@ func main() {
 		Version:     ctx.About().Version,
 	}
 
-	srv = server.New("kernel", &info, url, ctx)
-	initServices()
+	app.RunKernelApps(apps.Apps)
 
-	ctx.DispatchEvent(event.ServerLoad{})
-	ctx.DispatchEvent(event.ServerStart{})
+	srv = server.New("kernel", &info, url, ctx)
 
 	exitKernelChan := srv.StartAsync()
 	exitVertexChan := make(chan error)
@@ -154,8 +153,4 @@ func buildVertex() {
 	}
 
 	log.Info("Build completed in " + end.Sub(start).String())
-}
-
-func initServices() {
-	service.NewAppsService(ctx, true, apps.Apps)
 }

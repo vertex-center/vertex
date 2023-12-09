@@ -12,13 +12,11 @@ import (
 	"github.com/juju/errors"
 	"github.com/vertex-center/vertex/apps"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
+	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/core/port"
-	"github.com/vertex-center/vertex/core/service"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/core/types/server"
 	"github.com/vertex-center/vertex/core/types/storage"
-	"github.com/vertex-center/vertex/handler"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/wI2L/fizz"
@@ -35,18 +33,13 @@ var (
 var (
 	srv *server.Server
 	ctx *types.VertexContext
-
-	appsService port.AppsService
 )
 
 func main() {
 	defer log.Default.Close()
 
-	log.Info("Vertex starting...")
-
+	ensureNotRoot()
 	parseArgs()
-
-	checkNotRoot()
 
 	about := types.About{
 		Version: version,
@@ -66,8 +59,9 @@ func main() {
 		Version:     ctx.About().Version,
 	}
 
+	app.RunApps(apps.Apps)
+
 	srv = server.New("main", &info, url, ctx)
-	initServices()
 	initRoutes(about)
 
 	srv.Router.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.FSPath, "client", "dist"), true)))
@@ -105,14 +99,10 @@ func parseArgs() {
 	}
 }
 
-func checkNotRoot() {
+func ensureNotRoot() {
 	if os.Getuid() == 0 {
 		log.Warn("while vertex-kernel must be run as root, the vertex user should not be root")
 	}
-}
-
-func initServices() {
-	appsService = service.NewAppsService(ctx, false, apps.Apps)
 }
 
 func initRoutes(about types.About) {
@@ -127,12 +117,4 @@ func initRoutes(about types.About) {
 	}, router.Handler(func(c *gin.Context) (*types.About, error) {
 		return &about, nil
 	}))
-
-	appsHandler := handler.NewAppsHandler(appsService)
-	appsRoute := a.Group("/apps", "Apps", "Apps", middleware.Authenticated)
-	appsRoute.GET("", []fizz.OperationOption{
-		fizz.ID("getApps"),
-		fizz.Summary("Get apps"),
-		fizz.Description("Get all the apps installed on the server."),
-	}, router.Handler(appsHandler.GetApps))
 }
