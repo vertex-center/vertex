@@ -128,6 +128,7 @@ func RunStandalone(app Interface, waitInternet bool) {
 		}
 
 		base.GET("/ping", []fizz.OperationOption{
+			fizz.ID("ping"),
 			fizz.Summary("Ping the app"),
 		}, router.Handler(func(c *gin.Context) error {
 			return nil
@@ -186,6 +187,7 @@ func RunStandaloneKernel(app Interface, waitInternet bool) {
 		}
 
 		base.GET("/ping", []fizz.OperationOption{
+			fizz.ID("ping"),
 			fizz.Summary("Ping the app"),
 		}, router.Handler(func(c *gin.Context) error {
 			return nil

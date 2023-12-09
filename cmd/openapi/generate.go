@@ -68,6 +68,7 @@ func runServer(initRoutes func(r *fizz.RouterGroup) error, meta app.Meta, u *url
 	}
 
 	base.GET("/ping", []fizz.OperationOption{
+		fizz.ID("ping"),
 		fizz.Summary("Ping the app"),
 	}, router.Handler(func(c *gin.Context) error {
 		return nil
