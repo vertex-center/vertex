@@ -19,9 +19,9 @@ require (
 	github.com/google/uuid v1.4.0
 	github.com/h2non/gock v1.2.0
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/juju/errors v0.0.0-20190930114154-d42613fe1ab9
+	github.com/juju/errors v0.0.0-20200330140219-3fe23663418f
 	github.com/lib/pq v1.10.9
-	github.com/loopfz/gadgeto v0.9.0
+	github.com/loopfz/gadgeto v0.11.3
 	github.com/prometheus/client_golang v1.17.0
 	github.com/shirou/gopsutil/v3 v3.23.11
 	github.com/stretchr/testify v1.8.4
@@ -91,7 +91,7 @@ require (
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
-	github.com/mattn/go-sqlite3 v1.14.17 // indirect
+	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/moby/patternmatcher v0.5.0 // indirect
