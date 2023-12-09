@@ -65,22 +65,27 @@ func (a *App) Initialize() error {
 func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	r.Use(middleware.ReadAuth)
 
-	proxyHandler := handler.NewProxyHandler(proxyService)
+	var (
+		proxyHandler = handler.NewProxyHandler(proxyService)
 
-	r.GET("/redirects", []fizz.OperationOption{
+		redirects = r.Group("/redirects", "Redirects", "", middleware.Authenticated)
+		redirect  = r.Group("/redirect", "Redirect", "", middleware.Authenticated)
+	)
+
+	redirects.GET("", []fizz.OperationOption{
 		fizz.ID("getRedirects"),
 		fizz.Summary("Get redirects"),
-	}, middleware.Authenticated, proxyHandler.GetRedirects())
+	}, proxyHandler.GetRedirects())
 
-	r.POST("/redirect", []fizz.OperationOption{
+	redirect.POST("", []fizz.OperationOption{
 		fizz.ID("addRedirect"),
 		fizz.Summary("Add redirect"),
-	}, middleware.Authenticated, proxyHandler.AddRedirect())
+	}, proxyHandler.AddRedirect())
 
-	r.DELETE("/redirect/:id", []fizz.OperationOption{
+	redirect.DELETE("/:id", []fizz.OperationOption{
 		fizz.ID("removeRedirect"),
 		fizz.Summary("Remove redirect"),
-	}, middleware.Authenticated, proxyHandler.RemoveRedirect())
+	}, proxyHandler.RemoveRedirect())
 
 	return nil
 }
