@@ -3,7 +3,7 @@ package config
 var KernelCurrent = NewKernel()
 
 type Kernel struct {
-	Config
+	*Config
 
 	Uid uint32 `json:"uid"`
 	Gid uint32 `json:"gid"`
