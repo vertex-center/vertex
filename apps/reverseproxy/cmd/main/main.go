@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	app.RunStandalone(reverseproxy.NewApp())
+	app.RunStandalone(reverseproxy.NewApp(), true)
 }

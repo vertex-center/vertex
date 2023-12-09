@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	app.RunStandalone(serviceeditor.NewApp())
+	app.RunStandalone(serviceeditor.NewApp(), true)
 }

@@ -48,3 +48,9 @@ func Wait(ctx context.Context, url string) error {
 func WaitInternetConn(ctx context.Context) error {
 	return Wait(ctx, "http://clients3.google.com/generate_204")
 }
+
+func WaitInternetConnWithTimeout(timeout time.Duration) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	return WaitInternetConn(ctx)
+}

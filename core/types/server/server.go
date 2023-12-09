@@ -19,8 +19,6 @@ import (
 	"github.com/wI2L/fizz/openapi"
 )
 
-var InternetOK = false
-
 type Server struct {
 	id     string
 	url    *url.URL
@@ -55,7 +53,6 @@ func (s *Server) StartAsync() chan error {
 		exitChan <- s.Router.Start(":" + s.url.Port())
 	}()
 
-	s.waitInternet()
 	s.waitServerReady()
 
 	s.ctx.DispatchEvent(event.ServerLoad{})
@@ -74,25 +71,6 @@ func (s *Server) Stop() {
 	if err != nil {
 		log.Error(err)
 	}
-}
-
-func (s *Server) waitInternet() {
-	if InternetOK {
-		return
-	}
-
-	log.Info("waiting for internet connection...")
-
-	timeout, cancelTimeout := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancelTimeout()
-	err := net.WaitInternetConn(timeout)
-	if err != nil {
-		log.Error(err)
-		os.Exit(1)
-	}
-
-	InternetOK = true
-	log.Info("internet connection established")
 }
 
 func (s *Server) waitServerReady() {

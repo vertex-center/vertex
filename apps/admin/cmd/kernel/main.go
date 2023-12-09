@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	app.RunStandaloneKernel(admin.NewApp())
+	app.RunStandaloneKernel(admin.NewApp(), true)
 }

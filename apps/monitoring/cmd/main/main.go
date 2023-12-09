@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	app.RunStandalone(monitoring.NewApp())
+	app.RunStandalone(monitoring.NewApp(), true)
 }

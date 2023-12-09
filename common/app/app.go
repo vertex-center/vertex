@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/config"
@@ -11,6 +12,7 @@ import (
 	"github.com/vertex-center/vertex/core/types/server"
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/pkg/net"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/wI2L/fizz"
 	"github.com/wI2L/fizz/openapi"
@@ -72,20 +74,26 @@ func (a Meta) DefaultApiKernelURL() string {
 }
 
 func RunApps(app []Interface) {
+	waitNet()
 	for _, a := range app {
-		go RunStandalone(a)
+		go RunStandalone(a, false)
 	}
 }
 
 func RunKernelApps(app []Interface) {
+	waitNet()
 	for _, a := range app {
-		go RunStandaloneKernel(a)
+		go RunStandaloneKernel(a, false)
 	}
 }
 
 // RunStandalone runs the app as a standalone service.
 // It loads the app, initializes it and starts the HTTP server.
-func RunStandalone(app Interface) {
+func RunStandalone(app Interface, waitInternet bool) {
+	if waitInternet {
+		waitNet()
+	}
+
 	vertexCtx := types.NewVertexContext(types.About{}, false)
 	ctx := NewContext(vertexCtx)
 	app.Load(ctx)
@@ -137,7 +145,11 @@ func RunStandalone(app Interface) {
 
 // RunStandaloneKernel runs the app as a standalone service.
 // It loads the app, initializes it and starts the HTTP server.
-func RunStandaloneKernel(app Interface) {
+func RunStandaloneKernel(app Interface, waitInternet bool) {
+	if waitInternet {
+		waitNet()
+	}
+
 	vertexCtx := types.NewVertexContext(types.About{}, true)
 	ctx := NewContext(vertexCtx)
 	app.Load(ctx)
@@ -184,5 +196,13 @@ func RunStandaloneKernel(app Interface) {
 			log.Error(err)
 			os.Exit(1)
 		}
+	}
+}
+
+func waitNet() {
+	err := net.WaitInternetConnWithTimeout(20 * time.Second)
+	if err != nil {
+		log.Error(fmt.Errorf("internet connection not available: %w", err))
+		return
 	}
 }

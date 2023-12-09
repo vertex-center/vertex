@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	app.RunStandalone(tunnels.NewApp())
+	app.RunStandalone(tunnels.NewApp(), true)
 }

@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	app.RunStandalone(sql.NewApp())
+	app.RunStandalone(sql.NewApp(), true)
 }
