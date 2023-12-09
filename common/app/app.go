@@ -79,6 +79,7 @@ func RunApps(apps []Interface) {
 		if _, ok := a.(Initializable); !ok {
 			continue
 		}
+
 		go RunStandalone(a, false)
 	}
 }
@@ -105,6 +106,9 @@ func RunStandalone(app Interface, waitInternet bool) {
 	app.Load(ctx)
 
 	config.Current.RegisterApiURL(app.Meta().ID, app.Meta().DefaultApiURL())
+	if _, ok := app.(KernelInitializable); ok {
+		config.Current.RegisterKernelApiURL(app.Meta().ID, app.Meta().DefaultApiKernelURL())
+	}
 
 	u := app.Meta().ApiURL()
 
