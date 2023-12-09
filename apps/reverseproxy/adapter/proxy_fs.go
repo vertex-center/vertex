@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/types"
-	"github.com/vertex-center/vertex/core/types/storage"
+	"github.com/vertex-center/vertex/cmd/storage"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 )

@@ -8,8 +8,8 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/handler"
 	"github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
+	"github.com/vertex-center/vertex/cmd/storage"
 	"github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/wI2L/fizz"
 )
 

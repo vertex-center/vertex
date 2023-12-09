@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/core/types/storage"
+	"github.com/vertex-center/vertex/cmd/storage"
 	"github.com/vertex-center/vertex/pkg/log"
 	"gopkg.in/yaml.v3"
 )

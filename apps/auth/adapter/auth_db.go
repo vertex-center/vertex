@@ -6,7 +6,7 @@ import (
 
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
-	"github.com/vertex-center/vertex/core/types/storage"
+	"github.com/vertex-center/vertex/cmd/storage"
 )
 
 type authDbAdapter struct {

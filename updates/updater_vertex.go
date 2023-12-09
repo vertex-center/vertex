@@ -9,8 +9,8 @@ import (
 	"path"
 
 	"github.com/google/go-github/v50/github"
+	"github.com/vertex-center/vertex/cmd/storage"
 	"github.com/vertex-center/vertex/core/types"
-	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/pkg/log"
 	vstorage "github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"

@@ -6,7 +6,7 @@ import (
 
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
-	"github.com/vertex-center/vertex/core/types/storage"
+	"github.com/vertex-center/vertex/cmd/storage"
 )
 
 type settingsDbAdapter struct {

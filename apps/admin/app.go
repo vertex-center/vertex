@@ -11,9 +11,9 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/handler"
 	"github.com/vertex-center/vertex/apps/admin/meta"
 	authmiddleware "github.com/vertex-center/vertex/apps/auth/middleware"
+	storage2 "github.com/vertex-center/vertex/cmd/storage"
 	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/middleware"
-	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/updates"
 	"github.com/wI2L/fizz"
 )
@@ -35,8 +35,8 @@ func (a *App) Load(ctx *app.Context) {
 		baselinesApiAdapter := adapter.NewBaselinesApiAdapter()
 		updateService = service.NewUpdateService(a.ctx, baselinesApiAdapter, []types2.Updater{
 			updates.NewVertexUpdater(a.ctx.About()),
-			updates.NewVertexClientUpdater(path.Join(storage.FSPath, "client")),
-			updates.NewRepositoryUpdater("vertex_services", path.Join(storage.FSPath, "services"), "vertex-center", "services"),
+			updates.NewVertexClientUpdater(path.Join(storage2.FSPath, "client")),
+			updates.NewRepositoryUpdater("vertex_services", path.Join(storage2.FSPath, "services"), "vertex-center", "services"),
 		})
 	}
 }
@@ -56,7 +56,7 @@ var (
 )
 
 func (a *App) Initialize() error {
-	db, err := storage.NewDB(storage.DBParams{
+	db, err := storage2.NewDB(storage2.DBParams{
 		ID:         meta.Meta.ID,
 		SchemaFunc: database.GetSchema,
 		Migrations: database.Migrations,

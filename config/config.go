@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/vertex-center/vertex/core/types/storage"
+	"github.com/vertex-center/vertex/cmd/storage"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/net"
 	"github.com/vertex-center/vlog"
