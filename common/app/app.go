@@ -112,7 +112,7 @@ func RunStandalone(app Interface) {
 		}))
 	}
 
-	_ = srv.StartAsync()
+	<-srv.StartAsync()
 
 	if a, ok := app.(Uninitializable); ok {
 		err := a.Uninitialize()
@@ -164,7 +164,7 @@ func RunStandaloneKernel(app Interface) {
 		}))
 	}
 
-	_ = srv.StartAsync()
+	<-srv.StartAsync()
 
 	if a, ok := app.(KernelUninitializable); ok {
 		err := a.UninitializeKernel()
