@@ -73,16 +73,16 @@ func (a Meta) DefaultApiKernelURL() string {
 	return fmt.Sprintf(config.DefaultApiURLFormat, config.Current.LocalIP(), a.DefaultKernelPort)
 }
 
-func RunApps(app []Interface) {
+func RunApps(apps []Interface) {
 	waitNet()
-	for _, a := range app {
+	for _, a := range apps {
 		go RunStandalone(a, false)
 	}
 }
 
-func RunKernelApps(app []Interface) {
+func RunKernelApps(apps []Interface) {
 	waitNet()
-	for _, a := range app {
+	for _, a := range apps {
 		go RunStandaloneKernel(a, false)
 	}
 }
