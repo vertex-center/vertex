@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/vertex-center/vertex/common/event"
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
 )
@@ -16,5 +17,5 @@ func NewDebugService(ctx *types.VertexContext) port.DebugService {
 }
 
 func (s *debugService) HardReset() {
-	s.ctx.DispatchEvent(types.EventServerHardReset{})
+	s.ctx.DispatchEvent(event.ServerHardReset{})
 }

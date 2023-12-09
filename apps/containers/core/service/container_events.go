@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/core/types"
+	ev "github.com/vertex-center/vertex/common/event"
 	"github.com/vertex-center/vertex/pkg/event"
 )
 
@@ -12,15 +12,15 @@ func (s *containerService) GetUUID() uuid.UUID {
 
 func (s *containerService) OnEvent(e event.Event) error {
 	switch e.(type) {
-	case types.EventServerStart:
+	case ev.ServerStart:
 		s.LoadAll()
-	case types.EventServerSetupCompleted:
+	case ev.ServerSetupCompleted:
 		go func() {
 			s.StartAll()
 		}()
-	case types.EventServerStop:
+	case ev.ServerStop:
 		s.StopAll()
-	case types.EventServerHardReset:
+	case ev.ServerHardReset:
 		s.StopAll()
 		s.DeleteAll()
 	}

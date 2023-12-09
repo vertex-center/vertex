@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/common/app"
+	ev "github.com/vertex-center/vertex/common/event"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/core/port"
 	"github.com/vertex-center/vertex/core/types"
@@ -42,11 +43,11 @@ func (s *appsService) GetUUID() uuid.UUID {
 
 func (s *appsService) OnEvent(e event.Event) error {
 	switch e.(type) {
-	case types.EventServerLoad:
+	case ev.ServerLoad:
 		s.LoadApps()
-	case types.EventServerStart:
+	case ev.ServerStart:
 		s.StartApps()
-	case types.EventServerStop:
+	case ev.ServerStop:
 		s.StopApps()
 	}
 	return nil
@@ -84,12 +85,12 @@ func (s *appsService) StartApps() {
 				app.RunStandalone(a)
 			}
 		}
-		s.ctx.DispatchEvent(types.EventAppReady{
+		s.ctx.DispatchEvent(ev.AppReady{
 			AppID: a.Meta().ID,
 		})
 	}
 
-	s.ctx.DispatchEvent(types.EventAllAppsReady{})
+	s.ctx.DispatchEvent(ev.AllAppsReady{})
 
 	if !s.kernel {
 		t := table.New().Headers("App", "API", "Kernel API")

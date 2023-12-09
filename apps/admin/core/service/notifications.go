@@ -7,7 +7,7 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	apptypes "github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/core/types"
+	ev "github.com/vertex-center/vertex/common/event"
 	"github.com/vertex-center/vertex/pkg/event"
 )
 
@@ -59,7 +59,7 @@ func (s *notificationsService) GetUUID() uuid.UUID {
 
 func (s *notificationsService) OnEvent(e event.Event) error {
 	switch e := e.(type) {
-	case types.EventServerSetupCompleted:
+	case ev.ServerSetupCompleted:
 		return s.StartWebhook()
 	case containerstypes.EventContainerStatusChange:
 		if e.Status == containerstypes.ContainerStatusOff || e.Status == containerstypes.ContainerStatusError || e.Status == containerstypes.ContainerStatusRunning {

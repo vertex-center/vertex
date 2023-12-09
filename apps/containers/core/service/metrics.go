@@ -8,7 +8,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	monitoringtypes "github.com/vertex-center/vertex/apps/monitoring/core/types"
 	apptypes "github.com/vertex-center/vertex/common/app"
-	vtypes "github.com/vertex-center/vertex/core/types"
+	vtypes "github.com/vertex-center/vertex/common/event"
 	"github.com/vertex-center/vertex/pkg/event"
 )
 
@@ -37,7 +37,7 @@ func (s *metricsService) GetUUID() uuid.UUID {
 
 func (s *metricsService) OnEvent(e event.Event) error {
 	switch e := e.(type) {
-	case vtypes.EventServerStart:
+	case vtypes.ServerStart:
 		return s.ctx.DispatchEventWithErr(monitoringtypes.EventRegisterMetrics{
 			Metrics: []monitoringtypes.Metric{
 				{

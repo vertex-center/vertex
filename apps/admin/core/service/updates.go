@@ -11,8 +11,8 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 	apptypes "github.com/vertex-center/vertex/common/app"
+	coretypes "github.com/vertex-center/vertex/common/event"
 	"github.com/vertex-center/vertex/config"
-	coretypes "github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
@@ -101,7 +101,7 @@ func (s *updateService) InstallLatest(channel types.UpdatesChannel) error {
 		}
 	}
 
-	s.ctx.DispatchEvent(coretypes.EventVertexUpdated{})
+	s.ctx.DispatchEvent(coretypes.VertexUpdated{})
 	return nil
 }
 
@@ -142,7 +142,7 @@ func (s *updateService) firstSetup() error {
 
 func (s *updateService) OnEvent(e event.Event) error {
 	switch e.(type) {
-	case coretypes.EventServerLoad:
+	case coretypes.ServerLoad:
 		err := s.firstSetup()
 		if err != nil {
 			log.Error(err)

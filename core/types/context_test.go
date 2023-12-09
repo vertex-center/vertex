@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	ev "github.com/vertex-center/vertex/common/event"
 	"github.com/vertex-center/vertex/pkg/event"
 )
 
@@ -37,7 +38,7 @@ func (suite *VertexContextTestSuite) TestDispatchHardReset() {
 	bus := &event.MockBus{}
 	suite.context.bus = bus
 
-	err := suite.context.DispatchEventWithErr(EventServerHardReset{})
+	err := suite.context.DispatchEventWithErr(ev.ServerHardReset{})
 	suite.Require().NoError(err)
 	bus.AssertNotCalled(suite.T(), "DispatchEvent", mock.Anything)
 }

@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/common/event"
 	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
@@ -57,14 +58,14 @@ func (s *Server) StartAsync() chan error {
 	s.waitInternet()
 	s.waitServerReady()
 
-	s.ctx.DispatchEvent(types.EventServerLoad{})
-	s.ctx.DispatchEvent(types.EventServerStart{})
+	s.ctx.DispatchEvent(event.ServerLoad{})
+	s.ctx.DispatchEvent(event.ServerStart{})
 
 	return exitChan
 }
 
 func (s *Server) Stop() {
-	s.ctx.DispatchEvent(types.EventServerStop{})
+	s.ctx.DispatchEvent(event.ServerStop{})
 
 	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
 	defer cancel()

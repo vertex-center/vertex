@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/vertex-center/vertex/apps"
+	"github.com/vertex-center/vertex/common/event"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/core/service"
 	"github.com/vertex-center/vertex/core/types"
@@ -52,8 +53,8 @@ func main() {
 	srv = server.New("kernel", &info, url, ctx)
 	initServices()
 
-	ctx.DispatchEvent(types.EventServerLoad{})
-	ctx.DispatchEvent(types.EventServerStart{})
+	ctx.DispatchEvent(event.ServerLoad{})
+	ctx.DispatchEvent(event.ServerStart{})
 
 	exitKernelChan := srv.StartAsync()
 	exitVertexChan := make(chan error)

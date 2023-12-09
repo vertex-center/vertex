@@ -5,7 +5,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/adapter"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	vtypes "github.com/vertex-center/vertex/core/types"
+	vtypes "github.com/vertex-center/vertex/common/event"
 	"github.com/vertex-center/vertex/pkg/event"
 )
 
@@ -39,7 +39,7 @@ func (s *serviceService) GetUUID() uuid.UUID {
 
 func (s *serviceService) OnEvent(e event.Event) error {
 	switch e.(type) {
-	case vtypes.EventVertexUpdated:
+	case vtypes.VertexUpdated:
 		return s.reload()
 	}
 	return nil
