@@ -8,7 +8,7 @@ import (
 
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vlog"
 
 	"github.com/google/uuid"

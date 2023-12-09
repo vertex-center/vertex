@@ -10,8 +10,8 @@ import (
 	sqladapter "github.com/vertex-center/vertex/apps/sql/adapter"
 	"github.com/vertex-center/vertex/apps/sql/core/port"
 	sqltypes "github.com/vertex-center/vertex/apps/sql/core/types"
+	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 )

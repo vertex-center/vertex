@@ -7,7 +7,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/service"
 	"github.com/vertex-center/vertex/apps/containers/handler"
 	"github.com/vertex-center/vertex/apps/containers/meta"
-	apptypes "github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/common/app"
 	"github.com/wI2L/fizz"
 )
 
@@ -24,18 +24,18 @@ var (
 )
 
 type App struct {
-	ctx *apptypes.Context
+	ctx *app.Context
 }
 
 func NewApp() *App {
 	return &App{}
 }
 
-func (a *App) Load(ctx *apptypes.Context) {
+func (a *App) Load(ctx *app.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) Meta() apptypes.Meta {
+func (a *App) Meta() app.Meta {
 	return meta.Meta
 }
 
@@ -129,7 +129,7 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 		fizz.ID("eventsContainer"),
 		fizz.Summary("Get container events"),
 		fizz.Description("Get events for a container, sent as Server-Sent Events (SSE)."),
-	}, apptypes.HeadersSSE(), containerHandler.Events())
+	}, app.HeadersSSE(), containerHandler.Events())
 
 	container.GET("/docker", []fizz.OperationOption{
 		fizz.ID("getDockerContainer"),
@@ -186,7 +186,7 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	containers.GET("/events", []fizz.OperationOption{
 		fizz.ID("events"),
 		fizz.Summary("Get events"),
-	}, apptypes.HeadersSSE(), containersHandler.Events())
+	}, app.HeadersSSE(), containersHandler.Events())
 
 	// Service
 

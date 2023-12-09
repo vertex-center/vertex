@@ -5,35 +5,35 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	containersmeta "github.com/vertex-center/vertex/apps/containers/meta"
 	"github.com/vertex-center/vertex/apps/tunnels/handler"
-	apptypes "github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/common/app"
 	"github.com/wI2L/fizz"
 )
 
-var Meta = apptypes.Meta{
+var Meta = app.Meta{
 	ID:          "tunnels",
 	Name:        "Vertex Tunnels",
 	Description: "Create and manage tunnels.",
 	Icon:        "subway",
 	DefaultPort: "7514",
-	Dependencies: []*apptypes.Meta{
+	Dependencies: []*app.Meta{
 		&authmeta.Meta,
 		&containersmeta.Meta,
 	},
 }
 
 type App struct {
-	ctx *apptypes.Context
+	ctx *app.Context
 }
 
 func NewApp() *App {
 	return &App{}
 }
 
-func (a *App) Load(ctx *apptypes.Context) {
+func (a *App) Load(ctx *app.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) Meta() apptypes.Meta {
+func (a *App) Meta() app.Meta {
 	return Meta
 }
 

@@ -6,7 +6,7 @@ import (
 	"github.com/vertex-center/vertex/apps/serviceeditor/core/port"
 	"github.com/vertex-center/vertex/apps/serviceeditor/core/service"
 	"github.com/vertex-center/vertex/apps/serviceeditor/handler"
-	apptypes "github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/common/app"
 	"github.com/wI2L/fizz"
 )
 
@@ -14,31 +14,31 @@ var (
 	editorService port.EditorService
 )
 
-var Meta = apptypes.Meta{
+var Meta = app.Meta{
 	ID:          "devtools-service-editor",
 	Name:        "Vertex Service Editor",
 	Description: "Create services for publishing.",
 	Icon:        "frame_source",
 	Category:    "devtools",
 	DefaultPort: "7510",
-	Dependencies: []*apptypes.Meta{
+	Dependencies: []*app.Meta{
 		&authmeta.Meta,
 	},
 }
 
 type App struct {
-	ctx *apptypes.Context
+	ctx *app.Context
 }
 
 func NewApp() *App {
 	return &App{}
 }
 
-func (a *App) Load(ctx *apptypes.Context) {
+func (a *App) Load(ctx *app.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) Meta() apptypes.Meta {
+func (a *App) Meta() app.Meta {
 	return Meta
 }
 

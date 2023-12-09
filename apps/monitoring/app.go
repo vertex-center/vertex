@@ -8,7 +8,7 @@ import (
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	"github.com/vertex-center/vertex/apps/monitoring/core/service"
 	"github.com/vertex-center/vertex/apps/monitoring/handler"
-	apptypes "github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/common/app"
 	"github.com/wI2L/fizz"
 )
 
@@ -16,31 +16,31 @@ var (
 	metricsService port.MetricsService
 )
 
-var Meta = apptypes.Meta{
+var Meta = app.Meta{
 	ID:          "monitoring",
 	Name:        "Vertex Monitoring",
 	Description: "Create and manage containers.",
 	Icon:        "monitoring",
 	DefaultPort: "7506",
-	Dependencies: []*apptypes.Meta{
+	Dependencies: []*app.Meta{
 		&authmeta.Meta,
 		&containersmeta.Meta,
 	},
 }
 
 type App struct {
-	ctx *apptypes.Context
+	ctx *app.Context
 }
 
 func NewApp() *App {
 	return &App{}
 }
 
-func (a *App) Load(ctx *apptypes.Context) {
+func (a *App) Load(ctx *app.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) Meta() apptypes.Meta {
+func (a *App) Meta() app.Meta {
 	return Meta
 }
 

@@ -7,24 +7,24 @@ import (
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/service"
 	"github.com/vertex-center/vertex/apps/reverseproxy/handler"
-	apptypes "github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/wI2L/fizz"
 )
 
-var Meta = apptypes.Meta{
+var Meta = app.Meta{
 	ID:          "reverse-proxy",
 	Name:        "Vertex Reverse Proxy",
 	Description: "Redirect traffic to your containers.",
 	Icon:        "router",
 	DefaultPort: "7508",
-	Dependencies: []*apptypes.Meta{
+	Dependencies: []*app.Meta{
 		&authmeta.Meta,
 	},
 }
 
 type App struct {
-	ctx   *apptypes.Context
+	ctx   *app.Context
 	proxy *ProxyRouter
 }
 
@@ -32,11 +32,11 @@ func NewApp() *App {
 	return &App{}
 }
 
-func (a *App) Load(ctx *apptypes.Context) {
+func (a *App) Load(ctx *app.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) Meta() apptypes.Meta {
+func (a *App) Meta() app.Meta {
 	return Meta
 }
 

@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	apptypes "github.com/vertex-center/vertex/core/types/app"
+	apptypes "github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"

@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/vertex-center/vertex/apps/reverseproxy"
-	"github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/common/app"
 )
 
 func main() {

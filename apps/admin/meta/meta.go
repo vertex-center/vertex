@@ -2,7 +2,7 @@ package meta
 
 import (
 	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
-	"github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/common/app"
 )
 
 var Meta = app.Meta{

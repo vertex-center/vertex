@@ -6,8 +6,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
+	apptypes "github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/core/types"
-	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/event"
 )
 

@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/core/types"
-	"github.com/vertex-center/vertex/core/types/app"
 	"github.com/wI2L/fizz"
 )
 

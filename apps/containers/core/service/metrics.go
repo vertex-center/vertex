@@ -7,8 +7,8 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	monitoringtypes "github.com/vertex-center/vertex/apps/monitoring/core/types"
+	apptypes "github.com/vertex-center/vertex/common/app"
 	vtypes "github.com/vertex-center/vertex/core/types"
-	apptypes "github.com/vertex-center/vertex/core/types/app"
 	"github.com/vertex-center/vertex/pkg/event"
 )
 

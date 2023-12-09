@@ -11,7 +11,7 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/handler"
 	"github.com/vertex-center/vertex/apps/admin/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
-	apptypes "github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/updates"
 	"github.com/wI2L/fizz"
@@ -20,14 +20,14 @@ import (
 var updateService port.UpdateService
 
 type App struct {
-	ctx *apptypes.Context
+	ctx *app.Context
 }
 
 func NewApp() *App {
 	return &App{}
 }
 
-func (a *App) Load(ctx *apptypes.Context) {
+func (a *App) Load(ctx *app.Context) {
 	a.ctx = ctx
 
 	if !ctx.Kernel() {
@@ -40,7 +40,7 @@ func (a *App) Load(ctx *apptypes.Context) {
 	}
 }
 
-func (a *App) Meta() apptypes.Meta {
+func (a *App) Meta() app.Meta {
 	return meta.Meta
 }
 
@@ -159,7 +159,7 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 		fizz.ID("check"),
 		fizz.Summary("Get all checks"),
 		fizz.Description("Check that all vertex requirements are met."),
-	}, apptypes.HeadersSSE(), checksHandler.Check())
+	}, app.HeadersSSE(), checksHandler.Check())
 
 	return nil
 }

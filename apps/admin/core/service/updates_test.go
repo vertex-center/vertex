@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
+	apptypes "github.com/vertex-center/vertex/common/app"
 	coretypes "github.com/vertex-center/vertex/core/types"
-	apptypes "github.com/vertex-center/vertex/core/types/app"
 )
 
 type UpdateServiceTestSuite struct {

@@ -1,7 +1,7 @@
 package port
 
 import (
-	"github.com/vertex-center/vertex/core/types/app"
+	"github.com/vertex-center/vertex/common/app"
 )
 
 type (

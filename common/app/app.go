@@ -51,11 +51,6 @@ type Interface interface {
 	Meta() Meta
 }
 
-type InterfaceKernel interface {
-	LoadKernel(ctx *Context)
-	Meta() Meta
-}
-
 type Initializable interface {
 	Interface
 	Initialize() error
@@ -85,12 +80,6 @@ type KernelUninitializable interface {
 	Interface
 	UninitializeKernel() error
 }
-
-type DependenciesProvider interface {
-	DownloadDependencies() error
-}
-
-type HttpHandler func(r *fizz.RouterGroup)
 
 type Service interface {
 	OnEvent(e event.Event) error

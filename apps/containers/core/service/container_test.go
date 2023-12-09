@@ -6,8 +6,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/common/app"
 	vtypes "github.com/vertex-center/vertex/core/types"
-	"github.com/vertex-center/vertex/core/types/app"
 )
 
 type ContainerServiceTestSuite struct {

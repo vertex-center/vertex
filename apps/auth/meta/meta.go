@@ -1,6 +1,8 @@
 package meta
 
-import "github.com/vertex-center/vertex/core/types/app"
+import (
+	"github.com/vertex-center/vertex/common/app"
+)
 
 var Meta = app.Meta{
 	ID:          "auth",
