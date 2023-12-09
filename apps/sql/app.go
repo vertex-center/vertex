@@ -51,17 +51,22 @@ func (a *App) Initialize() error {
 func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	r.Use(middleware.ReadAuth)
 
-	dbmsHandler := handler.NewDBMSHandler(sqlService)
+	var (
+		dbmsHandler = handler.NewDBMSHandler(sqlService)
 
-	r.GET("/container/:container_uuid", []fizz.OperationOption{
+		container = r.Group("/container/:container_uuid", "Container", "", middleware.Authenticated)
+		dbms      = r.Group("/dbms/:dbms", "DBMS", "", middleware.Authenticated)
+	)
+
+	container.GET("", []fizz.OperationOption{
 		fizz.ID("getDBMS"),
 		fizz.Summary("Get an installed DBMS"),
-	}, middleware.Authenticated, dbmsHandler.Get())
+	}, dbmsHandler.Get())
 
-	r.POST("/dbms/:dbms/install", []fizz.OperationOption{
+	dbms.POST("/install", []fizz.OperationOption{
 		fizz.ID("installDBMS"),
 		fizz.Summary("Install a DBMS"),
-	}, middleware.Authenticated, dbmsHandler.Install())
+	}, dbmsHandler.Install())
 
 	return nil
 }
