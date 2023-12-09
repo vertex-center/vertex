@@ -1,13 +1,14 @@
 package containers
 
 import (
-	"github.com/vertex-center/vertex/apps/auth/middleware"
+	authmiddleware "github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/containers/adapter"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/service"
 	"github.com/vertex-center/vertex/apps/containers/handler"
 	"github.com/vertex-center/vertex/apps/containers/meta"
 	"github.com/vertex-center/vertex/common/app"
+	"github.com/vertex-center/vertex/common/middleware"
 	"github.com/wI2L/fizz"
 )
 
@@ -70,7 +71,7 @@ func (a *App) Initialize() error {
 }
 
 func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
-	r.Use(middleware.ReadAuth)
+	r.Use(authmiddleware.ReadAuth)
 
 	var (
 		servicesHandler   = handler.NewServicesHandler(serviceService)
@@ -87,9 +88,9 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 			ServiceService:           serviceService,
 		})
 
-		container  = r.Group("/container/:container_uuid", "Container", "", middleware.Authenticated)
-		containers = r.Group("/containers", "Containers", "", middleware.Authenticated)
-		serv       = r.Group("/service/:service_id", "Service", "", middleware.Authenticated)
+		container  = r.Group("/container/:container_uuid", "Container", "", authmiddleware.Authenticated)
+		containers = r.Group("/containers", "Containers", "", authmiddleware.Authenticated)
+		serv       = r.Group("/service/:service_id", "Service", "", authmiddleware.Authenticated)
 		services   = r.Group("/services", "Services", "")
 	)
 
@@ -129,7 +130,7 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 		fizz.ID("eventsContainer"),
 		fizz.Summary("Get container events"),
 		fizz.Description("Get events for a container, sent as Server-Sent Events (SSE)."),
-	}, app.HeadersSSE(), containerHandler.Events())
+	}, middleware.SSE, containerHandler.Events())
 
 	container.GET("/docker", []fizz.OperationOption{
 		fizz.ID("getDockerContainer"),
@@ -186,7 +187,7 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	containers.GET("/events", []fizz.OperationOption{
 		fizz.ID("events"),
 		fizz.Summary("Get events"),
-	}, app.HeadersSSE(), containersHandler.Events())
+	}, middleware.SSE, containersHandler.Events())
 
 	// Service
 
@@ -205,7 +206,7 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	services.GET("", []fizz.OperationOption{
 		fizz.ID("getServices"),
 		fizz.Summary("Get services"),
-	}, middleware.Authenticated, servicesHandler.Get())
+	}, authmiddleware.Authenticated, servicesHandler.Get())
 
 	services.GinRouterGroup().Static("/icons", "./live/services/icons")
 

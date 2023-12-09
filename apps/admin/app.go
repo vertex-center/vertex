@@ -10,8 +10,9 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/database"
 	"github.com/vertex-center/vertex/apps/admin/handler"
 	"github.com/vertex-center/vertex/apps/admin/meta"
-	"github.com/vertex-center/vertex/apps/auth/middleware"
+	authmiddleware "github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/common/app"
+	"github.com/vertex-center/vertex/common/middleware"
 	"github.com/vertex-center/vertex/core/types/storage"
 	"github.com/vertex-center/vertex/updates"
 	"github.com/wI2L/fizz"
@@ -80,7 +81,7 @@ func (a *App) Initialize() error {
 }
 
 func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
-	r.Use(middleware.ReadAuth)
+	r.Use(authmiddleware.ReadAuth)
 
 	var (
 		hardwareHandler = handler.NewHardwareHandler(hardwareService)
@@ -89,11 +90,11 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 		updateHandler   = handler.NewUpdateHandler(updateService, settingsService)
 		checksHandler   = handler.NewChecksHandler(checksService)
 
-		hardware = r.Group("/hardware", "Hardware", "", middleware.Authenticated)
-		ssh      = r.Group("/ssh", "SSH", "", middleware.Authenticated)
-		settings = r.Group("/settings", "Settings", "", middleware.Authenticated)
-		update   = r.Group("/update", "Update", "", middleware.Authenticated)
-		checks   = r.Group("/admin/checks", "Checks", "", middleware.Authenticated)
+		hardware = r.Group("/hardware", "Hardware", "", authmiddleware.Authenticated)
+		ssh      = r.Group("/ssh", "SSH", "", authmiddleware.Authenticated)
+		settings = r.Group("/settings", "Settings", "", authmiddleware.Authenticated)
+		update   = r.Group("/update", "Update", "", authmiddleware.Authenticated)
+		checks   = r.Group("/admin/checks", "Checks", "", authmiddleware.Authenticated)
 	)
 
 	hardware.GET("/host", []fizz.OperationOption{
@@ -159,7 +160,7 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 		fizz.ID("check"),
 		fizz.Summary("Get all checks"),
 		fizz.Description("Check that all vertex requirements are met."),
-	}, app.HeadersSSE(), checksHandler.Check())
+	}, middleware.SSE, checksHandler.Check())
 
 	return nil
 }

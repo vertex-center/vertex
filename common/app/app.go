@@ -5,7 +5,6 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/gin-contrib/sse"
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/core/types"
@@ -54,15 +53,6 @@ type KernelUninitializable interface {
 
 type Service interface {
 	OnEvent(e event.Event) error
-}
-
-func HeadersSSE() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Writer.Header().Set("Content-Type", sse.ContentType)
-		c.Writer.Header().Set("Cache-Control", "no-cache")
-		c.Writer.Header().Set("Connection", "keep-alive")
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-	}
 }
 
 func (a Meta) ApiURL() *url.URL {
