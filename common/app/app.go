@@ -98,6 +98,8 @@ func RunStandalone(app Interface, waitInternet bool) {
 	ctx := NewContext(vertexCtx)
 	app.Load(ctx)
 
+	config.Current.RegisterApiURL(app.Meta().ID, app.Meta().DefaultApiURL())
+
 	u := app.Meta().ApiURL()
 
 	info := openapi.Info{
@@ -153,6 +155,8 @@ func RunStandaloneKernel(app Interface, waitInternet bool) {
 	vertexCtx := types.NewVertexContext(types.About{}, true)
 	ctx := NewContext(vertexCtx)
 	app.Load(ctx)
+
+	config.Current.RegisterKernelApiURL(app.Meta().ID, app.Meta().DefaultApiKernelURL())
 
 	u := app.Meta().ApiKernelURL()
 
