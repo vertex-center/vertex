@@ -46,5 +46,5 @@ func Wait(ctx context.Context, url string) error {
 }
 
 func WaitInternetConn(ctx context.Context) error {
-	return Wait(ctx, "https://www.google.com/robots.txt")
+	return Wait(ctx, "http://clients3.google.com/generate_204")
 }
