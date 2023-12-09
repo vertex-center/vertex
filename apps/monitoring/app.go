@@ -54,19 +54,25 @@ func (a *App) Initialize() error {
 func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	r.Use(middleware.ReadAuth)
 
-	metricsHandler := handler.NewMetricsHandler(metricsService)
+	var (
+		metricsHandler = handler.NewMetricsHandler(metricsService)
 
-	r.GET("/metrics", []fizz.OperationOption{
+		metrics    = r.Group("/metrics", "Metrics", "", middleware.Authenticated)
+		collector  = r.Group("/collector/:collector", "Collector", "", middleware.Authenticated)
+		visualizer = r.Group("/visualizer/:visualizer", "Visualizer", "", middleware.Authenticated)
+	)
+
+	metrics.GET("", []fizz.OperationOption{
 		fizz.ID("getMetrics"),
 		fizz.Summary("Get metrics"),
-	}, middleware.Authenticated, metricsHandler.Get())
+	}, metricsHandler.Get())
 
-	r.POST("/collector/:collector/install", []fizz.OperationOption{
+	collector.POST("/install", []fizz.OperationOption{
 		fizz.ID("installCollector"),
 		fizz.Summary("Install a collector"),
 	}, metricsHandler.InstallCollector())
 
-	r.POST("/visualizer/:visualizer/install", []fizz.OperationOption{
+	visualizer.POST("/install", []fizz.OperationOption{
 		fizz.ID("installVisualizer"),
 		fizz.Summary("Install a visualizer"),
 	}, metricsHandler.InstallVisualizer())
