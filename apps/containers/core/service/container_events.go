@@ -20,9 +20,6 @@ func (s *containerService) OnEvent(e event.Event) error {
 		}()
 	case ev.ServerStop:
 		s.StopAll()
-	case ev.ServerHardReset:
-		s.StopAll()
-		s.DeleteAll()
 	}
 	return nil
 }

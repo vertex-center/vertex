@@ -36,8 +36,7 @@ var (
 	srv *server.Server
 	ctx *types.VertexContext
 
-	appsService  port.AppsService
-	debugService port.DebugService
+	appsService port.AppsService
 )
 
 func main() {
@@ -113,10 +112,7 @@ func checkNotRoot() {
 }
 
 func initServices() {
-	// Update service must be initialized before all other services, because it
-	// is responsible for downloading dependencies for other services.
 	appsService = service.NewAppsService(ctx, false, apps.Apps)
-	debugService = service.NewDebugService(ctx)
 }
 
 func initRoutes(about types.About) {
@@ -132,13 +128,11 @@ func initRoutes(about types.About) {
 		return &about, nil
 	}))
 
-	if config.Current.Debug() {
-		debugHandler := handler.NewDebugHandler(debugService)
-		debug := a.Group("/debug", "Debug", "Routes only available with DEBUG=1", middleware.Authenticated)
-		debug.POST("/hard-reset", debugHandler.HardResetInfo(), router.Handler(debugHandler.HardReset))
-	}
-
 	appsHandler := handler.NewAppsHandler(appsService)
-	apps := a.Group("/apps", "Apps", "Apps", middleware.Authenticated)
-	apps.GET("", appsHandler.GetAppsInfo(), router.Handler(appsHandler.GetApps))
+	appsRoute := a.Group("/apps", "Apps", "Apps", middleware.Authenticated)
+	appsRoute.GET("", []fizz.OperationOption{
+		fizz.ID("getApps"),
+		fizz.Summary("Get apps"),
+		fizz.Description("Get all the apps installed on the server."),
+	}, router.Handler(appsHandler.GetApps))
 }
