@@ -2,6 +2,13 @@ export const useApps = () => {
     return {
         apps: [
             {
+                id: "admin",
+                name: "Vertex Admin",
+                description: "Administer Vertex",
+                icon: "admin_panel_settings",
+                hidden: false,
+            },
+            {
                 id: "auth",
                 name: "Vertex Auth",
                 description: "Authentication app for Vertex",
