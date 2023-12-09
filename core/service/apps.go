@@ -85,12 +85,7 @@ func (s *appsService) StartApps() {
 				app.RunStandalone(a)
 			}
 		}
-		s.ctx.DispatchEvent(ev.AppReady{
-			AppID: a.Meta().ID,
-		})
 	}
-
-	s.ctx.DispatchEvent(ev.AllAppsReady{})
 
 	if !s.kernel {
 		t := table.New().Headers("App", "API", "Kernel API")
