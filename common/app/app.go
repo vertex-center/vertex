@@ -3,14 +3,12 @@ package app
 import (
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/common/app/appmeta"
 	"github.com/vertex-center/vertex/common/server"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/net"
-	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/wI2L/fizz"
 	"github.com/wI2L/fizz/openapi"
 )
@@ -115,13 +113,6 @@ func RunStandalone(app Interface, waitInternet bool) {
 		if err != nil {
 			panic(err)
 		}
-
-		base.GET("/ping", []fizz.OperationOption{
-			fizz.ID("ping"),
-			fizz.Summary("Ping the app"),
-		}, router.Handler(func(c *gin.Context) error {
-			return nil
-		}))
 	}
 
 	<-srv.StartAsync()
@@ -171,13 +162,6 @@ func RunStandaloneKernel(app Interface, waitInternet bool) {
 		if err != nil {
 			panic(err)
 		}
-
-		base.GET("/ping", []fizz.OperationOption{
-			fizz.ID("ping"),
-			fizz.Summary("Ping the app"),
-		}, router.Handler(func(c *gin.Context) error {
-			return nil
-		}))
 	}
 
 	<-srv.StartAsync()
