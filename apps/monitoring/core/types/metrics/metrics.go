@@ -18,25 +18,3 @@ type Metric struct {
 	Type        MetricType `json:"type,omitempty"`
 	Labels      []string   `json:"labels,omitempty"`
 }
-
-type (
-	EventRegisterMetrics struct {
-		Metrics []Metric
-	}
-
-	EventSetMetric struct {
-		MetricID string
-		Value    interface{}
-		Labels   []string
-	}
-
-	EventIncrementMetric struct {
-		MetricID string
-		Labels   []string
-	}
-
-	EventDecrementMetric struct {
-		MetricID string
-		Labels   []string
-	}
-)
