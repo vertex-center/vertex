@@ -1,7 +1,6 @@
 package storage
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -55,22 +54,6 @@ func CloneOrPullRepository(url string, dest string) error {
 	}
 
 	return nil
-}
-
-func DownloadLatestGithubRelease(owner string, repo string, dest string) error {
-	log.Info("downloading repository",
-		vlog.String("owner", owner),
-		vlog.String("repo", repo),
-	)
-
-	client := github.NewClient(nil)
-
-	release, _, err := client.Repositories.GetLatestRelease(context.Background(), owner, repo)
-	if err != nil {
-		return ErrNoReleasesPublished
-	}
-
-	return DownloadGithubRelease(release, dest)
 }
 
 func DownloadGithubRelease(release *github.RepositoryRelease, dest string) error {
