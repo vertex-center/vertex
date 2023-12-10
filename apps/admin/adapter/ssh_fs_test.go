@@ -1,6 +1,7 @@
 package adapter
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"errors"
@@ -81,7 +82,7 @@ func (suite *SshFsAdapterTestSuite) TearDownTest() {
 }
 
 func (suite *SshFsAdapterTestSuite) TestGetAll() {
-	keys, err := suite.adapter.GetAll([]user.User{suite.testUser})
+	keys, err := suite.adapter.GetAll(context.Background(), []user.User{suite.testUser})
 	suite.Require().NoError(err)
 	suite.Len(keys, 2)
 	for i, key := range keys {
@@ -94,7 +95,7 @@ func (suite *SshFsAdapterTestSuite) TestGetAllInvalidKey() {
 	_, err := suite.authorizedKeysFile.Write([]byte("invalid"))
 	suite.Require().NoError(err)
 
-	keys, err := suite.adapter.GetAll([]user.User{suite.testUser})
+	keys, err := suite.adapter.GetAll(context.Background(), []user.User{suite.testUser})
 	suite.Require().NoError(err)
 	suite.Len(keys, 2)
 }
@@ -104,7 +105,7 @@ func (suite *SshFsAdapterTestSuite) TestGetAllNoSuchFile() {
 	err := os.Remove(path.Join(suite.testUser.HomeDir, ".ssh", "authorized_keys"))
 	suite.Require().NoError(err)
 
-	keys, err := suite.adapter.GetAll([]user.User{suite.testUser})
+	keys, err := suite.adapter.GetAll(context.Background(), []user.User{suite.testUser})
 	suite.Require().NoError(err)
 	suite.Empty(keys)
 }
@@ -115,20 +116,20 @@ func (suite *SshFsAdapterTestSuite) TestAdd() {
 		suite.FailNow(err.Error())
 	}
 
-	err = suite.adapter.Add(string(publicKey), suite.testUser)
+	err = suite.adapter.Add(context.Background(), string(publicKey), suite.testUser)
 	suite.Require().NoError(err)
 
-	keys, err := suite.adapter.GetAll([]user.User{suite.testUser})
+	keys, err := suite.adapter.GetAll(context.Background(), []user.User{suite.testUser})
 	suite.Require().NoError(err)
 	suite.Len(keys, 3)
 }
 
 func (suite *SshFsAdapterTestSuite) TestDelete() {
 	k, _, _, _, _ := ssh.ParseAuthorizedKey([]byte(keys[0]))
-	err := suite.adapter.Remove(ssh.FingerprintSHA256(k), suite.testUser)
+	err := suite.adapter.Remove(context.Background(), ssh.FingerprintSHA256(k), suite.testUser)
 	suite.Require().NoError(err)
 
-	keys, err := suite.adapter.GetAll([]user.User{suite.testUser})
+	keys, err := suite.adapter.GetAll(context.Background(), []user.User{suite.testUser})
 	suite.Require().NoError(err)
 	suite.Len(keys, 1)
 }

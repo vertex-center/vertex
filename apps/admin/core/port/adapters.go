@@ -36,9 +36,9 @@ type (
 	}
 
 	SshKernelAdapter interface {
-		GetAll(users []user.User) ([]types.PublicKey, error)
-		Add(key string, user user.User) error
-		Remove(fingerprint string, user user.User) error
-		GetUsers() ([]user.User, error)
+		GetAll(ctx context.Context, users []user.User) ([]types.PublicKey, error)
+		Add(ctx context.Context, key string, user user.User) error
+		Remove(ctx context.Context, fingerprint string, user user.User) error
+		GetUsers(ctx context.Context) ([]user.User, error)
 	}
 )

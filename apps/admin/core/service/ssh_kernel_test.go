@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -53,8 +54,8 @@ func (suite *SshKernelServiceTestSuite) SetupTest() {
 }
 
 func (suite *SshKernelServiceTestSuite) TestGetAll() {
-	suite.adapter.On("GetAll", suite.testUsers).Return(testDataAuthorizedKeys, nil)
-	suite.adapter.On("GetUsers").Return(suite.testUsers, nil)
+	suite.adapter.On("GetAll", context.Background(), suite.testUsers).Return(testDataAuthorizedKeys, nil)
+	suite.adapter.On("GetUsers", context.Background()).Return(suite.testUsers, nil)
 
 	keys, err := suite.service.GetAll()
 
@@ -64,8 +65,8 @@ func (suite *SshKernelServiceTestSuite) TestGetAll() {
 }
 
 func (suite *SshKernelServiceTestSuite) TestAdd() {
-	suite.adapter.On("Add", testDataAuthorizedKey, suite.testUser).Return(nil)
-	suite.adapter.On("GetUsers").Return(suite.testUsers, nil)
+	suite.adapter.On("Add", context.Background(), testDataAuthorizedKey, suite.testUser).Return(nil)
+	suite.adapter.On("GetUsers", context.Background()).Return(suite.testUsers, nil)
 
 	err := suite.service.Add(testDataAuthorizedKey, suite.testUser.Name)
 
@@ -74,8 +75,8 @@ func (suite *SshKernelServiceTestSuite) TestAdd() {
 }
 
 func (suite *SshKernelServiceTestSuite) TestAddInvalidKey() {
-	suite.adapter.On("Add", "invalid", suite.testUser).Return(nil)
-	suite.adapter.On("GetUsers").Return(suite.testUsers, nil)
+	suite.adapter.On("Add", context.Background(), "invalid", suite.testUser).Return(nil)
+	suite.adapter.On("GetUsers", context.Background()).Return(suite.testUsers, nil)
 
 	err := suite.service.Add("invalid", "username")
 
@@ -85,8 +86,8 @@ func (suite *SshKernelServiceTestSuite) TestAddInvalidKey() {
 }
 
 func (suite *SshKernelServiceTestSuite) TestDelete() {
-	suite.adapter.On("Remove", testDataFingerprint, suite.testUser).Return(nil)
-	suite.adapter.On("GetUsers").Return(suite.testUsers, nil)
+	suite.adapter.On("Remove", context.Background(), testDataFingerprint, suite.testUser).Return(nil)
+	suite.adapter.On("GetUsers", context.Background()).Return(suite.testUsers, nil)
 
 	err := suite.service.Delete(testDataFingerprint, "username")
 
