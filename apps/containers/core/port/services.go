@@ -6,6 +6,7 @@ import (
 	vtypes "github.com/docker/docker/api/types"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/wI2L/fizz"
 )
 
 type (
@@ -63,7 +64,9 @@ type (
 		SetTags(inst *types.Container, tags []string) error
 	}
 
-	MetricsService interface{}
+	MetricsService interface {
+		Expose(r *fizz.RouterGroup)
+	}
 
 	ServiceService interface {
 		GetAll() []types.Service

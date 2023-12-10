@@ -45,9 +45,8 @@ func (a *App) Meta() app.Meta {
 }
 
 func (a *App) Initialize() error {
-	prometheusAdapter := adapter.NewMetricsPrometheusAdapter()
-	metricsService = service.NewMetricsService(a.ctx, prometheusAdapter)
-
+	metricsAdapter := adapter.NewMetricsPrometheusAdapter()
+	metricsService = service.NewMetricsService(metricsAdapter)
 	return nil
 }
 

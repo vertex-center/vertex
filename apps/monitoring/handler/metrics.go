@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
-	"github.com/vertex-center/vertex/apps/monitoring/core/types"
+	"github.com/vertex-center/vertex/apps/monitoring/core/types/metrics"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
@@ -18,8 +18,8 @@ func NewMetricsHandler(metricsService port.MetricsService) port.MetricsHandler {
 }
 
 func (r *metricsHandler) Get() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) ([]types.Metric, error) {
-		return r.metricsService.GetMetrics(), nil
+	return router.Handler(func(c *gin.Context) ([]metrics.Metric, error) {
+		return r.metricsService.GetMetrics()
 	})
 }
 

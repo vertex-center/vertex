@@ -4,12 +4,12 @@ import (
 	"context"
 
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/apps/monitoring/core/types"
+	"github.com/vertex-center/vertex/apps/monitoring/core/types/metrics"
 )
 
 type (
 	MetricsService interface {
-		GetMetrics() []types.Metric
+		GetMetrics() ([]metrics.Metric, error)
 		ConfigureVisualizer(inst *containerstypes.Container) error
 		InstallVisualizer(ctx context.Context, token string, visualizer string) error
 		ConfigureCollector(inst *containerstypes.Container) error

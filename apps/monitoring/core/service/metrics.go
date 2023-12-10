@@ -7,31 +7,23 @@ import (
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
-	"github.com/vertex-center/vertex/apps/monitoring/core/types"
-	"github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/pkg/event"
-	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vlog"
+	"github.com/vertex-center/vertex/apps/monitoring/core/types/metrics"
 )
 
 type metricsService struct {
 	uuid    uuid.UUID
 	adapter port.MetricsAdapter
-	metrics []types.Metric
 }
 
-func NewMetricsService(ctx *app.Context, metricsAdapter port.MetricsAdapter) port.MetricsService {
-	s := &metricsService{
+func NewMetricsService(metricsAdapter port.MetricsAdapter) port.MetricsService {
+	return &metricsService{
 		uuid:    uuid.New(),
 		adapter: metricsAdapter,
-		metrics: []types.Metric{},
 	}
-	ctx.AddListener(s)
-	return s
 }
 
-func (s *metricsService) GetMetrics() []types.Metric {
-	return s.metrics
+func (s *metricsService) GetMetrics() ([]metrics.Metric, error) {
+	return s.adapter.GetMetrics()
 }
 
 func (s *metricsService) InstallCollector(ctx context.Context, token string, collector string) error {
@@ -59,9 +51,7 @@ func (s *metricsService) InstallCollector(ctx context.Context, token string, col
 
 // ConfigureCollector will configure a container to monitor the metrics of Vertex.
 func (s *metricsService) ConfigureCollector(inst *containerstypes.Container) error {
-	// TODO: Enable again, but permissions are not set correctly
-	// return s.adapter.ConfigureContainer(inst.UUID)
-	return nil
+	return s.adapter.ConfigureContainer(inst.UUID)
 }
 
 func (s *metricsService) InstallVisualizer(ctx context.Context, token string, visualizer string) error {
@@ -89,25 +79,5 @@ func (s *metricsService) InstallVisualizer(ctx context.Context, token string, vi
 
 func (s *metricsService) ConfigureVisualizer(inst *containerstypes.Container) error {
 	// TODO: Implement
-	return nil
-}
-
-func (s *metricsService) GetUUID() uuid.UUID {
-	return s.uuid
-}
-
-func (s *metricsService) OnEvent(e event.Event) error {
-	switch e := e.(type) {
-	case types.EventRegisterMetrics:
-		log.Info("registering metrics", vlog.Int("count", len(e.Metrics)))
-		s.metrics = append(s.metrics, e.Metrics...)
-		s.adapter.RegisterMetrics(e.Metrics)
-	case types.EventSetMetric:
-		s.adapter.Set(e.MetricID, e.Value, e.Labels...)
-	case types.EventIncrementMetric:
-		s.adapter.Inc(e.MetricID, e.Labels...)
-	case types.EventDecrementMetric:
-		s.adapter.Dec(e.MetricID, e.Labels...)
-	}
 	return nil
 }

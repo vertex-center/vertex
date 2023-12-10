@@ -1,55 +1,26 @@
 package adapter
 
 import (
-	"errors"
-	"net/http"
+	"context"
+	"fmt"
 	"os"
 	"path"
-	"sync"
-
-	metricstypes "github.com/vertex-center/vertex/apps/monitoring/core/types"
+	"time"
 
 	"github.com/google/uuid"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/client_golang/api"
+	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/vertex-center/vertex/apps/monitoring/core/port"
+	"github.com/vertex-center/vertex/apps/monitoring/core/types/metrics"
 	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vlog"
+	"github.com/vertex-center/vertex/pkg/net"
 	"gopkg.in/yaml.v3"
 )
 
-var ErrMetricNotFound = errors.New("metric not found")
+type prometheusAdapter struct{}
 
-type prometheusAdapter struct {
-	gauges    map[string]prometheus.Gauge
-	gaugeVecs map[string]*prometheus.GaugeVec
-
-	// mutex for all maps
-	mutex *sync.RWMutex
-
-	reg *prometheus.Registry
-}
-
-func NewMetricsPrometheusAdapter() *prometheusAdapter {
-	reg := prometheus.NewRegistry()
-
-	a := &prometheusAdapter{
-		gauges:    map[string]prometheus.Gauge{},
-		gaugeVecs: map[string]*prometheus.GaugeVec{},
-
-		mutex: &sync.RWMutex{},
-
-		reg: reg,
-	}
-
-	go func() {
-		http.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
-		err := http.ListenAndServe(":2112", nil)
-		if err != nil {
-			log.Error(err)
-		}
-	}()
-
-	return a
+func NewMetricsPrometheusAdapter() port.MetricsAdapter {
+	return &prometheusAdapter{}
 }
 
 func (a *prometheusAdapter) ConfigureContainer(uuid uuid.UUID) error {
@@ -61,14 +32,22 @@ func (a *prometheusAdapter) ConfigureContainer(uuid uuid.UUID) error {
 		return err
 	}
 
+	ip, err := net.LocalIP()
+	if err != nil {
+		return err
+	}
+
 	data := map[string]interface{}{
 		"scrape_configs": []map[string]interface{}{
 			{
 				"job_name":        "vertex",
 				"scrape_interval": "5s",
+				"metrics_path":    "/api/metrics",
 				"static_configs": []map[string]interface{}{
 					{
-						"targets": []string{"localhost:2112"},
+						"targets": []string{
+							ip + ":7504",
+						},
 					},
 				},
 			},
@@ -83,71 +62,28 @@ func (a *prometheusAdapter) ConfigureContainer(uuid uuid.UUID) error {
 	return os.WriteFile(p, bytes, 0644)
 }
 
-func (a *prometheusAdapter) RegisterMetrics(metrics []metricstypes.Metric) {
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
-
-	var err error
-	for _, m := range metrics {
-		switch m.Type {
-		case metricstypes.MetricTypeOnOff:
-			fallthrough
-		case metricstypes.MetricTypeInteger:
-			opts := prometheus.GaugeOpts{
-				Name: m.ID,
-				Help: m.Description,
-			}
-			if m.Labels != nil {
-				collector := prometheus.NewGaugeVec(opts, m.Labels)
-				a.gaugeVecs[m.ID] = collector
-				err = a.reg.Register(collector)
-			} else {
-				collector := prometheus.NewGauge(opts)
-				a.gauges[m.ID] = collector
-				err = a.reg.Register(collector)
-			}
-		}
-	}
+func (a *prometheusAdapter) GetMetrics() ([]metrics.Metric, error) {
+	promClient, err := api.NewClient(api.Config{
+		Address: "http://localhost:9090",
+	})
 	if err != nil {
-		log.Error(err)
+		return nil, err
 	}
-}
 
-func (a *prometheusAdapter) Set(metricID string, value interface{}, labels ...string) {
-	a.mutex.RLock()
-	defer a.mutex.RUnlock()
-
-	if collector, ok := a.gaugeVecs[metricID]; ok {
-		collector.WithLabelValues(labels...).Set(value.(float64))
-	} else if collector, ok := a.gauges[metricID]; ok {
-		collector.Set(value.(float64))
-	} else {
-		log.Error(ErrMetricNotFound, vlog.String("metric_id", metricID))
+	promAPI := v1.NewAPI(promClient)
+	values, warns, err := promAPI.LabelValues(context.Background(), "__name__", []string{}, time.Time{}, time.Time{})
+	if err != nil {
+		return nil, fmt.Errorf("retrieve metrics: %w", err)
 	}
-}
-
-func (a *prometheusAdapter) Inc(metricID string, labels ...string) {
-	a.mutex.RLock()
-	defer a.mutex.RUnlock()
-
-	if collector, ok := a.gaugeVecs[metricID]; ok {
-		collector.WithLabelValues(labels...).Inc()
-	} else if collector, ok := a.gauges[metricID]; ok {
-		collector.Inc()
-	} else {
-		log.Error(ErrMetricNotFound, vlog.String("metric_id", metricID))
+	for _, warn := range warns {
+		log.Warn(warn)
 	}
-}
 
-func (a *prometheusAdapter) Dec(metricID string, labels ...string) {
-	a.mutex.RLock()
-	defer a.mutex.RUnlock()
-
-	if collector, ok := a.gaugeVecs[metricID]; ok {
-		collector.WithLabelValues(labels...).Dec()
-	} else if collector, ok := a.gauges[metricID]; ok {
-		collector.Dec()
-	} else {
-		log.Error(ErrMetricNotFound, vlog.String("metric_id", metricID))
+	var m []metrics.Metric
+	for _, value := range values {
+		m = append(m, metrics.Metric{
+			Name: string(value),
+		})
 	}
+	return m, nil
 }

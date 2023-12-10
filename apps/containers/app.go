@@ -20,6 +20,7 @@ var (
 	containerServiceService  port.ContainerServiceService
 	containerSettingsService port.ContainerSettingsService
 	containerService         port.ContainerService
+	metricsService           port.MetricsService
 
 	dockerKernelService port.DockerService
 )
@@ -65,13 +66,15 @@ func (a *App) Initialize() error {
 		ContainerSettingsService: containerSettingsService,
 		ServiceService:           serviceService,
 	})
-	_ = service.NewMetricsService(a.ctx)
+	metricsService = service.NewMetricsService(a.ctx)
 
 	return nil
 }
 
 func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	r.Use(authmiddleware.ReadAuth)
+
+	metricsService.Expose(r)
 
 	var (
 		servicesHandler   = handler.NewServicesHandler(serviceService)

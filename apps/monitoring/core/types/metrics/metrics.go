@@ -1,4 +1,4 @@
-package types
+package metrics
 
 const (
 	MetricStatusOff float64 = 0.0
