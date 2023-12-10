@@ -7,6 +7,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/service"
 	"github.com/vertex-center/vertex/apps/containers/handler"
 	"github.com/vertex-center/vertex/apps/containers/meta"
+	"github.com/vertex-center/vertex/apps/monitoring/core/types/metrics"
 	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/middleware"
 	"github.com/wI2L/fizz"
@@ -74,7 +75,7 @@ func (a *App) Initialize() error {
 func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	r.Use(authmiddleware.ReadAuth)
 
-	metricsService.Expose(r)
+	metrics.Serve(r, metricsService)
 
 	var (
 		servicesHandler   = handler.NewServicesHandler(serviceService)

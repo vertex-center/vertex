@@ -9,7 +9,6 @@ import (
 	"github.com/vertex-center/vertex/apps/monitoring/core/types/metrics"
 	apptypes "github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/pkg/event"
-	"github.com/wI2L/fizz"
 )
 
 const (
@@ -35,6 +34,10 @@ func NewMetricsService(ctx *apptypes.Context) port.MetricsService {
 		panic(err)
 	}
 	return s
+}
+
+func (s *metricsService) GetRegistry() *metrics.Registry {
+	return s.metricsRegistry
 }
 
 func (s *metricsService) GetUUID() uuid.UUID {
@@ -81,8 +84,4 @@ func (s *metricsService) Register() error {
 			Type:        metrics.MetricTypeGauge,
 		},
 	})
-}
-
-func (s *metricsService) Expose(r *fizz.RouterGroup) {
-	s.metricsRegistry.Expose(r)
 }

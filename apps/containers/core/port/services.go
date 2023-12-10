@@ -6,7 +6,7 @@ import (
 	vtypes "github.com/docker/docker/api/types"
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/wI2L/fizz"
+	"github.com/vertex-center/vertex/apps/monitoring/core/types/metrics"
 )
 
 type (
@@ -65,7 +65,7 @@ type (
 	}
 
 	MetricsService interface {
-		Expose(r *fizz.RouterGroup)
+		metrics.RegistryProvider
 	}
 
 	ServiceService interface {

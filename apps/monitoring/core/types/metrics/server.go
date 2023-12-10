@@ -61,25 +61,6 @@ func (s *Registry) Register(metrics []Metric) error {
 	return errors.Join(errs...)
 }
 
-func (s *Registry) Handler() gin.HandlerFunc {
-	httpHandler := promhttp.HandlerFor(s.reg, promhttp.HandlerOpts{})
-	return func(c *gin.Context) {
-		httpHandler.ServeHTTP(c.Writer, c.Request)
-	}
-}
-
-func (s *Registry) Expose(r *fizz.RouterGroup) {
-	metricsRoute := r.Group("/metrics", "Metrics", "")
-	metricsRoute.GET("", []fizz.OperationOption{
-		fizz.ID("getMetrics"),
-		fizz.Summary("Get metrics"),
-		fizz.Description("Retrieve metrics for Prometheus."),
-	}, tonic.Handler(func(c *gin.Context) error {
-		s.Handler()(c)
-		return nil
-	}, http.StatusOK))
-}
-
 func (s *Registry) Set(metricID string, value interface{}, labels ...string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -120,4 +101,25 @@ func (s *Registry) Dec(metricID string, labels ...string) {
 	default:
 		log.Error(ErrMetricNotFound, vlog.String("metric_id", metricID))
 	}
+}
+
+type RegistryProvider interface {
+	GetRegistry() *Registry
+}
+
+func Serve(r *fizz.RouterGroup, provider RegistryProvider) {
+	var reg *prometheus.Registry
+	if provider != nil {
+		reg = provider.GetRegistry().reg
+	}
+	httpHandler := promhttp.HandlerFor(reg, promhttp.HandlerOpts{})
+	metricsRoute := r.Group("/metrics", "Metrics", "")
+	metricsRoute.GET("", []fizz.OperationOption{
+		fizz.ID("getMetrics"),
+		fizz.Summary("Get metrics"),
+		fizz.Description("Retrieve metrics for Prometheus."),
+	}, tonic.Handler(func(c *gin.Context) error {
+		httpHandler.ServeHTTP(c.Writer, c.Request)
+		return nil
+	}, http.StatusOK))
 }
