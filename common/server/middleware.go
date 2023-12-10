@@ -53,6 +53,13 @@ func correlationID() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		key := "X-Correlation-ID"
 		id := c.Request.Header.Get(key)
+		if id != "" {
+			// Check if id is valid, else ignore it.
+			_, err := uuid.Parse(id)
+			if err != nil {
+				id = ""
+			}
+		}
 		if id == "" {
 			id = uuid.New().String()
 			c.Request.Header.Add(key, id)
