@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 
-	metricstypes "github.com/vertex-center/vertex/apps/monitoring/core/types/metrics"
+	metricstypes "github.com/vertex-center/vertex/apps/monitoring/core/types/metric"
 )
 
 func (c *Client) GetMetrics(ctx context.Context) ([]metricstypes.Metric, error) {

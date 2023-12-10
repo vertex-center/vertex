@@ -1,4 +1,4 @@
-package metrics
+package metric
 
 import (
 	"errors"
@@ -40,7 +40,7 @@ func (s *Registry) Register(metrics []Metric) error {
 
 	for _, m := range metrics {
 		switch m.Type {
-		case MetricTypeGauge:
+		case TypeGauge:
 			opts := prometheus.GaugeOpts{
 				Name: m.ID,
 				Help: m.Description,

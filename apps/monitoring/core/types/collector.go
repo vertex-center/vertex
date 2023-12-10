@@ -1,8 +1,8 @@
 package types
 
-import "github.com/vertex-center/vertex/apps/monitoring/core/types/metrics"
+import "github.com/vertex-center/vertex/apps/monitoring/core/types/metric"
 
 type Collector struct {
-	IsAlive bool             `json:"is_alive"`
-	Metrics []metrics.Metric `json:"metrics"`
+	IsAlive bool            `json:"is_alive"`
+	Metrics []metric.Metric `json:"metrics"`
 }

@@ -13,7 +13,7 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types"
-	"github.com/vertex-center/vertex/apps/monitoring/core/types/metrics"
+	"github.com/vertex-center/vertex/apps/monitoring/core/types/metric"
 	"github.com/vertex-center/vertex/pkg/net"
 	"gopkg.in/yaml.v3"
 )
@@ -63,7 +63,7 @@ func (a *prometheusAdapter) ConfigureContainer(uuid uuid.UUID) error {
 	return os.WriteFile(p, bytes, 0644)
 }
 
-func (a *prometheusAdapter) GetMetrics(ctx context.Context) ([]metrics.Metric, error) {
+func (a *prometheusAdapter) GetMetrics(ctx context.Context) ([]metric.Metric, error) {
 	promClient, err := api.NewClient(api.Config{
 		Address: "http://localhost:9090",
 	})
@@ -79,12 +79,12 @@ func (a *prometheusAdapter) GetMetrics(ctx context.Context) ([]metrics.Metric, e
 		return nil, fmt.Errorf("retrieve metrics: %w", err)
 	}
 
-	var m []metrics.Metric
+	var m []metric.Metric
 	for _, meta := range values {
-		m = append(m, metrics.Metric{
+		m = append(m, metric.Metric{
 			ID:          meta.Metric,
 			Name:        meta.Metric,
-			Type:        metrics.MetricType(meta.Type),
+			Type:        metric.Type(meta.Type),
 			Description: meta.Help,
 		})
 	}
