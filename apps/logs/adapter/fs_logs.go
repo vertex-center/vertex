@@ -1,9 +1,11 @@
 package adapter
 
 import (
+	"path"
 	"sync"
 
 	"github.com/vertex-center/vertex/apps/logs/core/port"
+	"github.com/vertex-center/vertex/common/storage"
 	"github.com/vertex-center/vlog"
 )
 
@@ -14,7 +16,7 @@ type FSLogsAdapter struct {
 
 func NewFSLogsAdapter() port.LogsAdapter {
 	logger := vlog.New(
-		vlog.WithOutputFile(vlog.LogFormatText, "logs"),
+		vlog.WithOutputFile(vlog.LogFormatJson, path.Join(storage.FSPath, "logs")),
 	)
 	a := &FSLogsAdapter{
 		logger: logger,
