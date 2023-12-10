@@ -7,7 +7,6 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/common/log"
-	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/net"
 	"github.com/vertex-center/vlog"
 	"go.uber.org/atomic"
@@ -29,8 +28,6 @@ func NewChecksService() port.ChecksService {
 func (s *checksService) CheckAll(ctx context.Context) <-chan types.CheckResponse {
 	checks := []func(ctx context.Context) types.CheckResponse{
 		s.checkInternet,
-		s.checkVertex,
-		s.checkKernel,
 	}
 
 	resChan := make(chan types.CheckResponse, len(checks))
@@ -62,26 +59,6 @@ func (s *checksService) checkInternet(ctx context.Context) types.CheckResponse {
 		Name: "Internet connection",
 	}
 	err := net.WaitInternetConn(ctx)
-	if err != nil {
-		res.Error = err.Error()
-	}
-	return res
-}
-
-func (s *checksService) checkVertex(ctx context.Context) types.CheckResponse {
-	return s.checkURL(ctx, "api_vertex", "Vertex API", config.Current.URL("vertex").String())
-}
-
-func (s *checksService) checkKernel(ctx context.Context) types.CheckResponse {
-	return s.checkURL(ctx, "api_kernel", "Vertex Kernel API", config.Current.KernelURL("vertex").String())
-}
-
-func (s *checksService) checkURL(ctx context.Context, id, name, url string) types.CheckResponse {
-	res := types.CheckResponse{
-		ID:   id,
-		Name: name,
-	}
-	err := net.Wait(ctx, url)
 	if err != nil {
 		res.Error = err.Error()
 	}
