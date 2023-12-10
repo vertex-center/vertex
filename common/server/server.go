@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -13,6 +14,7 @@ import (
 	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/pkg/net"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vlog"
 	"github.com/wI2L/fizz/openapi"
 )
 
@@ -36,6 +38,7 @@ func New(id string, info *openapi.Info, u *url.URL, ctx *common.VertexContext) *
 		ctx: ctx,
 		Router: router.New(info,
 			router.WithMiddleware(cors.New(cfg)),
+			router.WithMiddleware(logger(u)),
 			router.WithMiddleware(gin.Recovery()),
 		),
 	}
@@ -76,4 +79,26 @@ func (s *Server) waitServerReady() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func logger(u *url.URL) gin.HandlerFunc {
+	urlString := u.String()
+	return gin.LoggerWithFormatter(func(params gin.LogFormatterParams) string {
+		args := []vlog.KeyValue{
+			vlog.String("url", urlString),
+			vlog.String("method", params.Method),
+			vlog.Int("status", params.StatusCode),
+			vlog.String("path", params.Path),
+			vlog.String("latency", params.Latency.String()),
+			vlog.String("ip", params.ClientIP),
+			vlog.Int("size", params.BodySize),
+		}
+		if params.ErrorMessage != "" {
+			errorMessage := strings.TrimSuffix(params.ErrorMessage, "\n")
+			errorMessage = strings.ReplaceAll(errorMessage, "Error #01: ", "")
+			args = append(args, vlog.String("error", errorMessage))
+		}
+		log.Request("request", args...)
+		return ""
+	})
 }
