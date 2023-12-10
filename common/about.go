@@ -1,4 +1,4 @@
-package types
+package common
 
 type About struct {
 	Version string `json:"version" example:"1.2.3"`

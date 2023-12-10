@@ -10,17 +10,17 @@ import (
 
 	"github.com/google/go-github/v50/github"
 	"github.com/vertex-center/vertex/cmd/storage"
-	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/pkg/log"
 	vstorage "github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"
 )
 
 type VertexUpdater struct {
-	about types.About
+	about common.About
 }
 
-func NewVertexUpdater(about types.About) VertexUpdater {
+func NewVertexUpdater(about common.About) VertexUpdater {
 	return VertexUpdater{
 		about: about,
 	}

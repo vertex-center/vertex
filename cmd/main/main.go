@@ -13,10 +13,10 @@ import (
 	"github.com/vertex-center/vertex/apps"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/cmd/storage"
+	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/common/app"
+	"github.com/vertex-center/vertex/common/server"
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/core/types"
-	"github.com/vertex-center/vertex/core/types/server"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/wI2L/fizz"
@@ -32,7 +32,7 @@ var (
 
 var (
 	srv *server.Server
-	ctx *types.VertexContext
+	ctx *common.VertexContext
 )
 
 func main() {
@@ -41,7 +41,7 @@ func main() {
 	ensureNotRoot()
 	parseArgs()
 
-	about := types.About{
+	about := common.About{
 		Version: version,
 		Commit:  commit,
 		Date:    date,
@@ -50,7 +50,7 @@ func main() {
 		Arch: runtime.GOARCH,
 	}
 
-	ctx = types.NewVertexContext(about, false)
+	ctx = common.NewVertexContext(about, false)
 	url := config.Current.URL("vertex")
 
 	info := openapi.Info{
@@ -105,7 +105,7 @@ func ensureNotRoot() {
 	}
 }
 
-func initRoutes(about types.About) {
+func initRoutes(about common.About) {
 	srv.Router.Engine().NoRoute(router.Handler(func(c *gin.Context) error {
 		return errors.NewNotFound(nil, "route not found")
 	}))
@@ -114,7 +114,7 @@ func initRoutes(about types.About) {
 	a.GET("/about", []fizz.OperationOption{
 		fizz.ID("getAbout"),
 		fizz.Summary("Get server info"),
-	}, router.Handler(func(c *gin.Context) (*types.About, error) {
+	}, router.Handler(func(c *gin.Context) (*common.About, error) {
 		return &about, nil
 	}))
 }

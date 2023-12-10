@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/common"
+	"github.com/vertex-center/vertex/common/server"
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/core/types"
-	"github.com/vertex-center/vertex/core/types/server"
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/net"
@@ -101,7 +101,7 @@ func RunStandalone(app Interface, waitInternet bool) {
 		waitNet()
 	}
 
-	vertexCtx := types.NewVertexContext(types.About{}, false)
+	vertexCtx := common.NewVertexContext(common.About{}, false)
 	ctx := NewContext(vertexCtx)
 	app.Load(ctx)
 
@@ -163,7 +163,7 @@ func RunStandaloneKernel(app Interface, waitInternet bool) {
 		waitNet()
 	}
 
-	vertexCtx := types.NewVertexContext(types.About{}, true)
+	vertexCtx := common.NewVertexContext(common.About{}, true)
 	ctx := NewContext(vertexCtx)
 	app.Load(ctx)
 

@@ -1,15 +1,15 @@
 package app
 
 import (
-	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/pkg/event"
 )
 
 type Context struct {
-	vertexCtx *types.VertexContext
+	vertexCtx *common.VertexContext
 }
 
-func NewContext(vertexCtx *types.VertexContext) *Context {
+func NewContext(vertexCtx *common.VertexContext) *Context {
 	return &Context{
 		vertexCtx: vertexCtx,
 	}
@@ -31,7 +31,7 @@ func (ctx *Context) DispatchEventWithErr(event event.Event) error {
 	return ctx.vertexCtx.DispatchEventWithErr(event)
 }
 
-func (ctx *Context) About() types.About {
+func (ctx *Context) About() common.About {
 	return ctx.vertexCtx.About()
 }
 

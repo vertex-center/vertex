@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
+	"github.com/vertex-center/vertex/common"
 	apptypes "github.com/vertex-center/vertex/common/app"
-	coretypes "github.com/vertex-center/vertex/core/types"
 )
 
 type UpdateServiceTestSuite struct {
@@ -51,7 +51,7 @@ func (suite *UpdateServiceTestSuite) SetupTest() {
 		suite.updaterB,
 	}
 
-	ctx := coretypes.NewVertexContext(coretypes.About{}, false)
+	ctx := common.NewVertexContext(common.About{}, false)
 
 	suite.adapter = &port.MockBaselinesAdapter{}
 	suite.adapter.On("GetLatest", mock.Anything, types.UpdatesChannelStable).Return(suite.latestBaseline, nil)

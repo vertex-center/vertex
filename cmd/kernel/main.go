@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"github.com/vertex-center/vertex/apps"
+	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/common/app"
+	"github.com/vertex-center/vertex/common/server"
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/core/types"
-	"github.com/vertex-center/vertex/core/types/server"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/netcap"
 	"github.com/vertex-center/vlog"
@@ -21,7 +21,7 @@ import (
 
 var (
 	srv *server.Server
-	ctx *types.VertexContext
+	ctx *common.VertexContext
 )
 
 func main() {
@@ -42,7 +42,7 @@ func main() {
 		log.Error(err)
 	}
 
-	ctx = types.NewVertexContext(types.About{}, true)
+	ctx = common.NewVertexContext(common.About{}, true)
 	url := config.Current.KernelURL("vertex")
 
 	info := openapi.Info{

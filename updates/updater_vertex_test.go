@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"github.com/vertex-center/vertex/core/types"
+	"github.com/vertex-center/vertex/common"
 )
 
 type VertexUpdaterTestSuite struct {
@@ -17,7 +17,7 @@ func TestVertexUpdaterTestSuite(t *testing.T) {
 }
 
 func (suite *VertexUpdaterTestSuite) SetupTest() {
-	suite.updater = NewVertexUpdater(types.About{
+	suite.updater = NewVertexUpdater(common.About{
 		Version: "0.12.0",
 	})
 }

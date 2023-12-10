@@ -9,8 +9,8 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/common/event"
-	"github.com/vertex-center/vertex/core/types"
 	"github.com/vertex-center/vertex/pkg/ginutils"
 	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/net"
@@ -22,11 +22,11 @@ import (
 type Server struct {
 	id     string
 	url    *url.URL
-	ctx    *types.VertexContext
+	ctx    *common.VertexContext
 	Router *router.Router
 }
 
-func New(id string, info *openapi.Info, u *url.URL, ctx *types.VertexContext) *Server {
+func New(id string, info *openapi.Info, u *url.URL, ctx *common.VertexContext) *Server {
 	gin.SetMode(gin.ReleaseMode)
 
 	cfg := cors.DefaultConfig()

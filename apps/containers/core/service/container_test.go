@@ -6,8 +6,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/common/app"
-	vtypes "github.com/vertex-center/vertex/core/types"
 )
 
 type ContainerServiceTestSuite struct {
@@ -24,7 +24,7 @@ func TestContainerServiceTestSuite(t *testing.T) {
 
 func (suite *ContainerServiceTestSuite) SetupTest() {
 	suite.service = NewContainerService(ContainerServiceParams{
-		Ctx: app.NewContext(vtypes.NewVertexContext(vtypes.About{}, false)),
+		Ctx: app.NewContext(common.NewVertexContext(common.About{}, false)),
 	}).(*containerService)
 
 	suite.containerA = types.Container{

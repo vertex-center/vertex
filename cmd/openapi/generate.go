@@ -10,9 +10,9 @@ import (
 	"github.com/carlmjohnson/requests"
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/apps"
+	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/core/types"
-	"github.com/vertex-center/vertex/core/types/server"
+	"github.com/vertex-center/vertex/common/server"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/wI2L/fizz"
 	"github.com/wI2L/fizz/openapi"
@@ -50,7 +50,7 @@ func main() {
 }
 
 func runServer(initRoutes func(r *fizz.RouterGroup) error, meta app.Meta, u *url.URL) *server.Server {
-	vertexCtx := types.NewVertexContext(types.About{}, true)
+	vertexCtx := common.NewVertexContext(common.About{}, true)
 	ctx := app.NewContext(vertexCtx)
 
 	info := openapi.Info{
