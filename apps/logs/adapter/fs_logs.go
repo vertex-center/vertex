@@ -14,7 +14,6 @@ type FSLogsAdapter struct {
 
 func NewFSLogsAdapter() port.LogsAdapter {
 	logger := vlog.New(
-		vlog.WithOutputStd(),
 		vlog.WithOutputFile(vlog.LogFormatText, "logs"),
 	)
 	a := &FSLogsAdapter{
