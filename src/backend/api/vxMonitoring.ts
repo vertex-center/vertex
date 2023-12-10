@@ -1,4 +1,4 @@
-import { Metric } from "../../models/metrics";
+import { Collector, Metric } from "../../models/metrics";
 
 import { createServer } from "../server";
 
@@ -7,6 +7,11 @@ const server = createServer(window.api_urls.monitoring);
 
 const getMetrics = async () => {
     const { data } = await server.get<Metric[]>(`/metrics`);
+    return data;
+};
+
+const getCollector = async (collector: string) => {
+    const { data } = await server.get<Collector>(`/collector/${collector}`);
     return data;
 };
 
@@ -19,6 +24,7 @@ const installVisualizer = (visualizer: string) => {
 };
 
 const collectorRoutes = (collector: string) => ({
+    get: () => getCollector(collector),
     install: () => installCollector(collector),
 });
 

@@ -31,7 +31,6 @@ import SettingsHardware from "./apps/AdminSettings/SettingsHardware/SettingsHard
 import SettingsSecurity from "./apps/AdminSettings/SettingsSecurity/SettingsSecurity";
 import MonitoringApp from "./apps/Monitoring/MonitoringApp/MonitoringApp";
 import Prometheus from "./apps/Monitoring/Prometheus/Prometheus";
-import MetricsList from "./apps/Monitoring/MetricsList/MetricsList";
 import Grafana from "./apps/Monitoring/Grafana/Grafana";
 import TunnelsApp from "./apps/Tunnels/TunnelsApp/TunnelsApp";
 import CloudflareTunnels from "./apps/Tunnels/CloudflareTunnels/CloudflareTunnels";
@@ -145,10 +144,6 @@ function AllRoutes() {
                             path="/app/monitoring"
                             element={<MonitoringApp />}
                         >
-                            <Route
-                                path="/app/monitoring/metrics"
-                                element={<MetricsList />}
-                            />
                             <Route
                                 path="/app/monitoring/prometheus"
                                 element={<Prometheus />}

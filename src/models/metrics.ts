@@ -5,3 +5,7 @@ export type Metric = {
     description: string;
     type: MetricType;
 };
+
+export type Collector = {
+    metrics: Metric[];
+};

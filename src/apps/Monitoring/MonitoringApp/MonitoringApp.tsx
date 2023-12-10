@@ -5,7 +5,7 @@ import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useServerEvent } from "../../../hooks/useEvent";
 import { useQueryClient } from "@tanstack/react-query";
 import { useContainers } from "../../Containers/hooks/useContainers";
-import { MaterialIcon, Sidebar, useTitle } from "@vertex-center/components";
+import { Sidebar, useTitle } from "@vertex-center/components";
 import l from "../../../components/NavLink/navlink";
 import { ContainerLed } from "../../../components/ContainerLed/ContainerLed";
 import { useSidebar } from "../../../hooks/useSidebar";
@@ -38,13 +38,6 @@ export default function MonitoringApp() {
 
     const sidebar = useSidebar(
         <Sidebar>
-            <Sidebar.Group title="Overview">
-                <Sidebar.Item
-                    label="Metrics"
-                    icon={<MaterialIcon icon="rule" />}
-                    link={l("/app/monitoring/metrics")}
-                />
-            </Sidebar.Group>
             <Sidebar.Group title="Collectors">
                 <Sidebar.Item
                     label="Prometheus"
