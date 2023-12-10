@@ -47,9 +47,9 @@ var (
 func (a *App) Initialize() error {
 	var (
 		proxyFSAdapter = adapter.NewProxyFSAdapter(nil)
-		proxyService   = service.NewProxyService(proxyFSAdapter)
 	)
 
+	proxyService = service.NewProxyService(proxyFSAdapter)
 	a.proxy = NewProxyRouter(proxyService)
 
 	go func() {
