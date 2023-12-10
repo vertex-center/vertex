@@ -4,10 +4,11 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/juju/errors"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
-	"github.com/vertex-center/vertex/apps/monitoring/core/types/metrics"
+	"github.com/vertex-center/vertex/apps/monitoring/core/types"
 )
 
 type metricsService struct {
@@ -22,8 +23,24 @@ func NewMetricsService(metricsAdapter port.MetricsAdapter) port.MetricsService {
 	}
 }
 
-func (s *metricsService) GetMetrics() ([]metrics.Metric, error) {
-	return s.adapter.GetMetrics()
+func (s *metricsService) GetCollector(ctx context.Context, collector string) (types.Collector, error) {
+	if collector != "prometheus" {
+		return types.Collector{}, errors.NewNotSupported(nil, collector+" is not a supported collector")
+	}
+
+	metrics, err := s.adapter.GetMetrics(ctx)
+	if errors.Is(err, types.ErrCollectorNotAlive) {
+		return types.Collector{
+			IsAlive: false,
+		}, nil
+	} else if err != nil {
+		return types.Collector{}, err
+	}
+
+	return types.Collector{
+		IsAlive: true,
+		Metrics: metrics,
+	}, err
 }
 
 func (s *metricsService) InstallCollector(ctx context.Context, token string, collector string) error {

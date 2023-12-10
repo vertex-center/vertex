@@ -6,7 +6,7 @@ import (
 
 type (
 	MetricsHandler interface {
-		Get() gin.HandlerFunc
+		GetCollector() gin.HandlerFunc
 		InstallCollector() gin.HandlerFunc
 		InstallVisualizer() gin.HandlerFunc
 	}
