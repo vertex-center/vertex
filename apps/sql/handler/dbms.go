@@ -29,8 +29,7 @@ type GetParams struct {
 
 func (r *dbmsHandler) Get() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *GetParams) (*types.DBMS, error) {
-		token := c.MustGet("token").(string)
-		client := containersapi.NewContainersClient(token)
+		client := containersapi.NewContainersClient(c)
 
 		inst, err := client.GetContainer(c, params.UUID.UUID)
 		if err != nil {
@@ -51,8 +50,7 @@ type InstallParams struct {
 
 func (r *dbmsHandler) Install() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *InstallParams) (*containerstypes.Container, error) {
-		token := c.MustGet("token").(string)
-		client := containersapi.NewContainersClient(token)
+		client := containersapi.NewContainersClient(c)
 
 		serv, err := client.GetService(c, params.DBMS)
 		if err != nil {

@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 )
@@ -15,20 +17,20 @@ func NewSshService(sshAdapter port.SshAdapter) port.SshService {
 	}
 }
 
-func (s *sshService) GetAll() ([]types.PublicKey, error) {
-	return s.adapter.GetAll()
+func (s *sshService) GetAll(ctx context.Context) ([]types.PublicKey, error) {
+	return s.adapter.GetAll(ctx)
 }
 
-func (s *sshService) Add(key string, username string) error {
-	return s.adapter.Add(key, username)
+func (s *sshService) Add(ctx context.Context, key string, username string) error {
+	return s.adapter.Add(ctx, key, username)
 }
 
-func (s *sshService) Delete(fingerprint string, username string) error {
-	return s.adapter.Remove(fingerprint, username)
+func (s *sshService) Delete(ctx context.Context, fingerprint string, username string) error {
+	return s.adapter.Remove(ctx, fingerprint, username)
 }
 
-func (s *sshService) GetUsers() ([]string, error) {
-	users, err := s.adapter.GetUsers()
+func (s *sshService) GetUsers(ctx context.Context) ([]string, error) {
+	users, err := s.adapter.GetUsers(ctx)
 	if err != nil {
 		return nil, err
 	}

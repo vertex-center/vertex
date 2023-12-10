@@ -9,28 +9,28 @@ import (
 	"github.com/vertex-center/vertex/pkg/user"
 )
 
-type sshKernelApiAdapter struct {
-	client *api.KernelClient
-}
+type sshKernelApiAdapter struct{}
 
 func NewSshKernelApiAdapter() port.SshAdapter {
-	return &sshKernelApiAdapter{
-		client: api.NewAdminKernelClient(),
-	}
+	return &sshKernelApiAdapter{}
 }
 
-func (a *sshKernelApiAdapter) GetAll() ([]types.PublicKey, error) {
-	return a.client.GetSSHKeys(context.Background())
+func (a *sshKernelApiAdapter) GetAll(ctx context.Context) ([]types.PublicKey, error) {
+	cli := api.NewAdminKernelClient(ctx)
+	return cli.GetSSHKeys(ctx)
 }
 
-func (a *sshKernelApiAdapter) Add(key string, username string) error {
-	return a.client.AddSSHKey(context.Background(), key, username)
+func (a *sshKernelApiAdapter) Add(ctx context.Context, key string, username string) error {
+	cli := api.NewAdminKernelClient(ctx)
+	return cli.AddSSHKey(ctx, key, username)
 }
 
-func (a *sshKernelApiAdapter) Remove(fingerprint string, username string) error {
-	return a.client.DeleteSSHKey(context.Background(), fingerprint, username)
+func (a *sshKernelApiAdapter) Remove(ctx context.Context, fingerprint string, username string) error {
+	cli := api.NewAdminKernelClient(ctx)
+	return cli.DeleteSSHKey(ctx, fingerprint, username)
 }
 
-func (a *sshKernelApiAdapter) GetUsers() ([]user.User, error) {
-	return a.client.GetSSHUsers(context.Background())
+func (a *sshKernelApiAdapter) GetUsers(ctx context.Context) ([]user.User, error) {
+	cli := api.NewAdminKernelClient(ctx)
+	return cli.GetSSHUsers(ctx)
 }

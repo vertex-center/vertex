@@ -37,10 +37,10 @@ type (
 	}
 
 	SshService interface {
-		GetAll() ([]types.PublicKey, error)
-		Add(key string, username string) error
-		Delete(fingerprint string, username string) error
-		GetUsers() ([]string, error)
+		GetAll(ctx context.Context) ([]types.PublicKey, error)
+		Add(ctx context.Context, key string, username string) error
+		Delete(ctx context.Context, fingerprint string, username string) error
+		GetUsers(ctx context.Context) ([]string, error)
 	}
 
 	SshKernelService interface {

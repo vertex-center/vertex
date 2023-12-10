@@ -10,12 +10,20 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
+const (
+	HeaderXRequestID     = "X-Request-ID"
+	HeaderXCorrelationID = "X-Correlation-ID"
+
+	KeyRequestID     = "requestID"
+	KeyCorrelationID = "correlationID"
+)
+
 func logger(u *url.URL) gin.HandlerFunc {
 	urlString := u.String()
 	return gin.LoggerWithFormatter(func(params gin.LogFormatterParams) string {
 		args := []vlog.KeyValue{
-			vlog.String("request_id", params.Request.Header.Get("X-Request-ID")),
-			vlog.String("correlation_id", params.Request.Header.Get("X-Correlation-ID")),
+			vlog.String("request_id", params.Request.Header.Get(HeaderXRequestID)),
+			vlog.String("correlation_id", params.Request.Header.Get(HeaderXCorrelationID)),
 			vlog.String("url", urlString),
 			vlog.String("method", params.Method),
 			vlog.Int("status", params.StatusCode),
@@ -37,12 +45,12 @@ func logger(u *url.URL) gin.HandlerFunc {
 // requestID is a middleware that sets a unique ID for each request.
 func requestID() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		key := "X-Request-ID"
+		key := HeaderXRequestID
 		id := uuid.New().String()
 
 		c.Request.Header.Add(key, id)
 		c.Header(key, id)
-		c.Set("requestID", id)
+		c.Set(KeyRequestID, id)
 		c.Next()
 	}
 }
@@ -51,7 +59,7 @@ func requestID() gin.HandlerFunc {
 // for a request that is shared between services.
 func correlationID() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		key := "X-Correlation-ID"
+		key := HeaderXCorrelationID
 		id := c.Request.Header.Get(key)
 		if id != "" {
 			// Check if id is valid, else ignore it.
@@ -66,7 +74,7 @@ func correlationID() gin.HandlerFunc {
 		}
 
 		c.Header(key, id)
-		c.Set("correlationID", id)
+		c.Set(KeyCorrelationID, id)
 		c.Next()
 	}
 }

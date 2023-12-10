@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+
 	"github.com/google/uuid"
 	ev "github.com/vertex-center/vertex/common/event"
 	"github.com/vertex-center/vertex/pkg/event"
@@ -13,13 +15,13 @@ func (s *containerService) GetUUID() uuid.UUID {
 func (s *containerService) OnEvent(e event.Event) error {
 	switch e.(type) {
 	case ev.ServerStart:
-		s.LoadAll()
+		s.LoadAll(context.Background())
 	case ev.ServerSetupCompleted:
 		go func() {
-			s.StartAll()
+			s.StartAll(context.Background())
 		}()
 	case ev.ServerStop:
-		s.StopAll()
+		s.StopAll(context.Background())
 	}
 	return nil
 }

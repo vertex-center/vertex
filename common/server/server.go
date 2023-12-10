@@ -29,6 +29,8 @@ func New(id string, info *openapi.Info, u *url.URL, ctx *common.VertexContext) *
 	cfg := cors.DefaultConfig()
 	cfg.AllowAllOrigins = true
 	cfg.AddAllowHeaders("Authorization")
+	cfg.AddAllowHeaders("X-Request-ID")
+	cfg.AddAllowHeaders("X-Correlation-ID")
 
 	return &Server{
 		id:  id,

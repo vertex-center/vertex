@@ -43,8 +43,8 @@ func (s *metricsService) GetCollector(ctx context.Context, collector string) (ty
 	}, err
 }
 
-func (s *metricsService) InstallCollector(ctx context.Context, token string, collector string) error {
-	c := containersapi.NewContainersClient(token)
+func (s *metricsService) InstallCollector(ctx context.Context, collector string) error {
+	c := containersapi.NewContainersClient(ctx)
 
 	serv, err := c.GetService(ctx, collector)
 	if err != nil {
@@ -71,8 +71,8 @@ func (s *metricsService) ConfigureCollector(inst *containerstypes.Container) err
 	return s.adapter.ConfigureContainer(inst.UUID)
 }
 
-func (s *metricsService) InstallVisualizer(ctx context.Context, token string, visualizer string) error {
-	c := containersapi.NewContainersClient(token)
+func (s *metricsService) InstallVisualizer(ctx context.Context, visualizer string) error {
+	c := containersapi.NewContainersClient(ctx)
 
 	serv, err := c.GetService(ctx, visualizer)
 	if err != nil {

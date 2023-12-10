@@ -1,7 +1,10 @@
 package api
 
 import (
+	"context"
+
 	"github.com/vertex-center/vertex/apps/admin/meta"
+	"github.com/vertex-center/vertex/common/server"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/rest"
 )
@@ -10,9 +13,11 @@ type Client struct {
 	*rest.Client
 }
 
-func NewAdminClient(token string) *Client {
+func NewAdminClient(ctx context.Context) *Client {
+	token := ctx.Value("token").(string)
+	correlationID := ctx.Value(server.KeyCorrelationID).(string)
 	return &Client{
-		Client: rest.NewClient(config.Current.URL(meta.Meta.ID), token),
+		Client: rest.NewClient(config.Current.URL(meta.Meta.ID), token, correlationID),
 	}
 }
 
@@ -20,8 +25,9 @@ type KernelClient struct {
 	*rest.Client
 }
 
-func NewAdminKernelClient() *KernelClient {
+func NewAdminKernelClient(ctx context.Context) *KernelClient {
+	correlationID := ctx.Value(server.KeyCorrelationID).(string)
 	return &KernelClient{
-		Client: rest.NewClient(config.Current.KernelURL(meta.Meta.ID), ""),
+		Client: rest.NewClient(config.Current.KernelURL(meta.Meta.ID), "", correlationID),
 	}
 }

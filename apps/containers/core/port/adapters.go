@@ -1,6 +1,7 @@
 package port
 
 import (
+	"context"
 	"io"
 
 	dockertypes "github.com/docker/docker/api/types"
@@ -44,16 +45,16 @@ type (
 	}
 
 	ContainerRunnerAdapter interface {
-		DeleteContainer(inst *types.Container) error
-		DeleteMounts(inst *types.Container) error
-		Start(inst *types.Container, setStatus func(status string)) (stdout io.ReadCloser, stderr io.ReadCloser, err error)
-		Stop(inst *types.Container) error
-		Info(inst types.Container) (map[string]any, error)
-		WaitCondition(inst *types.Container, cond types.WaitContainerCondition) error
+		DeleteContainer(ctx context.Context, inst *types.Container) error
+		DeleteMounts(ctx context.Context, inst *types.Container) error
+		Start(ctx context.Context, inst *types.Container, setStatus func(status string)) (stdout io.ReadCloser, stderr io.ReadCloser, err error)
+		Stop(ctx context.Context, inst *types.Container) error
+		Info(ctx context.Context, inst types.Container) (map[string]any, error)
+		WaitCondition(ctx context.Context, inst *types.Container, cond types.WaitContainerCondition) error
 
-		CheckForUpdates(inst *types.Container) error
-		HasUpdateAvailable(inst types.Container) (bool, error)
-		GetAllVersions(inst types.Container) ([]string, error)
+		CheckForUpdates(ctx context.Context, inst *types.Container) error
+		HasUpdateAvailable(ctx context.Context, inst types.Container) (bool, error)
+		GetAllVersions(ctx context.Context, inst types.Container) ([]string, error)
 	}
 
 	ServiceAdapter interface {

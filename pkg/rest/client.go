@@ -12,7 +12,7 @@ type Client struct {
 	config requests.Config
 }
 
-func NewClient(u *url.URL, token string) *Client {
+func NewClient(u *url.URL, token, correlationID string) *Client {
 	return &Client{
 		config: func(rb *requests.Builder) {
 			rb.
@@ -24,6 +24,9 @@ func NewClient(u *url.URL, token string) *Client {
 
 			if token != "" {
 				rb.Header("Authorization", "Bearer "+token)
+			}
+			if correlationID != "" {
+				rb.Header("X-Correlation-ID", correlationID)
 			}
 		},
 	}

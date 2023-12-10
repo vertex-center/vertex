@@ -55,7 +55,7 @@ type GetContainerParams struct {
 
 func (h *containerHandler) Get() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *GetContainerParams) (*types.Container, error) {
-		return h.containerService.Get(params.ContainerUUID.UUID)
+		return h.containerService.Get(c, params.ContainerUUID.UUID)
 	})
 }
 
@@ -65,11 +65,11 @@ type DeleteContainerParams struct {
 
 func (h *containerHandler) Delete() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *DeleteContainerParams) error {
-		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
+		inst, err := h.containerService.Get(c, params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}
-		return h.containerService.Delete(inst)
+		return h.containerService.Delete(c, inst)
 	})
 }
 
@@ -91,7 +91,7 @@ type PatchContainerParams struct {
 
 func (h *containerHandler) Patch() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *PatchContainerParams) error {
-		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
+		inst, err := h.containerService.Get(c, params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}
@@ -121,7 +121,7 @@ func (h *containerHandler) Patch() gin.HandlerFunc {
 				}
 			}
 
-			err = h.containerService.SetDatabases(inst, databases, options)
+			err = h.containerService.SetDatabases(c, inst, databases, options)
 			if err != nil {
 				return err
 			}
@@ -151,11 +151,11 @@ type StartContainerParams struct {
 
 func (h *containerHandler) Start() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *StartContainerParams) error {
-		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
+		inst, err := h.containerService.Get(c, params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}
-		return h.containerRunnerService.Start(inst)
+		return h.containerRunnerService.Start(c, inst)
 	})
 }
 
@@ -165,11 +165,11 @@ type StopContainerParams struct {
 
 func (h *containerHandler) Stop() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *StopContainerParams) error {
-		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
+		inst, err := h.containerService.Get(c, params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}
-		return h.containerRunnerService.Stop(inst)
+		return h.containerRunnerService.Stop(c, inst)
 	})
 }
 
@@ -180,7 +180,7 @@ type PatchEnvironmentParams struct {
 
 func (h *containerHandler) PatchEnvironment() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *PatchEnvironmentParams) error {
-		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
+		inst, err := h.containerService.Get(c, params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}
@@ -190,7 +190,7 @@ func (h *containerHandler) PatchEnvironment() gin.HandlerFunc {
 			return err
 		}
 
-		err = h.containerRunnerService.RecreateContainer(inst)
+		err = h.containerRunnerService.RecreateContainer(c, inst)
 		if err != nil {
 			return err
 		}
@@ -204,7 +204,7 @@ type EventsContainerParams struct {
 
 func (h *containerHandler) Events() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *EventsContainerParams) error {
-		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
+		inst, err := h.containerService.Get(c, params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}
@@ -288,12 +288,12 @@ func (h *containerHandler) Events() gin.HandlerFunc {
 
 func (h *containerHandler) GetDocker() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *GetContainerParams) (map[string]any, error) {
-		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
+		inst, err := h.containerService.Get(c, params.ContainerUUID.UUID)
 		if err != nil {
 			return nil, err
 		}
 
-		return h.containerRunnerService.GetDockerContainerInfo(*inst)
+		return h.containerRunnerService.GetDockerContainerInfo(c, *inst)
 	})
 }
 
@@ -303,11 +303,11 @@ type RecreateContainerParams struct {
 
 func (h *containerHandler) RecreateDocker() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *RecreateContainerParams) error {
-		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
+		inst, err := h.containerService.Get(c, params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}
-		return h.containerRunnerService.RecreateContainer(inst)
+		return h.containerRunnerService.RecreateContainer(c, inst)
 	})
 }
 
@@ -327,7 +327,7 @@ type UpdateServiceParams struct {
 
 func (h *containerHandler) UpdateService() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *UpdateServiceParams) error {
-		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
+		inst, err := h.containerService.Get(c, params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}
@@ -349,11 +349,11 @@ func (h *containerHandler) GetVersions() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *GetVersionsParams) ([]string, error) {
 		useCache := c.Query("reload") != "true"
 
-		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
+		inst, err := h.containerService.Get(c, params.ContainerUUID.UUID)
 		if err != nil {
 			return nil, err
 		}
-		return h.containerRunnerService.GetAllVersions(inst, useCache)
+		return h.containerRunnerService.GetAllVersions(c, inst, useCache)
 	})
 }
 
@@ -365,11 +365,11 @@ func (h *containerHandler) WaitStatus() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *WaitStatusParams) error {
 		status := c.Query("status")
 
-		inst, err := h.containerService.Get(params.ContainerUUID.UUID)
+		inst, err := h.containerService.Get(c, params.ContainerUUID.UUID)
 		if err != nil {
 			return err
 		}
 
-		return h.containerRunnerService.WaitStatus(inst, status)
+		return h.containerRunnerService.WaitStatus(c, inst, status)
 	})
 }
