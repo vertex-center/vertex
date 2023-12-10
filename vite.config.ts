@@ -24,8 +24,6 @@ const remarkDirectiveBlocks = () => {
     };
 };
 
-async function transformYaml(data, filePath) {}
-
 const openapi = async () => {
     return {
         name: "openapi",
@@ -36,7 +34,7 @@ const openapi = async () => {
             if (id.endsWith("_category_.yml")) {
                 return src;
             }
-            const api = await SwaggerParser.dereference(id);
+            const api = await SwaggerParser.validate(id);
             return `export default ${JSON.stringify(api)}`;
         },
     };
