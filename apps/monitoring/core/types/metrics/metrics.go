@@ -8,8 +8,7 @@ const (
 type MetricType string
 
 const (
-	MetricTypeOnOff   MetricType = "metric_type_on_off"
-	MetricTypeInteger MetricType = "metric_type_number"
+	MetricTypeGauge MetricType = "metric_type_gauge"
 )
 
 type Metric struct {

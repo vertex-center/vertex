@@ -71,14 +71,14 @@ func (s *metricsService) Register() error {
 			ID:          MetricIDContainerStatus,
 			Name:        "Container Status",
 			Description: "The status of the container",
-			Type:        metrics.MetricTypeOnOff,
+			Type:        metrics.MetricTypeGauge,
 			Labels:      []string{"uuid", "service_id"},
 		},
 		{
 			ID:          MetricIDContainersCount,
 			Name:        "Containers Count",
 			Description: "The number of containers installed",
-			Type:        metrics.MetricTypeInteger,
+			Type:        metrics.MetricTypeGauge,
 		},
 	})
 }

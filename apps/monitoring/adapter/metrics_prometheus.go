@@ -6,7 +6,6 @@ import (
 	"os"
 	"path"
 	"syscall"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/juju/errors"
@@ -15,7 +14,6 @@ import (
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types/metrics"
-	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/net"
 	"gopkg.in/yaml.v3"
 )
@@ -74,20 +72,20 @@ func (a *prometheusAdapter) GetMetrics(ctx context.Context) ([]metrics.Metric, e
 	}
 
 	promAPI := v1.NewAPI(promClient)
-	values, warns, err := promAPI.LabelValues(ctx, "__name__", []string{}, time.Time{}, time.Time{})
+	values, err := promAPI.TargetsMetadata(ctx, "", "", "")
 	if errors.Is(err, syscall.ECONNREFUSED) {
 		return nil, types.ErrCollectorNotAlive
 	} else if err != nil {
 		return nil, fmt.Errorf("retrieve metrics: %w", err)
 	}
-	for _, warn := range warns {
-		log.Warn(warn)
-	}
 
 	var m []metrics.Metric
-	for _, value := range values {
+	for _, meta := range values {
 		m = append(m, metrics.Metric{
-			Name: string(value),
+			ID:          meta.Metric,
+			Name:        meta.Metric,
+			Type:        metrics.MetricType(meta.Type),
+			Description: meta.Help,
 		})
 	}
 	return m, nil

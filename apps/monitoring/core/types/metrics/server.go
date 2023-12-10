@@ -40,9 +40,7 @@ func (s *Registry) Register(metrics []Metric) error {
 
 	for _, m := range metrics {
 		switch m.Type {
-		case MetricTypeOnOff:
-			fallthrough
-		case MetricTypeInteger:
+		case MetricTypeGauge:
 			opts := prometheus.GaugeOpts{
 				Name: m.ID,
 				Help: m.Description,
