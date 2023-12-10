@@ -7,7 +7,7 @@ import (
 	"github.com/carlmjohnson/requests"
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
-	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vlog"
 )
 

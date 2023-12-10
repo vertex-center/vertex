@@ -2,6 +2,7 @@ package containersapi
 
 import (
 	"github.com/vertex-center/vertex/apps/containers/meta"
+	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/rest"
 )
 
@@ -11,7 +12,7 @@ type Client struct {
 
 func NewContainersClient(token string) *Client {
 	return &Client{
-		Client: rest.NewClient(meta.Meta.ApiURL(), token),
+		Client: rest.NewClient(config.Current.URL(meta.Meta.ID), token),
 	}
 }
 
@@ -21,6 +22,6 @@ type KernelClient struct {
 
 func NewContainersKernelClient() *KernelClient {
 	return &KernelClient{
-		Client: rest.NewClient(meta.Meta.ApiKernelURL(), ""),
+		Client: rest.NewClient(config.Current.KernelURL(meta.Meta.ID), ""),
 	}
 }

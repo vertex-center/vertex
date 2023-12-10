@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/wI2L/fizz"
 	"github.com/wI2L/fizz/openapi"
 )
@@ -37,7 +36,7 @@ func New(info *openapi.Info, opts ...Option) *Router {
 		f.GET("/openapi.json", nil, f.OpenAPI(info, "json"))
 	}
 	if len(f.Errors()) > 0 {
-		log.Error(errors.Join(f.Errors()...))
+		println(errors.Join(f.Errors()...))
 	}
 	return &Router{
 		Fizz: f,

@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/google/go-github/v50/github"
-	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/pkg/varchiver"
 	"github.com/vertex-center/vertex/pkg/vdownloader"
 	"github.com/vertex-center/vlog"

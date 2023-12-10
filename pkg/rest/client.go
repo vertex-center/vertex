@@ -6,8 +6,6 @@ import (
 	"net/url"
 
 	"github.com/carlmjohnson/requests"
-	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vlog"
 )
 
 type Client struct {
@@ -21,7 +19,6 @@ func NewClient(u *url.URL, token string) *Client {
 				BaseURL(fmt.Sprintf("%s://%s", u.Scheme, u.Host)).
 				Path(u.Path + "/").
 				AddValidator(func(response *http.Response) error {
-					log.Request("request from app", vlog.String("path", response.Request.URL.Path))
 					return nil
 				})
 

@@ -12,6 +12,7 @@ import (
 	"github.com/vertex-center/vertex/apps"
 	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/common/app"
+	"github.com/vertex-center/vertex/common/app/appmeta"
 	"github.com/vertex-center/vertex/common/server"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/wI2L/fizz"
@@ -49,7 +50,7 @@ func main() {
 	}
 }
 
-func runServer(initRoutes func(r *fizz.RouterGroup) error, meta app.Meta, u *url.URL) *server.Server {
+func runServer(initRoutes func(r *fizz.RouterGroup) error, meta appmeta.Meta, u *url.URL) *server.Server {
 	vertexCtx := common.NewVertexContext(common.About{}, true)
 	ctx := app.NewContext(vertexCtx)
 

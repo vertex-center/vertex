@@ -6,9 +6,6 @@ import (
 	"net"
 	"net/http"
 	"time"
-
-	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vlog"
 )
 
 func LocalIP() (string, error) {
@@ -38,7 +35,6 @@ func Wait(ctx context.Context, url string) error {
 
 	select {
 	case <-ch:
-		log.Info("successfully pinged", vlog.String("url", url))
 		return nil
 	case <-done:
 		return fmt.Errorf("internet connection: Failed to ping %s", url)

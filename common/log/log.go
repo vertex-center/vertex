@@ -1,9 +1,12 @@
 package log
 
 import (
+	"context"
+	"fmt"
 	"os"
 	"strings"
 
+	"github.com/vertex-center/vertex/apps/logs/api"
 	"github.com/vertex-center/vlog"
 )
 
@@ -25,8 +28,17 @@ func init() {
 	} else {
 		Default = *vlog.New(
 			vlog.WithOutputStd(),
-			vlog.WithOutputFile(p, vlog.LogFormatText),
-			vlog.WithOutputFile(p, vlog.LogFormatJson),
+			vlog.WithOutputFile(vlog.LogFormatText, p),
+			vlog.WithOutputFile(vlog.LogFormatJson, p),
+			vlog.WithOutputFunc(vlog.LogFormatJson, func(line string) {
+				go func() {
+					logsClient := api.NewLogsClient()
+					err := logsClient.PushLogs(context.Background(), line)
+					if err != nil {
+						fmt.Println("failed to push logs:", err)
+					}
+				}()
+			}),
 		)
 		Default.Info("full logger initialized")
 	}

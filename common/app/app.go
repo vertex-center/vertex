@@ -1,17 +1,14 @@
 package app
 
 import (
-	"fmt"
-	"net/url"
-	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/common"
+	"github.com/vertex-center/vertex/common/app/appmeta"
 	"github.com/vertex-center/vertex/common/server"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/event"
-	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/net"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/wI2L/fizz"
@@ -20,7 +17,7 @@ import (
 
 type Interface interface {
 	Load(ctx *Context)
-	Meta() Meta
+	Meta() appmeta.Meta
 }
 
 type Initializable interface {
@@ -57,22 +54,6 @@ type Service interface {
 	OnEvent(e event.Event) error
 }
 
-func (a Meta) ApiURL() *url.URL {
-	return config.Current.URL(a.ID)
-}
-
-func (a Meta) ApiKernelURL() *url.URL {
-	return config.Current.KernelURL(a.ID)
-}
-
-func (a Meta) DefaultApiURL() string {
-	return fmt.Sprintf(config.DefaultApiURLFormat, config.Current.LocalIP(), a.DefaultPort)
-}
-
-func (a Meta) DefaultApiKernelURL() string {
-	return fmt.Sprintf(config.DefaultApiURLFormat, config.Current.LocalIP(), a.DefaultKernelPort)
-}
-
 func RunApps(apps []Interface) {
 	waitNet()
 	for _, a := range apps {
@@ -105,12 +86,12 @@ func RunStandalone(app Interface, waitInternet bool) {
 	ctx := NewContext(vertexCtx)
 	app.Load(ctx)
 
-	config.Current.RegisterApiURL(app.Meta().ID, app.Meta().DefaultApiURL())
+	config.Current.RegisterApiURL(app.Meta().ID, config.Current.DefaultApiURL(app.Meta().DefaultPort))
 	if _, ok := app.(KernelInitializable); ok {
-		config.Current.RegisterKernelApiURL(app.Meta().ID, app.Meta().DefaultApiKernelURL())
+		config.Current.RegisterKernelApiURL(app.Meta().ID, config.Current.DefaultApiURL(app.Meta().DefaultKernelPort))
 	}
 
-	u := app.Meta().ApiURL()
+	u := config.Current.URL(app.Meta().ID)
 
 	info := openapi.Info{
 		Title:       app.Meta().Name,
@@ -123,8 +104,7 @@ func RunStandalone(app Interface, waitInternet bool) {
 	if a, ok := app.(Initializable); ok {
 		err := a.Initialize()
 		if err != nil {
-			log.Error(err)
-			os.Exit(1)
+			panic(err)
 		}
 	}
 
@@ -133,8 +113,7 @@ func RunStandalone(app Interface, waitInternet bool) {
 
 		err := a.InitializeRouter(base)
 		if err != nil {
-			log.Error(err)
-			os.Exit(1)
+			panic(err)
 		}
 
 		base.GET("/ping", []fizz.OperationOption{
@@ -150,8 +129,7 @@ func RunStandalone(app Interface, waitInternet bool) {
 	if a, ok := app.(Uninitializable); ok {
 		err := a.Uninitialize()
 		if err != nil {
-			log.Error(err)
-			os.Exit(1)
+			panic(err)
 		}
 	}
 }
@@ -167,9 +145,9 @@ func RunStandaloneKernel(app Interface, waitInternet bool) {
 	ctx := NewContext(vertexCtx)
 	app.Load(ctx)
 
-	config.Current.RegisterKernelApiURL(app.Meta().ID, app.Meta().DefaultApiKernelURL())
+	config.Current.RegisterKernelApiURL(app.Meta().ID, config.Current.DefaultApiURL(app.Meta().DefaultKernelPort))
 
-	u := app.Meta().ApiKernelURL()
+	u := config.Current.KernelURL(app.Meta().ID)
 
 	info := openapi.Info{
 		Title:       app.Meta().Name,
@@ -182,8 +160,7 @@ func RunStandaloneKernel(app Interface, waitInternet bool) {
 	if a, ok := app.(KernelInitializable); ok {
 		err := a.InitializeKernel()
 		if err != nil {
-			log.Error(err)
-			os.Exit(1)
+			panic(err)
 		}
 	}
 
@@ -192,8 +169,7 @@ func RunStandaloneKernel(app Interface, waitInternet bool) {
 
 		err := a.InitializeKernelRouter(base)
 		if err != nil {
-			log.Error(err)
-			os.Exit(1)
+			panic(err)
 		}
 
 		base.GET("/ping", []fizz.OperationOption{
@@ -209,8 +185,7 @@ func RunStandaloneKernel(app Interface, waitInternet bool) {
 	if a, ok := app.(KernelUninitializable); ok {
 		err := a.UninitializeKernel()
 		if err != nil {
-			log.Error(err)
-			os.Exit(1)
+			panic(err)
 		}
 	}
 }
@@ -218,7 +193,6 @@ func RunStandaloneKernel(app Interface, waitInternet bool) {
 func waitNet() {
 	err := net.WaitInternetConnWithTimeout(20 * time.Second)
 	if err != nil {
-		log.Error(fmt.Errorf("internet connection not available: %w", err))
-		return
+		panic(err)
 	}
 }

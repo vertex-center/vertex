@@ -6,16 +6,17 @@ import (
 	containersmeta "github.com/vertex-center/vertex/apps/containers/meta"
 	"github.com/vertex-center/vertex/apps/tunnels/handler"
 	"github.com/vertex-center/vertex/common/app"
+	"github.com/vertex-center/vertex/common/app/appmeta"
 	"github.com/wI2L/fizz"
 )
 
-var Meta = app.Meta{
+var Meta = appmeta.Meta{
 	ID:          "tunnels",
 	Name:        "Vertex Tunnels",
 	Description: "Create and manage tunnels.",
 	Icon:        "subway",
 	DefaultPort: "7514",
-	Dependencies: []*app.Meta{
+	Dependencies: []*appmeta.Meta{
 		&authmeta.Meta,
 		&containersmeta.Meta,
 	},
@@ -33,7 +34,7 @@ func (a *App) Load(ctx *app.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) Meta() app.Meta {
+func (a *App) Meta() appmeta.Meta {
 	return Meta
 }
 

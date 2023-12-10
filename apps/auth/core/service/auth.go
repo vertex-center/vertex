@@ -8,7 +8,7 @@ import (
 
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
-	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vlog"
 	"golang.org/x/crypto/argon2"
 )

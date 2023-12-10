@@ -12,3 +12,4 @@
 | Vertex Service Editor | 7510 |             |
 | Vertex SQL            | 7512 |             |
 | Vertex Tunnels        | 7514 |             |
+| Vertex Logs           | 7516 |             |

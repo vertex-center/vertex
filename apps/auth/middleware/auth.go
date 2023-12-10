@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/juju/errors"
 	"github.com/vertex-center/vertex/apps/auth/api"
-	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vlog"
 )
 

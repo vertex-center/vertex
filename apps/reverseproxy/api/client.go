@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/vertex-center/vertex/apps/reverseproxy"
+	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/rest"
 )
 
@@ -11,6 +12,6 @@ type Client struct {
 
 func NewReverseProxyClient(token string) *Client {
 	return &Client{
-		Client: rest.NewClient(reverseproxy.Meta.ApiURL(), token),
+		Client: rest.NewClient(config.Current.URL(reverseproxy.Meta.ID), token),
 	}
 }

@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"syscall"
 
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vlog"
 )
 

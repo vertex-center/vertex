@@ -11,9 +11,8 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/pkg/ginutils"
-	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vlog"
 )
@@ -28,7 +27,6 @@ func NewProxyRouter(proxyService port.ProxyService) *ProxyRouter {
 	r := &ProxyRouter{
 		Router: router.New(nil,
 			router.WithMiddleware(cors.Default()),
-			router.WithMiddleware(ginutils.Logger("PROXY", config.Current.URL("proxy").String())),
 			router.WithMiddleware(gin.Recovery()),
 		),
 		proxyService: proxyService,

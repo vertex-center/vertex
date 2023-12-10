@@ -20,7 +20,7 @@ import (
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/pkg/vdocker"
 	"github.com/vertex-center/vlog"
 )
