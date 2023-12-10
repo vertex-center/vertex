@@ -43,7 +43,7 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 		logs        = r.Group("/logs", "Logs", "")
 	)
 
-	logs.POST("/push", []fizz.OperationOption{
+	logs.GET("/ws", []fizz.OperationOption{
 		fizz.ID("pushLogs"),
 		fizz.Summary("Push logs to the server"),
 	}, logsHandler.Push())
