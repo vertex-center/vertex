@@ -13,13 +13,6 @@ import (
 var Default vlog.Logger
 
 func init() {
-	var p string
-	if strings.Contains(os.Args[0], "kernel") || strings.Contains(os.Args[0], "Kernel") {
-		p = "live_kernel/logs"
-	} else {
-		p = "live/logs"
-	}
-
 	if strings.HasSuffix(os.Args[0], ".test") {
 		Default = *vlog.New(
 			vlog.WithOutputStd(),
@@ -28,8 +21,6 @@ func init() {
 	} else {
 		Default = *vlog.New(
 			vlog.WithOutputStd(),
-			vlog.WithOutputFile(vlog.LogFormatText, p),
-			vlog.WithOutputFile(vlog.LogFormatJson, p),
 			vlog.WithOutputFunc(vlog.LogFormatJson, func(line string) {
 				go func() {
 					logsClient := api.NewLogsClient()
