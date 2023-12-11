@@ -2,10 +2,12 @@ package handler
 
 import (
 	"io"
+	"net/http"
 
 	"github.com/gin-contrib/sse"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/loopfz/gadgeto/tonic"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	apptypes "github.com/vertex-center/vertex/common/app"
@@ -54,9 +56,9 @@ type GetContainerParams struct {
 }
 
 func (h *containerHandler) Get() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *GetContainerParams) (*types.Container, error) {
+	return tonic.Handler(func(c *gin.Context, params *GetContainerParams) (*types.Container, error) {
 		return h.containerService.Get(c, params.ContainerUUID.UUID)
-	})
+	}, http.StatusOK)
 }
 
 type DeleteContainerParams struct {

@@ -1,9 +1,8 @@
 package types
 
 import (
-	"errors"
-
 	"github.com/google/uuid"
+	"github.com/juju/errors"
 )
 
 const (
@@ -16,23 +15,21 @@ const (
 )
 
 var (
-	ErrContainerNotFound     = errors.New("container not found")
+	ErrContainerNotFound     = errors.NotFoundf("container")
 	ErrContainerStillRunning = errors.New("container still running")
-	ErrDatabaseIDNotFound    = errors.New("database id not found")
+	ErrDatabaseIDNotFound    = errors.NotFoundf("database id")
 )
 
 type Container struct {
 	ContainerSettings
 
-	Service Service               `json:"service"`
-	UUID    uuid.UUID             `json:"uuid"`
-	Status  string                `json:"status"`
-	Env     ContainerEnvVariables `json:"environment,omitempty"`
-
-	Update        *ContainerUpdate `json:"update,omitempty"`
-	ServiceUpdate ServiceUpdate    `json:"service_update,omitempty"`
-
-	CacheVersions []string `json:"cache_versions,omitempty"`
+	Service       Service               `json:"service"`
+	UUID          uuid.UUID             `json:"uuid" example:"1cb8c970-395f-4810-8c9e-e4df35f456e1"`
+	Status        string                `json:"status" example:"running"`
+	Env           ContainerEnvVariables `json:"environment,omitempty"`
+	Update        *ContainerUpdate      `json:"update,omitempty"`
+	ServiceUpdate ServiceUpdate         `json:"service_update,omitempty"`
+	CacheVersions []string              `json:"cache_versions,omitempty"`
 }
 
 type ContainerSearchQuery struct {
