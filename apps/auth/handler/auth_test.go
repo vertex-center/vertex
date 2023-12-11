@@ -23,7 +23,7 @@ func TestAuthHandlerTestSuite(t *testing.T) {
 	suite.Run(t, new(AuthHandlerTestSuite))
 }
 
-func (suite *AuthHandlerTestSuite) SetupTest() {
+func (suite *AuthHandlerTestSuite) SetupSubTest() {
 	suite.service = port.MockAuthService{}
 	suite.handler = NewAuthHandler(&suite.service).(*authHandler)
 	suite.testSession = types.Session{
@@ -32,34 +32,36 @@ func (suite *AuthHandlerTestSuite) SetupTest() {
 }
 
 func (suite *AuthHandlerTestSuite) TestLogin() {
-	suite.service.On("Login", "test_login", "test_password").Return(suite.testSession, nil)
+	suite.Run("OK", func() {
+		suite.service.On("Login", "test_login", "test_password").Return(suite.testSession, nil)
 
-	auth := base64.StdEncoding.EncodeToString([]byte("test_login:test_password"))
+		auth := base64.StdEncoding.EncodeToString([]byte("test_login:test_password"))
 
-	res := routertest.Request("POST", suite.handler.Login(), routertest.RequestOptions{
-		Headers: map[string]string{
-			"Authorization": "Basic " + auth,
-		},
+		res := routertest.Request("POST", suite.handler.Login(), routertest.RequestOptions{
+			Headers: map[string]string{
+				"Authorization": "Basic " + auth,
+			},
+		})
+
+		suite.Equal(200, res.Code)
+		suite.JSONEq(routertest.ToJSON(suite.testSession), res.Body.String())
+		suite.service.AssertExpectations(suite.T())
 	})
 
-	suite.Equal(200, res.Code)
-	suite.JSONEq(routertest.ToJSON(suite.testSession), res.Body.String())
-	suite.service.AssertExpectations(suite.T())
-}
+	suite.Run("InvalidCredentials", func() {
+		suite.service.On("Login", "test_login", "invalid_password").Return(types.Session{}, types.ErrLoginFailed)
 
-func (suite *AuthHandlerTestSuite) TestLoginInvalidCredentials() {
-	suite.service.On("Login", "test_login", "invalid_password").Return(types.Session{}, types.ErrLoginFailed)
+		auth := base64.StdEncoding.EncodeToString([]byte("test_login:invalid_password"))
 
-	auth := base64.StdEncoding.EncodeToString([]byte("test_login:invalid_password"))
+		res := routertest.Request("POST", suite.handler.Login(), routertest.RequestOptions{
+			Headers: map[string]string{
+				"Authorization": "Basic " + auth,
+			},
+		})
 
-	res := routertest.Request("POST", suite.handler.Login(), routertest.RequestOptions{
-		Headers: map[string]string{
-			"Authorization": "Basic " + auth,
-		},
+		suite.Equal(500, res.Code)
+		suite.service.AssertExpectations(suite.T())
 	})
-
-	suite.Equal(500, res.Code)
-	suite.service.AssertExpectations(suite.T())
 }
 
 func (suite *AuthHandlerTestSuite) TestRegister() {
