@@ -13,6 +13,7 @@ import (
 	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/pkg/net"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vlog"
 	"github.com/wI2L/fizz/openapi"
 )
 
@@ -53,10 +54,14 @@ func (s *Server) StartAsync() chan error {
 		exitChan <- s.Router.Start(":" + s.url.Port())
 	}()
 
+	log.Info("server starting", vlog.String("port", s.url.Port()))
+
 	s.waitServerReady()
 
 	s.ctx.DispatchEvent(event.ServerLoad{})
 	s.ctx.DispatchEvent(event.ServerStart{})
+
+	log.Info("server started", vlog.String("port", s.url.Port()))
 
 	return exitChan
 }
