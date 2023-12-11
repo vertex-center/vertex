@@ -7,13 +7,13 @@ import (
 	"github.com/vertex-center/vertex/common/app"
 )
 
-type containerLogsService struct {
+type logsService struct {
 	uuid    uuid.UUID
 	adapter port.LogsAdapter
 }
 
 func NewLogsService(ctx *app.Context, adapter port.LogsAdapter) port.LogsService {
-	s := &containerLogsService{
+	s := &logsService{
 		uuid:    uuid.New(),
 		adapter: adapter,
 	}
@@ -21,6 +21,6 @@ func NewLogsService(ctx *app.Context, adapter port.LogsAdapter) port.LogsService
 	return s
 }
 
-func (s *containerLogsService) GetLatestLogs(uuid types.ContainerID) ([]types.LogLine, error) {
+func (s *logsService) GetLatestLogs(uuid types.ContainerID) ([]types.LogLine, error) {
 	return s.adapter.LoadBuffer(uuid)
 }

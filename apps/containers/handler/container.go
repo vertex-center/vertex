@@ -16,37 +16,37 @@ import (
 )
 
 type containerHandler struct {
-	ctx                      *apptypes.Context
-	containerService         port.ContainerService
-	containerSettingsService port.SettingsService
-	containerRunnerService   port.RunnerService
-	containerEnvService      port.EnvService
-	containerServiceService  port.ContainerServiceService
-	containerLogsService     port.LogsService
-	serviceService           port.ServiceService
+	ctx                     *apptypes.Context
+	containerService        port.ContainerService
+	settingsService         port.SettingsService
+	runnerService           port.RunnerService
+	envService              port.EnvService
+	containerServiceService port.ContainerServiceService
+	logsService             port.LogsService
+	serviceService          port.ServiceService
 }
 
 type ContainerHandlerParams struct {
-	Ctx                      *apptypes.Context
-	ContainerService         port.ContainerService
-	ContainerSettingsService port.SettingsService
-	ContainerRunnerService   port.RunnerService
-	ContainerEnvService      port.EnvService
-	ContainerServiceService  port.ContainerServiceService
-	ContainerLogsService     port.LogsService
-	ServiceService           port.ServiceService
+	Ctx                     *apptypes.Context
+	ContainerService        port.ContainerService
+	SettingsService         port.SettingsService
+	RunnerService           port.RunnerService
+	EnvService              port.EnvService
+	ContainerServiceService port.ContainerServiceService
+	LogsService             port.LogsService
+	ServiceService          port.ServiceService
 }
 
 func NewContainerHandler(params ContainerHandlerParams) port.ContainerHandler {
 	return &containerHandler{
-		ctx:                      params.Ctx,
-		containerService:         params.ContainerService,
-		containerSettingsService: params.ContainerSettingsService,
-		containerRunnerService:   params.ContainerRunnerService,
-		containerEnvService:      params.ContainerEnvService,
-		containerServiceService:  params.ContainerServiceService,
-		containerLogsService:     params.ContainerLogsService,
-		serviceService:           params.ServiceService,
+		ctx:                     params.Ctx,
+		containerService:        params.ContainerService,
+		settingsService:         params.SettingsService,
+		runnerService:           params.RunnerService,
+		envService:              params.EnvService,
+		containerServiceService: params.ContainerServiceService,
+		logsService:             params.LogsService,
+		serviceService:          params.ServiceService,
 	}
 }
 
@@ -93,14 +93,14 @@ func (h *containerHandler) Patch() gin.HandlerFunc {
 		}
 
 		if params.LaunchOnStartup != nil {
-			err = h.containerSettingsService.SetLaunchOnStartup(inst, *params.LaunchOnStartup)
+			err = h.settingsService.SetLaunchOnStartup(inst, *params.LaunchOnStartup)
 			if err != nil {
 				return err
 			}
 		}
 
 		if params.DisplayName != nil && *params.DisplayName != "" {
-			err = h.containerSettingsService.SetDisplayName(inst, *params.DisplayName)
+			err = h.settingsService.SetDisplayName(inst, *params.DisplayName)
 			if err != nil {
 				return err
 			}
@@ -124,14 +124,14 @@ func (h *containerHandler) Patch() gin.HandlerFunc {
 		}
 
 		if params.Version != nil {
-			err = h.containerSettingsService.SetVersion(inst, *params.Version)
+			err = h.settingsService.SetVersion(inst, *params.Version)
 			if err != nil {
 				return err
 			}
 		}
 
 		if params.Tags != nil {
-			err = h.containerSettingsService.SetTags(inst, params.Tags)
+			err = h.settingsService.SetTags(inst, params.Tags)
 			if err != nil {
 				return err
 			}
@@ -151,7 +151,7 @@ func (h *containerHandler) Start() gin.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		return h.containerRunnerService.Start(c, inst)
+		return h.runnerService.Start(c, inst)
 	})
 }
 
@@ -165,7 +165,7 @@ func (h *containerHandler) Stop() gin.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		return h.containerRunnerService.Stop(c, inst)
+		return h.runnerService.Stop(c, inst)
 	})
 }
 
@@ -181,12 +181,12 @@ func (h *containerHandler) PatchEnvironment() gin.HandlerFunc {
 			return err
 		}
 
-		err = h.containerEnvService.Save(inst, params.Env)
+		err = h.envService.Save(inst, params.Env)
 		if err != nil {
 			return err
 		}
 
-		err = h.containerRunnerService.RecreateContainer(c, inst)
+		err = h.runnerService.RecreateContainer(c, inst)
 		if err != nil {
 			return err
 		}
@@ -289,7 +289,7 @@ func (h *containerHandler) GetDocker() gin.HandlerFunc {
 			return nil, err
 		}
 
-		return h.containerRunnerService.GetDockerContainerInfo(c, *inst)
+		return h.runnerService.GetDockerContainerInfo(c, *inst)
 	})
 }
 
@@ -303,7 +303,7 @@ func (h *containerHandler) RecreateDocker() gin.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		return h.containerRunnerService.RecreateContainer(c, inst)
+		return h.runnerService.RecreateContainer(c, inst)
 	})
 }
 
@@ -313,7 +313,7 @@ type LogsContainerParams struct {
 
 func (h *containerHandler) GetLogs() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *LogsContainerParams) ([]types.LogLine, error) {
-		return h.containerLogsService.GetLatestLogs(params.ContainerUUID)
+		return h.logsService.GetLatestLogs(params.ContainerUUID)
 	})
 }
 
@@ -349,7 +349,7 @@ func (h *containerHandler) GetVersions() gin.HandlerFunc {
 		if err != nil {
 			return nil, err
 		}
-		return h.containerRunnerService.GetAllVersions(c, inst, useCache)
+		return h.runnerService.GetAllVersions(c, inst, useCache)
 	})
 }
 
@@ -366,6 +366,6 @@ func (h *containerHandler) WaitStatus() gin.HandlerFunc {
 			return err
 		}
 
-		return h.containerRunnerService.WaitStatus(c, inst, status)
+		return h.runnerService.WaitStatus(c, inst, status)
 	})
 }

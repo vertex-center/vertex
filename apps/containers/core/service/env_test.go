@@ -8,23 +8,23 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 )
 
-type ContainerEnvServiceTestSuite struct {
+type EnvServiceTestSuite struct {
 	suite.Suite
 
 	service *envService
-	adapter MockContainerEnvAdapter
+	adapter MockEnvAdapter
 }
 
-func TestContainerEnvServiceTestSuite(t *testing.T) {
-	suite.Run(t, new(ContainerEnvServiceTestSuite))
+func TestEnvServiceTestSuite(t *testing.T) {
+	suite.Run(t, new(EnvServiceTestSuite))
 }
 
-func (suite *ContainerEnvServiceTestSuite) SetupSuite() {
-	suite.adapter = MockContainerEnvAdapter{}
+func (suite *EnvServiceTestSuite) SetupSuite() {
+	suite.adapter = MockEnvAdapter{}
 	suite.service = NewEnvService(&suite.adapter).(*envService)
 }
 
-func (suite *ContainerEnvServiceTestSuite) TestSave() {
+func (suite *EnvServiceTestSuite) TestSave() {
 	suite.adapter.On("Save", mock.Anything, mock.Anything).Return(nil)
 
 	inst := &types.Container{}
@@ -36,7 +36,7 @@ func (suite *ContainerEnvServiceTestSuite) TestSave() {
 	suite.adapter.AssertExpectations(suite.T())
 }
 
-func (suite *ContainerEnvServiceTestSuite) TestLoad() {
+func (suite *EnvServiceTestSuite) TestLoad() {
 	suite.adapter.On("Load", mock.Anything).Return(types.ContainerEnvVariables{}, nil)
 
 	inst := &types.Container{}
@@ -47,14 +47,14 @@ func (suite *ContainerEnvServiceTestSuite) TestLoad() {
 	suite.adapter.AssertExpectations(suite.T())
 }
 
-type MockContainerEnvAdapter struct{ mock.Mock }
+type MockEnvAdapter struct{ mock.Mock }
 
-func (m *MockContainerEnvAdapter) Save(uuid types.ContainerID, env types.ContainerEnvVariables) error {
+func (m *MockEnvAdapter) Save(uuid types.ContainerID, env types.ContainerEnvVariables) error {
 	args := m.Called(uuid, env)
 	return args.Error(0)
 }
 
-func (m *MockContainerEnvAdapter) Load(uuid types.ContainerID) (types.ContainerEnvVariables, error) {
+func (m *MockEnvAdapter) Load(uuid types.ContainerID) (types.ContainerEnvVariables, error) {
 	args := m.Called(uuid)
 	return types.ContainerEnvVariables{"a": "b"}, args.Error(1)
 }

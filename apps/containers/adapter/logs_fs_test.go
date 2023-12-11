@@ -73,7 +73,7 @@ func (suite *ContainerLoggerTestSuite) TestCron() {
 type ContainerLogsFSAdapterTestSuite struct {
 	suite.Suite
 
-	adapter *containerLogsFSAdapter
+	adapter *logsFSAdapter
 }
 
 func TestContainerLogsFSAdapterTestSuite(t *testing.T) {
@@ -84,9 +84,9 @@ func (suite *ContainerLogsFSAdapterTestSuite) SetupTest() {
 	dir, err := os.MkdirTemp("", "*_logs_test")
 	suite.Require().NoError(err)
 
-	suite.adapter = NewLogsFSAdapter(&ContainerLogsFSAdapterParams{
+	suite.adapter = NewLogsFSAdapter(&LogsFSAdapterParams{
 		ContainersPath: dir,
-	}).(*containerLogsFSAdapter)
+	}).(*logsFSAdapter)
 }
 
 func (suite *ContainerLogsFSAdapterTestSuite) TearDownTest() {

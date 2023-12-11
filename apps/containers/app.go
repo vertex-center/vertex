@@ -83,14 +83,14 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 		serviceHandler    = handler.NewServiceHandler(serviceService, containerService)
 		containersHandler = handler.NewContainersHandler(a.ctx, containerService)
 		containerHandler  = handler.NewContainerHandler(handler.ContainerHandlerParams{
-			Ctx:                      a.ctx,
-			ContainerService:         containerService,
-			ContainerSettingsService: settingsService,
-			ContainerRunnerService:   runnerService,
-			ContainerEnvService:      envService,
-			ContainerServiceService:  containerServiceService,
-			ContainerLogsService:     logsService,
-			ServiceService:           serviceService,
+			Ctx:                     a.ctx,
+			ContainerService:        containerService,
+			SettingsService:         settingsService,
+			RunnerService:           runnerService,
+			EnvService:              envService,
+			ContainerServiceService: containerServiceService,
+			LogsService:             logsService,
+			ServiceService:          serviceService,
 		})
 
 		container  = r.Group("/container/:container_uuid", "Container", "", authmiddleware.Authenticated)

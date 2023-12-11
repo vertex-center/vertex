@@ -10,11 +10,11 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-func (s *containerLogsService) GetUUID() uuid.UUID {
+func (s *logsService) GetUUID() uuid.UUID {
 	return s.uuid
 }
 
-func (s *containerLogsService) OnEvent(e event.Event) error {
+func (s *logsService) OnEvent(e event.Event) error {
 	switch e := e.(type) {
 	case types.EventContainerLog:
 		s.onLogReceived(e)
@@ -31,7 +31,7 @@ func (s *containerLogsService) OnEvent(e event.Event) error {
 	return nil
 }
 
-func (s *containerLogsService) onLogReceived(e types.EventContainerLog) {
+func (s *logsService) onLogReceived(e types.EventContainerLog) {
 	switch e.Kind {
 	case types.LogKindDownload:
 		var downloads *types.LogLineMessageDownloads

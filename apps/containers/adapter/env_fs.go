@@ -18,13 +18,13 @@ type containerEnvFSAdapter struct {
 	containersPath string
 }
 
-type ContainerEnvFSAdapterParams struct {
+type EnvFSAdapterParams struct {
 	containersPath string
 }
 
-func NewEnvFSAdapter(params *ContainerEnvFSAdapterParams) port.EnvAdapter {
+func NewEnvFSAdapter(params *EnvFSAdapterParams) port.EnvAdapter {
 	if params == nil {
-		params = &ContainerEnvFSAdapterParams{}
+		params = &EnvFSAdapterParams{}
 	}
 	if params.containersPath == "" {
 		params.containersPath = path.Join(storage.FSPath, "apps", "containers", "containers")
