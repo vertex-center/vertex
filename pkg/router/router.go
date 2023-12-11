@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/loopfz/gadgeto/tonic"
 	"github.com/wI2L/fizz"
 	"github.com/wI2L/fizz/openapi"
 )
@@ -31,14 +31,23 @@ func New(info *openapi.Info, opts ...Option) *Router {
 	for _, opt := range opts {
 		opt(e)
 	}
+
 	f := fizz.NewFromEngine(e)
 	if info != nil {
 		f.GET("/openapi.yaml", nil, f.OpenAPI(info, "yaml"))
 		f.GET("/openapi.json", nil, f.OpenAPI(info, "json"))
+		f.GET("/api/ping", []fizz.OperationOption{
+			fizz.ID("ping"),
+			fizz.Summary("Ping the app"),
+		}, tonic.Handler(func(c *gin.Context) error {
+			return nil
+		}, http.StatusNoContent))
 	}
+
 	if len(f.Errors()) > 0 {
-		log.Error(errors.Join(f.Errors()...))
+		println(errors.Join(f.Errors()...))
 	}
+
 	return &Router{
 		Fizz: f,
 	}

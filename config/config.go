@@ -8,10 +8,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/vertex-center/vertex/cmd/storage"
-	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/common/storage"
 	"github.com/vertex-center/vertex/pkg/net"
-	"github.com/vertex-center/vlog"
 )
 
 const DefaultApiURLFormat = "http://%s:%s/api"
@@ -36,7 +34,6 @@ type Config struct {
 func New() *Config {
 	localIP, err := net.LocalIP()
 	if err != nil {
-		log.Error(err)
 		localIP = "127.0.0.1"
 	}
 
@@ -73,7 +70,7 @@ func New() *Config {
 	}
 
 	if os.Getenv("DEBUG") == "1" {
-		log.Warn("debug mode enabled. proceed with caution!")
+		println("debug mode enabled. proceed with caution!")
 		c.mode = DebugMode
 	}
 
@@ -86,12 +83,10 @@ func (c *Config) KernelURL(id string) *url.URL {
 	if u, ok := c.kernelUrls[id]; ok {
 		p, err := url.Parse(u)
 		if err != nil {
-			log.Error(err)
 			return &url.URL{}
 		}
 		return p
 	}
-	log.Error(fmt.Errorf("no url configured for this kernel app"), vlog.String("app_id", id))
 	return &url.URL{}
 }
 
@@ -101,13 +96,19 @@ func (c *Config) URL(id string) *url.URL {
 	if u, ok := c.urls[id]; ok {
 		p, err := url.Parse(u)
 		if err != nil {
-			log.Error(err)
 			return &url.URL{}
 		}
 		return p
 	}
-	log.Error(fmt.Errorf("no url configured for this app"), vlog.String("app_id", id))
 	return &url.URL{}
+}
+
+func (c *Config) DefaultApiURL(defaultPort string) string {
+	return fmt.Sprintf(DefaultApiURLFormat, c.localIP, defaultPort)
+}
+
+func (c *Config) DefaultKernelApiURL(defaultPort string) string {
+	return fmt.Sprintf(DefaultApiURLFormat, c.localIP, defaultPort)
 }
 
 func (c *Config) RegisterApiURL(id string, url string) {

@@ -2,6 +2,7 @@ package service
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"errors"
 	"path"
@@ -12,10 +13,10 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/adapter"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/cmd/storage"
 	"github.com/vertex-center/vertex/common/app"
+	"github.com/vertex-center/vertex/common/log"
+	"github.com/vertex-center/vertex/common/storage"
 	"github.com/vertex-center/vertex/pkg/event"
-	"github.com/vertex-center/vertex/pkg/log"
 	vstorage "github.com/vertex-center/vertex/pkg/storage"
 	"github.com/vertex-center/vlog"
 )
@@ -32,7 +33,7 @@ func NewContainerRunnerService(ctx *app.Context, adapter port.ContainerRunnerAda
 	}
 }
 
-func (s *containerRunnerService) Install(uuid uuid.UUID, service types.Service) error {
+func (s *containerRunnerService) Install(ctx context.Context, uuid uuid.UUID, service types.Service) error {
 	if service.Methods.Docker == nil {
 		return ErrInstallMethodDoesNotExists
 	}
@@ -48,18 +49,18 @@ func (s *containerRunnerService) Install(uuid uuid.UUID, service types.Service) 
 	return nil
 }
 
-func (s *containerRunnerService) Delete(inst *types.Container) error {
-	err := s.adapter.DeleteMounts(inst)
+func (s *containerRunnerService) Delete(ctx context.Context, inst *types.Container) error {
+	err := s.adapter.DeleteMounts(ctx, inst)
 	if err != nil {
 		return err
 	}
-	return s.adapter.DeleteContainer(inst)
+	return s.adapter.DeleteContainer(ctx, inst)
 }
 
 // Start starts a container by its UUID.
 // If the container does not exist, it returns ErrContainerNotFound.
 // If the container is already running, it returns ErrContainerAlreadyRunning.
-func (s *containerRunnerService) Start(inst *types.Container) error {
+func (s *containerRunnerService) Start(ctx context.Context, inst *types.Container) error {
 	if inst.IsBusy() {
 		return nil
 	}
@@ -87,7 +88,7 @@ func (s *containerRunnerService) Start(inst *types.Container) error {
 		s.setStatus(inst, status)
 	}
 
-	stdout, stderr, err := s.adapter.Start(inst, setStatus)
+	stdout, stderr, err := s.adapter.Start(ctx, inst, setStatus)
 	if err != nil {
 		s.setStatus(inst, types.ContainerStatusError)
 		return err
@@ -146,7 +147,7 @@ func (s *containerRunnerService) Start(inst *types.Container) error {
 	go func() {
 		defer wg.Done()
 
-		err := s.WaitStatus(inst, types.ContainerStatusRunning)
+		err := s.WaitStatus(ctx, inst, types.ContainerStatusRunning)
 		if err != nil {
 			log.Error(err)
 		}
@@ -159,7 +160,7 @@ func (s *containerRunnerService) Start(inst *types.Container) error {
 // Stop stops a container by its UUID.
 // If the container does not exist, it returns ErrContainerNotFound.
 // If the container is not running, it returns ErrContainerNotRunning.
-func (s *containerRunnerService) Stop(inst *types.Container) error {
+func (s *containerRunnerService) Stop(ctx context.Context, inst *types.Container) error {
 	if inst.IsBusy() {
 		return nil
 	}
@@ -185,7 +186,7 @@ func (s *containerRunnerService) Stop(inst *types.Container) error {
 
 	s.setStatus(inst, types.ContainerStatusStopping)
 
-	err := s.adapter.Stop(inst)
+	err := s.adapter.Stop(ctx, inst)
 	if err == nil {
 		s.ctx.DispatchEvent(types.EventContainerLog{
 			ContainerUUID: inst.UUID,
@@ -205,13 +206,13 @@ func (s *containerRunnerService) Stop(inst *types.Container) error {
 	return err
 }
 
-func (s *containerRunnerService) GetDockerContainerInfo(inst types.Container) (map[string]any, error) {
-	return s.adapter.Info(inst)
+func (s *containerRunnerService) GetDockerContainerInfo(ctx context.Context, inst types.Container) (map[string]any, error) {
+	return s.adapter.Info(ctx, inst)
 }
 
-func (s *containerRunnerService) GetAllVersions(inst *types.Container, useCache bool) ([]string, error) {
+func (s *containerRunnerService) GetAllVersions(ctx context.Context, inst *types.Container, useCache bool) ([]string, error) {
 	if !useCache || len(inst.CacheVersions) == 0 {
-		versions, err := s.adapter.GetAllVersions(*inst)
+		versions, err := s.adapter.GetAllVersions(ctx, *inst)
 		if err != nil {
 			return nil, err
 		}
@@ -221,28 +222,28 @@ func (s *containerRunnerService) GetAllVersions(inst *types.Container, useCache 
 	return inst.CacheVersions, nil
 }
 
-func (s *containerRunnerService) CheckForUpdates(inst *types.Container) error {
-	return s.adapter.CheckForUpdates(inst)
+func (s *containerRunnerService) CheckForUpdates(ctx context.Context, inst *types.Container) error {
+	return s.adapter.CheckForUpdates(ctx, inst)
 }
 
 // RecreateContainer recreates a container by its UUID.
-func (s *containerRunnerService) RecreateContainer(inst *types.Container) error {
+func (s *containerRunnerService) RecreateContainer(ctx context.Context, inst *types.Container) error {
 	if inst.IsRunning() {
-		err := s.adapter.Stop(inst)
+		err := s.adapter.Stop(ctx, inst)
 		if err != nil {
 			return err
 		}
 	}
 
-	err := s.adapter.DeleteContainer(inst)
+	err := s.adapter.DeleteContainer(ctx, inst)
 	if err != nil && !errors.Is(err, adapter.ErrContainerNotFound) {
 		return err
 	}
 
-	return s.Start(inst)
+	return s.Start(ctx, inst)
 }
 
-func (s *containerRunnerService) WaitStatus(inst *types.Container, status string) error {
+func (s *containerRunnerService) WaitStatus(ctx context.Context, inst *types.Container, status string) error {
 	statusChan := make(chan string)
 	defer close(statusChan)
 

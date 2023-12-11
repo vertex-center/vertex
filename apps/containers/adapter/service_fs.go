@@ -8,8 +8,8 @@ import (
 
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/cmd/storage"
-	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/common/log"
+	"github.com/vertex-center/vertex/common/storage"
 	"gopkg.in/yaml.v3"
 )
 

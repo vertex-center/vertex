@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/cmd/storage"
+	"github.com/vertex-center/vertex/common/storage"
 )
 
 const ContainerEnvPath = ".env"

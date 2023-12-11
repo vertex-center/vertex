@@ -8,12 +8,11 @@ import (
 	"path"
 
 	"github.com/carlmjohnson/requests"
-	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/apps"
 	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/common/app"
+	"github.com/vertex-center/vertex/common/app/appmeta"
 	"github.com/vertex-center/vertex/common/server"
-	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/wI2L/fizz"
 	"github.com/wI2L/fizz/openapi"
 )
@@ -49,7 +48,7 @@ func main() {
 	}
 }
 
-func runServer(initRoutes func(r *fizz.RouterGroup) error, meta app.Meta, u *url.URL) *server.Server {
+func runServer(initRoutes func(r *fizz.RouterGroup) error, meta appmeta.Meta, u *url.URL) *server.Server {
 	vertexCtx := common.NewVertexContext(common.About{}, true)
 	ctx := app.NewContext(vertexCtx)
 
@@ -66,13 +65,6 @@ func runServer(initRoutes func(r *fizz.RouterGroup) error, meta app.Meta, u *url
 	if err != nil {
 		panic(err)
 	}
-
-	base.GET("/ping", []fizz.OperationOption{
-		fizz.ID("ping"),
-		fizz.Summary("Ping the app"),
-	}, router.Handler(func(c *gin.Context) error {
-		return nil
-	}))
 
 	_ = srv.StartAsync()
 

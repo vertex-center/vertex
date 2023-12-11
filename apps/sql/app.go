@@ -8,6 +8,7 @@ import (
 	"github.com/vertex-center/vertex/apps/sql/core/service"
 	"github.com/vertex-center/vertex/apps/sql/handler"
 	"github.com/vertex-center/vertex/common/app"
+	"github.com/vertex-center/vertex/common/app/appmeta"
 	"github.com/wI2L/fizz"
 )
 
@@ -15,13 +16,13 @@ var (
 	sqlService port.SqlService
 )
 
-var Meta = app.Meta{
+var Meta = appmeta.Meta{
 	ID:          "sql",
 	Name:        "Vertex SQL",
 	Description: "Create and manage SQL databases.",
 	Icon:        "database",
 	DefaultPort: "7512",
-	Dependencies: []*app.Meta{
+	Dependencies: []*appmeta.Meta{
 		&authmeta.Meta,
 		&containersmeta.Meta,
 	},
@@ -39,7 +40,7 @@ func (a *App) Load(ctx *app.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) Meta() app.Meta {
+func (a *App) Meta() appmeta.Meta {
 	return Meta
 }
 

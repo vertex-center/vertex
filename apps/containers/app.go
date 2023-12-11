@@ -9,6 +9,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/meta"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types/metric"
 	"github.com/vertex-center/vertex/common/app"
+	"github.com/vertex-center/vertex/common/app/appmeta"
 	"github.com/vertex-center/vertex/common/middleware"
 	"github.com/wI2L/fizz"
 )
@@ -38,7 +39,7 @@ func (a *App) Load(ctx *app.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) Meta() app.Meta {
+func (a *App) Meta() appmeta.Meta {
 	return meta.Meta
 }
 

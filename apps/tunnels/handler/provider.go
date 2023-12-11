@@ -20,9 +20,7 @@ type InstallParams struct {
 
 func (r *providerHandler) Install() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *InstallParams) error {
-		token := c.MustGet("token").(string)
-
-		client := containersapi.NewContainersClient(token)
+		client := containersapi.NewContainersClient(c)
 
 		serv, err := client.GetService(c, params.Provider)
 		if err != nil {

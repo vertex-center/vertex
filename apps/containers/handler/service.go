@@ -47,7 +47,7 @@ func (h *serviceHandler) Install() gin.HandlerFunc {
 			return nil, apierrors.NewNotFound(err, "service not found")
 		}
 
-		inst, err := h.containerService.Install(service, "docker")
+		inst, err := h.containerService.Install(c, service, "docker")
 		if err != nil && errors.Is(err, types.ErrServiceNotFound) {
 			return nil, apierrors.NewNotFound(err, "service not found")
 		} else if err != nil {

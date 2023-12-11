@@ -1,4 +1,4 @@
-package app
+package appmeta
 
 type Meta struct {
 	// ID is the unique identifier of the app.

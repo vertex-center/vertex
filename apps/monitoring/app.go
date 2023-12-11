@@ -9,6 +9,7 @@ import (
 	"github.com/vertex-center/vertex/apps/monitoring/core/service"
 	"github.com/vertex-center/vertex/apps/monitoring/handler"
 	"github.com/vertex-center/vertex/common/app"
+	"github.com/vertex-center/vertex/common/app/appmeta"
 	"github.com/wI2L/fizz"
 )
 
@@ -16,13 +17,13 @@ var (
 	metricsService port.MetricsService
 )
 
-var Meta = app.Meta{
+var Meta = appmeta.Meta{
 	ID:          "monitoring",
 	Name:        "Vertex Monitoring",
 	Description: "Create and manage containers.",
 	Icon:        "monitoring",
 	DefaultPort: "7506",
-	Dependencies: []*app.Meta{
+	Dependencies: []*appmeta.Meta{
 		&authmeta.Meta,
 		&containersmeta.Meta,
 	},
@@ -40,7 +41,7 @@ func (a *App) Load(ctx *app.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) Meta() app.Meta {
+func (a *App) Meta() appmeta.Meta {
 	return Meta
 }
 

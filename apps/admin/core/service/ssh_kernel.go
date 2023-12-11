@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 
 	"github.com/vertex-center/vertex/apps/admin/core/port"
@@ -27,11 +28,11 @@ func NewSshKernelService(sshAdapter port.SshKernelAdapter) port.SshKernelService
 
 // GetAll returns all SSH keys from the authorized keys files.
 func (s *sshKernelService) GetAll() ([]types.PublicKey, error) {
-	users, err := s.sshAdapter.GetUsers()
+	users, err := s.sshAdapter.GetUsers(context.Background())
 	if err != nil {
 		return nil, err
 	}
-	return s.sshAdapter.GetAll(users)
+	return s.sshAdapter.GetAll(context.Background(), users)
 }
 
 // Add adds an SSH key to the authorized keys file. The key must
@@ -46,7 +47,7 @@ func (s *sshKernelService) Add(authorizedKey string, username string) error {
 	if err != nil {
 		return ErrInvalidPublicKey
 	}
-	return s.sshAdapter.Add(authorizedKey, u)
+	return s.sshAdapter.Add(context.Background(), authorizedKey, u)
 }
 
 // Delete deletes an SSH key from the authorized keys file.
@@ -56,12 +57,12 @@ func (s *sshKernelService) Delete(fingerprint string, username string) error {
 		return err
 	}
 
-	return s.sshAdapter.Remove(fingerprint, u)
+	return s.sshAdapter.Remove(context.Background(), fingerprint, u)
 }
 
 // GetUsers returns all users on the system that can have SSH keys.
 func (s *sshKernelService) GetUsers() ([]user.User, error) {
-	return s.sshAdapter.GetUsers()
+	return s.sshAdapter.GetUsers(context.Background())
 }
 
 func (s *sshKernelService) GetUser(username string) (user.User, error) {

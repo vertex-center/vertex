@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -24,9 +25,9 @@ func (suite *SshServiceTestSuite) SetupTest() {
 }
 
 func (suite *SshServiceTestSuite) TestGetAll() {
-	suite.adapter.On("GetAll").Return(testDataAuthorizedKeys, nil)
+	suite.adapter.On("GetAll", context.Background()).Return(testDataAuthorizedKeys, nil)
 
-	keys, err := suite.service.GetAll()
+	keys, err := suite.service.GetAll(context.Background())
 
 	suite.Require().NoError(err)
 	suite.Equal(testDataAuthorizedKeys, keys)
@@ -34,18 +35,18 @@ func (suite *SshServiceTestSuite) TestGetAll() {
 }
 
 func (suite *SshServiceTestSuite) TestAdd() {
-	suite.adapter.On("Add", testDataAuthorizedKey, "username").Return(nil)
+	suite.adapter.On("Add", context.Background(), testDataAuthorizedKey, "username").Return(nil)
 
-	err := suite.service.Add(testDataAuthorizedKey, "username")
+	err := suite.service.Add(context.Background(), testDataAuthorizedKey, "username")
 
 	suite.Require().NoError(err)
 	suite.adapter.AssertExpectations(suite.T())
 }
 
 func (suite *SshServiceTestSuite) TestDelete() {
-	suite.adapter.On("Remove", testDataFingerprint, "username").Return(nil)
+	suite.adapter.On("Remove", context.Background(), testDataFingerprint, "username").Return(nil)
 
-	err := suite.service.Delete(testDataFingerprint, "username")
+	err := suite.service.Delete(context.Background(), testDataFingerprint, "username")
 
 	suite.Require().NoError(err)
 	suite.adapter.AssertExpectations(suite.T())

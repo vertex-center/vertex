@@ -1,6 +1,7 @@
 package adapter
 
 import (
+	"context"
 	"errors"
 	"os"
 	"path"
@@ -8,9 +9,9 @@ import (
 
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/pkg/user"
 
-	"github.com/vertex-center/vertex/pkg/log"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -20,7 +21,7 @@ func NewSshFsAdapter() port.SshKernelAdapter {
 	return &sshFsAdapter{}
 }
 
-func (a *sshFsAdapter) GetAll(users []user.User) ([]types.PublicKey, error) {
+func (a *sshFsAdapter) GetAll(ctx context.Context, users []user.User) ([]types.PublicKey, error) {
 	var keys []types.PublicKey
 	for _, u := range users {
 		p := getAuthorizedKeysPath(u.HomeDir)
@@ -53,7 +54,7 @@ func (a *sshFsAdapter) GetAll(users []user.User) ([]types.PublicKey, error) {
 	return keys, nil
 }
 
-func (a *sshFsAdapter) Add(key string, user user.User) error {
+func (a *sshFsAdapter) Add(ctx context.Context, key string, user user.User) error {
 	p := getAuthorizedKeysPath(user.HomeDir)
 
 	err := os.MkdirAll(path.Dir(p), 0755)
@@ -71,7 +72,7 @@ func (a *sshFsAdapter) Add(key string, user user.User) error {
 	return err
 }
 
-func (a *sshFsAdapter) Remove(fingerprint string, user user.User) error {
+func (a *sshFsAdapter) Remove(ctx context.Context, fingerprint string, user user.User) error {
 	p := getAuthorizedKeysPath(user.HomeDir)
 
 	content, err := os.ReadFile(p)
@@ -97,7 +98,7 @@ func (a *sshFsAdapter) Remove(fingerprint string, user user.User) error {
 	return os.WriteFile(p, []byte(strings.Join(lines, "\n")), 0644)
 }
 
-func (a *sshFsAdapter) GetUsers() ([]user.User, error) {
+func (a *sshFsAdapter) GetUsers(ctx context.Context) ([]user.User, error) {
 	return user.GetAll()
 }
 

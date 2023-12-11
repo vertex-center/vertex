@@ -1,6 +1,7 @@
 package port
 
 import (
+	"context"
 	"io"
 
 	vtypes "github.com/docker/docker/api/types"
@@ -11,19 +12,19 @@ import (
 
 type (
 	ContainerService interface {
-		Get(uuid uuid.UUID) (*types.Container, error)
-		GetAll() map[uuid.UUID]*types.Container
-		GetTags() []string
-		Search(query types.ContainerSearchQuery) map[uuid.UUID]*types.Container
-		Exists(uuid uuid.UUID) bool
-		Delete(inst *types.Container) error
-		StartAll()
-		StopAll()
-		LoadAll()
-		DeleteAll()
-		Install(service types.Service, method string) (*types.Container, error)
-		CheckForUpdates() (map[uuid.UUID]*types.Container, error)
-		SetDatabases(inst *types.Container, databases map[string]uuid.UUID, options map[string]*types.SetDatabasesOptions) error
+		Get(ctx context.Context, uuid uuid.UUID) (*types.Container, error)
+		GetAll(ctx context.Context) map[uuid.UUID]*types.Container
+		GetTags(ctx context.Context) []string
+		Search(ctx context.Context, query types.ContainerSearchQuery) map[uuid.UUID]*types.Container
+		Exists(ctx context.Context, uuid uuid.UUID) bool
+		Delete(ctx context.Context, inst *types.Container) error
+		StartAll(ctx context.Context)
+		StopAll(ctx context.Context)
+		LoadAll(ctx context.Context)
+		DeleteAll(ctx context.Context)
+		Install(ctx context.Context, service types.Service, method string) (*types.Container, error)
+		CheckForUpdates(tx context.Context) (map[uuid.UUID]*types.Container, error)
+		SetDatabases(ctx context.Context, inst *types.Container, databases map[string]uuid.UUID, options map[string]*types.SetDatabasesOptions) error
 	}
 
 	ContainerEnvService interface {
@@ -36,15 +37,15 @@ type (
 	}
 
 	ContainerRunnerService interface {
-		Install(uuid uuid.UUID, service types.Service) error
-		Delete(inst *types.Container) error
-		Start(inst *types.Container) error
-		Stop(inst *types.Container) error
-		GetDockerContainerInfo(inst types.Container) (map[string]any, error)
-		GetAllVersions(inst *types.Container, useCache bool) ([]string, error)
-		CheckForUpdates(inst *types.Container) error
-		RecreateContainer(inst *types.Container) error
-		WaitStatus(inst *types.Container, status string) error
+		Install(ctx context.Context, uuid uuid.UUID, service types.Service) error
+		Delete(ctx context.Context, inst *types.Container) error
+		Start(ctx context.Context, inst *types.Container) error
+		Stop(ctx context.Context, inst *types.Container) error
+		GetDockerContainerInfo(ctx context.Context, inst types.Container) (map[string]any, error)
+		GetAllVersions(ctx context.Context, inst *types.Container, useCache bool) ([]string, error)
+		CheckForUpdates(ctx context.Context, inst *types.Container) error
+		RecreateContainer(ctx context.Context, inst *types.Container) error
+		WaitStatus(ctx context.Context, inst *types.Container, status string) error
 	}
 
 	ContainerServiceService interface {

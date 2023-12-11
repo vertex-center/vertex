@@ -4,15 +4,13 @@ import (
 	"context"
 	"fmt"
 	"net/url"
-	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/common/event"
-	"github.com/vertex-center/vertex/pkg/ginutils"
-	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/pkg/net"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vlog"
@@ -32,6 +30,8 @@ func New(id string, info *openapi.Info, u *url.URL, ctx *common.VertexContext) *
 	cfg := cors.DefaultConfig()
 	cfg.AllowAllOrigins = true
 	cfg.AddAllowHeaders("Authorization")
+	cfg.AddAllowHeaders("X-Request-ID")
+	cfg.AddAllowHeaders("X-Correlation-ID")
 
 	return &Server{
 		id:  id,
@@ -39,7 +39,9 @@ func New(id string, info *openapi.Info, u *url.URL, ctx *common.VertexContext) *
 		ctx: ctx,
 		Router: router.New(info,
 			router.WithMiddleware(cors.New(cfg)),
-			router.WithMiddleware(ginutils.Logger(id, u.String())),
+			router.WithMiddleware(requestID()),
+			router.WithMiddleware(correlationID()),
+			router.WithMiddleware(logger(u)),
 			router.WithMiddleware(gin.Recovery()),
 		),
 	}
@@ -49,14 +51,17 @@ func (s *Server) StartAsync() chan error {
 	exitChan := make(chan error)
 	go func() {
 		defer close(exitChan)
-		log.Info("starting server", vlog.String("port", s.url.Port()))
 		exitChan <- s.Router.Start(":" + s.url.Port())
 	}()
+
+	log.Info("server starting", vlog.String("port", s.url.Port()))
 
 	s.waitServerReady()
 
 	s.ctx.DispatchEvent(event.ServerLoad{})
 	s.ctx.DispatchEvent(event.ServerStart{})
+
+	log.Info("server started", vlog.String("port", s.url.Port()))
 
 	return exitChan
 }
@@ -75,16 +80,10 @@ func (s *Server) Stop() {
 
 func (s *Server) waitServerReady() {
 	pingURL := fmt.Sprintf("%s/ping", s.url.String())
-
-	log.Info("waiting for router to be ready...", vlog.String("ping_url", pingURL))
-
 	timeout, cancelTimeout := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancelTimeout()
 	err := net.Wait(timeout, pingURL)
 	if err != nil {
-		log.Error(err)
-		os.Exit(1)
+		panic(err)
 	}
-
-	log.Info("router is ready")
 }

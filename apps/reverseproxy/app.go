@@ -8,17 +8,18 @@ import (
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/service"
 	"github.com/vertex-center/vertex/apps/reverseproxy/handler"
 	"github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/common/app/appmeta"
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/wI2L/fizz"
 )
 
-var Meta = app.Meta{
+var Meta = appmeta.Meta{
 	ID:          "reverse-proxy",
 	Name:        "Vertex Reverse Proxy",
 	Description: "Redirect traffic to your containers.",
 	Icon:        "router",
 	DefaultPort: "7508",
-	Dependencies: []*app.Meta{
+	Dependencies: []*appmeta.Meta{
 		&authmeta.Meta,
 	},
 }
@@ -36,7 +37,7 @@ func (a *App) Load(ctx *app.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) Meta() app.Meta {
+func (a *App) Meta() appmeta.Meta {
 	return Meta
 }
 

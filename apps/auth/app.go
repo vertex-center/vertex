@@ -8,8 +8,9 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/handler"
 	"github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
-	"github.com/vertex-center/vertex/cmd/storage"
 	"github.com/vertex-center/vertex/common/app"
+	"github.com/vertex-center/vertex/common/app/appmeta"
+	"github.com/vertex-center/vertex/common/storage"
 	"github.com/wI2L/fizz"
 )
 
@@ -31,7 +32,7 @@ func (a *App) Load(ctx *app.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) Meta() app.Meta {
+func (a *App) Meta() appmeta.Meta {
 	return meta.Meta
 }
 

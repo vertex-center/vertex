@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/juju/errors"
 	"github.com/vertex-center/vertex/apps/auth/api"
-	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vlog"
 )
 
@@ -16,12 +16,11 @@ func ReadAuth(c *gin.Context) {
 	tokenStr = strings.TrimSpace(tokenStr)
 	c.Set("token", tokenStr)
 	log.Debug("reading auth", vlog.String("token", tokenStr))
+	c.Next()
 }
 
 func Authenticated(c *gin.Context) {
-	tokenStr := c.GetString("token")
-
-	authClient := api.NewAuthClient(tokenStr)
+	authClient := api.NewAuthClient(c)
 	session, err := authClient.Verify(c)
 	if err != nil {
 		_ = c.AbortWithError(401, errors.NewUnauthorized(err, "invalid token"))

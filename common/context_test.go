@@ -3,9 +3,7 @@ package common
 import (
 	"testing"
 
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	ev "github.com/vertex-center/vertex/common/event"
 	"github.com/vertex-center/vertex/pkg/event"
 )
 
@@ -32,15 +30,6 @@ func (suite *VertexContextTestSuite) TestDispatchEvent() {
 	err := suite.context.DispatchEventWithErr(event.MockEvent{})
 	suite.Require().NoError(err)
 	bus.AssertExpectations(suite.T())
-}
-
-func (suite *VertexContextTestSuite) TestDispatchHardReset() {
-	bus := &event.MockBus{}
-	suite.context.bus = bus
-
-	err := suite.context.DispatchEventWithErr(ev.ServerHardReset{})
-	suite.Require().NoError(err)
-	bus.AssertNotCalled(suite.T(), "DispatchEvent", mock.Anything)
 }
 
 func (suite *VertexContextTestSuite) TestAddListener() {

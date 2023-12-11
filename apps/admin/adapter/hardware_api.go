@@ -14,5 +14,5 @@ func NewHardwareApiAdapter() port.HardwareAdapter {
 }
 
 func (hardwareApiAdapter) Reboot(ctx context.Context) error {
-	return api.NewAdminKernelClient().Reboot(ctx)
+	return api.NewAdminKernelClient(ctx).Reboot(ctx)
 }

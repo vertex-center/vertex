@@ -9,19 +9,11 @@ import (
 	"time"
 
 	"github.com/vertex-center/vertex/apps"
-	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/common/server"
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/netcap"
 	"github.com/vertex-center/vlog"
-	"github.com/wI2L/fizz/openapi"
-)
-
-var (
-	srv *server.Server
-	ctx *common.VertexContext
 )
 
 func main() {
@@ -42,20 +34,8 @@ func main() {
 		log.Error(err)
 	}
 
-	ctx = common.NewVertexContext(common.About{}, true)
-	url := config.Current.KernelURL("vertex")
-
-	info := openapi.Info{
-		Title:       "Vertex Kernel",
-		Description: "Create your self-hosted lab in one click.",
-		Version:     ctx.About().Version,
-	}
-
 	app.RunKernelApps(apps.Apps)
 
-	srv = server.New("kernel", &info, url, ctx)
-
-	exitKernelChan := srv.StartAsync()
 	exitVertexChan := make(chan error)
 
 	var vertex *exec.Cmd
@@ -71,20 +51,9 @@ func main() {
 		exitVertexChan <- vertex.Wait()
 	}()
 
-	for {
-		select {
-		case err := <-exitKernelChan:
-			if err != nil {
-				log.Error(err)
-			}
-			if vertex != nil && vertex.Process != nil {
-				_ = vertex.Process.Signal(os.Interrupt)
-				_, _ = vertex.Process.Wait()
-			}
-		case err := <-exitVertexChan:
-			if err != nil {
-				log.Error(err)
-			}
+	for err = range exitVertexChan {
+		if err != nil {
+			log.Error(err)
 		}
 	}
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/loopfz/gadgeto/tonic"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/vertex-center/vertex/pkg/log"
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vlog"
 	"github.com/wI2L/fizz"
 )

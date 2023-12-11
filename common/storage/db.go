@@ -8,9 +8,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/vsql"
-	"github.com/vertex-center/vlog"
 	"gopkg.in/yaml.v3"
 
 	_ "github.com/lib/pq"
@@ -53,7 +51,6 @@ type DBParams struct {
 
 func NewDB(params DBParams) (DB, error) {
 	if params.ID == "" {
-		log.Warn("no database ID provided, using a placeholder one")
 		params.ID = "default"
 	}
 	if params.configPath == "" {
@@ -84,7 +81,6 @@ func NewDB(params DBParams) (DB, error) {
 
 func (db *DB) Connect() error {
 	driver := db.config.DbmsName
-	log.Info("connecting to the database", vlog.String("driver", driver))
 	return db.ConnectTo(driver, db.config.DataSource, 10)
 }
 
@@ -95,14 +91,11 @@ func (db *DB) ConnectTo(driver string, dataSource string, retries int) error {
 			if i == retries-1 {
 				return err
 			}
-			log.Info("failed to connect to the database, retrying...",
-				vlog.String("error", err.Error()),
-				vlog.Int("retry", i+1),
-			)
+			println("failed to connect to the database, retrying...")
 			<-time.After(1 * time.Second)
 		} else {
 			db.DB = conn
-			log.Info("connected to the database after some retries", vlog.Int("count", i+1))
+			println("connected to the database after some retries")
 			break
 		}
 	}

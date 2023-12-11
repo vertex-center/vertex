@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"testing"
 
 	"github.com/google/uuid"
@@ -131,7 +132,7 @@ func (suite *ContainerServiceTestSuite) TestSearch() {
 	}
 
 	for _, t := range tests {
-		results := suite.service.Search(t.query)
+		results := suite.service.Search(context.Background(), t.query)
 
 		suite.Len(results, len(t.expected))
 
@@ -147,7 +148,7 @@ func (suite *ContainerServiceTestSuite) TestSearch() {
 }
 
 func (suite *ContainerServiceTestSuite) TestGetTags() {
-	tags := suite.service.GetTags()
+	tags := suite.service.GetTags(context.Background())
 
 	suite.Len(tags, 3)
 	suite.Contains(tags, "Global Tag")

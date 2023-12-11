@@ -1,13 +1,8 @@
 package common
 
 import (
-	"reflect"
-
-	ev "github.com/vertex-center/vertex/common/event"
-	"github.com/vertex-center/vertex/config"
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/pkg/event"
-	"github.com/vertex-center/vertex/pkg/log"
-	"github.com/vertex-center/vlog"
 )
 
 type VertexContext struct {
@@ -32,16 +27,6 @@ func (c *VertexContext) DispatchEvent(e event.Event) {
 }
 
 func (c *VertexContext) DispatchEventWithErr(e event.Event) error {
-	log.Debug("dispatching event", vlog.String("name", reflect.TypeOf(e).String()))
-
-	if _, ok := e.(ev.ServerHardReset); ok {
-		if !config.Current.Debug() {
-			log.Warn("hard reset event received but skipped; this can be a malicious application, or you may have forgotten to switch to the development mode.")
-			return nil
-		}
-		log.Warn("hard reset event dispatched.")
-	}
-
 	return c.bus.DispatchEvent(e)
 }
 

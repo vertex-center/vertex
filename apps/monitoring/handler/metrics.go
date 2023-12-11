@@ -33,8 +33,7 @@ type InstallCollectorParams struct {
 
 func (r *metricsHandler) InstallCollector() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *InstallCollectorParams) error {
-		token := c.MustGet("token").(string)
-		return r.metricsService.InstallCollector(c, token, params.Collector)
+		return r.metricsService.InstallCollector(c, params.Collector)
 	})
 }
 
@@ -44,7 +43,6 @@ type InstallVisualizerParams struct {
 
 func (r *metricsHandler) InstallVisualizer() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *InstallVisualizerParams) error {
-		token := c.MustGet("token").(string)
-		return r.metricsService.InstallVisualizer(c, token, params.Visualizer)
+		return r.metricsService.InstallVisualizer(c, params.Visualizer)
 	})
 }

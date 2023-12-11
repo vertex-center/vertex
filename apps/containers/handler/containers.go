@@ -9,8 +9,8 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	apptypes "github.com/vertex-center/vertex/common/app"
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/pkg/event"
-	"github.com/vertex-center/vertex/pkg/log"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
@@ -28,13 +28,13 @@ func NewContainersHandler(ctx *apptypes.Context, containerService port.Container
 
 func (h *containersHandler) Get() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context) (map[uuid.UUID]*types.Container, error) {
-		return h.containerService.GetAll(), nil
+		return h.containerService.GetAll(c), nil
 	})
 }
 
 func (h *containersHandler) GetTags() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context) ([]string, error) {
-		return h.containerService.GetTags(), nil
+		return h.containerService.GetTags(c), nil
 	})
 }
 
@@ -52,13 +52,13 @@ func (h *containersHandler) Search() gin.HandlerFunc {
 			query.Tags = &tags
 		}
 
-		return h.containerService.Search(query), nil
+		return h.containerService.Search(c, query), nil
 	})
 }
 
 func (h *containersHandler) CheckForUpdates() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context) (map[uuid.UUID]*types.Container, error) {
-		return h.containerService.CheckForUpdates()
+		return h.containerService.CheckForUpdates(c)
 	})
 }
 
