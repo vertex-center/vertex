@@ -1,48 +1,44 @@
 package types
 
 import (
-	"errors"
 	"fmt"
 
+	"github.com/juju/errors"
 	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vlog"
 )
 
-const (
-	MaxSupportedVersion Version = 2
-)
+const MaxSupportedVersion Version = 2
 
-var (
-	ErrServiceNotFound = errors.New("the service was not found")
-)
+var ErrServiceNotFound = errors.NotFoundf("service")
 
 type Version int
 
 type ServiceVersioning struct {
 	// Version of the service format used.
-	Version Version `yaml:"version" json:"version"`
+	Version Version `yaml:"version" json:"version" example:"2"`
 }
 
 type Service struct {
 	ServiceVersioning `yaml:",inline"`
 
 	// ID is the identifier of the service. It must be unique.
-	ID string `yaml:"id" json:"id"`
+	ID string `yaml:"id" json:"id" example:"vertex-auth"`
 
 	// Name is the displayed name of the service.
-	Name string `yaml:"name" json:"name"`
+	Name string `yaml:"name" json:"name" example:"Vertex Auth"`
 
 	// Repository is the url of the repository, if it is an external repository.
-	Repository *string `yaml:"repository,omitempty" json:"repository,omitempty"`
+	Repository *string `yaml:"repository,omitempty" json:"repository,omitempty" example:"https://github.com/vertex-center/vertex"`
 
 	// Description describes the service in a few words.
-	Description string `yaml:"description" json:"description"`
+	Description string `yaml:"description" json:"description" example:"The authentication service of Vertex."`
 
 	// Color is the main color of the service.
-	Color *string `yaml:"color,omitempty" json:"color,omitempty"`
+	Color *string `yaml:"color,omitempty" json:"color,omitempty" example:"#f38ba8"`
 
 	// Icon is the icon link of the service, located in ./live/services/icons/.
-	Icon *string `yaml:"icon,omitempty" json:"icon,omitempty"`
+	Icon *string `yaml:"icon,omitempty" json:"icon,omitempty" example:"vertex.svg"`
 
 	// Features describes some features of the service to help Vertex.
 	Features *Features `yaml:"features,omitempty" json:"features,omitempty"`
@@ -167,26 +163,26 @@ type DatabaseEnvironmentNames struct {
 
 type DatabaseFeature struct {
 	// The database Type. Can be redis, postgres...
-	Type string `yaml:"type" json:"type"`
+	Type string `yaml:"type" json:"type" example:"postgres"`
 
 	// The database Category. Can be 'sql', 'redis'...
-	Category string `yaml:"category" json:"category"`
+	Category string `yaml:"category" json:"category" example:"sql"`
 
 	// The database Port. Must be the name
 	// of an environment variable.
-	Port string `yaml:"port" json:"port"`
+	Port string `yaml:"port" json:"port" example:"5432"`
 
 	// The Username to connect to the database. Must be the name
 	// of an environment variable.
-	Username *string `yaml:"username" json:"username"`
+	Username *string `yaml:"username" json:"username" example:"postgres"`
 
 	// The Password to connect to the database. Must be the name
 	// of an environment variable.
-	Password *string `yaml:"password" json:"password"`
+	Password *string `yaml:"password" json:"password" example:"postgres"`
 
 	// The DefaultDatabase to connect to the database. Must be the name
 	// of an environment variable.
-	DefaultDatabase *string `yaml:"default-database" json:"database_default"`
+	DefaultDatabase *string `yaml:"default-database" json:"database_default" example:"postgres"`
 }
 
 type Features struct {
@@ -198,28 +194,28 @@ type Features struct {
 type ServiceEnv struct {
 	// Type is the environment variable type.
 	// It can be: port, string, url.
-	Type string `yaml:"type" json:"type"`
+	Type string `yaml:"type" json:"type" example:"port"`
 
 	// Name is the environment variable name that will be used by the service.
-	Name string `yaml:"name" json:"name"`
+	Name string `yaml:"name" json:"name" example:"PORT"`
 
 	// DisplayName is a readable name for the user.
-	DisplayName string `yaml:"display_name" json:"display_name"`
+	DisplayName string `yaml:"display_name" json:"display_name" example:"Server Port"`
 
 	// Secret is true if the value should not be read.
-	Secret *bool `yaml:"secret,omitempty" json:"secret,omitempty"`
+	Secret *bool `yaml:"secret,omitempty" json:"secret,omitempty" example:"false"`
 
 	// Default defines a default value.
-	Default string `yaml:"default,omitempty" json:"default,omitempty"`
+	Default string `yaml:"default,omitempty" json:"default,omitempty" example:"8080"`
 
 	// Description describes this variable to the user.
-	Description string `yaml:"description" json:"description"`
+	Description string `yaml:"description" json:"description" example:"The port where the server will listen."`
 }
 
 type ServiceDependency struct{}
 
 type ServiceClone struct {
-	Repository string `yaml:"repository" json:"repository"`
+	Repository string `yaml:"repository" json:"repository" example:"https://github.com/vertex-center/vertex"`
 }
 
 type ServiceMethodScript struct {
@@ -240,13 +236,13 @@ type ServiceMethodRelease struct {
 
 type ServiceMethodDocker struct {
 	// Image is the Docker image to run.
-	Image *string `yaml:"image,omitempty" json:"image,omitempty"`
+	Image *string `yaml:"image,omitempty" json:"image,omitempty" example:"ghcr.io/vertex-center/vertex"`
 
 	// Clone describes the repository to clone if some files are needed to run the script.
 	Clone *ServiceClone `yaml:"clone,omitempty" json:"clone,omitempty"`
 
 	// Dockerfile is the name of the Dockerfile if the repository is cloned.
-	Dockerfile *string `yaml:"dockerfile,omitempty" json:"dockerfile,omitempty"`
+	Dockerfile *string `yaml:"dockerfile,omitempty" json:"dockerfile,omitempty" example:"Dockerfile"`
 
 	// Ports is a map containing docker port as a key, and output port as a value.
 	// The output port is automatically adjusted with PORT environment variables.
@@ -284,22 +280,22 @@ type ServiceMethods struct {
 
 type URL struct {
 	// Name is the name displayed to the used describing this URL.
-	Name string `yaml:"name" json:"name"`
+	Name string `yaml:"name" json:"name" example:"Vertex Client"`
 
 	// Port is the port where this url is supposed to be.
 	// Note that this port is mapped to the default value of an environment definition if possible,
 	// but the port here doesn't change with the environment.
-	Port string `yaml:"port" json:"port"`
+	Port string `yaml:"port" json:"port" example:"3000"`
 
 	// HomeRoute allows specifying a route to change the home path.
-	HomeRoute *string `yaml:"home,omitempty" json:"home,omitempty"`
+	HomeRoute *string `yaml:"home,omitempty" json:"home,omitempty" example:"/home"`
 
 	// PingRoute allows specifying a route to change the ping path.
-	PingRoute *string `yaml:"ping,omitempty" json:"ping,omitempty"`
+	PingRoute *string `yaml:"ping,omitempty" json:"ping,omitempty" example:"/ping"`
 
 	// Kind is the type of url.
 	// It can be: client, server.
-	Kind string `yaml:"kind" json:"kind"`
+	Kind string `yaml:"kind" json:"kind" enum:"client,server"`
 }
 
 type SetDatabasesOptions struct {

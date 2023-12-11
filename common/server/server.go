@@ -41,7 +41,7 @@ func New(id string, info *openapi.Info, u *url.URL, ctx *common.VertexContext) *
 			router.WithMiddleware(cors.New(cfg)),
 			router.WithMiddleware(requestID()),
 			router.WithMiddleware(correlationID()),
-			router.WithMiddleware(logger(u)),
+			router.WithMiddleware(logger(u, id)),
 			router.WithMiddleware(gin.Recovery()),
 		),
 	}

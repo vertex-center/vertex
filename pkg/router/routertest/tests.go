@@ -2,7 +2,9 @@ package routertest
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http/httptest"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -11,16 +13,25 @@ import (
 
 type RequestOptions struct {
 	Headers map[string]string
+	Params  map[string]string
+	Body    interface{}
 }
 
 func Request(method string, handler gin.HandlerFunc, opts RequestOptions) *httptest.ResponseRecorder {
+	var route, path string
+	for k, v := range opts.Params {
+		route += fmt.Sprintf("/:%v", k)
+		path += fmt.Sprintf("/%v", v)
+	}
+
 	// Setup
 	r := router.New(nil)
-	r.Handle("/", method, []fizz.OperationOption{}, handler)
+	r.Handle(route, method, []fizz.OperationOption{}, handler)
 	w := httptest.NewRecorder()
 
 	// Make the request
-	req := httptest.NewRequest(method, "/", nil)
+	body := strings.NewReader(fmt.Sprintf("%v", opts.Body))
+	req := httptest.NewRequest(method, path, body)
 
 	// Add headers
 	if opts.Headers != nil {

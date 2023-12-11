@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/loopfz/gadgeto/tonic"
+	"github.com/loopfz/gadgeto/tonic/utils/jujerr"
 	"github.com/wI2L/fizz"
 	"github.com/wI2L/fizz/openapi"
 )
@@ -27,6 +28,8 @@ func WithMiddleware(middleware ...gin.HandlerFunc) Option {
 }
 
 func New(info *openapi.Info, opts ...Option) *Router {
+	tonic.SetErrorHook(jujerr.ErrHook)
+
 	e := gin.New()
 	for _, opt := range opts {
 		opt(e)

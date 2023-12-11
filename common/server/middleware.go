@@ -18,7 +18,7 @@ const (
 	KeyCorrelationID = "correlationID"
 )
 
-func logger(u *url.URL) gin.HandlerFunc {
+func logger(u *url.URL, app string) gin.HandlerFunc {
 	urlString := u.String()
 	return gin.LoggerWithFormatter(func(params gin.LogFormatterParams) string {
 		args := []vlog.KeyValue{
@@ -26,6 +26,7 @@ func logger(u *url.URL) gin.HandlerFunc {
 			vlog.String("correlation_id", params.Request.Header.Get(HeaderXCorrelationID)),
 			vlog.String("url", urlString),
 			vlog.String("method", params.Method),
+			vlog.String("app", app),
 			vlog.Int("status", params.StatusCode),
 			vlog.String("path", params.Path),
 			vlog.String("latency", params.Latency.String()),
