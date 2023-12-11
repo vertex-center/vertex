@@ -18,14 +18,14 @@ import (
 
 type sqlService struct {
 	uuid      uuid.UUID
-	dbms      map[uuid.UUID]port.DBMSAdapter
+	dbms      map[types.ContainerID]port.DBMSAdapter
 	dbmsMutex *sync.RWMutex
 }
 
 func New(ctx *app.Context) port.SqlService {
 	s := &sqlService{
 		uuid:      uuid.New(),
-		dbms:      map[uuid.UUID]port.DBMSAdapter{},
+		dbms:      map[types.ContainerID]port.DBMSAdapter{},
 		dbmsMutex: &sync.RWMutex{},
 	}
 	ctx.AddListener(s)

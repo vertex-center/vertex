@@ -3,14 +3,13 @@ package port
 import (
 	"context"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 )
 
 type MockContainerService struct{ mock.Mock }
 
-func (m *MockContainerService) Get(ctx context.Context, uuid uuid.UUID) (*types.Container, error) {
+func (m *MockContainerService) Get(ctx context.Context, uuid types.ContainerID) (*types.Container, error) {
 	args := m.Called(ctx, uuid)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
@@ -18,9 +17,9 @@ func (m *MockContainerService) Get(ctx context.Context, uuid uuid.UUID) (*types.
 	return args.Get(0).(*types.Container), args.Error(1)
 }
 
-func (m *MockContainerService) GetAll(ctx context.Context) map[uuid.UUID]*types.Container {
+func (m *MockContainerService) GetAll(ctx context.Context) map[types.ContainerID]*types.Container {
 	args := m.Called(ctx)
-	return args.Get(0).(map[uuid.UUID]*types.Container)
+	return args.Get(0).(map[types.ContainerID]*types.Container)
 }
 
 func (m *MockContainerService) GetTags(ctx context.Context) []string {
@@ -28,12 +27,12 @@ func (m *MockContainerService) GetTags(ctx context.Context) []string {
 	return args.Get(0).([]string)
 }
 
-func (m *MockContainerService) Search(ctx context.Context, query types.ContainerSearchQuery) map[uuid.UUID]*types.Container {
+func (m *MockContainerService) Search(ctx context.Context, query types.ContainerSearchQuery) map[types.ContainerID]*types.Container {
 	args := m.Called(ctx, query)
-	return args.Get(0).(map[uuid.UUID]*types.Container)
+	return args.Get(0).(map[types.ContainerID]*types.Container)
 }
 
-func (m *MockContainerService) Exists(ctx context.Context, uuid uuid.UUID) bool {
+func (m *MockContainerService) Exists(ctx context.Context, uuid types.ContainerID) bool {
 	args := m.Called(ctx, uuid)
 	return args.Bool(0)
 }
@@ -53,12 +52,12 @@ func (m *MockContainerService) Install(ctx context.Context, service types.Servic
 	return args.Get(0).(*types.Container), args.Error(1)
 }
 
-func (m *MockContainerService) CheckForUpdates(tx context.Context) (map[uuid.UUID]*types.Container, error) {
+func (m *MockContainerService) CheckForUpdates(tx context.Context) (map[types.ContainerID]*types.Container, error) {
 	args := m.Called(tx)
-	return args.Get(0).(map[uuid.UUID]*types.Container), args.Error(1)
+	return args.Get(0).(map[types.ContainerID]*types.Container), args.Error(1)
 }
 
-func (m *MockContainerService) SetDatabases(ctx context.Context, inst *types.Container, databases map[string]uuid.UUID, options map[string]*types.SetDatabasesOptions) error {
+func (m *MockContainerService) SetDatabases(ctx context.Context, inst *types.Container, databases map[string]types.ContainerID, options map[string]*types.SetDatabasesOptions) error {
 	args := m.Called(ctx, inst, databases, options)
 	return args.Error(0)
 }

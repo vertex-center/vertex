@@ -7,7 +7,6 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common/log"
 
-	"github.com/google/uuid"
 	"github.com/vertex-center/vlog"
 )
 
@@ -61,6 +60,6 @@ func (s *containerServiceService) Save(inst *types.Container, service types.Serv
 	return s.adapter.Save(inst.UUID, service)
 }
 
-func (s *containerServiceService) Load(uuid uuid.UUID) (types.Service, error) {
+func (s *containerServiceService) Load(uuid types.ContainerID) (types.Service, error) {
 	return s.adapter.Load(uuid)
 }

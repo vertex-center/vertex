@@ -5,7 +5,6 @@ import (
 	"os"
 	"path"
 
-	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common/log"
@@ -38,7 +37,7 @@ func NewContainerSettingsFSAdapter(params *ContainerSettingsFSAdapterParams) por
 	return adapter
 }
 
-func (a *containerSettingsFSAdapter) Save(uuid uuid.UUID, settings types.ContainerSettings) error {
+func (a *containerSettingsFSAdapter) Save(uuid types.ContainerID, settings types.ContainerSettings) error {
 	settingsPath := path.Join(a.containersPath, uuid.String(), ContainerSettingsPath)
 
 	settingsBytes, err := yaml.Marshal(settings)
@@ -54,7 +53,7 @@ func (a *containerSettingsFSAdapter) Save(uuid uuid.UUID, settings types.Contain
 	return nil
 }
 
-func (a *containerSettingsFSAdapter) Load(uuid uuid.UUID) (types.ContainerSettings, error) {
+func (a *containerSettingsFSAdapter) Load(uuid types.ContainerID) (types.ContainerSettings, error) {
 	settingsPath := path.Join(a.containersPath, uuid.String(), ContainerSettingsPath)
 
 	settingsBytes, err := os.ReadFile(settingsPath)

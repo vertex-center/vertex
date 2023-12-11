@@ -3,7 +3,6 @@ package handler
 import (
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
@@ -31,7 +30,7 @@ func (suite *ContainerHandlerTestSuite) SetupSubTest() {
 		ContainerService: &suite.service,
 	}).(*containerHandler)
 	suite.testContainer = types.Container{
-		UUID: uuid.New(),
+		UUID: types.NewContainerID(),
 	}
 	suite.opts = routertest.RequestOptions{
 		Params: map[string]string{

@@ -20,36 +20,50 @@ var (
 	ErrDatabaseIDNotFound    = errors.NotFoundf("database id")
 )
 
-type Container struct {
-	ContainerSettings
+type (
+	ContainerID struct{ uuid.UUID }
 
-	Service       Service               `json:"service"`
-	UUID          uuid.UUID             `json:"uuid" example:"1cb8c970-395f-4810-8c9e-e4df35f456e1"`
-	Status        string                `json:"status" example:"running"`
-	Env           ContainerEnvVariables `json:"environment,omitempty"`
-	Update        *ContainerUpdate      `json:"update,omitempty"`
-	ServiceUpdate ServiceUpdate         `json:"service_update,omitempty"`
-	CacheVersions []string              `json:"cache_versions,omitempty"`
+	Container struct {
+		ContainerSettings
+
+		Service       Service               `json:"service"`
+		UUID          ContainerID           `json:"uuid" example:"1cb8c970-395f-4810-8c9e-e4df35f456e1"`
+		Status        string                `json:"status" example:"running"`
+		Env           ContainerEnvVariables `json:"environment,omitempty"`
+		Update        *ContainerUpdate      `json:"update,omitempty"`
+		ServiceUpdate ServiceUpdate         `json:"service_update,omitempty"`
+		CacheVersions []string              `json:"cache_versions,omitempty"`
+	}
+
+	ContainerSearchQuery struct {
+		Tags     *[]string `json:"tags,omitempty"`
+		Features *[]string `json:"features,omitempty"`
+	}
+
+	ContainerUpdate struct {
+		CurrentVersion string `json:"current_version"`
+		LatestVersion  string `json:"latest_version"`
+	}
+
+	DownloadProgress struct {
+		ID      string `json:"id"`
+		Status  string `json:"status"`
+		Current int64  `json:"current,omitempty"`
+		Total   int64  `json:"total,omitempty"`
+	}
+)
+
+func NewContainerID() ContainerID { return ContainerID{uuid.New()} }
+
+func ParseContainerID(s string) (ContainerID, error) {
+	id, err := uuid.Parse(s)
+	return ContainerID{id}, err
 }
 
-type ContainerSearchQuery struct {
-	Tags     *[]string `json:"tags,omitempty"`
-	Features *[]string `json:"features,omitempty"`
-}
+func (*ContainerID) Type() string   { return "string" }
+func (*ContainerID) Format() string { return "uuid" }
 
-type ContainerUpdate struct {
-	CurrentVersion string `json:"current_version"`
-	LatestVersion  string `json:"latest_version"`
-}
-
-type DownloadProgress struct {
-	ID      string `json:"id"`
-	Status  string `json:"status"`
-	Current int64  `json:"current,omitempty"`
-	Total   int64  `json:"total,omitempty"`
-}
-
-func NewContainer(id uuid.UUID, service Service) Container {
+func NewContainer(id ContainerID, service Service) Container {
 	return Container{
 		Service: service,
 		UUID:    id,
@@ -58,13 +72,8 @@ func NewContainer(id uuid.UUID, service Service) Container {
 	}
 }
 
-func (i *Container) DockerImageVertexName() string {
-	return "vertex_image_" + i.UUID.String()
-}
-
-func (i *Container) DockerContainerName() string {
-	return "VERTEX_CONTAINER_" + i.UUID.String()
-}
+func (i *Container) DockerImageVertexName() string { return "vertex_image_" + i.UUID.String() }
+func (i *Container) DockerContainerName() string   { return "VERTEX_CONTAINER_" + i.UUID.String() }
 
 func (i *Container) IsRunning() bool {
 	return i.Status != ContainerStatusOff && i.Status != ContainerStatusError

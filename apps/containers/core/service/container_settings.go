@@ -1,7 +1,6 @@
 package service
 
 import (
-	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 )
@@ -43,7 +42,7 @@ func (s *containerSettingsService) SetDisplayName(inst *types.Container, value s
 	return s.adapter.Save(inst.UUID, inst.ContainerSettings)
 }
 
-func (s *containerSettingsService) SetDatabases(inst *types.Container, databases map[string]uuid.UUID) error {
+func (s *containerSettingsService) SetDatabases(inst *types.Container, databases map[string]types.ContainerID) error {
 	inst.Databases = databases
 	return s.adapter.Save(inst.UUID, inst.ContainerSettings)
 }

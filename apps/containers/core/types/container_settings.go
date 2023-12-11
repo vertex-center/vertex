@@ -1,7 +1,5 @@
 package types
 
-import "github.com/google/uuid"
-
 type ContainerSettings struct {
 	// Method indicates how the container is installed.
 	// It can be by script, release or docker.
@@ -16,7 +14,7 @@ type ContainerSettings struct {
 
 	// Databases describe the databases used by the container.
 	// The key is the database ID, and the value is the database container UUID.
-	Databases map[string]uuid.UUID `json:"databases,omitempty" yaml:"databases,omitempty"`
+	Databases map[string]ContainerID `json:"databases,omitempty" yaml:"databases,omitempty"`
 
 	// Version is the version of the program.
 	Version *string `json:"version,omitempty" yaml:"version,omitempty"`

@@ -5,43 +5,42 @@ import (
 	"io"
 
 	dockertypes "github.com/docker/docker/api/types"
-	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 )
 
 type (
 	ContainerAdapter interface {
-		Create(uuid uuid.UUID) error
-		Delete(uuid uuid.UUID) error
-		GetAll() ([]uuid.UUID, error)
+		Create(uuid types.ContainerID) error
+		Delete(uuid types.ContainerID) error
+		GetAll() ([]types.ContainerID, error)
 	}
 
 	ContainerEnvAdapter interface {
-		Save(uuid uuid.UUID, env types.ContainerEnvVariables) error
-		Load(uuid uuid.UUID) (types.ContainerEnvVariables, error)
+		Save(uuid types.ContainerID, env types.ContainerEnvVariables) error
+		Load(uuid types.ContainerID) (types.ContainerEnvVariables, error)
 	}
 
 	ContainerServiceAdapter interface {
-		Save(uuid uuid.UUID, service types.Service) error
-		Load(uuid uuid.UUID) (types.Service, error)
-		LoadRaw(uuid uuid.UUID) (interface{}, error)
+		Save(uuid types.ContainerID, service types.Service) error
+		Load(uuid types.ContainerID) (types.Service, error)
+		LoadRaw(uuid types.ContainerID) (interface{}, error)
 	}
 
 	ContainerSettingsAdapter interface {
-		Save(uuid uuid.UUID, settings types.ContainerSettings) error
-		Load(uuid uuid.UUID) (types.ContainerSettings, error)
+		Save(uuid types.ContainerID, settings types.ContainerSettings) error
+		Load(uuid types.ContainerID) (types.ContainerSettings, error)
 	}
 
 	ContainerLogsAdapter interface {
-		Register(uuid uuid.UUID) error
-		Unregister(uuid uuid.UUID) error
+		Register(uuid types.ContainerID) error
+		Unregister(uuid types.ContainerID) error
 		UnregisterAll() error
 
-		Push(uuid uuid.UUID, line types.LogLine)
-		Pop(uuid uuid.UUID) (types.LogLine, error)
+		Push(uuid types.ContainerID, line types.LogLine)
+		Pop(uuid types.ContainerID) (types.LogLine, error)
 
 		// LoadBuffer will load the latest logs kept in memory.
-		LoadBuffer(uuid uuid.UUID) ([]types.LogLine, error)
+		LoadBuffer(uuid types.ContainerID) ([]types.LogLine, error)
 	}
 
 	ContainerRunnerAdapter interface {

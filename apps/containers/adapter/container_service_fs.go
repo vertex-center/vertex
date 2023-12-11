@@ -4,7 +4,6 @@ import (
 	"os"
 	"path"
 
-	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common/log"
@@ -40,7 +39,7 @@ func NewContainerServiceFSAdapter(params *ContainerServiceFSAdapterParams) port.
 	return adapter
 }
 
-func (a *containerServiceFSAdapter) Save(uuid uuid.UUID, service types.Service) error {
+func (a *containerServiceFSAdapter) Save(uuid types.ContainerID, service types.Service) error {
 	servicePath := path.Join(a.containersPath, uuid.String(), ContainerServicePath)
 
 	err := os.MkdirAll(path.Join(a.containersPath, uuid.String(), ".vertex"), os.ModePerm)
@@ -61,7 +60,7 @@ func (a *containerServiceFSAdapter) Save(uuid uuid.UUID, service types.Service) 
 	return nil
 }
 
-func (a *containerServiceFSAdapter) Load(uuid uuid.UUID) (types.Service, error) {
+func (a *containerServiceFSAdapter) Load(uuid types.ContainerID) (types.Service, error) {
 	servicePath := path.Join(a.containersPath, uuid.String(), ContainerServicePath)
 
 	data, err := os.ReadFile(servicePath)
@@ -75,7 +74,7 @@ func (a *containerServiceFSAdapter) Load(uuid uuid.UUID) (types.Service, error) 
 	return service, err
 }
 
-func (a *containerServiceFSAdapter) LoadRaw(uuid uuid.UUID) (interface{}, error) {
+func (a *containerServiceFSAdapter) LoadRaw(uuid types.ContainerID) (interface{}, error) {
 	servicePath := path.Join(a.containersPath, uuid.String(), ContainerServicePath)
 
 	data, err := os.ReadFile(servicePath)

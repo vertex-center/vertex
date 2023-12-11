@@ -99,7 +99,7 @@ func (suite *ContainerLogsFSAdapterTestSuite) TearDownTest() {
 }
 
 func (suite *ContainerLogsFSAdapterTestSuite) TestRegisterUnregister() {
-	instID := uuid.New()
+	instID := containerstypes.NewContainerID()
 
 	// Register
 	err := suite.adapter.Register(instID)
@@ -127,8 +127,8 @@ func (suite *ContainerLogsFSAdapterTestSuite) TestRegisterUnregister() {
 }
 
 func (suite *ContainerLogsFSAdapterTestSuite) TestUnregisterAll() {
-	instID1 := uuid.New()
-	instID2 := uuid.New()
+	instID1 := containerstypes.NewContainerID()
+	instID2 := containerstypes.NewContainerID()
 
 	// Register
 	err := suite.adapter.Register(instID1)
@@ -148,7 +148,7 @@ func (suite *ContainerLogsFSAdapterTestSuite) TestUnregisterAll() {
 }
 
 func (suite *ContainerLogsFSAdapterTestSuite) TestPush() {
-	instID := uuid.New()
+	instID := containerstypes.NewContainerID()
 
 	// Register
 	err := suite.adapter.Register(instID)
@@ -175,7 +175,7 @@ func (suite *ContainerLogsFSAdapterTestSuite) TestPush() {
 }
 
 func (suite *ContainerLogsFSAdapterTestSuite) TestPop() {
-	instID := uuid.New()
+	instID := containerstypes.NewContainerID()
 
 	// Register
 	err := suite.adapter.Register(instID)

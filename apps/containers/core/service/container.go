@@ -37,7 +37,7 @@ type containerService struct {
 	containerSettingsService port.ContainerSettingsService
 	serviceService           port.ServiceService
 
-	containers      map[uuid.UUID]*types.Container
+	containers      map[types.ContainerID]*types.Container
 	containersMutex *sync.RWMutex
 }
 
@@ -66,7 +66,7 @@ func NewContainerService(params ContainerServiceParams) port.ContainerService {
 		containerSettingsService: params.ContainerSettingsService,
 		serviceService:           params.ServiceService,
 
-		containers:      make(map[uuid.UUID]*types.Container),
+		containers:      make(map[types.ContainerID]*types.Container),
 		containersMutex: &sync.RWMutex{},
 	}
 
@@ -75,7 +75,7 @@ func NewContainerService(params ContainerServiceParams) port.ContainerService {
 	return s
 }
 
-func (s *containerService) Get(ctx context.Context, uuid uuid.UUID) (*types.Container, error) {
+func (s *containerService) Get(ctx context.Context, uuid types.ContainerID) (*types.Container, error) {
 	s.containersMutex.RLock()
 	defer s.containersMutex.RUnlock()
 
@@ -86,7 +86,7 @@ func (s *containerService) Get(ctx context.Context, uuid uuid.UUID) (*types.Cont
 	return container, nil
 }
 
-func (s *containerService) GetAll(ctx context.Context) map[uuid.UUID]*types.Container {
+func (s *containerService) GetAll(ctx context.Context) map[types.ContainerID]*types.Container {
 	s.containersMutex.RLock()
 	defer s.containersMutex.RUnlock()
 
@@ -118,8 +118,8 @@ func (s *containerService) GetTags(ctx context.Context) []string {
 }
 
 // Search returns all containers that match the query.
-func (s *containerService) Search(ctx context.Context, query types.ContainerSearchQuery) map[uuid.UUID]*types.Container {
-	containers := map[uuid.UUID]*types.Container{}
+func (s *containerService) Search(ctx context.Context, query types.ContainerSearchQuery) map[types.ContainerID]*types.Container {
+	containers := map[types.ContainerID]*types.Container{}
 
 	s.containersMutex.RLock()
 	defer s.containersMutex.RUnlock()
@@ -141,7 +141,7 @@ func (s *containerService) Search(ctx context.Context, query types.ContainerSear
 	return containers
 }
 
-func (s *containerService) Exists(ctx context.Context, uuid uuid.UUID) bool {
+func (s *containerService) Exists(ctx context.Context, uuid types.ContainerID) bool {
 	s.containersMutex.RLock()
 	defer s.containersMutex.RUnlock()
 
@@ -185,7 +185,7 @@ func (s *containerService) StartAll(ctx context.Context) {
 	s.containersMutex.RLock()
 	defer s.containersMutex.RUnlock()
 
-	var ids []uuid.UUID
+	var ids []types.ContainerID
 
 	for _, inst := range s.containers {
 		// vertex containers autostart are managed by the startup service.
@@ -211,7 +211,7 @@ func (s *containerService) StartAll(ctx context.Context) {
 
 	// Start them
 	for _, id := range ids {
-		go func(id uuid.UUID) {
+		go func(id types.ContainerID) {
 			inst, err := s.Get(ctx, id)
 			if err != nil {
 				log.Error(err)
@@ -275,7 +275,7 @@ func (s *containerService) DeleteAll(ctx context.Context) {
 }
 
 func (s *containerService) Install(ctx context.Context, service types.Service, method string) (*types.Container, error) {
-	id := uuid.New()
+	id := types.NewContainerID()
 	err := s.containerAdapter.Create(id)
 	if err != nil {
 		return nil, err
@@ -324,7 +324,7 @@ func (s *containerService) Install(ctx context.Context, service types.Service, m
 	return inst, nil
 }
 
-func (s *containerService) CheckForUpdates(ctx context.Context) (map[uuid.UUID]*types.Container, error) {
+func (s *containerService) CheckForUpdates(ctx context.Context) (map[types.ContainerID]*types.Container, error) {
 	for _, inst := range s.GetAll(ctx) {
 		err := s.containerRunnerService.CheckForUpdates(ctx, inst)
 		if err != nil {
@@ -335,7 +335,7 @@ func (s *containerService) CheckForUpdates(ctx context.Context) (map[uuid.UUID]*
 	return s.GetAll(ctx), nil
 }
 
-func (s *containerService) load(ctx context.Context, uuid uuid.UUID) error {
+func (s *containerService) load(ctx context.Context, uuid types.ContainerID) error {
 	service, err := s.containerServiceService.Load(uuid)
 	if err != nil {
 		return err
@@ -378,7 +378,7 @@ func (s *containerService) load(ctx context.Context, uuid uuid.UUID) error {
 	return nil
 }
 
-func (s *containerService) SetDatabases(ctx context.Context, inst *types.Container, databases map[string]uuid.UUID, options map[string]*types.SetDatabasesOptions) error {
+func (s *containerService) SetDatabases(ctx context.Context, inst *types.Container, databases map[string]types.ContainerID, options map[string]*types.SetDatabasesOptions) error {
 	for db := range databases {
 		if _, ok := inst.Service.Databases[db]; !ok {
 			return types.ErrDatabaseIDNotFound

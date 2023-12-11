@@ -16,7 +16,6 @@ import (
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/go-connections/nat"
 	"github.com/google/go-containerregistry/pkg/crane"
-	"github.com/google/uuid"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
@@ -493,12 +492,12 @@ func (a containerRunnerDockerAdapter) readLogs(ctx context.Context, containerID 
 	return stdout, stderr, nil
 }
 
-func (a containerRunnerDockerAdapter) getVolumePath(ctx context.Context, uuid uuid.UUID) string {
+func (a containerRunnerDockerAdapter) getVolumePath(ctx context.Context, uuid types.ContainerID) string {
 	appPath := a.getAppPath(ctx, "live_docker")
 	return path.Join(appPath, "volumes", uuid.String())
 }
 
-func (a containerRunnerDockerAdapter) getContainerPath(ctx context.Context, uuid uuid.UUID) string {
+func (a containerRunnerDockerAdapter) getContainerPath(ctx context.Context, uuid types.ContainerID) string {
 	appPath := a.getAppPath(ctx, "live")
 	return path.Join(appPath, "containers", uuid.String())
 }

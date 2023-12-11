@@ -3,7 +3,6 @@ package service
 import (
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
@@ -50,12 +49,12 @@ func (suite *ContainerEnvServiceTestSuite) TestLoad() {
 
 type MockContainerEnvAdapter struct{ mock.Mock }
 
-func (m *MockContainerEnvAdapter) Save(uuid uuid.UUID, env types.ContainerEnvVariables) error {
+func (m *MockContainerEnvAdapter) Save(uuid types.ContainerID, env types.ContainerEnvVariables) error {
 	args := m.Called(uuid, env)
 	return args.Error(0)
 }
 
-func (m *MockContainerEnvAdapter) Load(uuid uuid.UUID) (types.ContainerEnvVariables, error) {
+func (m *MockContainerEnvAdapter) Load(uuid types.ContainerID) (types.ContainerEnvVariables, error) {
 	args := m.Called(uuid)
 	return types.ContainerEnvVariables{"a": "b"}, args.Error(1)
 }

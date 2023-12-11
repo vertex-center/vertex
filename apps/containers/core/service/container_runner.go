@@ -9,7 +9,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/adapter"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
@@ -33,7 +32,7 @@ func NewContainerRunnerService(ctx *app.Context, adapter port.ContainerRunnerAda
 	}
 }
 
-func (s *containerRunnerService) Install(ctx context.Context, uuid uuid.UUID, service types.Service) error {
+func (s *containerRunnerService) Install(ctx context.Context, uuid types.ContainerID, service types.Service) error {
 	if service.Methods.Docker == nil {
 		return ErrInstallMethodDoesNotExists
 	}

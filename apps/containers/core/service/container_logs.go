@@ -21,6 +21,6 @@ func NewContainerLogsService(ctx *app.Context, adapter port.ContainerLogsAdapter
 	return s
 }
 
-func (s *containerLogsService) GetLatestLogs(uuid uuid.UUID) ([]types.LogLine, error) {
+func (s *containerLogsService) GetLatestLogs(uuid types.ContainerID) ([]types.LogLine, error) {
 	return s.adapter.LoadBuffer(uuid)
 }

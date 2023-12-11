@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-contrib/sse"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	apptypes "github.com/vertex-center/vertex/common/app"
@@ -27,7 +26,7 @@ func NewContainersHandler(ctx *apptypes.Context, containerService port.Container
 }
 
 func (h *containersHandler) Get() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (map[uuid.UUID]*types.Container, error) {
+	return router.Handler(func(c *gin.Context) (map[types.ContainerID]*types.Container, error) {
 		return h.containerService.GetAll(c), nil
 	})
 }
@@ -39,7 +38,7 @@ func (h *containersHandler) GetTags() gin.HandlerFunc {
 }
 
 func (h *containersHandler) Search() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (map[uuid.UUID]*types.Container, error) {
+	return router.Handler(func(c *gin.Context) (map[types.ContainerID]*types.Container, error) {
 		query := types.ContainerSearchQuery{}
 
 		features := c.QueryArray("features[]")
@@ -57,7 +56,7 @@ func (h *containersHandler) Search() gin.HandlerFunc {
 }
 
 func (h *containersHandler) CheckForUpdates() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (map[uuid.UUID]*types.Container, error) {
+	return router.Handler(func(c *gin.Context) (map[types.ContainerID]*types.Container, error) {
 		return h.containerService.CheckForUpdates(c)
 	})
 }

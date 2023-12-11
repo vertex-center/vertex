@@ -7,9 +7,8 @@ import (
 	"path"
 	"strings"
 
-	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
-	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common/storage"
 )
 
@@ -38,7 +37,7 @@ func NewContainerEnvFSAdapter(params *ContainerEnvFSAdapterParams) port.Containe
 	return adapter
 }
 
-func (a *containerEnvFSAdapter) Save(uuid uuid.UUID, env containerstypes.ContainerEnvVariables) error {
+func (a *containerEnvFSAdapter) Save(uuid types.ContainerID, env types.ContainerEnvVariables) error {
 	envPath := path.Join(a.containersPath, uuid.String(), ContainerEnvPath)
 
 	file, err := os.OpenFile(envPath, os.O_WRONLY|os.O_CREATE, os.ModePerm)
@@ -61,7 +60,7 @@ func (a *containerEnvFSAdapter) Save(uuid uuid.UUID, env containerstypes.Contain
 	return nil
 }
 
-func (a *containerEnvFSAdapter) Load(uuid uuid.UUID) (containerstypes.ContainerEnvVariables, error) {
+func (a *containerEnvFSAdapter) Load(uuid types.ContainerID) (types.ContainerEnvVariables, error) {
 	envPath := path.Join(a.containersPath, uuid.String(), ContainerEnvPath)
 
 	file, err := os.Open(envPath)
@@ -73,7 +72,7 @@ func (a *containerEnvFSAdapter) Load(uuid uuid.UUID) (containerstypes.ContainerE
 	}
 	defer file.Close()
 
-	env := containerstypes.ContainerEnvVariables{}
+	env := types.ContainerEnvVariables{}
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := strings.Split(scanner.Text(), "=")

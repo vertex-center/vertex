@@ -59,7 +59,7 @@ func (s *metricsService) OnEvent(e event.Event) error {
 	return nil
 }
 
-func (s *metricsService) updateStatus(uuid uuid.UUID, serviceId string, status string) {
+func (s *metricsService) updateStatus(uuid types.ContainerID, serviceId string, status string) {
 	switch status {
 	case types.ContainerStatusRunning:
 		s.metricsRegistry.Set(MetricIDContainerStatus, metric.StatusOn, uuid.String(), serviceId)

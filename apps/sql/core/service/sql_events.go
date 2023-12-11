@@ -44,7 +44,7 @@ func (s *sqlService) onContainerStart(inst *types.Container) {
 	s.dbms[inst.UUID] = dbms
 }
 
-func (s *sqlService) onContainerStop(uuid uuid.UUID) {
+func (s *sqlService) onContainerStop(uuid types.ContainerID) {
 	s.dbmsMutex.Lock()
 	defer s.dbmsMutex.Unlock()
 

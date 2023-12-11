@@ -4,11 +4,10 @@ import (
 	"context"
 
 	"github.com/docker/docker/api/types/container"
-	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 )
 
-func (c *Client) GetContainer(ctx context.Context, uuid uuid.UUID) (*types.Container, error) {
+func (c *Client) GetContainer(ctx context.Context, uuid types.ContainerID) (*types.Container, error) {
 	var inst types.Container
 	err := c.Request().
 		Pathf("./container/%s", uuid).
@@ -17,14 +16,14 @@ func (c *Client) GetContainer(ctx context.Context, uuid uuid.UUID) (*types.Conta
 	return &inst, err
 }
 
-func (c *Client) DeleteContainer(ctx context.Context, uuid uuid.UUID) error {
+func (c *Client) DeleteContainer(ctx context.Context, uuid types.ContainerID) error {
 	return c.Request().
 		Pathf("./container/%s", uuid).
 		Delete().
 		Fetch(ctx)
 }
 
-func (c *Client) PatchContainer(ctx context.Context, uuid uuid.UUID, settings types.ContainerSettings) error {
+func (c *Client) PatchContainer(ctx context.Context, uuid types.ContainerID, settings types.ContainerSettings) error {
 	return c.Request().
 		Pathf("./container/%s", uuid).
 		Patch().
@@ -32,21 +31,21 @@ func (c *Client) PatchContainer(ctx context.Context, uuid uuid.UUID, settings ty
 		Fetch(ctx)
 }
 
-func (c *Client) StartContainer(ctx context.Context, uuid uuid.UUID) error {
+func (c *Client) StartContainer(ctx context.Context, uuid types.ContainerID) error {
 	return c.Request().
 		Pathf("./container/%s/start", uuid).
 		Post().
 		Fetch(ctx)
 }
 
-func (c *Client) StopContainer(ctx context.Context, uuid uuid.UUID) error {
+func (c *Client) StopContainer(ctx context.Context, uuid types.ContainerID) error {
 	return c.Request().
 		Pathf("./container/%s/stop", uuid).
 		Post().
 		Fetch(ctx)
 }
 
-func (c *Client) PatchContainerEnvironment(ctx context.Context, uuid uuid.UUID, env map[string]string) error {
+func (c *Client) PatchContainerEnvironment(ctx context.Context, uuid types.ContainerID, env map[string]string) error {
 	return c.Request().
 		Pathf("./container/%s/environment", uuid).
 		Patch().
@@ -56,7 +55,7 @@ func (c *Client) PatchContainerEnvironment(ctx context.Context, uuid uuid.UUID, 
 		Fetch(ctx)
 }
 
-func (c *Client) GetDocker(ctx context.Context, uuid uuid.UUID) (map[string]any, error) {
+func (c *Client) GetDocker(ctx context.Context, uuid types.ContainerID) (map[string]any, error) {
 	var info map[string]any
 	err := c.Request().
 		Pathf("./container/%s/docker", uuid).
@@ -65,14 +64,14 @@ func (c *Client) GetDocker(ctx context.Context, uuid uuid.UUID) (map[string]any,
 	return info, err
 }
 
-func (c *Client) RecreateDocker(ctx context.Context, uuid uuid.UUID) error {
+func (c *Client) RecreateDocker(ctx context.Context, uuid types.ContainerID) error {
 	return c.Request().
 		Pathf("./container/%s/docker/recreate", uuid).
 		Post().
 		Fetch(ctx)
 }
 
-func (c *Client) GetContainerLogs(ctx context.Context, uuid uuid.UUID) (string, error) {
+func (c *Client) GetContainerLogs(ctx context.Context, uuid types.ContainerID) (string, error) {
 	var logs string
 	err := c.Request().
 		Pathf("./container/%s/logs", uuid).
@@ -81,14 +80,14 @@ func (c *Client) GetContainerLogs(ctx context.Context, uuid uuid.UUID) (string, 
 	return logs, err
 }
 
-func (c *Client) UpdateServiceContainer(ctx context.Context, uuid uuid.UUID) error {
+func (c *Client) UpdateServiceContainer(ctx context.Context, uuid types.ContainerID) error {
 	return c.Request().
 		Pathf("./container/%s/update/service", uuid).
 		Post().
 		Fetch(ctx)
 }
 
-func (c *Client) GetVersions(ctx context.Context, uuid uuid.UUID) ([]string, error) {
+func (c *Client) GetVersions(ctx context.Context, uuid types.ContainerID) ([]string, error) {
 	var versions []string
 	err := c.Request().
 		Pathf("./container/%s/versions", uuid).
@@ -97,7 +96,7 @@ func (c *Client) GetVersions(ctx context.Context, uuid uuid.UUID) ([]string, err
 	return versions, err
 }
 
-func (c *Client) WaitCondition(ctx context.Context, uuid uuid.UUID, condition container.WaitCondition) error {
+func (c *Client) WaitCondition(ctx context.Context, uuid types.ContainerID, condition container.WaitCondition) error {
 	return c.Request().
 		Pathf("./container/%s/wait/%s", uuid, condition).
 		Fetch(ctx)

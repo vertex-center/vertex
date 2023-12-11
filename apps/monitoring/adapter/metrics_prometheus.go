@@ -7,10 +7,10 @@ import (
 	"path"
 	"syscall"
 
-	"github.com/google/uuid"
 	"github.com/juju/errors"
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
+	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types/metric"
@@ -24,7 +24,7 @@ func NewMetricsPrometheusAdapter() port.MetricsAdapter {
 	return &prometheusAdapter{}
 }
 
-func (a *prometheusAdapter) ConfigureContainer(uuid uuid.UUID) error {
+func (a *prometheusAdapter) ConfigureContainer(uuid containerstypes.ContainerID) error {
 	dir := path.Join("live_docker", "apps", "containers", "volumes", uuid.String(), "config")
 	p := path.Join(dir, "prometheus.yml")
 

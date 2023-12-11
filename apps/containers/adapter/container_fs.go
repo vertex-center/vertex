@@ -6,8 +6,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
+	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/common/storage"
 	"github.com/vertex-center/vlog"
@@ -51,11 +51,11 @@ func NewContainerFSAdapter(params *ContainerFSAdapterParams) port.ContainerAdapt
 	return adapter
 }
 
-func (a *containerFSAdapter) GetPath(uuid uuid.UUID) string {
+func (a *containerFSAdapter) GetPath(uuid types.ContainerID) string {
 	return path.Join(a.containersPath, uuid.String())
 }
 
-func (a *containerFSAdapter) Create(uuid uuid.UUID) error {
+func (a *containerFSAdapter) Create(uuid types.ContainerID) error {
 	err := os.MkdirAll(a.GetPath(uuid), os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("failed to create server: %w", err)
@@ -63,7 +63,7 @@ func (a *containerFSAdapter) Create(uuid uuid.UUID) error {
 	return nil
 }
 
-func (a *containerFSAdapter) Delete(uuid uuid.UUID) error {
+func (a *containerFSAdapter) Delete(uuid types.ContainerID) error {
 	err := os.RemoveAll(a.GetPath(uuid))
 	if err != nil {
 		return fmt.Errorf("failed to delete server: %w", err)
@@ -71,14 +71,14 @@ func (a *containerFSAdapter) Delete(uuid uuid.UUID) error {
 	return nil
 }
 
-func (a *containerFSAdapter) GetAll() ([]uuid.UUID, error) {
+func (a *containerFSAdapter) GetAll() ([]types.ContainerID, error) {
 	entries, err := os.ReadDir(a.containersPath)
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)
 	}
 
-	var uuids []uuid.UUID
+	var uuids []types.ContainerID
 	for _, entry := range entries {
 		info, err := entry.Info()
 		if err != nil {
@@ -93,7 +93,7 @@ func (a *containerFSAdapter) GetAll() ([]uuid.UUID, error) {
 				vlog.String("uuid", entry.Name()),
 			)
 
-			id, err := uuid.Parse(entry.Name())
+			id, err := types.ParseContainerID(entry.Name())
 			if err != nil {
 				log.Error(err)
 				continue

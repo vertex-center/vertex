@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/juju/errors"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
@@ -24,14 +23,14 @@ func NewDBMSHandler(sqlService port.SqlService) port.DBMSHandler {
 }
 
 type GetParams struct {
-	UUID uuid.NullUUID `path:"container_uuid"`
+	UUID containerstypes.ContainerID `path:"container_uuid"`
 }
 
 func (r *dbmsHandler) Get() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *GetParams) (*types.DBMS, error) {
 		client := containersapi.NewContainersClient(c)
 
-		inst, err := client.GetContainer(c, params.UUID.UUID)
+		inst, err := client.GetContainer(c, params.UUID)
 		if err != nil {
 			return nil, err
 		}
