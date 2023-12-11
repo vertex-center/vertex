@@ -18,22 +18,22 @@ import (
 type containerHandler struct {
 	ctx                      *apptypes.Context
 	containerService         port.ContainerService
-	containerSettingsService port.ContainerSettingsService
-	containerRunnerService   port.ContainerRunnerService
-	containerEnvService      port.ContainerEnvService
+	containerSettingsService port.SettingsService
+	containerRunnerService   port.RunnerService
+	containerEnvService      port.EnvService
 	containerServiceService  port.ContainerServiceService
-	containerLogsService     port.ContainerLogsService
+	containerLogsService     port.LogsService
 	serviceService           port.ServiceService
 }
 
 type ContainerHandlerParams struct {
 	Ctx                      *apptypes.Context
 	ContainerService         port.ContainerService
-	ContainerSettingsService port.ContainerSettingsService
-	ContainerRunnerService   port.ContainerRunnerService
-	ContainerEnvService      port.ContainerEnvService
+	ContainerSettingsService port.SettingsService
+	ContainerRunnerService   port.RunnerService
+	ContainerEnvService      port.EnvService
 	ContainerServiceService  port.ContainerServiceService
-	ContainerLogsService     port.ContainerLogsService
+	ContainerLogsService     port.LogsService
 	ServiceService           port.ServiceService
 }
 

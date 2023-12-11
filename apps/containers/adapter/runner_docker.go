@@ -26,7 +26,7 @@ import (
 
 type containerRunnerDockerAdapter struct{}
 
-func NewContainerRunnerFSAdapter() port.ContainerRunnerAdapter {
+func NewRunnerFSAdapter() port.RunnerAdapter {
 	return containerRunnerDockerAdapter{}
 }
 

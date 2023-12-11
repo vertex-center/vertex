@@ -15,14 +15,14 @@ import (
 )
 
 var (
-	serviceService           port.ServiceService
-	containerEnvService      port.ContainerEnvService
-	containerLogsService     port.ContainerLogsService
-	containerRunnerService   port.ContainerRunnerService
-	containerServiceService  port.ContainerServiceService
-	containerSettingsService port.ContainerSettingsService
-	containerService         port.ContainerService
-	metricsService           port.MetricsService
+	serviceService          port.ServiceService
+	envService              port.EnvService
+	logsService             port.LogsService
+	runnerService           port.RunnerService
+	containerServiceService port.ContainerServiceService
+	settingsService         port.SettingsService
+	containerService        port.ContainerService
+	metricsService          port.MetricsService
 
 	dockerKernelService port.DockerService
 )
@@ -45,28 +45,28 @@ func (a *App) Meta() appmeta.Meta {
 
 func (a *App) Initialize() error {
 	var (
-		containerAdapter         = adapter.NewContainerFSAdapter(nil)
-		containerEnvAdapter      = adapter.NewContainerEnvFSAdapter(nil)
-		containerLogsAdapter     = adapter.NewContainerLogsFSAdapter(nil)
-		containerRunnerAdapter   = adapter.NewContainerRunnerFSAdapter()
-		containerServiceAdapter  = adapter.NewContainerServiceFSAdapter(nil)
-		containerSettingsAdapter = adapter.NewContainerSettingsFSAdapter(nil)
+		containerAdapter        = adapter.NewContainerFSAdapter(nil)
+		envAdapter              = adapter.NewEnvFSAdapter(nil)
+		logsAdapter             = adapter.NewLogsFSAdapter(nil)
+		runnerAdapter           = adapter.NewRunnerFSAdapter()
+		containerServiceAdapter = adapter.NewContainerServiceFSAdapter(nil)
+		settingsAdapter         = adapter.NewSettingsFSAdapter(nil)
 	)
 
 	serviceService = service.NewServiceService()
-	containerEnvService = service.NewContainerEnvService(containerEnvAdapter)
-	containerLogsService = service.NewContainerLogsService(a.ctx, containerLogsAdapter)
-	containerRunnerService = service.NewContainerRunnerService(a.ctx, containerRunnerAdapter)
+	envService = service.NewEnvService(envAdapter)
+	logsService = service.NewLogsService(a.ctx, logsAdapter)
+	runnerService = service.NewRunnerService(a.ctx, runnerAdapter)
 	containerServiceService = service.NewContainerServiceService(containerServiceAdapter)
-	containerSettingsService = service.NewContainerSettingsService(containerSettingsAdapter)
+	settingsService = service.NewSettingsService(settingsAdapter)
 	containerService = service.NewContainerService(service.ContainerServiceParams{
-		Ctx:                      a.ctx,
-		ContainerAdapter:         containerAdapter,
-		ContainerRunnerService:   containerRunnerService,
-		ContainerServiceService:  containerServiceService,
-		ContainerEnvService:      containerEnvService,
-		ContainerSettingsService: containerSettingsService,
-		ServiceService:           serviceService,
+		Ctx:                     a.ctx,
+		ContainerAdapter:        containerAdapter,
+		RunnerService:           runnerService,
+		ContainerServiceService: containerServiceService,
+		EnvService:              envService,
+		SettingsService:         settingsService,
+		ServiceService:          serviceService,
 	})
 	metricsService = service.NewMetricsService(a.ctx)
 
@@ -85,11 +85,11 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 		containerHandler  = handler.NewContainerHandler(handler.ContainerHandlerParams{
 			Ctx:                      a.ctx,
 			ContainerService:         containerService,
-			ContainerSettingsService: containerSettingsService,
-			ContainerRunnerService:   containerRunnerService,
-			ContainerEnvService:      containerEnvService,
+			ContainerSettingsService: settingsService,
+			ContainerRunnerService:   runnerService,
+			ContainerEnvService:      envService,
 			ContainerServiceService:  containerServiceService,
-			ContainerLogsService:     containerLogsService,
+			ContainerLogsService:     logsService,
 			ServiceService:           serviceService,
 		})
 

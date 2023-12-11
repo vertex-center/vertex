@@ -42,7 +42,7 @@ type ContainerLogsFSAdapterParams struct {
 	ContainersPath string
 }
 
-func NewContainerLogsFSAdapter(params *ContainerLogsFSAdapterParams) port.ContainerLogsAdapter {
+func NewLogsFSAdapter(params *ContainerLogsFSAdapterParams) port.LogsAdapter {
 	if params == nil {
 		params = &ContainerLogsFSAdapterParams{}
 	}

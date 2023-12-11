@@ -15,7 +15,7 @@ type (
 		GetAll() ([]types.ContainerID, error)
 	}
 
-	ContainerEnvAdapter interface {
+	EnvAdapter interface {
 		Save(uuid types.ContainerID, env types.ContainerEnvVariables) error
 		Load(uuid types.ContainerID) (types.ContainerEnvVariables, error)
 	}
@@ -26,12 +26,12 @@ type (
 		LoadRaw(uuid types.ContainerID) (interface{}, error)
 	}
 
-	ContainerSettingsAdapter interface {
+	SettingsAdapter interface {
 		Save(uuid types.ContainerID, settings types.ContainerSettings) error
 		Load(uuid types.ContainerID) (types.ContainerSettings, error)
 	}
 
-	ContainerLogsAdapter interface {
+	LogsAdapter interface {
 		Register(uuid types.ContainerID) error
 		Unregister(uuid types.ContainerID) error
 		UnregisterAll() error
@@ -43,7 +43,7 @@ type (
 		LoadBuffer(uuid types.ContainerID) ([]types.LogLine, error)
 	}
 
-	ContainerRunnerAdapter interface {
+	RunnerAdapter interface {
 		DeleteContainer(ctx context.Context, inst *types.Container) error
 		DeleteMounts(ctx context.Context, inst *types.Container) error
 		Start(ctx context.Context, inst *types.Container, setStatus func(status string)) (stdout io.ReadCloser, stderr io.ReadCloser, err error)

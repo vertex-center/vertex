@@ -11,7 +11,7 @@ import (
 type ContainerEnvServiceTestSuite struct {
 	suite.Suite
 
-	service *containerEnvService
+	service *envService
 	adapter MockContainerEnvAdapter
 }
 
@@ -21,7 +21,7 @@ func TestContainerEnvServiceTestSuite(t *testing.T) {
 
 func (suite *ContainerEnvServiceTestSuite) SetupSuite() {
 	suite.adapter = MockContainerEnvAdapter{}
-	suite.service = NewContainerEnvService(&suite.adapter).(*containerEnvService)
+	suite.service = NewEnvService(&suite.adapter).(*envService)
 }
 
 func (suite *ContainerEnvServiceTestSuite) TestSave() {

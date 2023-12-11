@@ -6,10 +6,10 @@ import (
 )
 
 type containerSettingsService struct {
-	adapter port.ContainerSettingsAdapter
+	adapter port.SettingsAdapter
 }
 
-func NewContainerSettingsService(adapter port.ContainerSettingsAdapter) *containerSettingsService {
+func NewSettingsService(adapter port.SettingsAdapter) *containerSettingsService {
 	return &containerSettingsService{
 		adapter: adapter,
 	}

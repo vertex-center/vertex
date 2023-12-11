@@ -30,11 +30,11 @@ type containerService struct {
 
 	containerAdapter port.ContainerAdapter
 
-	containerRunnerService   port.ContainerRunnerService
-	containerServiceService  port.ContainerServiceService
-	containerEnvService      port.ContainerEnvService
-	containerSettingsService port.ContainerSettingsService
-	serviceService           port.ServiceService
+	runnerService           port.RunnerService
+	containerServiceService port.ContainerServiceService
+	envService              port.EnvService
+	settingsService         port.SettingsService
+	serviceService          port.ServiceService
 
 	containers      map[types.ContainerID]*types.Container
 	containersMutex *sync.RWMutex
@@ -45,11 +45,11 @@ type ContainerServiceParams struct {
 
 	ContainerAdapter port.ContainerAdapter
 
-	ContainerRunnerService   port.ContainerRunnerService
-	ContainerServiceService  port.ContainerServiceService
-	ContainerEnvService      port.ContainerEnvService
-	ContainerSettingsService port.ContainerSettingsService
-	ServiceService           port.ServiceService
+	RunnerService           port.RunnerService
+	ContainerServiceService port.ContainerServiceService
+	EnvService              port.EnvService
+	SettingsService         port.SettingsService
+	ServiceService          port.ServiceService
 }
 
 func NewContainerService(params ContainerServiceParams) port.ContainerService {
@@ -59,11 +59,11 @@ func NewContainerService(params ContainerServiceParams) port.ContainerService {
 
 		containerAdapter: params.ContainerAdapter,
 
-		containerRunnerService:   params.ContainerRunnerService,
-		containerServiceService:  params.ContainerServiceService,
-		containerEnvService:      params.ContainerEnvService,
-		containerSettingsService: params.ContainerSettingsService,
-		serviceService:           params.ServiceService,
+		runnerService:           params.RunnerService,
+		containerServiceService: params.ContainerServiceService,
+		envService:              params.EnvService,
+		settingsService:         params.SettingsService,
+		serviceService:          params.ServiceService,
 
 		containers:      make(map[types.ContainerID]*types.Container),
 		containersMutex: &sync.RWMutex{},
@@ -159,7 +159,7 @@ func (s *containerService) Delete(ctx context.Context, uuid types.ContainerID) e
 		return types.ErrContainerStillRunning
 	}
 
-	err = s.containerRunnerService.Delete(ctx, inst)
+	err = s.runnerService.Delete(ctx, inst)
 	if err != nil && !errors.Is(err, errors.NotFound) {
 		return err
 	}
@@ -219,7 +219,7 @@ func (s *containerService) StartAll(ctx context.Context) {
 				return
 			}
 
-			err = s.containerRunnerService.Start(ctx, inst)
+			err = s.runnerService.Start(ctx, inst)
 			if err != nil {
 				log.Warn("failed to auto-start the container",
 					vlog.String("uuid", inst.UUID.String()),
@@ -235,7 +235,7 @@ func (s *containerService) StopAll(ctx context.Context) {
 	defer s.containersMutex.RUnlock()
 
 	for _, inst := range s.containers {
-		err := s.containerRunnerService.Stop(ctx, inst)
+		err := s.runnerService.Stop(ctx, inst)
 		if err != nil {
 			log.Error(err)
 		}
@@ -282,7 +282,7 @@ func (s *containerService) Install(ctx context.Context, service types.Service, m
 		return nil, err
 	}
 
-	err = s.containerRunnerService.Install(ctx, id, service)
+	err = s.runnerService.Install(ctx, id, service)
 	if err != nil {
 		return nil, err
 	}
@@ -308,13 +308,13 @@ func (s *containerService) Install(ctx context.Context, service types.Service, m
 	}
 
 	inst.ContainerSettings.InstallMethod = &method
-	err = s.containerSettingsService.Save(inst, inst.ContainerSettings)
+	err = s.settingsService.Save(inst, inst.ContainerSettings)
 	if err != nil {
 		return nil, err
 	}
 
 	inst.ResetDefaultEnv()
-	err = s.containerEnvService.Save(inst, inst.Env)
+	err = s.envService.Save(inst, inst.Env)
 	if err != nil {
 		return nil, err
 	}
@@ -327,7 +327,7 @@ func (s *containerService) Install(ctx context.Context, service types.Service, m
 
 func (s *containerService) CheckForUpdates(ctx context.Context) (map[types.ContainerID]*types.Container, error) {
 	for _, inst := range s.GetAll(ctx) {
-		err := s.containerRunnerService.CheckForUpdates(ctx, inst)
+		err := s.runnerService.CheckForUpdates(ctx, inst)
 		if err != nil {
 			return s.GetAll(ctx), err
 		}
@@ -344,12 +344,12 @@ func (s *containerService) load(ctx context.Context, uuid types.ContainerID) err
 
 	inst := types.NewContainer(uuid, service)
 
-	err = s.containerSettingsService.Load(&inst)
+	err = s.settingsService.Load(&inst)
 	if err != nil {
 		return err
 	}
 
-	err = s.containerEnvService.Load(&inst)
+	err = s.envService.Load(&inst)
 	if err != nil {
 		return err
 	}
@@ -387,7 +387,7 @@ func (s *containerService) SetDatabases(ctx context.Context, inst *types.Contain
 	}
 
 	inst.Databases = databases
-	err := s.containerSettingsService.Save(inst, inst.ContainerSettings)
+	err := s.settingsService.Save(inst, inst.ContainerSettings)
 	if err != nil {
 		return err
 	}
@@ -434,5 +434,5 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, inst *types.Con
 
 	}
 
-	return s.containerEnvService.Save(inst, inst.Env)
+	return s.envService.Save(inst, inst.Env)
 }

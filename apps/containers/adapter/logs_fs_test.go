@@ -84,7 +84,7 @@ func (suite *ContainerLogsFSAdapterTestSuite) SetupTest() {
 	dir, err := os.MkdirTemp("", "*_logs_test")
 	suite.Require().NoError(err)
 
-	suite.adapter = NewContainerLogsFSAdapter(&ContainerLogsFSAdapterParams{
+	suite.adapter = NewLogsFSAdapter(&ContainerLogsFSAdapterParams{
 		ContainersPath: dir,
 	}).(*containerLogsFSAdapter)
 }

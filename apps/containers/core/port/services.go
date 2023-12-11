@@ -26,16 +26,16 @@ type (
 		SetDatabases(ctx context.Context, inst *types.Container, databases map[string]types.ContainerID, options map[string]*types.SetDatabasesOptions) error
 	}
 
-	ContainerEnvService interface {
+	EnvService interface {
 		Save(inst *types.Container, env types.ContainerEnvVariables) error
 		Load(inst *types.Container) error
 	}
 
-	ContainerLogsService interface {
+	LogsService interface {
 		GetLatestLogs(uuid types.ContainerID) ([]types.LogLine, error)
 	}
 
-	ContainerRunnerService interface {
+	RunnerService interface {
 		Install(ctx context.Context, uuid types.ContainerID, service types.Service) error
 		Delete(ctx context.Context, inst *types.Container) error
 		Start(ctx context.Context, inst *types.Container) error
@@ -54,7 +54,7 @@ type (
 		Load(uuid types.ContainerID) (types.Service, error)
 	}
 
-	ContainerSettingsService interface {
+	SettingsService interface {
 		Save(inst *types.Container, settings types.ContainerSettings) error
 		Load(inst *types.Container) error
 		SetLaunchOnStartup(inst *types.Container, value bool) error

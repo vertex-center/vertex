@@ -9,10 +9,10 @@ import (
 
 type containerLogsService struct {
 	uuid    uuid.UUID
-	adapter port.ContainerLogsAdapter
+	adapter port.LogsAdapter
 }
 
-func NewContainerLogsService(ctx *app.Context, adapter port.ContainerLogsAdapter) port.ContainerLogsService {
+func NewLogsService(ctx *app.Context, adapter port.LogsAdapter) port.LogsService {
 	s := &containerLogsService{
 		uuid:    uuid.New(),
 		adapter: adapter,

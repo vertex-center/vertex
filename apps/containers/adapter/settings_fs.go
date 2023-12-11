@@ -14,30 +14,30 @@ import (
 
 const ContainerSettingsPath = ".vertex/settings.yml"
 
-type containerSettingsFSAdapter struct {
+type settingsFSAdapter struct {
 	containersPath string
 }
 
-type ContainerSettingsFSAdapterParams struct {
+type SettingsFSAdapterParams struct {
 	containersPath string
 }
 
-func NewContainerSettingsFSAdapter(params *ContainerSettingsFSAdapterParams) port.ContainerSettingsAdapter {
+func NewSettingsFSAdapter(params *SettingsFSAdapterParams) port.SettingsAdapter {
 	if params == nil {
-		params = &ContainerSettingsFSAdapterParams{}
+		params = &SettingsFSAdapterParams{}
 	}
 	if params.containersPath == "" {
 		params.containersPath = path.Join(storage.FSPath, "apps", "containers", "containers")
 	}
 
-	adapter := &containerSettingsFSAdapter{
+	adapter := &settingsFSAdapter{
 		containersPath: params.containersPath,
 	}
 
 	return adapter
 }
 
-func (a *containerSettingsFSAdapter) Save(uuid types.ContainerID, settings types.ContainerSettings) error {
+func (a *settingsFSAdapter) Save(uuid types.ContainerID, settings types.ContainerSettings) error {
 	settingsPath := path.Join(a.containersPath, uuid.String(), ContainerSettingsPath)
 
 	settingsBytes, err := yaml.Marshal(settings)
@@ -53,7 +53,7 @@ func (a *containerSettingsFSAdapter) Save(uuid types.ContainerID, settings types
 	return nil
 }
 
-func (a *containerSettingsFSAdapter) Load(uuid types.ContainerID) (types.ContainerSettings, error) {
+func (a *settingsFSAdapter) Load(uuid types.ContainerID) (types.ContainerSettings, error) {
 	settingsPath := path.Join(a.containersPath, uuid.String(), ContainerSettingsPath)
 
 	settingsBytes, err := os.ReadFile(settingsPath)

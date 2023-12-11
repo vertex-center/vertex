@@ -22,10 +22,10 @@ import (
 
 type containerRunnerService struct {
 	ctx     *app.Context
-	adapter port.ContainerRunnerAdapter
+	adapter port.RunnerAdapter
 }
 
-func NewContainerRunnerService(ctx *app.Context, adapter port.ContainerRunnerAdapter) port.ContainerRunnerService {
+func NewRunnerService(ctx *app.Context, adapter port.RunnerAdapter) port.RunnerService {
 	return &containerRunnerService{
 		ctx:     ctx,
 		adapter: adapter,

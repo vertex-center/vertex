@@ -22,7 +22,7 @@ type ContainerEnvFSAdapterParams struct {
 	containersPath string
 }
 
-func NewContainerEnvFSAdapter(params *ContainerEnvFSAdapterParams) port.ContainerEnvAdapter {
+func NewEnvFSAdapter(params *ContainerEnvFSAdapterParams) port.EnvAdapter {
 	if params == nil {
 		params = &ContainerEnvFSAdapterParams{}
 	}
