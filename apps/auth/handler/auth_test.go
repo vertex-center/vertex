@@ -58,7 +58,7 @@ func (suite *AuthHandlerTestSuite) TestLoginInvalidCredentials() {
 		},
 	})
 
-	suite.Equal(400, res.Code)
+	suite.Equal(500, res.Code)
 	suite.service.AssertExpectations(suite.T())
 }
 

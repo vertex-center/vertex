@@ -23,6 +23,10 @@ func Request(method string, handler gin.HandlerFunc, opts RequestOptions) *httpt
 		route += fmt.Sprintf("/:%v", k)
 		path += fmt.Sprintf("/%v", v)
 	}
+	if route == "" {
+		route = "/"
+		path = "/"
+	}
 
 	// Setup
 	r := router.New(nil)
