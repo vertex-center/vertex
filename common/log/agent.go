@@ -12,11 +12,11 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var defaultAgent *Agent
+var agent *Agent
 
 func init() {
 	var err error
-	defaultAgent, err = NewAgent()
+	agent, err = NewAgent()
 	if err != nil {
 		panic(err)
 	}
@@ -32,7 +32,7 @@ func init() {
 		}
 
 		for {
-			err := defaultAgent.Start(u)
+			err := agent.Start(u)
 			if err != nil {
 				err = fmt.Errorf("start log agent: %w", err)
 				_, _ = fmt.Fprintln(os.Stderr, err.Error())
