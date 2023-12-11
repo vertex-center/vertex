@@ -52,7 +52,7 @@ type Service struct {
 	// URLs defines all service urls.
 	URLs []URL `yaml:"urls,omitempty" json:"urls,omitempty"`
 
-	// Methods defines different methods to install the service.
+	// Methods define different methods to install the service.
 	Methods ServiceMethods `yaml:"methods" json:"methods"`
 }
 
@@ -218,22 +218,6 @@ type ServiceClone struct {
 	Repository string `yaml:"repository" json:"repository" example:"https://github.com/vertex-center/vertex"`
 }
 
-type ServiceMethodScript struct {
-	// Filename is the name of the file to run to start the service.
-	Filename string `yaml:"file" json:"file"`
-
-	// Clone describes the repository to clone if some files are needed to run the script.
-	Clone *ServiceClone `yaml:"clone,omitempty" json:"clone,omitempty"`
-
-	// Dependencies lists all dependencies needed before running the service.
-	Dependencies *map[string]ServiceDependency `yaml:"dependencies,omitempty" json:"dependencies,omitempty"`
-}
-
-type ServiceMethodRelease struct {
-	// Dependencies lists all dependencies needed before running the service.
-	Dependencies *map[string]ServiceDependency `yaml:"dependencies,omitempty" json:"dependencies,omitempty"`
-}
-
 type ServiceMethodDocker struct {
 	// Image is the Docker image to run.
 	Image *string `yaml:"image,omitempty" json:"image,omitempty" example:"ghcr.io/vertex-center/vertex"`
@@ -267,13 +251,6 @@ type ServiceMethodDocker struct {
 }
 
 type ServiceMethods struct {
-	// Script is a method to launch the service with a shell script.
-	Script *ServiceMethodScript `yaml:"script,omitempty" json:"script,omitempty"`
-
-	// Release is a method to download and launch the service with
-	// precompiled binaries from GitHub.
-	Release *ServiceMethodRelease `yaml:"release,omitempty" json:"release,omitempty"`
-
 	// Docker is a method to run the service with Docker.
 	Docker *ServiceMethodDocker `yaml:"docker,omitempty" json:"docker,omitempty"`
 }

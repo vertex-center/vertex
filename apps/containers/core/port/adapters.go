@@ -61,8 +61,6 @@ type (
 		// the service was not found.
 		Get(id string) (types.Service, error)
 
-		GetScript(id string) ([]byte, error)
-
 		// GetRaw gets a service by id, without any processing.
 		// Returns ErrServiceNotFound if the service was not found.
 		GetRaw(id string) (interface{}, error)

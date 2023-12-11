@@ -1,7 +1,6 @@
 package adapter
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -63,19 +62,6 @@ func (a *serviceFSAdapter) GetRaw(id string) (interface{}, error) {
 	var service interface{}
 	err = yaml.Unmarshal(data, &service)
 	return service, err
-}
-
-func (a *serviceFSAdapter) GetScript(id string) ([]byte, error) {
-	service, err := a.Get(id)
-	if err != nil {
-		return nil, err
-	}
-
-	if service.Methods.Script == nil {
-		return nil, errors.New("the service doesn't have a script method")
-	}
-
-	return os.ReadFile(path.Join(a.servicesPath, "services", id, service.Methods.Script.Filename))
 }
 
 func (a *serviceFSAdapter) GetAll() []types.Service {
