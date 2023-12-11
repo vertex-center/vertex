@@ -6,7 +6,6 @@ import (
 
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -25,7 +24,7 @@ func (suite *ContainerLoggerTestSuite) SetupTest() {
 	suite.Require().NoError(err)
 
 	suite.logger = &ContainerLogger{
-		uuid:   uuid.New(),
+		uuid:   containerstypes.NewContainerID(),
 		buffer: []containerstypes.LogLine{},
 		dir:    dir,
 	}
