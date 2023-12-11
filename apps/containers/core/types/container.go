@@ -60,8 +60,8 @@ func ParseContainerID(s string) (ContainerID, error) {
 	return ContainerID{id}, err
 }
 
-func (*ContainerID) Type() string   { return "string" }
-func (*ContainerID) Format() string { return "uuid" }
+func (ContainerID) Type() string   { return "string" }
+func (ContainerID) Format() string { return "uuid" }
 
 func NewContainer(id ContainerID, service Service) Container {
 	return Container{
