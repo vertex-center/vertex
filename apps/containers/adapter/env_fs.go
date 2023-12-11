@@ -14,7 +14,7 @@ import (
 
 const ContainerEnvPath = ".env"
 
-type containerEnvFSAdapter struct {
+type envFSAdapter struct {
 	containersPath string
 }
 
@@ -30,14 +30,14 @@ func NewEnvFSAdapter(params *EnvFSAdapterParams) port.EnvAdapter {
 		params.containersPath = path.Join(storage.FSPath, "apps", "containers", "containers")
 	}
 
-	adapter := &containerEnvFSAdapter{
+	adapter := &envFSAdapter{
 		containersPath: params.containersPath,
 	}
 
 	return adapter
 }
 
-func (a *containerEnvFSAdapter) Save(uuid types.ContainerID, env types.ContainerEnvVariables) error {
+func (a *envFSAdapter) Save(uuid types.ContainerID, env types.ContainerEnvVariables) error {
 	envPath := path.Join(a.containersPath, uuid.String(), ContainerEnvPath)
 
 	file, err := os.OpenFile(envPath, os.O_WRONLY|os.O_CREATE, os.ModePerm)
@@ -60,7 +60,7 @@ func (a *containerEnvFSAdapter) Save(uuid types.ContainerID, env types.Container
 	return nil
 }
 
-func (a *containerEnvFSAdapter) Load(uuid types.ContainerID) (types.ContainerEnvVariables, error) {
+func (a *envFSAdapter) Load(uuid types.ContainerID) (types.ContainerEnvVariables, error) {
 	envPath := path.Join(a.containersPath, uuid.String(), ContainerEnvPath)
 
 	file, err := os.Open(envPath)
