@@ -37,8 +37,8 @@ func (m *MockContainerService) Exists(ctx context.Context, uuid types.ContainerI
 	return args.Bool(0)
 }
 
-func (m *MockContainerService) Delete(ctx context.Context, inst *types.Container) error {
-	args := m.Called(ctx, inst)
+func (m *MockContainerService) Delete(ctx context.Context, uuid types.ContainerID) error {
+	args := m.Called(ctx, uuid)
 	return args.Error(0)
 }
 

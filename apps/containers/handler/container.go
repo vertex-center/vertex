@@ -65,13 +65,9 @@ type DeleteContainerParams struct {
 }
 
 func (h *containerHandler) Delete() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *DeleteContainerParams) error {
-		inst, err := h.containerService.Get(c, params.ContainerUUID)
-		if err != nil {
-			return err
-		}
-		return h.containerService.Delete(c, inst)
-	})
+	return tonic.Handler(func(c *gin.Context, params *DeleteContainerParams) error {
+		return h.containerService.Delete(c, params.ContainerUUID)
+	}, http.StatusNoContent)
 }
 
 // User can also add alternate username,password

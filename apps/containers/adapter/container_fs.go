@@ -1,11 +1,11 @@
 package adapter
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path"
 
+	"github.com/juju/errors"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common/log"
@@ -16,7 +16,7 @@ import (
 type ContainerFilePath string
 
 var (
-	ErrContainerNotFound = errors.New("container not found")
+	ErrContainerNotFound = errors.NotFoundf("container")
 )
 
 type containerFSAdapter struct {

@@ -16,7 +16,7 @@ type (
 		GetTags(ctx context.Context) []string
 		Search(ctx context.Context, query types.ContainerSearchQuery) map[types.ContainerID]*types.Container
 		Exists(ctx context.Context, uuid types.ContainerID) bool
-		Delete(ctx context.Context, inst *types.Container) error
+		Delete(ctx context.Context, uuid types.ContainerID) error
 		StartAll(ctx context.Context)
 		StopAll(ctx context.Context)
 		LoadAll(ctx context.Context)

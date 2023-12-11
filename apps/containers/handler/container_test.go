@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
@@ -40,7 +41,7 @@ func (suite *ContainerHandlerTestSuite) SetupSubTest() {
 }
 
 func (suite *ContainerHandlerTestSuite) TestGet() {
-	suite.Run("Success", func() {
+	suite.Run("OK", func() {
 		suite.service.On("Get", mock.Anything, suite.testContainer.UUID).Return(&suite.testContainer, nil)
 
 		res := routertest.Request("GET", suite.handler.Get(), suite.opts)
@@ -49,12 +50,44 @@ func (suite *ContainerHandlerTestSuite) TestGet() {
 		suite.service.AssertExpectations(suite.T())
 	})
 
-	suite.Run("NotFound", func() {
+	suite.Run("Not Found", func() {
 		suite.service.On("Get", mock.Anything, suite.testContainer.UUID).Return(nil, types.ErrContainerNotFound)
 
 		res := routertest.Request("GET", suite.handler.Get(), suite.opts)
 
 		suite.Equal(404, res.Code)
+		suite.JSONEq(`{"error":"container not found"}`, res.Body.String())
+		suite.service.AssertExpectations(suite.T())
+	})
+}
+
+func (suite *ContainerHandlerTestSuite) TestDelete() {
+	suite.Run("OK", func() {
+		suite.service.On("Delete", mock.Anything, suite.testContainer.UUID).Return(nil)
+
+		res := routertest.Request("DELETE", suite.handler.Delete(), suite.opts)
+
+		suite.Equal(204, res.Code)
+		suite.service.AssertExpectations(suite.T())
+	})
+
+	suite.Run("Not Found", func() {
+		suite.service.On("Delete", mock.Anything, suite.testContainer.UUID).Return(types.ErrContainerNotFound)
+
+		res := routertest.Request("DELETE", suite.handler.Delete(), suite.opts)
+
+		suite.Equal(404, res.Code)
+		suite.JSONEq(`{"error":"container not found"}`, res.Body.String())
+		suite.service.AssertExpectations(suite.T())
+	})
+
+	suite.Run("Error", func() {
+		suite.service.On("Delete", mock.Anything, suite.testContainer.UUID).Return(errors.New("error"))
+
+		res := routertest.Request("DELETE", suite.handler.Delete(), suite.opts)
+
+		suite.Equal(500, res.Code)
+		suite.JSONEq(`{"error":"error"}`, res.Body.String())
 		suite.service.AssertExpectations(suite.T())
 	})
 }

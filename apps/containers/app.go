@@ -111,6 +111,10 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	container.DELETE("", []fizz.OperationOption{
 		fizz.ID("deleteContainer"),
 		fizz.Summary("Delete a container"),
+		fizz.Response("404", "Container not found", nil, nil,
+			map[string]interface{}{"error": "container not found"}),
+		fizz.Response("500", "", nil, nil,
+			map[string]interface{}{"error": "container still running"}),
 	}, containerHandler.Delete())
 
 	container.PATCH("", []fizz.OperationOption{

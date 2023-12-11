@@ -34,7 +34,10 @@ func Request(method string, handler gin.HandlerFunc, opts RequestOptions) *httpt
 	w := httptest.NewRecorder()
 
 	// Make the request
-	body := strings.NewReader(fmt.Sprintf("%v", opts.Body))
+	body := strings.NewReader("")
+	if opts.Body != nil {
+		body = strings.NewReader(fmt.Sprintf("%v", opts.Body))
+	}
 	req := httptest.NewRequest(method, path, body)
 
 	// Add headers

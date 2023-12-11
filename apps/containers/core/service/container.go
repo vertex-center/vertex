@@ -2,10 +2,10 @@ package service
 
 import (
 	"context"
-	"errors"
 	"sync"
 	"time"
 
+	"github.com/juju/errors"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common/app"
@@ -13,7 +13,6 @@ import (
 	"github.com/vertex-center/vlog"
 
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/apps/containers/adapter"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/net"
 )
@@ -75,6 +74,8 @@ func NewContainerService(params ContainerServiceParams) port.ContainerService {
 	return s
 }
 
+// Get returns a container by its UUID.
+// If the container doesn't exist, it returns ErrContainerNotFound.
 func (s *containerService) Get(ctx context.Context, uuid types.ContainerID) (*types.Container, error) {
 	s.containersMutex.RLock()
 	defer s.containersMutex.RUnlock()
@@ -148,17 +149,18 @@ func (s *containerService) Exists(ctx context.Context, uuid types.ContainerID) b
 	return s.containers[uuid] != nil
 }
 
-// Delete deletes a container by its UUID.
-// If the container is still running, it returns ErrContainerStillRunning.
-func (s *containerService) Delete(ctx context.Context, inst *types.Container) error {
-	serviceID := inst.Service.ID
+func (s *containerService) Delete(ctx context.Context, uuid types.ContainerID) error {
+	inst, err := s.Get(ctx, uuid)
+	if err != nil {
+		return err
+	}
 
 	if inst.IsRunning() {
 		return types.ErrContainerStillRunning
 	}
 
-	err := s.containerRunnerService.Delete(ctx, inst)
-	if err != nil && !errors.Is(err, adapter.ErrContainerNotFound) {
+	err = s.containerRunnerService.Delete(ctx, inst)
+	if err != nil && !errors.Is(err, errors.NotFound) {
 		return err
 	}
 
@@ -173,9 +175,8 @@ func (s *containerService) Delete(ctx context.Context, inst *types.Container) er
 
 	s.ctx.DispatchEvent(types.EventContainerDeleted{
 		ContainerUUID: inst.UUID,
-		ServiceID:     serviceID,
+		ServiceID:     inst.Service.ID,
 	})
-
 	s.ctx.DispatchEvent(types.EventContainersChange{})
 
 	return nil
@@ -267,7 +268,7 @@ func (s *containerService) LoadAll(ctx context.Context) {
 func (s *containerService) DeleteAll(ctx context.Context) {
 	all := s.GetAll(ctx)
 	for _, inst := range all {
-		err := s.Delete(ctx, inst)
+		err := s.Delete(ctx, inst.UUID)
 		if err != nil {
 			log.Error(err)
 		}

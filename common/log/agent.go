@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -15,6 +16,10 @@ import (
 var agent *Agent
 
 func init() {
+	if strings.HasSuffix(os.Args[0], ".test") {
+		return
+	}
+
 	var err error
 	agent, err = NewAgent()
 	if err != nil {
