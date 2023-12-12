@@ -33,7 +33,7 @@ func GetSchema(driver vsql.Driver) string {
 		vsql.CreateTable("capabilities").
 			WithField("container_id", "VARCHAR(36)", "NOT NULL").
 			WithField("name", "VARCHAR(255)", "NOT NULL").
-			WithField("capability", "VARCHAR(255)", "NOT NULL").
+			WithPrimaryKey("container_id", "name").
 			WithForeignKey("container_id", "containers", "id"),
 
 		vsql.CreateTable("ports").

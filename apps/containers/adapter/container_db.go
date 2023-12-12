@@ -2,6 +2,8 @@ package adapter
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
@@ -17,11 +19,80 @@ func NewContainerDBAdapter(db storage.DB) port.ContainerAdapter {
 }
 
 func (a *containerDBAdapter) GetContainer(ctx context.Context, id types.ContainerID) (*types.Container, error) {
+	tx, err := a.db.Beginx()
+	if err != nil {
+		return nil, err
+	}
+
 	var container types.Container
-	err := a.db.Get(&container, `
+	err = tx.Get(&container, `
 		SELECT * FROM containers
 		WHERE id = $1
 	`, id)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Select(&container.Env, `
+		SELECT * FROM env_variables
+		WHERE container_id = $1
+	`, id)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Select(&container.Capabilities, `
+		SELECT * FROM capabilities
+		WHERE container_id = $1
+	`, id)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Select(&container.Ports, `
+		SELECT * FROM ports
+		WHERE container_id = $1
+	`, id)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Select(&container.Volumes, `
+		SELECT * FROM volumes
+		WHERE container_id = $1
+	`, id)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Select(&container.Sysctls, `
+		SELECT * FROM sysctls
+		WHERE container_id = $1
+	`, id)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Select(&container.Tags, `
+		SELECT * FROM tags
+		WHERE container_id = $1
+	`, id)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
+	}
+
 	return &container, err
 }
 
@@ -30,6 +101,9 @@ func (a *containerDBAdapter) GetContainers(ctx context.Context) (types.Container
 	err := a.db.Select(&containers, `
 		SELECT * FROM containers
 	`)
+	if errors.Is(err, sql.ErrNoRows) {
+		return containers, nil
+	}
 	return containers, err
 }
 
