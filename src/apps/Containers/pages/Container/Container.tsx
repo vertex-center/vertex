@@ -1,5 +1,4 @@
 import { Fragment, useState } from "react";
-import { api } from "../../../../backend/api/backend";
 import { Outlet, useNavigate, useOutlet, useParams } from "react-router-dom";
 import styles from "./Container.module.sass";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
@@ -18,9 +17,10 @@ import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useServerEvent } from "../../../../hooks/useEvent";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Container as ContainerModel } from "../../../../models/container";
+import { Container as ContainerModel } from "../../backend/models";
 import Container from "../../../../components/Container/Container";
 import { useSidebar } from "../../../../hooks/useSidebar";
+import { API } from "../../backend/api";
 
 export default function ContainerDetails() {
     const { uuid } = useParams();
@@ -50,18 +50,16 @@ export default function ContainerDetails() {
     const mutationContainerPower = useMutation({
         mutationFn: async () => {
             if (container.status === "off" || container.status === "error") {
-                await api.vxContainers.container(uuid).start();
+                await API.startContainer(uuid);
             } else {
-                await api.vxContainers.container(uuid).stop();
+                await API.stopContainer(uuid);
             }
         },
     });
 
     const mutationDeleteContainer = useMutation({
-        mutationFn: api.vxContainers.container(uuid).delete,
-        onSuccess: () => {
-            navigate("/app/containers");
-        },
+        mutationFn: () => API.deleteContainer(uuid),
+        onSuccess: () => navigate("/app/containers"),
     });
     const {
         isLoading: isDeleting,
@@ -89,13 +87,11 @@ export default function ContainerDetails() {
                     icon={<MaterialIcon icon="terminal" />}
                     link={l(`/app/containers/${uuid}/logs`)}
                 />
-                {container?.install_method === "docker" && (
-                    <Sidebar.Item
-                        label="Docker"
-                        icon={<SiDocker size={20} />}
-                        link={l(`/app/containers/${uuid}/docker`)}
-                    />
-                )}
+                <Sidebar.Item
+                    label="Docker"
+                    icon={<SiDocker size={20} />}
+                    link={l(`/app/containers/${uuid}/docker`)}
+                />
             </Sidebar.Group>
             <Sidebar.Group title="Manage">
                 <Sidebar.Item
@@ -103,7 +99,7 @@ export default function ContainerDetails() {
                     icon={<MaterialIcon icon="tune" />}
                     link={l(`/app/containers/${uuid}/environment`)}
                 />
-                {container?.service?.databases && (
+                {container?.databases && (
                     <Sidebar.Item
                         label="Database"
                         icon={<MaterialIcon icon="database" />}
@@ -160,15 +156,12 @@ export default function ContainerDetails() {
             <Popup
                 show={showDeletePopup}
                 onDismiss={dismissDeletePopup}
-                title={`Delete ${
-                    container?.display_name ?? container?.service?.name
-                }?`}
+                title={`Delete ${container?.name}?`}
                 actions={popupActions}
             >
                 <Paragraph>
-                    Are you sure you want to delete{" "}
-                    {container?.display_name ?? container?.service?.name}? All
-                    data will be permanently deleted.
+                    Are you sure you want to delete {container?.name}? All data
+                    will be permanently deleted.
                 </Paragraph>
                 {isDeleting && <Progress infinite />}
                 <APIError style={{ margin: 0 }} error={errorDeleting} />

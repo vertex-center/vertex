@@ -1,8 +1,13 @@
-import { Container, ContainerQuery, Containers } from "../../models/container";
-import { Env, Service } from "../../models/service";
-import { DockerContainerInfo } from "../../models/docker";
-
-import { createServer } from "../server";
+import { createServer } from "../../../backend/server";
+import {
+    Container,
+    ContainerQuery,
+    Containers,
+    EnvVariables,
+    Tags,
+} from "./models";
+import { DockerContainerInfo } from "../../../models/docker";
+import { Service } from "./service";
 
 // @ts-ignore
 const server = createServer(window.api_urls.containers);
@@ -13,7 +18,7 @@ const getAllContainers = async () => {
 };
 
 const getAllTags = async () => {
-    const { data } = await server.get<string[]>(`/containers/tags`);
+    const { data } = await server.get<Tags>(`/containers/tags`);
     return data;
 };
 
@@ -60,7 +65,7 @@ const getLogs = async (id: string) => {
     return data;
 };
 
-const saveEnv = (id: string, env: Env) => {
+const saveEnv = (id: string, env: EnvVariables) => {
     return server.patch(`/container/${id}/environment`, { env });
 };
 
@@ -86,49 +91,21 @@ const getVersions = async (id: string, cache?: boolean) => {
     return data;
 };
 
-const containersRoutes = {
-    all: getAllContainers,
-    tags: getAllTags,
-    search: searchContainers,
-};
-
-const containerRoutes = (id: string) => {
-    return {
-        get: () => getContainer(id),
-        delete: () => deleteContainer(id),
-        start: () => startContainer(id),
-        stop: () => stopContainer(id),
-        patch: (params: any) => patchContainer(id, params),
-        logs: {
-            get: () => getLogs(id),
-        },
-        env: {
-            save: (env: Env) => saveEnv(id, env),
-        },
-        docker: {
-            get: () => getDocker(id),
-            recreate: () => recreateDocker(id),
-        },
-        update: {
-            service: () => updateService(id),
-        },
-        versions: {
-            get: (cache?: boolean) => getVersions(id, cache),
-        },
-    };
-};
-
-const servicesRoutes = {
-    all: getAllServices,
-};
-
-const serviceRoutes = (service_id: string) => ({
-    install: () => installService(service_id),
-});
-
-export const vxContainersRoutes = {
-    containers: containersRoutes,
-    container: containerRoutes,
-    services: servicesRoutes,
-    service: serviceRoutes,
+export const API = {
+    getContainer,
+    getAllContainers,
+    getAllTags,
+    searchContainers,
+    deleteContainer,
+    startContainer,
+    stopContainer,
+    patchContainer,
+    getLogs,
+    saveEnv,
+    getDockerInfo: getDocker,
+    recreateDocker,
+    updateService,
+    getVersions,
+    installService,
+    getAllServices,
 };

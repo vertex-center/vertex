@@ -1,4 +1,4 @@
-import { Service as ServiceModel } from "../../models/service";
+import { Service as ServiceModel } from "../../apps/Containers/backend/service";
 
 import styles from "./Service.module.sass";
 import { Caption } from "../Text/Text";

@@ -2,7 +2,6 @@ import styles from "./ContainersApp.module.sass";
 import Container, {
     Containers,
 } from "../../../../components/Container/Container";
-import { api } from "../../../../backend/api/backend";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useServerEvent } from "../../../../hooks/useEvent";
@@ -20,6 +19,7 @@ import { useState } from "react";
 import NoItems from "../../../../components/NoItems/NoItems";
 import { useContainers } from "../../hooks/useContainers";
 import { useNavigate } from "react-router-dom";
+import { API } from "../../backend/api";
 
 type ToolbarProps = {
     tags?: string[];
@@ -65,9 +65,9 @@ export default function ContainersApp() {
                 containers[uuid].status === "off" ||
                 containers[uuid].status === "error"
             ) {
-                await api.vxContainers.container(uuid).start();
+                await API.startContainer(uuid);
             } else {
-                await api.vxContainers.container(uuid).stop();
+                await API.stopContainer(uuid);
             }
         },
     });
@@ -106,18 +106,18 @@ export default function ContainersApp() {
 
                 {!isLoading && !isError && (
                     <Containers>
-                        {Object.values(containers)?.map((inst) => (
+                        {containers?.map((c) => (
                             <Container
-                                key={inst.uuid}
+                                key={c.id}
                                 container={{
-                                    value: inst,
-                                    to: `/app/containers/${inst.uuid}/`,
+                                    value: c,
+                                    to: `/app/containers/${c.id}/`,
                                     onPower: async () =>
-                                        mutationPower.mutate(inst.uuid),
+                                        mutationPower.mutate(c.id),
                                 }}
                             />
                         ))}
-                        {Object.values(containers)?.length === 0 && (
+                        {containers?.length === 0 && (
                             <NoItems
                                 text="No containers found."
                                 icon="deployed_code"

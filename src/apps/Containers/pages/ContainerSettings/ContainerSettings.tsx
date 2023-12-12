@@ -14,13 +14,13 @@ import { useParams } from "react-router-dom";
 import useContainer from "../../hooks/useContainer";
 import ToggleButton from "../../../../components/ToggleButton/ToggleButton";
 import styles from "./ContainerSettings.module.sass";
-import { api } from "../../../../backend/api/backend";
 import { APIError } from "../../../../components/Error/APIError";
 import VersionTag from "../../../../components/VersionTag/VersionTag";
 import classNames from "classnames";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Content from "../../../../components/Content/Content";
+import { API } from "../../backend/api";
 
 export default function ContainerSettings() {
     const { uuid } = useParams();
@@ -40,17 +40,15 @@ export default function ContainerSettings() {
 
     useEffect(() => {
         if (!container) return;
-        setLaunchOnStartup(container?.launch_on_startup ?? true);
-        setDisplayName(container?.display_name ?? container?.service?.name);
-        setVersion(container?.version ?? "latest");
+        setLaunchOnStartup(container.launch_on_startup);
+        setDisplayName(container.name);
+        setVersion(container?.image_tag ?? "latest");
         reloadVersions();
     }, [container]);
 
     const reloadVersions = (cache = true) => {
         setVersionsLoading(true);
-        api.vxContainers
-            .container(container.uuid)
-            .versions.get(cache)
+        API.getVersions(container.id, cache)
             .then((data) => {
                 setVersions(data?.reverse());
             })
@@ -62,7 +60,7 @@ export default function ContainerSettings() {
 
     const mutationSave = useMutation({
         mutationFn: async () => {
-            await api.vxContainers.container(uuid).patch({
+            await API.patchContainer(uuid, {
                 launch_on_startup: launchOnStartup,
                 display_name: displayName,
                 version: version,

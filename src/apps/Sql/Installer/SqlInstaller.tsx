@@ -1,7 +1,7 @@
 import { api } from "../../../backend/api/backend";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import Service from "../../../components/Service/Service";
-import { Service as ServiceModel } from "../../../models/service";
+import { Service as ServiceModel } from "../../Containers/backend/service";
 import ServiceInstallPopup from "../../../components/ServiceInstallPopup/ServiceInstallPopup";
 import { useState } from "react";
 import { APIError } from "../../../components/Error/APIError";

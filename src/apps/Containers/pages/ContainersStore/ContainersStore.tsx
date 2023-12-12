@@ -1,14 +1,14 @@
-import { Service as ServiceModel } from "../../../../models/service";
+import { Service as ServiceModel } from "../../backend/service";
 import { Fragment, useState } from "react";
 import styles from "./ContainersStore.module.sass";
 import Service from "../../../../components/Service/Service";
 import { Vertical } from "../../../../components/Layouts/Layouts";
-import { api } from "../../../../backend/api/backend";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import ServiceInstallPopup from "../../../../components/ServiceInstallPopup/ServiceInstallPopup";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { List, useTitle } from "@vertex-center/components";
+import { API } from "../../backend/api";
 
 type Downloading = {
     service: ServiceModel;
@@ -21,7 +21,7 @@ export default function ContainersStore() {
 
     const queryServices = useQuery({
         queryKey: ["services"],
-        queryFn: api.vxContainers.services.all,
+        queryFn: API.getAllServices,
     });
     const {
         data: services,
@@ -31,7 +31,7 @@ export default function ContainersStore() {
 
     const queryContainers = useQuery({
         queryKey: ["containers"],
-        queryFn: api.vxContainers.containers.all,
+        queryFn: API.getAllContainers,
     });
     const {
         data: containers,
@@ -40,12 +40,10 @@ export default function ContainersStore() {
     } = queryContainers;
 
     const mutationInstallService = useMutation({
-        mutationFn: async (serviceId: string) => {
-            await api.vxContainers.service(serviceId).install();
-        },
-        onSettled: (data, error, serviceId) => {
+        mutationFn: API.installService,
+        onSettled: (data, error, serviceID) => {
             setDownloading(
-                downloading.filter(({ service: s }) => s.id !== serviceId)
+                downloading.filter(({ service: s }) => s.id !== serviceID)
             );
             queryClient.invalidateQueries({
                 queryKey: ["containers"],
@@ -86,21 +84,18 @@ export default function ContainersStore() {
             <Vertical className={styles.content} gap={10}>
                 <APIError error={error} />
                 <List>
-                    {services?.map((service) => (
+                    {services?.map((serv) => (
                         <Service
-                            key={service.id}
-                            service={service}
-                            onInstall={() => openInstallPopup(service)}
+                            key={serv.id}
+                            service={serv}
+                            onInstall={() => openInstallPopup(serv)}
                             downloading={downloading.some(
-                                ({ service: s }) => s.id === service.id
+                                ({ service: s }) => s.id === serv.id
                             )}
                             installedCount={
-                                containers === undefined
-                                    ? undefined
-                                    : Object.values(containers)?.filter(
-                                          ({ service: s }) =>
-                                              s.id === service.id
-                                      )?.length
+                                containers?.filter(
+                                    (c) => c.service_id === serv.id
+                                )?.length
                             }
                         />
                     ))}

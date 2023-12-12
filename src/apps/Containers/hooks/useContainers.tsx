@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../../../backend/api/backend";
-import { ContainerQuery } from "../../../models/container";
+import { API } from "../backend/api";
+import { ContainerQuery } from "../backend/models";
 
 export function useContainersTags() {
     const queryTags = useQuery({
         queryKey: ["containers", "tags"],
-        queryFn: api.vxContainers.containers.tags,
+        queryFn: API.getAllTags,
     });
     const { data: tags } = queryTags;
     return { tags, ...queryTags };
@@ -14,7 +14,7 @@ export function useContainersTags() {
 export function useContainers(query: ContainerQuery) {
     const queryContainers = useQuery({
         queryKey: ["containers", query],
-        queryFn: () => api.vxContainers.containers.search(query),
+        queryFn: () => API.searchContainers(query),
     });
     const { data: containers } = queryContainers;
     return { containers, ...queryContainers };

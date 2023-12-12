@@ -1,5 +1,4 @@
 import { About } from "../../models/about";
-import { vxContainersRoutes } from "./vxContainers";
 import { vxTunnelsRoutes } from "./vxTunnels";
 import { vxMonitoringRoutes } from "./vxMonitoring";
 import { vxSqlRoutes } from "./vxSql";
@@ -19,7 +18,6 @@ const getAbout = async () => {
 export const api = {
     about: getAbout,
 
-    vxContainers: vxContainersRoutes,
     vxTunnels: vxTunnelsRoutes,
     vxMonitoring: vxMonitoringRoutes,
     vxSql: vxSqlRoutes,

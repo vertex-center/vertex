@@ -1,6 +1,6 @@
 import { TextField } from "@vertex-center/components";
 import TimezoneField from "../../../../components/TimezoneField/TimezoneField";
-import { EnvVariable } from "../../../../models/service";
+import { EnvVariable } from "../../backend/models";
 
 type Props = {
     id: string;
@@ -16,7 +16,7 @@ export default function EnvVariableInput(props: Readonly<Props>) {
     const inputProps = {
         id,
         value,
-        label: env.display_name,
+        label: env.name,
         name: env.name,
         description: env.description,
         onChange: (e: any) => onChange(e.target.value),

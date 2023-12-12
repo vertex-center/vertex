@@ -2,11 +2,11 @@ import Container, { Containers } from "../Container/Container";
 import { APIError } from "../Error/APIError";
 import { Fragment, useEffect, useState } from "react";
 import { ProgressOverlay } from "../Progress/Progress";
-import { Container as ContainerModel } from "../../models/container";
-import { api } from "../../backend/api/backend";
+import { Container as ContainerModel } from "../../apps/Containers/backend/models";
 import { useServerEvent } from "../../hooks/useEvent";
 import { useQueryClient } from "@tanstack/react-query";
 import { useContainers } from "../../apps/Containers/hooks/useContainers";
+import { API } from "../../apps/Containers/backend/api";
 
 type Props = {
     name: string;
@@ -42,7 +42,7 @@ export default function ContainerInstaller(props: Readonly<Props>) {
         const inst = Object.values(containers ?? {})?.[0];
         if (!inst) {
             setContainer({
-                display_name: name,
+                name: name,
                 status: "not-installed",
             });
             return;
@@ -67,19 +67,19 @@ export default function ContainerInstaller(props: Readonly<Props>) {
             });
     };
 
-    const onPower = async (inst: Inst) => {
-        if (!inst) {
+    const onPower = async (c: Inst) => {
+        if (!c) {
             console.error("Container not found");
             return;
         }
-        if (inst?.status === "off" || inst?.status === "error") {
-            await api.vxContainers.container(inst.uuid).start();
+        if (c?.status === "off" || c?.status === "error") {
+            await API.startContainer(c.id);
             return;
         }
-        await api.vxContainers.container(inst.uuid).stop();
+        await API.stopContainer(c.id);
     };
 
-    const route = container?.uuid ? `/container/${container?.uuid}/events` : "";
+    const route = container?.id ? `/container/${container?.id}/events` : "";
 
     // @ts-ignore
     useServerEvent(window.api_urls.containers, route, {
@@ -94,8 +94,8 @@ export default function ContainerInstaller(props: Readonly<Props>) {
                 <Container
                     container={{
                         value: container,
-                        to: container?.uuid
-                            ? `/app/containers/${container?.uuid}`
+                        to: container?.id
+                            ? `/app/containers/${container?.id}`
                             : undefined,
                         onInstall: onInstall,
                         onPower: () => onPower(container),

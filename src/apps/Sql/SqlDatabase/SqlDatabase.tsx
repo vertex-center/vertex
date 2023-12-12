@@ -51,10 +51,10 @@ export default function SqlDatabase() {
             return;
         }
         if (inst?.status === "off" || inst?.status === "error") {
-            await api.vxContainers.container(inst.uuid).start();
+            await api.vxContainers.container(inst.id).start();
             return;
         }
-        await api.vxContainers.container(inst.uuid).stop();
+        await api.vxContainers.container(inst.id).stop();
     };
 
     const route = uuid ? `/container/${uuid}/events` : "";
@@ -97,9 +97,9 @@ export default function SqlDatabase() {
                 <Container
                     container={{
                         value: container ?? {
-                            uuid: uuidv4(),
+                            id: uuidv4(),
                         },
-                        to: `/app/containers/${container?.uuid}`,
+                        to: `/app/containers/${container?.id}`,
                         onPower: () => onPower(container),
                     }}
                 />
