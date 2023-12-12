@@ -389,6 +389,71 @@ func (s *containerService) Install(ctx context.Context, serviceID string) (*type
 		Command:         service.Methods.Docker.Cmd,
 	}
 
+	// Set default env
+	env := types.EnvVariables{}
+	for _, e := range service.Env {
+		env = append(env, types.EnvVariable{
+			ContainerID: id,
+			Type:        types.EnvVariableType(e.Type),
+			Name:        e.Name,
+			Value:       e.Default,
+			Default:     &e.Default,
+			Description: &e.Description,
+		})
+	}
+	c.Env = env
+
+	// Set default capabilities
+	if service.Methods.Docker.Capabilities != nil {
+		capabilities := types.Capabilities{}
+		for _, cp := range *service.Methods.Docker.Capabilities {
+			capabilities = append(capabilities, types.Capability{
+				ContainerID: id,
+				Name:        cp,
+			})
+		}
+		c.Capabilities = capabilities
+	}
+
+	// Set default ports
+	if service.Methods.Docker.Ports != nil {
+		ports := types.Ports{}
+		for in, out := range *service.Methods.Docker.Ports {
+			ports = append(ports, types.Port{
+				ContainerID: id,
+				In:          in,
+				Out:         out,
+			})
+		}
+		c.Ports = ports
+	}
+
+	// Set default volumes
+	if service.Methods.Docker.Volumes != nil {
+		volumes := types.Volumes{}
+		for in, out := range *service.Methods.Docker.Volumes {
+			volumes = append(volumes, types.Volume{
+				ContainerID: id,
+				In:          in,
+				Out:         out,
+			})
+		}
+		c.Volumes = volumes
+	}
+
+	// Set default sysctls
+	if service.Methods.Docker.Sysctls != nil {
+		sysctls := types.Sysctls{}
+		for name, value := range *service.Methods.Docker.Sysctls {
+			sysctls = append(sysctls, types.Sysctl{
+				ContainerID: id,
+				Name:        name,
+				Value:       value,
+			})
+		}
+		c.Sysctls = sysctls
+	}
+
 	err = s.containers.CreateContainer(ctx, c)
 	if err != nil {
 		return nil, err
