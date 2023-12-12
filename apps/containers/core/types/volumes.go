@@ -3,7 +3,8 @@ package types
 type (
 	Volumes []Volume
 	Volume  struct {
-		In  string `json:"in"`  // Path in the container
-		Out string `json:"out"` // Path on the host
+		ContainerID ContainerID `json:"container_id" db:"container_id"   example:"d1fb743c-f937-4f3d-95b9-1a8475464591"`
+		In          string      `json:"in"           db:"internal_path"` // Path in the container
+		Out         string      `json:"out"          db:"external_path"` // Path on the host
 	}
 )

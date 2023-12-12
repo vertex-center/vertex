@@ -33,10 +33,10 @@ type (
 		Status          string                 `json:"status"                   db:"status"             example:"running"`
 		LaunchOnStartup bool                   `json:"launch_on_startup"        db:"launch_on_startup"  example:"true"`
 		Name            string                 `json:"name"                     db:"name"               example:"Postgres"`
-		Description     string                 `json:"description"              db:"description"        example:"An SQL database."`
-		Color           string                 `json:"color"                    db:"color"              example:"#336699"`
-		Icon            string                 `json:"icon"                     db:"icon"               example:"simpleicons/postgres.svg"`
-		Command         *string                `json:"command,omitempty"        db:"cmd"                example:"tunnel run"`
+		Description     *string                `json:"description"              db:"description"        example:"An SQL database."`
+		Color           *string                `json:"color"                    db:"color"              example:"#336699"`
+		Icon            *string                `json:"icon"                     db:"icon"               example:"simpleicons/postgres.svg"`
+		Command         *string                `json:"command,omitempty"        db:"command"            example:"tunnel run"`
 		Env             EnvVariables           `json:"environment,omitempty"`
 		Capabilities    Capabilities           `json:"capabilities,omitempty"`
 		Ports           Ports                  `json:"ports,omitempty"`
