@@ -15,7 +15,6 @@ type (
 		GetDocker() gin.HandlerFunc
 		RecreateDocker() gin.HandlerFunc
 		GetLogs() gin.HandlerFunc
-		UpdateService() gin.HandlerFunc
 		GetVersions() gin.HandlerFunc
 		WaitStatus() gin.HandlerFunc
 		Events() gin.HandlerFunc

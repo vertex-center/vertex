@@ -8,17 +8,15 @@ import (
 )
 
 type servicesHandler struct {
-	serviceService port.ServiceService
+	containerService port.ContainerService
 }
 
-func NewServicesHandler(serviceService port.ServiceService) port.ServicesHandler {
-	return &servicesHandler{
-		serviceService: serviceService,
-	}
+func NewServicesHandler(service port.ContainerService) port.ServicesHandler {
+	return &servicesHandler{service}
 }
 
 func (h *servicesHandler) Get() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context) ([]types.Service, error) {
-		return h.serviceService.GetAll(), nil
+		return h.containerService.GetServices(c), nil
 	})
 }

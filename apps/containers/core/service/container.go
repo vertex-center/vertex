@@ -1,320 +1,394 @@
 package service
 
 import (
+	"bufio"
 	"context"
+	"encoding/json"
+	goerrors "errors"
+	"path"
+	"strings"
 	"sync"
-	"time"
 
+	"github.com/google/uuid"
 	"github.com/juju/errors"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/log"
-	"github.com/vertex-center/vlog"
-
-	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/common/storage"
 	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/pkg/net"
+	"github.com/vertex-center/vertex/pkg/event"
+	vstorage "github.com/vertex-center/vertex/pkg/storage"
+	"github.com/vertex-center/vlog"
 )
 
 var (
-	ErrContainerAlreadyExists     = errors.New("container already exists")
-	ErrContainerAlreadyRunning    = errors.New("the container is already running")
-	ErrContainerNotRunning        = errors.New("the container is not running")
-	ErrInstallMethodDoesNotExists = errors.New("this install method doesn't exist for this service")
+	ErrContainerAlreadyRunning = errors.New("the container is already running")
+	ErrContainerNotRunning     = errors.New("the container is not running")
 )
 
 type containerService struct {
-	uuid uuid.UUID
-	ctx  *app.Context
-
-	containerAdapter port.ContainerAdapter
-
-	runnerService           port.RunnerService
-	containerServiceService port.ContainerServiceService
-	envService              port.EnvService
-	settingsService         port.SettingsService
-	serviceService          port.ServiceService
-
-	containers      map[types.ContainerID]*types.Container
-	containersMutex *sync.RWMutex
+	uuid       uuid.UUID
+	ctx        *app.Context
+	containers port.ContainerAdapter
+	env        port.EnvAdapter
+	runner     port.RunnerAdapter
+	services   port.ServiceAdapter
+	logs       port.LogsAdapter
 }
 
-type ContainerServiceParams struct {
-	Ctx *app.Context
-
-	ContainerAdapter port.ContainerAdapter
-
-	RunnerService           port.RunnerService
-	ContainerServiceService port.ContainerServiceService
-	EnvService              port.EnvService
-	SettingsService         port.SettingsService
-	ServiceService          port.ServiceService
-}
-
-func NewContainerService(params ContainerServiceParams) port.ContainerService {
+func NewContainerService(ctx *app.Context, containers port.ContainerAdapter, env port.EnvAdapter, runner port.RunnerAdapter, services port.ServiceAdapter, logs port.LogsAdapter) port.ContainerService {
 	s := &containerService{
-		uuid: uuid.New(),
-		ctx:  params.Ctx,
-
-		containerAdapter: params.ContainerAdapter,
-
-		runnerService:           params.RunnerService,
-		containerServiceService: params.ContainerServiceService,
-		envService:              params.EnvService,
-		settingsService:         params.SettingsService,
-		serviceService:          params.ServiceService,
-
-		containers:      make(map[types.ContainerID]*types.Container),
-		containersMutex: &sync.RWMutex{},
+		uuid:       uuid.New(),
+		ctx:        ctx,
+		containers: containers,
+		env:        env,
+		runner:     runner,
+		services:   services,
+		logs:       logs,
 	}
-
 	s.ctx.AddListener(s)
-
 	return s
 }
 
-// Get returns a container by its UUID.
-// If the container doesn't exist, it returns ErrContainerNotFound.
-func (s *containerService) Get(ctx context.Context, uuid types.ContainerID) (*types.Container, error) {
-	s.containersMutex.RLock()
-	defer s.containersMutex.RUnlock()
-
-	container, ok := s.containers[uuid]
-	if !ok {
-		return nil, types.ErrContainerNotFound
-	}
-	return container, nil
+func (s *containerService) Get(ctx context.Context, id types.ContainerID) (*types.Container, error) {
+	return s.containers.GetContainer(ctx, id)
 }
 
-func (s *containerService) GetAll(ctx context.Context) map[types.ContainerID]*types.Container {
-	s.containersMutex.RLock()
-	defer s.containersMutex.RUnlock()
-
-	return s.containers
+func (s *containerService) GetContainers(ctx context.Context) (types.Containers, error) {
+	return s.containers.GetContainers(ctx)
 }
 
-func (s *containerService) GetTags(ctx context.Context) []string {
-	var tags []string
-
-	s.containersMutex.RLock()
-	defer s.containersMutex.RUnlock()
-
-	for _, inst := range s.containers {
-		for _, tag := range inst.Tags {
-			found := false
-			for _, t := range tags {
-				if t == tag {
-					found = true
-					break
-				}
-			}
-			if !found {
-				tags = append(tags, tag)
-			}
-		}
-	}
-
-	return tags
+func (s *containerService) GetTags(ctx context.Context) (types.Tags, error) {
+	return s.containers.GetTags(ctx)
 }
 
 // Search returns all containers that match the query.
-func (s *containerService) Search(ctx context.Context, query types.ContainerSearchQuery) map[types.ContainerID]*types.Container {
-	containers := map[types.ContainerID]*types.Container{}
+func (s *containerService) Search(ctx context.Context, query types.ContainerSearchQuery) (types.Containers, error) {
+	var containers types.Containers
 
-	s.containersMutex.RLock()
-	defer s.containersMutex.RUnlock()
-
-	for _, inst := range s.containers {
-		if query.Features != nil {
-			if !inst.HasFeatureIn(*query.Features) {
-				continue
-			}
-		}
-		if query.Tags != nil {
-			if !inst.HasTagIn(*query.Tags) {
-				continue
-			}
-		}
-		containers[inst.UUID] = inst
+	all, err := s.containers.GetContainers(ctx)
+	if err != nil {
+		return containers, err
 	}
 
-	return containers
+	for _, c := range all {
+		//if query.Features != nil {
+		//	if !c.HasFeatureIn(*query.Features) {
+		//		continue
+		//	}
+		//}
+		if query.Tags != nil {
+			if !c.HasTagIn(*query.Tags) {
+				continue
+			}
+		}
+		containers = append(containers, c)
+	}
+
+	return containers, nil
 }
 
-func (s *containerService) Exists(ctx context.Context, uuid types.ContainerID) bool {
-	s.containersMutex.RLock()
-	defer s.containersMutex.RUnlock()
-
-	return s.containers[uuid] != nil
-}
-
-func (s *containerService) Delete(ctx context.Context, uuid types.ContainerID) error {
-	inst, err := s.Get(ctx, uuid)
+func (s *containerService) Delete(ctx context.Context, id types.ContainerID) error {
+	c, err := s.Get(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	if inst.IsRunning() {
+	if c.IsRunning() {
 		return types.ErrContainerStillRunning
 	}
 
-	err = s.runnerService.Delete(ctx, inst)
+	err = s.runner.DeleteMounts(ctx, c)
 	if err != nil && !errors.Is(err, errors.NotFound) {
 		return err
 	}
 
-	err = s.containerAdapter.Delete(inst.UUID)
+	err = s.runner.DeleteContainer(ctx, c)
+	if err != nil && !errors.Is(err, errors.NotFound) {
+		return err
+	}
+
+	err = s.containers.DeleteContainer(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	s.containersMutex.Lock()
-	defer s.containersMutex.Unlock()
-	delete(s.containers, inst.UUID)
+	err = s.logs.Unregister(id)
+	if err != nil {
+		return err
+	}
 
 	s.ctx.DispatchEvent(types.EventContainerDeleted{
-		ContainerUUID: inst.UUID,
-		ServiceID:     inst.Service.ID,
+		ContainerID: c.ID,
+		ServiceID:   c.ServiceID,
 	})
 	s.ctx.DispatchEvent(types.EventContainersChange{})
 
 	return nil
 }
 
-func (s *containerService) StartAll(ctx context.Context) {
-	s.containersMutex.RLock()
-	defer s.containersMutex.RUnlock()
+func (s *containerService) Start(ctx context.Context, id types.ContainerID) error {
+	c, err := s.Get(ctx, id)
+	if err != nil {
+		return err
+	}
 
+	if c.IsBusy() {
+		return nil
+	}
+
+	s.ctx.DispatchEvent(types.EventContainerLog{
+		ContainerID: c.ID,
+		Kind:        types.LogKindOut,
+		Message:     types.NewLogLineMessageString("Starting container..."),
+	})
+
+	log.Info("starting container", vlog.String("uuid", id.String()))
+
+	if c.IsRunning() {
+		s.ctx.DispatchEvent(types.EventContainerLog{
+			ContainerID: c.ID,
+			Kind:        types.LogKindVertexErr,
+			Message:     types.NewLogLineMessageString(ErrContainerAlreadyRunning.Error()),
+		})
+		return ErrContainerAlreadyRunning
+	}
+
+	setStatus := func(status string) {
+		s.setStatus(c, status)
+	}
+
+	stdout, stderr, err := s.runner.Start(ctx, c, setStatus)
+	if err != nil {
+		s.setStatus(c, types.ContainerStatusError)
+		return err
+	}
+
+	go func() {
+		scanner := bufio.NewScanner(stdout)
+		for scanner.Scan() {
+			if strings.HasPrefix(scanner.Text(), "DOWNLOAD") {
+				msg := strings.TrimPrefix(scanner.Text(), "DOWNLOAD")
+
+				var downloadProgress types.DownloadProgress
+				err := json.Unmarshal([]byte(msg), &downloadProgress)
+				if err != nil {
+					log.Error(err)
+					continue
+				}
+
+				s.ctx.DispatchEvent(types.EventContainerLog{
+					ContainerID: c.ID,
+					Kind:        types.LogKindDownload,
+					Message:     types.NewLogLineMessageDownload(&downloadProgress),
+				})
+				continue
+			}
+
+			s.ctx.DispatchEvent(types.EventContainerLog{
+				ContainerID: c.ID,
+				Kind:        types.LogKindOut,
+				Message:     types.NewLogLineMessageString(scanner.Text()),
+			})
+		}
+		if scanner.Err() != nil {
+			log.Error(scanner.Err())
+		}
+	}()
+
+	go func() {
+		scanner := bufio.NewScanner(stderr)
+		for scanner.Scan() {
+			s.ctx.DispatchEvent(types.EventContainerLog{
+				ContainerID: c.ID,
+				Kind:        types.LogKindErr,
+				Message:     types.NewLogLineMessageString(scanner.Text()),
+			})
+		}
+		if scanner.Err() != nil {
+			log.Error(scanner.Err())
+		}
+	}()
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+
+		err := s.WaitStatus(ctx, id, types.ContainerStatusRunning)
+		if err != nil {
+			log.Error(err)
+		}
+	}()
+	wg.Wait()
+
+	return nil
+}
+
+func (s *containerService) StartAll(ctx context.Context) error {
 	var ids []types.ContainerID
 
-	for _, inst := range s.containers {
-		// vertex containers autostart are managed by the startup service.
-		if inst.LaunchOnStartup() {
-			ids = append(ids, inst.UUID)
-		}
-	}
+	// TODO: Retrieve only the containers where LaunchOnStartup is true in the DB.
 
-	if len(ids) == 0 {
-		return
-	}
-
-	log.Info("trying to ping Google...")
-
-	// Wait for internet connection
-	timeout, cancelTimeout := context.WithTimeout(context.Background(), 60*time.Second)
-	err := net.WaitInternetConn(timeout)
-	cancelTimeout()
+	all, err := s.containers.GetContainers(ctx)
 	if err != nil {
-		log.Error(err)
-		return
+		return err
+	}
+
+	for _, inst := range all {
+		// vertex containers autostart are managed by the startup service.
+		if inst.LaunchOnStartup {
+			ids = append(ids, inst.ID)
+		}
 	}
 
 	// Start them
 	for _, id := range ids {
 		go func(id types.ContainerID) {
-			inst, err := s.Get(ctx, id)
-			if err != nil {
-				log.Error(err)
-				return
-			}
-
-			err = s.runnerService.Start(ctx, inst)
+			err = s.Start(ctx, id)
 			if err != nil {
 				log.Warn("failed to auto-start the container",
-					vlog.String("uuid", inst.UUID.String()),
+					vlog.String("uuid", id.String()),
 					vlog.String("reason", err.Error()),
 				)
 			}
 		}(id)
 	}
+
+	return nil
 }
 
-func (s *containerService) StopAll(ctx context.Context) {
-	s.containersMutex.RLock()
-	defer s.containersMutex.RUnlock()
-
-	for _, inst := range s.containers {
-		err := s.runnerService.Stop(ctx, inst)
-		if err != nil {
-			log.Error(err)
-		}
-	}
-
-	s.ctx.DispatchEvent(types.EventContainersStopped{})
-}
-
-func (s *containerService) LoadAll(ctx context.Context) {
-	uuids, err := s.containerAdapter.GetAll()
+func (s *containerService) Stop(ctx context.Context, id types.ContainerID) error {
+	c, err := s.Get(ctx, id)
 	if err != nil {
-		return
+		return err
 	}
 
-	loaded := 0
-	for _, id := range uuids {
-		err := s.load(ctx, id)
-		if err != nil {
-			log.Error(err)
-			continue
-		}
-		loaded += 1
+	if c.IsBusy() {
+		return nil
 	}
 
-	s.ctx.DispatchEvent(types.EventContainersLoaded{
-		Count: loaded,
+	if !c.IsRunning() {
+		s.ctx.DispatchEvent(types.EventContainerLog{
+			ContainerID: c.ID,
+			Kind:        types.LogKindVertexErr,
+			Message:     types.NewLogLineMessageString(ErrContainerNotRunning.Error()),
+		})
+		return ErrContainerNotRunning
+	}
+
+	// Log stopped
+	s.ctx.DispatchEvent(types.EventContainerLog{
+		ContainerID: c.ID,
+		Kind:        types.LogKindVertexOut,
+		Message:     types.NewLogLineMessageString("Stopping container..."),
 	})
+	log.Info("stopping container", vlog.String("uuid", c.ID.String()))
+	s.setStatus(c, types.ContainerStatusStopping)
+
+	err = s.runner.Stop(ctx, c)
+	if err == nil {
+		s.ctx.DispatchEvent(types.EventContainerLog{
+			ContainerID: c.ID,
+			Kind:        types.LogKindVertexOut,
+			Message:     types.NewLogLineMessageString("Container stopped."),
+		})
+		log.Info("container stopped", vlog.String("uuid", c.ID.String()))
+		s.setStatus(c, types.ContainerStatusOff)
+	} else {
+		s.setStatus(c, types.ContainerStatusRunning)
+	}
+
+	return err
 }
 
-func (s *containerService) DeleteAll(ctx context.Context) {
-	all := s.GetAll(ctx)
-	for _, inst := range all {
-		err := s.Delete(ctx, inst.UUID)
+func (s *containerService) StopAll(ctx context.Context) error {
+	all, err := s.containers.GetContainers(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, c := range all {
+		err := s.Stop(ctx, c.ID)
 		if err != nil {
 			log.Error(err)
 		}
 	}
+
+	return nil
 }
 
-func (s *containerService) Install(ctx context.Context, service types.Service, method string) (*types.Container, error) {
+func (s *containerService) RecreateContainer(ctx context.Context, id types.ContainerID) error {
+	c, err := s.Get(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	if c.IsRunning() {
+		err := s.Stop(ctx, id)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Make sure to only delete the container!
+	// The volumes must be kept here.
+	err = s.runner.DeleteContainer(ctx, c)
+	if err != nil && !errors.Is(err, errors.NotFound) {
+		return err
+	}
+
+	return s.Start(ctx, id)
+}
+
+func (s *containerService) DeleteAll(ctx context.Context) error {
+	all, err := s.containers.GetContainers(ctx)
+	if err != nil {
+		return err
+	}
+
+	var errs []error
+	for _, c := range all {
+		err := s.Delete(ctx, c.ID)
+		if err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return goerrors.Join(errs...)
+}
+
+func (s *containerService) Install(ctx context.Context, serviceID string) (*types.Container, error) {
 	id := types.NewContainerID()
-	err := s.containerAdapter.Create(id)
+
+	service, err := s.services.Get(serviceID)
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.runnerService.Install(ctx, id, service)
+	dir := path.Join(storage.FSPath, id.String())
+	if service.Methods.Docker.Clone != nil {
+		err := vstorage.CloneRepository(dir, service.Methods.Docker.Clone.Repository)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	c := types.NewContainer(id, serviceID)
+
+	err = s.containers.CreateContainer(ctx, c)
 	if err != nil {
 		return nil, err
 	}
 
-	tempContainer := &types.Container{
-		UUID:    id,
-		Service: service,
-	}
-
-	err = s.containerServiceService.Save(tempContainer, service)
+	err = s.logs.Register(id)
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.load(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	inst, err := s.Get(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	inst.ContainerSettings.InstallMethod = &method
-	err = s.settingsService.Save(inst, inst.ContainerSettings)
-	if err != nil {
-		return nil, err
-	}
-
-	inst.ResetDefaultEnv()
-	err = s.envService.Save(inst, inst.Env)
+	c.ResetDefaultEnv(service)
+	err = s.env.SaveEnv(c.ID, c.Env)
 	if err != nil {
 		return nil, err
 	}
@@ -322,117 +396,191 @@ func (s *containerService) Install(ctx context.Context, service types.Service, m
 	s.ctx.DispatchEvent(types.EventContainerCreated{})
 	s.ctx.DispatchEvent(types.EventContainersChange{})
 
-	return inst, nil
+	return &c, nil
 }
 
-func (s *containerService) CheckForUpdates(ctx context.Context) (map[types.ContainerID]*types.Container, error) {
-	for _, inst := range s.GetAll(ctx) {
-		err := s.runnerService.CheckForUpdates(ctx, inst)
+func (s *containerService) CheckForUpdates(ctx context.Context) (types.Containers, error) {
+	all, err := s.GetContainers(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, c := range all {
+		err := s.runner.CheckForUpdates(ctx, &c)
 		if err != nil {
-			return s.GetAll(ctx), err
+			return all, err
 		}
 	}
 
-	return s.GetAll(ctx), nil
+	return all, nil
 }
 
-func (s *containerService) load(ctx context.Context, uuid types.ContainerID) error {
-	service, err := s.containerServiceService.Load(uuid)
+func (s *containerService) SetDatabases(ctx context.Context, c *types.Container, databases map[string]types.ContainerID, options map[string]*types.SetDatabasesOptions) error {
+	service, err := s.services.Get(c.ServiceID)
 	if err != nil {
 		return err
 	}
 
-	inst := types.NewContainer(uuid, service)
-
-	err = s.settingsService.Load(&inst)
-	if err != nil {
-		return err
-	}
-
-	err = s.envService.Load(&inst)
-	if err != nil {
-		return err
-	}
-
-	latestService, err := s.serviceService.GetById(service.ID)
-	if err != nil {
-		log.Error(err)
-	} else {
-		err = s.containerServiceService.CheckForUpdate(&inst, latestService)
-		if err != nil {
-			log.Error(err)
-		}
-	}
-
-	if !s.Exists(ctx, uuid) {
-		s.containersMutex.Lock()
-		defer s.containersMutex.Unlock()
-		s.containers[uuid] = &inst
-	} else {
-		return ErrContainerAlreadyExists
-	}
-
-	s.ctx.DispatchEvent(types.EventContainerLoaded{
-		Container: &inst,
-	})
-
-	return nil
-}
-
-func (s *containerService) SetDatabases(ctx context.Context, inst *types.Container, databases map[string]types.ContainerID, options map[string]*types.SetDatabasesOptions) error {
 	for db := range databases {
-		if _, ok := inst.Service.Databases[db]; !ok {
+		if _, ok := service.Databases[db]; !ok {
 			return types.ErrDatabaseIDNotFound
 		}
 	}
 
-	inst.Databases = databases
-	err := s.settingsService.Save(inst, inst.ContainerSettings)
-	if err != nil {
-		return err
-	}
-	return s.remapDatabaseEnv(ctx, inst, options)
+	c.Databases = databases
+	// TODO: Save
+	return s.remapDatabaseEnv(ctx, c, options)
 }
 
 // remapDatabaseEnv remaps the environment variables of a container.
-func (s *containerService) remapDatabaseEnv(ctx context.Context, inst *types.Container, options map[string]*types.SetDatabasesOptions) error {
-	for databaseID, databaseContainerUUID := range inst.Databases {
+func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Container, options map[string]*types.SetDatabasesOptions) error {
+	for databaseID, databaseContainerUUID := range c.Databases {
 		db, err := s.Get(ctx, databaseContainerUUID)
+		if err != nil {
+			return err
+		}
+
+		dbService, err := s.services.Get(db.ServiceID)
+		if err != nil {
+			return err
+		}
+
+		cService, err := s.services.Get(c.ServiceID)
 		if err != nil {
 			return err
 		}
 
 		host := config.Current.URL("vertex").String()
 
-		dbEnvNames := (*db.Service.Features.Databases)[0]
-		iEnvNames := inst.Service.Databases[databaseID].Names
+		dbEnvNames := (*dbService.Features.Databases)[0]
+		iEnvNames := cService.Databases[databaseID].Names
 
-		inst.Env[iEnvNames.Host] = host
-		inst.Env[iEnvNames.Port] = db.Env[dbEnvNames.Port]
+		c.Env.Set(iEnvNames.Host, host)
+		c.Env.Set(iEnvNames.Port, db.Env.Get(dbEnvNames.Port))
 		if dbEnvNames.Username != nil {
-			inst.Env[iEnvNames.Username] = db.Env[*dbEnvNames.Username]
+			c.Env.Set(iEnvNames.Username, db.Env.Get(*dbEnvNames.Username))
 		}
 		if dbEnvNames.Password != nil {
-			inst.Env[iEnvNames.Password] = db.Env[*dbEnvNames.Password]
+			c.Env.Set(iEnvNames.Password, db.Env.Get(*dbEnvNames.Password))
 		}
 
 		if options != nil {
 			if modifiedFeature, ok := options[databaseID]; ok {
 				if modifiedFeature != nil && modifiedFeature.DatabaseName != nil {
-					inst.Env[iEnvNames.Database] = *modifiedFeature.DatabaseName
+					c.Env.Set(iEnvNames.Database, *modifiedFeature.DatabaseName)
 					continue
 				}
 			}
 		}
 
 		if dbEnvNames.DefaultDatabase != nil {
-			inst.Env[iEnvNames.Database] = db.Env[*dbEnvNames.DefaultDatabase]
+			c.Env.Set(iEnvNames.Database, db.Env.Get(*dbEnvNames.DefaultDatabase))
 			continue
 		}
-
-		delete(inst.Env, iEnvNames.Database)
-
 	}
 
-	return s.envService.Save(inst, inst.Env)
+	return s.env.SaveEnv(c.ID, c.Env)
+}
+
+// SaveEnv saves the environment variables of a container
+// and applies them by recreating the container.
+func (s *containerService) SaveEnv(ctx context.Context, id types.ContainerID, env types.EnvVariables) error {
+	err := s.env.SaveEnv(id, env)
+	if err != nil {
+		return err
+	}
+	return s.RecreateContainer(ctx, id)
+}
+
+func (s *containerService) GetAllVersions(ctx context.Context, id types.ContainerID, useCache bool) ([]string, error) {
+	c, err := s.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	if !useCache || len(c.CacheVersions) == 0 {
+		versions, err := s.runner.GetAllVersions(ctx, *c)
+		if err != nil {
+			return nil, err
+		}
+		c.CacheVersions = versions
+	}
+
+	return c.CacheVersions, nil
+}
+
+func (s *containerService) GetContainerInfo(ctx context.Context, id types.ContainerID) (map[string]any, error) {
+	c, err := s.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return s.runner.Info(ctx, *c)
+}
+
+func (s *containerService) WaitStatus(ctx context.Context, id types.ContainerID, status string) error {
+	statusChan := make(chan string)
+	defer close(statusChan)
+
+	c, err := s.Get(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	if c.Status == status {
+		return nil
+	}
+
+	l := event.NewTempListener(func(e event.Event) error {
+		switch e := e.(type) {
+		case types.EventContainerStatusChange:
+			if e.ContainerUUID != c.ID {
+				return nil
+			}
+			statusChan <- e.Status
+		}
+		return nil
+	})
+
+	s.ctx.AddListener(l)
+	defer s.ctx.RemoveListener(l)
+
+	for e := range statusChan {
+		if e == status {
+			return nil
+		}
+	}
+
+	return errors.Timeoutf("wait status")
+}
+
+func (s *containerService) GetLatestLogs(id types.ContainerID) ([]types.LogLine, error) {
+	return s.logs.LoadBuffer(id)
+}
+
+func (s *containerService) GetServiceByID(ctx context.Context, id string) (*types.Service, error) {
+	serv, err := s.services.Get(id)
+	if err != nil {
+		return nil, err
+	}
+	return &serv, nil
+}
+
+func (s *containerService) GetServices(ctx context.Context) []types.Service {
+	return s.services.GetAll()
+}
+
+func (s *containerService) setStatus(c *types.Container, status string) {
+	if c.Status == status {
+		return
+	}
+
+	c.Status = status
+	s.ctx.DispatchEvent(types.EventContainersChange{})
+	s.ctx.DispatchEvent(types.EventContainerStatusChange{
+		ContainerUUID: c.ID,
+		ServiceID:     c.ServiceID,
+		Container:     *c,
+		Name:          c.Name,
+		Status:        status,
+	})
 }

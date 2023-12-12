@@ -23,7 +23,7 @@ func (c *Client) DeleteContainer(ctx context.Context, uuid types.ContainerID) er
 		Fetch(ctx)
 }
 
-func (c *Client) PatchContainer(ctx context.Context, uuid types.ContainerID, settings types.ContainerSettings) error {
+func (c *Client) PatchContainer(ctx context.Context, uuid types.ContainerID, settings interface{}) error {
 	return c.Request().
 		Pathf("./container/%s", uuid).
 		Patch().
@@ -45,7 +45,7 @@ func (c *Client) StopContainer(ctx context.Context, uuid types.ContainerID) erro
 		Fetch(ctx)
 }
 
-func (c *Client) PatchContainerEnvironment(ctx context.Context, uuid types.ContainerID, env map[string]string) error {
+func (c *Client) PatchContainerEnvironment(ctx context.Context, uuid types.ContainerID, env types.EnvVariables) error {
 	return c.Request().
 		Pathf("./container/%s/environment", uuid).
 		Patch().

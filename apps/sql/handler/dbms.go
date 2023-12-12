@@ -61,8 +61,11 @@ func (r *dbmsHandler) Install() gin.HandlerFunc {
 			return nil, err
 		}
 
-		inst.ContainerSettings.Tags = []string{"Vertex SQL", "Vertex SQL - Postgres Database"}
-		err = client.PatchContainer(c, inst.UUID, inst.ContainerSettings)
+		inst.Tags = containerstypes.Tags{
+			containerstypes.Tag{Tag: "Vertex SQL"},
+			containerstypes.Tag{Tag: "Vertex SQL - Postgres Database"},
+		}
+		err = client.PatchContainer(c, inst.ID, inst)
 		if err != nil {
 			return nil, err
 		}
@@ -72,7 +75,7 @@ func (r *dbmsHandler) Install() gin.HandlerFunc {
 			return nil, fmt.Errorf("setup credentials: %w", err)
 		}
 
-		err = client.PatchContainerEnvironment(c, inst.UUID, inst.Env)
+		err = client.PatchContainerEnvironment(c, inst.ID, inst.Env)
 		if err != nil {
 			return nil, err
 		}

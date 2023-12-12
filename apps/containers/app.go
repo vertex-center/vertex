@@ -5,24 +5,20 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/adapter"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/service"
+	"github.com/vertex-center/vertex/apps/containers/database"
 	"github.com/vertex-center/vertex/apps/containers/handler"
 	"github.com/vertex-center/vertex/apps/containers/meta"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types/metric"
 	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/app/appmeta"
 	"github.com/vertex-center/vertex/common/middleware"
+	"github.com/vertex-center/vertex/common/storage"
 	"github.com/wI2L/fizz"
 )
 
 var (
-	serviceService          port.ServiceService
-	envService              port.EnvService
-	logsService             port.LogsService
-	runnerService           port.RunnerService
-	containerServiceService port.ContainerServiceService
-	settingsService         port.SettingsService
-	containerService        port.ContainerService
-	metricsService          port.MetricsService
+	containerService port.ContainerService
+	metricsService   port.MetricsService
 
 	dockerKernelService port.DockerService
 )
@@ -44,30 +40,24 @@ func (a *App) Meta() appmeta.Meta {
 }
 
 func (a *App) Initialize() error {
+	db, err := storage.NewDB(storage.DBParams{
+		ID:         a.Meta().ID,
+		SchemaFunc: database.GetSchema,
+		Migrations: database.Migrations,
+	})
+	if err != nil {
+		return err
+	}
+
 	var (
-		containerAdapter        = adapter.NewContainerFSAdapter(nil)
-		envAdapter              = adapter.NewEnvFSAdapter(nil)
-		logsAdapter             = adapter.NewLogsFSAdapter(nil)
-		runnerAdapter           = adapter.NewRunnerFSAdapter()
-		containerServiceAdapter = adapter.NewContainerServiceFSAdapter(nil)
-		settingsAdapter         = adapter.NewSettingsFSAdapter(nil)
+		containers = adapter.NewContainerDBAdapter(db)
+		env        = adapter.NewEnvDBAdapter(db)
+		logs       = adapter.NewLogsFSAdapter(nil)
+		runner     = adapter.NewRunnerDockerAdapter()
+		services   = adapter.NewServiceFSAdapter(nil)
 	)
 
-	serviceService = service.NewServiceService()
-	envService = service.NewEnvService(envAdapter)
-	logsService = service.NewLogsService(a.ctx, logsAdapter)
-	runnerService = service.NewRunnerService(a.ctx, runnerAdapter)
-	containerServiceService = service.NewContainerServiceService(containerServiceAdapter)
-	settingsService = service.NewSettingsService(settingsAdapter)
-	containerService = service.NewContainerService(service.ContainerServiceParams{
-		Ctx:                     a.ctx,
-		ContainerAdapter:        containerAdapter,
-		RunnerService:           runnerService,
-		ContainerServiceService: containerServiceService,
-		EnvService:              envService,
-		SettingsService:         settingsService,
-		ServiceService:          serviceService,
-	})
+	containerService = service.NewContainerService(a.ctx, containers, env, runner, services, logs)
 	metricsService = service.NewMetricsService(a.ctx)
 
 	return nil
@@ -79,21 +69,15 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	metric.Serve(r, metricsService)
 
 	var (
-		servicesHandler   = handler.NewServicesHandler(serviceService)
-		serviceHandler    = handler.NewServiceHandler(serviceService, containerService)
+		servicesHandler   = handler.NewServicesHandler(containerService)
+		serviceHandler    = handler.NewServiceHandler(containerService)
 		containersHandler = handler.NewContainersHandler(a.ctx, containerService)
 		containerHandler  = handler.NewContainerHandler(handler.ContainerHandlerParams{
-			Ctx:                     a.ctx,
-			ContainerService:        containerService,
-			SettingsService:         settingsService,
-			RunnerService:           runnerService,
-			EnvService:              envService,
-			ContainerServiceService: containerServiceService,
-			LogsService:             logsService,
-			ServiceService:          serviceService,
+			Ctx:              a.ctx,
+			ContainerService: containerService,
 		})
 
-		container  = r.Group("/container/:container_uuid", "Container", "", authmiddleware.Authenticated)
+		container  = r.Group("/container/:container_id", "Container", "", authmiddleware.Authenticated)
 		containers = r.Group("/containers", "Containers", "", authmiddleware.Authenticated)
 		serv       = r.Group("/service/:service_id", "Service", "", authmiddleware.Authenticated)
 		services   = r.Group("/services", "Services", "")
@@ -157,11 +141,6 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 		fizz.ID("getContainerLogs"),
 		fizz.Summary("Get container logs"),
 	}, containerHandler.GetLogs())
-
-	container.POST("/update/service", []fizz.OperationOption{
-		fizz.ID("updateService"),
-		fizz.Summary("Update service"),
-	}, containerHandler.UpdateService())
 
 	container.GET("/versions", []fizz.OperationOption{
 		fizz.ID("getContainerVersions"),

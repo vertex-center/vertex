@@ -52,7 +52,7 @@ func (s *metricsService) OnEvent(e event.Event) error {
 		s.metricsRegistry.Inc(MetricIDContainersCount)
 	case types.EventContainerDeleted:
 		s.metricsRegistry.Dec(MetricIDContainersCount)
-		s.metricsRegistry.Set(MetricIDContainerStatus, math.NaN(), e.ContainerUUID.String(), e.ServiceID)
+		s.metricsRegistry.Set(MetricIDContainerStatus, math.NaN(), e.ContainerID.String(), e.ServiceID)
 	case types.EventContainersLoaded:
 		s.metricsRegistry.Set(MetricIDContainersCount, float64(e.Count))
 	}

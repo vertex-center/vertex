@@ -16,10 +16,7 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-var (
-	ErrNoReleasesPublished = errors.New("this repository has no existing releases")
-	ErrNoReleasesForThisOS = errors.New("this repository has no releases appropriate for this OS")
-)
+var ErrNoReleasesForThisOS = errors.New("this repository has no releases appropriate for this OS")
 
 func CloneRepository(url string, dest string) error {
 	log.Info("cloning repository",
