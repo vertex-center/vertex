@@ -46,7 +46,7 @@ type (
 		Databases       map[string]ContainerID `json:"databases,omitempty"`
 		Update          *ContainerUpdate       `json:"update,omitempty"`
 		ServiceUpdate   ServiceUpdate          `json:"service_update,omitempty"`
-		CacheVersions   []string               `json:"cache_versions,omitempty"`
+		CacheVersions   []string
 	}
 
 	ContainerSearchQuery struct {
