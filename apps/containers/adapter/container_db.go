@@ -2,7 +2,6 @@ package adapter
 
 import (
 	"context"
-	"time"
 
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
@@ -36,18 +35,17 @@ func (c *containerDBAdapter) GetContainers(ctx context.Context) (types.Container
 
 func (c *containerDBAdapter) CreateContainer(ctx context.Context, container types.Container) error {
 	_, err := c.db.NamedExec(`
-		INSERT INTO containers (id, service_id, user_id, status, launch_on_startup, display_name, version)
-		VALUES (:id, :service_id, :user_id, :status, :launch_on_startup, :display_name, :version)
+		INSERT INTO containers (id, service_id, user_id, image, image_tag, status, launch_on_startup, name, description, color, icon, command)
+		VALUES (:id, :service_id, :user_id, :image, :image_tag, :status, :launch_on_startup, :name, :description, :color, :icon, :command)
 	`, container)
 	return err
 }
 
 func (c *containerDBAdapter) DeleteContainer(ctx context.Context, id types.ContainerID) error {
 	_, err := c.db.Exec(`
-		UPDATE containers
-		SET deleted_at = $1
-		WHERE id = $2
-	`, time.Now().Unix(), id)
+		DELETE FROM containers
+		WHERE id = $1
+	`, id)
 	return err
 }
 
