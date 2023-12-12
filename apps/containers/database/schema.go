@@ -27,7 +27,7 @@ func GetSchema(driver vsql.Driver) string {
 			WithField("value", "VARCHAR(255)", "NOT NULL").
 			WithField("default_value", "VARCHAR(255)").
 			WithField("description", "VARCHAR(255)").
-			WithPrimaryKey("container_id", "key").
+			WithPrimaryKey("container_id", "name").
 			WithForeignKey("container_id", "containers", "id"),
 
 		vsql.CreateTable("capabilities").
