@@ -72,10 +72,7 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 		servicesHandler   = handler.NewServicesHandler(containerService)
 		serviceHandler    = handler.NewServiceHandler(containerService)
 		containersHandler = handler.NewContainersHandler(a.ctx, containerService)
-		containerHandler  = handler.NewContainerHandler(handler.ContainerHandlerParams{
-			Ctx:              a.ctx,
-			ContainerService: containerService,
-		})
+		containerHandler  = handler.NewContainerHandler(a.ctx, containerService)
 
 		container  = r.Group("/container/:container_id", "Container", "", authmiddleware.Authenticated)
 		containers = r.Group("/containers", "Containers", "", authmiddleware.Authenticated)

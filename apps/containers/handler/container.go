@@ -20,15 +20,10 @@ type containerHandler struct {
 	containerService port.ContainerService
 }
 
-type ContainerHandlerParams struct {
-	Ctx              *apptypes.Context
-	ContainerService port.ContainerService
-}
-
-func NewContainerHandler(params ContainerHandlerParams) port.ContainerHandler {
+func NewContainerHandler(ctx *apptypes.Context, containerService port.ContainerService) port.ContainerHandler {
 	return &containerHandler{
-		ctx:              params.Ctx,
-		containerService: params.ContainerService,
+		ctx:              ctx,
+		containerService: containerService,
 	}
 }
 
