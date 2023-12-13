@@ -38,7 +38,7 @@ type (
 		Icon            *string                `json:"icon"                     db:"icon"               example:"simpleicons/postgres.svg"`
 		Command         *string                `json:"command,omitempty"        db:"command"            example:"tunnel run"`
 		Env             EnvVariables           `json:"environment,omitempty"`
-		Capabilities    Capabilities           `json:"capabilities,omitempty"`
+		Caps            Capabilities           `json:"capabilities,omitempty"`
 		Ports           Ports                  `json:"ports,omitempty"`
 		Volumes         Volumes                `json:"volumes,omitempty"`
 		Sysctls         Sysctls                `json:"sysctls,omitempty"`

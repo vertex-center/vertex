@@ -14,12 +14,43 @@ type (
 		GetContainers(ctx context.Context) (types.Containers, error)
 		CreateContainer(ctx context.Context, container types.Container) error
 		DeleteContainer(ctx context.Context, id types.ContainerID) error
-		GetTags(ctx context.Context) (types.Tags, error)
+	}
+
+	PortAdapter interface {
+		GetPorts(ctx context.Context, id types.ContainerID) (types.Ports, error)
+		CreatePorts(ctx context.Context, ports types.Ports) error
+		DeletePorts(ctx context.Context, id types.ContainerID) error
+	}
+
+	VolumeAdapter interface {
+		GetVolumes(ctx context.Context, id types.ContainerID) (types.Volumes, error)
+		CreateVolumes(ctx context.Context, volumes types.Volumes) error
+		DeleteVolumes(ctx context.Context, id types.ContainerID) error
+	}
+
+	TagAdapter interface {
+		CreateTags(ctx context.Context, tags types.Tags) error
+		DeleteTags(ctx context.Context, id types.ContainerID) error
+		GetContainerTags(ctx context.Context, id types.ContainerID) (types.Tags, error)
+		GetUniqueTags(ctx context.Context) (types.Tags, error)
+	}
+
+	SysctlAdapter interface {
+		GetSysctls(ctx context.Context, id types.ContainerID) (types.Sysctls, error)
+		CreateSysctls(ctx context.Context, sysctls types.Sysctls) error
+		DeleteSysctls(ctx context.Context, id types.ContainerID) error
 	}
 
 	EnvAdapter interface {
-		GetEnv(id types.ContainerID) (types.EnvVariables, error)
-		SaveEnv(id types.ContainerID, env types.EnvVariables) error
+		GetVariable(ctx context.Context, id types.ContainerID) (types.EnvVariables, error)
+		CreateVariables(ctx context.Context, env types.EnvVariables) error
+		DeleteVariables(ctx context.Context, id types.ContainerID) error
+	}
+
+	CapAdapter interface {
+		GetCaps(ctx context.Context, id types.ContainerID) (types.Capabilities, error)
+		CreateCaps(ctx context.Context, caps types.Capabilities) error
+		DeleteCaps(ctx context.Context, id types.ContainerID) error
 	}
 
 	LogsAdapter interface {

@@ -50,6 +50,11 @@ func (a *App) Initialize() error {
 	}
 
 	var (
+		caps       = adapter.NewCapDBAdapter(db)
+		ports      = adapter.NewPortDBAdapter(db)
+		sysctls    = adapter.NewSysctlDBAdapter(db)
+		tags       = adapter.NewTagDBAdapter(db)
+		volumes    = adapter.NewVolumeDBAdapter(db)
 		containers = adapter.NewContainerDBAdapter(db)
 		env        = adapter.NewEnvDBAdapter(db)
 		logs       = adapter.NewLogsFSAdapter(nil)
@@ -57,7 +62,7 @@ func (a *App) Initialize() error {
 		services   = adapter.NewServiceFSAdapter(nil)
 	)
 
-	containerService = service.NewContainerService(a.ctx, containers, env, runner, services, logs)
+	containerService = service.NewContainerService(a.ctx, caps, containers, env, ports, volumes, tags, sysctls, runner, services, logs)
 	metricsService = service.NewMetricsService(a.ctx)
 
 	return nil

@@ -30,19 +30,40 @@ var (
 type containerService struct {
 	uuid       uuid.UUID
 	ctx        *app.Context
+	caps       port.CapAdapter // capabilities
 	containers port.ContainerAdapter
-	env        port.EnvAdapter
+	vars       port.EnvAdapter
+	ports      port.PortAdapter
+	volumes    port.VolumeAdapter
+	tags       port.TagAdapter
+	sysctls    port.SysctlAdapter
 	runner     port.RunnerAdapter
 	services   port.ServiceAdapter
 	logs       port.LogsAdapter
 }
 
-func NewContainerService(ctx *app.Context, containers port.ContainerAdapter, env port.EnvAdapter, runner port.RunnerAdapter, services port.ServiceAdapter, logs port.LogsAdapter) port.ContainerService {
+func NewContainerService(ctx *app.Context,
+	caps port.CapAdapter,
+	containers port.ContainerAdapter,
+	vars port.EnvAdapter,
+	ports port.PortAdapter,
+	volumes port.VolumeAdapter,
+	tags port.TagAdapter,
+	sysctls port.SysctlAdapter,
+	runner port.RunnerAdapter,
+	services port.ServiceAdapter,
+	logs port.LogsAdapter,
+) port.ContainerService {
 	s := &containerService{
 		uuid:       uuid.New(),
 		ctx:        ctx,
+		caps:       caps,
 		containers: containers,
-		env:        env,
+		vars:       vars,
+		ports:      ports,
+		volumes:    volumes,
+		tags:       tags,
+		sysctls:    sysctls,
 		runner:     runner,
 		services:   services,
 		logs:       logs,
@@ -60,7 +81,7 @@ func (s *containerService) GetContainers(ctx context.Context) (types.Containers,
 }
 
 func (s *containerService) GetTags(ctx context.Context) (types.Tags, error) {
-	return s.containers.GetTags(ctx)
+	return s.tags.GetUniqueTags(ctx)
 }
 
 // Search returns all containers that match the query.
@@ -109,9 +130,20 @@ func (s *containerService) Delete(ctx context.Context, id types.ContainerID) err
 		return err
 	}
 
-	err = s.containers.DeleteContainer(ctx, id)
-	if err != nil {
-		return err
+	deletes := []func(context.Context, types.ContainerID) error{
+		s.caps.DeleteCaps,
+		s.ports.DeletePorts,
+		s.volumes.DeleteVolumes,
+		s.sysctls.DeleteSysctls,
+		s.vars.DeleteVariables,
+		s.tags.DeleteTags,
+		s.containers.DeleteContainer,
+	}
+	for _, f := range deletes {
+		err := f(ctx, id)
+		if err != nil {
+			return err
+		}
 	}
 
 	err = s.logs.Unregister(id)
@@ -403,16 +435,26 @@ func (s *containerService) Install(ctx context.Context, serviceID string) (*type
 	}
 	c.Env = env
 
+	err = s.vars.CreateVariables(ctx, env)
+	if err != nil {
+		return nil, err
+	}
+
 	// Set default capabilities
 	if service.Methods.Docker.Capabilities != nil {
-		capabilities := types.Capabilities{}
+		caps := types.Capabilities{}
 		for _, cp := range *service.Methods.Docker.Capabilities {
-			capabilities = append(capabilities, types.Capability{
+			caps = append(caps, types.Capability{
 				ContainerID: id,
 				Name:        cp,
 			})
 		}
-		c.Capabilities = capabilities
+		c.Caps = caps
+
+		err = s.caps.CreateCaps(ctx, caps)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// Set default ports
@@ -426,6 +468,11 @@ func (s *containerService) Install(ctx context.Context, serviceID string) (*type
 			})
 		}
 		c.Ports = ports
+
+		err = s.ports.CreatePorts(ctx, ports)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// Set default volumes
@@ -439,6 +486,11 @@ func (s *containerService) Install(ctx context.Context, serviceID string) (*type
 			})
 		}
 		c.Volumes = volumes
+
+		err = s.volumes.CreateVolumes(ctx, volumes)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// Set default sysctls
@@ -452,6 +504,11 @@ func (s *containerService) Install(ctx context.Context, serviceID string) (*type
 			})
 		}
 		c.Sysctls = sysctls
+
+		err = s.sysctls.CreateSysctls(ctx, sysctls)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	err = s.containers.CreateContainer(ctx, c)
@@ -465,7 +522,7 @@ func (s *containerService) Install(ctx context.Context, serviceID string) (*type
 	}
 
 	c.ResetDefaultEnv(service)
-	err = s.env.SaveEnv(c.ID, c.Env)
+	err = s.vars.CreateVariables(ctx, c.Env)
 	if err != nil {
 		return nil, err
 	}
@@ -556,13 +613,13 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 		}
 	}
 
-	return s.env.SaveEnv(c.ID, c.Env)
+	return s.vars.CreateVariables(ctx, c.Env)
 }
 
 // SaveEnv saves the environment variables of a container
 // and applies them by recreating the container.
 func (s *containerService) SaveEnv(ctx context.Context, id types.ContainerID, env types.EnvVariables) error {
-	err := s.env.SaveEnv(id, env)
+	err := s.vars.CreateVariables(ctx, env)
 	if err != nil {
 		return err
 	}

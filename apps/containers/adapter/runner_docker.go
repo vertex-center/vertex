@@ -193,7 +193,7 @@ func (a runnerDockerAdapter) Start(ctx context.Context, c *types.Container, setS
 			}
 
 			// capAdd
-			for _, cap := range c.Capabilities {
+			for _, cap := range c.Caps {
 				options.CapAdd = append(options.CapAdd, cap.Name)
 			}
 
