@@ -18,7 +18,7 @@ const getAllContainers = async () => {
 };
 
 const getAllTags = async () => {
-    const { data } = await server.get<Tags>(`/containers/tags`);
+    const { data } = await server.get<Tags>(`/tags`);
     return data;
 };
 
