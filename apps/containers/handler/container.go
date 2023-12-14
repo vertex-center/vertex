@@ -189,7 +189,7 @@ func (h *containerHandler) Events() gin.HandlerFunc {
 				}
 
 			case types.EventContainerStatusChange:
-				if inst.ID != e.ContainerUUID {
+				if inst.ID != e.ContainerID {
 					break
 				}
 

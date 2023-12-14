@@ -16,7 +16,7 @@ func (s *sqlService) OnEvent(e event.Event) error {
 		if e.Status == types.ContainerStatusRunning {
 			s.onContainerStart(&e.Container)
 		} else if e.Status == types.ContainerStatusOff {
-			s.onContainerStop(e.ContainerUUID)
+			s.onContainerStop(e.ContainerID)
 		}
 	}
 	return nil
