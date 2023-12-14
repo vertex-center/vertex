@@ -476,7 +476,7 @@ func (s *containerService) Install(ctx context.Context, serviceID string) (*type
 
 	// Set default volumes
 	if service.Methods.Docker.Volumes != nil {
-		for in, out := range *service.Methods.Docker.Volumes {
+		for out, in := range *service.Methods.Docker.Volumes {
 			err = s.volumes.CreateVolume(ctx, types.Volume{
 				ContainerID: id,
 				In:          in,
