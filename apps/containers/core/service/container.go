@@ -143,7 +143,7 @@ func (s *containerService) Delete(ctx context.Context, id types.ContainerID) err
 	}
 
 	err = s.logs.Unregister(id)
-	if err != nil {
+	if err != nil && !errors.Is(err, errors.NotFound) {
 		return err
 	}
 
