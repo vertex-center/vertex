@@ -30,17 +30,12 @@ func (a *volumeDBAdapter) GetVolumes(ctx context.Context, id types.ContainerID) 
 	return volumes, err
 }
 
-func (a *volumeDBAdapter) CreateVolumes(ctx context.Context, volumes types.Volumes) error {
-	for _, v := range volumes {
-		_, err := a.db.NamedExec(`
+func (a *volumeDBAdapter) CreateVolume(ctx context.Context, vol types.Volume) error {
+	_, err := a.db.NamedExec(`
 			INSERT INTO volumes (container_id, internal_path, external_path)
 			VALUES (:container_id, :internal_path, :external_path)
-		`, v)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+		`, vol)
+	return err
 }
 
 func (a *volumeDBAdapter) DeleteVolumes(ctx context.Context, id types.ContainerID) error {

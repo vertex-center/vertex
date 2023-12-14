@@ -50,7 +50,16 @@ func (a runnerDockerAdapter) DeleteMounts(ctx context.Context, c *types.Containe
 	return cli.DeleteMounts(context.Background(), id)
 }
 
-func (a runnerDockerAdapter) Start(ctx context.Context, c *types.Container, setStatus func(status string)) (io.ReadCloser, io.ReadCloser, error) {
+func (a runnerDockerAdapter) Start(
+	ctx context.Context,
+	c *types.Container,
+	ports types.Ports,
+	volumes types.Volumes,
+	env types.EnvVariables,
+	caps types.Capabilities,
+	sysctls types.Sysctls,
+	setStatus func(status string),
+) (io.ReadCloser, io.ReadCloser, error) {
 	rErr, wErr := io.Pipe()
 	rOut, wOut := io.Pipe()
 
@@ -83,7 +92,7 @@ func (a runnerDockerAdapter) Start(ctx context.Context, c *types.Container, setS
 				if err != nil {
 					log.Error(err,
 						vlog.String("text", scanner.Text()),
-						vlog.String("uuid", c.ID.String()))
+						vlog.String("id", c.ID.String()))
 					continue
 				}
 
@@ -101,7 +110,7 @@ func (a runnerDockerAdapter) Start(ctx context.Context, c *types.Container, setS
 				if err != nil {
 					log.Error(err,
 						vlog.String("text", scanner.Text()),
-						vlog.String("uuid", c.ID.String()))
+						vlog.String("id", c.ID.String()))
 					continue
 				}
 
@@ -109,14 +118,14 @@ func (a runnerDockerAdapter) Start(ctx context.Context, c *types.Container, setS
 				if err != nil {
 					log.Error(err,
 						vlog.String("text", scanner.Text()),
-						vlog.String("uuid", c.ID.String()))
+						vlog.String("id", c.ID.String()))
 					setStatus(types.ContainerStatusError)
 					return
 				}
 			}
 			if scanner.Err() != nil {
 				log.Error(scanner.Err(),
-					vlog.String("uuid", c.ID.String()))
+					vlog.String("id", c.ID.String()))
 				setStatus(types.ContainerStatusError)
 				return
 			}
@@ -157,13 +166,12 @@ func (a runnerDockerAdapter) Start(ctx context.Context, c *types.Container, setS
 				CapAdd:        []string{},
 			}
 
-			// exposedPorts and portBindings
 			var all []string
-			for _, p := range c.Ports {
-				for _, e := range c.Env {
+			for _, p := range ports {
+				for _, e := range env {
 					if e.Type == "port" && e.Name == p.Out {
 						in := e.Value
-						out := c.Env.Get(e.Name)
+						out := env.Get(e.Name)
 						all = append(all, out+":"+in)
 						break
 					}
@@ -174,8 +182,7 @@ func (a runnerDockerAdapter) Start(ctx context.Context, c *types.Container, setS
 				return
 			}
 
-			// binds
-			for _, v := range c.Volumes {
+			for _, v := range volumes {
 				in := v.In
 				if !strings.HasPrefix(in, "/") {
 					volumePath := a.getVolumePath(ctx, c.ID)
@@ -186,28 +193,20 @@ func (a runnerDockerAdapter) Start(ctx context.Context, c *types.Container, setS
 				}
 				options.Binds = append(options.Binds, in+":"+v.Out)
 			}
-
-			// env
-			for _, e := range c.Env {
+			for _, e := range env {
 				options.Env = append(options.Env, e.Name+"="+e.Value)
 			}
-
-			// capAdd
-			for _, cap := range c.Caps {
-				options.CapAdd = append(options.CapAdd, cap.Name)
+			for _, cp := range caps {
+				options.CapAdd = append(options.CapAdd, cp.Name)
 			}
-
-			// sysctls
-			for _, sysctl := range c.Sysctls {
+			for _, sysctl := range sysctls {
 				options.Sysctls[sysctl.Name] = sysctl.Value
 			}
-
-			// cmd
 			if c.Command != nil {
 				options.Cmd = strings.Split(*c.Command, " ")
 			}
-
 			options.ImageName = c.GetImageNameWithTag()
+
 			id, err = a.createContainer(ctx, options)
 			if err != nil {
 				return

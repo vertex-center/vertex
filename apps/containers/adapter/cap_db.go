@@ -30,17 +30,12 @@ func (a *capDBAdapter) GetCaps(ctx context.Context, id types.ContainerID) (types
 	return caps, err
 }
 
-func (a *capDBAdapter) CreateCaps(ctx context.Context, caps types.Capabilities) error {
-	for _, c := range caps {
-		_, err := a.db.NamedExec(`
-			INSERT INTO capabilities (container_id, name)
-			VALUES (:container_id, :name)
-		`, c)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+func (a *capDBAdapter) CreateCap(ctx context.Context, c types.Capability) error {
+	_, err := a.db.NamedExec(`
+		INSERT INTO capabilities (container_id, name)
+		VALUES (:container_id, :name)
+	`, c)
+	return err
 }
 
 func (a *capDBAdapter) DeleteCaps(ctx context.Context, id types.ContainerID) error {

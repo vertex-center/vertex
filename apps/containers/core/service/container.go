@@ -99,11 +99,11 @@ func (s *containerService) Search(ctx context.Context, query types.ContainerSear
 		//		continue
 		//	}
 		//}
-		if query.Tags != nil {
-			if !c.HasTagIn(*query.Tags) {
-				continue
-			}
-		}
+		//if query.Tags != nil {
+		//	if !c.HasTagIn(*query.Tags) {
+		//		continue
+		//	}
+		//}
 		containers = append(containers, c)
 	}
 
@@ -191,7 +191,32 @@ func (s *containerService) Start(ctx context.Context, id types.ContainerID) erro
 		s.setStatus(c, status)
 	}
 
-	stdout, stderr, err := s.runner.Start(ctx, c, setStatus)
+	ports, err := s.ports.GetPorts(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	volumes, err := s.volumes.GetVolumes(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	env, err := s.vars.GetVariables(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	caps, err := s.caps.GetCaps(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	sysctls, err := s.sysctls.GetSysctls(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	stdout, stderr, err := s.runner.Start(ctx, c, ports, volumes, env, caps, sysctls, setStatus)
 	if err != nil {
 		s.setStatus(c, types.ContainerStatusError)
 		return err
@@ -407,6 +432,76 @@ func (s *containerService) Install(ctx context.Context, serviceID string) (*type
 		}
 	}
 
+	// Set default env
+	for _, e := range service.Env {
+		err = s.vars.CreateVariable(ctx, types.EnvVariable{
+			ContainerID: id,
+			Type:        types.EnvVariableType(e.Type),
+			Name:        e.Name,
+			Value:       e.Default,
+			Default:     &e.Default,
+			Description: &e.Description,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Set default capabilities
+	if service.Methods.Docker.Capabilities != nil {
+		for _, cp := range *service.Methods.Docker.Capabilities {
+			err = s.caps.CreateCap(ctx, types.Capability{
+				ContainerID: id,
+				Name:        cp,
+			})
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	// Set default ports
+	if service.Methods.Docker.Ports != nil {
+		for in, out := range *service.Methods.Docker.Ports {
+			err = s.ports.CreatePort(ctx, types.Port{
+				ContainerID: id,
+				In:          in,
+				Out:         out,
+			})
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	// Set default volumes
+	if service.Methods.Docker.Volumes != nil {
+		for in, out := range *service.Methods.Docker.Volumes {
+			err = s.volumes.CreateVolume(ctx, types.Volume{
+				ContainerID: id,
+				In:          in,
+				Out:         out,
+			})
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	// Set default sysctls
+	if service.Methods.Docker.Sysctls != nil {
+		for name, value := range *service.Methods.Docker.Sysctls {
+			err = s.sysctls.CreateSysctl(ctx, types.Sysctl{
+				ContainerID: id,
+				Name:        name,
+				Value:       value,
+			})
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	c := types.Container{
 		ID:              id,
 		ServiceID:       serviceID,
@@ -420,109 +515,12 @@ func (s *containerService) Install(ctx context.Context, serviceID string) (*type
 		Icon:            service.Icon,
 		Command:         service.Methods.Docker.Cmd,
 	}
-
-	// Set default env
-	env := types.EnvVariables{}
-	for _, e := range service.Env {
-		env = append(env, types.EnvVariable{
-			ContainerID: id,
-			Type:        types.EnvVariableType(e.Type),
-			Name:        e.Name,
-			Value:       e.Default,
-			Default:     &e.Default,
-			Description: &e.Description,
-		})
-	}
-	c.Env = env
-
-	err = s.vars.CreateVariables(ctx, env)
-	if err != nil {
-		return nil, err
-	}
-
-	// Set default capabilities
-	if service.Methods.Docker.Capabilities != nil {
-		caps := types.Capabilities{}
-		for _, cp := range *service.Methods.Docker.Capabilities {
-			caps = append(caps, types.Capability{
-				ContainerID: id,
-				Name:        cp,
-			})
-		}
-		c.Caps = caps
-
-		err = s.caps.CreateCaps(ctx, caps)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// Set default ports
-	if service.Methods.Docker.Ports != nil {
-		ports := types.Ports{}
-		for in, out := range *service.Methods.Docker.Ports {
-			ports = append(ports, types.Port{
-				ContainerID: id,
-				In:          in,
-				Out:         out,
-			})
-		}
-		c.Ports = ports
-
-		err = s.ports.CreatePorts(ctx, ports)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// Set default volumes
-	if service.Methods.Docker.Volumes != nil {
-		volumes := types.Volumes{}
-		for in, out := range *service.Methods.Docker.Volumes {
-			volumes = append(volumes, types.Volume{
-				ContainerID: id,
-				In:          in,
-				Out:         out,
-			})
-		}
-		c.Volumes = volumes
-
-		err = s.volumes.CreateVolumes(ctx, volumes)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// Set default sysctls
-	if service.Methods.Docker.Sysctls != nil {
-		sysctls := types.Sysctls{}
-		for name, value := range *service.Methods.Docker.Sysctls {
-			sysctls = append(sysctls, types.Sysctl{
-				ContainerID: id,
-				Name:        name,
-				Value:       value,
-			})
-		}
-		c.Sysctls = sysctls
-
-		err = s.sysctls.CreateSysctls(ctx, sysctls)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	err = s.containers.CreateContainer(ctx, c)
 	if err != nil {
 		return nil, err
 	}
 
 	err = s.logs.Register(id)
-	if err != nil {
-		return nil, err
-	}
-
-	c.ResetDefaultEnv(service)
-	err = s.vars.CreateVariables(ctx, c.Env)
 	if err != nil {
 		return nil, err
 	}
@@ -587,41 +585,66 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 		host := config.Current.URL("vertex").String()
 
 		dbEnvNames := (*dbService.Features.Databases)[0]
-		iEnvNames := cService.Databases[databaseID].Names
+		cEnvNames := cService.Databases[databaseID].Names
 
-		c.Env.Set(iEnvNames.Host, host)
-		c.Env.Set(iEnvNames.Port, db.Env.Get(dbEnvNames.Port))
+		dbVars, err := s.vars.GetVariables(ctx, db.ID)
+		if err != nil {
+			return err
+		}
+
+		err = s.vars.UpdateVariable(ctx, c.ID, cEnvNames.Host, host)
+		if err != nil {
+			return err
+		}
+		err = s.vars.UpdateVariable(ctx, c.ID, cEnvNames.Port, dbVars.Get(dbEnvNames.Port))
+		if err != nil {
+			return err
+		}
+
 		if dbEnvNames.Username != nil {
-			c.Env.Set(iEnvNames.Username, db.Env.Get(*dbEnvNames.Username))
+			err = s.vars.UpdateVariable(ctx, c.ID, cEnvNames.Username, dbVars.Get(*dbEnvNames.Username))
+			if err != nil {
+				return err
+			}
 		}
 		if dbEnvNames.Password != nil {
-			c.Env.Set(iEnvNames.Password, db.Env.Get(*dbEnvNames.Password))
+			err = s.vars.UpdateVariable(ctx, c.ID, cEnvNames.Password, dbVars.Get(*dbEnvNames.Password))
+			if err != nil {
+				return err
+			}
 		}
 
 		if options != nil {
 			if modifiedFeature, ok := options[databaseID]; ok {
 				if modifiedFeature != nil && modifiedFeature.DatabaseName != nil {
-					c.Env.Set(iEnvNames.Database, *modifiedFeature.DatabaseName)
+					err = s.vars.UpdateVariable(ctx, c.ID, cEnvNames.Database, *modifiedFeature.DatabaseName)
+					if err != nil {
+						return err
+					}
 					continue
 				}
 			}
 		}
 
 		if dbEnvNames.DefaultDatabase != nil {
-			c.Env.Set(iEnvNames.Database, db.Env.Get(*dbEnvNames.DefaultDatabase))
+			err = s.vars.UpdateVariable(ctx, c.ID, cEnvNames.Database, dbVars.Get(*dbEnvNames.DefaultDatabase))
+			if err != nil {
+				return err
+			}
 			continue
 		}
 	}
-
-	return s.vars.CreateVariables(ctx, c.Env)
+	return nil
 }
 
 // SaveEnv saves the environment variables of a container
 // and applies them by recreating the container.
 func (s *containerService) SaveEnv(ctx context.Context, id types.ContainerID, env types.EnvVariables) error {
-	err := s.vars.CreateVariables(ctx, env)
-	if err != nil {
-		return err
+	for _, e := range env {
+		err := s.vars.UpdateVariable(ctx, id, e.Name, e.Value)
+		if err != nil {
+			return err
+		}
 	}
 	return s.RecreateContainer(ctx, id)
 }

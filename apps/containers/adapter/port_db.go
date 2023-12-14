@@ -30,17 +30,12 @@ func (a *portDBAdapter) GetPorts(ctx context.Context, id types.ContainerID) (typ
 	return ports, err
 }
 
-func (a *portDBAdapter) CreatePorts(ctx context.Context, ports types.Ports) error {
-	for _, p := range ports {
-		_, err := a.db.NamedExec(`
-			INSERT INTO ports (container_id, internal_port, external_port)
-			VALUES (:container_id, :internal_port, :external_port)
-		`, p)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+func (a *portDBAdapter) CreatePort(ctx context.Context, port types.Port) error {
+	_, err := a.db.NamedExec(`
+		INSERT INTO ports (container_id, internal_port, external_port)
+		VALUES (:container_id, :internal_port, :external_port)
+	`, port)
+	return err
 }
 
 func (a *portDBAdapter) DeletePorts(ctx context.Context, id types.ContainerID) error {

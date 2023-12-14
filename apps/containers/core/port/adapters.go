@@ -18,13 +18,13 @@ type (
 
 	PortAdapter interface {
 		GetPorts(ctx context.Context, id types.ContainerID) (types.Ports, error)
-		CreatePorts(ctx context.Context, ports types.Ports) error
+		CreatePort(ctx context.Context, port types.Port) error
 		DeletePorts(ctx context.Context, id types.ContainerID) error
 	}
 
 	VolumeAdapter interface {
 		GetVolumes(ctx context.Context, id types.ContainerID) (types.Volumes, error)
-		CreateVolumes(ctx context.Context, volumes types.Volumes) error
+		CreateVolume(ctx context.Context, vol types.Volume) error
 		DeleteVolumes(ctx context.Context, id types.ContainerID) error
 	}
 
@@ -37,19 +37,20 @@ type (
 
 	SysctlAdapter interface {
 		GetSysctls(ctx context.Context, id types.ContainerID) (types.Sysctls, error)
-		CreateSysctls(ctx context.Context, sysctls types.Sysctls) error
+		CreateSysctl(ctx context.Context, sysctl types.Sysctl) error
 		DeleteSysctls(ctx context.Context, id types.ContainerID) error
 	}
 
 	EnvAdapter interface {
-		GetVariable(ctx context.Context, id types.ContainerID) (types.EnvVariables, error)
-		CreateVariables(ctx context.Context, env types.EnvVariables) error
+		GetVariables(ctx context.Context, id types.ContainerID) (types.EnvVariables, error)
+		CreateVariable(ctx context.Context, variable types.EnvVariable) error
 		DeleteVariables(ctx context.Context, id types.ContainerID) error
+		UpdateVariable(ctx context.Context, id types.ContainerID, key, value string) error
 	}
 
 	CapAdapter interface {
 		GetCaps(ctx context.Context, id types.ContainerID) (types.Capabilities, error)
-		CreateCaps(ctx context.Context, caps types.Capabilities) error
+		CreateCap(ctx context.Context, c types.Capability) error
 		DeleteCaps(ctx context.Context, id types.ContainerID) error
 	}
 
@@ -65,7 +66,7 @@ type (
 	RunnerAdapter interface {
 		DeleteContainer(ctx context.Context, c *types.Container) error
 		DeleteMounts(ctx context.Context, c *types.Container) error
-		Start(ctx context.Context, c *types.Container, setStatus func(status string)) (stdout io.ReadCloser, stderr io.ReadCloser, err error)
+		Start(ctx context.Context, c *types.Container, ports types.Ports, volumes types.Volumes, env types.EnvVariables, caps types.Capabilities, sysctls types.Sysctls, setStatus func(status string)) (stdout io.ReadCloser, stderr io.ReadCloser, err error)
 		Stop(ctx context.Context, c *types.Container) error
 		Info(ctx context.Context, c types.Container) (map[string]any, error)
 		WaitCondition(ctx context.Context, c *types.Container, cond types.WaitContainerCondition) error

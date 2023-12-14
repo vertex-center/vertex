@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"strconv"
 	"sync"
 
 	"github.com/google/uuid"
@@ -49,18 +48,18 @@ func (s *sqlService) getDbFeature(c *types.Container) (types.DatabaseFeature, er
 
 func (s *sqlService) Get(inst *types.Container) (sqltypes.DBMS, error) {
 	db := sqltypes.DBMS{}
+	var err error
 
-	feature, err := s.getDbFeature(inst)
-	if err != nil {
-		return db, err
-	}
-
-	if feature.Username != nil {
-		db.Username = inst.Env.Get(*feature.Username)
-	}
-	if feature.Password != nil {
-		db.Password = inst.Env.Get(*feature.Password)
-	}
+	//feature, err := s.getDbFeature(inst)
+	//if err != nil {
+	//	return db, err
+	//}
+	//if feature.Username != nil {
+	//	db.Username = inst.Env.Get(*feature.Username)
+	//}
+	//if feature.Password != nil {
+	//	db.Password = inst.Env.Get(*feature.Password)
+	//}
 
 	s.dbmsMutex.RLock()
 	defer s.dbmsMutex.RUnlock()
@@ -76,21 +75,22 @@ func (s *sqlService) Get(inst *types.Container) (sqltypes.DBMS, error) {
 }
 
 func (s *sqlService) EnvCredentials(c *types.Container, user string, pass string) (types.EnvVariables, error) {
-	env := c.Env
+	//env := c.Env
+	//
+	//feature, err := s.getDbFeature(c)
+	//if err != nil {
+	//	return env, err
+	//}
+	//
+	//if feature.Username != nil {
+	//	env.Set(*feature.Username, user)
+	//}
+	//if feature.Password != nil {
+	//	env.Set(*feature.Password, pass)
+	//}
+	//return env, nil
 
-	feature, err := s.getDbFeature(c)
-	if err != nil {
-		return env, err
-	}
-
-	if feature.Username != nil {
-		env.Set(*feature.Username, user)
-	}
-	if feature.Password != nil {
-		env.Set(*feature.Password, pass)
-	}
-
-	return env, nil
+	return types.EnvVariables{}, nil
 }
 
 func (s *sqlService) createDbmsAdapter(inst *types.Container) (port.DBMSAdapter, error) {
@@ -106,17 +106,17 @@ func (s *sqlService) createDbmsAdapter(inst *types.Container) (port.DBMSAdapter,
 			Host: config.Current.URL("vertex").String(),
 		}
 
-		params.Port, err = strconv.Atoi(inst.Env.Get(feature.Port))
-		if err != nil {
-			return nil, err
-		}
+		//params.Port, err = strconv.Atoi(inst.Env.Get(feature.Port))
+		//if err != nil {
+		//	return nil, err
+		//}
 
-		if feature.Username != nil {
-			params.Username = inst.Env.Get(*feature.Username)
-		}
-		if feature.Password != nil {
-			params.Password = inst.Env.Get(*feature.Password)
-		}
+		//if feature.Username != nil {
+		//	params.Username = inst.Env.Get(*feature.Username)
+		//}
+		//if feature.Password != nil {
+		//	params.Password = inst.Env.Get(*feature.Password)
+		//}
 
 		return sqladapter.NewSqlDBMSPostgresAdapter(params), nil
 	default:

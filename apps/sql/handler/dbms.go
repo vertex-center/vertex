@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"github.com/juju/errors"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
@@ -61,24 +59,24 @@ func (r *dbmsHandler) Install() gin.HandlerFunc {
 			return nil, err
 		}
 
-		inst.Tags = containerstypes.Tags{
-			containerstypes.Tag{Tag: "Vertex SQL"},
-			containerstypes.Tag{Tag: "Vertex SQL - Postgres Database"},
-		}
-		err = client.PatchContainer(c, inst.ID, inst)
-		if err != nil {
-			return nil, err
-		}
+		//inst.Tags = containerstypes.Tags{
+		//	containerstypes.Tag{Tag: "Vertex SQL"},
+		//	containerstypes.Tag{Tag: "Vertex SQL - Postgres Database"},
+		//}
+		//err = client.PatchContainer(c, inst.ID, inst)
+		//if err != nil {
+		//	return nil, err
+		//}
+		//
+		//inst.Env, err = r.sqlService.EnvCredentials(inst, "postgres", "postgres")
+		//if err != nil {
+		//	return nil, fmt.Errorf("setup credentials: %w", err)
+		//}
+		//err = client.PatchContainerEnvironment(c, inst.ID, inst.Env)
+		//if err != nil {
+		//	return nil, err
+		//}
 
-		inst.Env, err = r.sqlService.EnvCredentials(inst, "postgres", "postgres")
-		if err != nil {
-			return nil, fmt.Errorf("setup credentials: %w", err)
-		}
-
-		err = client.PatchContainerEnvironment(c, inst.ID, inst.Env)
-		if err != nil {
-			return nil, err
-		}
 		return inst, nil
 	})
 }

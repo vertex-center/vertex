@@ -30,17 +30,12 @@ func (a *sysctlDBAdapter) GetSysctls(ctx context.Context, id types.ContainerID) 
 	return sysctls, err
 }
 
-func (a *sysctlDBAdapter) CreateSysctls(ctx context.Context, sysctls types.Sysctls) error {
-	for _, s := range sysctls {
-		_, err := a.db.NamedExec(`
-			INSERT INTO sysctls (container_id, name, value)
-			VALUES (:container_id, :name, :value)
-		`, s)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+func (a *sysctlDBAdapter) CreateSysctl(ctx context.Context, sysctl types.Sysctl) error {
+	_, err := a.db.NamedExec(`
+		INSERT INTO sysctls (container_id, name, value)
+		VALUES (:container_id, :name, :value)
+	`, sysctl)
+	return err
 }
 
 func (a *sysctlDBAdapter) DeleteSysctls(ctx context.Context, id types.ContainerID) error {
