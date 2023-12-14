@@ -18,6 +18,7 @@ import (
 
 var (
 	containerService port.ContainerService
+	tagsService      port.TagsService
 	metricsService   port.MetricsService
 
 	dockerKernelService port.DockerService
@@ -63,6 +64,7 @@ func (a *App) Initialize() error {
 	)
 
 	containerService = service.NewContainerService(a.ctx, caps, containers, env, ports, volumes, tags, sysctls, runner, services, logs)
+	tagsService = service.NewTagsService(tags)
 	metricsService = service.NewMetricsService(a.ctx)
 
 	return nil
@@ -76,11 +78,13 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	var (
 		servicesHandler   = handler.NewServicesHandler(containerService)
 		serviceHandler    = handler.NewServiceHandler(containerService)
+		tagsHandler       = handler.NewTagsHandler(tagsService)
 		containersHandler = handler.NewContainersHandler(a.ctx, containerService)
 		containerHandler  = handler.NewContainerHandler(a.ctx, containerService)
 
 		container  = r.Group("/container/:container_id", "Container", "", authmiddleware.Authenticated)
 		containers = r.Group("/containers", "Containers", "", authmiddleware.Authenticated)
+		tags       = r.Group("/tags", "Tags", "", authmiddleware.Authenticated)
 		serv       = r.Group("/service/:service_id", "Service", "", authmiddleware.Authenticated)
 		services   = r.Group("/services", "Services", "")
 	)
@@ -161,11 +165,6 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 		fizz.Summary("Get containers"),
 	}, containersHandler.Get())
 
-	containers.GET("/tags", []fizz.OperationOption{
-		fizz.ID("getTags"),
-		fizz.Summary("Get tags"),
-	}, containersHandler.GetTags())
-
 	containers.GET("/search", []fizz.OperationOption{
 		fizz.ID("searchContainers"),
 		fizz.Summary("Search containers"),
@@ -180,6 +179,13 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 		fizz.ID("events"),
 		fizz.Summary("Get events"),
 	}, middleware.SSE, containersHandler.Events())
+
+	// Tags
+
+	tags.GET("", []fizz.OperationOption{
+		fizz.ID("getTags"),
+		fizz.Summary("Get tags"),
+	}, tagsHandler.GetTags())
 
 	// Service
 

@@ -22,7 +22,6 @@ type (
 
 	ContainersHandler interface {
 		Get() gin.HandlerFunc
-		GetTags() gin.HandlerFunc
 		Search() gin.HandlerFunc
 		CheckForUpdates() gin.HandlerFunc
 		Events() gin.HandlerFunc
@@ -35,6 +34,10 @@ type (
 
 	ServicesHandler interface {
 		Get() gin.HandlerFunc
+	}
+
+	TagsHandler interface {
+		GetTags() gin.HandlerFunc
 	}
 
 	DockerKernelHandler interface {

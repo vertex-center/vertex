@@ -80,10 +80,6 @@ func (s *containerService) GetContainers(ctx context.Context) (types.Containers,
 	return s.containers.GetContainers(ctx)
 }
 
-func (s *containerService) GetTags(ctx context.Context) (types.Tags, error) {
-	return s.tags.GetUniqueTags(ctx)
-}
-
 // Search returns all containers that match the query.
 func (s *containerService) Search(ctx context.Context, query types.ContainerSearchQuery) (types.Containers, error) {
 	var containers types.Containers

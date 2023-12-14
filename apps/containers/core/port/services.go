@@ -13,7 +13,6 @@ type (
 	ContainerService interface {
 		Get(ctx context.Context, id types.ContainerID) (*types.Container, error)
 		GetContainers(ctx context.Context) (types.Containers, error)
-		GetTags(ctx context.Context) (types.Tags, error)
 		Search(ctx context.Context, query types.ContainerSearchQuery) (types.Containers, error)
 		Delete(ctx context.Context, id types.ContainerID) error
 		Start(ctx context.Context, id types.ContainerID) error
@@ -36,6 +35,10 @@ type (
 
 	MetricsService interface {
 		metric.RegistryProvider
+	}
+
+	TagsService interface {
+		GetTags(ctx context.Context) (types.Tags, error)
 	}
 
 	DockerService interface {

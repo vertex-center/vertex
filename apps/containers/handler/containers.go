@@ -31,12 +31,6 @@ func (h *containersHandler) Get() gin.HandlerFunc {
 	})
 }
 
-func (h *containersHandler) GetTags() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (types.Tags, error) {
-		return h.containerService.GetTags(c)
-	})
-}
-
 func (h *containersHandler) Search() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context) (types.Containers, error) {
 		query := types.ContainerSearchQuery{}

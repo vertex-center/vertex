@@ -7,9 +7,15 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 )
 
-type MockContainerService struct{ mock.Mock }
+type (
+	MockContainerService struct{ mock.Mock }
+	MockTagsService      struct{ mock.Mock }
+)
 
-var _ ContainerService = &MockContainerService{}
+var (
+	_ ContainerService = &MockContainerService{}
+	_ TagsService      = &MockTagsService{}
+)
 
 func (m *MockContainerService) Get(ctx context.Context, id types.ContainerID) (*types.Container, error) {
 	args := m.Called(ctx, id)
@@ -22,11 +28,6 @@ func (m *MockContainerService) Get(ctx context.Context, id types.ContainerID) (*
 func (m *MockContainerService) GetContainers(ctx context.Context) (types.Containers, error) {
 	args := m.Called(ctx)
 	return args.Get(0).(types.Containers), args.Error(1)
-}
-
-func (m *MockContainerService) GetTags(ctx context.Context) (types.Tags, error) {
-	args := m.Called(ctx)
-	return args.Get(0).(types.Tags), args.Error(1)
 }
 
 func (m *MockContainerService) Search(ctx context.Context, query types.ContainerSearchQuery) (types.Containers, error) {
@@ -125,4 +126,9 @@ func (m *MockContainerService) GetServiceByID(ctx context.Context, id string) (*
 func (m *MockContainerService) GetServices(ctx context.Context) []types.Service {
 	args := m.Called(ctx)
 	return args.Get(0).([]types.Service)
+}
+
+func (m *MockTagsService) GetTags(ctx context.Context) (types.Tags, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(types.Tags), args.Error(1)
 }
