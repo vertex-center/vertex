@@ -16,5 +16,9 @@ func NewTagsService(tags port.TagAdapter) port.TagsService {
 }
 
 func (s *tagsService) GetTags(ctx context.Context) (types.Tags, error) {
-	return s.tags.GetUniqueTags(ctx)
+	return s.tags.GetTags(ctx)
+}
+
+func (s *tagsService) CreateTag(ctx context.Context, tag types.Tag) error {
+	return s.tags.CreateTag(ctx, tag)
 }

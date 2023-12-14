@@ -56,3 +56,32 @@ func (a *containerDBAdapter) DeleteContainer(ctx context.Context, id types.Conta
 	`, id)
 	return err
 }
+
+func (a *containerDBAdapter) GetContainerTags(ctx context.Context, id types.ContainerID) (types.Tags, error) {
+	var tags types.Tags
+	err := a.db.Select(&tags, `
+		SELECT tags.id, tags.tag FROM tags
+		INNER JOIN container_tags ct on tags.id = ct.tag_id
+		WHERE ct.container_id = $1
+	`, id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return tags, nil
+	}
+	return tags, err
+}
+
+func (a *containerDBAdapter) AddTag(ctx context.Context, id types.ContainerID, tagID types.TagID) error {
+	_, err := a.db.Exec(`
+		INSERT INTO container_tags (container_id, tag_id)
+		VALUES ($1, $2)
+	`, id, tagID)
+	return err
+}
+
+func (a *containerDBAdapter) DeleteTags(ctx context.Context, id types.ContainerID) error {
+	_, err := a.db.Exec(`
+		DELETE FROM container_tags
+		WHERE container_id = $1
+	`, id)
+	return err
+}

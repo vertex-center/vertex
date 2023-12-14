@@ -62,13 +62,7 @@ type (
 	}
 )
 
-func NewContainerID() ContainerID { return ContainerID{uuid.New()} }
-
-func ParseContainerID(s string) (ContainerID, error) {
-	id, err := uuid.Parse(s)
-	return ContainerID{id}, err
-}
-
+func NewContainerID() ContainerID  { return ContainerID{uuid.New()} }
 func (ContainerID) Type() string   { return "string" }
 func (ContainerID) Format() string { return "uuid" }
 

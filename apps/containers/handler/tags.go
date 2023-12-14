@@ -20,3 +20,13 @@ func (h *tagsHandler) GetTags() gin.HandlerFunc {
 		return h.tagsService.GetTags(c)
 	})
 }
+
+type CreateTagParams struct {
+	Tag types.Tag `json:"tag"`
+}
+
+func (h *tagsHandler) CreateTag() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context, params *CreateTagParams) error {
+		return h.tagsService.CreateTag(c, params.Tag)
+	})
+}

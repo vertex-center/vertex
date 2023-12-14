@@ -14,6 +14,9 @@ type (
 		GetContainers(ctx context.Context) (types.Containers, error)
 		CreateContainer(ctx context.Context, container types.Container) error
 		DeleteContainer(ctx context.Context, id types.ContainerID) error
+		GetContainerTags(ctx context.Context, id types.ContainerID) (types.Tags, error)
+		AddTag(ctx context.Context, id types.ContainerID, tagID types.TagID) error
+		DeleteTags(ctx context.Context, id types.ContainerID) error
 	}
 
 	PortAdapter interface {
@@ -29,10 +32,9 @@ type (
 	}
 
 	TagAdapter interface {
-		CreateTags(ctx context.Context, tags types.Tags) error
-		DeleteTags(ctx context.Context, id types.ContainerID) error
-		GetContainerTags(ctx context.Context, id types.ContainerID) (types.Tags, error)
-		GetUniqueTags(ctx context.Context) (types.Tags, error)
+		GetTags(ctx context.Context) (types.Tags, error)
+		CreateTag(ctx context.Context, tag types.Tag) error
+		DeleteTags(ctx context.Context, id types.TagID) error
 	}
 
 	SysctlAdapter interface {

@@ -137,6 +137,17 @@ func (h *containerHandler) Stop() gin.HandlerFunc {
 	})
 }
 
+type AddTagParams struct {
+	ContainerID types.ContainerID `path:"container_id"`
+	TagID       types.TagID       `json:"tag_id"`
+}
+
+func (h *containerHandler) AddTag() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context, params *AddTagParams) error {
+		return h.containerService.AddTag(c, params.ContainerID, params.TagID)
+	})
+}
+
 type PatchEnvironmentParams struct {
 	ContainerID types.ContainerID  `path:"container_id"`
 	Env         types.EnvVariables `body:"env"`

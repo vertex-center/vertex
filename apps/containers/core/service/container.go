@@ -132,7 +132,7 @@ func (s *containerService) Delete(ctx context.Context, id types.ContainerID) err
 		s.volumes.DeleteVolumes,
 		s.sysctls.DeleteSysctls,
 		s.vars.DeleteVariables,
-		s.tags.DeleteTags,
+		s.containers.DeleteTags,
 		s.containers.DeleteContainer,
 	}
 	for _, f := range deletes {
@@ -371,6 +371,10 @@ func (s *containerService) StopAll(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (s *containerService) AddTag(ctx context.Context, id types.ContainerID, tagID types.TagID) error {
+	return s.containers.AddTag(ctx, id, tagID)
 }
 
 func (s *containerService) RecreateContainer(ctx context.Context, id types.ContainerID) error {

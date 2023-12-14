@@ -70,6 +70,11 @@ func (m *MockContainerService) DeleteAll(ctx context.Context) error {
 	return args.Error(0)
 }
 
+func (m *MockContainerService) AddTag(ctx context.Context, id types.ContainerID, tagID types.TagID) error {
+	args := m.Called(ctx, id, tagID)
+	return args.Error(0)
+}
+
 func (m *MockContainerService) RecreateContainer(ctx context.Context, uuid types.ContainerID) error {
 	args := m.Called(ctx, uuid)
 	return args.Error(0)
@@ -131,4 +136,9 @@ func (m *MockContainerService) GetServices(ctx context.Context) []types.Service 
 func (m *MockTagsService) GetTags(ctx context.Context) (types.Tags, error) {
 	args := m.Called(ctx)
 	return args.Get(0).(types.Tags), args.Error(1)
+}
+
+func (m *MockTagsService) CreateTag(ctx context.Context, tag types.Tag) error {
+	args := m.Called(ctx, tag)
+	return args.Error(0)
 }
