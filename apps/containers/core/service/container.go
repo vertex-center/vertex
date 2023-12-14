@@ -731,6 +731,13 @@ func (s *containerService) setStatus(c *types.Container, status string) {
 		return
 	}
 
+	// TODO: Status should be saved only in the memory.
+
+	err := s.containers.SetStatus(context.Background(), c.ID, status)
+	if err != nil {
+		log.Error(err)
+	}
+
 	c.Status = status
 	s.ctx.DispatchEvent(types.EventContainersChange{})
 	s.ctx.DispatchEvent(types.EventContainerStatusChange{

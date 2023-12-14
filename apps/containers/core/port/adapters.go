@@ -17,6 +17,7 @@ type (
 		GetContainerTags(ctx context.Context, id types.ContainerID) (types.Tags, error)
 		AddTag(ctx context.Context, id types.ContainerID, tagID types.TagID) error
 		DeleteTags(ctx context.Context, id types.ContainerID) error
+		SetStatus(ctx context.Context, id types.ContainerID, status string) error
 	}
 
 	PortAdapter interface {

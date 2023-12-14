@@ -85,3 +85,12 @@ func (a *containerDBAdapter) DeleteTags(ctx context.Context, id types.ContainerI
 	`, id)
 	return err
 }
+
+func (a *containerDBAdapter) SetStatus(ctx context.Context, id types.ContainerID, status string) error {
+	_, err := a.db.Exec(`
+		UPDATE containers
+		SET status = $1
+		WHERE id = $2
+	`, status, id)
+	return err
+}
