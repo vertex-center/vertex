@@ -64,6 +64,7 @@ type (
 		Push(id types.ContainerID, line types.LogLine)
 		Pop(id types.ContainerID) (types.LogLine, error)
 		LoadBuffer(id types.ContainerID) ([]types.LogLine, error) // LoadBuffer loads the latest logs kept in memory.
+		Exists(id types.ContainerID) bool
 	}
 
 	RunnerAdapter interface {

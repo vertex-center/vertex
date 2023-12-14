@@ -166,6 +166,13 @@ func (s *containerService) Start(ctx context.Context, id types.ContainerID) erro
 		return nil
 	}
 
+	if !s.logs.Exists(id) {
+		err = s.logs.Register(id)
+		if err != nil {
+			return err
+		}
+	}
+
 	s.ctx.DispatchEvent(types.EventContainerLog{
 		ContainerID: id,
 		Kind:        types.LogKindOut,
