@@ -571,6 +571,10 @@ func (s *containerService) SetDatabases(ctx context.Context, c *types.Container,
 	return s.remapDatabaseEnv(ctx, c, options)
 }
 
+func (s *containerService) GetContainerEnv(ctx context.Context, id types.ContainerID) (types.EnvVariables, error) {
+	return s.vars.GetVariables(ctx, id)
+}
+
 // remapDatabaseEnv remaps the environment variables of a container.
 func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Container, options map[string]*types.SetDatabasesOptions) error {
 	for databaseID, databaseContainerID := range c.Databases {

@@ -122,6 +122,11 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 		fizz.Summary("Stop a container"),
 	}, containerHandler.Stop())
 
+	container.GET("/environment", []fizz.OperationOption{
+		fizz.ID("getContainerEnvironment"),
+		fizz.Summary("Get container environment"),
+	}, containerHandler.GetContainerEnv())
+
 	container.PATCH("/environment", []fizz.OperationOption{
 		fizz.ID("patchContainerEnvironment"),
 		fizz.Summary("Patch a container environment"),

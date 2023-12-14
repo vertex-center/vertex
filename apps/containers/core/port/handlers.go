@@ -12,6 +12,7 @@ type (
 		Start() gin.HandlerFunc
 		Stop() gin.HandlerFunc
 		AddTag() gin.HandlerFunc
+		GetContainerEnv() gin.HandlerFunc
 		PatchEnvironment() gin.HandlerFunc
 		GetDocker() gin.HandlerFunc
 		RecreateDocker() gin.HandlerFunc

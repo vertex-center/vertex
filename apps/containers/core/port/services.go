@@ -25,6 +25,7 @@ type (
 		Install(ctx context.Context, serviceID string) (*types.Container, error)
 		CheckForUpdates(ctx context.Context) (types.Containers, error)
 		SetDatabases(ctx context.Context, c *types.Container, databases map[string]types.ContainerID, options map[string]*types.SetDatabasesOptions) error
+		GetContainerEnv(ctx context.Context, id types.ContainerID) (types.EnvVariables, error)
 		SaveEnv(ctx context.Context, id types.ContainerID, env types.EnvVariables) error
 		GetAllVersions(ctx context.Context, id types.ContainerID, useCache bool) ([]string, error)
 		GetContainerInfo(ctx context.Context, id types.ContainerID) (map[string]any, error)

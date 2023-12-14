@@ -148,6 +148,16 @@ func (h *containerHandler) AddTag() gin.HandlerFunc {
 	})
 }
 
+type GetContainerEnvParams struct {
+	ContainerID types.ContainerID `path:"container_id"`
+}
+
+func (h *containerHandler) GetContainerEnv() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context, params *GetContainerEnvParams) (types.EnvVariables, error) {
+		return h.containerService.GetContainerEnv(c, params.ContainerID)
+	})
+}
+
 type PatchEnvironmentParams struct {
 	ContainerID types.ContainerID  `path:"container_id"`
 	Env         types.EnvVariables `body:"env"`
