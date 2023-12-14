@@ -11,7 +11,7 @@ import (
 
 type (
 	ContainerService interface {
-		Get(ctx context.Context, uuid types.ContainerID) (*types.Container, error)
+		Get(ctx context.Context, id types.ContainerID) (*types.Container, error)
 		GetContainers(ctx context.Context) (types.Containers, error)
 		GetTags(ctx context.Context) (types.Tags, error)
 		Search(ctx context.Context, query types.ContainerSearchQuery) (types.Containers, error)
@@ -23,7 +23,7 @@ type (
 		RecreateContainer(ctx context.Context, id types.ContainerID) error
 		DeleteAll(ctx context.Context) error
 		Install(ctx context.Context, serviceID string) (*types.Container, error)
-		CheckForUpdates(tx context.Context) (types.Containers, error)
+		CheckForUpdates(ctx context.Context) (types.Containers, error)
 		SetDatabases(ctx context.Context, c *types.Container, databases map[string]types.ContainerID, options map[string]*types.SetDatabasesOptions) error
 		SaveEnv(ctx context.Context, id types.ContainerID, env types.EnvVariables) error
 		GetAllVersions(ctx context.Context, id types.ContainerID, useCache bool) ([]string, error)

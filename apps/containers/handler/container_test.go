@@ -8,6 +8,8 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/common"
+	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/pkg/router/routertest"
 )
 
@@ -27,15 +29,15 @@ func TestContainerHandlerTestSuite(t *testing.T) {
 
 func (suite *ContainerHandlerTestSuite) SetupSubTest() {
 	suite.service = port.MockContainerService{}
-	suite.handler = NewContainerHandler(ContainerHandlerParams{
-		ContainerService: &suite.service,
-	}).(*containerHandler)
+	ctx := common.NewVertexContext(common.About{}, false)
+	appCtx := app.NewContext(ctx)
+	suite.handler = NewContainerHandler(appCtx, &suite.service).(*containerHandler)
 	suite.testContainer = types.Container{
 		ID: types.NewContainerID(),
 	}
 	suite.opts = routertest.RequestOptions{
 		Params: map[string]string{
-			"container_uuid": suite.testContainer.ID.String(),
+			"container_id": suite.testContainer.ID.String(),
 		},
 	}
 }
