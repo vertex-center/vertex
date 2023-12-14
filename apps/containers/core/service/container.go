@@ -111,7 +111,7 @@ func (s *containerService) Search(ctx context.Context, query types.ContainerSear
 }
 
 func (s *containerService) Delete(ctx context.Context, id types.ContainerID) error {
-	c, err := s.Get(ctx, id)
+	c, err := s.containers.GetContainer(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -152,7 +152,7 @@ func (s *containerService) Delete(ctx context.Context, id types.ContainerID) err
 	}
 
 	s.ctx.DispatchEvent(types.EventContainerDeleted{
-		ContainerID: c.ID,
+		ContainerID: id,
 		ServiceID:   c.ServiceID,
 	})
 	s.ctx.DispatchEvent(types.EventContainersChange{})
@@ -161,7 +161,7 @@ func (s *containerService) Delete(ctx context.Context, id types.ContainerID) err
 }
 
 func (s *containerService) Start(ctx context.Context, id types.ContainerID) error {
-	c, err := s.Get(ctx, id)
+	c, err := s.containers.GetContainer(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -171,16 +171,16 @@ func (s *containerService) Start(ctx context.Context, id types.ContainerID) erro
 	}
 
 	s.ctx.DispatchEvent(types.EventContainerLog{
-		ContainerID: c.ID,
+		ContainerID: id,
 		Kind:        types.LogKindOut,
 		Message:     types.NewLogLineMessageString("Starting container..."),
 	})
 
-	log.Info("starting container", vlog.String("uuid", id.String()))
+	log.Info("starting container", vlog.String("id", id.String()))
 
 	if c.IsRunning() {
 		s.ctx.DispatchEvent(types.EventContainerLog{
-			ContainerID: c.ID,
+			ContainerID: id,
 			Kind:        types.LogKindVertexErr,
 			Message:     types.NewLogLineMessageString(ErrContainerAlreadyRunning.Error()),
 		})
@@ -211,7 +211,7 @@ func (s *containerService) Start(ctx context.Context, id types.ContainerID) erro
 				}
 
 				s.ctx.DispatchEvent(types.EventContainerLog{
-					ContainerID: c.ID,
+					ContainerID: id,
 					Kind:        types.LogKindDownload,
 					Message:     types.NewLogLineMessageDownload(&downloadProgress),
 				})
@@ -219,7 +219,7 @@ func (s *containerService) Start(ctx context.Context, id types.ContainerID) erro
 			}
 
 			s.ctx.DispatchEvent(types.EventContainerLog{
-				ContainerID: c.ID,
+				ContainerID: id,
 				Kind:        types.LogKindOut,
 				Message:     types.NewLogLineMessageString(scanner.Text()),
 			})
@@ -233,7 +233,7 @@ func (s *containerService) Start(ctx context.Context, id types.ContainerID) erro
 		scanner := bufio.NewScanner(stderr)
 		for scanner.Scan() {
 			s.ctx.DispatchEvent(types.EventContainerLog{
-				ContainerID: c.ID,
+				ContainerID: id,
 				Kind:        types.LogKindErr,
 				Message:     types.NewLogLineMessageString(scanner.Text()),
 			})
@@ -282,7 +282,7 @@ func (s *containerService) StartAll(ctx context.Context) error {
 			err = s.Start(ctx, id)
 			if err != nil {
 				log.Warn("failed to auto-start the container",
-					vlog.String("uuid", id.String()),
+					vlog.String("id", id.String()),
 					vlog.String("reason", err.Error()),
 				)
 			}
@@ -293,7 +293,7 @@ func (s *containerService) StartAll(ctx context.Context) error {
 }
 
 func (s *containerService) Stop(ctx context.Context, id types.ContainerID) error {
-	c, err := s.Get(ctx, id)
+	c, err := s.containers.GetContainer(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -304,7 +304,7 @@ func (s *containerService) Stop(ctx context.Context, id types.ContainerID) error
 
 	if !c.IsRunning() {
 		s.ctx.DispatchEvent(types.EventContainerLog{
-			ContainerID: c.ID,
+			ContainerID: id,
 			Kind:        types.LogKindVertexErr,
 			Message:     types.NewLogLineMessageString(ErrContainerNotRunning.Error()),
 		})
@@ -313,21 +313,21 @@ func (s *containerService) Stop(ctx context.Context, id types.ContainerID) error
 
 	// Log stopped
 	s.ctx.DispatchEvent(types.EventContainerLog{
-		ContainerID: c.ID,
+		ContainerID: id,
 		Kind:        types.LogKindVertexOut,
 		Message:     types.NewLogLineMessageString("Stopping container..."),
 	})
-	log.Info("stopping container", vlog.String("uuid", c.ID.String()))
+	log.Info("stopping container", vlog.String("id", id.String()))
 	s.setStatus(c, types.ContainerStatusStopping)
 
 	err = s.runner.Stop(ctx, c)
 	if err == nil {
 		s.ctx.DispatchEvent(types.EventContainerLog{
-			ContainerID: c.ID,
+			ContainerID: id,
 			Kind:        types.LogKindVertexOut,
 			Message:     types.NewLogLineMessageString("Container stopped."),
 		})
-		log.Info("container stopped", vlog.String("uuid", c.ID.String()))
+		log.Info("container stopped", vlog.String("id", id.String()))
 		s.setStatus(c, types.ContainerStatusOff)
 	} else {
 		s.setStatus(c, types.ContainerStatusRunning)
@@ -353,7 +353,7 @@ func (s *containerService) StopAll(ctx context.Context) error {
 }
 
 func (s *containerService) RecreateContainer(ctx context.Context, id types.ContainerID) error {
-	c, err := s.Get(ctx, id)
+	c, err := s.containers.GetContainer(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -568,8 +568,8 @@ func (s *containerService) SetDatabases(ctx context.Context, c *types.Container,
 
 // remapDatabaseEnv remaps the environment variables of a container.
 func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Container, options map[string]*types.SetDatabasesOptions) error {
-	for databaseID, databaseContainerUUID := range c.Databases {
-		db, err := s.Get(ctx, databaseContainerUUID)
+	for databaseID, databaseContainerID := range c.Databases {
+		db, err := s.containers.GetContainer(ctx, databaseContainerID)
 		if err != nil {
 			return err
 		}
@@ -627,7 +627,7 @@ func (s *containerService) SaveEnv(ctx context.Context, id types.ContainerID, en
 }
 
 func (s *containerService) GetAllVersions(ctx context.Context, id types.ContainerID, useCache bool) ([]string, error) {
-	c, err := s.Get(ctx, id)
+	c, err := s.containers.GetContainer(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -644,7 +644,7 @@ func (s *containerService) GetAllVersions(ctx context.Context, id types.Containe
 }
 
 func (s *containerService) GetContainerInfo(ctx context.Context, id types.ContainerID) (map[string]any, error) {
-	c, err := s.Get(ctx, id)
+	c, err := s.containers.GetContainer(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -655,7 +655,7 @@ func (s *containerService) WaitStatus(ctx context.Context, id types.ContainerID,
 	statusChan := make(chan string)
 	defer close(statusChan)
 
-	c, err := s.Get(ctx, id)
+	c, err := s.containers.GetContainer(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -667,7 +667,7 @@ func (s *containerService) WaitStatus(ctx context.Context, id types.ContainerID,
 	l := event.NewTempListener(func(e event.Event) error {
 		switch e := e.(type) {
 		case types.EventContainerStatusChange:
-			if e.ContainerUUID != c.ID {
+			if e.ContainerID != id {
 				return nil
 			}
 			statusChan <- e.Status
@@ -711,10 +711,10 @@ func (s *containerService) setStatus(c *types.Container, status string) {
 	c.Status = status
 	s.ctx.DispatchEvent(types.EventContainersChange{})
 	s.ctx.DispatchEvent(types.EventContainerStatusChange{
-		ContainerUUID: c.ID,
-		ServiceID:     c.ServiceID,
-		Container:     *c,
-		Name:          c.Name,
-		Status:        status,
+		ContainerID: c.ID,
+		ServiceID:   c.ServiceID,
+		Container:   *c,
+		Name:        c.Name,
+		Status:      status,
 	})
 }
