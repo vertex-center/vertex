@@ -43,6 +43,7 @@ type (
 	TagsService interface {
 		GetTags(ctx context.Context) (types.Tags, error)
 		CreateTag(ctx context.Context, tag types.Tag) error
+		DeleteTag(ctx context.Context, id types.TagID) error
 	}
 
 	DockerService interface {

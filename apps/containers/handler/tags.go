@@ -30,3 +30,13 @@ func (h *tagsHandler) CreateTag() gin.HandlerFunc {
 		return h.tagsService.CreateTag(c, params.Tag)
 	})
 }
+
+type DeleteTagParams struct {
+	ID types.TagID `path:"id"`
+}
+
+func (h *tagsHandler) DeleteTag() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context, params *DeleteTagParams) error {
+		return h.tagsService.DeleteTag(c, params.ID)
+	})
+}

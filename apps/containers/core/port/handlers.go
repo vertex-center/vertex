@@ -40,6 +40,8 @@ type (
 
 	TagsHandler interface {
 		GetTags() gin.HandlerFunc
+		CreateTag() gin.HandlerFunc
+		DeleteTag() gin.HandlerFunc
 	}
 
 	DockerKernelHandler interface {

@@ -84,6 +84,7 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 
 		container  = r.Group("/container/:container_id", "Container", "", authmiddleware.Authenticated)
 		containers = r.Group("/containers", "Containers", "", authmiddleware.Authenticated)
+		tag        = r.Group("/tag", "Tag", "", authmiddleware.Authenticated)
 		tags       = r.Group("/tags", "Tags", "", authmiddleware.Authenticated)
 		serv       = r.Group("/service/:service_id", "Service", "", authmiddleware.Authenticated)
 		services   = r.Group("/services", "Services", "")
@@ -186,6 +187,16 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	}, middleware.SSE, containersHandler.Events())
 
 	// Tags
+
+	tag.POST("", []fizz.OperationOption{
+		fizz.ID("createTag"),
+		fizz.Summary("Create tag"),
+	}, tagsHandler.GetTags())
+
+	tag.DELETE("/:id", []fizz.OperationOption{
+		fizz.ID("deleteTag"),
+		fizz.Summary("Delete tag"),
+	}, tagsHandler.DeleteTag())
 
 	tags.GET("", []fizz.OperationOption{
 		fizz.ID("getTags"),

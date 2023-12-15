@@ -22,3 +22,7 @@ func (s *tagsService) GetTags(ctx context.Context) (types.Tags, error) {
 func (s *tagsService) CreateTag(ctx context.Context, tag types.Tag) error {
 	return s.tags.CreateTag(ctx, tag)
 }
+
+func (s *tagsService) DeleteTag(ctx context.Context, id types.TagID) error {
+	return s.tags.DeleteTag(ctx, id)
+}
