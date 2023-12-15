@@ -22,19 +22,18 @@ import {
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import NoItems from "../../../components/NoItems/NoItems";
 import Content from "../../../components/Content/Content";
+import useContainer from "../../Containers/hooks/useContainer";
+import { API } from "../../Containers/backend/api";
 
 export default function SqlDatabase() {
     const { uuid } = useParams();
     const queryClient = useQueryClient();
 
     const {
-        data: container,
+        container,
         isLoading: isLoadingContainer,
         error: errorContainer,
-    } = useQuery({
-        queryKey: ["containers", uuid],
-        queryFn: api.vxContainers.container(uuid).get,
-    });
+    } = useContainer(uuid);
 
     const {
         data: db,
@@ -51,10 +50,10 @@ export default function SqlDatabase() {
             return;
         }
         if (inst?.status === "off" || inst?.status === "error") {
-            await api.vxContainers.container(inst.id).start();
+            await API.startContainer(inst.id);
             return;
         }
-        await api.vxContainers.container(inst.id).stop();
+        await API.stopContainer(inst.id);
     };
 
     const route = uuid ? `/container/${uuid}/events` : "";
