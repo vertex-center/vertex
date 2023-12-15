@@ -445,6 +445,7 @@ func (s *containerService) Install(ctx context.Context, serviceID string) (*type
 			ContainerID: id,
 			Type:        types.EnvVariableType(e.Type),
 			Name:        e.Name,
+			DisplayName: e.DisplayName,
 			Value:       e.Default,
 			Default:     &e.Default,
 			Description: &e.Description,

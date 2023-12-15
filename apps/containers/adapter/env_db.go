@@ -32,8 +32,8 @@ func (a *envDBAdapter) GetVariables(ctx context.Context, id types.ContainerID) (
 
 func (a *envDBAdapter) CreateVariable(ctx context.Context, v types.EnvVariable) error {
 	_, err := a.db.NamedExec(`
-		INSERT INTO env_variables (container_id, type, name, value, default_value, description)
-		VALUES (:container_id, :type, :name, :value, :default_value, :description)
+		INSERT INTO env_variables (container_id, type, name, display_name, value, default_value, description)
+		VALUES (:container_id, :type, :name, :display_name, :value, :default_value, :description)
 	`, v)
 	return err
 }

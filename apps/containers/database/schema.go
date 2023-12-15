@@ -24,6 +24,7 @@ func GetSchema(driver vsql.Driver) string {
 			WithField("container_id", "VARCHAR(36)", "NOT NULL").
 			WithField("type", "VARCHAR(255)", "NOT NULL").
 			WithField("name", "VARCHAR(255)", "NOT NULL").
+			WithField("display_name", "VARCHAR(255)", "NOT NULL").
 			WithField("value", "VARCHAR(255)", "NOT NULL").
 			WithField("default_value", "VARCHAR(255)").
 			WithField("description", "VARCHAR(255)").

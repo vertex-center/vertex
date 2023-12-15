@@ -9,9 +9,10 @@ type (
 		ContainerID ContainerID     `json:"container_id"          db:"container_id"  example:"d1fb743c-f937-4f3d-95b9-1a8475464591"`
 		Type        EnvVariableType `json:"type"                  db:"type"          enum:"port"`
 		Name        string          `json:"name"                  db:"name"          example:"DB_PORT"`
+		DisplayName string          `json:"display_name"          db:"display_name"  example:"Database Port"`
 		Value       string          `json:"value"                 db:"value"         example:"5400"`
 		Default     *string         `json:"default,omitempty"     db:"default_value" example:"5432"`
-		Description *string         `json:"description,omitempty" db:"description"   example:"The database port"`
+		Description *string         `json:"description,omitempty" db:"description"   example:"The server database port"`
 	}
 )
 
