@@ -370,20 +370,14 @@ func (a runnerDockerAdapter) getContainer(ctx context.Context, c types.Container
 		return types.DockerContainer{}, err
 	}
 
-	var dockerContainer *types.DockerContainer
 	for _, dc := range containers {
 		name := dc.Names[0]
 		if name == "/"+c.DockerContainerName() {
-			dockerContainer = &dc
-			break
+			return dc, nil
 		}
 	}
 
-	if dockerContainer == nil {
-		return types.DockerContainer{}, errors.NotFoundf("docker container")
-	}
-
-	return *dockerContainer, nil
+	return types.DockerContainer{}, errors.NotFoundf("docker container")
 }
 
 func (a runnerDockerAdapter) getContainerID(ctx context.Context, c types.Container) (string, error) {
