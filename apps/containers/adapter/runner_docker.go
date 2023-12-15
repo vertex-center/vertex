@@ -179,6 +179,7 @@ func (a runnerDockerAdapter) Start(
 			}
 			options.ExposedPorts, options.PortBindings, err = nat.ParsePortSpecs(all)
 			if err != nil {
+				log.Error(err)
 				return
 			}
 
@@ -189,6 +190,7 @@ func (a runnerDockerAdapter) Start(
 					in, err = filepath.Abs(path.Join(volumePath, in))
 				}
 				if err != nil {
+					log.Error(err)
 					return
 				}
 				options.Binds = append(options.Binds, in+":"+v.Out)
@@ -209,9 +211,11 @@ func (a runnerDockerAdapter) Start(
 
 			id, err = a.createContainer(ctx, options)
 			if err != nil {
+				log.Error(err)
 				return
 			}
 		} else if err != nil {
+			log.Error(err)
 			return
 		}
 
@@ -432,9 +436,7 @@ func (a runnerDockerAdapter) createContainer(ctx context.Context, options types.
 	}
 
 	for _, warn := range res.Warnings {
-		log.Warn("warning while creating container",
-			vlog.String("warning", warn),
-		)
+		log.Warn("warning while creating container", vlog.String("warning", warn))
 	}
 	return res.ID, nil
 }
