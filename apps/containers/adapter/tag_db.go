@@ -18,11 +18,12 @@ func NewTagDBAdapter(db storage.DB) port.TagAdapter {
 	return &tagDBAdapter{db}
 }
 
-func (a *tagDBAdapter) GetTags(ctx context.Context) (types.Tags, error) {
+func (a *tagDBAdapter) GetTags(ctx context.Context, userID uint) (types.Tags, error) {
 	var tags types.Tags
 	err := a.db.Select(&tags, `
 		SELECT * FROM tags
-	`)
+		WHERE user_id = $1
+	`, userID)
 	if errors.Is(err, sql.ErrNoRows) {
 		return tags, nil
 	}
@@ -31,8 +32,8 @@ func (a *tagDBAdapter) GetTags(ctx context.Context) (types.Tags, error) {
 
 func (a *tagDBAdapter) CreateTag(ctx context.Context, tag types.Tag) error {
 	_, err := a.db.NamedExec(`
-		INSERT INTO tags (tag)
-		VALUES (:tag)
+		INSERT INTO tags (id, user_id, name)
+		VALUES (:id, :user_id, :name)
 	`, tag)
 	return err
 }

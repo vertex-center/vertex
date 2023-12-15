@@ -17,7 +17,8 @@ func NewTagsHandler(service port.TagsService) port.TagsHandler {
 
 func (h *tagsHandler) GetTags() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context) (types.Tags, error) {
-		return h.tagsService.GetTags(c)
+		userID := uint(c.GetInt("user_id"))
+		return h.tagsService.GetTags(c, userID)
 	})
 }
 
@@ -27,6 +28,8 @@ type CreateTagParams struct {
 
 func (h *tagsHandler) CreateTag() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *CreateTagParams) error {
+		userID := uint(c.GetInt("user_id"))
+		params.Tag.UserID = userID
 		return h.tagsService.CreateTag(c, params.Tag)
 	})
 }
