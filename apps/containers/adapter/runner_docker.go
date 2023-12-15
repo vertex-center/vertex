@@ -184,16 +184,16 @@ func (a runnerDockerAdapter) Start(
 			}
 
 			for _, v := range volumes {
-				in := v.In
-				if !strings.HasPrefix(in, "/") {
+				out := v.Out
+				if !strings.HasPrefix(out, "/") {
 					volumePath := a.getVolumePath(ctx, c.ID)
-					in, err = filepath.Abs(path.Join(volumePath, in))
+					out, err = filepath.Abs(path.Join(volumePath, out))
 				}
 				if err != nil {
 					log.Error(err)
 					return
 				}
-				options.Binds = append(options.Binds, in+":"+v.Out)
+				options.Binds = append(options.Binds, out+":"+v.In)
 			}
 			for _, e := range env {
 				options.Env = append(options.Env, e.Name+"="+e.Value)
