@@ -24,7 +24,7 @@ type GetParams struct {
 	UUID containerstypes.ContainerID `path:"container_uuid"`
 }
 
-func (r *dbmsHandler) Get() gin.HandlerFunc {
+func (h *dbmsHandler) Get() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *GetParams) (*types.DBMS, error) {
 		client := containersapi.NewContainersClient(c)
 
@@ -33,7 +33,7 @@ func (r *dbmsHandler) Get() gin.HandlerFunc {
 			return nil, err
 		}
 
-		dbms, err := r.sqlService.Get(inst)
+		dbms, err := h.sqlService.Get(inst)
 		if err != nil {
 			return nil, errors.NewNotFound(err, "SQL Database not found")
 		}
@@ -45,38 +45,12 @@ type InstallParams struct {
 	DBMS string `path:"dbms"`
 }
 
-func (r *dbmsHandler) Install() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *InstallParams) (*containerstypes.Container, error) {
-		client := containersapi.NewContainersClient(c)
-
-		serv, err := client.GetService(c, params.DBMS)
+func (h *dbmsHandler) Install() gin.HandlerFunc {
+	return router.Handler(func(ctx *gin.Context, params *InstallParams) (*containerstypes.Container, error) {
+		c, err := h.sqlService.Install(ctx, params.DBMS)
 		if err != nil {
 			return nil, err
 		}
-
-		inst, err := client.InstallService(c, serv.ID)
-		if err != nil {
-			return nil, err
-		}
-
-		//inst.Tags = containerstypes.Tags{
-		//	containerstypes.Tag{Tag: "Vertex SQL"},
-		//	containerstypes.Tag{Tag: "Vertex SQL - Postgres Database"},
-		//}
-		//err = client.PatchContainer(c, inst.ID, inst)
-		//if err != nil {
-		//	return nil, err
-		//}
-		//
-		//inst.Env, err = r.sqlService.EnvCredentials(inst, "postgres", "postgres")
-		//if err != nil {
-		//	return nil, fmt.Errorf("setup credentials: %w", err)
-		//}
-		//err = client.PatchContainerEnvironment(c, inst.ID, inst.Env)
-		//if err != nil {
-		//	return nil, err
-		//}
-
-		return inst, nil
+		return &c, nil
 	})
 }

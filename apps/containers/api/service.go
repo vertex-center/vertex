@@ -15,12 +15,12 @@ func (c *Client) GetService(ctx context.Context, serviceId string) (types.Servic
 	return service, err
 }
 
-func (c *Client) InstallService(ctx context.Context, serviceId string) (*types.Container, error) {
-	var inst *types.Container
+func (c *Client) InstallService(ctx context.Context, serviceId string) (types.Container, error) {
+	var ctr types.Container
 	err := c.Request().
 		Pathf("./service/%s/install", serviceId).
 		Post().
-		ToJSON(&inst).
+		ToJSON(&ctr).
 		Fetch(ctx)
-	return inst, err
+	return ctr, err
 }

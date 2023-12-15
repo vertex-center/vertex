@@ -123,6 +123,11 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 		fizz.Summary("Stop a container"),
 	}, containerHandler.Stop())
 
+	container.PUT("/tag/:tag_id", []fizz.OperationOption{
+		fizz.ID("addContainerTag"),
+		fizz.Summary("Link tag to container"),
+	}, containerHandler.AddContainerTag())
+
 	container.GET("/environment", []fizz.OperationOption{
 		fizz.ID("getContainerEnvironment"),
 		fizz.Summary("Get container environment"),
@@ -188,10 +193,15 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 
 	// Tags
 
+	tag.GET("", []fizz.OperationOption{
+		fizz.ID("getTag"),
+		fizz.Summary("Get tag"),
+	}, tagsHandler.GetTag())
+
 	tag.POST("", []fizz.OperationOption{
 		fizz.ID("createTag"),
 		fizz.Summary("Create tag"),
-	}, tagsHandler.GetTags())
+	}, tagsHandler.CreateTag())
 
 	tag.DELETE("/:id", []fizz.OperationOption{
 		fizz.ID("deleteTag"),

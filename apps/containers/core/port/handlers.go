@@ -11,7 +11,7 @@ type (
 		Patch() gin.HandlerFunc
 		Start() gin.HandlerFunc
 		Stop() gin.HandlerFunc
-		AddTag() gin.HandlerFunc
+		AddContainerTag() gin.HandlerFunc
 		GetContainerEnv() gin.HandlerFunc
 		PatchEnvironment() gin.HandlerFunc
 		GetDocker() gin.HandlerFunc
@@ -39,6 +39,7 @@ type (
 	}
 
 	TagsHandler interface {
+		GetTag() gin.HandlerFunc
 		GetTags() gin.HandlerFunc
 		CreateTag() gin.HandlerFunc
 		DeleteTag() gin.HandlerFunc

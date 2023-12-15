@@ -1,11 +1,13 @@
 package service
 
 import (
-	"errors"
+	"context"
 	"sync"
 
 	"github.com/google/uuid"
-	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/juju/errors"
+	containersapi "github.com/vertex-center/vertex/apps/containers/api"
+	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	sqladapter "github.com/vertex-center/vertex/apps/sql/adapter"
 	"github.com/vertex-center/vertex/apps/sql/core/port"
 	sqltypes "github.com/vertex-center/vertex/apps/sql/core/types"
@@ -17,21 +19,21 @@ import (
 
 type sqlService struct {
 	uuid      uuid.UUID
-	dbms      map[types.ContainerID]port.DBMSAdapter
+	dbms      map[containerstypes.ContainerID]port.DBMSAdapter
 	dbmsMutex *sync.RWMutex
 }
 
 func New(ctx *app.Context) port.SqlService {
 	s := &sqlService{
 		uuid:      uuid.New(),
-		dbms:      map[types.ContainerID]port.DBMSAdapter{},
+		dbms:      map[containerstypes.ContainerID]port.DBMSAdapter{},
 		dbmsMutex: &sync.RWMutex{},
 	}
 	ctx.AddListener(s)
 	return s
 }
 
-func (s *sqlService) getDbFeature(c *types.Container) (types.DatabaseFeature, error) {
+func (s *sqlService) getDbFeature(c *containerstypes.Container) (containerstypes.DatabaseFeature, error) {
 	//if c.Service.Features == nil || c.Service.Features.Databases == nil {
 	//	return types.DatabaseFeature{}, errors.New("no databases found")
 	//}
@@ -43,10 +45,10 @@ func (s *sqlService) getDbFeature(c *types.Container) (types.DatabaseFeature, er
 	//	}
 	//}
 
-	return types.DatabaseFeature{}, errors.New("no sql database found")
+	return containerstypes.DatabaseFeature{}, errors.New("no sql database found")
 }
 
-func (s *sqlService) Get(inst *types.Container) (sqltypes.DBMS, error) {
+func (s *sqlService) Get(inst *containerstypes.Container) (sqltypes.DBMS, error) {
 	db := sqltypes.DBMS{}
 	var err error
 
@@ -74,26 +76,53 @@ func (s *sqlService) Get(inst *types.Container) (sqltypes.DBMS, error) {
 	return db, nil
 }
 
-func (s *sqlService) EnvCredentials(c *types.Container, user string, pass string) (types.EnvVariables, error) {
-	//env := c.Env
-	//
-	//feature, err := s.getDbFeature(c)
-	//if err != nil {
-	//	return env, err
-	//}
-	//
-	//if feature.Username != nil {
-	//	env.Set(*feature.Username, user)
-	//}
-	//if feature.Password != nil {
-	//	env.Set(*feature.Password, pass)
-	//}
-	//return env, nil
+func (s *sqlService) Install(ctx context.Context, dbms string) (containerstypes.Container, error) {
+	var c containerstypes.Container
+	client := containersapi.NewContainersClient(ctx)
 
-	return types.EnvVariables{}, nil
+	serv, err := client.GetService(ctx, dbms)
+	if err != nil {
+		return c, err
+	}
+
+	c, err = client.InstallService(ctx, serv.ID)
+	if err != nil {
+		return c, err
+	}
+
+	tag, err := client.GetTag(ctx, "Vertex SQL")
+	if errors.Is(err, errors.NotFound) {
+		tag, err = client.CreateTag(ctx, containerstypes.Tag{
+			Name: "Vertex SQL",
+		})
+		if err != nil {
+			return c, err
+		}
+	}
+
+	err = client.AddContainerTag(ctx, c.ID, tag.ID)
+	if err != nil {
+		return c, err
+	}
+
+	feature, err := s.getDbFeature(&c)
+	if err != nil {
+		return c, err
+	}
+
+	var env containerstypes.EnvVariables
+	if feature.Username != nil {
+		env.Set(*feature.Username, "postgres")
+	}
+	if feature.Password != nil {
+		env.Set(*feature.Password, "postgres")
+	}
+
+	err = client.PatchContainerEnvironment(ctx, c.ID, env)
+	return c, err
 }
 
-func (s *sqlService) createDbmsAdapter(inst *types.Container) (port.DBMSAdapter, error) {
+func (s *sqlService) createDbmsAdapter(inst *containerstypes.Container) (port.DBMSAdapter, error) {
 	feature, err := s.getDbFeature(inst)
 	if err != nil {
 		return nil, err

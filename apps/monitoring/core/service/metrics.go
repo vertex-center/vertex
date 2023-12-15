@@ -56,7 +56,7 @@ func (s *metricsService) InstallCollector(ctx context.Context, collector string)
 		return err
 	}
 
-	err = s.ConfigureCollector(inst)
+	err = s.ConfigureCollector(&inst)
 	if err != nil {
 		return err
 	}
@@ -84,7 +84,7 @@ func (s *metricsService) InstallVisualizer(ctx context.Context, visualizer strin
 		return err
 	}
 
-	err = s.ConfigureVisualizer(inst)
+	err = s.ConfigureVisualizer(&inst)
 	if err != nil {
 		return err
 	}

@@ -15,13 +15,18 @@ func NewTagsService(tags port.TagAdapter) port.TagsService {
 	return &tagsService{tags}
 }
 
+func (s *tagsService) GetTag(ctx context.Context, userID uint, name string) (types.Tag, error) {
+	return s.tags.GetTag(ctx, userID, name)
+}
+
 func (s *tagsService) GetTags(ctx context.Context, userID uint) (types.Tags, error) {
 	return s.tags.GetTags(ctx, userID)
 }
 
-func (s *tagsService) CreateTag(ctx context.Context, tag types.Tag) error {
+func (s *tagsService) CreateTag(ctx context.Context, tag types.Tag) (types.Tag, error) {
 	tag.ID = types.NewTagID()
-	return s.tags.CreateTag(ctx, tag)
+	err := s.tags.CreateTag(ctx, tag)
+	return tag, err
 }
 
 func (s *tagsService) DeleteTag(ctx context.Context, id types.TagID) error {

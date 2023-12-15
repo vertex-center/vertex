@@ -20,7 +20,7 @@ type (
 		StartAll(ctx context.Context) error
 		Stop(ctx context.Context, id types.ContainerID) error
 		StopAll(ctx context.Context) error
-		AddTag(ctx context.Context, id types.ContainerID, tagID types.TagID) error
+		AddContainerTag(ctx context.Context, id types.ContainerID, tagID types.TagID) error
 		RecreateContainer(ctx context.Context, id types.ContainerID) error
 		DeleteAll(ctx context.Context) error
 		Install(ctx context.Context, serviceID string) (*types.Container, error)
@@ -41,8 +41,9 @@ type (
 	}
 
 	TagsService interface {
+		GetTag(ctx context.Context, userID uint, name string) (types.Tag, error)
 		GetTags(ctx context.Context, userID uint) (types.Tags, error)
-		CreateTag(ctx context.Context, tag types.Tag) error
+		CreateTag(ctx context.Context, tag types.Tag) (types.Tag, error)
 		DeleteTag(ctx context.Context, id types.TagID) error
 	}
 

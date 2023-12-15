@@ -18,6 +18,18 @@ func NewTagDBAdapter(db storage.DB) port.TagAdapter {
 	return &tagDBAdapter{db}
 }
 
+func (a *tagDBAdapter) GetTag(ctx context.Context, userID uint, name string) (types.Tag, error) {
+	var tag types.Tag
+	err := a.db.Get(&tag, `
+		SELECT * FROM tags
+		WHERE user_id = $1 AND name = $2
+	`, userID, name)
+	if errors.Is(err, sql.ErrNoRows) {
+		err = errors.NotFoundf("tag %s", name)
+	}
+	return tag, err
+}
+
 func (a *tagDBAdapter) GetTags(ctx context.Context, userID uint) (types.Tags, error) {
 	var tags types.Tags
 	err := a.db.Select(&tags, `

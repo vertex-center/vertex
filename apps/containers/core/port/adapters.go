@@ -34,6 +34,7 @@ type (
 	}
 
 	TagAdapter interface {
+		GetTag(ctx context.Context, userID uint, name string) (types.Tag, error)
 		GetTags(ctx context.Context, userID uint) (types.Tags, error)
 		CreateTag(ctx context.Context, tag types.Tag) error
 		DeleteTag(ctx context.Context, id types.TagID) error

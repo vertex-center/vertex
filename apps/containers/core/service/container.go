@@ -389,7 +389,7 @@ func (s *containerService) StopAll(ctx context.Context) error {
 	return nil
 }
 
-func (s *containerService) AddTag(ctx context.Context, id types.ContainerID, tagID types.TagID) error {
+func (s *containerService) AddContainerTag(ctx context.Context, id types.ContainerID, tagID types.TagID) error {
 	return s.containers.AddTag(ctx, id, tagID)
 }
 
