@@ -13,6 +13,7 @@ type (
 		Value       string          `json:"value"                 db:"value"         example:"5400"`
 		Default     *string         `json:"default,omitempty"     db:"default_value" example:"5432"`
 		Description *string         `json:"description,omitempty" db:"description"   example:"The server database port"`
+		Secret      bool            `json:"secret"                db:"secret"        example:"true"`
 	}
 )
 

@@ -449,6 +449,7 @@ func (s *containerService) Install(ctx context.Context, serviceID string) (*type
 			Value:       e.Default,
 			Default:     &e.Default,
 			Description: &e.Description,
+			Secret:      e.Secret != nil && *e.Secret,
 		})
 		if err != nil {
 			return nil, err
