@@ -156,6 +156,11 @@ func (s *containerService) Delete(ctx context.Context, id types.ContainerID) err
 	return nil
 }
 
+func (s *containerService) UpdateContainer(ctx context.Context, id types.ContainerID, c types.Container) error {
+	c.ID = id
+	return s.containers.UpdateContainer(ctx, c)
+}
+
 func (s *containerService) Start(ctx context.Context, id types.ContainerID) error {
 	c, err := s.containers.GetContainer(ctx, id)
 	if err != nil {

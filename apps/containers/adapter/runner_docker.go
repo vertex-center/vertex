@@ -340,7 +340,7 @@ func (a runnerDockerAdapter) CheckForUpdates(ctx context.Context, c *types.Conta
 }
 
 func (a runnerDockerAdapter) GetAllVersions(ctx context.Context, c types.Container) ([]string, error) {
-	log.Debug("querying all versions of image", vlog.String("image", c.Image))
+	log.Info("querying all versions of image", vlog.String("image", c.Image))
 	return crane.ListTags(c.Image)
 }
 

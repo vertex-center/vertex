@@ -40,6 +40,11 @@ func (m *MockContainerService) Delete(ctx context.Context, uuid types.ContainerI
 	return args.Error(0)
 }
 
+func (m *MockContainerService) UpdateContainer(ctx context.Context, uuid types.ContainerID, c types.Container) error {
+	args := m.Called(ctx, uuid, c)
+	return args.Error(0)
+}
+
 func (m *MockContainerService) Start(ctx context.Context, uuid types.ContainerID) error {
 	args := m.Called(ctx, uuid)
 	return args.Error(0)

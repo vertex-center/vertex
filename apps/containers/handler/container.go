@@ -53,12 +53,10 @@ type PatchBodyDatabase struct {
 }
 
 type PatchContainerParams struct {
-	ContainerID     types.ContainerID            `path:"container_id"`
-	LaunchOnStartup *bool                        `json:"launch_on_startup,omitempty"`
-	DisplayName     *string                      `json:"display_name,omitempty"`
-	Databases       map[string]PatchBodyDatabase `json:"databases,omitempty"`
-	Version         *string                      `json:"version,omitempty"`
-	Tags            []string                     `json:"tags,omitempty"`
+	ContainerID     types.ContainerID `path:"container_id"`
+	LaunchOnStartup *bool             `json:"launch_on_startup,omitempty"`
+	Name            *string           `json:"name,omitempty"`
+	ImageTag        *string           `json:"image_tag,omitempty"`
 }
 
 func (h *containerHandler) Patch() gin.HandlerFunc {
@@ -69,51 +67,16 @@ func (h *containerHandler) Patch() gin.HandlerFunc {
 		}
 
 		if params.LaunchOnStartup != nil {
-			//err = h.settingsService.SetLaunchOnStartup(inst, *params.LaunchOnStartup)
-			//if err != nil {
-			//	return err
-			//}
+			inst.LaunchOnStartup = *params.LaunchOnStartup
+		}
+		if params.Name != nil && *params.Name != "" {
+			inst.Name = *params.Name
+		}
+		if params.ImageTag != nil {
+			inst.ImageTag = *params.ImageTag
 		}
 
-		if params.DisplayName != nil && *params.DisplayName != "" {
-			//err = h.settingsService.SetDisplayName(inst, *params.DisplayName)
-			//if err != nil {
-			//	return err
-			//}
-		}
-
-		if params.Databases != nil {
-			databases := map[string]types.ContainerID{}
-			options := map[string]*types.SetDatabasesOptions{}
-
-			for databaseID, container := range params.Databases {
-				databases[databaseID] = container.ContainerID
-				options[databaseID] = &types.SetDatabasesOptions{
-					DatabaseName: container.DatabaseName,
-				}
-			}
-
-			err = h.containerService.SetDatabases(c, inst, databases, options)
-			if err != nil {
-				return err
-			}
-		}
-
-		if params.Version != nil {
-			//err = h.settingsService.SetVersion(inst, *params.Version)
-			//if err != nil {
-			//	return err
-			//}
-		}
-
-		if params.Tags != nil {
-			//err = h.settingsService.SetTags(inst, params.Tags)
-			//if err != nil {
-			//	return err
-			//}
-		}
-
-		return nil
+		return h.containerService.UpdateContainer(c, params.ContainerID, *inst)
 	})
 }
 

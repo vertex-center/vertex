@@ -49,6 +49,25 @@ func (a *containerDBAdapter) CreateContainer(ctx context.Context, c types.Contai
 	return err
 }
 
+func (a *containerDBAdapter) UpdateContainer(ctx context.Context, c types.Container) error {
+	_, err := a.db.NamedExec(`
+		UPDATE containers
+		SET service_id = :service_id,
+			user_id = :user_id,
+			image = :image,
+			image_tag = :image_tag,
+			status = :status,
+			launch_on_startup = :launch_on_startup,
+			name = :name,
+			description = :description,
+			color = :color,
+			icon = :icon,
+			command = :command
+		WHERE id = :id
+	`, c)
+	return err
+}
+
 func (a *containerDBAdapter) DeleteContainer(ctx context.Context, id types.ContainerID) error {
 	_, err := a.db.Exec(`
 		DELETE FROM containers

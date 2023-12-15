@@ -13,6 +13,7 @@ type (
 		GetContainer(ctx context.Context, id types.ContainerID) (*types.Container, error)
 		GetContainers(ctx context.Context) (types.Containers, error)
 		CreateContainer(ctx context.Context, container types.Container) error
+		UpdateContainer(ctx context.Context, container types.Container) error
 		DeleteContainer(ctx context.Context, id types.ContainerID) error
 		GetContainerTags(ctx context.Context, id types.ContainerID) (types.Tags, error)
 		AddTag(ctx context.Context, id types.ContainerID, tagID types.TagID) error
