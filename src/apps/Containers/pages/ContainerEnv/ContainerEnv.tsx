@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import EnvVariableInput from "../../components/EnvVariableInput/EnvVariableInput";
 import { Button, MaterialIcon, Title } from "@vertex-center/components";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
-import useContainer from "../../hooks/useContainer";
+import { useContainerEnv } from "../../hooks/useContainer";
 import styles from "./ContainerEnv.module.sass";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
@@ -16,7 +16,13 @@ export default function ContainerEnv() {
     const { uuid } = useParams();
     const queryClient = useQueryClient();
 
-    const { container, isLoading, error } = useContainer(uuid);
+    const { env: currentEnv, isLoadingEnv, errorEnv } = useContainerEnv(uuid);
+    const [env, setEnv] = useState<EnvVariables>(currentEnv);
+
+    useEffect(() => {
+        setEnv(currentEnv);
+        setSaved(undefined);
+    }, [currentEnv]);
 
     // undefined = not saved AND never modified
     const [saved, setSaved] = useState<boolean>(undefined);
@@ -34,16 +40,19 @@ export default function ContainerEnv() {
     });
     const { isLoading: isUploading } = mutationSaveEnv;
 
-    const save = () => mutationSaveEnv.mutate(container?.environment ?? []);
+    const save = () => mutationSaveEnv.mutate(env ?? []);
 
     const onChange = (i: number, value: any) => {
+        const newEnv = [...env];
+        newEnv[i].value = value;
+        setEnv(newEnv);
         setSaved(false);
     };
 
     return (
         <Content>
             <Title variant="h2">Environment</Title>
-            {container?.environment?.map((env, i) => (
+            {env?.map((env, i) => (
                 <EnvVariableInput
                     id={env.name}
                     key={env.name}
@@ -53,7 +62,7 @@ export default function ContainerEnv() {
                     disabled={isUploading}
                 />
             ))}
-            <ProgressOverlay show={isLoading ?? isUploading} />
+            <ProgressOverlay show={isLoadingEnv ?? isUploading} />
             <Horizontal justifyContent="flex-end">
                 {saved && (
                     <Horizontal
@@ -74,7 +83,7 @@ export default function ContainerEnv() {
                     Save
                 </Button>
             </Horizontal>
-            <APIError error={error} />
+            <APIError error={errorEnv} />
         </Content>
     );
 }

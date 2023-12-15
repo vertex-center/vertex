@@ -28,11 +28,11 @@ export default function ContainerSettings() {
 
     const { container, isLoading: isLoadingContainer } = useContainer(uuid);
 
-    const [displayName, setDisplayName] = useState<string>();
+    const [name, setName] = useState<string>();
     const [launchOnStartup, setLaunchOnStartup] = useState<boolean>();
-    const [version, setVersion] = useState<string>();
-    const [versions, setVersions] = useState<string[]>();
-    const [versionsLoading, setVersionsLoading] = useState<boolean>(false);
+    const [imageTag, setImageTag] = useState<string>();
+    const [imageTags, setImageTags] = useState<string[]>();
+    const [imageTagsLoading, setImageTagsLoading] = useState<boolean>(false);
 
     // undefined = not saved AND never modified
     const [saved, setSaved] = useState<boolean>(undefined);
@@ -41,20 +41,20 @@ export default function ContainerSettings() {
     useEffect(() => {
         if (!container) return;
         setLaunchOnStartup(container.launch_on_startup);
-        setDisplayName(container.name);
-        setVersion(container?.image_tag ?? "latest");
+        setName(container.name);
+        setImageTag(container?.image_tag ?? "latest");
         reloadVersions();
     }, [container]);
 
     const reloadVersions = (cache = true) => {
-        setVersionsLoading(true);
+        setImageTagsLoading(true);
         API.getVersions(container.id, cache)
             .then((data) => {
-                setVersions(data?.reverse());
+                setImageTags(data?.reverse());
             })
             .catch(setError)
             .finally(() => {
-                setVersionsLoading(false);
+                setImageTagsLoading(false);
             });
     };
 
@@ -62,8 +62,8 @@ export default function ContainerSettings() {
         mutationFn: async () => {
             await API.patchContainer(uuid, {
                 launch_on_startup: launchOnStartup,
-                display_name: displayName,
-                version: version,
+                name,
+                imageTag,
             });
         },
         onSuccess: () => {
@@ -78,20 +78,20 @@ export default function ContainerSettings() {
     const { isLoading: isUploading } = mutationSave;
 
     const onVersionChange = (v: any) => {
-        setVersion(v);
+        setImageTag(v);
         setSaved(false);
     };
 
     const versionValue = (
         <div
             className={classNames({
-                [styles.versionValue]: version !== "latest",
+                [styles.versionValue]: imageTag !== "latest",
             })}
         >
-            {version === "latest" ? (
-                "Always pull latest version"
+            {imageTag === "latest" ? (
+                "Always pull latest"
             ) : (
-                <VersionTag>{version}</VersionTag>
+                <VersionTag>{imageTag}</VersionTag>
             )}
         </div>
     );
@@ -100,7 +100,7 @@ export default function ContainerSettings() {
         <Content>
             <Title variant="h2">Settings</Title>
             <ProgressOverlay
-                show={isLoadingContainer || versionsLoading || isUploading}
+                show={isLoadingContainer || imageTagsLoading || isUploading}
             />
             <APIError error={error} />
             <Horizontal alignItems="center">
@@ -119,9 +119,9 @@ export default function ContainerSettings() {
                 id="container-name"
                 label="Container name"
                 description="The custom name of your choice for this service"
-                value={displayName}
+                value={name}
                 onChange={(e: any) => {
-                    setDisplayName(e.target.value);
+                    setName(e.target.value);
                     setSaved(false);
                 }}
                 disabled={isLoadingContainer}
@@ -131,16 +131,16 @@ export default function ContainerSettings() {
                     id="container-version"
                     label="Version"
                     onChange={onVersionChange}
-                    disabled={isLoadingContainer || versionsLoading}
+                    disabled={isLoadingContainer || imageTagsLoading}
                     // @ts-ignore
                     value={versionValue}
                 >
-                    {versions?.includes("latest") && (
+                    {imageTags?.includes("latest") && (
                         <SelectOption value="latest">
-                            Always pull latest version
+                            Always pull latest
                         </SelectOption>
                     )}
-                    {versions?.map((v) => {
+                    {imageTags?.map((v) => {
                         if (v === "latest") {
                             return null;
                         }
@@ -154,7 +154,7 @@ export default function ContainerSettings() {
                 <Button
                     rightIcon={<MaterialIcon icon="refresh" />}
                     onClick={() => reloadVersions(false)}
-                    disabled={isLoadingContainer || versionsLoading}
+                    disabled={isLoadingContainer || imageTagsLoading}
                 >
                     Refresh
                 </Button>

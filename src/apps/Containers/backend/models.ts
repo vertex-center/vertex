@@ -23,9 +23,11 @@ export type EnvVariable = {
     container_id: string;
     type: string;
     name: string;
+    display_name: string;
     value: string;
     default: string;
     description: string;
+    secret: boolean;
 };
 
 export type Containers = Container[];

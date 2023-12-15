@@ -65,6 +65,13 @@ const getLogs = async (id: string) => {
     return data;
 };
 
+const getContainerEnvironment = async (id: string) => {
+    const { data } = await server.get<EnvVariables>(
+        `/container/${id}/environment`
+    );
+    return data;
+};
+
 const saveEnv = (id: string, env: EnvVariables) => {
     return server.patch(`/container/${id}/environment`, { env });
 };
@@ -86,7 +93,7 @@ const updateService = (id: string) => {
 
 const getVersions = async (id: string, cache?: boolean) => {
     const { data } = await server.get<string[]>(
-        `/container/${id}/versions?reload=${!cache}`
+        `/container/${id}/versions?cache=${cache}`
     );
     return data;
 };
@@ -101,6 +108,7 @@ export const API = {
     stopContainer,
     patchContainer,
     getLogs,
+    getContainerEnvironment,
     saveEnv,
     getDockerInfo: getDocker,
     recreateDocker,

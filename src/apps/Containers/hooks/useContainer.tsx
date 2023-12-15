@@ -24,3 +24,15 @@ export function useDockerInfo(id?: string) {
     });
     return { dockerInfo: queryDockerInfo.data, ...queryDockerInfo };
 }
+
+export function useContainerEnv(id?: string) {
+    const queryEnv = useQuery({
+        queryKey: ["container_env", id],
+        queryFn: () => API.getContainerEnvironment(id),
+    });
+    return {
+        env: queryEnv.data,
+        isLoadingEnv: queryEnv.isLoading,
+        errorEnv: queryEnv.error,
+    };
+}
