@@ -40,6 +40,9 @@ type containerService struct {
 	runner     port.RunnerAdapter
 	services   port.ServiceAdapter
 	logs       port.LogsAdapter
+
+	cacheImageTags map[string][]string
+	mu             sync.RWMutex
 }
 
 func NewContainerService(ctx *app.Context,
@@ -55,18 +58,19 @@ func NewContainerService(ctx *app.Context,
 	logs port.LogsAdapter,
 ) port.ContainerService {
 	s := &containerService{
-		uuid:       uuid.New(),
-		ctx:        ctx,
-		caps:       caps,
-		containers: containers,
-		vars:       vars,
-		ports:      ports,
-		volumes:    volumes,
-		tags:       tags,
-		sysctls:    sysctls,
-		runner:     runner,
-		services:   services,
-		logs:       logs,
+		uuid:           uuid.New(),
+		ctx:            ctx,
+		caps:           caps,
+		containers:     containers,
+		vars:           vars,
+		ports:          ports,
+		volumes:        volumes,
+		tags:           tags,
+		sysctls:        sysctls,
+		runner:         runner,
+		services:       services,
+		logs:           logs,
+		cacheImageTags: make(map[string][]string),
 	}
 	s.ctx.AddListener(s)
 	return s
@@ -673,15 +677,20 @@ func (s *containerService) GetAllVersions(ctx context.Context, id types.Containe
 		return nil, err
 	}
 
-	if !useCache || len(c.CacheVersions) == 0 {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	_, ok := s.cacheImageTags[c.Image]
+
+	if !useCache || !ok {
 		versions, err := s.runner.GetAllVersions(ctx, *c)
 		if err != nil {
 			return nil, err
 		}
-		c.CacheVersions = versions
+		s.cacheImageTags[c.Image] = versions
 	}
 
-	return c.CacheVersions, nil
+	return s.cacheImageTags[c.Image], nil
 }
 
 func (s *containerService) GetContainerInfo(ctx context.Context, id types.ContainerID) (map[string]any, error) {

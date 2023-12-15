@@ -13,6 +13,7 @@ import (
 	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vlog"
 )
 
 type containerHandler struct {
@@ -248,12 +249,13 @@ func (h *containerHandler) GetLogs() gin.HandlerFunc {
 
 type GetVersionsParams struct {
 	ContainerID types.ContainerID `path:"container_id"`
+	UseCache    bool              `query:"cache"`
 }
 
 func (h *containerHandler) GetVersions() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *GetVersionsParams) ([]string, error) {
-		useCache := c.Query("reload") != "true"
-		return h.containerService.GetAllVersions(c, params.ContainerID, useCache)
+		log.Info("GetVersions", vlog.Bool("use_cache", params.UseCache))
+		return h.containerService.GetAllVersions(c, params.ContainerID, params.UseCache)
 	})
 }
 
