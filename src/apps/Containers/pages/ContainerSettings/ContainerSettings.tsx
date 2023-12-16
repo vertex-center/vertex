@@ -62,8 +62,8 @@ export default function ContainerSettings() {
         mutationFn: async () => {
             await API.patchContainer(uuid, {
                 launch_on_startup: launchOnStartup,
-                name,
-                imageTag,
+                name: name,
+                image_tag: imageTag,
             });
         },
         onSuccess: () => {
