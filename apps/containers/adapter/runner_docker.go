@@ -411,17 +411,6 @@ func (a runnerDockerAdapter) buildImageFromName(ctx context.Context, imageName s
 	return res, nil
 }
 
-func (a runnerDockerAdapter) buildImageFromDockerfile(ctx context.Context, containerPath string, imageName string) (io.ReadCloser, error) {
-	options := types.BuildImageOptions{
-		Dir:        containerPath,
-		Name:       imageName,
-		Dockerfile: "Dockerfile",
-	}
-
-	cli := containersapi.NewContainersKernelClient(ctx)
-	return cli.BuildImage(context.Background(), options)
-}
-
 func (a runnerDockerAdapter) createContainer(ctx context.Context, options types.CreateContainerOptions) (string, error) {
 	cli := containersapi.NewContainersKernelClient(ctx)
 	res, err := cli.CreateContainer(context.Background(), options)
@@ -455,11 +444,6 @@ func (a runnerDockerAdapter) readLogs(ctx context.Context, id string) (stdout io
 func (a runnerDockerAdapter) getVolumePath(ctx context.Context, id types.ContainerID) string {
 	appPath := a.getAppPath(ctx, "live_docker")
 	return path.Join(appPath, "volumes", id.String())
-}
-
-func (a runnerDockerAdapter) getContainerPath(ctx context.Context, id types.ContainerID) string {
-	appPath := a.getAppPath(ctx, "live")
-	return path.Join(appPath, "containers", id.String())
 }
 
 func (a runnerDockerAdapter) getAppPath(ctx context.Context, base string) string {
