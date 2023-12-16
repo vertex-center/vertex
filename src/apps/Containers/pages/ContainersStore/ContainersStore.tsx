@@ -31,7 +31,7 @@ export default function ContainersStore() {
 
     const queryContainers = useQuery({
         queryKey: ["containers"],
-        queryFn: API.getAllContainers,
+        queryFn: API.getContainers,
     });
     const {
         data: containers,

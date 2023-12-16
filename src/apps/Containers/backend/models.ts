@@ -1,4 +1,4 @@
-export type ContainerQuery = {
+export type ContainerFilters = {
     features?: string[];
     tags?: string[];
 };

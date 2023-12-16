@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { api } from "../../../backend/api/backend";
-import { Container as ContainerModel } from "../../../models/container";
+import { Container as ContainerModel } from "../../../apps/Containers/backend/models";
 import Container, { Containers } from "../../../components/Container/Container";
 import { v4 as uuidv4 } from "uuid";
 import { useServerEvent } from "../../../hooks/useEvent";

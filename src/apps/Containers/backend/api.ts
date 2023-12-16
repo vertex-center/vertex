@@ -1,7 +1,7 @@
 import { createServer } from "../../../backend/server";
 import {
     Container,
-    ContainerQuery,
+    ContainerFilters,
     Containers,
     EnvVariables,
     Tags,
@@ -12,20 +12,15 @@ import { Service } from "./service";
 // @ts-ignore
 const server = createServer(window.api_urls.containers);
 
-const getAllContainers = async () => {
-    const { data } = await server.get<Containers>(`/containers`);
+const getContainers = async (query?: ContainerFilters) => {
+    const { data } = await server.get<Containers>(`/containers`, {
+        params: query,
+    });
     return data;
 };
 
 const getAllTags = async () => {
     const { data } = await server.get<Tags>(`/tags`);
-    return data;
-};
-
-const searchContainers = async (query: ContainerQuery) => {
-    const { data } = await server.get<Containers>(`/containers/search`, {
-        params: query,
-    });
     return data;
 };
 
@@ -100,9 +95,8 @@ const getVersions = async (id: string, cache?: boolean) => {
 
 export const API = {
     getContainer,
-    getAllContainers,
+    getContainers,
     getAllTags,
-    searchContainers,
     deleteContainer,
     startContainer,
     stopContainer,

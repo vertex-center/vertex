@@ -72,7 +72,7 @@ function Database(props: Readonly<DatabaseProps>) {
                     <ContainerSelect
                         onChange={onDatabaseChange}
                         container={database}
-                        query={{
+                        filters={{
                             features: dbDefinition?.types,
                         }}
                     />

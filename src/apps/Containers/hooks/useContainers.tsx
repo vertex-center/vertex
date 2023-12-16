@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { API } from "../backend/api";
-import { ContainerQuery } from "../backend/models";
+import { ContainerFilters } from "../backend/models";
 
 export function useContainersTags() {
     const queryTags = useQuery({
@@ -11,10 +11,10 @@ export function useContainersTags() {
     return { tags, ...queryTags };
 }
 
-export function useContainers(query: ContainerQuery) {
+export function useContainers(query: ContainerFilters) {
     const queryContainers = useQuery({
         queryKey: ["containers", query],
-        queryFn: () => API.searchContainers(query),
+        queryFn: () => API.getContainers(query),
     });
     const { data: containers } = queryContainers;
     return { containers, ...queryContainers };
