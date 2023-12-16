@@ -174,12 +174,7 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	containers.GET("", []fizz.OperationOption{
 		fizz.ID("getContainers"),
 		fizz.Summary("Get containers"),
-	}, containersHandler.Get())
-
-	containers.GET("/search", []fizz.OperationOption{
-		fizz.ID("searchContainers"),
-		fizz.Summary("Search containers"),
-	}, containersHandler.Search())
+	}, containersHandler.GetContainers())
 
 	containers.GET("/checkupdates", []fizz.OperationOption{
 		fizz.ID("checkForUpdates"),

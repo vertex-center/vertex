@@ -25,27 +25,21 @@ func NewContainersHandler(ctx *apptypes.Context, containerService port.Container
 	}
 }
 
-func (h *containersHandler) Get() gin.HandlerFunc {
+func (h *containersHandler) GetContainers() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context) (types.Containers, error) {
-		return h.containerService.GetContainers(c)
-	})
-}
-
-func (h *containersHandler) Search() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (types.Containers, error) {
-		query := types.ContainerSearchQuery{}
+		filters := types.ContainerFilters{}
 
 		features := c.QueryArray("features[]")
 		if len(features) > 0 {
-			query.Features = &features
+			filters.Features = &features
 		}
 
 		tags := c.QueryArray("tags[]")
 		if len(tags) > 0 {
-			query.Tags = &tags
+			filters.Tags = &tags
 		}
 
-		return h.containerService.Search(c, query)
+		return h.containerService.GetContainersWithFilters(c, filters)
 	})
 }
 

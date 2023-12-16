@@ -12,6 +12,7 @@ type (
 	ContainerAdapter interface {
 		GetContainer(ctx context.Context, id types.ContainerID) (*types.Container, error)
 		GetContainers(ctx context.Context) (types.Containers, error)
+		GetContainersWithFilters(ctx context.Context, filters types.ContainerFilters) (types.Containers, error)
 		CreateContainer(ctx context.Context, container types.Container) error
 		UpdateContainer(ctx context.Context, container types.Container) error
 		DeleteContainer(ctx context.Context, id types.ContainerID) error

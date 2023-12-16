@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strings"
 
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
@@ -31,10 +32,21 @@ func (a *containerDBAdapter) GetContainer(ctx context.Context, id types.Containe
 }
 
 func (a *containerDBAdapter) GetContainers(ctx context.Context) (types.Containers, error) {
+	return a.GetContainersWithFilters(ctx, types.ContainerFilters{})
+}
+
+func (a *containerDBAdapter) GetContainersWithFilters(ctx context.Context, filters types.ContainerFilters) (types.Containers, error) {
 	var containers types.Containers
-	err := a.db.Select(&containers, `
-		SELECT * FROM containers
-	`)
+	query := `SELECT containers.* FROM containers`
+	var args []interface{}
+	if filters.Tags != nil {
+		query += ` INNER JOIN container_tags ct on containers.id = ct.container_id`
+		query += ` INNER JOIN tags t on ct.tag_id = t.id`
+		query += ` WHERE t.name IN (?)`
+		tags := strings.Join(*filters.Tags, ", ")
+		args = append(args, tags)
+	}
+	err := a.db.Select(&containers, query, args...)
 	if errors.Is(err, sql.ErrNoRows) {
 		return containers, nil
 	}
@@ -79,7 +91,7 @@ func (a *containerDBAdapter) DeleteContainer(ctx context.Context, id types.Conta
 func (a *containerDBAdapter) GetContainerTags(ctx context.Context, id types.ContainerID) (types.Tags, error) {
 	var tags types.Tags
 	err := a.db.Select(&tags, `
-		SELECT tags.id, tags.tag FROM tags
+		SELECT tags.* FROM tags
 		INNER JOIN container_tags ct on tags.id = ct.tag_id
 		WHERE ct.container_id = $1
 	`, id)

@@ -13,7 +13,7 @@ type (
 	ContainerService interface {
 		Get(ctx context.Context, id types.ContainerID) (*types.Container, error)
 		GetContainers(ctx context.Context) (types.Containers, error)
-		Search(ctx context.Context, query types.ContainerSearchQuery) (types.Containers, error)
+		GetContainersWithFilters(ctx context.Context, filters types.ContainerFilters) (types.Containers, error)
 		Delete(ctx context.Context, id types.ContainerID) error
 		UpdateContainer(ctx context.Context, id types.ContainerID, c types.Container) error
 		Start(ctx context.Context, id types.ContainerID) error

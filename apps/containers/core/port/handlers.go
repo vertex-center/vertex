@@ -23,8 +23,7 @@ type (
 	}
 
 	ContainersHandler interface {
-		Get() gin.HandlerFunc
-		Search() gin.HandlerFunc
+		GetContainers() gin.HandlerFunc
 		CheckForUpdates() gin.HandlerFunc
 		Events() gin.HandlerFunc
 	}

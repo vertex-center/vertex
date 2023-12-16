@@ -41,7 +41,7 @@ type (
 		Update    *ContainerUpdate       `json:"update,omitempty"`
 	}
 
-	ContainerSearchQuery struct {
+	ContainerFilters struct {
 		Tags     *[]string `json:"tags,omitempty"`
 		Features *[]string `json:"features,omitempty"`
 	}

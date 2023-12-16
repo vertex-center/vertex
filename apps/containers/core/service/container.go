@@ -84,30 +84,8 @@ func (s *containerService) GetContainers(ctx context.Context) (types.Containers,
 	return s.containers.GetContainers(ctx)
 }
 
-// Search returns all containers that match the query.
-func (s *containerService) Search(ctx context.Context, query types.ContainerSearchQuery) (types.Containers, error) {
-	var containers types.Containers
-
-	all, err := s.containers.GetContainers(ctx)
-	if err != nil {
-		return containers, err
-	}
-
-	for _, c := range all {
-		//if query.Features != nil {
-		//	if !c.HasFeatureIn(*query.Features) {
-		//		continue
-		//	}
-		//}
-		//if query.Tags != nil {
-		//	if !c.HasTagIn(*query.Tags) {
-		//		continue
-		//	}
-		//}
-		containers = append(containers, c)
-	}
-
-	return containers, nil
+func (s *containerService) GetContainersWithFilters(ctx context.Context, filters types.ContainerFilters) (types.Containers, error) {
+	return s.containers.GetContainersWithFilters(ctx, filters)
 }
 
 func (s *containerService) Delete(ctx context.Context, id types.ContainerID) error {

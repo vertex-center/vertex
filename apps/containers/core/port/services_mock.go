@@ -30,8 +30,8 @@ func (m *MockContainerService) GetContainers(ctx context.Context) (types.Contain
 	return args.Get(0).(types.Containers), args.Error(1)
 }
 
-func (m *MockContainerService) Search(ctx context.Context, query types.ContainerSearchQuery) (types.Containers, error) {
-	args := m.Called(ctx, query)
+func (m *MockContainerService) GetContainersWithFilters(ctx context.Context, filters types.ContainerFilters) (types.Containers, error) {
+	args := m.Called(ctx, filters)
 	return args.Get(0).(types.Containers), args.Error(1)
 }
 
