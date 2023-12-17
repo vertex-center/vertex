@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/common/uuid"
 
 	"github.com/stretchr/testify/suite"
 )
@@ -24,7 +25,7 @@ func (suite *ContainerLoggerTestSuite) SetupTest() {
 	suite.Require().NoError(err)
 
 	suite.logger = &ContainerLogger{
-		uuid:   containerstypes.NewContainerID(),
+		uuid:   uuid.New(),
 		buffer: []containerstypes.LogLine{},
 		dir:    dir,
 	}
@@ -98,7 +99,7 @@ func (suite *ContainerLogsFSAdapterTestSuite) TearDownTest() {
 }
 
 func (suite *ContainerLogsFSAdapterTestSuite) TestRegisterUnregister() {
-	instID := containerstypes.NewContainerID()
+	instID := uuid.New()
 
 	// Register
 	err := suite.adapter.Register(instID)
@@ -126,8 +127,8 @@ func (suite *ContainerLogsFSAdapterTestSuite) TestRegisterUnregister() {
 }
 
 func (suite *ContainerLogsFSAdapterTestSuite) TestUnregisterAll() {
-	instID1 := containerstypes.NewContainerID()
-	instID2 := containerstypes.NewContainerID()
+	instID1 := uuid.New()
+	instID2 := uuid.New()
 
 	// Register
 	err := suite.adapter.Register(instID1)
@@ -147,7 +148,7 @@ func (suite *ContainerLogsFSAdapterTestSuite) TestUnregisterAll() {
 }
 
 func (suite *ContainerLogsFSAdapterTestSuite) TestPush() {
-	instID := containerstypes.NewContainerID()
+	instID := uuid.New()
 
 	// Register
 	err := suite.adapter.Register(instID)
@@ -174,7 +175,7 @@ func (suite *ContainerLogsFSAdapterTestSuite) TestPush() {
 }
 
 func (suite *ContainerLogsFSAdapterTestSuite) TestPop() {
-	instID := containerstypes.NewContainerID()
+	instID := uuid.New()
 
 	// Register
 	err := suite.adapter.Register(instID)

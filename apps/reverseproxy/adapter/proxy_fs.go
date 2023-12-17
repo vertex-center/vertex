@@ -8,11 +8,11 @@ import (
 	"path"
 	"sync"
 
-	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/types"
 	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/common/storage"
+	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vlog"
 )
 

@@ -20,6 +20,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common/log"
+	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vertex/pkg/vdocker"
 	"github.com/vertex-center/vlog"
 )
@@ -441,7 +442,7 @@ func (a runnerDockerAdapter) readLogs(ctx context.Context, id string) (stdout io
 	return stdout, stderr, nil
 }
 
-func (a runnerDockerAdapter) getVolumePath(ctx context.Context, id types.ContainerID) string {
+func (a runnerDockerAdapter) getVolumePath(ctx context.Context, id uuid.UUID) string {
 	appPath := a.getAppPath(ctx, "live_docker")
 	return path.Join(appPath, "volumes", id.String())
 }

@@ -3,8 +3,8 @@ package event
 import (
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type TempListenerTestSuite struct {

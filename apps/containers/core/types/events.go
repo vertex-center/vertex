@@ -1,5 +1,7 @@
 package types
 
+import "github.com/vertex-center/vertex/common/uuid"
+
 const (
 	EventNameContainersChange      = "change"
 	EventNameContainerStatusChange = "status_change"
@@ -10,13 +12,13 @@ const (
 
 type (
 	EventContainerLog struct {
-		ContainerID ContainerID
+		ContainerID uuid.UUID
 		Kind        string
 		Message     LogLineMessage
 	}
 
 	EventContainerStatusChange struct {
-		ContainerID ContainerID
+		ContainerID uuid.UUID
 		ServiceID   string
 		Container   Container
 		Name        string
@@ -24,7 +26,7 @@ type (
 	}
 
 	EventContainerDeleted struct {
-		ContainerID ContainerID
+		ContainerID uuid.UUID
 		ServiceID   string
 	}
 

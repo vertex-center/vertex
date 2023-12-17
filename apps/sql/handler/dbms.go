@@ -7,6 +7,7 @@ import (
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/sql/core/port"
 	"github.com/vertex-center/vertex/apps/sql/core/types"
+	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
@@ -21,7 +22,7 @@ func NewDBMSHandler(sqlService port.SqlService) port.DBMSHandler {
 }
 
 type GetParams struct {
-	UUID containerstypes.ContainerID `path:"container_uuid"`
+	UUID uuid.UUID `path:"container_uuid"`
 }
 
 func (h *dbmsHandler) Get() gin.HandlerFunc {

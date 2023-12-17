@@ -11,6 +11,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	apptypes "github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/log"
+	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vertex/pkg/event"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vlog"
@@ -29,7 +30,7 @@ func NewContainerHandler(ctx *apptypes.Context, containerService port.ContainerS
 }
 
 type GetContainerParams struct {
-	ContainerID types.ContainerID `path:"container_id"`
+	ContainerID uuid.UUID `path:"container_id"`
 }
 
 func (h *containerHandler) Get() gin.HandlerFunc {
@@ -39,7 +40,7 @@ func (h *containerHandler) Get() gin.HandlerFunc {
 }
 
 type DeleteContainerParams struct {
-	ContainerID types.ContainerID `path:"container_id"`
+	ContainerID uuid.UUID `path:"container_id"`
 }
 
 func (h *containerHandler) Delete() gin.HandlerFunc {
@@ -49,15 +50,15 @@ func (h *containerHandler) Delete() gin.HandlerFunc {
 }
 
 type PatchBodyDatabase struct {
-	ContainerID  types.ContainerID `json:"container_id"`
-	DatabaseName *string           `json:"db_name"`
+	ContainerID  uuid.UUID `json:"container_id"`
+	DatabaseName *string   `json:"db_name"`
 }
 
 type PatchContainerParams struct {
-	ContainerID     types.ContainerID `path:"container_id"`
-	LaunchOnStartup *bool             `json:"launch_on_startup,omitempty"`
-	Name            *string           `json:"name,omitempty"`
-	ImageTag        *string           `json:"image_tag,omitempty"`
+	ContainerID     uuid.UUID `path:"container_id"`
+	LaunchOnStartup *bool     `json:"launch_on_startup,omitempty"`
+	Name            *string   `json:"name,omitempty"`
+	ImageTag        *string   `json:"image_tag,omitempty"`
 }
 
 func (h *containerHandler) Patch() gin.HandlerFunc {
@@ -82,7 +83,7 @@ func (h *containerHandler) Patch() gin.HandlerFunc {
 }
 
 type StartContainerParams struct {
-	ContainerID types.ContainerID `path:"container_id"`
+	ContainerID uuid.UUID `path:"container_id"`
 }
 
 func (h *containerHandler) Start() gin.HandlerFunc {
@@ -92,7 +93,7 @@ func (h *containerHandler) Start() gin.HandlerFunc {
 }
 
 type StopContainerParams struct {
-	ContainerID types.ContainerID `path:"container_id"`
+	ContainerID uuid.UUID `path:"container_id"`
 }
 
 func (h *containerHandler) Stop() gin.HandlerFunc {
@@ -102,8 +103,8 @@ func (h *containerHandler) Stop() gin.HandlerFunc {
 }
 
 type AddTagParams struct {
-	ContainerID types.ContainerID `path:"container_id"`
-	TagID       types.TagID       `path:"tag_id"`
+	ContainerID uuid.UUID   `path:"container_id"`
+	TagID       types.TagID `path:"tag_id"`
 }
 
 func (h *containerHandler) AddContainerTag() gin.HandlerFunc {
@@ -113,7 +114,7 @@ func (h *containerHandler) AddContainerTag() gin.HandlerFunc {
 }
 
 type GetContainerEnvParams struct {
-	ContainerID types.ContainerID `path:"container_id"`
+	ContainerID uuid.UUID `path:"container_id"`
 }
 
 func (h *containerHandler) GetContainerEnv() gin.HandlerFunc {
@@ -123,7 +124,7 @@ func (h *containerHandler) GetContainerEnv() gin.HandlerFunc {
 }
 
 type PatchEnvironmentParams struct {
-	ContainerID types.ContainerID  `path:"container_id"`
+	ContainerID uuid.UUID          `path:"container_id"`
 	Env         types.EnvVariables `body:"env"`
 }
 
@@ -134,7 +135,7 @@ func (h *containerHandler) PatchEnvironment() gin.HandlerFunc {
 }
 
 type EventsContainerParams struct {
-	ContainerID types.ContainerID `path:"container_id"`
+	ContainerID uuid.UUID `path:"container_id"`
 }
 
 func (h *containerHandler) Events() gin.HandlerFunc {
@@ -228,7 +229,7 @@ func (h *containerHandler) GetDocker() gin.HandlerFunc {
 }
 
 type RecreateContainerParams struct {
-	ContainerID types.ContainerID `path:"container_id"`
+	ContainerID uuid.UUID `path:"container_id"`
 }
 
 func (h *containerHandler) RecreateDocker() gin.HandlerFunc {
@@ -238,7 +239,7 @@ func (h *containerHandler) RecreateDocker() gin.HandlerFunc {
 }
 
 type LogsContainerParams struct {
-	ContainerID types.ContainerID `path:"container_id"`
+	ContainerID uuid.UUID `path:"container_id"`
 }
 
 func (h *containerHandler) GetLogs() gin.HandlerFunc {
@@ -248,8 +249,8 @@ func (h *containerHandler) GetLogs() gin.HandlerFunc {
 }
 
 type GetVersionsParams struct {
-	ContainerID types.ContainerID `path:"container_id"`
-	UseCache    bool              `query:"cache"`
+	ContainerID uuid.UUID `path:"container_id"`
+	UseCache    bool      `query:"cache"`
 }
 
 func (h *containerHandler) GetVersions() gin.HandlerFunc {
@@ -260,7 +261,7 @@ func (h *containerHandler) GetVersions() gin.HandlerFunc {
 }
 
 type WaitStatusParams struct {
-	ContainerID types.ContainerID `path:"container_id"`
+	ContainerID uuid.UUID `path:"container_id"`
 }
 
 func (h *containerHandler) WaitStatus() gin.HandlerFunc {

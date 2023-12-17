@@ -3,11 +3,11 @@ package service
 import (
 	"context"
 
-	"github.com/google/uuid"
 	"github.com/juju/errors"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	ev "github.com/vertex-center/vertex/common/event"
 	"github.com/vertex-center/vertex/common/log"
+	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vertex/pkg/event"
 )
 

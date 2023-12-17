@@ -3,12 +3,12 @@ package service
 import (
 	"context"
 
-	"github.com/google/uuid"
 	"github.com/juju/errors"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type metricsService struct {

@@ -9,13 +9,13 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/google/uuid"
 	"github.com/juju/errors"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/common/storage"
+	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/event"
 	vstorage "github.com/vertex-center/vertex/pkg/storage"
@@ -76,7 +76,7 @@ func NewContainerService(ctx *app.Context,
 	return s
 }
 
-func (s *containerService) Get(ctx context.Context, id types.ContainerID) (*types.Container, error) {
+func (s *containerService) Get(ctx context.Context, id uuid.UUID) (*types.Container, error) {
 	return s.containers.GetContainer(ctx, id)
 }
 
@@ -88,7 +88,7 @@ func (s *containerService) GetContainersWithFilters(ctx context.Context, filters
 	return s.containers.GetContainersWithFilters(ctx, filters)
 }
 
-func (s *containerService) Delete(ctx context.Context, id types.ContainerID) error {
+func (s *containerService) Delete(ctx context.Context, id uuid.UUID) error {
 	c, err := s.containers.GetContainer(ctx, id)
 	if err != nil {
 		return err
@@ -108,7 +108,7 @@ func (s *containerService) Delete(ctx context.Context, id types.ContainerID) err
 		return err
 	}
 
-	deletes := []func(context.Context, types.ContainerID) error{
+	deletes := []func(context.Context, uuid.UUID) error{
 		s.caps.DeleteCaps,
 		s.ports.DeletePorts,
 		s.volumes.DeleteVolumes,
@@ -138,12 +138,12 @@ func (s *containerService) Delete(ctx context.Context, id types.ContainerID) err
 	return nil
 }
 
-func (s *containerService) UpdateContainer(ctx context.Context, id types.ContainerID, c types.Container) error {
+func (s *containerService) UpdateContainer(ctx context.Context, id uuid.UUID, c types.Container) error {
 	c.ID = id
 	return s.containers.UpdateContainer(ctx, c)
 }
 
-func (s *containerService) Start(ctx context.Context, id types.ContainerID) error {
+func (s *containerService) Start(ctx context.Context, id uuid.UUID) error {
 	c, err := s.containers.GetContainer(ctx, id)
 	if err != nil {
 		return err
@@ -275,7 +275,7 @@ func (s *containerService) Start(ctx context.Context, id types.ContainerID) erro
 }
 
 func (s *containerService) StartAll(ctx context.Context) error {
-	var ids []types.ContainerID
+	var ids []uuid.UUID
 
 	// TODO: Retrieve only the containers where LaunchOnStartup is true in the DB.
 
@@ -293,7 +293,7 @@ func (s *containerService) StartAll(ctx context.Context) error {
 
 	// Start them
 	for _, id := range ids {
-		go func(id types.ContainerID) {
+		go func(id uuid.UUID) {
 			err = s.Start(ctx, id)
 			if err != nil {
 				log.Warn("failed to auto-start the container",
@@ -307,7 +307,7 @@ func (s *containerService) StartAll(ctx context.Context) error {
 	return nil
 }
 
-func (s *containerService) Stop(ctx context.Context, id types.ContainerID) error {
+func (s *containerService) Stop(ctx context.Context, id uuid.UUID) error {
 	c, err := s.containers.GetContainer(ctx, id)
 	if err != nil {
 		return err
@@ -367,11 +367,11 @@ func (s *containerService) StopAll(ctx context.Context) error {
 	return nil
 }
 
-func (s *containerService) AddContainerTag(ctx context.Context, id types.ContainerID, tagID types.TagID) error {
+func (s *containerService) AddContainerTag(ctx context.Context, id uuid.UUID, tagID types.TagID) error {
 	return s.containers.AddTag(ctx, id, tagID)
 }
 
-func (s *containerService) RecreateContainer(ctx context.Context, id types.ContainerID) error {
+func (s *containerService) RecreateContainer(ctx context.Context, id uuid.UUID) error {
 	c, err := s.containers.GetContainer(ctx, id)
 	if err != nil {
 		return err
@@ -411,7 +411,7 @@ func (s *containerService) DeleteAll(ctx context.Context) error {
 }
 
 func (s *containerService) Install(ctx context.Context, serviceID string) (*types.Container, error) {
-	id := types.NewContainerID()
+	id := uuid.New()
 
 	service, err := s.services.Get(serviceID)
 	if err != nil {
@@ -543,7 +543,7 @@ func (s *containerService) CheckForUpdates(ctx context.Context) (types.Container
 	return all, nil
 }
 
-func (s *containerService) SetDatabases(ctx context.Context, c *types.Container, databases map[string]types.ContainerID, options map[string]*types.SetDatabasesOptions) error {
+func (s *containerService) SetDatabases(ctx context.Context, c *types.Container, databases map[string]uuid.UUID, options map[string]*types.SetDatabasesOptions) error {
 	service, err := s.services.Get(c.ServiceID)
 	if err != nil {
 		return err
@@ -560,7 +560,7 @@ func (s *containerService) SetDatabases(ctx context.Context, c *types.Container,
 	return s.remapDatabaseEnv(ctx, c, options)
 }
 
-func (s *containerService) GetContainerEnv(ctx context.Context, id types.ContainerID) (types.EnvVariables, error) {
+func (s *containerService) GetContainerEnv(ctx context.Context, id uuid.UUID) (types.EnvVariables, error) {
 	return s.vars.GetVariables(ctx, id)
 }
 
@@ -639,7 +639,7 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 
 // SaveEnv saves the environment variables of a container
 // and applies them by recreating the container.
-func (s *containerService) SaveEnv(ctx context.Context, id types.ContainerID, env types.EnvVariables) error {
+func (s *containerService) SaveEnv(ctx context.Context, id uuid.UUID, env types.EnvVariables) error {
 	for _, e := range env {
 		err := s.vars.UpdateVariable(ctx, id, e.Name, e.Value)
 		if err != nil {
@@ -649,7 +649,7 @@ func (s *containerService) SaveEnv(ctx context.Context, id types.ContainerID, en
 	return s.RecreateContainer(ctx, id)
 }
 
-func (s *containerService) GetAllVersions(ctx context.Context, id types.ContainerID, useCache bool) ([]string, error) {
+func (s *containerService) GetAllVersions(ctx context.Context, id uuid.UUID, useCache bool) ([]string, error) {
 	c, err := s.containers.GetContainer(ctx, id)
 	if err != nil {
 		return nil, err
@@ -671,7 +671,7 @@ func (s *containerService) GetAllVersions(ctx context.Context, id types.Containe
 	return s.cacheImageTags[c.Image], nil
 }
 
-func (s *containerService) GetContainerInfo(ctx context.Context, id types.ContainerID) (map[string]any, error) {
+func (s *containerService) GetContainerInfo(ctx context.Context, id uuid.UUID) (map[string]any, error) {
 	c, err := s.containers.GetContainer(ctx, id)
 	if err != nil {
 		return nil, err
@@ -679,7 +679,7 @@ func (s *containerService) GetContainerInfo(ctx context.Context, id types.Contai
 	return s.runner.Info(ctx, *c)
 }
 
-func (s *containerService) WaitStatus(ctx context.Context, id types.ContainerID, status string) error {
+func (s *containerService) WaitStatus(ctx context.Context, id uuid.UUID, status string) error {
 	statusChan := make(chan string)
 	defer close(statusChan)
 
@@ -715,7 +715,7 @@ func (s *containerService) WaitStatus(ctx context.Context, id types.ContainerID,
 	return errors.Timeoutf("wait status")
 }
 
-func (s *containerService) GetLatestLogs(id types.ContainerID) ([]types.LogLine, error) {
+func (s *containerService) GetLatestLogs(id uuid.UUID) ([]types.LogLine, error) {
 	return s.logs.LoadBuffer(id)
 }
 

@@ -1,8 +1,8 @@
 package event
 
 import (
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type MockListener struct{ mock.Mock }

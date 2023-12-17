@@ -4,7 +4,7 @@ import (
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/types"
 
-	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type proxyService struct {

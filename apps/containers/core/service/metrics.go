@@ -3,11 +3,11 @@ package service
 import (
 	"math"
 
-	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types/metric"
 	apptypes "github.com/vertex-center/vertex/common/app"
+	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vertex/pkg/event"
 )
 
@@ -59,7 +59,7 @@ func (s *metricsService) OnEvent(e event.Event) error {
 	return nil
 }
 
-func (s *metricsService) updateStatus(uuid types.ContainerID, serviceId string, status string) {
+func (s *metricsService) updateStatus(uuid uuid.UUID, serviceId string, status string) {
 	switch status {
 	case types.ContainerStatusRunning:
 		s.metricsRegistry.Set(MetricIDContainerStatus, metric.StatusOn, uuid.String(), serviceId)

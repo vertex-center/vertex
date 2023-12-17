@@ -3,8 +3,8 @@ package containersapi
 import (
 	"context"
 
-	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
 func (c *Client) GetContainers(ctx context.Context) (map[uuid.UUID]*types.Container, error) {

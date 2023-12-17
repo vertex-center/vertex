@@ -13,6 +13,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/common/storage"
+	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vlog"
 )
 
@@ -23,7 +24,7 @@ var (
 )
 
 type ContainerLogger struct {
-	uuid        types.ContainerID
+	uuid        uuid.UUID
 	file        *os.File
 	buffer      []types.LogLine
 	currentLine int
@@ -32,7 +33,7 @@ type ContainerLogger struct {
 }
 
 type logsFSAdapter struct {
-	loggers   map[types.ContainerID]*ContainerLogger
+	loggers   map[uuid.UUID]*ContainerLogger
 	loggersMu sync.RWMutex
 
 	containersPath string
@@ -52,14 +53,14 @@ func NewLogsFSAdapter(params *LogsFSAdapterParams) port.LogsAdapter {
 	}
 
 	return &logsFSAdapter{
-		loggers:   map[types.ContainerID]*ContainerLogger{},
+		loggers:   map[uuid.UUID]*ContainerLogger{},
 		loggersMu: sync.RWMutex{},
 
 		containersPath: params.ContainersPath,
 	}
 }
 
-func (a *logsFSAdapter) Register(uuid types.ContainerID) error {
+func (a *logsFSAdapter) Register(uuid uuid.UUID) error {
 	dir := a.dir(uuid)
 
 	err := os.MkdirAll(dir, os.ModePerm)
@@ -85,7 +86,7 @@ func (a *logsFSAdapter) Register(uuid types.ContainerID) error {
 	return l.startCron()
 }
 
-func (a *logsFSAdapter) Unregister(uuid types.ContainerID) error {
+func (a *logsFSAdapter) Unregister(uuid uuid.UUID) error {
 	l, err := a.getLogger(uuid)
 	if err != nil {
 		return err
@@ -107,7 +108,7 @@ func (a *logsFSAdapter) Unregister(uuid types.ContainerID) error {
 	return nil
 }
 
-func (a *logsFSAdapter) Push(uuid types.ContainerID, line types.LogLine) {
+func (a *logsFSAdapter) Push(uuid uuid.UUID, line types.LogLine) {
 	l, err := a.getLogger(uuid)
 	if err != nil {
 		log.Error(err)
@@ -125,7 +126,7 @@ func (a *logsFSAdapter) Push(uuid types.ContainerID, line types.LogLine) {
 	}
 }
 
-func (a *logsFSAdapter) Pop(uuid types.ContainerID) (types.LogLine, error) {
+func (a *logsFSAdapter) Pop(uuid uuid.UUID) (types.LogLine, error) {
 	l, err := a.getLogger(uuid)
 	if err != nil {
 		return types.LogLine{}, err
@@ -138,7 +139,7 @@ func (a *logsFSAdapter) Pop(uuid types.ContainerID) (types.LogLine, error) {
 	return line, nil
 }
 
-func (a *logsFSAdapter) LoadBuffer(uuid types.ContainerID) ([]types.LogLine, error) {
+func (a *logsFSAdapter) LoadBuffer(uuid uuid.UUID) ([]types.LogLine, error) {
 	l, err := a.getLogger(uuid)
 	if err != nil {
 		return nil, err
@@ -147,7 +148,7 @@ func (a *logsFSAdapter) LoadBuffer(uuid types.ContainerID) ([]types.LogLine, err
 }
 
 func (a *logsFSAdapter) UnregisterAll() error {
-	var ids []types.ContainerID
+	var ids []uuid.UUID
 
 	a.loggersMu.RLock()
 	for id := range a.loggers {
@@ -166,12 +167,12 @@ func (a *logsFSAdapter) UnregisterAll() error {
 	return nil
 }
 
-func (a *logsFSAdapter) Exists(uuid types.ContainerID) bool {
+func (a *logsFSAdapter) Exists(uuid uuid.UUID) bool {
 	_, err := a.getLogger(uuid)
 	return err == nil
 }
 
-func (a *logsFSAdapter) getLogger(uuid types.ContainerID) (*ContainerLogger, error) {
+func (a *logsFSAdapter) getLogger(uuid uuid.UUID) (*ContainerLogger, error) {
 	a.loggersMu.RLock()
 	defer a.loggersMu.RUnlock()
 
@@ -182,7 +183,7 @@ func (a *logsFSAdapter) getLogger(uuid types.ContainerID) (*ContainerLogger, err
 	return l, nil
 }
 
-func (a *logsFSAdapter) dir(uuid types.ContainerID) string {
+func (a *logsFSAdapter) dir(uuid uuid.UUID) string {
 	return path.Join(a.containersPath, uuid.String(), ".vertex", "logs")
 }
 

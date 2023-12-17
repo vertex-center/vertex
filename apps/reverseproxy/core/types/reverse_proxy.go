@@ -1,6 +1,6 @@
 package types
 
-import "github.com/google/uuid"
+import "github.com/vertex-center/vertex/common/uuid"
 
 type ProxyRedirects map[uuid.UUID]ProxyRedirect
 

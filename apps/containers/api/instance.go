@@ -5,9 +5,10 @@ import (
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
-func (c *Client) GetContainer(ctx context.Context, id types.ContainerID) (*types.Container, error) {
+func (c *Client) GetContainer(ctx context.Context, id uuid.UUID) (*types.Container, error) {
 	var inst types.Container
 	err := c.Request().
 		Pathf("./container/%s", id).
@@ -16,14 +17,14 @@ func (c *Client) GetContainer(ctx context.Context, id types.ContainerID) (*types
 	return &inst, err
 }
 
-func (c *Client) DeleteContainer(ctx context.Context, id types.ContainerID) error {
+func (c *Client) DeleteContainer(ctx context.Context, id uuid.UUID) error {
 	return c.Request().
 		Pathf("./container/%s", id).
 		Delete().
 		Fetch(ctx)
 }
 
-func (c *Client) PatchContainer(ctx context.Context, id types.ContainerID, settings interface{}) error {
+func (c *Client) PatchContainer(ctx context.Context, id uuid.UUID, settings interface{}) error {
 	return c.Request().
 		Pathf("./container/%s", id).
 		Patch().
@@ -31,28 +32,28 @@ func (c *Client) PatchContainer(ctx context.Context, id types.ContainerID, setti
 		Fetch(ctx)
 }
 
-func (c *Client) StartContainer(ctx context.Context, id types.ContainerID) error {
+func (c *Client) StartContainer(ctx context.Context, id uuid.UUID) error {
 	return c.Request().
 		Pathf("./container/%s/start", id).
 		Post().
 		Fetch(ctx)
 }
 
-func (c *Client) StopContainer(ctx context.Context, id types.ContainerID) error {
+func (c *Client) StopContainer(ctx context.Context, id uuid.UUID) error {
 	return c.Request().
 		Pathf("./container/%s/stop", id).
 		Post().
 		Fetch(ctx)
 }
 
-func (c *Client) AddContainerTag(ctx context.Context, id types.ContainerID, tagID types.TagID) error {
+func (c *Client) AddContainerTag(ctx context.Context, id uuid.UUID, tagID types.TagID) error {
 	return c.Request().
 		Pathf("./container/%s/tag/%s", id, tagID).
 		Post().
 		Fetch(ctx)
 }
 
-func (c *Client) PatchContainerEnvironment(ctx context.Context, id types.ContainerID, env types.EnvVariables) error {
+func (c *Client) PatchContainerEnvironment(ctx context.Context, id uuid.UUID, env types.EnvVariables) error {
 	return c.Request().
 		Pathf("./container/%s/environment", id).
 		Patch().
@@ -62,7 +63,7 @@ func (c *Client) PatchContainerEnvironment(ctx context.Context, id types.Contain
 		Fetch(ctx)
 }
 
-func (c *Client) GetDocker(ctx context.Context, id types.ContainerID) (map[string]any, error) {
+func (c *Client) GetDocker(ctx context.Context, id uuid.UUID) (map[string]any, error) {
 	var info map[string]any
 	err := c.Request().
 		Pathf("./container/%s/docker", id).
@@ -71,14 +72,14 @@ func (c *Client) GetDocker(ctx context.Context, id types.ContainerID) (map[strin
 	return info, err
 }
 
-func (c *Client) RecreateDocker(ctx context.Context, id types.ContainerID) error {
+func (c *Client) RecreateDocker(ctx context.Context, id uuid.UUID) error {
 	return c.Request().
 		Pathf("./container/%s/docker/recreate", id).
 		Post().
 		Fetch(ctx)
 }
 
-func (c *Client) GetContainerLogs(ctx context.Context, id types.ContainerID) (string, error) {
+func (c *Client) GetContainerLogs(ctx context.Context, id uuid.UUID) (string, error) {
 	var logs string
 	err := c.Request().
 		Pathf("./container/%s/logs", id).
@@ -87,14 +88,14 @@ func (c *Client) GetContainerLogs(ctx context.Context, id types.ContainerID) (st
 	return logs, err
 }
 
-func (c *Client) UpdateServiceContainer(ctx context.Context, id types.ContainerID) error {
+func (c *Client) UpdateServiceContainer(ctx context.Context, id uuid.UUID) error {
 	return c.Request().
 		Pathf("./container/%s/update/service", id).
 		Post().
 		Fetch(ctx)
 }
 
-func (c *Client) GetVersions(ctx context.Context, id types.ContainerID) ([]string, error) {
+func (c *Client) GetVersions(ctx context.Context, id uuid.UUID) ([]string, error) {
 	var versions []string
 	err := c.Request().
 		Pathf("./container/%s/versions", id).
@@ -103,7 +104,7 @@ func (c *Client) GetVersions(ctx context.Context, id types.ContainerID) ([]strin
 	return versions, err
 }
 
-func (c *Client) WaitCondition(ctx context.Context, id types.ContainerID, condition container.WaitCondition) error {
+func (c *Client) WaitCondition(ctx context.Context, id uuid.UUID, condition container.WaitCondition) error {
 	return c.Request().
 		Pathf("./container/%s/wait/%s", id, condition).
 		Fetch(ctx)

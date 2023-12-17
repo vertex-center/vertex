@@ -18,7 +18,7 @@ var (
 	_ TagsService      = &MockTagsService{}
 )
 
-func (m *MockContainerService) Get(ctx context.Context, id types.ContainerID) (*types.Container, error) {
+func (m *MockContainerService) Get(ctx context.Context, id uuid.UUID) (*types.Container, error) {
 	args := m.Called(ctx, id)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
@@ -36,22 +36,22 @@ func (m *MockContainerService) GetContainersWithFilters(ctx context.Context, fil
 	return args.Get(0).(types.Containers), args.Error(1)
 }
 
-func (m *MockContainerService) Delete(ctx context.Context, uuid types.ContainerID) error {
+func (m *MockContainerService) Delete(ctx context.Context, uuid uuid.UUID) error {
 	args := m.Called(ctx, uuid)
 	return args.Error(0)
 }
 
-func (m *MockContainerService) UpdateContainer(ctx context.Context, uuid types.ContainerID, c types.Container) error {
+func (m *MockContainerService) UpdateContainer(ctx context.Context, uuid uuid.UUID, c types.Container) error {
 	args := m.Called(ctx, uuid, c)
 	return args.Error(0)
 }
 
-func (m *MockContainerService) Start(ctx context.Context, uuid types.ContainerID) error {
+func (m *MockContainerService) Start(ctx context.Context, uuid uuid.UUID) error {
 	args := m.Called(ctx, uuid)
 	return args.Error(0)
 }
 
-func (m *MockContainerService) Stop(ctx context.Context, uuid types.ContainerID) error {
+func (m *MockContainerService) Stop(ctx context.Context, uuid uuid.UUID) error {
 	args := m.Called(ctx, uuid)
 	return args.Error(0)
 }
@@ -76,17 +76,17 @@ func (m *MockContainerService) DeleteAll(ctx context.Context) error {
 	return args.Error(0)
 }
 
-func (m *MockContainerService) AddContainerTag(ctx context.Context, id types.ContainerID, tagID types.TagID) error {
+func (m *MockContainerService) AddContainerTag(ctx context.Context, id uuid.UUID, tagID types.TagID) error {
 	args := m.Called(ctx, id, tagID)
 	return args.Error(0)
 }
 
-func (m *MockContainerService) GetContainerEnv(ctx context.Context, id types.ContainerID) (types.EnvVariables, error) {
+func (m *MockContainerService) GetContainerEnv(ctx context.Context, id uuid.UUID) (types.EnvVariables, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).(types.EnvVariables), args.Error(1)
 }
 
-func (m *MockContainerService) RecreateContainer(ctx context.Context, uuid types.ContainerID) error {
+func (m *MockContainerService) RecreateContainer(ctx context.Context, uuid uuid.UUID) error {
 	args := m.Called(ctx, uuid)
 	return args.Error(0)
 }
@@ -101,32 +101,32 @@ func (m *MockContainerService) CheckForUpdates(ctx context.Context) (types.Conta
 	return args.Get(0).(types.Containers), args.Error(1)
 }
 
-func (m *MockContainerService) SetDatabases(ctx context.Context, inst *types.Container, databases map[string]types.ContainerID, options map[string]*types.SetDatabasesOptions) error {
+func (m *MockContainerService) SetDatabases(ctx context.Context, inst *types.Container, databases map[string]uuid.UUID, options map[string]*types.SetDatabasesOptions) error {
 	args := m.Called(ctx, inst, databases, options)
 	return args.Error(0)
 }
 
-func (m *MockContainerService) SaveEnv(ctx context.Context, id types.ContainerID, env types.EnvVariables) error {
+func (m *MockContainerService) SaveEnv(ctx context.Context, id uuid.UUID, env types.EnvVariables) error {
 	args := m.Called(ctx, id, env)
 	return args.Error(0)
 }
 
-func (m *MockContainerService) GetAllVersions(ctx context.Context, id types.ContainerID, useCache bool) ([]string, error) {
+func (m *MockContainerService) GetAllVersions(ctx context.Context, id uuid.UUID, useCache bool) ([]string, error) {
 	args := m.Called(ctx, id, useCache)
 	return args.Get(0).([]string), args.Error(1)
 }
 
-func (m *MockContainerService) GetContainerInfo(ctx context.Context, id types.ContainerID) (map[string]any, error) {
+func (m *MockContainerService) GetContainerInfo(ctx context.Context, id uuid.UUID) (map[string]any, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).(map[string]any), args.Error(1)
 }
 
-func (m *MockContainerService) WaitStatus(ctx context.Context, id types.ContainerID, status string) error {
+func (m *MockContainerService) WaitStatus(ctx context.Context, id uuid.UUID, status string) error {
 	args := m.Called(ctx, id, status)
 	return args.Error(0)
 }
 
-func (m *MockContainerService) GetLatestLogs(id types.ContainerID) ([]types.LogLine, error) {
+func (m *MockContainerService) GetLatestLogs(id uuid.UUID) ([]types.LogLine, error) {
 	args := m.Called(id)
 	return args.Get(0).([]types.LogLine), args.Error(1)
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/common/app"
+	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vertex/pkg/router/routertest"
 )
 
@@ -33,7 +34,7 @@ func (suite *ContainerHandlerTestSuite) SetupSubTest() {
 	appCtx := app.NewContext(ctx)
 	suite.handler = NewContainerHandler(appCtx, &suite.service).(*containerHandler)
 	suite.testContainer = types.Container{
-		ID: types.NewContainerID(),
+		ID: uuid.New(),
 	}
 	suite.opts = routertest.RequestOptions{
 		Params: map[string]string{

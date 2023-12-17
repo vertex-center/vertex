@@ -11,28 +11,28 @@ import (
 
 type (
 	ContainerAdapter interface {
-		GetContainer(ctx context.Context, id types.ContainerID) (*types.Container, error)
+		GetContainer(ctx context.Context, id uuid.UUID) (*types.Container, error)
 		GetContainers(ctx context.Context) (types.Containers, error)
 		GetContainersWithFilters(ctx context.Context, filters types.ContainerFilters) (types.Containers, error)
 		CreateContainer(ctx context.Context, container types.Container) error
 		UpdateContainer(ctx context.Context, container types.Container) error
-		DeleteContainer(ctx context.Context, id types.ContainerID) error
-		GetContainerTags(ctx context.Context, id types.ContainerID) (types.Tags, error)
-		AddTag(ctx context.Context, id types.ContainerID, tagID types.TagID) error
-		DeleteTags(ctx context.Context, id types.ContainerID) error
-		SetStatus(ctx context.Context, id types.ContainerID, status string) error
+		DeleteContainer(ctx context.Context, id uuid.UUID) error
+		GetContainerTags(ctx context.Context, id uuid.UUID) (types.Tags, error)
+		AddTag(ctx context.Context, id uuid.UUID, tagID types.TagID) error
+		DeleteTags(ctx context.Context, id uuid.UUID) error
+		SetStatus(ctx context.Context, id uuid.UUID, status string) error
 	}
 
 	PortAdapter interface {
-		GetPorts(ctx context.Context, id types.ContainerID) (types.Ports, error)
+		GetPorts(ctx context.Context, id uuid.UUID) (types.Ports, error)
 		CreatePort(ctx context.Context, port types.Port) error
-		DeletePorts(ctx context.Context, id types.ContainerID) error
+		DeletePorts(ctx context.Context, id uuid.UUID) error
 	}
 
 	VolumeAdapter interface {
-		GetVolumes(ctx context.Context, id types.ContainerID) (types.Volumes, error)
+		GetVolumes(ctx context.Context, id uuid.UUID) (types.Volumes, error)
 		CreateVolume(ctx context.Context, vol types.Volume) error
-		DeleteVolumes(ctx context.Context, id types.ContainerID) error
+		DeleteVolumes(ctx context.Context, id uuid.UUID) error
 	}
 
 	TagAdapter interface {
@@ -43,32 +43,32 @@ type (
 	}
 
 	SysctlAdapter interface {
-		GetSysctls(ctx context.Context, id types.ContainerID) (types.Sysctls, error)
+		GetSysctls(ctx context.Context, id uuid.UUID) (types.Sysctls, error)
 		CreateSysctl(ctx context.Context, sysctl types.Sysctl) error
-		DeleteSysctls(ctx context.Context, id types.ContainerID) error
+		DeleteSysctls(ctx context.Context, id uuid.UUID) error
 	}
 
 	EnvAdapter interface {
-		GetVariables(ctx context.Context, id types.ContainerID) (types.EnvVariables, error)
+		GetVariables(ctx context.Context, id uuid.UUID) (types.EnvVariables, error)
 		CreateVariable(ctx context.Context, variable types.EnvVariable) error
-		DeleteVariables(ctx context.Context, id types.ContainerID) error
-		UpdateVariable(ctx context.Context, id types.ContainerID, key, value string) error
+		DeleteVariables(ctx context.Context, id uuid.UUID) error
+		UpdateVariable(ctx context.Context, id uuid.UUID, key, value string) error
 	}
 
 	CapAdapter interface {
-		GetCaps(ctx context.Context, id types.ContainerID) (types.Capabilities, error)
+		GetCaps(ctx context.Context, id uuid.UUID) (types.Capabilities, error)
 		CreateCap(ctx context.Context, c types.Capability) error
-		DeleteCaps(ctx context.Context, id types.ContainerID) error
+		DeleteCaps(ctx context.Context, id uuid.UUID) error
 	}
 
 	LogsAdapter interface {
-		Register(id types.ContainerID) error
-		Unregister(id types.ContainerID) error
+		Register(id uuid.UUID) error
+		Unregister(id uuid.UUID) error
 		UnregisterAll() error
-		Push(id types.ContainerID, line types.LogLine)
-		Pop(id types.ContainerID) (types.LogLine, error)
-		LoadBuffer(id types.ContainerID) ([]types.LogLine, error) // LoadBuffer loads the latest logs kept in memory.
-		Exists(id types.ContainerID) bool
+		Push(id uuid.UUID, line types.LogLine)
+		Pop(id uuid.UUID) (types.LogLine, error)
+		LoadBuffer(id uuid.UUID) ([]types.LogLine, error) // LoadBuffer loads the latest logs kept in memory.
+		Exists(id uuid.UUID) bool
 	}
 
 	RunnerAdapter interface {

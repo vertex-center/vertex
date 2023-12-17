@@ -4,7 +4,6 @@ import (
 	"context"
 	"sync"
 
-	"github.com/google/uuid"
 	"github.com/juju/errors"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
@@ -13,20 +12,21 @@ import (
 	sqltypes "github.com/vertex-center/vertex/apps/sql/core/types"
 	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/log"
+	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vlog"
 )
 
 type sqlService struct {
 	uuid      uuid.UUID
-	dbms      map[containerstypes.ContainerID]port.DBMSAdapter
+	dbms      map[uuid.UUID]port.DBMSAdapter
 	dbmsMutex *sync.RWMutex
 }
 
 func New(ctx *app.Context) port.SqlService {
 	s := &sqlService{
 		uuid:      uuid.New(),
-		dbms:      map[containerstypes.ContainerID]port.DBMSAdapter{},
+		dbms:      map[uuid.UUID]port.DBMSAdapter{},
 		dbmsMutex: &sync.RWMutex{},
 	}
 	ctx.AddListener(s)

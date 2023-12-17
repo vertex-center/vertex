@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/google/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vertex/pkg/event"
 )
 
@@ -44,7 +44,7 @@ func (s *sqlService) onContainerStart(inst *types.Container) {
 	s.dbms[inst.ID] = dbms
 }
 
-func (s *sqlService) onContainerStop(uuid types.ContainerID) {
+func (s *sqlService) onContainerStop(uuid uuid.UUID) {
 	s.dbmsMutex.Lock()
 	defer s.dbmsMutex.Unlock()
 

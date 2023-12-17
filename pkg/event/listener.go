@@ -1,7 +1,7 @@
 package event
 
 import (
-	"github.com/google/uuid"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type Listener interface {

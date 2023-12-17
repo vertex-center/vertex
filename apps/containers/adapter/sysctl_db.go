@@ -8,6 +8,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common/storage"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type sysctlDBAdapter struct {
@@ -18,7 +19,7 @@ func NewSysctlDBAdapter(db storage.DB) port.SysctlAdapter {
 	return &sysctlDBAdapter{db}
 }
 
-func (a *sysctlDBAdapter) GetSysctls(ctx context.Context, id types.ContainerID) (types.Sysctls, error) {
+func (a *sysctlDBAdapter) GetSysctls(ctx context.Context, id uuid.UUID) (types.Sysctls, error) {
 	var sysctls types.Sysctls
 	err := a.db.Select(&sysctls, `
 		SELECT * FROM sysctls
@@ -38,7 +39,7 @@ func (a *sysctlDBAdapter) CreateSysctl(ctx context.Context, sysctl types.Sysctl)
 	return err
 }
 
-func (a *sysctlDBAdapter) DeleteSysctls(ctx context.Context, id types.ContainerID) error {
+func (a *sysctlDBAdapter) DeleteSysctls(ctx context.Context, id uuid.UUID) error {
 	_, err := a.db.Exec(`
 		DELETE FROM sysctls
 		WHERE container_id = $1

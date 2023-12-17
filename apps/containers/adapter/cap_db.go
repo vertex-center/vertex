@@ -8,6 +8,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common/storage"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type capDBAdapter struct {
@@ -18,7 +19,7 @@ func NewCapDBAdapter(db storage.DB) port.CapAdapter {
 	return &capDBAdapter{db}
 }
 
-func (a *capDBAdapter) GetCaps(ctx context.Context, id types.ContainerID) (types.Capabilities, error) {
+func (a *capDBAdapter) GetCaps(ctx context.Context, id uuid.UUID) (types.Capabilities, error) {
 	var caps types.Capabilities
 	err := a.db.Select(&caps, `
 		SELECT * FROM capabilities
@@ -38,7 +39,7 @@ func (a *capDBAdapter) CreateCap(ctx context.Context, c types.Capability) error 
 	return err
 }
 
-func (a *capDBAdapter) DeleteCaps(ctx context.Context, id types.ContainerID) error {
+func (a *capDBAdapter) DeleteCaps(ctx context.Context, id uuid.UUID) error {
 	_, err := a.db.Exec(`
 		DELETE FROM capabilities
 		WHERE container_id = $1

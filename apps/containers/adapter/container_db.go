@@ -9,6 +9,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common/storage"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type containerDBAdapter struct {
@@ -19,7 +20,7 @@ func NewContainerDBAdapter(db storage.DB) port.ContainerAdapter {
 	return &containerDBAdapter{db}
 }
 
-func (a *containerDBAdapter) GetContainer(ctx context.Context, id types.ContainerID) (*types.Container, error) {
+func (a *containerDBAdapter) GetContainer(ctx context.Context, id uuid.UUID) (*types.Container, error) {
 	var container types.Container
 	err := a.db.Get(&container, `
 		SELECT * FROM containers
@@ -80,7 +81,7 @@ func (a *containerDBAdapter) UpdateContainer(ctx context.Context, c types.Contai
 	return err
 }
 
-func (a *containerDBAdapter) DeleteContainer(ctx context.Context, id types.ContainerID) error {
+func (a *containerDBAdapter) DeleteContainer(ctx context.Context, id uuid.UUID) error {
 	_, err := a.db.Exec(`
 		DELETE FROM containers
 		WHERE id = $1
@@ -88,7 +89,7 @@ func (a *containerDBAdapter) DeleteContainer(ctx context.Context, id types.Conta
 	return err
 }
 
-func (a *containerDBAdapter) GetContainerTags(ctx context.Context, id types.ContainerID) (types.Tags, error) {
+func (a *containerDBAdapter) GetContainerTags(ctx context.Context, id uuid.UUID) (types.Tags, error) {
 	var tags types.Tags
 	err := a.db.Select(&tags, `
 		SELECT tags.* FROM tags
@@ -101,7 +102,7 @@ func (a *containerDBAdapter) GetContainerTags(ctx context.Context, id types.Cont
 	return tags, err
 }
 
-func (a *containerDBAdapter) AddTag(ctx context.Context, id types.ContainerID, tagID types.TagID) error {
+func (a *containerDBAdapter) AddTag(ctx context.Context, id uuid.UUID, tagID types.TagID) error {
 	_, err := a.db.Exec(`
 		INSERT INTO container_tags (container_id, tag_id)
 		VALUES ($1, $2)
@@ -109,7 +110,7 @@ func (a *containerDBAdapter) AddTag(ctx context.Context, id types.ContainerID, t
 	return err
 }
 
-func (a *containerDBAdapter) DeleteTags(ctx context.Context, id types.ContainerID) error {
+func (a *containerDBAdapter) DeleteTags(ctx context.Context, id uuid.UUID) error {
 	_, err := a.db.Exec(`
 		DELETE FROM container_tags
 		WHERE container_id = $1
@@ -117,7 +118,7 @@ func (a *containerDBAdapter) DeleteTags(ctx context.Context, id types.ContainerI
 	return err
 }
 
-func (a *containerDBAdapter) SetStatus(ctx context.Context, id types.ContainerID, status string) error {
+func (a *containerDBAdapter) SetStatus(ctx context.Context, id uuid.UUID, status string) error {
 	_, err := a.db.Exec(`
 		UPDATE containers
 		SET status = $1
