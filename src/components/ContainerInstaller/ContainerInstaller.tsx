@@ -38,9 +38,7 @@ export default function ContainerInstaller(props: Readonly<Props>) {
     const [container, setContainer] = useState<Inst>();
 
     useEffect(() => {
-        if (!containers) return;
-        const inst = Object.values(containers ?? {})?.[0];
-        if (!inst) {
+        if (!containers || containers.length === 0) {
             setContainer({
                 name: name,
                 status: "not-installed",
@@ -48,7 +46,7 @@ export default function ContainerInstaller(props: Readonly<Props>) {
             return;
         }
         setContainer({
-            ...inst,
+            ...containers[0],
             onPower: onPower,
         });
     }, [containers]);

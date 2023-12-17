@@ -113,17 +113,15 @@ export default function Container(props: Readonly<Props>) {
         "Vertex Tunnels",
     ];
 
-    const inst = container.value;
-    const tag = tags?.find((name) =>
-        inst?.tags?.includes((t) => t.tag === name)
-    );
+    const c = container.value;
+    const tag = tags?.find((name) => c?.tags?.includes((t) => t.tag === name));
     // The uuidv4() is used to generate a unique key for containers that are not yet loaded.
-    const key = inst?.id ?? uuidv4();
+    const key = c?.id ?? uuidv4();
 
     const content = (
         <Fragment>
-            <ContainerLed status={inst?.status} />
-            <LCD container={inst} />
+            <ContainerLed status={c?.status} />
+            <LCD container={c} />
 
             {tag && (
                 <div className={styles.lcdTag}>
@@ -132,18 +130,18 @@ export default function Container(props: Readonly<Props>) {
                 </div>
             )}
 
-            {container?.onPower && inst?.status !== "not-installed" && (
+            {container?.onPower && c?.status !== "not-installed" && (
                 <Button
                     icon="power_rounded"
                     onClick={(e: any) => onPower(e, container)}
                     disabled={
-                        inst?.status === "building" ||
-                        inst?.status === "starting" ||
-                        inst?.status === "stopping"
+                        c?.status === "building" ||
+                        c?.status === "starting" ||
+                        c?.status === "stopping"
                     }
                 />
             )}
-            {container?.onInstall && inst?.status === "not-installed" && (
+            {container?.onInstall && c?.status === "not-installed" && (
                 <Button icon="download" onClick={container.onInstall} />
             )}
         </Fragment>
