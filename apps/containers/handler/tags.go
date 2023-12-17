@@ -39,14 +39,16 @@ func (h *tagsHandler) GetTags() gin.HandlerFunc {
 }
 
 type CreateTagParams struct {
-	Tag types.Tag `json:"tag"`
+	Name string `json:"name"`
 }
 
 func (h *tagsHandler) CreateTag() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *CreateTagParams) (types.Tag, error) {
 		s := session.Get(c)
-		params.Tag.UserID = s.UserID
-		return h.tagsService.CreateTag(c, params.Tag)
+		return h.tagsService.CreateTag(c, types.Tag{
+			UserID: s.UserID,
+			Name:   params.Name,
+		})
 	})
 }
 

@@ -2,7 +2,9 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/juju/errors"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
+	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/tunnels/core/port"
 	"github.com/vertex-center/vertex/pkg/router"
 )
@@ -18,21 +20,31 @@ type InstallParams struct {
 }
 
 func (r *providerHandler) Install() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *InstallParams) error {
-		client := containersapi.NewContainersClient(c)
+	return router.Handler(func(ctx *gin.Context, params *InstallParams) error {
+		cli := containersapi.NewContainersClient(ctx)
 
-		serv, err := client.GetService(c, params.Provider)
+		serv, err := cli.GetService(ctx, params.Provider)
 		if err != nil {
 			return err
 		}
 
-		inst, err := client.InstallService(c, serv.ID)
+		c, err := cli.InstallService(ctx, serv.ID)
 		if err != nil {
 			return err
 		}
 
-		return client.PatchContainer(c, inst.ID, map[string]interface{}{
-			"tags": []string{"Vertex Tunnels", "Vertex Tunnels - Cloudflare"},
-		})
+		tag, err := cli.GetTag(ctx, "Vertex Tunnels")
+		if errors.Is(err, errors.NotFound) {
+			tag, err = cli.CreateTag(ctx, containerstypes.Tag{
+				Name: "Vertex Tunnels",
+			})
+			if err != nil {
+				return err
+			}
+		} else if err != nil {
+			return err
+		}
+
+		return cli.AddContainerTag(ctx, c.ID, tag.ID)
 	})
 }

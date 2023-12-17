@@ -49,7 +49,7 @@ func (c *Client) StopContainer(ctx context.Context, id uuid.UUID) error {
 func (c *Client) AddContainerTag(ctx context.Context, id uuid.UUID, tagID types.TagID) error {
 	return c.Request().
 		Pathf("./container/%s/tag/%s", id, tagID).
-		Post().
+		Put().
 		Fetch(ctx)
 }
 

@@ -44,26 +44,7 @@ func (s *metricsService) GetCollector(ctx context.Context, collector string) (ty
 }
 
 func (s *metricsService) InstallCollector(ctx context.Context, collector string) error {
-	c := containersapi.NewContainersClient(ctx)
-
-	serv, err := c.GetService(ctx, collector)
-	if err != nil {
-		return err
-	}
-
-	inst, err := c.InstallService(ctx, serv.ID)
-	if err != nil {
-		return err
-	}
-
-	err = s.ConfigureCollector(&inst)
-	if err != nil {
-		return err
-	}
-
-	return c.PatchContainer(ctx, inst.ID, map[string]interface{}{
-		"tags": []string{"Vertex Monitoring", "Vertex Monitoring - Prometheus Collector"},
-	})
+	return s.install(ctx, collector)
 }
 
 // ConfigureCollector will configure a container to monitor the metrics of Vertex.
@@ -72,29 +53,43 @@ func (s *metricsService) ConfigureCollector(inst *containerstypes.Container) err
 }
 
 func (s *metricsService) InstallVisualizer(ctx context.Context, visualizer string) error {
-	c := containersapi.NewContainersClient(ctx)
-
-	serv, err := c.GetService(ctx, visualizer)
-	if err != nil {
-		return err
-	}
-
-	inst, err := c.InstallService(ctx, serv.ID)
-	if err != nil {
-		return err
-	}
-
-	err = s.ConfigureVisualizer(&inst)
-	if err != nil {
-		return err
-	}
-
-	return c.PatchContainer(ctx, inst.ID, map[string]interface{}{
-		"tags": []string{"Vertex Monitoring", "Vertex Monitoring - Grafana Visualizer"},
-	})
+	return s.install(ctx, visualizer)
 }
 
 func (s *metricsService) ConfigureVisualizer(inst *containerstypes.Container) error {
 	// TODO: Implement
 	return nil
+}
+
+func (s *metricsService) install(ctx context.Context, serviceID string) error {
+	cli := containersapi.NewContainersClient(ctx)
+
+	serv, err := cli.GetService(ctx, serviceID)
+	if err != nil {
+		return err
+	}
+
+	c, err := cli.InstallService(ctx, serv.ID)
+	if err != nil {
+		return err
+	}
+
+	err = s.ConfigureVisualizer(&c)
+	if err != nil {
+		return err
+	}
+
+	tag, err := cli.GetTag(ctx, "Vertex Monitoring")
+	if errors.Is(err, errors.NotFound) {
+		tag, err = cli.CreateTag(ctx, containerstypes.Tag{
+			Name: "Vertex Monitoring",
+		})
+		if err != nil {
+			return err
+		}
+	} else if err != nil {
+		return err
+	}
+
+	return cli.AddContainerTag(ctx, c.ID, tag.ID)
 }

@@ -98,6 +98,8 @@ func (s *sqlService) Install(ctx context.Context, dbms string) (containerstypes.
 		if err != nil {
 			return c, err
 		}
+	} else if err != nil {
+		return c, err
 	}
 
 	err = client.AddContainerTag(ctx, c.ID, tag.ID)
