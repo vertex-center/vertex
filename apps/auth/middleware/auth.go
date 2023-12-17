@@ -28,6 +28,6 @@ func Authenticated(c *gin.Context) {
 	}
 
 	c.Set("authenticated", true)
-	c.Set("user_id", int(session.UserID))
+	c.Set("user_id", session.UserID)
 	c.Next()
 }

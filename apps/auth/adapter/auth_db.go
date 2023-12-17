@@ -7,6 +7,7 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 	"github.com/vertex-center/vertex/common/storage"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type authDbAdapter struct {
@@ -14,13 +15,12 @@ type authDbAdapter struct {
 }
 
 func NewAuthDbAdapter(db storage.DB) port.AuthAdapter {
-	return &authDbAdapter{
-		db: db,
-	}
+	return &authDbAdapter{db}
 }
 
 func (a *authDbAdapter) CreateAccount(username string, credential types.CredentialsArgon2id) error {
 	user := types.User{
+		ID:        uuid.New(),
 		Username:  username,
 		CreatedAt: time.Now().Unix(),
 		UpdatedAt: time.Now().Unix(),
@@ -31,39 +31,26 @@ func (a *authDbAdapter) CreateAccount(username string, credential types.Credenti
 		return err
 	}
 
-	query, args, err := tx.BindNamed(`
-		INSERT INTO users (username, created_at, updated_at)
-		VALUES (:username, :created_at, :updated_at)
-		RETURNING id
+	_, err = tx.NamedExec(`
+		INSERT INTO users (id, username, created_at, updated_at)
+		VALUES (:id, :username, :created_at, :updated_at)
 	`, user)
 	if err != nil {
 		_ = tx.Rollback()
 		return fmt.Errorf("failed to create user: %w", err)
 	}
 
-	err = tx.Get(&user, query, args...)
-	if err != nil {
-		_ = tx.Rollback()
-		return fmt.Errorf("failed to create user: %w", err)
-	}
-
+	credential.ID = uuid.New()
 	credential.CreatedAt = time.Now().Unix()
 	credential.UpdatedAt = time.Now().Unix()
 
-	query, args, err = tx.BindNamed(`
-		INSERT INTO credentials_argon2 (login, hash, type, iterations, memory, parallelism, salt, key_len, created_at, updated_at)
-		VALUES (:login, :hash, :type, :iterations, :memory, :parallelism, :salt, :key_len, :created_at, :updated_at)
-		RETURNING id
+	_, err = tx.NamedExec(`
+		INSERT INTO credentials_argon2 (id, login, hash, type, iterations, memory, parallelism, salt, key_len, created_at, updated_at)
+		VALUES (:id, :login, :hash, :type, :iterations, :memory, :parallelism, :salt, :key_len, :created_at, :updated_at)
 	`, credential)
 	if err != nil {
 		_ = tx.Rollback()
 		return err
-	}
-
-	err = tx.Get(&credential, query, args...)
-	if err != nil {
-		_ = tx.Rollback()
-		return fmt.Errorf("failed to create user: %w", err)
 	}
 
 	_, err = tx.Exec(`
@@ -82,7 +69,7 @@ func (a *authDbAdapter) GetCredentials(login string) ([]types.CredentialsArgon2i
 	var creds []types.CredentialsArgon2id
 
 	rows, err := a.db.Queryx(`
-		SELECT credentials_argon2.id, credentials_argon2.login, credentials_argon2.hash, credentials_argon2.type, credentials_argon2.iterations, credentials_argon2.memory, credentials_argon2.parallelism, credentials_argon2.salt, credentials_argon2.key_len, credentials_argon2.created_at, credentials_argon2.updated_at, credentials_argon2.deleted_at
+		SELECT *
 		FROM credentials_argon2
 		WHERE credentials_argon2.login = $1
 	`, login)
@@ -102,7 +89,7 @@ func (a *authDbAdapter) GetCredentials(login string) ([]types.CredentialsArgon2i
 	return creds, nil
 }
 
-func (a *authDbAdapter) GetUsersByCredential(credentialID uint) ([]types.User, error) {
+func (a *authDbAdapter) GetUsersByCredential(credentialID uuid.UUID) ([]types.User, error) {
 	var users []types.User
 	err := a.db.Select(&users, `
 		SELECT users.id, users.username, users.created_at, users.updated_at, users.deleted_at
@@ -114,37 +101,14 @@ func (a *authDbAdapter) GetUsersByCredential(credentialID uint) ([]types.User, e
 }
 
 func (a *authDbAdapter) SaveSession(session *types.Session) error {
-	tx, err := a.db.Beginx()
-	if err != nil {
-		return err
-	}
-
 	session.CreatedAt = time.Now().Unix()
 	session.UpdatedAt = time.Now().Unix()
 
-	_, err = tx.NamedExec(`
-		INSERT INTO sessions (token, user_id, created_at, updated_at)
-		VALUES (:token, :user_id, :created_at, :updated_at)
+	_, err := a.db.NamedExec(`
+		INSERT INTO sessions (id, token, user_id, created_at, updated_at)
+		VALUES (:id, :token, :user_id, :created_at, :updated_at)
 	`, session)
-	if err != nil {
-		_ = tx.Rollback()
-		return err
-	}
-
-	*session = types.Session{Token: session.Token}
-
-	err = tx.Get(session, `
-		SELECT sessions.id, sessions.token, users.id, sessions.created_at, sessions.updated_at, sessions.deleted_at
-		FROM sessions
-		JOIN users ON sessions.user_id = users.id
-		WHERE sessions.deleted_at IS NULL AND sessions.token = $1
-	`, session.Token)
-	if err != nil {
-		_ = tx.Rollback()
-		return err
-	}
-
-	return tx.Commit()
+	return err
 }
 
 func (a *authDbAdapter) DeleteSession(token string) error {
@@ -155,7 +119,7 @@ func (a *authDbAdapter) DeleteSession(token string) error {
 func (a *authDbAdapter) GetSession(token string) (*types.Session, error) {
 	var session types.Session
 	err := a.db.Get(&session, `
-		SELECT sessions.id, sessions.token, sessions.user_id, sessions.created_at, sessions.updated_at, sessions.deleted_at
+		SELECT *
 		FROM sessions
 		WHERE sessions.deleted_at IS NULL AND sessions.token = $1
 	`, token)
@@ -165,17 +129,17 @@ func (a *authDbAdapter) GetSession(token string) (*types.Session, error) {
 func (a *authDbAdapter) GetUser(username string) (types.User, error) {
 	var user types.User
 	err := a.db.Get(&user, `
-		SELECT users.id, users.username, users.created_at, users.updated_at, users.deleted_at
+		SELECT *
 		FROM users
 		WHERE users.username = $1
 	`, username)
 	return user, err
 }
 
-func (a *authDbAdapter) GetUserByID(id uint) (types.User, error) {
+func (a *authDbAdapter) GetUserByID(id uuid.UUID) (types.User, error) {
 	var user types.User
 	err := a.db.Get(&user, `
-		SELECT users.id, users.username, users.created_at, users.updated_at, users.deleted_at
+		SELECT *
 		FROM users
 		WHERE users.id = $1
 	`, id)
@@ -201,7 +165,7 @@ func (a *authDbAdapter) PatchUser(user types.User) (types.User, error) {
 	}
 
 	err = tx.Get(&user, `
-		SELECT users.id, users.username, users.created_at, users.updated_at, users.deleted_at
+		SELECT *
 		FROM users
 		WHERE users.id = $1
 	`, user.ID)
@@ -213,10 +177,10 @@ func (a *authDbAdapter) PatchUser(user types.User) (types.User, error) {
 	return user, tx.Commit()
 }
 
-func (a *authDbAdapter) GetUserCredentialsMethods(userID uint) ([]types.CredentialsMethods, error) {
+func (a *authDbAdapter) GetUserCredentialsMethods(userID uuid.UUID) ([]types.CredentialsMethods, error) {
 	var credsArgon2id []types.CredentialsArgon2id
 	err := a.db.Select(&credsArgon2id, `
-		SELECT credentials_argon2.id, credentials_argon2.login, credentials_argon2.hash, credentials_argon2.type, credentials_argon2.iterations, credentials_argon2.memory, credentials_argon2.parallelism, credentials_argon2.salt, credentials_argon2.key_len, credentials_argon2.created_at, credentials_argon2.updated_at, credentials_argon2.deleted_at
+		SELECT credentials_argon2.*
 		FROM credentials_argon2
 		JOIN credentials_argon2_users ON credentials_argon2.id = credentials_argon2_users.credential_id
 		WHERE credentials_argon2_users.user_id = $1

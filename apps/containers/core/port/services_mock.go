@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/mock"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type (
@@ -143,12 +144,12 @@ func (m *MockContainerService) GetServices(ctx context.Context) []types.Service 
 	return args.Get(0).([]types.Service)
 }
 
-func (m *MockTagsService) GetTag(ctx context.Context, userID uint, name string) (types.Tag, error) {
+func (m *MockTagsService) GetTag(ctx context.Context, userID uuid.UUID, name string) (types.Tag, error) {
 	args := m.Called(ctx, userID, name)
 	return args.Get(0).(types.Tag), args.Error(1)
 }
 
-func (m *MockTagsService) GetTags(ctx context.Context, userID uint) (types.Tags, error) {
+func (m *MockTagsService) GetTags(ctx context.Context, userID uuid.UUID) (types.Tags, error) {
 	args := m.Called(ctx, userID)
 	return args.Get(0).(types.Tags), args.Error(1)
 }

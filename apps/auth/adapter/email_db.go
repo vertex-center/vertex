@@ -5,6 +5,7 @@ import (
 
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 	"github.com/vertex-center/vertex/common/storage"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type emailDbAdapter struct {
@@ -42,17 +43,10 @@ func (a *emailDbAdapter) CreateEmail(email *types.Email) error {
 	email.CreatedAt = time.Now().Unix()
 	email.UpdatedAt = time.Now().Unix()
 
-	query, args, err := tx.BindNamed(`
-		INSERT INTO emails (user_id, email, created_at, updated_at)
-		VALUES (:user_id, :email, :created_at, :updated_at)
-		RETURNING id
+	_, err = tx.NamedExec(`
+		INSERT INTO emails (id, user_id, email, created_at, updated_at)
+		VALUES (:id, :user_id, :email, :created_at, :updated_at)
 	`, *email)
-	if err != nil {
-		_ = tx.Rollback()
-		return err
-	}
-
-	err = tx.Get(email, query, args...)
 	if err != nil {
 		_ = tx.Rollback()
 		return err
@@ -61,17 +55,17 @@ func (a *emailDbAdapter) CreateEmail(email *types.Email) error {
 	return tx.Commit()
 }
 
-func (a *emailDbAdapter) GetEmails(userID uint) ([]types.Email, error) {
+func (a *emailDbAdapter) GetEmails(userID uuid.UUID) ([]types.Email, error) {
 	var emails []types.Email
 	err := a.db.Select(&emails, `
-		SELECT id, user_id, email, created_at, updated_at
+		SELECT *
 		FROM emails
 		WHERE user_id = $1 AND deleted_at IS NULL
 	`, userID)
 	return emails, err
 }
 
-func (a *emailDbAdapter) DeleteEmail(userID uint, email string) error {
+func (a *emailDbAdapter) DeleteEmail(userID uuid.UUID, email string) error {
 	_, err := a.db.Exec(`
 		UPDATE emails
 		SET deleted_at = $1

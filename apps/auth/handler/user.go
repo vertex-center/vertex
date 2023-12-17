@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
+	"github.com/vertex-center/vertex/apps/auth/core/types/session"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
@@ -19,8 +20,8 @@ func NewUserHandler(userService port.UserService) port.UserHandler {
 
 func (h *userHandler) GetCurrentUser() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context) (*types.User, error) {
-		userID := c.GetInt("user_id")
-		user, err := h.service.GetUserByID(uint(userID))
+		s := session.Get(c)
+		user, err := h.service.GetUserByID(s.UserID)
 		return &user, err
 	})
 }
@@ -31,9 +32,9 @@ type PatchCurrentUserParams struct {
 
 func (h *userHandler) PatchCurrentUser() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *PatchCurrentUserParams) (*types.User, error) {
-		userID := c.GetInt("user_id")
+		s := session.Get(c)
 		var err error
-		params.ID = uint(userID)
+		params.ID = s.UserID
 		params.User, err = h.service.PatchUser(params.User)
 		if err != nil {
 			return nil, err
@@ -45,7 +46,7 @@ func (h *userHandler) PatchCurrentUser() gin.HandlerFunc {
 
 func (h *userHandler) GetCurrentUserCredentials() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context) ([]types.CredentialsMethods, error) {
-		userID := c.GetInt("user_id")
-		return h.service.GetUserCredentialsMethods(uint(userID))
+		s := session.Get(c)
+		return h.service.GetUserCredentialsMethods(s.UserID)
 	})
 }

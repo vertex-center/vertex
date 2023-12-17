@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type AuthServiceTestSuite struct {
@@ -36,7 +37,7 @@ func (suite *AuthServiceTestSuite) SetupTest() {
 		KeyLen:      32,
 	}
 	suite.testUser = types.User{
-		ID:       10,
+		ID:       uuid.New(),
 		Username: "test_username",
 	}
 }

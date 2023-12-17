@@ -8,6 +8,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common/storage"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type tagDBAdapter struct {
@@ -18,7 +19,7 @@ func NewTagDBAdapter(db storage.DB) port.TagAdapter {
 	return &tagDBAdapter{db}
 }
 
-func (a *tagDBAdapter) GetTag(ctx context.Context, userID uint, name string) (types.Tag, error) {
+func (a *tagDBAdapter) GetTag(ctx context.Context, userID uuid.UUID, name string) (types.Tag, error) {
 	var tag types.Tag
 	err := a.db.Get(&tag, `
 		SELECT * FROM tags
@@ -30,7 +31,7 @@ func (a *tagDBAdapter) GetTag(ctx context.Context, userID uint, name string) (ty
 	return tag, err
 }
 
-func (a *tagDBAdapter) GetTags(ctx context.Context, userID uint) (types.Tags, error) {
+func (a *tagDBAdapter) GetTags(ctx context.Context, userID uuid.UUID) (types.Tags, error) {
 	var tags types.Tags
 	err := a.db.Select(&tags, `
 		SELECT * FROM tags

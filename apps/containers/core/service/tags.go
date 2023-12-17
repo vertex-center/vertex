@@ -5,6 +5,7 @@ import (
 
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type tagsService struct {
@@ -15,11 +16,11 @@ func NewTagsService(tags port.TagAdapter) port.TagsService {
 	return &tagsService{tags}
 }
 
-func (s *tagsService) GetTag(ctx context.Context, userID uint, name string) (types.Tag, error) {
+func (s *tagsService) GetTag(ctx context.Context, userID uuid.UUID, name string) (types.Tag, error) {
 	return s.tags.GetTag(ctx, userID, name)
 }
 
-func (s *tagsService) GetTags(ctx context.Context, userID uint) (types.Tags, error) {
+func (s *tagsService) GetTags(ctx context.Context, userID uuid.UUID) (types.Tags, error) {
 	return s.tags.GetTags(ctx, userID)
 }
 

@@ -1,6 +1,9 @@
 package port
 
-import "github.com/vertex-center/vertex/apps/auth/core/types"
+import (
+	"github.com/vertex-center/vertex/apps/auth/core/types"
+	"github.com/vertex-center/vertex/common/uuid"
+)
 
 type (
 	AuthAdapter interface {
@@ -13,15 +16,15 @@ type (
 		GetSession(token string) (*types.Session, error)
 
 		GetUser(username string) (types.User, error)
-		GetUserByID(id uint) (types.User, error)
-		GetUsersByCredential(credentialID uint) ([]types.User, error)
+		GetUserByID(id uuid.UUID) (types.User, error)
+		GetUsersByCredential(credentialID uuid.UUID) ([]types.User, error)
 		PatchUser(user types.User) (types.User, error)
-		GetUserCredentialsMethods(userID uint) ([]types.CredentialsMethods, error)
+		GetUserCredentialsMethods(userID uuid.UUID) ([]types.CredentialsMethods, error)
 	}
 
 	EmailAdapter interface {
 		CreateEmail(email *types.Email) error
-		GetEmails(userID uint) ([]types.Email, error)
-		DeleteEmail(userID uint, email string) error
+		GetEmails(userID uuid.UUID) ([]types.Email, error)
+		DeleteEmail(userID uuid.UUID, email string) error
 	}
 )

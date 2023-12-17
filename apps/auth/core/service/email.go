@@ -5,6 +5,7 @@ import (
 
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type emailService struct {
@@ -17,17 +18,18 @@ func NewEmailService(adapter port.EmailAdapter) port.EmailService {
 	}
 }
 
-func (s emailService) GetEmails(userID uint) ([]types.Email, error) {
+func (s emailService) GetEmails(userID uuid.UUID) ([]types.Email, error) {
 	return s.adapter.GetEmails(userID)
 }
 
-func (s emailService) CreateEmail(userID uint, email string) (types.Email, error) {
+func (s emailService) CreateEmail(userID uuid.UUID, email string) (types.Email, error) {
 	email = strings.TrimSpace(email)
 	if email == "" {
 		return types.Email{}, types.ErrEmailEmpty
 	}
 
 	res := types.Email{
+		ID:     uuid.New(),
 		UserID: userID,
 		Email:  email,
 	}
@@ -35,7 +37,7 @@ func (s emailService) CreateEmail(userID uint, email string) (types.Email, error
 	return res, err
 }
 
-func (s emailService) DeleteEmail(userID uint, email string) error {
+func (s emailService) DeleteEmail(userID uuid.UUID, email string) error {
 	email = strings.TrimSpace(email)
 	return s.adapter.DeleteEmail(userID, email)
 }

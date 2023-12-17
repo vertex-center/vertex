@@ -9,6 +9,7 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 	"github.com/vertex-center/vertex/common/log"
+	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vlog"
 	"golang.org/x/crypto/argon2"
 )
@@ -127,6 +128,7 @@ func (s *authService) generateToken() (types.Session, error) {
 		return types.Session{}, err
 	}
 	return types.Session{
+		ID:    uuid.New(),
 		Token: base64.StdEncoding.EncodeToString(token),
 	}, nil
 }

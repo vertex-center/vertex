@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/vertex/apps/auth/core/types/session"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/pkg/router"
@@ -21,8 +22,8 @@ type GetTagParams struct {
 
 func (h *tagsHandler) GetTag() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *GetTagParams) (*types.Tag, error) {
-		userID := uint(c.GetInt("user_id"))
-		tag, err := h.tagsService.GetTag(c, userID, params.Name)
+		s := session.Get(c)
+		tag, err := h.tagsService.GetTag(c, s.UserID, params.Name)
 		if err != nil {
 			return nil, err
 		}
@@ -32,8 +33,8 @@ func (h *tagsHandler) GetTag() gin.HandlerFunc {
 
 func (h *tagsHandler) GetTags() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context) (types.Tags, error) {
-		userID := uint(c.GetInt("user_id"))
-		return h.tagsService.GetTags(c, userID)
+		s := session.Get(c)
+		return h.tagsService.GetTags(c, s.UserID)
 	})
 }
 
@@ -43,8 +44,8 @@ type CreateTagParams struct {
 
 func (h *tagsHandler) CreateTag() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *CreateTagParams) (types.Tag, error) {
-		userID := uint(c.GetInt("user_id"))
-		params.Tag.UserID = userID
+		s := session.Get(c)
+		params.Tag.UserID = s.UserID
 		return h.tagsService.CreateTag(c, params.Tag)
 	})
 }

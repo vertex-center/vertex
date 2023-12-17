@@ -3,6 +3,7 @@ package port
 import (
 	"github.com/stretchr/testify/mock"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type MockAuthAdapter struct{ mock.Mock }
@@ -17,7 +18,7 @@ func (m *MockAuthAdapter) GetCredentials(login string) ([]types.CredentialsArgon
 	return args.Get(0).([]types.CredentialsArgon2id), args.Error(1)
 }
 
-func (m *MockAuthAdapter) GetUsersByCredential(credentialID uint) ([]types.User, error) {
+func (m *MockAuthAdapter) GetUsersByCredential(credentialID uuid.UUID) ([]types.User, error) {
 	args := m.Called(credentialID)
 	return args.Get(0).([]types.User), args.Error(1)
 }
@@ -42,7 +43,7 @@ func (m *MockAuthAdapter) GetUser(username string) (types.User, error) {
 	return args.Get(0).(types.User), args.Error(1)
 }
 
-func (m *MockAuthAdapter) GetUserByID(id uint) (types.User, error) {
+func (m *MockAuthAdapter) GetUserByID(id uuid.UUID) (types.User, error) {
 	args := m.Called(id)
 	return args.Get(0).(types.User), args.Error(1)
 }
@@ -52,7 +53,7 @@ func (m *MockAuthAdapter) PatchUser(user types.User) (types.User, error) {
 	return args.Get(0).(types.User), args.Error(1)
 }
 
-func (m *MockAuthAdapter) GetUserCredentialsMethods(userID uint) ([]types.CredentialsMethods, error) {
+func (m *MockAuthAdapter) GetUserCredentialsMethods(userID uuid.UUID) ([]types.CredentialsMethods, error) {
 	args := m.Called(userID)
 	return args.Get(0).([]types.CredentialsMethods), args.Error(1)
 }

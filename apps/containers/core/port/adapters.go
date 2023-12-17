@@ -6,6 +6,7 @@ import (
 
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type (
@@ -35,8 +36,8 @@ type (
 	}
 
 	TagAdapter interface {
-		GetTag(ctx context.Context, userID uint, name string) (types.Tag, error)
-		GetTags(ctx context.Context, userID uint) (types.Tags, error)
+		GetTag(ctx context.Context, userID uuid.UUID, name string) (types.Tag, error)
+		GetTags(ctx context.Context, userID uuid.UUID) (types.Tags, error)
 		CreateTag(ctx context.Context, tag types.Tag) error
 		DeleteTag(ctx context.Context, id types.TagID) error
 	}

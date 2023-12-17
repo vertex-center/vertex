@@ -9,15 +9,15 @@ func GetSchema(driver vsql.Driver) string {
 		vsql.CreateMigrationTable(Migrations),
 
 		vsql.CreateTable("users").
-			WithID().
+			WithField("id", "VARCHAR(36)", "NOT NULL", "PRIMARY KEY").
 			WithField("username", "VARCHAR(255)", "NOT NULL").
 			WithCreatedAt().
 			WithUpdatedAt().
 			WithDeletedAt(),
 
 		vsql.CreateTable("emails").
-			WithID().
-			WithField("user_id", "INTEGER", "NOT NULL").
+			WithField("id", "VARCHAR(36)", "NOT NULL", "PRIMARY KEY").
+			WithField("user_id", "VARCHAR(36)", "NOT NULL").
 			WithField("email", "VARCHAR(255)", "NOT NULL").
 			WithCreatedAt().
 			WithUpdatedAt().
@@ -25,7 +25,7 @@ func GetSchema(driver vsql.Driver) string {
 			WithForeignKey("user_id", "users", "id"),
 
 		vsql.CreateTable("credentials_argon2").
-			WithID().
+			WithField("id", "VARCHAR(36)", "NOT NULL", "PRIMARY KEY").
 			WithField("login", "VARCHAR(255)", "NOT NULL").
 			WithField("hash", "VARCHAR(255)", "NOT NULL").
 			WithField("type", "VARCHAR(255)", "NOT NULL").
@@ -39,16 +39,16 @@ func GetSchema(driver vsql.Driver) string {
 			WithDeletedAt(),
 
 		vsql.CreateTable("credentials_argon2_users").
-			WithField("credential_id", "INTEGER", "NOT NULL").
-			WithField("user_id", "INTEGER", "NOT NULL").
+			WithField("credential_id", "VARCHAR(36)", "NOT NULL").
+			WithField("user_id", "VARCHAR(36)", "NOT NULL").
 			WithPrimaryKey("credential_id", "user_id").
 			WithForeignKey("credential_id", "credentials_argon2", "id").
 			WithForeignKey("user_id", "users", "id"),
 
 		vsql.CreateTable("sessions").
-			WithID().
+			WithField("id", "VARCHAR(36)", "NOT NULL", "PRIMARY KEY").
 			WithField("token", "VARCHAR(255)", "NOT NULL").
-			WithField("user_id", "INTEGER", "NOT NULL").
+			WithField("user_id", "VARCHAR(36)", "NOT NULL").
 			WithCreatedAt().
 			WithUpdatedAt().
 			WithDeletedAt().

@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
+	"github.com/vertex-center/vertex/apps/auth/core/types/session"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 
@@ -21,7 +22,8 @@ func NewEmailHandler(emailService port.EmailService) port.EmailHandler {
 
 func (h *emailHandler) GetCurrentUserEmails() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context) ([]types.Email, error) {
-		return h.service.GetEmails(uint(c.GetInt("user_id")))
+		s := session.Get(c)
+		return h.service.GetEmails(s.UserID)
 	})
 }
 
@@ -31,14 +33,14 @@ type CreateCurrentUserEmailParams struct {
 
 func (h *emailHandler) CreateCurrentUserEmail() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *CreateCurrentUserEmailParams) (*types.Email, error) {
-		userID := c.GetInt("user_id")
+		s := session.Get(c)
 
 		addr, err := mail.ParseAddress(params.Email)
 		if err != nil {
 			return nil, err
 		}
 
-		email, err := h.service.CreateEmail(uint(userID), addr.Address)
+		email, err := h.service.CreateEmail(s.UserID, addr.Address)
 		return &email, err
 	})
 }
@@ -49,7 +51,7 @@ type DeleteCurrentUserEmailParams struct {
 
 func (h *emailHandler) DeleteCurrentUserEmail() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *DeleteCurrentUserEmailParams) error {
-		userID := c.GetInt("user_id")
-		return h.service.DeleteEmail(uint(userID), params.Email)
+		s := session.Get(c)
+		return h.service.DeleteEmail(s.UserID, params.Email)
 	})
 }
