@@ -14,8 +14,9 @@ export type ServiceUpdate = {
 
 export type Tags = Tag[];
 export type Tag = {
+    id: string;
     container_id: string;
-    tag: string;
+    name: string;
 };
 
 export type EnvVariables = EnvVariable[];
