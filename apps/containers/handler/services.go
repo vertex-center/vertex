@@ -16,7 +16,7 @@ func NewServicesHandler(service port.ContainerService) port.ServicesHandler {
 }
 
 func (h *servicesHandler) Get() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) ([]types.Service, error) {
-		return h.containerService.GetServices(c), nil
+	return router.Handler(func(ctx *gin.Context) ([]types.Service, error) {
+		return h.containerService.GetServices(ctx), nil
 	})
 }

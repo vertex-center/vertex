@@ -51,8 +51,8 @@ func (r *ProxyRouter) initAPIRoutes() {
 	r.Engine().Any("/*path", r.HandleProxy)
 }
 
-func (r *ProxyRouter) HandleProxy(c *gin.Context) {
-	host := c.Request.Host
+func (r *ProxyRouter) HandleProxy(ctx *gin.Context) {
+	host := ctx.Request.Host
 
 	redirect := r.proxyService.GetRedirectByHost(host)
 	if redirect == nil {
@@ -75,11 +75,11 @@ func (r *ProxyRouter) HandleProxy(c *gin.Context) {
 		}
 	}
 	proxy.Director = func(request *http.Request) {
-		request.Header = c.Request.Header
+		request.Header = ctx.Request.Header
 		request.Host = target.Host
 		request.URL.Scheme = target.Scheme
 		request.URL.Host = target.Host
-		request.URL.Path = c.Param("path")
+		request.URL.Path = ctx.Param("path")
 	}
-	proxy.ServeHTTP(c.Writer, c.Request)
+	proxy.ServeHTTP(ctx.Writer, ctx.Request)
 }

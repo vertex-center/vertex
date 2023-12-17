@@ -21,8 +21,8 @@ func NewAuthHandler(authService port.AuthService) port.AuthHandler {
 }
 
 func (h authHandler) Login() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (*types.Session, error) {
-		login, pass, err := h.getUserPassFromHeader(c)
+	return router.Handler(func(ctx *gin.Context) (*types.Session, error) {
+		login, pass, err := h.getUserPassFromHeader(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -32,8 +32,8 @@ func (h authHandler) Login() gin.HandlerFunc {
 }
 
 func (h authHandler) Register() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (*types.Session, error) {
-		login, pass, err := h.getUserPassFromHeader(c)
+	return router.Handler(func(ctx *gin.Context) (*types.Session, error) {
+		login, pass, err := h.getUserPassFromHeader(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -44,22 +44,22 @@ func (h authHandler) Register() gin.HandlerFunc {
 }
 
 func (h authHandler) Verify() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (*types.Session, error) {
-		token := c.MustGet("token").(string)
+	return router.Handler(func(ctx *gin.Context) (*types.Session, error) {
+		token := ctx.MustGet("token").(string)
 		session, err := h.authService.Verify(token)
 		return session, err
 	})
 }
 
 func (h authHandler) Logout() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) error {
-		token := c.MustGet("token").(string)
+	return router.Handler(func(ctx *gin.Context) error {
+		token := ctx.MustGet("token").(string)
 		return h.authService.Logout(token)
 	})
 }
 
-func (h authHandler) getUserPassFromHeader(c *gin.Context) (string, string, error) {
-	authorization := c.Request.Header.Get("Authorization")
+func (h authHandler) getUserPassFromHeader(ctx *gin.Context) (string, string, error) {
+	authorization := ctx.Request.Header.Get("Authorization")
 
 	userpass := strings.TrimPrefix(authorization, "Basic ")
 	userpassBytes, err := base64.StdEncoding.DecodeString(userpass)

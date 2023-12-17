@@ -25,13 +25,13 @@ func NewDockerKernelHandler(dockerKernelService port.DockerService) port.DockerK
 }
 
 func (h *dockerKernelHandler) GetContainers() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) ([]types.DockerContainer, error) {
+	return router.Handler(func(ctx *gin.Context) ([]types.DockerContainer, error) {
 		return h.dockerService.ListContainers()
 	})
 }
 
 func (h *dockerKernelHandler) CreateContainer() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *types.CreateContainerOptions) (*types.CreateContainerResponse, error) {
+	return router.Handler(func(ctx *gin.Context, params *types.CreateContainerOptions) (*types.CreateContainerResponse, error) {
 		res, err := h.dockerService.CreateContainer(*params)
 		return &res, err
 	})
@@ -42,7 +42,7 @@ type DeleteDockerContainerParams struct {
 }
 
 func (h *dockerKernelHandler) DeleteContainer() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *DeleteDockerContainerParams) error {
+	return router.Handler(func(ctx *gin.Context, params *DeleteDockerContainerParams) error {
 		return h.dockerService.DeleteContainer(params.ID)
 	})
 }
@@ -52,7 +52,7 @@ type StartDockerContainerParams struct {
 }
 
 func (h *dockerKernelHandler) StartContainer() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *StartDockerContainerParams) error {
+	return router.Handler(func(ctx *gin.Context, params *StartDockerContainerParams) error {
 		err := h.dockerService.StartContainer(params.ID)
 		if err != nil && client.IsErrNotFound(err) {
 			return apierrors.NewNotFound(err, "container not found")
@@ -66,7 +66,7 @@ type StopDockerContainerParams struct {
 }
 
 func (h *dockerKernelHandler) StopContainer() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *StopDockerContainerParams) error {
+	return router.Handler(func(ctx *gin.Context, params *StopDockerContainerParams) error {
 		err := h.dockerService.StopContainer(params.ID)
 		if err != nil && client.IsErrNotFound(err) {
 			return apierrors.NewNotFound(err, "container not found")
@@ -80,7 +80,7 @@ type InfoContainerParams struct {
 }
 
 func (h *dockerKernelHandler) InfoContainer() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *InfoContainerParams) (*types.InfoContainerResponse, error) {
+	return router.Handler(func(ctx *gin.Context, params *InfoContainerParams) (*types.InfoContainerResponse, error) {
 		info, err := h.dockerService.InfoContainer(params.ID)
 		if err != nil && client.IsErrNotFound(err) {
 			return nil, apierrors.NewNotFound(err, "container not found")
@@ -94,7 +94,7 @@ type LogsStdoutContainerParams struct {
 }
 
 func (h *dockerKernelHandler) LogsStdoutContainer() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *LogsStdoutContainerParams) error {
+	return router.Handler(func(ctx *gin.Context, params *LogsStdoutContainerParams) error {
 		stdout, err := h.dockerService.LogsStdoutContainer(params.ID)
 		if err != nil {
 			return err
@@ -102,7 +102,7 @@ func (h *dockerKernelHandler) LogsStdoutContainer() gin.HandlerFunc {
 
 		scanner := bufio.NewScanner(stdout)
 
-		c.Stream(func(w io.Writer) bool {
+		ctx.Stream(func(w io.Writer) bool {
 			if scanner.Err() != nil {
 				return false
 			}
@@ -127,7 +127,7 @@ type LogsStderrContainerParams struct {
 }
 
 func (h *dockerKernelHandler) LogsStderrContainer() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *LogsStderrContainerParams) error {
+	return router.Handler(func(ctx *gin.Context, params *LogsStderrContainerParams) error {
 		stderr, err := h.dockerService.LogsStderrContainer(params.ID)
 		if err != nil {
 			return err
@@ -135,7 +135,7 @@ func (h *dockerKernelHandler) LogsStderrContainer() gin.HandlerFunc {
 
 		scanner := bufio.NewScanner(stderr)
 
-		c.Stream(func(w io.Writer) bool {
+		ctx.Stream(func(w io.Writer) bool {
 			if scanner.Err() != nil {
 				return false
 			}
@@ -161,7 +161,7 @@ type WaitContainerParams struct {
 }
 
 func (h *dockerKernelHandler) WaitContainer() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *WaitContainerParams) error {
+	return router.Handler(func(ctx *gin.Context, params *WaitContainerParams) error {
 		return h.dockerService.WaitContainer(params.ID, types.WaitContainerCondition(params.Cond))
 	})
 }
@@ -171,7 +171,7 @@ type DeleteMountsParams struct {
 }
 
 func (h *dockerKernelHandler) DeleteMounts() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *DeleteMountsParams) error {
+	return router.Handler(func(ctx *gin.Context, params *DeleteMountsParams) error {
 		return h.dockerService.DeleteMounts(params.ID)
 	})
 }
@@ -181,14 +181,14 @@ type InfoImageParams struct {
 }
 
 func (h *dockerKernelHandler) InfoImage() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *InfoImageParams) (*types.InfoImageResponse, error) {
+	return router.Handler(func(ctx *gin.Context, params *InfoImageParams) (*types.InfoImageResponse, error) {
 		info, err := h.dockerService.InfoImage(params.ID)
 		return &info, err
 	})
 }
 
 func (h *dockerKernelHandler) PullImage() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *types.PullImageOptions) error {
+	return router.Handler(func(ctx *gin.Context, params *types.PullImageOptions) error {
 		r, err := h.dockerService.PullImage(*params)
 		if err != nil {
 			return err
@@ -197,7 +197,7 @@ func (h *dockerKernelHandler) PullImage() gin.HandlerFunc {
 
 		scanner := bufio.NewScanner(r)
 
-		c.Stream(func(w io.Writer) bool {
+		ctx.Stream(func(w io.Writer) bool {
 			if scanner.Err() != nil {
 				return false
 			}
@@ -218,7 +218,7 @@ func (h *dockerKernelHandler) PullImage() gin.HandlerFunc {
 }
 
 func (h *dockerKernelHandler) BuildImage() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *types.BuildImageOptions) error {
+	return router.Handler(func(ctx *gin.Context, params *types.BuildImageOptions) error {
 		res, err := h.dockerService.BuildImage(*params)
 		if err != nil {
 			return err
@@ -227,7 +227,7 @@ func (h *dockerKernelHandler) BuildImage() gin.HandlerFunc {
 
 		scanner := bufio.NewScanner(res.Body)
 
-		c.Stream(func(w io.Writer) bool {
+		ctx.Stream(func(w io.Writer) bool {
 			if scanner.Err() != nil {
 				log.Error(scanner.Err())
 				return false

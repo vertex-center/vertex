@@ -17,7 +17,7 @@ func NewDatabaseHandler(dataService port.DatabaseService) port.DatabaseHandler {
 }
 
 func (h *databaseHandler) GetCurrentDbms() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (*string, error) {
+	return router.Handler(func(ctx *gin.Context) (*string, error) {
 		dbms := h.dataService.GetCurrentDbms()
 		return &dbms, nil
 	})
@@ -28,7 +28,7 @@ type MigrateToParams struct {
 }
 
 func (h *databaseHandler) MigrateTo() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *MigrateToParams) error {
+	return router.Handler(func(ctx *gin.Context, params *MigrateToParams) error {
 		return h.dataService.MigrateTo(params.Dbms)
 	})
 }

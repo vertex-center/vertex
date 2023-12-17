@@ -18,8 +18,8 @@ func NewSshHandler(sshService port.SshService) port.SshHandler {
 }
 
 func (h *sshHandler) Get() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) ([]types.PublicKey, error) {
-		return h.sshService.GetAll(c)
+	return router.Handler(func(ctx *gin.Context) ([]types.PublicKey, error) {
+		return h.sshService.GetAll(ctx)
 	})
 }
 
@@ -29,8 +29,8 @@ type AddSSHKeyParams struct {
 }
 
 func (h *sshHandler) Add() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *AddSSHKeyParams) error {
-		return h.sshService.Add(c, params.AuthorizedKey, params.Username)
+	return router.Handler(func(ctx *gin.Context, params *AddSSHKeyParams) error {
+		return h.sshService.Add(ctx, params.AuthorizedKey, params.Username)
 	})
 }
 
@@ -40,13 +40,13 @@ type DeleteSSHKeyParams struct {
 }
 
 func (h *sshHandler) Delete() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *DeleteSSHKeyParams) error {
-		return h.sshService.Delete(c, params.Fingerprint, params.Username)
+	return router.Handler(func(ctx *gin.Context, params *DeleteSSHKeyParams) error {
+		return h.sshService.Delete(ctx, params.Fingerprint, params.Username)
 	})
 }
 
 func (h *sshHandler) GetUsers() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) ([]string, error) {
-		return h.sshService.GetUsers(c)
+	return router.Handler(func(ctx *gin.Context) ([]string, error) {
+		return h.sshService.GetUsers(ctx)
 	})
 }

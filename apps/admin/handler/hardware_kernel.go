@@ -17,7 +17,7 @@ func NewHardwareKernelHandler(service port.HardwareKernelService) port.HardwareK
 }
 
 func (h *hardwareKernelHandler) Reboot() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) error {
+	return router.Handler(func(ctx *gin.Context) error {
 		return h.service.Reboot()
 	})
 }

@@ -22,9 +22,9 @@ type GetTagParams struct {
 }
 
 func (h *tagsHandler) GetTag() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *GetTagParams) (*types.Tag, error) {
-		s := session.Get(c)
-		tag, err := h.tagsService.GetTag(c, s.UserID, params.Name)
+	return router.Handler(func(ctx *gin.Context, params *GetTagParams) (*types.Tag, error) {
+		s := session.Get(ctx)
+		tag, err := h.tagsService.GetTag(ctx, s.UserID, params.Name)
 		if err != nil {
 			return nil, err
 		}
@@ -33,9 +33,9 @@ func (h *tagsHandler) GetTag() gin.HandlerFunc {
 }
 
 func (h *tagsHandler) GetTags() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (types.Tags, error) {
-		s := session.Get(c)
-		return h.tagsService.GetTags(c, s.UserID)
+	return router.Handler(func(ctx *gin.Context) (types.Tags, error) {
+		s := session.Get(ctx)
+		return h.tagsService.GetTags(ctx, s.UserID)
 	})
 }
 
@@ -44,9 +44,9 @@ type CreateTagParams struct {
 }
 
 func (h *tagsHandler) CreateTag() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *CreateTagParams) (types.Tag, error) {
-		s := session.Get(c)
-		return h.tagsService.CreateTag(c, types.Tag{
+	return router.Handler(func(ctx *gin.Context, params *CreateTagParams) (types.Tag, error) {
+		s := session.Get(ctx)
+		return h.tagsService.CreateTag(ctx, types.Tag{
 			UserID: s.UserID,
 			Name:   params.Name,
 		})
@@ -58,7 +58,7 @@ type DeleteTagParams struct {
 }
 
 func (h *tagsHandler) DeleteTag() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *DeleteTagParams) error {
-		return h.tagsService.DeleteTag(c, params.ID.UUID)
+	return router.Handler(func(ctx *gin.Context, params *DeleteTagParams) error {
+		return h.tagsService.DeleteTag(ctx, params.ID.UUID)
 	})
 }

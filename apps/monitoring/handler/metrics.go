@@ -22,8 +22,8 @@ type GetCollectorParams struct {
 }
 
 func (r *metricsHandler) GetCollector() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *GetCollectorParams) (types.Collector, error) {
-		return r.metricsService.GetCollector(c, params.Collector)
+	return router.Handler(func(ctx *gin.Context, params *GetCollectorParams) (types.Collector, error) {
+		return r.metricsService.GetCollector(ctx, params.Collector)
 	})
 }
 
@@ -32,8 +32,8 @@ type InstallCollectorParams struct {
 }
 
 func (r *metricsHandler) InstallCollector() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *InstallCollectorParams) error {
-		return r.metricsService.InstallCollector(c, params.Collector)
+	return router.Handler(func(ctx *gin.Context, params *InstallCollectorParams) error {
+		return r.metricsService.InstallCollector(ctx, params.Collector)
 	})
 }
 
@@ -42,7 +42,7 @@ type InstallVisualizerParams struct {
 }
 
 func (r *metricsHandler) InstallVisualizer() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *InstallVisualizerParams) error {
-		return r.metricsService.InstallVisualizer(c, params.Visualizer)
+	return router.Handler(func(ctx *gin.Context, params *InstallVisualizerParams) error {
+		return r.metricsService.InstallVisualizer(ctx, params.Visualizer)
 	})
 }

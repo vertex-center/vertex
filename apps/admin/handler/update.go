@@ -20,7 +20,7 @@ func NewUpdateHandler(updateService port.UpdateService, settingsService port.Set
 }
 
 func (h *updateHandler) Get() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (*types.Update, error) {
+	return router.Handler(func(ctx *gin.Context) (*types.Update, error) {
 		channel, err := h.settingsService.GetChannel()
 		if err != nil {
 			return nil, err
@@ -34,7 +34,7 @@ func (h *updateHandler) Get() gin.HandlerFunc {
 }
 
 func (h *updateHandler) Install() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) error {
+	return router.Handler(func(ctx *gin.Context) error {
 		channel, err := h.settingsService.GetChannel()
 		if err != nil {
 			return err

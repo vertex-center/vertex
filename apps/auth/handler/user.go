@@ -19,8 +19,8 @@ func NewUserHandler(userService port.UserService) port.UserHandler {
 }
 
 func (h *userHandler) GetCurrentUser() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (*types.User, error) {
-		s := session.Get(c)
+	return router.Handler(func(ctx *gin.Context) (*types.User, error) {
+		s := session.Get(ctx)
 		user, err := h.service.GetUserByID(s.UserID)
 		return &user, err
 	})
@@ -31,8 +31,8 @@ type PatchCurrentUserParams struct {
 }
 
 func (h *userHandler) PatchCurrentUser() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *PatchCurrentUserParams) (*types.User, error) {
-		s := session.Get(c)
+	return router.Handler(func(ctx *gin.Context, params *PatchCurrentUserParams) (*types.User, error) {
+		s := session.Get(ctx)
 		var err error
 		params.ID = s.UserID
 		params.User, err = h.service.PatchUser(params.User)
@@ -45,8 +45,8 @@ func (h *userHandler) PatchCurrentUser() gin.HandlerFunc {
 }
 
 func (h *userHandler) GetCurrentUserCredentials() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) ([]types.CredentialsMethods, error) {
-		s := session.Get(c)
+	return router.Handler(func(ctx *gin.Context) ([]types.CredentialsMethods, error) {
+		s := session.Get(ctx)
 		return h.service.GetUserCredentialsMethods(s.UserID)
 	})
 }

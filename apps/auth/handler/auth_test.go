@@ -83,9 +83,9 @@ func (suite *AuthHandlerTestSuite) TestRegister() {
 func (suite *AuthHandlerTestSuite) TestLogout() {
 	suite.service.On("Logout", "test_token").Return(nil)
 
-	handle := func(c *gin.Context) {
-		c.Set("token", "test_token")
-		suite.handler.Logout()(c)
+	handle := func(ctx *gin.Context) {
+		ctx.Set("token", "test_token")
+		suite.handler.Logout()(ctx)
 	}
 
 	res := routertest.Request("POST", handle, routertest.RequestOptions{

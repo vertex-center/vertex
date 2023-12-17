@@ -26,10 +26,10 @@ type GetParams struct {
 }
 
 func (h *dbmsHandler) Get() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *GetParams) (*types.DBMS, error) {
-		client := containersapi.NewContainersClient(c)
+	return router.Handler(func(ctx *gin.Context, params *GetParams) (*types.DBMS, error) {
+		client := containersapi.NewContainersClient(ctx)
 
-		inst, err := client.GetContainer(c, params.UUID)
+		inst, err := client.GetContainer(ctx, params.UUID)
 		if err != nil {
 			return nil, err
 		}

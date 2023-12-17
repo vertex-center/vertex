@@ -21,8 +21,8 @@ func NewEmailHandler(emailService port.EmailService) port.EmailHandler {
 }
 
 func (h *emailHandler) GetCurrentUserEmails() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) ([]types.Email, error) {
-		s := session.Get(c)
+	return router.Handler(func(ctx *gin.Context) ([]types.Email, error) {
+		s := session.Get(ctx)
 		return h.service.GetEmails(s.UserID)
 	})
 }
@@ -32,8 +32,8 @@ type CreateCurrentUserEmailParams struct {
 }
 
 func (h *emailHandler) CreateCurrentUserEmail() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *CreateCurrentUserEmailParams) (*types.Email, error) {
-		s := session.Get(c)
+	return router.Handler(func(ctx *gin.Context, params *CreateCurrentUserEmailParams) (*types.Email, error) {
+		s := session.Get(ctx)
 
 		addr, err := mail.ParseAddress(params.Email)
 		if err != nil {
@@ -50,8 +50,8 @@ type DeleteCurrentUserEmailParams struct {
 }
 
 func (h *emailHandler) DeleteCurrentUserEmail() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *DeleteCurrentUserEmailParams) error {
-		s := session.Get(c)
+	return router.Handler(func(ctx *gin.Context, params *DeleteCurrentUserEmailParams) error {
+		s := session.Get(ctx)
 		return h.service.DeleteEmail(s.UserID, params.Email)
 	})
 }

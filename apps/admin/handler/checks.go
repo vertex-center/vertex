@@ -22,12 +22,12 @@ func NewChecksHandler(checksService port.ChecksService) port.ChecksHandler {
 }
 
 func (h *checksHandler) Check() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) error {
-		timeout, cancelTimeout := context.WithTimeout(c, 10*time.Second)
+	return router.Handler(func(ctx *gin.Context) error {
+		timeout, cancelTimeout := context.WithTimeout(ctx, 10*time.Second)
 		resCh := h.checksService.CheckAll(timeout)
 		defer cancelTimeout()
 
-		c.Stream(func(w io.Writer) bool {
+		ctx.Stream(func(w io.Writer) bool {
 			res, ok := <-resCh
 			if !ok {
 				_ = sse.Encode(w, sse.Event{

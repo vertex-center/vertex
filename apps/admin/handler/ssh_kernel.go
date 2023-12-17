@@ -20,25 +20,25 @@ func NewSshKernelHandler(sshKernelService port.SshKernelService) port.SshKernelH
 }
 
 func (h *sshKernelHandler) Get() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) ([]types.PublicKey, error) {
+	return router.Handler(func(ctx *gin.Context) ([]types.PublicKey, error) {
 		return h.sshService.GetAll()
 	})
 }
 
 func (h *sshKernelHandler) Add() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *AddSSHKeyParams) error {
+	return router.Handler(func(ctx *gin.Context, params *AddSSHKeyParams) error {
 		return h.sshService.Add(params.AuthorizedKey, params.Username)
 	})
 }
 
 func (h *sshKernelHandler) Delete() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *DeleteSSHKeyParams) error {
+	return router.Handler(func(ctx *gin.Context, params *DeleteSSHKeyParams) error {
 		return h.sshService.Delete(params.Fingerprint, params.Username)
 	})
 }
 
 func (h *sshKernelHandler) GetUsers() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) ([]user.User, error) {
+	return router.Handler(func(ctx *gin.Context) ([]user.User, error) {
 		return h.sshService.GetUsers()
 	})
 }

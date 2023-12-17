@@ -20,8 +20,8 @@ type GetServiceParams struct {
 }
 
 func (h *serviceHandler) Get() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *GetServiceParams) (*types.Service, error) {
-		return h.containerService.GetServiceByID(c, params.ServiceID)
+	return router.Handler(func(ctx *gin.Context, params *GetServiceParams) (*types.Service, error) {
+		return h.containerService.GetServiceByID(ctx, params.ServiceID)
 	})
 }
 
@@ -30,7 +30,7 @@ type InstallServiceParams struct {
 }
 
 func (h *serviceHandler) Install() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *InstallServiceParams) (*types.Container, error) {
-		return h.containerService.Install(c, params.ServiceID)
+	return router.Handler(func(ctx *gin.Context, params *InstallServiceParams) (*types.Container, error) {
+		return h.containerService.Install(ctx, params.ServiceID)
 	})
 }

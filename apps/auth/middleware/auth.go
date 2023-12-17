@@ -10,24 +10,24 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-func ReadAuth(c *gin.Context) {
-	tokenStr := c.Request.Header.Get("Authorization")
+func ReadAuth(ctx *gin.Context) {
+	tokenStr := ctx.Request.Header.Get("Authorization")
 	tokenStr = strings.TrimPrefix(tokenStr, "Bearer")
 	tokenStr = strings.TrimSpace(tokenStr)
-	c.Set("token", tokenStr)
+	ctx.Set("token", tokenStr)
 	log.Debug("reading auth", vlog.String("token", tokenStr))
-	c.Next()
+	ctx.Next()
 }
 
-func Authenticated(c *gin.Context) {
-	authClient := api.NewAuthClient(c)
-	session, err := authClient.Verify(c)
+func Authenticated(ctx *gin.Context) {
+	authClient := api.NewAuthClient(ctx)
+	session, err := authClient.Verify(ctx)
 	if err != nil {
-		_ = c.AbortWithError(401, errors.NewUnauthorized(err, "invalid token"))
+		_ = ctx.AbortWithError(401, errors.NewUnauthorized(err, "invalid token"))
 		return
 	}
 
-	c.Set("authenticated", true)
-	c.Set("user_id", session.UserID)
-	c.Next()
+	ctx.Set("authenticated", true)
+	ctx.Set("user_id", session.UserID)
+	ctx.Next()
 }

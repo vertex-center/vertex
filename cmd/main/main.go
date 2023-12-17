@@ -106,7 +106,7 @@ func ensureNotRoot() {
 }
 
 func initRoutes(about common.About) {
-	srv.Router.Engine().NoRoute(router.Handler(func(c *gin.Context) error {
+	srv.Router.Engine().NoRoute(router.Handler(func(ctx *gin.Context) error {
 		return errors.NewNotFound(nil, "route not found")
 	}))
 
@@ -114,7 +114,7 @@ func initRoutes(about common.About) {
 	a.GET("/about", []fizz.OperationOption{
 		fizz.ID("getAbout"),
 		fizz.Summary("Get server info"),
-	}, router.Handler(func(c *gin.Context) (*common.About, error) {
+	}, router.Handler(func(ctx *gin.Context) (*common.About, error) {
 		return &about, nil
 	}))
 }

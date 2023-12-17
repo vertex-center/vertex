@@ -26,35 +26,35 @@ func NewContainersHandler(ctx *apptypes.Context, containerService port.Container
 }
 
 func (h *containersHandler) GetContainers() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (types.Containers, error) {
+	return router.Handler(func(ctx *gin.Context) (types.Containers, error) {
 		filters := types.ContainerFilters{}
 
-		features := c.QueryArray("features[]")
+		features := ctx.QueryArray("features[]")
 		if len(features) > 0 {
 			filters.Features = &features
 		}
 
-		tags := c.QueryArray("tags[]")
+		tags := ctx.QueryArray("tags[]")
 		if len(tags) > 0 {
 			filters.Tags = &tags
 		}
 
-		return h.containerService.GetContainersWithFilters(c, filters)
+		return h.containerService.GetContainersWithFilters(ctx, filters)
 	})
 }
 
 func (h *containersHandler) CheckForUpdates() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (types.Containers, error) {
-		return h.containerService.CheckForUpdates(c)
+	return router.Handler(func(ctx *gin.Context) (types.Containers, error) {
+		return h.containerService.CheckForUpdates(ctx)
 	})
 }
 
 func (h *containersHandler) Events() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) error {
+	return router.Handler(func(ctx *gin.Context) error {
 		eventsChan := make(chan sse.Event)
 		defer close(eventsChan)
 
-		done := c.Request.Context().Done()
+		done := ctx.Request.Context().Done()
 
 		listener := event.NewTempListener(func(e event.Event) error {
 			switch e.(type) {
@@ -71,7 +71,7 @@ func (h *containersHandler) Events() gin.HandlerFunc {
 
 		first := true
 
-		c.Stream(func(w io.Writer) bool {
+		ctx.Stream(func(w io.Writer) bool {
 			if first {
 				err := sse.Encode(w, sse.Event{
 					Event: "open",

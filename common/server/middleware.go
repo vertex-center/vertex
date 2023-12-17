@@ -45,23 +45,23 @@ func logger(u *url.URL, app string) gin.HandlerFunc {
 
 // requestID is a middleware that sets a unique ID for each request.
 func requestID() gin.HandlerFunc {
-	return func(c *gin.Context) {
+	return func(ctx *gin.Context) {
 		key := HeaderXRequestID
 		id := uuid.New().String()
 
-		c.Request.Header.Add(key, id)
-		c.Header(key, id)
-		c.Set(KeyRequestID, id)
-		c.Next()
+		ctx.Request.Header.Add(key, id)
+		ctx.Header(key, id)
+		ctx.Set(KeyRequestID, id)
+		ctx.Next()
 	}
 }
 
 // correlationID is a middleware that sets a unique ID
 // for a request that is shared between services.
 func correlationID() gin.HandlerFunc {
-	return func(c *gin.Context) {
+	return func(ctx *gin.Context) {
 		key := HeaderXCorrelationID
-		id := c.Request.Header.Get(key)
+		id := ctx.Request.Header.Get(key)
 		if id != "" {
 			// Check if id is valid, else ignore it.
 			_, err := uuid.Parse(id)
@@ -71,11 +71,11 @@ func correlationID() gin.HandlerFunc {
 		}
 		if id == "" {
 			id = uuid.New().String()
-			c.Request.Header.Add(key, id)
+			ctx.Request.Header.Add(key, id)
 		}
 
-		c.Header(key, id)
-		c.Set(KeyCorrelationID, id)
-		c.Next()
+		ctx.Header(key, id)
+		ctx.Set(KeyCorrelationID, id)
+		ctx.Next()
 	}
 }

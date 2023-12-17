@@ -6,9 +6,9 @@ import (
 )
 
 // SSE sets the headers for server-sent events.
-func SSE(c *gin.Context) {
-	c.Writer.Header().Set("Content-Type", sse.ContentType)
-	c.Writer.Header().Set("Cache-Control", "no-cache")
-	c.Writer.Header().Set("Connection", "keep-alive")
-	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+func SSE(ctx *gin.Context) {
+	ctx.Writer.Header().Set("Content-Type", sse.ContentType)
+	ctx.Writer.Header().Set("Cache-Control", "no-cache")
+	ctx.Writer.Header().Set("Connection", "keep-alive")
+	ctx.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 }

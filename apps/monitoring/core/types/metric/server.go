@@ -118,8 +118,8 @@ func Serve(r *fizz.RouterGroup, provider RegistryProvider) {
 		fizz.ID("getMetrics"),
 		fizz.Summary("Get metrics"),
 		fizz.Description("Retrieve metrics for Prometheus."),
-	}, tonic.Handler(func(c *gin.Context) error {
-		httpHandler.ServeHTTP(c.Writer, c.Request)
+	}, tonic.Handler(func(ctx *gin.Context) error {
+		httpHandler.ServeHTTP(ctx.Writer, ctx.Request)
 		return nil
 	}, http.StatusOK))
 }

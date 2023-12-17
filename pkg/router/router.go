@@ -42,7 +42,7 @@ func New(info *openapi.Info, opts ...Option) *Router {
 		f.GET("/api/ping", []fizz.OperationOption{
 			fizz.ID("ping"),
 			fizz.Summary("Ping the app"),
-		}, tonic.Handler(func(c *gin.Context) error {
+		}, tonic.Handler(func(ctx *gin.Context) error {
 			return nil
 		}, http.StatusNoContent))
 	}

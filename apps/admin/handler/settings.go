@@ -18,7 +18,7 @@ func NewSettingsHandler(settingsService port.SettingsService) port.SettingsHandl
 }
 
 func (h *settingsHandler) Get() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (*types.AdminSettings, error) {
+	return router.Handler(func(ctx *gin.Context) (*types.AdminSettings, error) {
 		settings, err := h.service.Get()
 		if err != nil {
 			return nil, err
@@ -32,7 +32,7 @@ type PatchSettingsParams struct {
 }
 
 func (h *settingsHandler) Patch() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *PatchSettingsParams) error {
+	return router.Handler(func(ctx *gin.Context, params *PatchSettingsParams) error {
 		return h.service.Update(params.Settings)
 	})
 }

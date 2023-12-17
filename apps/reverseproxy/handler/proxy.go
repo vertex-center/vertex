@@ -22,13 +22,13 @@ func NewProxyHandler(proxyService port.ProxyService) port.ProxyHandler {
 }
 
 func (r *proxyHandler) GetRedirects() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (types.ProxyRedirects, error) {
+	return router.Handler(func(ctx *gin.Context) (types.ProxyRedirects, error) {
 		return r.proxyService.GetRedirects(), nil
 	})
 }
 
 func (r *proxyHandler) AddRedirect() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, redirect *types.ProxyRedirect) error {
+	return router.Handler(func(ctx *gin.Context, redirect *types.ProxyRedirect) error {
 		err := r.proxyService.AddRedirect(*redirect)
 		if err != nil {
 			return errors.New(fmt.Sprintf("failed to add redirect '%s' to '%s'", redirect.Source, redirect.Target))
@@ -42,7 +42,7 @@ type RemoveRedirectParams struct {
 }
 
 func (r *proxyHandler) RemoveRedirect() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context, params *RemoveRedirectParams) error {
+	return router.Handler(func(ctx *gin.Context, params *RemoveRedirectParams) error {
 		err := r.proxyService.RemoveRedirect(params.ID.UUID)
 		if err != nil {
 			return errors.New(fmt.Sprintf("failed to remove redirect '%s'", params.ID.UUID))

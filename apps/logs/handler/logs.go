@@ -23,8 +23,8 @@ func NewLogsHandler(service port.LogsService) port.LogsHandler {
 }
 
 func (h *logsHandler) Push() gin.HandlerFunc {
-	return tonic.Handler(func(c *gin.Context) error {
-		conn, err := h.upgrader.Upgrade(c.Writer, c.Request, nil)
+	return tonic.Handler(func(ctx *gin.Context) error {
+		conn, err := h.upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 		if err != nil {
 			return errors.Annotate(err, "upgrade connection")
 		}
