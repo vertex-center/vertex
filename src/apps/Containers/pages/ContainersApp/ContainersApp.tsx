@@ -60,14 +60,12 @@ export default function ContainersApp() {
     } = useContainers({ tags });
 
     const mutationPower = useMutation({
-        mutationFn: async (uuid: string) => {
-            if (
-                containers[uuid].status === "off" ||
-                containers[uuid].status === "error"
-            ) {
-                await API.startContainer(uuid);
+        mutationFn: async (id: string) => {
+            const container = containers?.find((c) => c.id === id);
+            if (container.status === "off" || container.status === "error") {
+                await API.startContainer(id);
             } else {
-                await API.stopContainer(uuid);
+                await API.stopContainer(id);
             }
         },
     });
