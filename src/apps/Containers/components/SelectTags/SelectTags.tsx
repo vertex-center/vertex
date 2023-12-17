@@ -10,7 +10,7 @@ export default function SelectTags(props: Readonly<Props>) {
     const { selected } = props;
     const { tags, isLoading, isError } = useContainersTags();
 
-    tags?.sort((a, b) => a.localeCompare(b));
+    tags?.sort((a, b) => a.tag.localeCompare(b.tag));
 
     const count = selected?.length;
 
@@ -33,11 +33,11 @@ export default function SelectTags(props: Readonly<Props>) {
         >
             {tags?.map((tag) => (
                 <SelectOption
-                    key={tag}
+                    key={tag.tag}
                     value={tag}
-                    selected={selected.includes(tag)}
+                    selected={selected.includes(tag.tag)}
                 >
-                    {tag}
+                    {tag.tag}
                 </SelectOption>
             ))}
         </SelectField>

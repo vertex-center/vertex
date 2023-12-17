@@ -1,20 +1,22 @@
 import { api } from "../../../backend/api/backend";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import Service from "../../../components/Service/Service";
-import { Service as ServiceModel } from "../../../models/service";
+import { Service as ServiceModel } from "../../Containers/backend/service";
 import ServiceInstallPopup from "../../../components/ServiceInstallPopup/ServiceInstallPopup";
 import { useState } from "react";
 import { APIError } from "../../../components/Error/APIError";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { List, Title } from "@vertex-center/components";
 import Content from "../../../components/Content/Content";
+import { API } from "../../Containers/backend/api";
+import { useContainers } from "../../Containers/hooks/useContainers";
 
 export default function SqlInstaller() {
     const queryClient = useQueryClient();
 
     const queryServices = useQuery({
         queryKey: ["services"],
-        queryFn: api.vxContainers.services.all,
+        queryFn: API.getAllServices,
     });
     const {
         data: services,
@@ -22,15 +24,11 @@ export default function SqlInstaller() {
         error: servicesError,
     } = queryServices;
 
-    const queryContainers = useQuery({
-        queryKey: ["containers"],
-        queryFn: api.vxContainers.containers.all,
-    });
     const {
-        data: containers,
-        isLoading: isContainersLoading,
+        containers,
+        isLoading: isLoadingContainers,
         error: containersError,
-    } = queryContainers;
+    } = useContainers({});
 
     const [selectedService, setSelectedService] = useState<ServiceModel>();
     const [showPopup, setShowPopup] = useState(false);
@@ -77,7 +75,7 @@ export default function SqlInstaller() {
 
     return (
         <Content>
-            <ProgressOverlay show={isContainersLoading ?? isServicesLoading} />
+            <ProgressOverlay show={isLoadingContainers ?? isServicesLoading} />
             <Title variant="h2">Installer</Title>
             <APIError error={error} />
             <List>
@@ -100,9 +98,11 @@ export default function SqlInstaller() {
                                 installedCount={
                                     containers === undefined
                                         ? undefined
-                                        : Object.values(containers)?.filter(
-                                              ({ service: s }) =>
-                                                  s.id === service.id
+                                        : Object.values(
+                                              containers ?? []
+                                          )?.filter(
+                                              ({ service_id }) =>
+                                                  service_id === service.id
                                           )?.length
                                 }
                             />

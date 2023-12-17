@@ -1,4 +1,4 @@
-import { Service } from "../../models/service";
+import { Service } from "../../apps/Containers/backend/service";
 
 import { createServer } from "../server";
 

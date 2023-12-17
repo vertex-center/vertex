@@ -7,7 +7,6 @@ import {
     Title,
     Vertical,
 } from "@vertex-center/components";
-import { api } from "../../../../backend/api/backend";
 import {
     KeyValueGroup,
     KeyValueInfo,
@@ -17,6 +16,7 @@ import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useDockerInfo } from "../../hooks/useContainer";
 import Content from "../../../../components/Content/Content";
+import { API } from "../../backend/api";
 
 export default function ContainerDocker() {
     const { uuid } = useParams();
@@ -30,9 +30,7 @@ export default function ContainerDocker() {
         setRecreatingContainer(true);
         setRecreatingContainerError(undefined);
 
-        api.vxContainers
-            .container(uuid)
-            .docker.recreate()
+        API.recreateDocker(uuid)
             .catch((err) => {
                 setRecreatingContainerError(
                     err?.response?.data?.message ?? err?.message

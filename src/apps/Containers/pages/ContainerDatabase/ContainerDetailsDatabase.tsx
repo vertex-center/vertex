@@ -16,7 +16,7 @@ import {
     Title,
 } from "@vertex-center/components";
 import { api } from "../../../../backend/api/backend";
-import { DatabaseEnvironment } from "../../../../models/service";
+import { DatabaseEnvironment } from "../../backend/service";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -38,7 +38,7 @@ function Database(props: Readonly<DatabaseProps>) {
     const [database, setDatabase] = useState<Container>();
     const [error, setError] = useState();
 
-    const env = database?.environment;
+    const env = database?.env;
 
     useEffect(() => {
         const uuid = container?.databases?.[dbID];
@@ -54,7 +54,7 @@ function Database(props: Readonly<DatabaseProps>) {
 
     const onDatabaseChange = (container: Container) => {
         setDatabase(container);
-        onChange?.(dbID, container?.uuid);
+        onChange?.(dbID, container?.id);
     };
 
     const port = env?.[database?.service?.features?.databases?.[0]?.port];
@@ -72,7 +72,7 @@ function Database(props: Readonly<DatabaseProps>) {
                     <ContainerSelect
                         onChange={onDatabaseChange}
                         container={database}
-                        query={{
+                        filters={{
                             features: dbDefinition?.types,
                         }}
                     />

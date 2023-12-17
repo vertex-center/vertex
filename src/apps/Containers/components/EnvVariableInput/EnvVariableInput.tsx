@@ -1,6 +1,6 @@
 import { TextField } from "@vertex-center/components";
 import TimezoneField from "../../../../components/TimezoneField/TimezoneField";
-import { EnvVariable } from "../../../../models/service";
+import { EnvVariable } from "../../backend/models";
 
 type Props = {
     id: string;

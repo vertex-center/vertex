@@ -22,9 +22,9 @@ export default function SqlApp() {
         <Sidebar>
             {Object.values(containers ?? {}).length > 0 && (
                 <Sidebar.Group title="DBMS">
-                    {Object.values(containers ?? {})?.map((inst) => {
+                    {Object.values(containers ?? {})?.map((c) => {
                         let icon = <MaterialIcon icon="database" />;
-                        const type = inst?.service?.features?.databases?.find(
+                        const type = c?.service?.features?.databases?.find(
                             (d) => d.category === "sql"
                         )?.type;
                         if (type === "postgres") {
@@ -33,15 +33,15 @@ export default function SqlApp() {
 
                         return (
                             <Sidebar.Item
-                                key={inst.uuid}
-                                label={inst?.display_name ?? inst.service.name}
+                                key={c?.id}
+                                label={c?.name}
                                 icon={icon}
-                                link={l(`/app/sql/db/${inst.uuid}`)}
+                                link={l(`/app/sql/db/${c?.id}`)}
                                 trailing={
-                                    inst && (
+                                    c && (
                                         <ContainerLed
                                             small
-                                            status={inst?.status}
+                                            status={c?.status}
                                         />
                                     )
                                 }

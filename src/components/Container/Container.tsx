@@ -4,7 +4,7 @@ import { Horizontal, Vertical } from "../Layouts/Layouts";
 import { Link } from "react-router-dom";
 import { Fragment, HTMLProps, MouseEventHandler } from "react";
 import LoadingValue from "../LoadingValue/LoadingValue";
-import { Container as ContainerModel } from "../../models/container";
+import { Container as ContainerModel } from "../../apps/Containers/backend/models";
 import LogoIcon from "../Logo/LogoIcon";
 import { ContainerLed } from "../ContainerLed/ContainerLed";
 import { v4 as uuidv4 } from "uuid";
@@ -35,10 +35,9 @@ type LCDProps = {
 
 function LCD(props: Readonly<LCDProps>) {
     const { container } = props;
-    const { display_name, service, status } = container ?? {};
-    const { name } = service ?? {};
+    const { name, status } = container ?? {};
 
-    let message;
+    let message = status;
     switch (status) {
         case "off":
             message = "Off";
@@ -64,16 +63,12 @@ function LCD(props: Readonly<LCDProps>) {
         case "not-installed":
             message = "Not installed";
             break;
-        default:
-            message = status;
     }
 
     let content = (
         <Vertical gap={10}>
             <Horizontal gap={8}>
-                <Horizontal gap={8}>
-                    {display_name ?? name ?? <LoadingValue />}
-                </Horizontal>
+                <Horizontal gap={8}>{name ?? <LoadingValue />}</Horizontal>
             </Horizontal>
             <div
                 className={classNames({
@@ -119,9 +114,11 @@ export default function Container(props: Readonly<Props>) {
     ];
 
     const inst = container.value;
-    const tag = tags?.find((t) => inst?.tags?.includes(t));
+    const tag = tags?.find((name) =>
+        inst?.tags?.includes((t) => t.tag === name)
+    );
     // The uuidv4() is used to generate a unique key for containers that are not yet loaded.
-    const key = inst?.uuid ?? uuidv4();
+    const key = inst?.id ?? uuidv4();
 
     const content = (
         <Fragment>

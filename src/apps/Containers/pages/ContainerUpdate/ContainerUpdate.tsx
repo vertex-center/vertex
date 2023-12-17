@@ -1,7 +1,6 @@
 import { Caption } from "../../../../components/Text/Text";
 import { useParams } from "react-router-dom";
 import useContainer from "../../hooks/useContainer";
-import { api } from "../../../../backend/api/backend";
 import { useState } from "react";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
@@ -17,6 +16,7 @@ import {
     Title,
 } from "@vertex-center/components";
 import Content from "../../../../components/Content/Content";
+import { API } from "../../backend/api";
 
 export default function ContainerUpdate() {
     const { uuid } = useParams();
@@ -27,9 +27,7 @@ export default function ContainerUpdate() {
     const [error, setError] = useState();
 
     const updateVertexIntegration = () => {
-        return api.vxContainers
-            .container(uuid)
-            .update.service()
+        return API.updateService(uuid)
             .then(() => {
                 queryClient.invalidateQueries({
                     queryKey: ["containers", uuid],
