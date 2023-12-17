@@ -64,7 +64,7 @@ func correlationID() gin.HandlerFunc {
 		id := ctx.Request.Header.Get(key)
 		if id != "" {
 			// Check if id is valid, else ignore it.
-			_, err := uuid.Parse(id)
+			err := uuid.Validate(id)
 			if err != nil {
 				id = ""
 			}
