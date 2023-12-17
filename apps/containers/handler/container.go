@@ -13,7 +13,6 @@ import (
 	apptypes "github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/pkg/event"
-	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vlog"
 )
 
@@ -46,7 +45,7 @@ type DeleteContainerParams struct {
 func (h *containerHandler) Delete() gin.HandlerFunc {
 	return tonic.Handler(func(ctx *gin.Context, params *DeleteContainerParams) error {
 		return h.containerService.Delete(ctx, params.ContainerID.UUID)
-	}, http.StatusNoContent)
+	}, http.StatusOK)
 }
 
 type PatchBodyDatabase struct {
@@ -62,24 +61,24 @@ type PatchContainerParams struct {
 }
 
 func (h *containerHandler) Patch() gin.HandlerFunc {
-	return router.Handler(func(ctx *gin.Context, params *PatchContainerParams) error {
-		inst, err := h.containerService.Get(ctx, params.ContainerID.UUID)
+	return tonic.Handler(func(ctx *gin.Context, params *PatchContainerParams) error {
+		c, err := h.containerService.Get(ctx, params.ContainerID.UUID)
 		if err != nil {
 			return err
 		}
 
 		if params.LaunchOnStartup != nil {
-			inst.LaunchOnStartup = *params.LaunchOnStartup
+			c.LaunchOnStartup = *params.LaunchOnStartup
 		}
 		if params.Name != nil && *params.Name != "" {
-			inst.Name = *params.Name
+			c.Name = *params.Name
 		}
 		if params.ImageTag != nil {
-			inst.ImageTag = *params.ImageTag
+			c.ImageTag = *params.ImageTag
 		}
 
-		return h.containerService.UpdateContainer(ctx, params.ContainerID.UUID, *inst)
-	})
+		return h.containerService.UpdateContainer(ctx, params.ContainerID.UUID, *c)
+	}, http.StatusOK)
 }
 
 type StartContainerParams struct {
@@ -87,9 +86,9 @@ type StartContainerParams struct {
 }
 
 func (h *containerHandler) Start() gin.HandlerFunc {
-	return router.Handler(func(ctx *gin.Context, params *StartContainerParams) error {
+	return tonic.Handler(func(ctx *gin.Context, params *StartContainerParams) error {
 		return h.containerService.Start(ctx, params.ContainerID.UUID)
-	})
+	}, http.StatusOK)
 }
 
 type StopContainerParams struct {
@@ -97,9 +96,9 @@ type StopContainerParams struct {
 }
 
 func (h *containerHandler) Stop() gin.HandlerFunc {
-	return router.Handler(func(ctx *gin.Context, params *StopContainerParams) error {
+	return tonic.Handler(func(ctx *gin.Context, params *StopContainerParams) error {
 		return h.containerService.Stop(ctx, params.ContainerID.UUID)
-	})
+	}, http.StatusOK)
 }
 
 type AddTagParams struct {
@@ -108,9 +107,9 @@ type AddTagParams struct {
 }
 
 func (h *containerHandler) AddContainerTag() gin.HandlerFunc {
-	return router.Handler(func(ctx *gin.Context, params *AddTagParams) error {
+	return tonic.Handler(func(ctx *gin.Context, params *AddTagParams) error {
 		return h.containerService.AddContainerTag(ctx, params.ContainerID.UUID, params.TagID.UUID)
-	})
+	}, http.StatusOK)
 }
 
 type GetContainerEnvParams struct {
@@ -118,9 +117,9 @@ type GetContainerEnvParams struct {
 }
 
 func (h *containerHandler) GetContainerEnv() gin.HandlerFunc {
-	return router.Handler(func(ctx *gin.Context, params *GetContainerEnvParams) (types.EnvVariables, error) {
+	return tonic.Handler(func(ctx *gin.Context, params *GetContainerEnvParams) (types.EnvVariables, error) {
 		return h.containerService.GetContainerEnv(ctx, params.ContainerID.UUID)
-	})
+	}, http.StatusOK)
 }
 
 type PatchEnvironmentParams struct {
@@ -129,9 +128,9 @@ type PatchEnvironmentParams struct {
 }
 
 func (h *containerHandler) PatchEnvironment() gin.HandlerFunc {
-	return router.Handler(func(ctx *gin.Context, params *PatchEnvironmentParams) error {
+	return tonic.Handler(func(ctx *gin.Context, params *PatchEnvironmentParams) error {
 		return h.containerService.SaveEnv(ctx, params.ContainerID.UUID, params.Env)
-	})
+	}, http.StatusOK)
 }
 
 type EventsContainerParams struct {
@@ -139,7 +138,7 @@ type EventsContainerParams struct {
 }
 
 func (h *containerHandler) Events() gin.HandlerFunc {
-	return router.Handler(func(ctx *gin.Context, params *EventsContainerParams) error {
+	return tonic.Handler(func(ctx *gin.Context, params *EventsContainerParams) error {
 		inst, err := h.containerService.Get(ctx, params.ContainerID.UUID)
 		if err != nil {
 			return err
@@ -219,13 +218,13 @@ func (h *containerHandler) Events() gin.HandlerFunc {
 		})
 
 		return nil
-	})
+	}, http.StatusOK)
 }
 
 func (h *containerHandler) GetDocker() gin.HandlerFunc {
-	return router.Handler(func(ctx *gin.Context, params *GetContainerParams) (map[string]any, error) {
+	return tonic.Handler(func(ctx *gin.Context, params *GetContainerParams) (map[string]any, error) {
 		return h.containerService.GetContainerInfo(ctx, params.ContainerID.UUID)
-	})
+	}, http.StatusOK)
 }
 
 type RecreateContainerParams struct {
@@ -233,9 +232,9 @@ type RecreateContainerParams struct {
 }
 
 func (h *containerHandler) RecreateDocker() gin.HandlerFunc {
-	return router.Handler(func(ctx *gin.Context, params *RecreateContainerParams) error {
+	return tonic.Handler(func(ctx *gin.Context, params *RecreateContainerParams) error {
 		return h.containerService.RecreateContainer(ctx, params.ContainerID.UUID)
-	})
+	}, http.StatusNoContent)
 }
 
 type LogsContainerParams struct {
@@ -243,9 +242,9 @@ type LogsContainerParams struct {
 }
 
 func (h *containerHandler) GetLogs() gin.HandlerFunc {
-	return router.Handler(func(ctx *gin.Context, params *LogsContainerParams) ([]types.LogLine, error) {
+	return tonic.Handler(func(ctx *gin.Context, params *LogsContainerParams) ([]types.LogLine, error) {
 		return h.containerService.GetLatestLogs(params.ContainerID.UUID)
-	})
+	}, http.StatusOK)
 }
 
 type GetVersionsParams struct {
@@ -254,10 +253,10 @@ type GetVersionsParams struct {
 }
 
 func (h *containerHandler) GetVersions() gin.HandlerFunc {
-	return router.Handler(func(ctx *gin.Context, params *GetVersionsParams) ([]string, error) {
+	return tonic.Handler(func(ctx *gin.Context, params *GetVersionsParams) ([]string, error) {
 		log.Info("GetVersions", vlog.Bool("use_cache", params.UseCache))
 		return h.containerService.GetAllVersions(ctx, params.ContainerID.UUID, params.UseCache)
-	})
+	}, http.StatusOK)
 }
 
 type WaitStatusParams struct {
@@ -265,8 +264,8 @@ type WaitStatusParams struct {
 }
 
 func (h *containerHandler) WaitStatus() gin.HandlerFunc {
-	return router.Handler(func(ctx *gin.Context, params *WaitStatusParams) error {
+	return tonic.Handler(func(ctx *gin.Context, params *WaitStatusParams) error {
 		status := ctx.Query("status")
 		return h.containerService.WaitStatus(ctx, params.ContainerID.UUID, status)
-	})
+	}, http.StatusNoContent)
 }
