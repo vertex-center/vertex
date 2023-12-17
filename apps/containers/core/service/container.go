@@ -367,7 +367,7 @@ func (s *containerService) StopAll(ctx context.Context) error {
 	return nil
 }
 
-func (s *containerService) AddContainerTag(ctx context.Context, id uuid.UUID, tagID types.TagID) error {
+func (s *containerService) AddContainerTag(ctx context.Context, id uuid.UUID, tagID uuid.UUID) error {
 	return s.containers.AddTag(ctx, id, tagID)
 }
 

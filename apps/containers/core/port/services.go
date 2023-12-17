@@ -21,7 +21,7 @@ type (
 		StartAll(ctx context.Context) error
 		Stop(ctx context.Context, id uuid.UUID) error
 		StopAll(ctx context.Context) error
-		AddContainerTag(ctx context.Context, id uuid.UUID, tagID types.TagID) error
+		AddContainerTag(ctx context.Context, id uuid.UUID, tagID uuid.UUID) error
 		RecreateContainer(ctx context.Context, id uuid.UUID) error
 		DeleteAll(ctx context.Context) error
 		Install(ctx context.Context, serviceID string) (*types.Container, error)
@@ -45,7 +45,7 @@ type (
 		GetTag(ctx context.Context, userID uuid.UUID, name string) (types.Tag, error)
 		GetTags(ctx context.Context, userID uuid.UUID) (types.Tags, error)
 		CreateTag(ctx context.Context, tag types.Tag) (types.Tag, error)
-		DeleteTag(ctx context.Context, id types.TagID) error
+		DeleteTag(ctx context.Context, id uuid.UUID) error
 	}
 
 	DockerService interface {

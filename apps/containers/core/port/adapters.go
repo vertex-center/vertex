@@ -18,7 +18,7 @@ type (
 		UpdateContainer(ctx context.Context, container types.Container) error
 		DeleteContainer(ctx context.Context, id uuid.UUID) error
 		GetContainerTags(ctx context.Context, id uuid.UUID) (types.Tags, error)
-		AddTag(ctx context.Context, id uuid.UUID, tagID types.TagID) error
+		AddTag(ctx context.Context, id uuid.UUID, tagID uuid.UUID) error
 		DeleteTags(ctx context.Context, id uuid.UUID) error
 		SetStatus(ctx context.Context, id uuid.UUID, status string) error
 	}
@@ -39,7 +39,7 @@ type (
 		GetTag(ctx context.Context, userID uuid.UUID, name string) (types.Tag, error)
 		GetTags(ctx context.Context, userID uuid.UUID) (types.Tags, error)
 		CreateTag(ctx context.Context, tag types.Tag) error
-		DeleteTag(ctx context.Context, id types.TagID) error
+		DeleteTag(ctx context.Context, id uuid.UUID) error
 	}
 
 	SysctlAdapter interface {

@@ -46,7 +46,7 @@ func (c *Client) StopContainer(ctx context.Context, id uuid.UUID) error {
 		Fetch(ctx)
 }
 
-func (c *Client) AddContainerTag(ctx context.Context, id uuid.UUID, tagID types.TagID) error {
+func (c *Client) AddContainerTag(ctx context.Context, id uuid.UUID, tagID uuid.UUID) error {
 	return c.Request().
 		Pathf("./container/%s/tag/%s", id, tagID).
 		Put().

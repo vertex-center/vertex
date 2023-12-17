@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/uuid"
 	"github.com/vertex-center/vertex/apps/auth/core/types/session"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
@@ -53,11 +54,11 @@ func (h *tagsHandler) CreateTag() gin.HandlerFunc {
 }
 
 type DeleteTagParams struct {
-	ID types.TagID `path:"id"`
+	ID uuid.NullUUID `path:"id"`
 }
 
 func (h *tagsHandler) DeleteTag() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *DeleteTagParams) error {
-		return h.tagsService.DeleteTag(c, params.ID)
+		return h.tagsService.DeleteTag(c, params.ID.UUID)
 	})
 }

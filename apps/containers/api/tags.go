@@ -3,6 +3,7 @@ package containersapi
 import (
 	"context"
 
+	"github.com/vertex-center/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 )
 
@@ -35,7 +36,7 @@ func (c *Client) CreateTag(ctx context.Context, tag types.Tag) (types.Tag, error
 	return tag, err
 }
 
-func (c *Client) DeleteTag(ctx context.Context, id types.TagID) error {
+func (c *Client) DeleteTag(ctx context.Context, id uuid.UUID) error {
 	return c.Request().
 		Pathf("./tag/%s", id).
 		Delete().

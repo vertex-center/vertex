@@ -102,7 +102,7 @@ func (a *containerDBAdapter) GetContainerTags(ctx context.Context, id uuid.UUID)
 	return tags, err
 }
 
-func (a *containerDBAdapter) AddTag(ctx context.Context, id uuid.UUID, tagID types.TagID) error {
+func (a *containerDBAdapter) AddTag(ctx context.Context, id uuid.UUID, tagID uuid.UUID) error {
 	_, err := a.db.Exec(`
 		INSERT INTO container_tags (container_id, tag_id)
 		VALUES ($1, $2)

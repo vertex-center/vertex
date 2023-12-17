@@ -104,12 +104,12 @@ func (h *containerHandler) Stop() gin.HandlerFunc {
 
 type AddTagParams struct {
 	ContainerID uuid.NullUUID `path:"container_id"`
-	TagID       types.TagID   `path:"tag_id"`
+	TagID       uuid.NullUUID `path:"tag_id"`
 }
 
 func (h *containerHandler) AddContainerTag() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *AddTagParams) error {
-		return h.containerService.AddContainerTag(c, params.ContainerID.UUID, params.TagID)
+		return h.containerService.AddContainerTag(c, params.ContainerID.UUID, params.TagID.UUID)
 	})
 }
 

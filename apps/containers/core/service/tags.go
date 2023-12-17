@@ -25,11 +25,11 @@ func (s *tagsService) GetTags(ctx context.Context, userID uuid.UUID) (types.Tags
 }
 
 func (s *tagsService) CreateTag(ctx context.Context, tag types.Tag) (types.Tag, error) {
-	tag.ID = types.NewTagID()
+	tag.ID = uuid.New()
 	err := s.tags.CreateTag(ctx, tag)
 	return tag, err
 }
 
-func (s *tagsService) DeleteTag(ctx context.Context, id types.TagID) error {
+func (s *tagsService) DeleteTag(ctx context.Context, id uuid.UUID) error {
 	return s.tags.DeleteTag(ctx, id)
 }

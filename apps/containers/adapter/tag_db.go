@@ -51,7 +51,7 @@ func (a *tagDBAdapter) CreateTag(ctx context.Context, tag types.Tag) error {
 	return err
 }
 
-func (a *tagDBAdapter) DeleteTag(ctx context.Context, id types.TagID) error {
+func (a *tagDBAdapter) DeleteTag(ctx context.Context, id uuid.UUID) error {
 	_, err := a.db.Exec(`
 		DELETE FROM tags
 		WHERE id = $1
