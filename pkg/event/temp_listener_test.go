@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"github.com/vertex-center/vertex/common/uuid"
+	"github.com/vertex-center/uuid"
 )
 
 type TempListenerTestSuite struct {

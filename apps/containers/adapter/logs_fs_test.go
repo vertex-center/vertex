@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/vertex-center/uuid"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/common/uuid"
 
 	"github.com/stretchr/testify/suite"
 )

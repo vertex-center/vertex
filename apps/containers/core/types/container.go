@@ -2,7 +2,7 @@ package types
 
 import (
 	"github.com/juju/errors"
-	"github.com/vertex-center/vertex/common/uuid"
+	"github.com/vertex-center/uuid"
 )
 
 const (

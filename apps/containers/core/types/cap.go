@@ -1,6 +1,6 @@
 package types
 
-import "github.com/vertex-center/vertex/common/uuid"
+import "github.com/vertex-center/uuid"
 
 type (
 	Capabilities []Capability

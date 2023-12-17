@@ -10,10 +10,10 @@ import (
 	"github.com/juju/errors"
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/vertex-center/uuid"
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types/metric"
-	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vertex/pkg/net"
 	"gopkg.in/yaml.v3"
 )

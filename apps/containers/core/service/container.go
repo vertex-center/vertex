@@ -10,12 +10,12 @@ import (
 	"sync"
 
 	"github.com/juju/errors"
+	"github.com/vertex-center/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/common/storage"
-	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/event"
 	vstorage "github.com/vertex-center/vertex/pkg/storage"

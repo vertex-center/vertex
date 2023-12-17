@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/docker/docker/api/types/container"
+	"github.com/vertex-center/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/common/uuid"
 )
 
 func (c *Client) GetContainer(ctx context.Context, id uuid.UUID) (*types.Container, error) {

@@ -16,11 +16,11 @@ import (
 	"github.com/docker/go-connections/nat"
 	"github.com/google/go-containerregistry/pkg/crane"
 	"github.com/juju/errors"
+	"github.com/vertex-center/uuid"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common/log"
-	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vertex/pkg/vdocker"
 	"github.com/vertex-center/vlog"
 )

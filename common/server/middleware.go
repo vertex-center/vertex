@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/vertex-center/uuid"
 	"github.com/vertex-center/vertex/common/log"
-	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vlog"
 )
 

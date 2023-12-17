@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/vertex-center/vertex/common/uuid"
+	"github.com/vertex-center/uuid"
 )
 
 type (

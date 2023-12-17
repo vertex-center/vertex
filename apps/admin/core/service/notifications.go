@@ -3,11 +3,11 @@ package service
 import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/webhook"
+	"github.com/vertex-center/uuid"
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	apptypes "github.com/vertex-center/vertex/common/app"
 	ev "github.com/vertex-center/vertex/common/event"
-	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vertex/pkg/event"
 )
 

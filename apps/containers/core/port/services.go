@@ -5,9 +5,9 @@ import (
 	"io"
 
 	vtypes "github.com/docker/docker/api/types"
+	"github.com/vertex-center/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types/metric"
-	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type (

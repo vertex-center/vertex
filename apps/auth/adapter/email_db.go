@@ -3,9 +3,9 @@ package adapter
 import (
 	"time"
 
+	"github.com/vertex-center/uuid"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 	"github.com/vertex-center/vertex/common/storage"
-	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type emailDbAdapter struct {

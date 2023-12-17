@@ -6,10 +6,10 @@ import (
 	"encoding/base64"
 	"errors"
 
+	"github.com/vertex-center/uuid"
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 	"github.com/vertex-center/vertex/common/log"
-	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vlog"
 	"golang.org/x/crypto/argon2"
 )

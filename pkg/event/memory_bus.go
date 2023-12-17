@@ -4,8 +4,8 @@ import (
 	"errors"
 	"sync"
 
+	"github.com/vertex-center/uuid"
 	"github.com/vertex-center/vertex/common/log"
-	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vlog"
 )
 

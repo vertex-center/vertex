@@ -464,6 +464,8 @@ github.com/ugorji/go/codec v1.2.11/go.mod h1:UNopzCgEMSXjBc6AOMqYvWC1ktqTAfzJZUZ
 github.com/urfave/cli v1.22.12/go.mod h1:sSBEIC79qR6OvcmsD4U3KABeOTxDqQtdDnaFuUN30b8=
 github.com/vbatts/tar-split v0.11.3 h1:hLFqsOLQ1SsppQNTMpkpPXClLDfC2A3Zgy9OUU+RVck=
 github.com/vbatts/tar-split v0.11.3/go.mod h1:9QlHN18E+fEH7RdG+QAJJcuya3rqT7eXSTY7wGrAokY=
+github.com/vertex-center/uuid v1.5.0 h1:8sAsqIZS06rGfC7tuW8RvLrDGjqmNeFdEL+2fPwwO74=
+github.com/vertex-center/uuid v1.5.0/go.mod h1:CLPR/Dr8mV0N5yxSk9kCOjRtwhcV8AclGMz15W3QLBg=
 github.com/vertex-center/vlog v1.0.4 h1:q1UtjCxDs8MjbDcuwybnXBkwAnY1Ktgj+QYvIEkhNFA=
 github.com/vertex-center/vlog v1.0.4/go.mod h1:ZzL+BHZdX/xIIZLzMqAt7cQ7+oreeY1arbvDkx1Sv+o=
 github.com/wI2L/fizz v0.22.0 h1:mgRA+uUdESvgsIeBFkMSS/MEIQ4EZ4I2xyRxnCqkhJY=

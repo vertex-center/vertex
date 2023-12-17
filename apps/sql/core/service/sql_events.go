@@ -1,8 +1,8 @@
 package service
 
 import (
+	"github.com/vertex-center/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vertex/pkg/event"
 )
 

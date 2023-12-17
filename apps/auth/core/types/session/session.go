@@ -3,7 +3,7 @@ package session
 import (
 	"context"
 
-	"github.com/vertex-center/vertex/common/uuid"
+	"github.com/vertex-center/uuid"
 )
 
 type Session struct {

@@ -3,11 +3,11 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/juju/errors"
+	"github.com/vertex-center/uuid"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/sql/core/port"
 	"github.com/vertex-center/vertex/apps/sql/core/types"
-	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vertex/pkg/router"
 )
 

@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/juju/errors"
+	"github.com/vertex-center/uuid"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	sqladapter "github.com/vertex-center/vertex/apps/sql/adapter"
@@ -12,7 +13,6 @@ import (
 	sqltypes "github.com/vertex-center/vertex/apps/sql/core/types"
 	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/log"
-	"github.com/vertex-center/vertex/common/uuid"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vlog"
 )

@@ -3,7 +3,7 @@ package types
 import (
 	"errors"
 
-	"github.com/vertex-center/vertex/common/uuid"
+	"github.com/vertex-center/uuid"
 )
 
 // User and CredentialsArgon2id are many-to-many relationship, because one user

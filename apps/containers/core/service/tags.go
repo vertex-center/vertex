@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 
+	"github.com/vertex-center/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/common/uuid"
 )
 
 type tagsService struct {
