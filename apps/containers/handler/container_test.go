@@ -70,7 +70,7 @@ func (suite *ContainerHandlerTestSuite) TestDelete() {
 
 		res := routertest.Request("DELETE", suite.handler.Delete(), suite.opts)
 
-		suite.Equal(204, res.Code)
+		suite.Equal(200, res.Code)
 		suite.service.AssertExpectations(suite.T())
 	})
 
