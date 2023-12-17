@@ -18,10 +18,6 @@ type Mount struct {
 	Destination string `json:"destination,omitempty"`
 }
 
-type Volume struct {
-	Name string `json:"name,omitempty"`
-}
-
 type CreateContainerOptions struct {
 	ImageName     string            `json:"image_name,omitempty"`
 	ContainerName string            `json:"container_name,omitempty"`

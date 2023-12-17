@@ -166,6 +166,11 @@ func (a *logsFSAdapter) UnregisterAll() error {
 	return nil
 }
 
+func (a *logsFSAdapter) Exists(uuid types.ContainerID) bool {
+	_, err := a.getLogger(uuid)
+	return err == nil
+}
+
 func (a *logsFSAdapter) getLogger(uuid types.ContainerID) (*ContainerLogger, error) {
 	a.loggersMu.RLock()
 	defer a.loggersMu.RUnlock()

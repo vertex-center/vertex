@@ -14,63 +14,61 @@ import (
 )
 
 type dockerKernelService struct {
-	dockerAdapter port.DockerAdapter
+	adapter port.DockerAdapter
 }
 
-func NewDockerKernelService(dockerAdapter port.DockerAdapter) port.DockerService {
-	return &dockerKernelService{
-		dockerAdapter: dockerAdapter,
-	}
+func NewDockerKernelService(adapter port.DockerAdapter) port.DockerService {
+	return &dockerKernelService{adapter}
 }
 
 func (s dockerKernelService) ListContainers() ([]types.DockerContainer, error) {
-	return s.dockerAdapter.ListContainers()
+	return s.adapter.ListContainers()
 }
 
 func (s dockerKernelService) DeleteContainer(id string) error {
-	return s.dockerAdapter.DeleteContainer(id)
+	return s.adapter.DeleteContainer(id)
 }
 
 func (s dockerKernelService) CreateContainer(options types.CreateContainerOptions) (types.CreateContainerResponse, error) {
-	return s.dockerAdapter.CreateContainer(options)
+	return s.adapter.CreateContainer(options)
 }
 
 func (s dockerKernelService) StartContainer(id string) error {
-	return s.dockerAdapter.StartContainer(id)
+	return s.adapter.StartContainer(id)
 }
 
 func (s dockerKernelService) StopContainer(id string) error {
-	return s.dockerAdapter.StopContainer(id)
+	return s.adapter.StopContainer(id)
 }
 
 func (s dockerKernelService) InfoContainer(id string) (types.InfoContainerResponse, error) {
-	return s.dockerAdapter.InfoContainer(id)
+	return s.adapter.InfoContainer(id)
 }
 
 func (s dockerKernelService) LogsStdoutContainer(id string) (io.ReadCloser, error) {
-	return s.dockerAdapter.LogsStdoutContainer(id)
+	return s.adapter.LogsStdoutContainer(id)
 }
 
 func (s dockerKernelService) LogsStderrContainer(id string) (io.ReadCloser, error) {
-	return s.dockerAdapter.LogsStderrContainer(id)
+	return s.adapter.LogsStderrContainer(id)
 }
 
 func (s dockerKernelService) WaitContainer(id string, cond types.WaitContainerCondition) error {
-	return s.dockerAdapter.WaitContainer(id, cond)
+	return s.adapter.WaitContainer(id, cond)
 }
 
 func (s dockerKernelService) InfoImage(id string) (types.InfoImageResponse, error) {
-	return s.dockerAdapter.InfoImage(id)
+	return s.adapter.InfoImage(id)
 }
 
 func (s dockerKernelService) PullImage(options types.PullImageOptions) (io.ReadCloser, error) {
 	log.Info("pulling image", vlog.String("image", options.Image))
-	return s.dockerAdapter.PullImage(options)
+	return s.adapter.PullImage(options)
 }
 
 func (s dockerKernelService) BuildImage(options types.BuildImageOptions) (dockertypes.ImageBuildResponse, error) {
 	log.Info("building image", vlog.String("dockerfile", options.Dockerfile))
-	return s.dockerAdapter.BuildImage(options)
+	return s.adapter.BuildImage(options)
 }
 
 func (s dockerKernelService) DeleteMounts(uuid string) error {

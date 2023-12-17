@@ -11,20 +11,19 @@ type (
 		Patch() gin.HandlerFunc
 		Start() gin.HandlerFunc
 		Stop() gin.HandlerFunc
+		AddContainerTag() gin.HandlerFunc
+		GetContainerEnv() gin.HandlerFunc
 		PatchEnvironment() gin.HandlerFunc
 		GetDocker() gin.HandlerFunc
 		RecreateDocker() gin.HandlerFunc
 		GetLogs() gin.HandlerFunc
-		UpdateService() gin.HandlerFunc
 		GetVersions() gin.HandlerFunc
 		WaitStatus() gin.HandlerFunc
 		Events() gin.HandlerFunc
 	}
 
 	ContainersHandler interface {
-		Get() gin.HandlerFunc
-		GetTags() gin.HandlerFunc
-		Search() gin.HandlerFunc
+		GetContainers() gin.HandlerFunc
 		CheckForUpdates() gin.HandlerFunc
 		Events() gin.HandlerFunc
 	}
@@ -36,6 +35,13 @@ type (
 
 	ServicesHandler interface {
 		Get() gin.HandlerFunc
+	}
+
+	TagsHandler interface {
+		GetTag() gin.HandlerFunc
+		GetTags() gin.HandlerFunc
+		CreateTag() gin.HandlerFunc
+		DeleteTag() gin.HandlerFunc
 	}
 
 	DockerKernelHandler interface {

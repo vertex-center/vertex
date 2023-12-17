@@ -25,38 +25,26 @@ func NewContainersHandler(ctx *apptypes.Context, containerService port.Container
 	}
 }
 
-func (h *containersHandler) Get() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (map[types.ContainerID]*types.Container, error) {
-		return h.containerService.GetAll(c), nil
-	})
-}
-
-func (h *containersHandler) GetTags() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) ([]string, error) {
-		return h.containerService.GetTags(c), nil
-	})
-}
-
-func (h *containersHandler) Search() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (map[types.ContainerID]*types.Container, error) {
-		query := types.ContainerSearchQuery{}
+func (h *containersHandler) GetContainers() gin.HandlerFunc {
+	return router.Handler(func(c *gin.Context) (types.Containers, error) {
+		filters := types.ContainerFilters{}
 
 		features := c.QueryArray("features[]")
 		if len(features) > 0 {
-			query.Features = &features
+			filters.Features = &features
 		}
 
 		tags := c.QueryArray("tags[]")
 		if len(tags) > 0 {
-			query.Tags = &tags
+			filters.Tags = &tags
 		}
 
-		return h.containerService.Search(c, query), nil
+		return h.containerService.GetContainersWithFilters(c, filters)
 	})
 }
 
 func (h *containersHandler) CheckForUpdates() gin.HandlerFunc {
-	return router.Handler(func(c *gin.Context) (map[types.ContainerID]*types.Container, error) {
+	return router.Handler(func(c *gin.Context) (types.Containers, error) {
 		return h.containerService.CheckForUpdates(c)
 	})
 }

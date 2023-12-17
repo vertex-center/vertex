@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"path"
@@ -16,6 +15,7 @@ import (
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/go-connections/nat"
 	"github.com/google/go-containerregistry/pkg/crane"
+	"github.com/juju/errors"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
@@ -26,12 +26,12 @@ import (
 
 type runnerDockerAdapter struct{}
 
-func NewRunnerFSAdapter() port.RunnerAdapter {
+func NewRunnerDockerAdapter() port.RunnerAdapter {
 	return runnerDockerAdapter{}
 }
 
-func (a runnerDockerAdapter) DeleteContainer(ctx context.Context, inst *types.Container) error {
-	id, err := a.getContainerID(ctx, *inst)
+func (a runnerDockerAdapter) DeleteContainer(ctx context.Context, c *types.Container) error {
+	id, err := a.getContainerID(ctx, *c)
 	if err != nil {
 		return err
 	}
@@ -40,8 +40,8 @@ func (a runnerDockerAdapter) DeleteContainer(ctx context.Context, inst *types.Co
 	return cli.DeleteContainer(context.Background(), id)
 }
 
-func (a runnerDockerAdapter) DeleteMounts(ctx context.Context, inst *types.Container) error {
-	id, err := a.getContainerID(ctx, *inst)
+func (a runnerDockerAdapter) DeleteMounts(ctx context.Context, c *types.Container) error {
+	id, err := a.getContainerID(ctx, *c)
 	if err != nil {
 		return err
 	}
@@ -50,30 +50,28 @@ func (a runnerDockerAdapter) DeleteMounts(ctx context.Context, inst *types.Conta
 	return cli.DeleteMounts(context.Background(), id)
 }
 
-func (a runnerDockerAdapter) Start(ctx context.Context, inst *types.Container, setStatus func(status string)) (io.ReadCloser, io.ReadCloser, error) {
+func (a runnerDockerAdapter) Start(
+	ctx context.Context,
+	c *types.Container,
+	ports types.Ports,
+	volumes types.Volumes,
+	env types.EnvVariables,
+	caps types.Capabilities,
+	sysctls types.Sysctls,
+	setStatus func(status string),
+) (io.ReadCloser, io.ReadCloser, error) {
 	rErr, wErr := io.Pipe()
 	rOut, wOut := io.Pipe()
 
 	go func() {
-		imageName := inst.DockerImageVertexName()
+		imageName := c.DockerImageVertexName()
 
 		setStatus(types.ContainerStatusBuilding)
-
-		service := inst.Service
 
 		log.Debug("building image", vlog.String("image", imageName))
 
 		// Build
-		var err error
-		var stdout, stderr io.ReadCloser
-		if service.Methods.Docker.Dockerfile != nil {
-			containerPath := a.getContainerPath(ctx, inst.UUID)
-			stdout, err = a.buildImageFromDockerfile(ctx, containerPath, imageName)
-		} else if service.Methods.Docker.Image != nil {
-			stdout, err = a.buildImageFromName(ctx, inst.GetImageNameWithTag())
-		} else {
-			err = errors.New("no Docker methods found")
-		}
+		stdout, err := a.buildImageFromName(ctx, c.GetImageNameWithTag())
 		if err != nil {
 			log.Error(err)
 			setStatus(types.ContainerStatusError)
@@ -94,7 +92,7 @@ func (a runnerDockerAdapter) Start(ctx context.Context, inst *types.Container, s
 				if err != nil {
 					log.Error(err,
 						vlog.String("text", scanner.Text()),
-						vlog.String("uuid", inst.UUID.String()))
+						vlog.String("id", c.ID.String()))
 					continue
 				}
 
@@ -112,7 +110,7 @@ func (a runnerDockerAdapter) Start(ctx context.Context, inst *types.Container, s
 				if err != nil {
 					log.Error(err,
 						vlog.String("text", scanner.Text()),
-						vlog.String("uuid", inst.UUID.String()))
+						vlog.String("id", c.ID.String()))
 					continue
 				}
 
@@ -120,14 +118,14 @@ func (a runnerDockerAdapter) Start(ctx context.Context, inst *types.Container, s
 				if err != nil {
 					log.Error(err,
 						vlog.String("text", scanner.Text()),
-						vlog.String("uuid", inst.UUID.String()))
+						vlog.String("id", c.ID.String()))
 					setStatus(types.ContainerStatusError)
 					return
 				}
 			}
 			if scanner.Err() != nil {
 				log.Error(scanner.Err(),
-					vlog.String("uuid", inst.UUID.String()))
+					vlog.String("id", c.ID.String()))
 				setStatus(types.ContainerStatusError)
 				return
 			}
@@ -144,16 +142,16 @@ func (a runnerDockerAdapter) Start(ctx context.Context, inst *types.Container, s
 		//	}
 		//}()
 
-		log.Info("waiting for image to be built", vlog.String("uuid", inst.UUID.String()))
+		log.Info("waiting for image to be built", vlog.String("uuid", c.ID.String()))
 
 		wg.Wait()
 
-		log.Info("image built", vlog.String("uuid", inst.UUID.String()))
+		log.Info("image built", vlog.String("uuid", c.ID.String()))
 
 		// Create
-		id, err := a.getContainerID(ctx, *inst)
-		if errors.Is(err, ErrContainerNotFound) {
-			containerName := inst.DockerContainerName()
+		id, err := a.getContainerID(ctx, *c)
+		if errors.Is(err, errors.NotFound) {
+			containerName := c.DockerContainerName()
 
 			log.Info("container doesn't exists, create it.",
 				vlog.String("container_name", containerName),
@@ -168,74 +166,56 @@ func (a runnerDockerAdapter) Start(ctx context.Context, inst *types.Container, s
 				CapAdd:        []string{},
 			}
 
-			// exposedPorts and portBindings
-			if service.Methods.Docker.Ports != nil {
-				var all []string
-
-				for in, out := range *service.Methods.Docker.Ports {
-					for _, e := range service.Env {
-						if e.Type == "port" && e.Name == out {
-							out = inst.Env[e.Name]
-							all = append(all, out+":"+in)
-							break
-						}
+			var all []string
+			for _, p := range ports {
+				for _, e := range env {
+					if e.Type == "port" && e.Name == p.Out {
+						in := e.Value
+						out := env.Get(e.Name)
+						all = append(all, out+":"+in)
+						break
 					}
 				}
+			}
+			options.ExposedPorts, options.PortBindings, err = nat.ParsePortSpecs(all)
+			if err != nil {
+				log.Error(err)
+				return
+			}
 
-				options.ExposedPorts, options.PortBindings, err = nat.ParsePortSpecs(all)
+			for _, v := range volumes {
+				out := v.Out
+				if !strings.HasPrefix(out, "/") {
+					volumePath := a.getVolumePath(ctx, c.ID)
+					out, err = filepath.Abs(path.Join(volumePath, out))
+				}
 				if err != nil {
+					log.Error(err)
 					return
 				}
+				options.Binds = append(options.Binds, out+":"+v.In)
 			}
+			for _, e := range env {
+				options.Env = append(options.Env, e.Name+"="+e.Value)
+			}
+			for _, cp := range caps {
+				options.CapAdd = append(options.CapAdd, cp.Name)
+			}
+			for _, sysctl := range sysctls {
+				options.Sysctls[sysctl.Name] = sysctl.Value
+			}
+			if c.Command != nil {
+				options.Cmd = strings.Split(*c.Command, " ")
+			}
+			options.ImageName = c.GetImageNameWithTag()
 
-			// binds
-			if service.Methods.Docker.Volumes != nil {
-				for source, target := range *service.Methods.Docker.Volumes {
-					if !strings.HasPrefix(source, "/") {
-						volumePath := a.getVolumePath(ctx, inst.UUID)
-						source, err = filepath.Abs(path.Join(volumePath, source))
-					}
-					if err != nil {
-						return
-					}
-					options.Binds = append(options.Binds, source+":"+target)
-				}
-			}
-
-			// env
-			if service.Methods.Docker.Environment != nil {
-				for in, out := range *service.Methods.Docker.Environment {
-					value := inst.Env[out]
-					options.Env = append(options.Env, in+"="+value)
-				}
-			}
-
-			// capAdd
-			if service.Methods.Docker.Capabilities != nil {
-				options.CapAdd = *service.Methods.Docker.Capabilities
-			}
-
-			// sysctls
-			if service.Methods.Docker.Sysctls != nil {
-				options.Sysctls = *service.Methods.Docker.Sysctls
-			}
-
-			// cmd
-			if service.Methods.Docker.Cmd != nil {
-				options.Cmd = strings.Split(*service.Methods.Docker.Cmd, " ")
-			}
-
-			if service.Methods.Docker.Dockerfile != nil {
-				options.ImageName = inst.DockerImageVertexName()
-				id, err = a.createContainer(ctx, options)
-			} else if service.Methods.Docker.Image != nil {
-				options.ImageName = inst.GetImageNameWithTag()
-				id, err = a.createContainer(ctx, options)
-			}
+			id, err = a.createContainer(ctx, options)
 			if err != nil {
+				log.Error(err)
 				return
 			}
 		} else if err != nil {
+			log.Error(err)
 			return
 		}
 
@@ -249,6 +229,7 @@ func (a runnerDockerAdapter) Start(ctx context.Context, inst *types.Container, s
 		}
 		setStatus(types.ContainerStatusRunning)
 
+		var stderr io.ReadCloser
 		stdout, stderr, err = a.readLogs(ctx, id)
 		if err != nil {
 			log.Error(err)
@@ -277,7 +258,7 @@ func (a runnerDockerAdapter) Start(ctx context.Context, inst *types.Container, s
 			}
 		}()
 
-		err = a.WaitCondition(ctx, inst, types.WaitContainerCondition(container.WaitConditionNotRunning))
+		err = a.WaitCondition(ctx, c, types.WaitContainerCondition(container.WaitConditionNotRunning))
 		if err != nil {
 			log.Error(err)
 			setStatus(types.ContainerStatusError)
@@ -289,8 +270,8 @@ func (a runnerDockerAdapter) Start(ctx context.Context, inst *types.Container, s
 	return rOut, rErr, nil
 }
 
-func (a runnerDockerAdapter) Stop(ctx context.Context, inst *types.Container) error {
-	id, err := a.getContainerID(ctx, *inst)
+func (a runnerDockerAdapter) Stop(ctx context.Context, c *types.Container) error {
+	id, err := a.getContainerID(ctx, *c)
 	if err != nil {
 		return err
 	}
@@ -299,8 +280,8 @@ func (a runnerDockerAdapter) Stop(ctx context.Context, inst *types.Container) er
 	return cli.StopContainer(context.Background(), id)
 }
 
-func (a runnerDockerAdapter) Info(ctx context.Context, inst types.Container) (map[string]any, error) {
-	id, err := a.getContainerID(ctx, inst)
+func (a runnerDockerAdapter) Info(ctx context.Context, c types.Container) (map[string]any, error) {
+	id, err := a.getContainerID(ctx, c)
 	if err != nil {
 		return nil, err
 	}
@@ -322,15 +303,8 @@ func (a runnerDockerAdapter) Info(ctx context.Context, inst types.Container) (ma
 	}, nil
 }
 
-func (a runnerDockerAdapter) CheckForUpdates(ctx context.Context, inst *types.Container) error {
-	service := inst.Service
-
-	if service.Methods.Docker.Image == nil {
-		// TODO: Support Dockerfile updates
-		return nil
-	}
-
-	imageName := inst.GetImageNameWithTag()
+func (a runnerDockerAdapter) CheckForUpdates(ctx context.Context, c *types.Container) error {
+	imageName := c.GetImageNameWithTag()
 
 	res, err := a.pullImage(ctx, imageName)
 	if err != nil {
@@ -346,21 +320,21 @@ func (a runnerDockerAdapter) CheckForUpdates(ctx context.Context, inst *types.Co
 
 	latestImageID := imageInfo.ID
 
-	currentImageID, err := a.getImageID(ctx, *inst)
+	currentImageID, err := a.getImageID(ctx, *c)
 	if err != nil {
 		return err
 	}
 
 	if latestImageID == currentImageID {
 		log.Info("already up-to-date",
-			vlog.String("uuid", inst.UUID.String()),
+			vlog.String("uuid", c.ID.String()),
 		)
-		inst.Update = nil
+		c.Update = nil
 	} else {
 		log.Info("a new update is available",
-			vlog.String("uuid", inst.UUID.String()),
+			vlog.String("uuid", c.ID.String()),
 		)
-		inst.Update = &types.ContainerUpdate{
+		c.Update = &types.ContainerUpdate{
 			CurrentVersion: currentImageID,
 			LatestVersion:  latestImageID,
 		}
@@ -369,24 +343,18 @@ func (a runnerDockerAdapter) CheckForUpdates(ctx context.Context, inst *types.Co
 	return nil
 }
 
-func (a runnerDockerAdapter) GetAllVersions(ctx context.Context, inst types.Container) ([]string, error) {
-	if inst.Service.Methods.Docker == nil {
-		return nil, errors.New("no Docker methods found")
-	}
-	image := *inst.Service.Methods.Docker.Image
-	log.Debug("querying all versions of image",
-		vlog.String("image", image),
-	)
-	return crane.ListTags(image)
+func (a runnerDockerAdapter) GetAllVersions(ctx context.Context, c types.Container) ([]string, error) {
+	log.Info("querying all versions of image", vlog.String("image", c.Image))
+	return crane.ListTags(c.Image)
 }
 
-func (a runnerDockerAdapter) HasUpdateAvailable(ctx context.Context, inst types.Container) (bool, error) {
+func (a runnerDockerAdapter) HasUpdateAvailable(ctx context.Context, c types.Container) (bool, error) {
 	//TODO implement me
 	return false, nil
 }
 
-func (a runnerDockerAdapter) WaitCondition(ctx context.Context, inst *types.Container, cond types.WaitContainerCondition) error {
-	id, err := a.getContainerID(ctx, *inst)
+func (a runnerDockerAdapter) WaitCondition(ctx context.Context, c *types.Container, cond types.WaitContainerCondition) error {
+	id, err := a.getContainerID(ctx, *c)
 	if err != nil {
 		return err
 	}
@@ -395,43 +363,37 @@ func (a runnerDockerAdapter) WaitCondition(ctx context.Context, inst *types.Cont
 	return cli.WaitContainer(context.Background(), id, string(cond))
 }
 
-func (a runnerDockerAdapter) getContainer(ctx context.Context, inst types.Container) (types.DockerContainer, error) {
+func (a runnerDockerAdapter) getContainer(ctx context.Context, c types.Container) (types.DockerContainer, error) {
 	cli := containersapi.NewContainersKernelClient(ctx)
 	containers, err := cli.GetContainers(context.Background())
 	if err != nil {
 		return types.DockerContainer{}, err
 	}
 
-	var dockerContainer *types.DockerContainer
-	for _, c := range containers {
-		name := c.Names[0]
-		if name == "/"+inst.DockerContainerName() {
-			dockerContainer = &c
-			break
+	for _, dc := range containers {
+		name := dc.Names[0]
+		if name == "/"+c.DockerContainerName() {
+			return dc, nil
 		}
 	}
 
-	if dockerContainer == nil {
-		return types.DockerContainer{}, ErrContainerNotFound
-	}
-
-	return *dockerContainer, nil
+	return types.DockerContainer{}, errors.NotFoundf("docker container")
 }
 
-func (a runnerDockerAdapter) getContainerID(ctx context.Context, inst types.Container) (string, error) {
-	c, err := a.getContainer(ctx, inst)
+func (a runnerDockerAdapter) getContainerID(ctx context.Context, c types.Container) (string, error) {
+	dc, err := a.getContainer(ctx, c)
 	if err != nil {
 		return "", err
 	}
-	return c.ID, nil
+	return dc.ID, nil
 }
 
-func (a runnerDockerAdapter) getImageID(ctx context.Context, inst types.Container) (string, error) {
-	c, err := a.getContainer(ctx, inst)
+func (a runnerDockerAdapter) getImageID(ctx context.Context, c types.Container) (string, error) {
+	dc, err := a.getContainer(ctx, c)
 	if err != nil {
 		return "", err
 	}
-	return c.ImageID, nil
+	return dc.ImageID, nil
 }
 
 func (a runnerDockerAdapter) pullImage(ctx context.Context, imageName string) (io.ReadCloser, error) {
@@ -449,17 +411,6 @@ func (a runnerDockerAdapter) buildImageFromName(ctx context.Context, imageName s
 	return res, nil
 }
 
-func (a runnerDockerAdapter) buildImageFromDockerfile(ctx context.Context, containerPath string, imageName string) (io.ReadCloser, error) {
-	options := types.BuildImageOptions{
-		Dir:        containerPath,
-		Name:       imageName,
-		Dockerfile: "Dockerfile",
-	}
-
-	cli := containersapi.NewContainersKernelClient(ctx)
-	return cli.BuildImage(context.Background(), options)
-}
-
 func (a runnerDockerAdapter) createContainer(ctx context.Context, options types.CreateContainerOptions) (string, error) {
 	cli := containersapi.NewContainersKernelClient(ctx)
 	res, err := cli.CreateContainer(context.Background(), options)
@@ -468,22 +419,20 @@ func (a runnerDockerAdapter) createContainer(ctx context.Context, options types.
 	}
 
 	for _, warn := range res.Warnings {
-		log.Warn("warning while creating container",
-			vlog.String("warning", warn),
-		)
+		log.Warn("warning while creating container", vlog.String("warning", warn))
 	}
 	return res.ID, nil
 }
 
-func (a runnerDockerAdapter) readLogs(ctx context.Context, containerID string) (stdout io.ReadCloser, stderr io.ReadCloser, _ error) {
+func (a runnerDockerAdapter) readLogs(ctx context.Context, id string) (stdout io.ReadCloser, stderr io.ReadCloser, _ error) {
 	cli := containersapi.NewContainersKernelClient(ctx)
 
-	stdout, err := cli.GetContainerStdout(context.Background(), containerID)
+	stdout, err := cli.GetContainerStdout(context.Background(), id)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	stderr, err = cli.GetContainerStderr(context.Background(), containerID)
+	stderr, err = cli.GetContainerStderr(context.Background(), id)
 	if err != nil {
 		stdout.Close()
 		return nil, nil, err
@@ -492,14 +441,9 @@ func (a runnerDockerAdapter) readLogs(ctx context.Context, containerID string) (
 	return stdout, stderr, nil
 }
 
-func (a runnerDockerAdapter) getVolumePath(ctx context.Context, uuid types.ContainerID) string {
+func (a runnerDockerAdapter) getVolumePath(ctx context.Context, id types.ContainerID) string {
 	appPath := a.getAppPath(ctx, "live_docker")
-	return path.Join(appPath, "volumes", uuid.String())
-}
-
-func (a runnerDockerAdapter) getContainerPath(ctx context.Context, uuid types.ContainerID) string {
-	appPath := a.getAppPath(ctx, "live")
-	return path.Join(appPath, "containers", uuid.String())
+	return path.Join(appPath, "volumes", id.String())
 }
 
 func (a runnerDockerAdapter) getAppPath(ctx context.Context, base string) string {

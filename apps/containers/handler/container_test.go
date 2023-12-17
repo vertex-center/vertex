@@ -8,6 +8,8 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/common"
+	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/pkg/router/routertest"
 )
 
@@ -27,22 +29,22 @@ func TestContainerHandlerTestSuite(t *testing.T) {
 
 func (suite *ContainerHandlerTestSuite) SetupSubTest() {
 	suite.service = port.MockContainerService{}
-	suite.handler = NewContainerHandler(ContainerHandlerParams{
-		ContainerService: &suite.service,
-	}).(*containerHandler)
+	ctx := common.NewVertexContext(common.About{}, false)
+	appCtx := app.NewContext(ctx)
+	suite.handler = NewContainerHandler(appCtx, &suite.service).(*containerHandler)
 	suite.testContainer = types.Container{
-		UUID: types.NewContainerID(),
+		ID: types.NewContainerID(),
 	}
 	suite.opts = routertest.RequestOptions{
 		Params: map[string]string{
-			"container_uuid": suite.testContainer.UUID.String(),
+			"container_id": suite.testContainer.ID.String(),
 		},
 	}
 }
 
 func (suite *ContainerHandlerTestSuite) TestGet() {
 	suite.Run("OK", func() {
-		suite.service.On("Get", mock.Anything, suite.testContainer.UUID).Return(&suite.testContainer, nil)
+		suite.service.On("Get", mock.Anything, suite.testContainer.ID).Return(&suite.testContainer, nil)
 
 		res := routertest.Request("GET", suite.handler.Get(), suite.opts)
 
@@ -51,7 +53,7 @@ func (suite *ContainerHandlerTestSuite) TestGet() {
 	})
 
 	suite.Run("Not Found", func() {
-		suite.service.On("Get", mock.Anything, suite.testContainer.UUID).Return(nil, types.ErrContainerNotFound)
+		suite.service.On("Get", mock.Anything, suite.testContainer.ID).Return(nil, types.ErrContainerNotFound)
 
 		res := routertest.Request("GET", suite.handler.Get(), suite.opts)
 
@@ -63,7 +65,7 @@ func (suite *ContainerHandlerTestSuite) TestGet() {
 
 func (suite *ContainerHandlerTestSuite) TestDelete() {
 	suite.Run("OK", func() {
-		suite.service.On("Delete", mock.Anything, suite.testContainer.UUID).Return(nil)
+		suite.service.On("Delete", mock.Anything, suite.testContainer.ID).Return(nil)
 
 		res := routertest.Request("DELETE", suite.handler.Delete(), suite.opts)
 
@@ -72,7 +74,7 @@ func (suite *ContainerHandlerTestSuite) TestDelete() {
 	})
 
 	suite.Run("Not Found", func() {
-		suite.service.On("Delete", mock.Anything, suite.testContainer.UUID).Return(types.ErrContainerNotFound)
+		suite.service.On("Delete", mock.Anything, suite.testContainer.ID).Return(types.ErrContainerNotFound)
 
 		res := routertest.Request("DELETE", suite.handler.Delete(), suite.opts)
 
@@ -82,7 +84,7 @@ func (suite *ContainerHandlerTestSuite) TestDelete() {
 	})
 
 	suite.Run("Error", func() {
-		suite.service.On("Delete", mock.Anything, suite.testContainer.UUID).Return(errors.New("error"))
+		suite.service.On("Delete", mock.Anything, suite.testContainer.ID).Return(errors.New("error"))
 
 		res := routertest.Request("DELETE", suite.handler.Delete(), suite.opts)
 

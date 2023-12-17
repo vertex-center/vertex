@@ -11,66 +11,40 @@ import (
 
 type (
 	ContainerService interface {
-		Get(ctx context.Context, uuid types.ContainerID) (*types.Container, error)
-		GetAll(ctx context.Context) map[types.ContainerID]*types.Container
-		GetTags(ctx context.Context) []string
-		Search(ctx context.Context, query types.ContainerSearchQuery) map[types.ContainerID]*types.Container
-		Exists(ctx context.Context, uuid types.ContainerID) bool
-		Delete(ctx context.Context, uuid types.ContainerID) error
-		StartAll(ctx context.Context)
-		StopAll(ctx context.Context)
-		LoadAll(ctx context.Context)
-		DeleteAll(ctx context.Context)
-		Install(ctx context.Context, service types.Service, method string) (*types.Container, error)
-		CheckForUpdates(tx context.Context) (map[types.ContainerID]*types.Container, error)
-		SetDatabases(ctx context.Context, inst *types.Container, databases map[string]types.ContainerID, options map[string]*types.SetDatabasesOptions) error
-	}
-
-	EnvService interface {
-		Save(inst *types.Container, env types.ContainerEnvVariables) error
-		Load(inst *types.Container) error
-	}
-
-	LogsService interface {
-		GetLatestLogs(uuid types.ContainerID) ([]types.LogLine, error)
-	}
-
-	RunnerService interface {
-		Install(ctx context.Context, uuid types.ContainerID, service types.Service) error
-		Delete(ctx context.Context, inst *types.Container) error
-		Start(ctx context.Context, inst *types.Container) error
-		Stop(ctx context.Context, inst *types.Container) error
-		GetDockerContainerInfo(ctx context.Context, inst types.Container) (map[string]any, error)
-		GetAllVersions(ctx context.Context, inst *types.Container, useCache bool) ([]string, error)
-		CheckForUpdates(ctx context.Context, inst *types.Container) error
-		RecreateContainer(ctx context.Context, inst *types.Container) error
-		WaitStatus(ctx context.Context, inst *types.Container, status string) error
-	}
-
-	ContainerServiceService interface {
-		CheckForUpdate(inst *types.Container, latest types.Service) error
-		Update(inst *types.Container, service types.Service) error
-		Save(inst *types.Container, service types.Service) error
-		Load(uuid types.ContainerID) (types.Service, error)
-	}
-
-	SettingsService interface {
-		Save(inst *types.Container, settings types.ContainerSettings) error
-		Load(inst *types.Container) error
-		SetLaunchOnStartup(inst *types.Container, value bool) error
-		SetDisplayName(inst *types.Container, value string) error
-		SetDatabases(inst *types.Container, databases map[string]types.ContainerID) error
-		SetVersion(inst *types.Container, value string) error
-		SetTags(inst *types.Container, tags []string) error
+		Get(ctx context.Context, id types.ContainerID) (*types.Container, error)
+		GetContainers(ctx context.Context) (types.Containers, error)
+		GetContainersWithFilters(ctx context.Context, filters types.ContainerFilters) (types.Containers, error)
+		Delete(ctx context.Context, id types.ContainerID) error
+		UpdateContainer(ctx context.Context, id types.ContainerID, c types.Container) error
+		Start(ctx context.Context, id types.ContainerID) error
+		StartAll(ctx context.Context) error
+		Stop(ctx context.Context, id types.ContainerID) error
+		StopAll(ctx context.Context) error
+		AddContainerTag(ctx context.Context, id types.ContainerID, tagID types.TagID) error
+		RecreateContainer(ctx context.Context, id types.ContainerID) error
+		DeleteAll(ctx context.Context) error
+		Install(ctx context.Context, serviceID string) (*types.Container, error)
+		CheckForUpdates(ctx context.Context) (types.Containers, error)
+		SetDatabases(ctx context.Context, c *types.Container, databases map[string]types.ContainerID, options map[string]*types.SetDatabasesOptions) error
+		GetContainerEnv(ctx context.Context, id types.ContainerID) (types.EnvVariables, error)
+		SaveEnv(ctx context.Context, id types.ContainerID, env types.EnvVariables) error
+		GetAllVersions(ctx context.Context, id types.ContainerID, useCache bool) ([]string, error)
+		GetContainerInfo(ctx context.Context, id types.ContainerID) (map[string]any, error)
+		WaitStatus(ctx context.Context, id types.ContainerID, status string) error
+		GetLatestLogs(id types.ContainerID) ([]types.LogLine, error)
+		GetServiceByID(ctx context.Context, id string) (*types.Service, error)
+		GetServices(ctx context.Context) []types.Service
 	}
 
 	MetricsService interface {
 		metric.RegistryProvider
 	}
 
-	ServiceService interface {
-		GetAll() []types.Service
-		GetById(id string) (types.Service, error)
+	TagsService interface {
+		GetTag(ctx context.Context, userID uint, name string) (types.Tag, error)
+		GetTags(ctx context.Context, userID uint) (types.Tags, error)
+		CreateTag(ctx context.Context, tag types.Tag) (types.Tag, error)
+		DeleteTag(ctx context.Context, id types.TagID) error
 	}
 
 	DockerService interface {

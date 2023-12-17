@@ -47,12 +47,12 @@ func (s *metricsService) GetUUID() uuid.UUID {
 func (s *metricsService) OnEvent(e event.Event) error {
 	switch e := e.(type) {
 	case types.EventContainerStatusChange:
-		s.updateStatus(e.ContainerUUID, e.ServiceID, e.Status)
+		s.updateStatus(e.ContainerID, e.ServiceID, e.Status)
 	case types.EventContainerCreated:
 		s.metricsRegistry.Inc(MetricIDContainersCount)
 	case types.EventContainerDeleted:
 		s.metricsRegistry.Dec(MetricIDContainersCount)
-		s.metricsRegistry.Set(MetricIDContainerStatus, math.NaN(), e.ContainerUUID.String(), e.ServiceID)
+		s.metricsRegistry.Set(MetricIDContainerStatus, math.NaN(), e.ContainerID.String(), e.ServiceID)
 	case types.EventContainersLoaded:
 		s.metricsRegistry.Set(MetricIDContainersCount, float64(e.Count))
 	}

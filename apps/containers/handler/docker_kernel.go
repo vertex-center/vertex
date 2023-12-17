@@ -43,11 +43,7 @@ type DeleteDockerContainerParams struct {
 
 func (h *dockerKernelHandler) DeleteContainer() gin.HandlerFunc {
 	return router.Handler(func(c *gin.Context, params *DeleteDockerContainerParams) error {
-		err := h.dockerService.DeleteContainer(params.ID)
-		if err != nil && client.IsErrNotFound(err) {
-			return apierrors.NewNotFound(err, "container not found")
-		}
-		return err
+		return h.dockerService.DeleteContainer(params.ID)
 	})
 }
 

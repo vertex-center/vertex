@@ -16,7 +16,7 @@ func (s *sqlService) OnEvent(e event.Event) error {
 		if e.Status == types.ContainerStatusRunning {
 			s.onContainerStart(&e.Container)
 		} else if e.Status == types.ContainerStatusOff {
-			s.onContainerStop(e.ContainerUUID)
+			s.onContainerStop(e.ContainerID)
 		}
 	}
 	return nil
@@ -32,7 +32,7 @@ func (s *sqlService) onContainerStart(inst *types.Container) {
 	s.dbmsMutex.Lock()
 	defer s.dbmsMutex.Unlock()
 
-	if _, ok := s.dbms[inst.UUID]; ok {
+	if _, ok := s.dbms[inst.ID]; ok {
 		return
 	}
 
@@ -41,7 +41,7 @@ func (s *sqlService) onContainerStart(inst *types.Container) {
 		return
 	}
 
-	s.dbms[inst.UUID] = dbms
+	s.dbms[inst.ID] = dbms
 }
 
 func (s *sqlService) onContainerStop(uuid types.ContainerID) {

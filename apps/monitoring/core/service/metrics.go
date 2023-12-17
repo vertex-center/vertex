@@ -56,19 +56,19 @@ func (s *metricsService) InstallCollector(ctx context.Context, collector string)
 		return err
 	}
 
-	err = s.ConfigureCollector(inst)
+	err = s.ConfigureCollector(&inst)
 	if err != nil {
 		return err
 	}
 
-	return c.PatchContainer(ctx, inst.UUID, containerstypes.ContainerSettings{
-		Tags: []string{"Vertex Monitoring", "Vertex Monitoring - Prometheus Collector"},
+	return c.PatchContainer(ctx, inst.ID, map[string]interface{}{
+		"tags": []string{"Vertex Monitoring", "Vertex Monitoring - Prometheus Collector"},
 	})
 }
 
 // ConfigureCollector will configure a container to monitor the metrics of Vertex.
 func (s *metricsService) ConfigureCollector(inst *containerstypes.Container) error {
-	return s.adapter.ConfigureContainer(inst.UUID)
+	return s.adapter.ConfigureContainer(inst.ID)
 }
 
 func (s *metricsService) InstallVisualizer(ctx context.Context, visualizer string) error {
@@ -84,13 +84,13 @@ func (s *metricsService) InstallVisualizer(ctx context.Context, visualizer strin
 		return err
 	}
 
-	err = s.ConfigureVisualizer(inst)
+	err = s.ConfigureVisualizer(&inst)
 	if err != nil {
 		return err
 	}
 
-	return c.PatchContainer(ctx, inst.UUID, containerstypes.ContainerSettings{
-		Tags: []string{"Vertex Monitoring", "Vertex Monitoring - Grafana Visualizer"},
+	return c.PatchContainer(ctx, inst.ID, map[string]interface{}{
+		"tags": []string{"Vertex Monitoring", "Vertex Monitoring - Grafana Visualizer"},
 	})
 }
 

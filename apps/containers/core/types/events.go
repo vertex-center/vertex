@@ -9,34 +9,26 @@ const (
 )
 
 type (
-	EventContainerLoaded struct {
-		Container *Container
-	}
-
 	EventContainerLog struct {
-		ContainerUUID ContainerID
-		Kind          string
-		Message       LogLineMessage
+		ContainerID ContainerID
+		Kind        string
+		Message     LogLineMessage
 	}
 
 	EventContainerStatusChange struct {
-		ContainerUUID ContainerID
-		ServiceID     string
-		Container     Container
-		Name          string
-		Status        string
+		ContainerID ContainerID
+		ServiceID   string
+		Container   Container
+		Name        string
+		Status      string
 	}
 
 	EventContainerDeleted struct {
-		ContainerUUID ContainerID
-		ServiceID     string
+		ContainerID ContainerID
+		ServiceID   string
 	}
 
-	EventContainersLoaded struct {
-		Count int
-	}
-
-	EventContainerCreated  struct{}
-	EventContainersChange  struct{}
-	EventContainersStopped struct{}
+	EventContainersLoaded struct{ Count int }
+	EventContainerCreated struct{}
+	EventContainersChange struct{}
 )

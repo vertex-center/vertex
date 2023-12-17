@@ -3,7 +3,6 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
-	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/tunnels/core/port"
 	"github.com/vertex-center/vertex/pkg/router"
 )
@@ -32,8 +31,8 @@ func (r *providerHandler) Install() gin.HandlerFunc {
 			return err
 		}
 
-		return client.PatchContainer(c, inst.UUID, containerstypes.ContainerSettings{
-			Tags: []string{"Vertex Tunnels", "Vertex Tunnels - Cloudflare"},
+		return client.PatchContainer(c, inst.ID, map[string]interface{}{
+			"tags": []string{"Vertex Tunnels", "Vertex Tunnels - Cloudflare"},
 		})
 	})
 }
