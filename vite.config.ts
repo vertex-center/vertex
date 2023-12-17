@@ -34,7 +34,7 @@ const openapi = async () => {
             if (id.endsWith("_category_.yml")) {
                 return src;
             }
-            const api = await SwaggerParser.validate(id);
+            const api = await SwaggerParser.dereference(id);
             return `export default ${JSON.stringify(api)}`;
         },
     };
