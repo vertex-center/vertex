@@ -45,9 +45,8 @@ func main() {
 		Version: version,
 		Commit:  commit,
 		Date:    date,
-
-		OS:   runtime.GOOS,
-		Arch: runtime.GOARCH,
+		OS:      runtime.GOOS,
+		Arch:    runtime.GOARCH,
 	}
 
 	ctx = common.NewVertexContext(about, false)

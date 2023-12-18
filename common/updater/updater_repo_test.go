@@ -1,4 +1,4 @@
-package updates
+package updater
 
 import (
 	"testing"

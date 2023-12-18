@@ -59,11 +59,12 @@ func NewDB(params DBParams) (DB, error) {
 		params.configPath = path.Join(FSPath, "database", "config.yml")
 	}
 
-	err := os.MkdirAll(path.Dir(params.configPath), os.ModePerm)
+	configDir := path.Dir(params.configPath)
+	err := os.MkdirAll(configDir, os.ModePerm)
 	if err != nil && !os.IsExist(err) {
 		log.Error(err,
 			vlog.String("message", "failed to create directory"),
-			vlog.String("path", params.configPath),
+			vlog.String("path", configDir),
 		)
 		os.Exit(1)
 	}

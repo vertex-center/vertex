@@ -1,21 +1,19 @@
 package admin
 
 import (
-	"path"
-
 	"github.com/vertex-center/vertex/apps/admin/adapter"
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/service"
-	types2 "github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/apps/admin/database"
 	"github.com/vertex-center/vertex/apps/admin/handler"
 	"github.com/vertex-center/vertex/apps/admin/meta"
+	"github.com/vertex-center/vertex/apps/admin/updates"
 	authmiddleware "github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/app/appmeta"
 	"github.com/vertex-center/vertex/common/middleware"
 	"github.com/vertex-center/vertex/common/storage"
-	"github.com/vertex-center/vertex/updates"
+	"github.com/vertex-center/vertex/common/updater"
 	"github.com/wI2L/fizz"
 )
 
@@ -42,10 +40,8 @@ func (a *App) Load(ctx *app.Context) {
 	a.ctx = ctx
 
 	if !ctx.Kernel() {
-		updateService = service.NewUpdateService(a.ctx, []types2.Updater{
+		updateService = service.NewUpdateService(a.ctx, []updater.Updater{
 			updates.NewVertexUpdater(a.ctx.About()),
-			updates.NewVertexClientUpdater(path.Join(storage.FSPath, "client")),
-			updates.NewRepositoryUpdater("vertex_services", path.Join(storage.FSPath, "services"), "vertex-center", "services"),
 		})
 	}
 }

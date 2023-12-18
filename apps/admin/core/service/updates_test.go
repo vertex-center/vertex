@@ -8,10 +8,10 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"github.com/vertex-center/vertex/apps/admin/core/port"
-	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/common"
 	apptypes "github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/baseline"
+	"github.com/vertex-center/vertex/common/updater"
 )
 
 type UpdateServiceTestSuite struct {
@@ -61,7 +61,7 @@ func (suite *UpdateServiceTestSuite) SetupTest() {
 	suite.updaterB = &MockUpdater{}
 	suite.updaterB.On("ID").Return("vertex_client")
 
-	updaters := []types.Updater{
+	updaters := []updater.Updater{
 		suite.updaterA,
 		suite.updaterB,
 	}

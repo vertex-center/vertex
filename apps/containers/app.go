@@ -1,6 +1,10 @@
 package containers
 
 import (
+	"context"
+	"os"
+	"path"
+
 	authmiddleware "github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/apps/containers/adapter"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
@@ -11,8 +15,10 @@ import (
 	"github.com/vertex-center/vertex/apps/monitoring/core/types/metric"
 	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/app/appmeta"
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/common/middleware"
 	"github.com/vertex-center/vertex/common/storage"
+	"github.com/vertex-center/vertex/common/updater"
 	"github.com/wI2L/fizz"
 )
 
@@ -34,6 +40,16 @@ func NewApp() *App {
 
 func (a *App) Load(ctx *app.Context) {
 	a.ctx = ctx
+
+	if !ctx.Kernel() {
+		err := updater.Execute(context.Background(), ctx.About().Channel(),
+			updater.NewRepositoryUpdater("vertex_services", path.Join(storage.FSPath, "services"), "vertex-center", "services"),
+		)
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+	}
 }
 
 func (a *App) Meta() appmeta.Meta {

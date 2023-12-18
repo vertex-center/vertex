@@ -13,3 +13,4 @@
 | Vertex SQL            | 7512 |             |
 | Vertex Tunnels        | 7514 |             |
 | Vertex Logs           | 7516 |             |
+| Vertex Client         | 7518 |             |
