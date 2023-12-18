@@ -10,8 +10,7 @@ import (
 func (c *Client) GetTag(ctx context.Context, name string) (types.Tag, error) {
 	var tag types.Tag
 	err := c.Request().
-		Path("./tag").
-		Param("name", name).
+		Pathf("./tags/%s", name).
 		ToJSON(&tag).
 		Fetch(ctx)
 	return tag, err
@@ -28,7 +27,7 @@ func (c *Client) GetTags(ctx context.Context) (*types.Tags, error) {
 
 func (c *Client) CreateTag(ctx context.Context, tag types.Tag) (types.Tag, error) {
 	err := c.Request().
-		Path("./tag").
+		Path("./tags").
 		BodyJSON(tag).
 		ToJSON(&tag).
 		Post().

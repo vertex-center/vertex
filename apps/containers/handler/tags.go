@@ -18,7 +18,7 @@ func NewTagsHandler(service port.TagsService) port.TagsHandler {
 }
 
 type GetTagParams struct {
-	Name string `query:"name"`
+	Name string `path:"name"`
 }
 
 func (h *tagsHandler) GetTag() gin.HandlerFunc {

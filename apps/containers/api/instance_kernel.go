@@ -11,7 +11,7 @@ import (
 func (c *KernelClient) CreateContainer(ctx context.Context, options types.CreateContainerOptions) (types.CreateContainerResponse, error) {
 	var res types.CreateContainerResponse
 	err := c.Request().
-		Pathf("./docker/container").
+		Pathf("./docker/containers").
 		BodyJSON(options).
 		ToJSON(&res).
 		Fetch(ctx)
@@ -20,21 +20,21 @@ func (c *KernelClient) CreateContainer(ctx context.Context, options types.Create
 
 func (c *KernelClient) DeleteContainer(ctx context.Context, id string) error {
 	return c.Request().
-		Pathf("./docker/container/%s", id).
+		Pathf("./docker/containers/%s", id).
 		Delete().
 		Fetch(ctx)
 }
 
 func (c *KernelClient) StartContainer(ctx context.Context, id string) error {
 	return c.Request().
-		Pathf("./docker/container/%s/start", id).
+		Pathf("./docker/containers/%s/start", id).
 		Post().
 		Fetch(ctx)
 }
 
 func (c *KernelClient) StopContainer(ctx context.Context, id string) error {
 	return c.Request().
-		Pathf("./docker/container/%s/stop", id).
+		Pathf("./docker/containers/%s/stop", id).
 		Post().
 		Fetch(ctx)
 }
@@ -42,7 +42,7 @@ func (c *KernelClient) StopContainer(ctx context.Context, id string) error {
 func (c *KernelClient) GetContainerInfo(ctx context.Context, id string) (types.InfoContainerResponse, error) {
 	var info types.InfoContainerResponse
 	err := c.Request().
-		Pathf("./docker/container/%s/info", id).
+		Pathf("./docker/containers/%s/info", id).
 		ToJSON(&info).
 		Fetch(ctx)
 	return info, err
@@ -51,7 +51,7 @@ func (c *KernelClient) GetContainerInfo(ctx context.Context, id string) (types.I
 func (c *KernelClient) GetImageInfo(ctx context.Context, id string) (types.InfoImageResponse, error) {
 	var info types.InfoImageResponse
 	err := c.Request().
-		Pathf("./docker/image/%s/info", id).
+		Pathf("./docker/images/%s/info", id).
 		ToJSON(&info).
 		Fetch(ctx)
 	return info, err
@@ -59,7 +59,7 @@ func (c *KernelClient) GetImageInfo(ctx context.Context, id string) (types.InfoI
 
 func (c *KernelClient) BuildImage(ctx context.Context, options types.BuildImageOptions) (io.ReadCloser, error) {
 	req, err := c.Request().
-		Pathf("./docker/image/build").
+		Pathf("./docker/images/build").
 		Post().
 		BodyJSON(options).
 		Request(ctx)
@@ -77,7 +77,7 @@ func (c *KernelClient) BuildImage(ctx context.Context, options types.BuildImageO
 
 func (c *KernelClient) PullImage(ctx context.Context, options types.PullImageOptions) (io.ReadCloser, error) {
 	req, err := c.Request().
-		Pathf("./docker/image/pull").
+		Pathf("./docker/images/pull").
 		Post().
 		BodyJSON(options).
 		Request(ctx)
@@ -95,14 +95,14 @@ func (c *KernelClient) PullImage(ctx context.Context, options types.PullImageOpt
 
 func (c *KernelClient) WaitContainer(ctx context.Context, id string, cond string) error {
 	return c.Request().
-		Pathf("./docker/container/%s/wait/%s", id, cond).
+		Pathf("./docker/containers/%s/wait/%s", id, cond).
 		Fetch(ctx)
 }
 
 func (c *KernelClient) GetContainerStdout(ctx context.Context, id string) (io.ReadCloser, error) {
 	var req *http.Request
 	req, err := c.Request().
-		Pathf("./docker/container/%s/logs/stdout", id).
+		Pathf("./docker/containers/%s/logs/stdout", id).
 		Request(ctx)
 	if err != nil || req == nil {
 		return nil, err
@@ -119,7 +119,7 @@ func (c *KernelClient) GetContainerStdout(ctx context.Context, id string) (io.Re
 func (c *KernelClient) GetContainerStderr(ctx context.Context, id string) (io.ReadCloser, error) {
 	var req *http.Request
 	req, err := c.Request().
-		Pathf("./docker/container/%s/logs/stderr", id).
+		Pathf("./docker/containers/%s/logs/stderr", id).
 		Request(ctx)
 	if err != nil || req == nil {
 		return nil, err
@@ -135,7 +135,7 @@ func (c *KernelClient) GetContainerStderr(ctx context.Context, id string) (io.Re
 
 func (c *KernelClient) DeleteMounts(ctx context.Context, id string) error {
 	return c.Request().
-		Pathf("./docker/container/%s/mounts", id).
+		Pathf("./docker/containers/%s/mounts", id).
 		Delete().
 		Fetch(ctx)
 }

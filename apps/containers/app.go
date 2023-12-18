@@ -76,135 +76,128 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	metric.Serve(r, metricsService)
 
 	var (
-		servicesHandler   = handler.NewServicesHandler(containerService)
-		serviceHandler    = handler.NewServiceHandler(containerService)
+		servicesHandler   = handler.NewServiceHandler(containerService)
 		tagsHandler       = handler.NewTagsHandler(tagsService)
-		containersHandler = handler.NewContainersHandler(a.ctx, containerService)
-		containerHandler  = handler.NewContainerHandler(a.ctx, containerService)
+		containersHandler = handler.NewContainerHandler(a.ctx, containerService)
 
-		container  = r.Group("/container", "Container", "", authmiddleware.Authenticated)
 		containers = r.Group("/containers", "Containers", "", authmiddleware.Authenticated)
-		tag        = r.Group("/tag", "Tag", "", authmiddleware.Authenticated)
 		tags       = r.Group("/tags", "Tags", "", authmiddleware.Authenticated)
-		serv       = r.Group("/service/:service_id", "Service", "", authmiddleware.Authenticated)
 		services   = r.Group("/services", "Services", "")
 	)
 
 	// Container
 
-	container.GET("/:container_id", []fizz.OperationOption{
+	containers.GET("", []fizz.OperationOption{
+		fizz.ID("getContainers"),
+		fizz.Summary("Get containers"),
+	}, containersHandler.GetContainers())
+
+	containers.GET("/:container_id", []fizz.OperationOption{
 		fizz.ID("getContainer"),
 		fizz.Summary("Get a container"),
 		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
-	}, containerHandler.Get())
+	}, containersHandler.Get())
 
-	container.POST("", []fizz.OperationOption{
+	containers.POST("", []fizz.OperationOption{
 		fizz.ID("createContainer"),
 		fizz.Summary("Create a container"),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to create container"}),
-	}, containerHandler.CreateContainer())
+	}, containersHandler.CreateContainer())
 
-	container.DELETE("/:container_id", []fizz.OperationOption{
+	containers.DELETE("/:container_id", []fizz.OperationOption{
 		fizz.ID("deleteContainer"),
 		fizz.Summary("Delete a container"),
 		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "container still running"}),
-	}, containerHandler.Delete())
+	}, containersHandler.Delete())
 
-	container.PATCH("/:container_id", []fizz.OperationOption{
+	containers.PATCH("/:container_id", []fizz.OperationOption{
 		fizz.ID("patchContainer"),
 		fizz.Summary("Patch a container"),
 		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to patch container"}),
-	}, containerHandler.Patch())
+	}, containersHandler.Patch())
 
-	container.POST("/:container_id/start", []fizz.OperationOption{
+	containers.POST("/:container_id/start", []fizz.OperationOption{
 		fizz.ID("startContainer"),
 		fizz.Summary("Start a container"),
 		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to start container"}),
-	}, containerHandler.Start())
+	}, containersHandler.Start())
 
-	container.POST("/:container_id/stop", []fizz.OperationOption{
+	containers.POST("/:container_id/stop", []fizz.OperationOption{
 		fizz.ID("stopContainer"),
 		fizz.Summary("Stop a container"),
 		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to stop container"}),
-	}, containerHandler.Stop())
+	}, containersHandler.Stop())
 
-	container.PUT("/:container_id/tag/:tag_id", []fizz.OperationOption{
+	containers.PUT("/:container_id/tags/:tag_id", []fizz.OperationOption{
 		fizz.ID("addContainerTag"),
 		fizz.Summary("Link tag to container"),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to link tag to container"}),
-	}, containerHandler.AddContainerTag())
+	}, containersHandler.AddContainerTag())
 
-	container.GET("/:container_id/environment", []fizz.OperationOption{
+	containers.GET("/:container_id/environment", []fizz.OperationOption{
 		fizz.ID("getContainerEnvironment"),
 		fizz.Summary("Get container environment"),
 		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to get container environment"}),
-	}, containerHandler.GetContainerEnv())
+	}, containersHandler.GetContainerEnv())
 
-	container.PATCH("/:container_id/environment", []fizz.OperationOption{
+	containers.PATCH("/:container_id/environment", []fizz.OperationOption{
 		fizz.ID("patchContainerEnvironment"),
 		fizz.Summary("Patch a container environment"),
 		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to patch container environment"}),
-	}, containerHandler.PatchEnvironment())
+	}, containersHandler.PatchEnvironment())
 
-	container.GET("/:container_id/events", []fizz.OperationOption{
+	containers.GET("/:container_id/events", []fizz.OperationOption{
 		fizz.ID("eventsContainer"),
 		fizz.Summary("Get container events"),
 		fizz.Description("Get events for a container, sent as Server-Sent Events (SSE)."),
 		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to get container events"}),
-	}, middleware.SSE, containerHandler.Events())
+	}, middleware.SSE, containersHandler.ContainerEvents())
 
-	container.GET("/:container_id/docker", []fizz.OperationOption{
+	containers.GET("/:container_id/docker", []fizz.OperationOption{
 		fizz.ID("getDockerContainer"),
 		fizz.Summary("Get Docker container info"),
 		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to get Docker container info"}),
-	}, containerHandler.GetDocker())
+	}, containersHandler.GetDocker())
 
-	container.POST("/:container_id/docker/recreate", []fizz.OperationOption{
+	containers.POST("/:container_id/docker/recreate", []fizz.OperationOption{
 		fizz.ID("recreateDockerContainer"),
 		fizz.Summary("Recreate Docker container"),
 		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to recreate Docker container"}),
-	}, containerHandler.RecreateDocker())
+	}, containersHandler.RecreateDocker())
 
-	container.GET("/:container_id/logs", []fizz.OperationOption{
+	containers.GET("/:container_id/logs", []fizz.OperationOption{
 		fizz.ID("getContainerLogs"),
 		fizz.Summary("Get container logs"),
 		fizz.Description("Get latest container logs."),
 		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to get container logs"}),
-	}, containerHandler.GetLogs())
+	}, containersHandler.GetLogs())
 
-	container.GET("/:container_id/versions", []fizz.OperationOption{
+	containers.GET("/:container_id/versions", []fizz.OperationOption{
 		fizz.ID("getContainerVersions"),
 		fizz.Summary("Get container image versions"),
 		fizz.Description("Get the possible versions of the container image that can be used."),
 		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to get container image versions"}),
-	}, containerHandler.GetVersions())
+	}, containersHandler.GetVersions())
 
-	container.GET("/:container_id/wait", []fizz.OperationOption{
+	containers.GET("/:container_id/wait", []fizz.OperationOption{
 		fizz.ID("waitContainerStatus"),
 		fizz.Summary("Wait for a status change"),
 		fizz.Description("Wait for a status change of the container."),
 		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
 		fizz.Response("408", "Timeout", nil, nil, map[string]interface{}{"error": "wait status timeout"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to wait for status change"}),
-	}, containerHandler.WaitStatus())
-
-	// Containers
-
-	containers.GET("", []fizz.OperationOption{
-		fizz.ID("getContainers"),
-		fizz.Summary("Get containers"),
-	}, containersHandler.GetContainers())
+	}, containersHandler.WaitStatus())
 
 	containers.GET("/checkupdates", []fizz.OperationOption{
 		fizz.ID("checkForUpdates"),
@@ -214,43 +207,41 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	containers.GET("/events", []fizz.OperationOption{
 		fizz.ID("events"),
 		fizz.Summary("Get events"),
-	}, middleware.SSE, containersHandler.Events())
+	}, middleware.SSE, containersHandler.ContainersEvents())
 
 	// Tags
 
-	tag.GET("", []fizz.OperationOption{
+	tags.GET("/:name", []fizz.OperationOption{
 		fizz.ID("getTag"),
 		fizz.Summary("Get tag"),
 	}, tagsHandler.GetTag())
-
-	tag.POST("", []fizz.OperationOption{
-		fizz.ID("createTag"),
-		fizz.Summary("Create tag"),
-	}, tagsHandler.CreateTag())
-
-	tag.DELETE("/:id", []fizz.OperationOption{
-		fizz.ID("deleteTag"),
-		fizz.Summary("Delete tag"),
-	}, tagsHandler.DeleteTag())
 
 	tags.GET("", []fizz.OperationOption{
 		fizz.ID("getTags"),
 		fizz.Summary("Get tags"),
 	}, tagsHandler.GetTags())
 
-	// Service
+	tags.POST("", []fizz.OperationOption{
+		fizz.ID("createTag"),
+		fizz.Summary("Create tag"),
+	}, tagsHandler.CreateTag())
 
-	serv.GET("", []fizz.OperationOption{
-		fizz.ID("getService"),
-		fizz.Summary("Get service"),
-	}, serviceHandler.Get())
+	tags.DELETE("/:id", []fizz.OperationOption{
+		fizz.ID("deleteTag"),
+		fizz.Summary("Delete tag"),
+	}, tagsHandler.DeleteTag())
 
 	// Services
+
+	services.GET("/:service_id", []fizz.OperationOption{
+		fizz.ID("getService"),
+		fizz.Summary("Get service"),
+	}, servicesHandler.GetService())
 
 	services.GET("", []fizz.OperationOption{
 		fizz.ID("getServices"),
 		fizz.Summary("Get services"),
-	}, authmiddleware.Authenticated, servicesHandler.Get())
+	}, authmiddleware.Authenticated, servicesHandler.GetServices())
 
 	services.GinRouterGroup().Static("/icons", "./live/services/icons")
 
@@ -274,64 +265,64 @@ func (a *App) InitializeKernelRouter(r *fizz.RouterGroup) error {
 		fizz.Summary("Get containers"),
 	}, dockerHandler.GetContainers())
 
-	docker.POST("/container", []fizz.OperationOption{
+	docker.POST("/containers", []fizz.OperationOption{
 		fizz.ID("createContainer"),
 		fizz.Summary("Create container"),
 	}, dockerHandler.CreateContainer())
 
-	docker.DELETE("/container/:id", []fizz.OperationOption{
+	docker.DELETE("/containers/:id", []fizz.OperationOption{
 		fizz.ID("deleteContainer"),
 		fizz.Summary("Delete container"),
 	}, dockerHandler.DeleteContainer())
 
-	docker.POST("/container/:id/start", []fizz.OperationOption{
+	docker.POST("/containers/:id/start", []fizz.OperationOption{
 		fizz.ID("startContainer"),
 		fizz.Summary("Start container"),
 	}, dockerHandler.StartContainer())
 
-	docker.POST("/container/:id/stop", []fizz.OperationOption{
+	docker.POST("/containers/:id/stop", []fizz.OperationOption{
 		fizz.ID("stopContainer"),
 		fizz.Summary("Stop container"),
 	}, dockerHandler.StopContainer())
 
-	docker.GET("/container/:id/info", []fizz.OperationOption{
+	docker.GET("/containers/:id/info", []fizz.OperationOption{
 		fizz.ID("infoContainer"),
 		fizz.Summary("Get container info"),
 	}, dockerHandler.InfoContainer())
 
-	docker.GET("/container/:id/logs/stdout", []fizz.OperationOption{
+	docker.GET("/containers/:id/logs/stdout", []fizz.OperationOption{
 		fizz.ID("logsStdoutContainer"),
 		fizz.Summary("Get container stdout logs"),
 		fizz.Description("Get container stdout logs as a stream."),
 	}, dockerHandler.LogsStdoutContainer())
 
-	docker.GET("/container/:id/logs/stderr", []fizz.OperationOption{
+	docker.GET("/containers/:id/logs/stderr", []fizz.OperationOption{
 		fizz.ID("logsStderrContainer"),
 		fizz.Summary("Get container stderr logs"),
 		fizz.Description("Get container stderr logs as a stream."),
 	}, dockerHandler.LogsStderrContainer())
 
-	docker.GET("/container/:id/wait/:cond", []fizz.OperationOption{
+	docker.GET("/containers/:id/wait/:cond", []fizz.OperationOption{
 		fizz.ID("waitContainer"),
 		fizz.Summary("Wait container"),
 	}, dockerHandler.WaitContainer())
 
-	docker.DELETE("/container/:id/mounts", []fizz.OperationOption{
+	docker.DELETE("/containers/:id/mounts", []fizz.OperationOption{
 		fizz.ID("deleteMounts"),
 		fizz.Summary("Delete mounts"),
 	}, dockerHandler.DeleteMounts())
 
-	docker.GET("/image/:id/info", []fizz.OperationOption{
+	docker.GET("/images/:id/info", []fizz.OperationOption{
 		fizz.ID("infoImage"),
 		fizz.Summary("Get image info"),
 	}, dockerHandler.InfoImage())
 
-	docker.POST("/image/pull", []fizz.OperationOption{
+	docker.POST("/images/pull", []fizz.OperationOption{
 		fizz.ID("pullImage"),
 		fizz.Summary("Pull image"),
 	}, dockerHandler.PullImage())
 
-	docker.POST("/image/build", []fizz.OperationOption{
+	docker.POST("/images/build", []fizz.OperationOption{
 		fizz.ID("buildImage"),
 		fizz.Summary("Build image"),
 	}, dockerHandler.BuildImage())

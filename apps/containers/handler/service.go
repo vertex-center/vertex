@@ -19,8 +19,14 @@ type GetServiceParams struct {
 	ServiceID string `path:"service_id"`
 }
 
-func (h *serviceHandler) Get() gin.HandlerFunc {
+func (h *serviceHandler) GetService() gin.HandlerFunc {
 	return router.Handler(func(ctx *gin.Context, params *GetServiceParams) (*types.Service, error) {
 		return h.containerService.GetServiceByID(ctx, params.ServiceID)
+	})
+}
+
+func (h *serviceHandler) GetServices() gin.HandlerFunc {
+	return router.Handler(func(ctx *gin.Context) ([]types.Service, error) {
+		return h.containerService.GetServices(ctx), nil
 	})
 }

@@ -7,6 +7,7 @@ import (
 type (
 	ContainerHandler interface {
 		Get() gin.HandlerFunc
+		GetContainers() gin.HandlerFunc
 		CreateContainer() gin.HandlerFunc
 		Delete() gin.HandlerFunc
 		Patch() gin.HandlerFunc
@@ -20,21 +21,14 @@ type (
 		GetLogs() gin.HandlerFunc
 		GetVersions() gin.HandlerFunc
 		WaitStatus() gin.HandlerFunc
-		Events() gin.HandlerFunc
-	}
-
-	ContainersHandler interface {
-		GetContainers() gin.HandlerFunc
 		CheckForUpdates() gin.HandlerFunc
-		Events() gin.HandlerFunc
+		ContainerEvents() gin.HandlerFunc
+		ContainersEvents() gin.HandlerFunc
 	}
 
 	ServiceHandler interface {
-		Get() gin.HandlerFunc
-	}
-
-	ServicesHandler interface {
-		Get() gin.HandlerFunc
+		GetService() gin.HandlerFunc
+		GetServices() gin.HandlerFunc
 	}
 
 	TagsHandler interface {

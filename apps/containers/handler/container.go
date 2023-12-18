@@ -38,6 +38,24 @@ func (h *containerHandler) Get() gin.HandlerFunc {
 	}, http.StatusOK)
 }
 
+func (h *containerHandler) GetContainers() gin.HandlerFunc {
+	return tonic.Handler(func(ctx *gin.Context) (types.Containers, error) {
+		filters := types.ContainerFilters{}
+
+		features := ctx.QueryArray("features[]")
+		if len(features) > 0 {
+			filters.Features = &features
+		}
+
+		tags := ctx.QueryArray("tags[]")
+		if len(tags) > 0 {
+			filters.Tags = &tags
+		}
+
+		return h.containerService.GetContainersWithFilters(ctx, filters)
+	}, http.StatusOK)
+}
+
 type CreateContainerParams struct {
 	ServiceID string `json:"service_id"`
 }
@@ -143,11 +161,66 @@ func (h *containerHandler) PatchEnvironment() gin.HandlerFunc {
 	}, http.StatusOK)
 }
 
+func (h *containerHandler) GetDocker() gin.HandlerFunc {
+	return tonic.Handler(func(ctx *gin.Context, params *GetContainerParams) (map[string]any, error) {
+		return h.containerService.GetContainerInfo(ctx, params.ContainerID.UUID)
+	}, http.StatusOK)
+}
+
+type RecreateContainerParams struct {
+	ContainerID uuid.NullUUID `path:"container_id"`
+}
+
+func (h *containerHandler) RecreateDocker() gin.HandlerFunc {
+	return tonic.Handler(func(ctx *gin.Context, params *RecreateContainerParams) error {
+		return h.containerService.RecreateContainer(ctx, params.ContainerID.UUID)
+	}, http.StatusNoContent)
+}
+
+type LogsContainerParams struct {
+	ContainerID uuid.NullUUID `path:"container_id"`
+}
+
+func (h *containerHandler) GetLogs() gin.HandlerFunc {
+	return tonic.Handler(func(ctx *gin.Context, params *LogsContainerParams) ([]types.LogLine, error) {
+		return h.containerService.GetLatestLogs(params.ContainerID.UUID)
+	}, http.StatusOK)
+}
+
+type GetVersionsParams struct {
+	ContainerID uuid.NullUUID `path:"container_id"`
+	UseCache    bool          `query:"cache"`
+}
+
+func (h *containerHandler) GetVersions() gin.HandlerFunc {
+	return tonic.Handler(func(ctx *gin.Context, params *GetVersionsParams) ([]string, error) {
+		log.Info("GetVersions", vlog.Bool("use_cache", params.UseCache))
+		return h.containerService.GetAllVersions(ctx, params.ContainerID.UUID, params.UseCache)
+	}, http.StatusOK)
+}
+
+type WaitStatusParams struct {
+	ContainerID uuid.NullUUID `path:"container_id"`
+}
+
+func (h *containerHandler) WaitStatus() gin.HandlerFunc {
+	return tonic.Handler(func(ctx *gin.Context, params *WaitStatusParams) error {
+		status := ctx.Query("status")
+		return h.containerService.WaitStatus(ctx, params.ContainerID.UUID, status)
+	}, http.StatusNoContent)
+}
+
+func (h *containerHandler) CheckForUpdates() gin.HandlerFunc {
+	return tonic.Handler(func(ctx *gin.Context) (types.Containers, error) {
+		return h.containerService.CheckForUpdates(ctx)
+	}, http.StatusOK)
+}
+
 type EventsContainerParams struct {
 	ContainerID uuid.NullUUID `path:"container_id"`
 }
 
-func (h *containerHandler) Events() gin.HandlerFunc {
+func (h *containerHandler) ContainerEvents() gin.HandlerFunc {
 	return tonic.Handler(func(ctx *gin.Context, params *EventsContainerParams) error {
 		inst, err := h.containerService.Get(ctx, params.ContainerID.UUID)
 		if err != nil {
@@ -231,51 +304,54 @@ func (h *containerHandler) Events() gin.HandlerFunc {
 	}, http.StatusOK)
 }
 
-func (h *containerHandler) GetDocker() gin.HandlerFunc {
-	return tonic.Handler(func(ctx *gin.Context, params *GetContainerParams) (map[string]any, error) {
-		return h.containerService.GetContainerInfo(ctx, params.ContainerID.UUID)
+func (h *containerHandler) ContainersEvents() gin.HandlerFunc {
+	return tonic.Handler(func(ctx *gin.Context) error {
+		eventsChan := make(chan sse.Event)
+		defer close(eventsChan)
+
+		done := ctx.Request.Context().Done()
+
+		listener := event.NewTempListener(func(e event.Event) error {
+			switch e.(type) {
+			case types.EventContainersChange:
+				eventsChan <- sse.Event{
+					Event: types.EventNameContainersChange,
+				}
+			}
+			return nil
+		})
+
+		h.ctx.AddListener(listener)
+		defer h.ctx.RemoveListener(listener)
+
+		first := true
+
+		ctx.Stream(func(w io.Writer) bool {
+			if first {
+				err := sse.Encode(w, sse.Event{
+					Event: "open",
+				})
+
+				if err != nil {
+					log.Error(err)
+					return false
+				}
+				first = false
+				return true
+			}
+
+			select {
+			case e := <-eventsChan:
+				err := sse.Encode(w, e)
+				if err != nil {
+					log.Error(err)
+				}
+				return true
+			case <-done:
+				return false
+			}
+		})
+
+		return nil
 	}, http.StatusOK)
-}
-
-type RecreateContainerParams struct {
-	ContainerID uuid.NullUUID `path:"container_id"`
-}
-
-func (h *containerHandler) RecreateDocker() gin.HandlerFunc {
-	return tonic.Handler(func(ctx *gin.Context, params *RecreateContainerParams) error {
-		return h.containerService.RecreateContainer(ctx, params.ContainerID.UUID)
-	}, http.StatusNoContent)
-}
-
-type LogsContainerParams struct {
-	ContainerID uuid.NullUUID `path:"container_id"`
-}
-
-func (h *containerHandler) GetLogs() gin.HandlerFunc {
-	return tonic.Handler(func(ctx *gin.Context, params *LogsContainerParams) ([]types.LogLine, error) {
-		return h.containerService.GetLatestLogs(params.ContainerID.UUID)
-	}, http.StatusOK)
-}
-
-type GetVersionsParams struct {
-	ContainerID uuid.NullUUID `path:"container_id"`
-	UseCache    bool          `query:"cache"`
-}
-
-func (h *containerHandler) GetVersions() gin.HandlerFunc {
-	return tonic.Handler(func(ctx *gin.Context, params *GetVersionsParams) ([]string, error) {
-		log.Info("GetVersions", vlog.Bool("use_cache", params.UseCache))
-		return h.containerService.GetAllVersions(ctx, params.ContainerID.UUID, params.UseCache)
-	}, http.StatusOK)
-}
-
-type WaitStatusParams struct {
-	ContainerID uuid.NullUUID `path:"container_id"`
-}
-
-func (h *containerHandler) WaitStatus() gin.HandlerFunc {
-	return tonic.Handler(func(ctx *gin.Context, params *WaitStatusParams) error {
-		status := ctx.Query("status")
-		return h.containerService.WaitStatus(ctx, params.ContainerID.UUID, status)
-	}, http.StatusNoContent)
 }
