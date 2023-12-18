@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/vertex-center/vertex/apps/admin/core/types"
+	"github.com/vertex-center/vertex/common/baseline"
 	"github.com/vertex-center/vertex/pkg/user"
 )
 
@@ -32,8 +33,8 @@ type (
 		Update(settings types.AdminSettings) error
 		GetWebhook() (*string, error)
 		SetWebhook(webhook string) error
-		GetChannel() (types.UpdatesChannel, error)
-		SetChannel(channel types.UpdatesChannel) error
+		GetChannel() (baseline.Channel, error)
+		SetChannel(channel baseline.Channel) error
 	}
 
 	SshService interface {
@@ -51,7 +52,7 @@ type (
 	}
 
 	UpdateService interface {
-		GetUpdate(channel types.UpdatesChannel) (*types.Update, error)
-		InstallLatest(channel types.UpdatesChannel) error
+		GetUpdate(channel baseline.Channel) (*types.Update, error)
+		InstallLatest(channel baseline.Channel) error
 	}
 )

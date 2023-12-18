@@ -11,6 +11,7 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 	apptypes "github.com/vertex-center/vertex/common/app"
+	"github.com/vertex-center/vertex/common/baseline"
 	coretypes "github.com/vertex-center/vertex/common/event"
 	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/config"
@@ -21,27 +22,25 @@ import (
 type updateService struct {
 	uuid     uuid.UUID
 	ctx      *apptypes.Context
-	adapter  port.BaselinesAdapter
 	updaters []types.Updater // updaters containers update logic for each dependency.
 	updating atomic.Bool     // updating is true if an update is currently in progress.
 }
 
-func NewUpdateService(ctx *apptypes.Context, adapter port.BaselinesAdapter, updaters []types.Updater) port.UpdateService {
+func NewUpdateService(ctx *apptypes.Context, updaters []types.Updater) port.UpdateService {
 	s := &updateService{
 		uuid:     uuid.New(),
 		ctx:      ctx,
-		adapter:  adapter,
 		updaters: updaters,
 	}
 	s.ctx.AddListener(s)
 	return s
 }
 
-func (s *updateService) GetUpdate(channel types.UpdatesChannel) (*types.Update, error) {
+func (s *updateService) GetUpdate(channel baseline.Channel) (*types.Update, error) {
 	available := false
 	update := types.Update{}
 
-	latest, err := s.adapter.GetLatest(context.Background(), channel)
+	latest, err := baseline.Fetch(context.Background(), channel)
 	if err != nil {
 		return nil, err
 	}
@@ -78,13 +77,13 @@ func (s *updateService) GetUpdate(channel types.UpdatesChannel) (*types.Update, 
 	return &update, nil
 }
 
-func (s *updateService) InstallLatest(channel types.UpdatesChannel) error {
+func (s *updateService) InstallLatest(channel baseline.Channel) error {
 	if !s.updating.CompareAndSwap(false, true) {
 		return types.ErrAlreadyUpdating
 	}
 	defer s.updating.Store(false)
 
-	latest, err := s.adapter.GetLatest(context.Background(), channel)
+	latest, err := baseline.Fetch(context.Background(), channel)
 	if err != nil {
 		return err
 	}
@@ -120,7 +119,7 @@ func (s *updateService) firstSetup() error {
 
 	log.Info("installing missing dependencies", vlog.Any("count", len(missingDeps)))
 
-	latest, err := s.adapter.GetLatest(context.Background(), types.UpdatesChannelStable)
+	latest, err := baseline.Fetch(context.Background(), baseline.ChannelStable)
 	if err != nil {
 		return err
 	}

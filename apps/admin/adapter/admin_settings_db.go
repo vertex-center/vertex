@@ -6,6 +6,7 @@ import (
 
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
+	"github.com/vertex-center/vertex/common/baseline"
 	"github.com/vertex-center/vertex/common/storage"
 )
 
@@ -34,7 +35,7 @@ func (a *settingsDbAdapter) Get() (types.AdminSettings, error) {
 	return settings, err
 }
 
-func (a *settingsDbAdapter) SetChannel(channel types.UpdatesChannel) error {
+func (a *settingsDbAdapter) SetChannel(channel baseline.Channel) error {
 	a.dbMutex.Lock()
 	defer a.dbMutex.Unlock()
 

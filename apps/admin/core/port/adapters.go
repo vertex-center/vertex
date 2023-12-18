@@ -4,16 +4,11 @@ import (
 	"context"
 
 	"github.com/vertex-center/vertex/apps/admin/core/types"
+	"github.com/vertex-center/vertex/common/baseline"
 	"github.com/vertex-center/vertex/pkg/user"
 )
 
 type (
-	BaselinesAdapter interface {
-		// GetLatest returns the latest available Baseline. This
-		// will typically fetch the latest Baseline from a remote source.
-		GetLatest(ctx context.Context, channel types.UpdatesChannel) (types.Baseline, error)
-	}
-
 	HardwareAdapter interface {
 		Reboot(ctx context.Context) error
 	}
@@ -24,7 +19,7 @@ type (
 
 	SettingsAdapter interface {
 		Get() (types.AdminSettings, error)
-		SetChannel(channel types.UpdatesChannel) error
+		SetChannel(channel baseline.Channel) error
 		SetWebhook(webhook string) error
 	}
 

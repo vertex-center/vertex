@@ -1,11 +1,24 @@
-package types
+package baseline
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"reflect"
+
+	"github.com/carlmjohnson/requests"
+	"github.com/vertex-center/vertex/common/log"
+	"github.com/vertex-center/vlog"
 )
 
 var ErrFailedToFetchBaseline = errors.New("failed to fetch baseline")
+
+const (
+	ChannelStable Channel = "stable"
+	ChannelBeta   Channel = "beta"
+)
+
+type Channel string
 
 type Baseline struct {
 	Date           string `json:"date"`            // Date of this release.
@@ -26,4 +39,26 @@ func (b Baseline) GetVersionByID(id string) (string, error) {
 		}
 	}
 	return "", errors.New("field not found")
+}
+
+func Fetch(ctx context.Context, channel Channel) (Baseline, error) {
+	var baseline Baseline
+	builder := requests.New().
+		BaseURL("https://bl.vx.arra.red/").
+		Pathf("%s.json", channel).
+		ToJSON(&baseline)
+
+	url, err := builder.URL()
+	if err != nil {
+		return baseline, err
+	}
+
+	log.Info("fetching latest baseline", vlog.String("url", url.String()))
+
+	err = builder.Fetch(ctx)
+	if err == nil {
+		return baseline, nil
+	}
+
+	return baseline, fmt.Errorf("%w: %w", ErrFailedToFetchBaseline, err)
 }

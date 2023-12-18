@@ -5,6 +5,7 @@ import (
 
 	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/apps/admin/core/types"
+	"github.com/vertex-center/vertex/common/baseline"
 )
 
 type settingsService struct {
@@ -48,14 +49,14 @@ func (s *settingsService) SetWebhook(webhook string) error {
 	return s.adapter.SetWebhook(webhook)
 }
 
-func (s *settingsService) GetChannel() (types.UpdatesChannel, error) {
+func (s *settingsService) GetChannel() (baseline.Channel, error) {
 	settings, err := s.Get()
 	if err != nil {
-		return types.UpdatesChannelStable, err
+		return baseline.ChannelStable, err
 	}
 	return settings.UpdatesChannel, nil
 }
 
-func (s *settingsService) SetChannel(channel types.UpdatesChannel) error {
+func (s *settingsService) SetChannel(channel baseline.Channel) error {
 	return s.adapter.SetChannel(channel)
 }

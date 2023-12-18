@@ -33,8 +33,7 @@ func (a *App) Load(ctx *app.Context) {
 	a.ctx = ctx
 
 	if !ctx.Kernel() {
-		baselinesApiAdapter := adapter.NewBaselinesApiAdapter()
-		updateService = service.NewUpdateService(a.ctx, baselinesApiAdapter, []types2.Updater{
+		updateService = service.NewUpdateService(a.ctx, []types2.Updater{
 			updates.NewVertexUpdater(a.ctx.About()),
 			updates.NewVertexClientUpdater(path.Join(storage.FSPath, "client")),
 			updates.NewRepositoryUpdater("vertex_services", path.Join(storage.FSPath, "services"), "vertex-center", "services"),
