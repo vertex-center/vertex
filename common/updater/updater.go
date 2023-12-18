@@ -1,7 +1,6 @@
 package updater
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/vertex-center/vertex/common/baseline"
@@ -34,23 +33,19 @@ func CheckUpdates(bl baseline.Baseline, updaters ...Updater) (bool, error) {
 	return false, nil
 }
 
-func Execute(ctx context.Context, channel baseline.Channel, updaters ...Updater) error {
-	latest, err := baseline.Fetch(ctx, channel)
-	if err != nil {
-		return fmt.Errorf("fetch baseline: %w", err)
-	}
-
+func Install(bl baseline.Baseline, updaters ...Updater) error {
+	var err error
 	for _, u := range updaters {
+		currentVersion := "not-installed"
+
 		if u.IsInstalled() {
-			continue
+			currentVersion, err = u.CurrentVersion()
+			if err != nil {
+				return err
+			}
 		}
 
-		currentVersion, err := u.CurrentVersion()
-		if err != nil {
-			return err
-		}
-
-		version, err := latest.GetVersionByID(u.ID())
+		version, err := bl.GetVersionByID(u.ID())
 		if err != nil {
 			return err
 		}
@@ -62,6 +57,5 @@ func Execute(ctx context.Context, channel baseline.Channel, updaters ...Updater)
 			}
 		}
 	}
-
 	return nil
 }

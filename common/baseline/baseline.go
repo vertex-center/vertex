@@ -41,7 +41,35 @@ func (b Baseline) GetVersionByID(id string) (string, error) {
 	return "", errors.New("field not found")
 }
 
-func Fetch(ctx context.Context, channel Channel) (Baseline, error) {
+func Fetch(ctx context.Context, version string) (Baseline, error) {
+	var history []Baseline
+	builder := requests.New().
+		BaseURL("https://bl.vx.arra.red/").
+		Pathf("versions.json").
+		ToJSON(&history)
+
+	url, err := builder.URL()
+	if err != nil {
+		return Baseline{}, err
+	}
+
+	log.Info("fetching baseline history", vlog.String("url", url.String()))
+
+	err = builder.Fetch(ctx)
+	if err != nil {
+		return Baseline{}, fmt.Errorf("%w: %w", ErrFailedToFetchBaseline, err)
+	}
+
+	for _, baseline := range history {
+		if baseline.Version == version {
+			return baseline, nil
+		}
+	}
+
+	return Baseline{}, fmt.Errorf("%w (%s)", ErrFailedToFetchBaseline, version)
+}
+
+func FetchLatest(ctx context.Context, channel Channel) (Baseline, error) {
 	var baseline Baseline
 	builder := requests.New().
 		BaseURL("https://bl.vx.arra.red/").

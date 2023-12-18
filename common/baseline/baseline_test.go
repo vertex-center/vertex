@@ -55,7 +55,7 @@ func (suite *BaselineTestSuite) TestFetch() {
 				"vertex_services": "071bcdc8162664fb9b6c489c00277f0cce15ad87",
 			})
 
-		baseline, err := Fetch(context.Background(), "stable")
+		baseline, err := FetchLatest(context.Background(), "stable")
 		suite.Require().NoError(err)
 		suite.NotEmpty(baseline)
 		suite.Equal("2023-10-13", baseline.Date)
@@ -77,7 +77,7 @@ func (suite *BaselineTestSuite) TestFetch() {
 				"vertex_services": "071bcdc8162664fb9b6c489c00277f0cce15ad87",
 			})
 
-		baseline, err := Fetch(context.Background(), "beta")
+		baseline, err := FetchLatest(context.Background(), "beta")
 		suite.Require().NoError(err)
 		suite.NotEmpty(baseline)
 		suite.Equal("2023-10-15", baseline.Date)

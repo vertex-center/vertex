@@ -4,10 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path"
-	"runtime"
 
-	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/juju/errors"
 	"github.com/vertex-center/vertex/apps"
@@ -16,7 +13,6 @@ import (
 	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/common/server"
-	"github.com/vertex-center/vertex/common/storage"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/wI2L/fizz"
@@ -41,13 +37,7 @@ func main() {
 	ensureNotRoot()
 	parseArgs()
 
-	about := common.About{
-		Version: version,
-		Commit:  commit,
-		Date:    date,
-		OS:      runtime.GOOS,
-		Arch:    runtime.GOARCH,
-	}
+	about := common.NewAbout(version, commit, date)
 
 	ctx = common.NewVertexContext(about, false)
 	url := config.Current.URL("vertex")
@@ -58,13 +48,10 @@ func main() {
 		Version:     ctx.About().Version,
 	}
 
-	app.RunApps(apps.Apps)
+	app.RunApps(about, apps.Apps)
 
 	srv = server.New("main", &info, url, ctx)
 	initRoutes(about)
-
-	srv.Router.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.FSPath, "client", "dist"), true)))
-
 	exitChan := srv.StartAsync()
 
 	for err := range exitChan {

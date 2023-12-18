@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/vertex-center/vertex/apps"
+	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/config"
@@ -16,11 +17,20 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
+// goreleaser will override version, commit and date
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 func main() {
 	defer log.Default.Close()
 
 	ensureRoot()
 	parseArgs()
+
+	about := common.NewAbout(version, commit, date)
 
 	// If go.mod is there, build vertex first.
 	_, err := os.Stat("go.mod")
@@ -34,7 +44,7 @@ func main() {
 		log.Error(err)
 	}
 
-	app.RunKernelApps(apps.Apps)
+	app.RunKernelApps(about, apps.Apps)
 
 	exitVertexChan := make(chan error)
 

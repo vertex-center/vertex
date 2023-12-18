@@ -1,7 +1,6 @@
 package containers
 
 import (
-	"context"
 	"os"
 	"path"
 
@@ -42,9 +41,13 @@ func (a *App) Load(ctx *app.Context) {
 	a.ctx = ctx
 
 	if !ctx.Kernel() {
-		err := updater.Execute(context.Background(), ctx.About().Channel(),
-			updater.NewRepositoryUpdater("vertex_services", path.Join(storage.FSPath, "services"), "vertex-center", "services"),
-		)
+		bl, err := ctx.About().Baseline()
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+
+		err = updater.Install(bl, updater.NewRepositoryUpdater("vertex_services", path.Join(storage.FSPath, "services"), "vertex-center", "services"))
 		if err != nil {
 			log.Error(err)
 			os.Exit(1)

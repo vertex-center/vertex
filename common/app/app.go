@@ -52,35 +52,35 @@ type Service interface {
 	OnEvent(e event.Event) error
 }
 
-func RunApps(apps []Interface) {
+func RunApps(about common.About, apps []Interface) {
 	waitNet()
 	for _, a := range apps {
 		if _, ok := a.(Initializable); !ok {
 			continue
 		}
 
-		go RunStandalone(a, false)
+		go RunStandalone(a, about, false)
 	}
 }
 
-func RunKernelApps(apps []Interface) {
+func RunKernelApps(about common.About, apps []Interface) {
 	waitNet()
 	for _, a := range apps {
 		if _, ok := a.(KernelInitializable); !ok {
 			continue
 		}
-		go RunStandaloneKernel(a, false)
+		go RunStandaloneKernel(a, about, false)
 	}
 }
 
 // RunStandalone runs the app as a standalone service.
 // It loads the app, initializes it and starts the HTTP server.
-func RunStandalone(app Interface, waitInternet bool) {
+func RunStandalone(app Interface, about common.About, waitInternet bool) {
 	if waitInternet {
 		waitNet()
 	}
 
-	vertexCtx := common.NewVertexContext(common.About{}, false)
+	vertexCtx := common.NewVertexContext(about, false)
 	ctx := NewContext(vertexCtx)
 	app.Load(ctx)
 
@@ -127,12 +127,12 @@ func RunStandalone(app Interface, waitInternet bool) {
 
 // RunStandaloneKernel runs the app as a standalone service.
 // It loads the app, initializes it and starts the HTTP server.
-func RunStandaloneKernel(app Interface, waitInternet bool) {
+func RunStandaloneKernel(app Interface, about common.About, waitInternet bool) {
 	if waitInternet {
 		waitNet()
 	}
 
-	vertexCtx := common.NewVertexContext(common.About{}, true)
+	vertexCtx := common.NewVertexContext(about, true)
 	ctx := NewContext(vertexCtx)
 	app.Load(ctx)
 

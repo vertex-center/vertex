@@ -29,7 +29,7 @@ func NewUpdateService(ctx *apptypes.Context, updaters []updater.Updater) port.Up
 }
 
 func (s *updateService) GetUpdate(channel baseline.Channel) (*types.Update, error) {
-	bl, err := baseline.Fetch(context.Background(), channel)
+	bl, err := baseline.FetchLatest(context.Background(), channel)
 	if err != nil {
 		return nil, fmt.Errorf("fetch baseline: %w", err)
 	}
@@ -53,5 +53,11 @@ func (s *updateService) InstallLatest(channel baseline.Channel) error {
 		return types.ErrAlreadyUpdating
 	}
 	defer s.updating.Store(false)
-	return updater.Execute(context.Background(), channel, s.updaters...)
+
+	bl, err := baseline.FetchLatest(context.Background(), channel)
+	if err != nil {
+		return fmt.Errorf("fetch baseline: %w", err)
+	}
+
+	return updater.Install(bl, s.updaters...)
 }

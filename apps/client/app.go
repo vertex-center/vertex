@@ -1,10 +1,10 @@
 package client
 
 import (
-	"context"
 	"os"
 	"path"
 
+	"github.com/gin-contrib/static"
 	"github.com/vertex-center/vertex/apps/client/meta"
 	"github.com/vertex-center/vertex/apps/client/updates"
 	"github.com/vertex-center/vertex/common/app"
@@ -12,6 +12,7 @@ import (
 	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/common/storage"
 	"github.com/vertex-center/vertex/common/updater"
+	"github.com/wI2L/fizz"
 )
 
 type App struct {
@@ -26,9 +27,13 @@ func (a *App) Load(ctx *app.Context) {
 	a.ctx = ctx
 
 	if !ctx.Kernel() {
-		err := updater.Execute(context.Background(), ctx.About().Channel(),
-			updates.NewVertexClientUpdater(path.Join(storage.FSPath, "client")),
-		)
+		bl, err := ctx.About().Baseline()
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+
+		err = updater.Install(bl, updates.NewVertexClientUpdater(path.Join(storage.FSPath, "client")))
 		if err != nil {
 			log.Error(err)
 			os.Exit(1)
@@ -38,4 +43,13 @@ func (a *App) Load(ctx *app.Context) {
 
 func (a *App) Meta() appmeta.Meta {
 	return meta.Meta
+}
+
+func (a *App) Initialize() error {
+	return nil
+}
+
+func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
+	r.Use(static.Serve("/", static.LocalFile(path.Join(".", storage.FSPath, "client", "dist"), true)))
+	return nil
 }

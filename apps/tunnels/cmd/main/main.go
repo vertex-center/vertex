@@ -2,9 +2,18 @@ package main
 
 import (
 	"github.com/vertex-center/vertex/apps/tunnels"
+	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/common/app"
 )
 
+// goreleaser will override version, commit and date
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 func main() {
-	app.RunStandalone(tunnels.NewApp(), true)
+	about := common.NewAbout(version, commit, date)
+	app.RunStandalone(tunnels.NewApp(), about, true)
 }

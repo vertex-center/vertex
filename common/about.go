@@ -1,6 +1,8 @@
 package common
 
 import (
+	"context"
+	"runtime"
 	"strings"
 
 	"github.com/vertex-center/vertex/common/baseline"
@@ -14,9 +16,26 @@ type About struct {
 	Arch    string `json:"arch"    example:"amd64"`
 }
 
+func NewAbout(version, commit, date string) About {
+	return About{
+		Version: version,
+		Commit:  commit,
+		Date:    date,
+		OS:      runtime.GOOS,
+		Arch:    runtime.GOARCH,
+	}
+}
+
 func (a About) Channel() baseline.Channel {
 	if strings.Contains(a.Version, "beta") {
 		return baseline.ChannelBeta
 	}
 	return baseline.ChannelStable
+}
+
+func (a About) Baseline() (baseline.Baseline, error) {
+	if a.Version == "dev" {
+		return baseline.FetchLatest(context.Background(), a.Channel())
+	}
+	return baseline.Fetch(context.Background(), a.Version)
 }
