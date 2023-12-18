@@ -85,7 +85,7 @@ func (s *sqlService) Install(ctx context.Context, dbms string) (containerstypes.
 		return c, err
 	}
 
-	c, err = client.InstallService(ctx, serv.ID)
+	c, err = client.CreateContainer(ctx, serv.ID)
 	if err != nil {
 		return c, err
 	}

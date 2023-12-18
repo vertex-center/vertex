@@ -15,6 +15,7 @@ type (
 		Get(ctx context.Context, id uuid.UUID) (*types.Container, error)
 		GetContainers(ctx context.Context) (types.Containers, error)
 		GetContainersWithFilters(ctx context.Context, filters types.ContainerFilters) (types.Containers, error)
+		CreateContainer(ctx context.Context, serviceID string) (*types.Container, error)
 		Delete(ctx context.Context, id uuid.UUID) error
 		UpdateContainer(ctx context.Context, id uuid.UUID, c types.Container) error
 		Start(ctx context.Context, id uuid.UUID) error
@@ -24,7 +25,6 @@ type (
 		AddContainerTag(ctx context.Context, id uuid.UUID, tagID uuid.UUID) error
 		RecreateContainer(ctx context.Context, id uuid.UUID) error
 		DeleteAll(ctx context.Context) error
-		Install(ctx context.Context, serviceID string) (*types.Container, error)
 		CheckForUpdates(ctx context.Context) (types.Containers, error)
 		SetDatabases(ctx context.Context, c *types.Container, databases map[string]uuid.UUID, options map[string]*types.SetDatabasesOptions) error
 		GetContainerEnv(ctx context.Context, id uuid.UUID) (types.EnvVariables, error)

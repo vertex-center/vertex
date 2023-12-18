@@ -88,6 +88,123 @@ func (s *containerService) GetContainersWithFilters(ctx context.Context, filters
 	return s.containers.GetContainersWithFilters(ctx, filters)
 }
 
+func (s *containerService) CreateContainer(ctx context.Context, serviceID string) (*types.Container, error) {
+	id := uuid.New()
+
+	service, err := s.services.Get(serviceID)
+	if err != nil {
+		return nil, err
+	}
+
+	dir := path.Join(storage.FSPath, id.String())
+	if service.Methods.Docker.Clone != nil {
+		err := vstorage.CloneRepository(dir, service.Methods.Docker.Clone.Repository)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Set default env
+	for _, e := range service.Env {
+		err = s.vars.CreateVariable(ctx, types.EnvVariable{
+			ContainerID: id,
+			Type:        types.EnvVariableType(e.Type),
+			Name:        e.Name,
+			DisplayName: e.DisplayName,
+			Value:       e.Default,
+			Default:     &e.Default,
+			Description: &e.Description,
+			Secret:      e.Secret != nil && *e.Secret,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Set default capabilities
+	if service.Methods.Docker.Capabilities != nil {
+		for _, cp := range *service.Methods.Docker.Capabilities {
+			err = s.caps.CreateCap(ctx, types.Capability{
+				ContainerID: id,
+				Name:        cp,
+			})
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	// Set default ports
+	if service.Methods.Docker.Ports != nil {
+		for in, out := range *service.Methods.Docker.Ports {
+			err = s.ports.CreatePort(ctx, types.Port{
+				ContainerID: id,
+				In:          in,
+				Out:         out,
+			})
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	// Set default volumes
+	if service.Methods.Docker.Volumes != nil {
+		for out, in := range *service.Methods.Docker.Volumes {
+			err = s.volumes.CreateVolume(ctx, types.Volume{
+				ContainerID: id,
+				In:          in,
+				Out:         out,
+			})
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	// Set default sysctls
+	if service.Methods.Docker.Sysctls != nil {
+		for name, value := range *service.Methods.Docker.Sysctls {
+			err = s.sysctls.CreateSysctl(ctx, types.Sysctl{
+				ContainerID: id,
+				Name:        name,
+				Value:       value,
+			})
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	c := types.Container{
+		ID:              id,
+		ServiceID:       serviceID,
+		Image:           *service.Methods.Docker.Image,
+		ImageTag:        "latest",
+		Status:          types.ContainerStatusOff,
+		LaunchOnStartup: true,
+		Name:            service.Name,
+		Description:     &service.Description,
+		Color:           service.Color,
+		Icon:            service.Icon,
+		Command:         service.Methods.Docker.Cmd,
+	}
+	err = s.containers.CreateContainer(ctx, c)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.logs.Register(id)
+	if err != nil {
+		return nil, err
+	}
+
+	s.ctx.DispatchEvent(types.EventContainerCreated{})
+	s.ctx.DispatchEvent(types.EventContainersChange{})
+
+	return &c, nil
+}
+
 func (s *containerService) Delete(ctx context.Context, id uuid.UUID) error {
 	c, err := s.containers.GetContainer(ctx, id)
 	if err != nil {
@@ -408,123 +525,6 @@ func (s *containerService) DeleteAll(ctx context.Context) error {
 		}
 	}
 	return goerrors.Join(errs...)
-}
-
-func (s *containerService) Install(ctx context.Context, serviceID string) (*types.Container, error) {
-	id := uuid.New()
-
-	service, err := s.services.Get(serviceID)
-	if err != nil {
-		return nil, err
-	}
-
-	dir := path.Join(storage.FSPath, id.String())
-	if service.Methods.Docker.Clone != nil {
-		err := vstorage.CloneRepository(dir, service.Methods.Docker.Clone.Repository)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// Set default env
-	for _, e := range service.Env {
-		err = s.vars.CreateVariable(ctx, types.EnvVariable{
-			ContainerID: id,
-			Type:        types.EnvVariableType(e.Type),
-			Name:        e.Name,
-			DisplayName: e.DisplayName,
-			Value:       e.Default,
-			Default:     &e.Default,
-			Description: &e.Description,
-			Secret:      e.Secret != nil && *e.Secret,
-		})
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// Set default capabilities
-	if service.Methods.Docker.Capabilities != nil {
-		for _, cp := range *service.Methods.Docker.Capabilities {
-			err = s.caps.CreateCap(ctx, types.Capability{
-				ContainerID: id,
-				Name:        cp,
-			})
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	// Set default ports
-	if service.Methods.Docker.Ports != nil {
-		for in, out := range *service.Methods.Docker.Ports {
-			err = s.ports.CreatePort(ctx, types.Port{
-				ContainerID: id,
-				In:          in,
-				Out:         out,
-			})
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	// Set default volumes
-	if service.Methods.Docker.Volumes != nil {
-		for out, in := range *service.Methods.Docker.Volumes {
-			err = s.volumes.CreateVolume(ctx, types.Volume{
-				ContainerID: id,
-				In:          in,
-				Out:         out,
-			})
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	// Set default sysctls
-	if service.Methods.Docker.Sysctls != nil {
-		for name, value := range *service.Methods.Docker.Sysctls {
-			err = s.sysctls.CreateSysctl(ctx, types.Sysctl{
-				ContainerID: id,
-				Name:        name,
-				Value:       value,
-			})
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	c := types.Container{
-		ID:              id,
-		ServiceID:       serviceID,
-		Image:           *service.Methods.Docker.Image,
-		ImageTag:        "latest",
-		Status:          types.ContainerStatusOff,
-		LaunchOnStartup: true,
-		Name:            service.Name,
-		Description:     &service.Description,
-		Color:           service.Color,
-		Icon:            service.Icon,
-		Command:         service.Methods.Docker.Cmd,
-	}
-	err = s.containers.CreateContainer(ctx, c)
-	if err != nil {
-		return nil, err
-	}
-
-	err = s.logs.Register(id)
-	if err != nil {
-		return nil, err
-	}
-
-	s.ctx.DispatchEvent(types.EventContainerCreated{})
-	s.ctx.DispatchEvent(types.EventContainersChange{})
-
-	return &c, nil
 }
 
 func (s *containerService) CheckForUpdates(ctx context.Context) (types.Containers, error) {

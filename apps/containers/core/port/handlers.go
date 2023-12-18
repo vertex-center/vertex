@@ -7,6 +7,7 @@ import (
 type (
 	ContainerHandler interface {
 		Get() gin.HandlerFunc
+		CreateContainer() gin.HandlerFunc
 		Delete() gin.HandlerFunc
 		Patch() gin.HandlerFunc
 		Start() gin.HandlerFunc
@@ -30,7 +31,6 @@ type (
 
 	ServiceHandler interface {
 		Get() gin.HandlerFunc
-		Install() gin.HandlerFunc
 	}
 
 	ServicesHandler interface {

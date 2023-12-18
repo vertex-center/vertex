@@ -24,13 +24,3 @@ func (h *serviceHandler) Get() gin.HandlerFunc {
 		return h.containerService.GetServiceByID(ctx, params.ServiceID)
 	})
 }
-
-type InstallServiceParams struct {
-	ServiceID string `path:"service_id"`
-}
-
-func (h *serviceHandler) Install() gin.HandlerFunc {
-	return router.Handler(func(ctx *gin.Context, params *InstallServiceParams) (*types.Container, error) {
-		return h.containerService.Install(ctx, params.ServiceID)
-	})
-}

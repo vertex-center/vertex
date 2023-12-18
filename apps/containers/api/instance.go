@@ -17,6 +17,19 @@ func (c *Client) GetContainer(ctx context.Context, id uuid.UUID) (*types.Contain
 	return &inst, err
 }
 
+func (c *Client) CreateContainer(ctx context.Context, serviceID string) (types.Container, error) {
+	var ctr types.Container
+	err := c.Request().
+		Path("./container").
+		BodyJSON(map[string]string{
+			"service_id": serviceID,
+		}).
+		Post().
+		ToJSON(&ctr).
+		Fetch(ctx)
+	return ctr, err
+}
+
 func (c *Client) DeleteContainer(ctx context.Context, id uuid.UUID) error {
 	return c.Request().
 		Pathf("./container/%s", id).

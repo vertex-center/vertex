@@ -28,7 +28,7 @@ func (r *providerHandler) Install() gin.HandlerFunc {
 			return err
 		}
 
-		c, err := cli.InstallService(ctx, serv.ID)
+		c, err := cli.CreateContainer(ctx, serv.ID)
 		if err != nil {
 			return err
 		}

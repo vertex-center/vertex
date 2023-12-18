@@ -69,7 +69,7 @@ func (s *metricsService) install(ctx context.Context, serviceID string) error {
 		return err
 	}
 
-	c, err := cli.InstallService(ctx, serv.ID)
+	c, err := cli.CreateContainer(ctx, serv.ID)
 	if err != nil {
 		return err
 	}

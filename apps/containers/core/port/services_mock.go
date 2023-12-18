@@ -36,6 +36,14 @@ func (m *MockContainerService) GetContainersWithFilters(ctx context.Context, fil
 	return args.Get(0).(types.Containers), args.Error(1)
 }
 
+func (m *MockContainerService) CreateContainer(ctx context.Context, serviceID string) (*types.Container, error) {
+	args := m.Called(ctx, serviceID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*types.Container), args.Error(1)
+}
+
 func (m *MockContainerService) Delete(ctx context.Context, uuid uuid.UUID) error {
 	args := m.Called(ctx, uuid)
 	return args.Error(0)
@@ -89,11 +97,6 @@ func (m *MockContainerService) GetContainerEnv(ctx context.Context, id uuid.UUID
 func (m *MockContainerService) RecreateContainer(ctx context.Context, uuid uuid.UUID) error {
 	args := m.Called(ctx, uuid)
 	return args.Error(0)
-}
-
-func (m *MockContainerService) Install(ctx context.Context, serviceID string) (*types.Container, error) {
-	args := m.Called(ctx, serviceID)
-	return args.Get(0).(*types.Container), args.Error(1)
 }
 
 func (m *MockContainerService) CheckForUpdates(ctx context.Context) (types.Containers, error) {

@@ -38,6 +38,16 @@ func (h *containerHandler) Get() gin.HandlerFunc {
 	}, http.StatusOK)
 }
 
+type CreateContainerParams struct {
+	ServiceID string `json:"service_id"`
+}
+
+func (h *containerHandler) CreateContainer() gin.HandlerFunc {
+	return tonic.Handler(func(ctx *gin.Context, params *CreateContainerParams) (*types.Container, error) {
+		return h.containerService.CreateContainer(ctx, params.ServiceID)
+	}, http.StatusCreated)
+}
+
 type DeleteContainerParams struct {
 	ContainerID uuid.NullUUID `path:"container_id"`
 }
