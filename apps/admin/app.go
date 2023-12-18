@@ -19,7 +19,16 @@ import (
 	"github.com/wI2L/fizz"
 )
 
-var updateService port.UpdateService
+var (
+	updateService   port.UpdateService
+	checksService   port.ChecksService
+	settingsService port.SettingsService
+	hardwareService port.HardwareService
+	sshService      port.SshService
+
+	hardwareKernelService port.HardwareKernelService
+	sshKernelService      port.SshKernelService
+)
 
 type App struct {
 	ctx *app.Context
@@ -44,16 +53,6 @@ func (a *App) Load(ctx *app.Context) {
 func (a *App) Meta() appmeta.Meta {
 	return meta.Meta
 }
-
-var (
-	checksService   port.ChecksService
-	settingsService port.SettingsService
-	hardwareService port.HardwareService
-	sshService      port.SshService
-
-	hardwareKernelService port.HardwareKernelService
-	sshKernelService      port.SshKernelService
-)
 
 func (a *App) Initialize() error {
 	db, err := storage.NewDB(storage.DBParams{
