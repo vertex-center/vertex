@@ -7,7 +7,6 @@ import (
 	"github.com/h2non/gock"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"github.com/vertex-center/vertex/apps/admin/core/port"
 	"github.com/vertex-center/vertex/common"
 	apptypes "github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/baseline"
@@ -22,7 +21,6 @@ type UpdateServiceTestSuite struct {
 	betaBaseline   baseline.Baseline
 	updaterA       *MockUpdater
 	updaterB       *MockUpdater
-	adapter        *port.MockBaselinesAdapter
 }
 
 func TestUpdatesServiceTestSuite(t *testing.T) {
