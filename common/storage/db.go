@@ -8,7 +8,9 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/pkg/vsql"
+	"github.com/vertex-center/vlog"
 	"gopkg.in/yaml.v3"
 
 	_ "github.com/lib/pq"
@@ -57,6 +59,15 @@ func NewDB(params DBParams) (DB, error) {
 		params.configPath = path.Join(FSPath, "database", "config.yml")
 	}
 
+	err := os.MkdirAll(path.Dir(params.configPath), os.ModePerm)
+	if err != nil && !os.IsExist(err) {
+		log.Error(err,
+			vlog.String("message", "failed to create directory"),
+			vlog.String("path", params.configPath),
+		)
+		os.Exit(1)
+	}
+
 	db := DB{
 		configPath: params.configPath,
 		config: DBConfig{
@@ -65,7 +76,7 @@ func NewDB(params DBParams) (DB, error) {
 		},
 	}
 
-	err := db.readConfig()
+	err = db.readConfig()
 	if errors.Is(err, errDbConfigFailedToDecode) {
 		return db, err
 	}
