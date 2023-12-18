@@ -19,7 +19,7 @@ func NewSysctlDBAdapter(db storage.DB) port.SysctlAdapter {
 	return &sysctlDBAdapter{db}
 }
 
-func (a *sysctlDBAdapter) GetSysctls(ctx context.Context, id uuid.UUID) (types.Sysctls, error) {
+func (a *sysctlDBAdapter) GetContainerSysctls(ctx context.Context, id uuid.UUID) (types.Sysctls, error) {
 	var sysctls types.Sysctls
 	err := a.db.Select(&sysctls, `
 		SELECT * FROM sysctls
@@ -33,13 +33,13 @@ func (a *sysctlDBAdapter) GetSysctls(ctx context.Context, id uuid.UUID) (types.S
 
 func (a *sysctlDBAdapter) CreateSysctl(ctx context.Context, sysctl types.Sysctl) error {
 	_, err := a.db.NamedExec(`
-		INSERT INTO sysctls (container_id, name, value)
-		VALUES (:container_id, :name, :value)
+		INSERT INTO sysctls (id, container_id, name, value)
+		VALUES (:id, :container_id, :name, :value)
 	`, sysctl)
 	return err
 }
 
-func (a *sysctlDBAdapter) DeleteSysctls(ctx context.Context, id uuid.UUID) error {
+func (a *sysctlDBAdapter) DeleteContainerSysctls(ctx context.Context, id uuid.UUID) error {
 	_, err := a.db.Exec(`
 		DELETE FROM sysctls
 		WHERE container_id = $1

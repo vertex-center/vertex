@@ -19,7 +19,7 @@ func NewEnvDBAdapter(db storage.DB) port.EnvAdapter {
 	return &envDBAdapter{db}
 }
 
-func (a *envDBAdapter) GetVariables(ctx context.Context, id uuid.UUID) (types.EnvVariables, error) {
+func (a *envDBAdapter) GetContainerVariables(ctx context.Context, id uuid.UUID) (types.EnvVariables, error) {
 	var env types.EnvVariables
 	err := a.db.Select(&env, `
 		SELECT * FROM env_variables
@@ -33,13 +33,13 @@ func (a *envDBAdapter) GetVariables(ctx context.Context, id uuid.UUID) (types.En
 
 func (a *envDBAdapter) CreateVariable(ctx context.Context, v types.EnvVariable) error {
 	_, err := a.db.NamedExec(`
-		INSERT INTO env_variables (container_id, type, name, display_name, value, default_value, description, secret)
-		VALUES (:container_id, :type, :name, :display_name, :value, :default_value, :description, :secret)
+		INSERT INTO env_variables (id, container_id, type, name, display_name, value, default_value, description, secret)
+		VALUES (:id, :container_id, :type, :name, :display_name, :value, :default_value, :description, :secret)
 	`, v)
 	return err
 }
 
-func (a *envDBAdapter) DeleteVariables(ctx context.Context, id uuid.UUID) error {
+func (a *envDBAdapter) DeleteContainerVariables(ctx context.Context, id uuid.UUID) error {
 	_, err := a.db.Exec(`
 		DELETE FROM env_variables
 		WHERE container_id = $1
@@ -47,7 +47,7 @@ func (a *envDBAdapter) DeleteVariables(ctx context.Context, id uuid.UUID) error 
 	return err
 }
 
-func (a *envDBAdapter) UpdateVariable(ctx context.Context, id uuid.UUID, key, value string) error {
+func (a *envDBAdapter) UpdateContainerVariable(ctx context.Context, id uuid.UUID, key, value string) error {
 	_, err := a.db.Exec(`
 		UPDATE env_variables
 		SET value = $1

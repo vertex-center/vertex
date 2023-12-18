@@ -19,7 +19,7 @@ func NewCapDBAdapter(db storage.DB) port.CapAdapter {
 	return &capDBAdapter{db}
 }
 
-func (a *capDBAdapter) GetCaps(ctx context.Context, id uuid.UUID) (types.Capabilities, error) {
+func (a *capDBAdapter) GetContainerCaps(ctx context.Context, id uuid.UUID) (types.Capabilities, error) {
 	var caps types.Capabilities
 	err := a.db.Select(&caps, `
 		SELECT * FROM capabilities
@@ -33,13 +33,13 @@ func (a *capDBAdapter) GetCaps(ctx context.Context, id uuid.UUID) (types.Capabil
 
 func (a *capDBAdapter) CreateCap(ctx context.Context, c types.Capability) error {
 	_, err := a.db.NamedExec(`
-		INSERT INTO capabilities (container_id, name)
-		VALUES (:container_id, :name)
+		INSERT INTO capabilities (id, container_id, name)
+		VALUES (:id, :container_id, :name)
 	`, c)
 	return err
 }
 
-func (a *capDBAdapter) DeleteCaps(ctx context.Context, id uuid.UUID) error {
+func (a *capDBAdapter) DeleteContainerCaps(ctx context.Context, id uuid.UUID) error {
 	_, err := a.db.Exec(`
 		DELETE FROM capabilities
 		WHERE container_id = $1

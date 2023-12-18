@@ -19,7 +19,7 @@ func NewPortDBAdapter(db storage.DB) port.PortAdapter {
 	return &portDBAdapter{db}
 }
 
-func (a *portDBAdapter) GetPorts(ctx context.Context, id uuid.UUID) (types.Ports, error) {
+func (a *portDBAdapter) GetContainerPorts(ctx context.Context, id uuid.UUID) (types.Ports, error) {
 	var ports types.Ports
 	err := a.db.Select(&ports, `
 		SELECT * FROM ports
@@ -33,13 +33,13 @@ func (a *portDBAdapter) GetPorts(ctx context.Context, id uuid.UUID) (types.Ports
 
 func (a *portDBAdapter) CreatePort(ctx context.Context, port types.Port) error {
 	_, err := a.db.NamedExec(`
-		INSERT INTO ports (container_id, internal_port, external_port)
-		VALUES (:container_id, :internal_port, :external_port)
+		INSERT INTO ports (id, container_id, internal_port, external_port)
+		VALUES (:id, :container_id, :internal_port, :external_port)
 	`, port)
 	return err
 }
 
-func (a *portDBAdapter) DeletePorts(ctx context.Context, id uuid.UUID) error {
+func (a *portDBAdapter) DeleteContainerPorts(ctx context.Context, id uuid.UUID) error {
 	_, err := a.db.Exec(`
 		DELETE FROM ports
 		WHERE container_id = $1

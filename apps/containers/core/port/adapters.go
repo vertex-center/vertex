@@ -24,15 +24,34 @@ type (
 	}
 
 	PortAdapter interface {
-		GetPorts(ctx context.Context, id uuid.UUID) (types.Ports, error)
+		GetContainerPorts(ctx context.Context, id uuid.UUID) (types.Ports, error)
 		CreatePort(ctx context.Context, port types.Port) error
-		DeletePorts(ctx context.Context, id uuid.UUID) error
+		DeleteContainerPorts(ctx context.Context, id uuid.UUID) error
 	}
 
 	VolumeAdapter interface {
-		GetVolumes(ctx context.Context, id uuid.UUID) (types.Volumes, error)
+		GetContainerVolumes(ctx context.Context, id uuid.UUID) (types.Volumes, error)
 		CreateVolume(ctx context.Context, vol types.Volume) error
-		DeleteVolumes(ctx context.Context, id uuid.UUID) error
+		DeleteContainerVolumes(ctx context.Context, id uuid.UUID) error
+	}
+
+	SysctlAdapter interface {
+		GetContainerSysctls(ctx context.Context, id uuid.UUID) (types.Sysctls, error)
+		CreateSysctl(ctx context.Context, sysctl types.Sysctl) error
+		DeleteContainerSysctls(ctx context.Context, id uuid.UUID) error
+	}
+
+	EnvAdapter interface {
+		GetContainerVariables(ctx context.Context, id uuid.UUID) (types.EnvVariables, error)
+		CreateVariable(ctx context.Context, variable types.EnvVariable) error
+		DeleteContainerVariables(ctx context.Context, id uuid.UUID) error
+		UpdateContainerVariable(ctx context.Context, id uuid.UUID, key, value string) error
+	}
+
+	CapAdapter interface {
+		GetContainerCaps(ctx context.Context, id uuid.UUID) (types.Capabilities, error)
+		CreateCap(ctx context.Context, c types.Capability) error
+		DeleteContainerCaps(ctx context.Context, id uuid.UUID) error
 	}
 
 	TagAdapter interface {
@@ -40,25 +59,6 @@ type (
 		GetTags(ctx context.Context, userID uuid.UUID) (types.Tags, error)
 		CreateTag(ctx context.Context, tag types.Tag) error
 		DeleteTag(ctx context.Context, id uuid.UUID) error
-	}
-
-	SysctlAdapter interface {
-		GetSysctls(ctx context.Context, id uuid.UUID) (types.Sysctls, error)
-		CreateSysctl(ctx context.Context, sysctl types.Sysctl) error
-		DeleteSysctls(ctx context.Context, id uuid.UUID) error
-	}
-
-	EnvAdapter interface {
-		GetVariables(ctx context.Context, id uuid.UUID) (types.EnvVariables, error)
-		CreateVariable(ctx context.Context, variable types.EnvVariable) error
-		DeleteVariables(ctx context.Context, id uuid.UUID) error
-		UpdateVariable(ctx context.Context, id uuid.UUID, key, value string) error
-	}
-
-	CapAdapter interface {
-		GetCaps(ctx context.Context, id uuid.UUID) (types.Capabilities, error)
-		CreateCap(ctx context.Context, c types.Capability) error
-		DeleteCaps(ctx context.Context, id uuid.UUID) error
 	}
 
 	LogsAdapter interface {

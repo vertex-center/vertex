@@ -21,6 +21,7 @@ func GetSchema(driver vsql.Driver) string {
 			WithField("command", "VARCHAR(255)"),
 
 		vsql.CreateTable("env_variables").
+			WithField("id", "VARCHAR(36)", "NOT NULL", "PRIMARY KEY").
 			WithField("container_id", "VARCHAR(36)", "NOT NULL").
 			WithField("type", "VARCHAR(255)", "NOT NULL").
 			WithField("name", "VARCHAR(255)", "NOT NULL").
@@ -29,34 +30,33 @@ func GetSchema(driver vsql.Driver) string {
 			WithField("default_value", "VARCHAR(255)").
 			WithField("description", "VARCHAR(255)").
 			WithField("secret", "BOOLEAN", "NOT NULL", "DEFAULT FALSE").
-			WithPrimaryKey("container_id", "name").
 			WithForeignKey("container_id", "containers", "id"),
 
 		vsql.CreateTable("capabilities").
+			WithField("id", "VARCHAR(36)", "NOT NULL", "PRIMARY KEY").
 			WithField("container_id", "VARCHAR(36)", "NOT NULL").
 			WithField("name", "VARCHAR(255)", "NOT NULL").
-			WithPrimaryKey("container_id", "name").
 			WithForeignKey("container_id", "containers", "id"),
 
 		vsql.CreateTable("ports").
+			WithField("id", "VARCHAR(36)", "NOT NULL", "PRIMARY KEY").
 			WithField("container_id", "VARCHAR(36)", "NOT NULL").
 			WithField("internal_port", "VARCHAR(255)", "NOT NULL").
 			WithField("external_port", "VARCHAR(255)", "NOT NULL").
-			WithPrimaryKey("container_id", "internal_port", "external_port").
 			WithForeignKey("container_id", "containers", "id"),
 
 		vsql.CreateTable("volumes").
+			WithField("id", "VARCHAR(36)", "NOT NULL", "PRIMARY KEY").
 			WithField("container_id", "VARCHAR(36)", "NOT NULL").
 			WithField("internal_path", "VARCHAR(255)", "NOT NULL").
 			WithField("external_path", "VARCHAR(255)", "NOT NULL").
-			WithPrimaryKey("container_id", "internal_path", "external_path").
 			WithForeignKey("container_id", "containers", "id"),
 
 		vsql.CreateTable("sysctls").
+			WithField("id", "VARCHAR(36)", "NOT NULL", "PRIMARY KEY").
 			WithField("container_id", "VARCHAR(36)", "NOT NULL").
 			WithField("name", "VARCHAR(255)", "NOT NULL").
 			WithField("value", "VARCHAR(255)", "NOT NULL").
-			WithPrimaryKey("container_id", "name").
 			WithForeignKey("container_id", "containers", "id"),
 
 		vsql.CreateTable("tags").

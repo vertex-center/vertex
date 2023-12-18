@@ -107,6 +107,7 @@ func (s *containerService) CreateContainer(ctx context.Context, serviceID string
 	// Set default env
 	for _, e := range service.Env {
 		err = s.vars.CreateVariable(ctx, types.EnvVariable{
+			ID:          uuid.New(),
 			ContainerID: id,
 			Type:        types.EnvVariableType(e.Type),
 			Name:        e.Name,
@@ -125,6 +126,7 @@ func (s *containerService) CreateContainer(ctx context.Context, serviceID string
 	if service.Methods.Docker.Capabilities != nil {
 		for _, cp := range *service.Methods.Docker.Capabilities {
 			err = s.caps.CreateCap(ctx, types.Capability{
+				ID:          uuid.New(),
 				ContainerID: id,
 				Name:        cp,
 			})
@@ -138,6 +140,7 @@ func (s *containerService) CreateContainer(ctx context.Context, serviceID string
 	if service.Methods.Docker.Ports != nil {
 		for in, out := range *service.Methods.Docker.Ports {
 			err = s.ports.CreatePort(ctx, types.Port{
+				ID:          uuid.New(),
 				ContainerID: id,
 				In:          in,
 				Out:         out,
@@ -152,6 +155,7 @@ func (s *containerService) CreateContainer(ctx context.Context, serviceID string
 	if service.Methods.Docker.Volumes != nil {
 		for out, in := range *service.Methods.Docker.Volumes {
 			err = s.volumes.CreateVolume(ctx, types.Volume{
+				ID:          uuid.New(),
 				ContainerID: id,
 				In:          in,
 				Out:         out,
@@ -166,6 +170,7 @@ func (s *containerService) CreateContainer(ctx context.Context, serviceID string
 	if service.Methods.Docker.Sysctls != nil {
 		for name, value := range *service.Methods.Docker.Sysctls {
 			err = s.sysctls.CreateSysctl(ctx, types.Sysctl{
+				ID:          uuid.New(),
 				ContainerID: id,
 				Name:        name,
 				Value:       value,
@@ -226,11 +231,11 @@ func (s *containerService) Delete(ctx context.Context, id uuid.UUID) error {
 	}
 
 	deletes := []func(context.Context, uuid.UUID) error{
-		s.caps.DeleteCaps,
-		s.ports.DeletePorts,
-		s.volumes.DeleteVolumes,
-		s.sysctls.DeleteSysctls,
-		s.vars.DeleteVariables,
+		s.caps.DeleteContainerCaps,
+		s.ports.DeleteContainerPorts,
+		s.volumes.DeleteContainerVolumes,
+		s.sysctls.DeleteContainerSysctls,
+		s.vars.DeleteContainerVariables,
 		s.containers.DeleteTags,
 		s.containers.DeleteContainer,
 	}
@@ -298,27 +303,27 @@ func (s *containerService) Start(ctx context.Context, id uuid.UUID) error {
 		s.setStatus(c, status)
 	}
 
-	ports, err := s.ports.GetPorts(ctx, id)
+	ports, err := s.ports.GetContainerPorts(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	volumes, err := s.volumes.GetVolumes(ctx, id)
+	volumes, err := s.volumes.GetContainerVolumes(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	env, err := s.vars.GetVariables(ctx, id)
+	env, err := s.vars.GetContainerVariables(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	caps, err := s.caps.GetCaps(ctx, id)
+	caps, err := s.caps.GetContainerCaps(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	sysctls, err := s.sysctls.GetSysctls(ctx, id)
+	sysctls, err := s.sysctls.GetContainerSysctls(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -561,7 +566,7 @@ func (s *containerService) SetDatabases(ctx context.Context, c *types.Container,
 }
 
 func (s *containerService) GetContainerEnv(ctx context.Context, id uuid.UUID) (types.EnvVariables, error) {
-	return s.vars.GetVariables(ctx, id)
+	return s.vars.GetContainerVariables(ctx, id)
 }
 
 // remapDatabaseEnv remaps the environment variables of a container.
@@ -587,28 +592,28 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 		dbEnvNames := (*dbService.Features.Databases)[0]
 		cEnvNames := cService.Databases[databaseID].Names
 
-		dbVars, err := s.vars.GetVariables(ctx, db.ID)
+		dbVars, err := s.vars.GetContainerVariables(ctx, db.ID)
 		if err != nil {
 			return err
 		}
 
-		err = s.vars.UpdateVariable(ctx, c.ID, cEnvNames.Host, host)
+		err = s.vars.UpdateContainerVariable(ctx, c.ID, cEnvNames.Host, host)
 		if err != nil {
 			return err
 		}
-		err = s.vars.UpdateVariable(ctx, c.ID, cEnvNames.Port, dbVars.Get(dbEnvNames.Port))
+		err = s.vars.UpdateContainerVariable(ctx, c.ID, cEnvNames.Port, dbVars.Get(dbEnvNames.Port))
 		if err != nil {
 			return err
 		}
 
 		if dbEnvNames.Username != nil {
-			err = s.vars.UpdateVariable(ctx, c.ID, cEnvNames.Username, dbVars.Get(*dbEnvNames.Username))
+			err = s.vars.UpdateContainerVariable(ctx, c.ID, cEnvNames.Username, dbVars.Get(*dbEnvNames.Username))
 			if err != nil {
 				return err
 			}
 		}
 		if dbEnvNames.Password != nil {
-			err = s.vars.UpdateVariable(ctx, c.ID, cEnvNames.Password, dbVars.Get(*dbEnvNames.Password))
+			err = s.vars.UpdateContainerVariable(ctx, c.ID, cEnvNames.Password, dbVars.Get(*dbEnvNames.Password))
 			if err != nil {
 				return err
 			}
@@ -617,7 +622,7 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 		if options != nil {
 			if modifiedFeature, ok := options[databaseID]; ok {
 				if modifiedFeature != nil && modifiedFeature.DatabaseName != nil {
-					err = s.vars.UpdateVariable(ctx, c.ID, cEnvNames.Database, *modifiedFeature.DatabaseName)
+					err = s.vars.UpdateContainerVariable(ctx, c.ID, cEnvNames.Database, *modifiedFeature.DatabaseName)
 					if err != nil {
 						return err
 					}
@@ -627,7 +632,7 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 		}
 
 		if dbEnvNames.DefaultDatabase != nil {
-			err = s.vars.UpdateVariable(ctx, c.ID, cEnvNames.Database, dbVars.Get(*dbEnvNames.DefaultDatabase))
+			err = s.vars.UpdateContainerVariable(ctx, c.ID, cEnvNames.Database, dbVars.Get(*dbEnvNames.DefaultDatabase))
 			if err != nil {
 				return err
 			}
@@ -641,7 +646,7 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 // and applies them by recreating the container.
 func (s *containerService) SaveEnv(ctx context.Context, id uuid.UUID, env types.EnvVariables) error {
 	for _, e := range env {
-		err := s.vars.UpdateVariable(ctx, id, e.Name, e.Value)
+		err := s.vars.UpdateContainerVariable(ctx, id, e.Name, e.Value)
 		if err != nil {
 			return err
 		}

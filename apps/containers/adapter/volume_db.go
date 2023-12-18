@@ -19,7 +19,7 @@ func NewVolumeDBAdapter(db storage.DB) port.VolumeAdapter {
 	return &volumeDBAdapter{db}
 }
 
-func (a *volumeDBAdapter) GetVolumes(ctx context.Context, id uuid.UUID) (types.Volumes, error) {
+func (a *volumeDBAdapter) GetContainerVolumes(ctx context.Context, id uuid.UUID) (types.Volumes, error) {
 	var volumes types.Volumes
 	err := a.db.Select(&volumes, `
 		SELECT * FROM volumes
@@ -33,13 +33,13 @@ func (a *volumeDBAdapter) GetVolumes(ctx context.Context, id uuid.UUID) (types.V
 
 func (a *volumeDBAdapter) CreateVolume(ctx context.Context, vol types.Volume) error {
 	_, err := a.db.NamedExec(`
-			INSERT INTO volumes (container_id, internal_path, external_path)
-			VALUES (:container_id, :internal_path, :external_path)
+			INSERT INTO volumes (id, container_id, internal_path, external_path)
+			VALUES (:id, :container_id, :internal_path, :external_path)
 		`, vol)
 	return err
 }
 
-func (a *volumeDBAdapter) DeleteVolumes(ctx context.Context, id uuid.UUID) error {
+func (a *volumeDBAdapter) DeleteContainerVolumes(ctx context.Context, id uuid.UUID) error {
 	_, err := a.db.Exec(`
 		DELETE FROM volumes
 		WHERE container_id = $1
