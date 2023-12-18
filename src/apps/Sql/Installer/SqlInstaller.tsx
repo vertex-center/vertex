@@ -48,7 +48,7 @@ export default function SqlInstaller() {
         setShowPopup(false);
     };
 
-    const mutationInstallService = useMutation({
+    const mutationCreateContainer = useMutation({
         mutationFn: async (serviceId: string) => {
             await api.vxSql.dbms(serviceId).install();
         },
@@ -62,13 +62,13 @@ export default function SqlInstaller() {
         },
     });
     const { isLoading: isInstalling, error: installError } =
-        mutationInstallService;
+        mutationCreateContainer;
 
     const install = () => {
         const service = selectedService;
         setDownloading((prev) => [...prev, { service }]);
         setShowPopup(false);
-        mutationInstallService.mutate(service.id);
+        mutationCreateContainer.mutate(service.id);
     };
 
     const error = servicesError ?? containersError ?? installError;

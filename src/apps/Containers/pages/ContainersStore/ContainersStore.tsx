@@ -31,7 +31,7 @@ export default function ContainersStore() {
 
     const queryContainers = useQuery({
         queryKey: ["containers"],
-        queryFn: API.getContainers,
+        queryFn: () => API.getContainers(),
     });
     const {
         data: containers,
@@ -39,8 +39,8 @@ export default function ContainersStore() {
         error: containersError,
     } = queryContainers;
 
-    const mutationInstallService = useMutation({
-        mutationFn: API.installService,
+    const mutationCreateContainer = useMutation({
+        mutationFn: API.createContainer,
         onSettled: (data, error, serviceID) => {
             setDownloading(
                 downloading.filter(({ service: s }) => s.id !== serviceID)
@@ -51,13 +51,13 @@ export default function ContainersStore() {
         },
     });
     const { isLoading: isInstalling, error: installError } =
-        mutationInstallService;
+        mutationCreateContainer;
 
     const install = () => {
         const service = selectedService;
         setDownloading((prev) => [...prev, { service }]);
         setShowInstallPopup(false);
-        mutationInstallService.mutate(service.id);
+        mutationCreateContainer.mutate(service.id);
     };
 
     const [showInstallPopup, setShowInstallPopup] = useState<boolean>(false);

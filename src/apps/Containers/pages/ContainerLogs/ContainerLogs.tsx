@@ -73,7 +73,7 @@ export default function ContainerLogs() {
         });
     };
 
-    const route = uuid ? `/container/${uuid}/events` : "";
+    const route = uuid ? `/containers/${uuid}/events` : "";
 
     // @ts-ignore
     useServerEvent(window.api_urls.containers, route, {

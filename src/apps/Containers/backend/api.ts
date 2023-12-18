@@ -24,71 +24,71 @@ const getAllTags = async () => {
     return data;
 };
 
-const installService = async (serviceId: string) => {
-    const { data } = await server.post(`/service/${serviceId}/install`);
-    return data;
-};
-
 const getAllServices = async () => {
     const { data } = await server.get<Service[]>(`/services`);
     return data;
 };
 
 const getContainer = async (id: string) => {
-    const { data } = await server.get<Container>(`/container/${id}`);
+    const { data } = await server.get<Container>(`/containers/${id}`);
+    return data;
+};
+
+const createContainer = async (service_id: string) => {
+    const { data } = await server.post(`/containers`, { service_id });
     return data;
 };
 
 const deleteContainer = (id: string) => {
-    return server.delete(`/container/${id}`);
+    return server.delete(`/containers/${id}`);
 };
 
 const startContainer = (id: string) => {
-    return server.post(`/container/${id}/start`);
+    return server.post(`/containers/${id}/start`);
 };
 
 const stopContainer = (id: string) => {
-    return server.post(`/container/${id}/stop`);
+    return server.post(`/containers/${id}/stop`);
 };
 
 const patchContainer = (id: string, params: any) => {
-    return server.patch(`/container/${id}`, params);
+    return server.patch(`/containers/${id}`, params);
 };
 
 const getLogs = async (id: string) => {
-    const { data } = await server.get(`/container/${id}/logs`);
+    const { data } = await server.get(`/containers/${id}/logs`);
     return data;
 };
 
 const getContainerEnvironment = async (id: string) => {
     const { data } = await server.get<EnvVariables>(
-        `/container/${id}/environment`
+        `/containers/${id}/environment`
     );
     return data;
 };
 
 const saveEnv = (id: string, env: EnvVariables) => {
-    return server.patch(`/container/${id}/environment`, { env });
+    return server.patch(`/containers/${id}/environment`, { env });
 };
 
 const getDocker = async (id: string) => {
     const { data } = await server.get<DockerContainerInfo>(
-        `/container/${id}/docker`
+        `/containers/${id}/docker`
     );
     return data;
 };
 
 const recreateDocker = (id: string) => {
-    return server.post(`/container/${id}/docker/recreate`);
+    return server.post(`/containers/${id}/docker/recreate`);
 };
 
 const updateService = (id: string) => {
-    return server.post(`/container/${id}/update/service`);
+    return server.post(`/containers/${id}/update/service`);
 };
 
 const getVersions = async (id: string, cache?: boolean) => {
     const { data } = await server.get<string[]>(
-        `/container/${id}/versions?cache=${cache}`
+        `/containers/${id}/versions?cache=${cache}`
     );
     return data;
 };
@@ -97,6 +97,7 @@ export const API = {
     getContainer,
     getContainers,
     getAllTags,
+    createContainer,
     deleteContainer,
     startContainer,
     stopContainer,
@@ -108,6 +109,5 @@ export const API = {
     recreateDocker,
     updateService,
     getVersions,
-    installService,
     getAllServices,
 };
