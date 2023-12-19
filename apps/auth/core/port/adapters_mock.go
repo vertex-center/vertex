@@ -6,7 +6,15 @@ import (
 	"github.com/vertex-center/vertex/apps/auth/core/types"
 )
 
-type MockAuthAdapter struct{ mock.Mock }
+type (
+	MockAuthAdapter  struct{ mock.Mock }
+	MockEmailAdapter struct{ mock.Mock }
+)
+
+var (
+	_ AuthAdapter  = (*MockAuthAdapter)(nil)
+	_ EmailAdapter = (*MockEmailAdapter)(nil)
+)
 
 func (m *MockAuthAdapter) CreateAccount(username string, credentials types.CredentialsArgon2id) error {
 	args := m.Called(username, credentials)
@@ -56,4 +64,19 @@ func (m *MockAuthAdapter) PatchUser(user types.User) (types.User, error) {
 func (m *MockAuthAdapter) GetUserCredentialsMethods(userID uuid.UUID) ([]types.CredentialsMethods, error) {
 	args := m.Called(userID)
 	return args.Get(0).([]types.CredentialsMethods), args.Error(1)
+}
+
+func (m *MockEmailAdapter) CreateEmail(email *types.Email) error {
+	args := m.Called(email)
+	return args.Error(0)
+}
+
+func (m *MockEmailAdapter) GetEmails(userID uuid.UUID) ([]types.Email, error) {
+	args := m.Called(userID)
+	return args.Get(0).([]types.Email), args.Error(1)
+}
+
+func (m *MockEmailAdapter) DeleteEmail(userID uuid.UUID, email string) error {
+	args := m.Called(userID, email)
+	return args.Error(0)
 }

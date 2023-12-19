@@ -34,7 +34,10 @@ func (s emailService) CreateEmail(userID uuid.UUID, email string) (types.Email, 
 		Email:  email,
 	}
 	err := s.adapter.CreateEmail(&res)
-	return res, err
+	if err != nil {
+		return types.Email{}, err
+	}
+	return res, nil
 }
 
 func (s emailService) DeleteEmail(userID uuid.UUID, email string) error {
