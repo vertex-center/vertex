@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"net/mail"
-
 	"github.com/gin-gonic/gin"
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
@@ -34,13 +32,7 @@ type CreateCurrentUserEmailParams struct {
 func (h *emailHandler) CreateCurrentUserEmail() gin.HandlerFunc {
 	return router.Handler(func(ctx *gin.Context, params *CreateCurrentUserEmailParams) (*types.Email, error) {
 		s := session.Get(ctx)
-
-		addr, err := mail.ParseAddress(params.Email)
-		if err != nil {
-			return nil, err
-		}
-
-		email, err := h.service.CreateEmail(s.UserID, addr.Address)
+		email, err := h.service.CreateEmail(s.UserID, params.Email)
 		return &email, err
 	})
 }

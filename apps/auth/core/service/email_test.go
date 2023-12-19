@@ -62,6 +62,13 @@ func (suite *EmailTestSuite) TestCreateEmail() {
 		suite.Equal(suite.testEmail.UserID, email.UserID)
 	})
 
+	suite.Run("invalid email", func() {
+		email, err := suite.service.CreateEmail(suite.testEmail.UserID, "invalid")
+		suite.Require().Error(err)
+		suite.Equal("create email address: mail: missing '@' or angle-addr", err.Error())
+		suite.Equal(types.Email{}, email)
+	})
+
 	suite.Run("error", func() {
 		err := errors.AlreadyExistsf("email")
 		suite.adapter.On("CreateEmail", mock.AnythingOfType("*types.Email")).Return(err)

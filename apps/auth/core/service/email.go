@@ -1,8 +1,10 @@
 package service
 
 import (
+	"net/mail"
 	"strings"
 
+	"github.com/juju/errors"
 	"github.com/vertex-center/uuid"
 	"github.com/vertex-center/vertex/apps/auth/core/port"
 	"github.com/vertex-center/vertex/apps/auth/core/types"
@@ -23,17 +25,17 @@ func (s emailService) GetEmails(userID uuid.UUID) ([]types.Email, error) {
 }
 
 func (s emailService) CreateEmail(userID uuid.UUID, email string) (types.Email, error) {
-	email = strings.TrimSpace(email)
-	if email == "" {
-		return types.Email{}, types.ErrEmailEmpty
+	addr, err := mail.ParseAddress(email)
+	if err != nil {
+		return types.Email{}, errors.NewBadRequest(err, "create email address")
 	}
 
 	res := types.Email{
 		ID:     uuid.New(),
 		UserID: userID,
-		Email:  email,
+		Email:  addr.Address,
 	}
-	err := s.adapter.CreateEmail(&res)
+	err = s.adapter.CreateEmail(&res)
 	if err != nil {
 		return types.Email{}, err
 	}
