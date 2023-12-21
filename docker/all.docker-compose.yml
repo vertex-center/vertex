@@ -1,0 +1,189 @@
+version: "3.8"
+
+services:
+  admin:
+    image: vertex-admin
+    build:
+      context: ..
+      dockerfile: ./docker/app.Dockerfile
+      args:
+        - APP_ID=admin
+    networks:
+      - internal
+      - external
+    ports:
+      - "7500:8080"
+    environment:
+      - VERTEX_LOGS_ADDR=http://logs:8080/api
+      - VERTEX_AUTH_ADDR=http://auth:8080/api
+      - VERTEX_ADMIN_KERNEL_ADDR=http://admin-kernel:8080/api
+
+  admin-kernel:
+    image: vertex-admin-kernel
+    build:
+      context: ..
+      dockerfile: ./docker/app.Dockerfile
+      args:
+        - APP_ID=admin
+        - APP_KIND=kernel
+    networks:
+      - internal
+    environment:
+      - VERTEX_LOGS_ADDR=http://logs:8080/api
+
+  auth:
+    image: vertex-auth
+    build:
+      context: ..
+      dockerfile: ./docker/app.Dockerfile
+      args:
+        - APP_ID=auth
+    networks:
+      - internal
+      - external
+    ports:
+      - "7502:8080"
+    environment:
+      - VERTEX_LOGS_ADDR=http://logs:8080/api
+
+  client:
+    image: vertex-client
+    build:
+      context: ..
+      dockerfile: ./docker/app.Dockerfile
+      args:
+        - APP_ID=client
+    networks:
+      - external
+      - internal
+    ports:
+      - "7518:8080"
+    environment:
+      - VERTEX_LOGS_ADDR=http://logs:8080/api
+
+  containers:
+    image: vertex-containers
+    build:
+      context: ..
+      dockerfile: ./docker/app.Dockerfile
+      args:
+        - APP_ID=containers
+    networks:
+      - internal
+      - external
+    ports:
+      - "7504:8080"
+    environment:
+      - VERTEX_LOGS_ADDR=http://logs:8080/api
+      - VERTEX_AUTH_ADDR=http://auth:8080/api
+      - VERTEX_CONTAINERS_KERNEL_ADDR=http://containers-kernel:8080/api
+
+  containers-kernel:
+    image: vertex-containers-kernel
+    build:
+      context: ..
+      dockerfile: ./docker/app.Dockerfile
+      args:
+        - APP_ID=containers
+        - APP_KIND=kernel
+    networks:
+      - internal
+    environment:
+      - VERTEX_LOGS_ADDR=http://logs:8080/api
+
+  monitoring:
+    image: vertex-monitoring
+    build:
+      context: ..
+      dockerfile: ./docker/app.Dockerfile
+      args:
+        - APP_ID=monitoring
+    networks:
+      - internal
+      - external
+    ports:
+      - "7506:8080"
+    environment:
+      - VERTEX_LOGS_ADDR=http://logs:8080/api
+      - VERTEX_AUTH_ADDR=http://auth:8080/api
+      - VERTEX_CONTAINERS_ADDR=http://containers:8080/api
+
+  reverseproxy:
+    image: vertex-reverseproxy
+    build:
+      context: ..
+      dockerfile: ./docker/app.Dockerfile
+      args:
+        - APP_ID=reverseproxy
+    networks:
+      - internal
+      - external
+    ports:
+      - "7508:8080"
+    environment:
+      - VERTEX_LOGS_ADDR=http://logs:8080/api
+      - VERTEX_AUTH_ADDR=http://auth:8080/api
+
+  serviceeditor:
+    image: vertex-serviceeditor
+    build:
+      context: ..
+      dockerfile: ./docker/app.Dockerfile
+      args:
+        - APP_ID=serviceeditor
+    networks:
+      - internal
+      - external
+    ports:
+      - "7510:8080"
+    environment:
+      - VERTEX_LOGS_ADDR=http://logs:8080/api
+      - VERTEX_AUTH_ADDR=http://auth:8080/api
+
+  sql:
+    image: vertex-sql
+    build:
+      context: ..
+      dockerfile: ./docker/app.Dockerfile
+      args:
+        - APP_ID=sql
+    networks:
+      - internal
+      - external
+    ports:
+      - "7512:8080"
+    environment:
+      - VERTEX_LOGS_ADDR=http://logs:8080/api
+      - VERTEX_AUTH_ADDR=http://auth:8080/api
+      - VERTEX_CONTAINERS_ADDR=http://containers:8080/api
+
+  tunnels:
+    image: vertex-tunnels
+    build:
+      context: ..
+      dockerfile: ./docker/app.Dockerfile
+      args:
+        - APP_ID=tunnels
+    networks:
+      - internal
+      - external
+    ports:
+      - "7514:8080"
+    environment:
+      - VERTEX_LOGS_ADDR=http://logs:8080/api
+      - VERTEX_AUTH_ADDR=http://auth:8080/api
+      - VERTEX_CONTAINERS_ADDR=http://containers:8080/api
+
+  logs:
+    image: vertex-logs
+    build:
+      context: ..
+      dockerfile: ./docker/app.Dockerfile
+      args:
+        - APP_ID=logs
+    networks:
+      - internal
+
+networks:
+  external:
+  internal:
