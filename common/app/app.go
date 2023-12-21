@@ -4,8 +4,10 @@ import (
 	"sync"
 	"time"
 
+	logsmeta "github.com/vertex-center/vertex/apps/logs/meta"
 	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/common/app/appmeta"
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/common/server"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/event"
@@ -94,6 +96,8 @@ func RunStandalone(app Interface, about common.About, waitInternet bool) {
 	config.ParseArgs(about)
 	config.Current.RegisterAPIAddr(app.Meta().ID, config.Current.DefaultApiAddr(config.Current.Port))
 
+	log.SetupAgent(*config.Current.Addr(logsmeta.Meta.ID))
+
 	runApp(app, about, waitInternet)
 }
 
@@ -105,6 +109,8 @@ func RunStandaloneKernel(app Interface, about common.About, waitInternet bool) {
 	}
 	config.ParseArgs(about)
 	config.Current.RegisterAPIAddr(app.Meta().ID+"-kernel", config.Current.DefaultApiAddr(config.Current.Port))
+
+	log.SetupAgent(*config.Current.Addr(logsmeta.Meta.ID))
 
 	runApp(app, about, waitInternet)
 }

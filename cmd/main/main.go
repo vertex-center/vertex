@@ -7,6 +7,7 @@ import (
 	"github.com/juju/errors"
 	"github.com/vertex-center/vertex/apps"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
+	logsmeta "github.com/vertex-center/vertex/apps/logs/meta"
 	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/log"
@@ -41,6 +42,8 @@ func main() {
 	}
 	config.RegisterHost("vertex", "6130")
 	config.ParseArgs(about)
+
+	log.SetupAgent(*config.Current.Addr(logsmeta.Meta.ID))
 
 	ctx = common.NewVertexContext(about, false)
 	url := config.Current.Addr("vertex")

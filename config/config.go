@@ -5,8 +5,6 @@ import (
 	"net/url"
 	"os"
 	"sync"
-
-	"github.com/vertex-center/vertex/pkg/net"
 )
 
 const DefaultApiURLFormat = "http://%s:%s/api"
@@ -21,24 +19,19 @@ const (
 )
 
 type Config struct {
-	mode    Mode
-	localIP string
-	mu      sync.RWMutex
+	mode Mode
+	host string
+	mu   sync.RWMutex
 
 	Port  string
 	hosts map[string]string
 }
 
 func New() *Config {
-	localIP, err := net.LocalIP()
-	if err != nil {
-		localIP = "127.0.0.1"
-	}
-
 	c := &Config{
-		mode:    ProductionMode,
-		localIP: localIP,
-		hosts:   map[string]string{},
+		mode:  ProductionMode,
+		host:  "127.0.0.1",
+		hosts: map[string]string{},
 	}
 
 	if os.Getenv("DEBUG") == "1" {
@@ -71,7 +64,7 @@ func (c *Config) KernelAddr(id string) *url.URL {
 }
 
 func (c *Config) DefaultApiAddr(defaultPort string) string {
-	return fmt.Sprintf(DefaultApiURLFormat, c.localIP, defaultPort)
+	return fmt.Sprintf(DefaultApiURLFormat, c.host, defaultPort)
 }
 
 func (c *Config) RegisterAPIAddr(id string, url string) {
@@ -90,7 +83,7 @@ func (c *Config) SetAPIAddr(id string, url string) {
 }
 
 func (c *Config) LocalIP() string {
-	return c.localIP
+	return c.host
 }
 
 func (c *Config) Debug() bool {

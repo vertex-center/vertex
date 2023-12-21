@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/vertex-center/vertex/apps"
+	logsmeta "github.com/vertex-center/vertex/apps/logs/meta"
 	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/log"
@@ -27,6 +28,8 @@ func main() {
 		config.RegisterHost(meta.ID+"-kernel", meta.DefaultKernelPort)
 	}
 	config.ParseArgs(about)
+
+	log.SetupAgent(*config.Current.Addr(logsmeta.Meta.ID))
 
 	app.RunKernelApps(about, apps.Apps)
 }

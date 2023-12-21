@@ -15,7 +15,7 @@ import (
 
 var agent *Agent
 
-func init() {
+func SetupAgent(url url.URL) {
 	if strings.HasSuffix(os.Args[0], ".test") {
 		return
 	}
@@ -27,17 +27,14 @@ func init() {
 	}
 
 	go func() {
-		u := &url.URL{
-			Scheme: "ws",
-			Host:   "localhost:7516",
-			Path:   "/api/logs/ws",
-		}
-		if err != nil {
-			panic(err)
-		}
+		url.Scheme = "ws"
+		url.Path = "/api/logs/ws"
+
+		_, _ = fmt.Fprintln(os.Stderr, "starting log agent...")
+		_, _ = fmt.Fprintln(os.Stderr, "connecting to", url.String())
 
 		for {
-			err := agent.Start(u)
+			err := agent.Start(&url)
 			if err != nil {
 				err = fmt.Errorf("start log agent: %w", err)
 				_, _ = fmt.Fprintln(os.Stderr, err.Error())

@@ -30,6 +30,9 @@ func init() {
 }
 
 func sendToAgent(line string) {
+	if agent == nil {
+		return
+	}
 	err := agent.Send(line)
 	if err != nil {
 		_, _ = fmt.Fprint(os.Stderr, err.Error())

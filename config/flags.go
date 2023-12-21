@@ -13,6 +13,7 @@ import (
 var (
 	commit = kingpin.Flag("commit", "Print commit hash and quit.").Bool()
 	date   = kingpin.Flag("date", "Print build date and quit.").Bool()
+	host   = kingpin.Flag("host", "Host to listen on.").Default("127.0.0.1").String()
 	port   = kingpin.Flag("port", "Port to listen on.").Default("8080").String()
 
 	mu    sync.RWMutex
@@ -48,6 +49,9 @@ func ParseArgs(about common.About) {
 		os.Exit(1)
 	}
 
+	if host != nil {
+		Current.host = *host
+	}
 	if port != nil {
 		Current.Port = *port
 	}
