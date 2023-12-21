@@ -95,3 +95,14 @@ import { Tabs, TabItem } from "@vertex-center/components";
 :::tip{About sudo}
 To learn more about permissions, read [Security > Vertex Kernel](../security/vertex-kernel).
 :::
+
+## Flags and environment variables
+
+| Flag            | Environment variable | Description                                            |
+|-----------------|----------------------|--------------------------------------------------------|
+| `--version`     |                      | Print version and exit.                                |
+| `--commit`      |                      | Print commit hash and exit.                            |
+| `--date`        |                      | Print build date and exit.                             |
+| `--host <host>` | `VERTEX_HOST`        | Host to bind to.                                       |
+| `--port <port>` | `VERTEX_PORT`        | Port to bind to.                                       |
+| `--*-addr`      | `VERTEX_*_ADDR`      | Address of a service. Replace `*` with the service ID. |
