@@ -3,7 +3,7 @@ FROM golang:1.21-alpine AS build-stage
 WORKDIR /app
 COPY . ./
 
-ARG APP_ID
+ARG APP_ID=undefined
 RUN test -d ./apps/$APP_ID || (echo "APP_ID is not set to a valid app ID" && exit 1)
 
 RUN apk add git
