@@ -54,7 +54,7 @@ func (s *Server) StartAsync() chan error {
 		exitChan <- s.Router.Start(":" + s.url.Port())
 	}()
 
-	log.Info("server starting", vlog.String("port", s.url.Port()))
+	log.Info("server starting", vlog.String("url", s.url.String()), vlog.String("port", s.url.Port()))
 
 	s.waitServerReady()
 
