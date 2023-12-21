@@ -173,16 +173,17 @@ func runKernelApp(app Interface, about common.About, waitInternet bool) {
 	vertexCtx := common.NewVertexContext(about, true)
 	ctx := NewContext(vertexCtx)
 	app.Load(ctx)
+	meta := app.Meta()
 
-	u := config.Current.KernelAddr(app.Meta().ID)
+	u := config.Current.KernelAddr(meta.ID)
 
 	info := openapi.Info{
-		Title:       app.Meta().Name,
-		Description: app.Meta().Description,
+		Title:       meta.Name,
+		Description: meta.Description,
 		Version:     ctx.About().Version,
 	}
 
-	srv := server.New(app.Meta().ID, &info, u, vertexCtx)
+	srv := server.New(meta.ID, &info, u, vertexCtx)
 
 	if a, ok := app.(KernelInitializable); ok {
 		err := a.InitializeKernel()
