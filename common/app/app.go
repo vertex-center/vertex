@@ -92,6 +92,7 @@ func RunStandalone(app Interface, about common.About, waitInternet bool) {
 		config.RegisterHost(m.ID, m.DefaultPort)
 	}
 	config.ParseArgs(about)
+	config.Current.RegisterAPIAddr(app.Meta().ID, config.Current.DefaultApiAddr(config.Current.Port))
 
 	runApp(app, about, waitInternet)
 }
@@ -103,6 +104,7 @@ func RunStandaloneKernel(app Interface, about common.About, waitInternet bool) {
 		config.RegisterHost(m.ID+"-kernel", m.DefaultPort)
 	}
 	config.ParseArgs(about)
+	config.Current.RegisterAPIAddr(app.Meta().ID+"-kernel", config.Current.DefaultApiAddr(config.Current.Port))
 
 	runApp(app, about, waitInternet)
 }
