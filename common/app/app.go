@@ -90,11 +90,13 @@ func RunKernelApps(about common.About, apps []Interface) {
 // RunStandalone runs the app as a standalone service.
 // It parses the configs, loads the app, initializes it and starts the HTTP server.
 func RunStandalone(app Interface, about common.About, waitInternet bool) {
-	for _, m := range app.Meta().Dependencies {
+	meta := app.Meta()
+
+	for _, m := range meta.Dependencies {
 		config.RegisterHost(m.ID, m.DefaultPort)
 	}
 	config.ParseArgs(about)
-	config.Current.RegisterAPIAddr(app.Meta().ID, config.Current.DefaultApiAddr(config.Current.Port))
+	config.Current.RegisterAPIAddr(meta.ID, config.Current.DefaultApiAddr(config.Current.Port))
 
 	log.SetupAgent(*config.Current.Addr(logsmeta.Meta.ID))
 
@@ -104,11 +106,13 @@ func RunStandalone(app Interface, about common.About, waitInternet bool) {
 // RunStandaloneKernel runs the app as a standalone service.
 // It loads the app, initializes it and starts the HTTP server.
 func RunStandaloneKernel(app Interface, about common.About, waitInternet bool) {
-	for _, m := range app.Meta().Dependencies {
-		config.RegisterHost(m.ID+"-kernel", m.DefaultPort)
+	meta := app.Meta()
+
+	for _, m := range meta.Dependencies {
+		config.RegisterHost(m.ID, m.DefaultPort)
 	}
 	config.ParseArgs(about)
-	config.Current.RegisterAPIAddr(app.Meta().ID+"-kernel", config.Current.DefaultApiAddr(config.Current.Port))
+	config.Current.RegisterAPIAddr(meta.ID+"-kernel", config.Current.DefaultApiAddr(config.Current.Port))
 
 	log.SetupAgent(*config.Current.Addr(logsmeta.Meta.ID))
 
