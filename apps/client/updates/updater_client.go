@@ -2,6 +2,7 @@ package updates
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/google/go-github/v50/github"
 	"github.com/vertex-center/vertex/common/log"
+	"github.com/vertex-center/vertex/common/storage"
 	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/varchiver"
 	"github.com/vertex-center/vlog"
@@ -90,7 +92,7 @@ func install(dir string, releaseUrl string) error {
 		return err
 	}
 
-	return config.Current.Apply()
+	return applyConfig()
 }
 
 func download(dir string, url string) error {
@@ -108,4 +110,15 @@ func download(dir string, url string) error {
 
 	_, err = io.Copy(file, res.Body)
 	return err
+}
+
+func applyConfig() error {
+	cfg := "window.api_urls = {\n"
+	// Only for the non-kernel apps
+	for name, u := range config.Current.Urls {
+		name = strings.ReplaceAll(name, "-", "_")
+		cfg += fmt.Sprintf("\t%s: '%s',\n", name, u)
+	}
+	cfg += "};\n"
+	return os.WriteFile(path.Join(storage.FSPath, "client", "dist", "config.js"), []byte(cfg), os.ModePerm)
 }

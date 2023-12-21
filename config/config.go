@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-	"path"
 	"strings"
 	"sync"
 
-	"github.com/vertex-center/vertex/common/storage"
 	"github.com/vertex-center/vertex/pkg/net"
 )
 
@@ -26,9 +24,9 @@ const (
 type Config struct {
 	mode       Mode
 	localIP    string
-	urls       map[string]string
 	kernelUrls map[string]string
 	mu         sync.RWMutex
+	Urls       map[string]string
 }
 
 func New() *Config {
@@ -40,7 +38,7 @@ func New() *Config {
 	c := &Config{
 		mode:    ProductionMode,
 		localIP: localIP,
-		urls: map[string]string{
+		Urls: map[string]string{
 			"vertex": fmt.Sprintf(DefaultApiURLFormat, localIP, "6130"),
 		},
 		kernelUrls: map[string]string{
@@ -63,7 +61,7 @@ func New() *Config {
 					name = strings.TrimSuffix(name, "_kernel")
 					c.kernelUrls[name] = value
 				} else {
-					c.urls[name] = value
+					c.Urls[name] = value
 				}
 			}
 		}
@@ -93,7 +91,7 @@ func (c *Config) KernelURL(id string) *url.URL {
 func (c *Config) URL(id string) *url.URL {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	if u, ok := c.urls[id]; ok {
+	if u, ok := c.Urls[id]; ok {
 		p, err := url.Parse(u)
 		if err != nil {
 			return &url.URL{}
@@ -114,10 +112,10 @@ func (c *Config) DefaultKernelApiURL(defaultPort string) string {
 func (c *Config) RegisterApiURL(id string, url string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if _, ok := c.urls[id]; ok {
+	if _, ok := c.Urls[id]; ok {
 		return
 	}
-	c.urls[id] = url
+	c.Urls[id] = url
 }
 
 func (c *Config) RegisterKernelApiURL(id string, url string) {
@@ -135,15 +133,4 @@ func (c *Config) LocalIP() string {
 
 func (c *Config) Debug() bool {
 	return c.mode == DebugMode
-}
-
-func (c *Config) Apply() error {
-	cfg := "window.api_urls = {\n"
-	// Only for the non-kernel apps
-	for name, u := range c.urls {
-		name = strings.ReplaceAll(name, "-", "_")
-		cfg += fmt.Sprintf("\t%s: '%s',\n", name, u)
-	}
-	cfg += "};\n"
-	return os.WriteFile(path.Join(storage.FSPath, "client", "dist", "config.js"), []byte(cfg), os.ModePerm)
 }
