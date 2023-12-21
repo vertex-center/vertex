@@ -10,7 +10,7 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-// Download downloads a file from a URL. It creates the
+// Download downloads a file from a Addr. It creates the
 // directory if it doesn't exist.
 func Download(url string, dir string, filename string) error {
 	log.Info("downloading",

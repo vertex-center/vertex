@@ -17,6 +17,6 @@ func NewReverseProxyClient(ctx context.Context) *Client {
 	token := ctx.Value("token").(string)
 	correlationID := ctx.Value(server.KeyCorrelationID).(string)
 	return &Client{
-		Client: rest.NewClient(config.Current.URL(reverseproxy.Meta.ID), token, correlationID),
+		Client: rest.NewClient(config.Current.Addr(reverseproxy.Meta.ID), token, correlationID),
 	}
 }

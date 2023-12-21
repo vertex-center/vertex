@@ -36,7 +36,7 @@ func NewProxyRouter(proxyService port.ProxyService) *ProxyRouter {
 }
 
 func (r *ProxyRouter) Start() error {
-	proxyURL := config.Current.URL("proxy")
+	proxyURL := config.Current.Addr("proxy")
 	log.Info("Vertex-Proxy started", vlog.String("url", proxyURL.String()))
 	return r.Router.Start(":" + proxyURL.Port())
 }

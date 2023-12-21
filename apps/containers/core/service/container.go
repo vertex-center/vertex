@@ -587,7 +587,7 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 			return err
 		}
 
-		host := config.Current.URL("vertex").String()
+		host := config.Current.Addr("vertex").String()
 
 		dbEnvNames := (*dbService.Features.Databases)[0]
 		cEnvNames := cService.Databases[databaseID].Names

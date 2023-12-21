@@ -17,7 +17,7 @@ func NewContainersClient(ctx context.Context) *Client {
 	token := ctx.Value("token").(string)
 	correlationID := ctx.Value(server.KeyCorrelationID).(string)
 	return &Client{
-		Client: rest.NewClient(config.Current.URL(meta.Meta.ID), token, correlationID),
+		Client: rest.NewClient(config.Current.Addr(meta.Meta.ID), token, correlationID),
 	}
 }
 
@@ -28,6 +28,6 @@ type KernelClient struct {
 func NewContainersKernelClient(ctx context.Context) *KernelClient {
 	correlationID := ctx.Value(server.KeyCorrelationID).(string)
 	return &KernelClient{
-		Client: rest.NewClient(config.Current.KernelURL(meta.Meta.ID), "", correlationID),
+		Client: rest.NewClient(config.Current.KernelAddr(meta.Meta.ID), "", correlationID),
 	}
 }

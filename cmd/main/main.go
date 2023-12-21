@@ -38,7 +38,7 @@ func main() {
 	config.ParseArgs(about)
 
 	ctx = common.NewVertexContext(about, false)
-	url := config.Current.URL("vertex")
+	url := config.Current.Addr("vertex")
 
 	info := openapi.Info{
 		Title:       "Vertex",

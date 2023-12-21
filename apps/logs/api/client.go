@@ -16,6 +16,6 @@ type Client struct {
 func NewLogsClient(ctx context.Context) *Client {
 	correlationID := ctx.Value(server.KeyCorrelationID).(string)
 	return &Client{
-		Client: rest.NewClient(config.Current.URL(meta.Meta.ID), "", correlationID),
+		Client: rest.NewClient(config.Current.Addr(meta.Meta.ID), "", correlationID),
 	}
 }

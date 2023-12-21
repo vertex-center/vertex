@@ -66,7 +66,7 @@ func NewAgent() (*Agent, error) {
 }
 
 // Start connects to Vertex Logs and starts sending logs.
-// Make sure the URL is a websocket URL (ws:// or wss://).
+// Make sure the Addr is a websocket Addr (ws:// or wss://).
 func (a *Agent) Start(u *url.URL) error {
 	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
