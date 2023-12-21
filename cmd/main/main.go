@@ -1,8 +1,6 @@
 package main
 
 import (
-	"flag"
-	"fmt"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -35,9 +33,9 @@ func main() {
 	defer log.Default.Close()
 
 	ensureNotRoot()
-	parseArgs()
 
 	about := common.NewAbout(version, commit, date)
+	config.ParseArgs(about)
 
 	ctx = common.NewVertexContext(about, false)
 	url := config.Current.URL("vertex")
@@ -58,30 +56,6 @@ func main() {
 		if err != nil {
 			log.Error(err)
 		}
-	}
-}
-
-func parseArgs() {
-	var (
-		flagVersion = flag.Bool("version", false, "Print vertex version")
-		flagV       = flag.Bool("v", false, "Print vertex version")
-		flagDate    = flag.Bool("date", false, "Print the release date")
-		flagCommit  = flag.Bool("commit", false, "Print the commit hash")
-	)
-
-	flag.Parse()
-
-	if *flagVersion || *flagV {
-		fmt.Println(version)
-		os.Exit(0)
-	}
-	if *flagDate {
-		fmt.Println(date)
-		os.Exit(0)
-	}
-	if *flagCommit {
-		fmt.Println(commit)
-		os.Exit(0)
 	}
 }
 

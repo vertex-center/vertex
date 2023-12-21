@@ -27,6 +27,8 @@ type Config struct {
 	kernelUrls map[string]string
 	mu         sync.RWMutex
 	Urls       map[string]string
+
+	Port string
 }
 
 func New() *Config {

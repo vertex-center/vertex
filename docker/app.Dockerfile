@@ -20,4 +20,6 @@ ENV APP_ID=$APP_ID
 
 COPY --from=build-stage /$APP_ID /$APP_ID
 
+EXPOSE 8080
+
 ENTRYPOINT /$APP_ID
