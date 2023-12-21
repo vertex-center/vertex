@@ -18,20 +18,17 @@ To install Vertex for development, you will need to install both the Vertex Clie
     cd vertex
     ```
 
-3. Run **Vertex Kernel as sudo**:
+3. Run **Vertex**:
     ```bash
-    sudo go run ./cmd/kernel --user $(whoami)
+    go run ./cmd/main
     ```
 
-    or if you want to use a custom host/port:
+4. In another terminal, run **Vertex Kernel as sudo**:
     ```bash
-    sudo go run ./cmd/kernel \
-        --user $(whoami) \
-        --host localhost \
-        --port 6130
+    sudo go run ./cmd/kernel
     ```
 
-4. Open the UI in your browser: [http://localhost:6130](http://localhost:6130)
+5. Open the UI in your browser: [http://localhost:6130](http://localhost:6130)
 
 ---
 
