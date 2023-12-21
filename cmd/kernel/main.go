@@ -25,6 +25,7 @@ func main() {
 	about := common.NewAbout(version, commit, date)
 	for _, a := range apps.Apps {
 		meta := a.Meta()
+		config.RegisterHost(meta.ID, meta.DefaultPort)
 		config.RegisterHost(meta.ID+"-kernel", meta.DefaultKernelPort)
 	}
 	config.ParseArgs(about)

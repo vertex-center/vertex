@@ -39,6 +39,7 @@ func main() {
 	for _, a := range apps.Apps {
 		meta := a.Meta()
 		config.RegisterHost(meta.ID, meta.DefaultPort)
+		config.RegisterHost(meta.ID+"-kernel", meta.DefaultKernelPort)
 	}
 	config.RegisterHost("vertex", "6130")
 	config.ParseArgs(about)
