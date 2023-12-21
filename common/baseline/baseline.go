@@ -66,7 +66,10 @@ func Fetch(ctx context.Context, version string) (Baseline, error) {
 		}
 	}
 
-	return Baseline{}, fmt.Errorf("%w (%s)", ErrFailedToFetchBaseline, version)
+	log.Info("failed to find baseline in history", vlog.String("version", version))
+	log.Info("fetching latest baseline instead")
+
+	return FetchLatest(ctx, ChannelStable)
 }
 
 func FetchLatest(ctx context.Context, channel Channel) (Baseline, error) {
