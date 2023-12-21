@@ -1,6 +1,7 @@
 package meta
 
 import (
+	logsmeta "github.com/vertex-center/vertex/apps/logs/meta"
 	"github.com/vertex-center/vertex/common/app/appmeta"
 )
 
@@ -11,4 +12,7 @@ var Meta = appmeta.Meta{
 	Icon:        "admin_panel_settings",
 	Hidden:      true,
 	DefaultPort: "7502",
+	Dependencies: []*appmeta.Meta{
+		&logsmeta.Meta,
+	},
 }

@@ -14,6 +14,10 @@ var (
 	port   = kingpin.Flag("port", "Port to listen on.").Default("8080").String()
 )
 
+func RegisterPort(id string, def string) {
+	kingpin.Flag(id+"-port", "Port for "+id+".").Default(def).String()
+}
+
 func ParseArgs(about common.About) {
 	kingpin.Version(about.Version)
 	kingpin.Parse()

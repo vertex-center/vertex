@@ -74,8 +74,17 @@ func RunKernelApps(about common.About, apps []Interface) {
 }
 
 // RunStandalone runs the app as a standalone service.
-// It loads the app, initializes it and starts the HTTP server.
+// It parses the configs, loads the app, initializes it and starts the HTTP server.
 func RunStandalone(app Interface, about common.About, waitInternet bool) {
+	for _, m := range app.Meta().Dependencies {
+		config.RegisterPort(m.ID, m.DefaultPort)
+	}
+	config.ParseArgs(about)
+
+	runApp(app, about, waitInternet)
+}
+
+func runApp(app Interface, about common.About, waitInternet bool) {
 	if waitInternet {
 		waitNet()
 	}
@@ -83,21 +92,22 @@ func RunStandalone(app Interface, about common.About, waitInternet bool) {
 	vertexCtx := common.NewVertexContext(about, false)
 	ctx := NewContext(vertexCtx)
 	app.Load(ctx)
+	meta := app.Meta()
 
-	config.Current.RegisterApiURL(app.Meta().ID, config.Current.DefaultApiURL(app.Meta().DefaultPort))
+	config.Current.RegisterApiURL(meta.ID, config.Current.DefaultApiURL(meta.DefaultPort))
 	if _, ok := app.(KernelInitializable); ok {
-		config.Current.RegisterKernelApiURL(app.Meta().ID, config.Current.DefaultApiURL(app.Meta().DefaultKernelPort))
+		config.Current.RegisterKernelApiURL(meta.ID, config.Current.DefaultApiURL(meta.DefaultKernelPort))
 	}
 
-	u := config.Current.URL(app.Meta().ID)
+	u := config.Current.URL(meta.ID)
 
 	info := openapi.Info{
-		Title:       app.Meta().Name,
-		Description: app.Meta().Description,
+		Title:       meta.Name,
+		Description: meta.Description,
 		Version:     ctx.About().Version,
 	}
 
-	srv := server.New(app.Meta().ID, &info, u, vertexCtx)
+	srv := server.New(meta.ID, &info, u, vertexCtx)
 
 	if a, ok := app.(Initializable); ok {
 		err := a.Initialize()

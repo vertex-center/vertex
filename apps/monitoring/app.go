@@ -4,6 +4,7 @@ import (
 	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
 	containersmeta "github.com/vertex-center/vertex/apps/containers/meta"
+	logsmeta "github.com/vertex-center/vertex/apps/logs/meta"
 	"github.com/vertex-center/vertex/apps/monitoring/adapter"
 	"github.com/vertex-center/vertex/apps/monitoring/core/port"
 	"github.com/vertex-center/vertex/apps/monitoring/core/service"
@@ -26,6 +27,7 @@ var Meta = appmeta.Meta{
 	Dependencies: []*appmeta.Meta{
 		&authmeta.Meta,
 		&containersmeta.Meta,
+		&logsmeta.Meta,
 	},
 }
 

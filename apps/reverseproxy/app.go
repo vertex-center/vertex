@@ -3,6 +3,7 @@ package reverseproxy
 import (
 	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
+	logsmeta "github.com/vertex-center/vertex/apps/logs/meta"
 	"github.com/vertex-center/vertex/apps/reverseproxy/adapter"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
 	"github.com/vertex-center/vertex/apps/reverseproxy/core/service"
@@ -21,6 +22,7 @@ var Meta = appmeta.Meta{
 	DefaultPort: "7508",
 	Dependencies: []*appmeta.Meta{
 		&authmeta.Meta,
+		&logsmeta.Meta,
 	},
 }
 

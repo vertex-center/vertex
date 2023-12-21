@@ -3,6 +3,7 @@ package serviceeditor
 import (
 	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
 	"github.com/vertex-center/vertex/apps/auth/middleware"
+	logsmeta "github.com/vertex-center/vertex/apps/logs/meta"
 	"github.com/vertex-center/vertex/apps/serviceeditor/core/port"
 	"github.com/vertex-center/vertex/apps/serviceeditor/core/service"
 	"github.com/vertex-center/vertex/apps/serviceeditor/handler"
@@ -24,6 +25,7 @@ var Meta = appmeta.Meta{
 	DefaultPort: "7510",
 	Dependencies: []*appmeta.Meta{
 		&authmeta.Meta,
+		&logsmeta.Meta,
 	},
 }
 

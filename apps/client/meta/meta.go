@@ -1,6 +1,9 @@
 package meta
 
-import "github.com/vertex-center/vertex/common/app/appmeta"
+import (
+	logsmeta "github.com/vertex-center/vertex/apps/logs/meta"
+	"github.com/vertex-center/vertex/common/app/appmeta"
+)
 
 var Meta = appmeta.Meta{
 	ID:          "client",
@@ -9,4 +12,7 @@ var Meta = appmeta.Meta{
 	Icon:        "web",
 	DefaultPort: "7518",
 	Hidden:      true,
+	Dependencies: []*appmeta.Meta{
+		&logsmeta.Meta,
+	},
 }
