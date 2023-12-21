@@ -58,6 +58,7 @@ services:
       - internal
     ports:
       - "7518:8080"
+      - "6132:6132"
     environment:
       - VERTEX_LOGS_ADDR=http://logs:8080/api
 
