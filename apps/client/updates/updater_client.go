@@ -115,7 +115,7 @@ func download(dir string, url string) error {
 func applyConfig() error {
 	cfg := "window.api_urls = {\n"
 	// Only for the non-kernel apps
-	for name, u := range config.Current.Urls {
+	for name, u := range config.Current.GetAddrs() {
 		name = strings.ReplaceAll(name, "-", "_")
 		cfg += fmt.Sprintf("\t%s: '%s',\n", name, u)
 	}

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"sync"
 	"time"
 
 	"github.com/vertex-center/vertex/common"
@@ -54,23 +55,34 @@ type Service interface {
 
 func RunApps(about common.About, apps []Interface) {
 	waitNet()
+	wg := sync.WaitGroup{}
+	wg.Add(len(apps))
 	for _, a := range apps {
 		if _, ok := a.(Initializable); !ok {
 			continue
 		}
-
-		go RunStandalone(a, about, false)
+		go func(a Interface) {
+			runApp(a, about, false)
+			wg.Done()
+		}(a)
 	}
+	wg.Wait()
 }
 
 func RunKernelApps(about common.About, apps []Interface) {
 	waitNet()
+	wg := sync.WaitGroup{}
+	wg.Add(len(apps))
 	for _, a := range apps {
 		if _, ok := a.(KernelInitializable); !ok {
 			continue
 		}
-		go RunStandaloneKernel(a, about, false)
+		go func(a Interface) {
+			runKernelApp(a, about, false)
+			wg.Done()
+		}(a)
 	}
+	wg.Wait()
 }
 
 // RunStandalone runs the app as a standalone service.
@@ -78,6 +90,17 @@ func RunKernelApps(about common.About, apps []Interface) {
 func RunStandalone(app Interface, about common.About, waitInternet bool) {
 	for _, m := range app.Meta().Dependencies {
 		config.RegisterHost(m.ID, m.DefaultPort)
+	}
+	config.ParseArgs(about)
+
+	runApp(app, about, waitInternet)
+}
+
+// RunStandaloneKernel runs the app as a standalone service.
+// It loads the app, initializes it and starts the HTTP server.
+func RunStandaloneKernel(app Interface, about common.About, waitInternet bool) {
+	for _, m := range app.Meta().Dependencies {
+		config.RegisterHost(m.ID+"-kernel", m.DefaultPort)
 	}
 	config.ParseArgs(about)
 
@@ -130,9 +153,7 @@ func runApp(app Interface, about common.About, waitInternet bool) {
 	}
 }
 
-// RunStandaloneKernel runs the app as a standalone service.
-// It loads the app, initializes it and starts the HTTP server.
-func RunStandaloneKernel(app Interface, about common.About, waitInternet bool) {
+func runKernelApp(app Interface, about common.About, waitInternet bool) {
 	if waitInternet {
 		waitNet()
 	}

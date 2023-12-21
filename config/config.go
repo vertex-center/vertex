@@ -49,6 +49,10 @@ func New() *Config {
 	return c
 }
 
+func (c *Config) GetAddrs() map[string]string {
+	return c.hosts
+}
+
 func (c *Config) Addr(id string) *url.URL {
 	c.mu.RLock()
 	defer c.mu.RUnlock()

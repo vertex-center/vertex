@@ -35,6 +35,11 @@ func main() {
 	ensureNotRoot()
 
 	about := common.NewAbout(version, commit, date)
+	for _, a := range apps.Apps {
+		meta := a.Meta()
+		config.RegisterHost(meta.ID, meta.DefaultPort)
+	}
+	config.RegisterHost("vertex", "6130")
 	config.ParseArgs(about)
 
 	ctx = common.NewVertexContext(about, false)
@@ -46,7 +51,7 @@ func main() {
 		Version:     ctx.About().Version,
 	}
 
-	app.RunApps(about, apps.Apps)
+	go app.RunApps(about, apps.Apps)
 
 	srv = server.New("main", &info, url, ctx)
 	initRoutes(about)

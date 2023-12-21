@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/alecthomas/kingpin/v2"
@@ -18,16 +19,19 @@ var (
 	hosts = map[string]*string{}
 )
 
-// RegisterHost registers a host flag with the given id and default value.
-func RegisterHost(id, def string) {
+// RegisterHost registers a host flag with the given id and default port.
+func RegisterHost(id, defaultPort string) {
+	idUpper := strings.ToUpper(id)
+	idUpper = strings.ReplaceAll(idUpper, "-", "_")
+
 	mu.Lock()
 	defer mu.Unlock()
 	hosts[id] = kingpin.
 		Flag(id+"-addr", "Address for "+id+".").
-		Envar("VERTEX_" + id + "_ADDR").
-		Default(def).
+		Envar("VERTEX_" + idUpper + "_ADDR").
+		Default(Current.DefaultApiAddr(defaultPort)).
 		String()
-	Current.RegisterAPIAddr(id, def)
+	Current.RegisterAPIAddr(id, defaultPort)
 }
 
 func ParseArgs(about common.About) {
