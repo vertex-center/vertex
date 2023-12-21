@@ -116,7 +116,7 @@ func RunStandaloneKernel(app Interface, about common.About, waitInternet bool) {
 
 	log.SetupAgent(*config.Current.Addr(logsmeta.Meta.ID))
 
-	runApp(app, about, waitInternet)
+	runKernelApp(app, about, waitInternet)
 }
 
 func runApp(app Interface, about common.About, waitInternet bool) {
