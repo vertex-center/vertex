@@ -37,7 +37,7 @@ func Wait(ctx context.Context, url string) error {
 	case <-ch:
 		return nil
 	case <-done:
-		return fmt.Errorf("internet connection: Failed to ping %s", url)
+		return fmt.Errorf("failed to ping %s", url)
 	}
 }
 
