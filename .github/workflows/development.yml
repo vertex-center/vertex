@@ -26,7 +26,6 @@ jobs:
   pre-checks:
     name: Run pre-checks
     needs: changes
-    if: needs.changes.outputs.go-changed == 'true'
     uses: ./.github/workflows/call-all-go-tests.yml
 
   trigger-docapi:
