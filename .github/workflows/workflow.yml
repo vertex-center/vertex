@@ -196,7 +196,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/vertex-bundle${{ matrix.app-kind != 'main' && '-' + matrix.app-kind }}:${{ github.ref == 'refs/heads/main' && 'main' || startsWith(github.ref, 'refs/tags/v') && github.ref.replace('refs/tags/v', '') || github.sha }}
+          images: ghcr.io/${{ github.repository_owner }}/vertex-bundle${{ matrix.app-kind != 'main' && format('-{0}', matrix.app-kind) }}:${{ github.ref == 'refs/heads/main' && 'main' || startsWith(github.ref, 'refs/tags/v') && format('{0}', github.ref_name) || github.sha }}
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -254,7 +254,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/vertex-bundle${{ matrix.app-kind != 'main' && '-' + matrix.app-kind }}:${{ github.ref == 'refs/heads/main' && 'main' || startsWith(github.ref, 'refs/tags/v') && github.ref.replace('refs/tags/v', '') || github.sha }}
+          images: ghcr.io/${{ github.repository_owner }}/vertex-${{ matrix.app-id }}${{ matrix.app-kind != 'main' && format('-{0}', matrix.app-kind) }}:${{ github.ref == 'refs/heads/main' && 'main' || startsWith(github.ref, 'refs/tags/v') && format('{0}', github.ref_name) || github.sha }}
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -351,7 +351,7 @@ jobs:
         run: |
           IMAGES=vertex-bundle vertex-bundle-kernel vertex-admin vertex-auth vertex-client vertex-containers vertex-logs vertex-monitoring vertex-reverseproxy vertex-serviceeditor vertex-sql vertex-tunnels
           for IMAGE in $IMAGES; do
-            docker pull ghcr.io/${{ github.repository_owner }}/$IMAGE:${{ github.ref.replace('refs/tags/v', '') }}
-            docker tag ghcr.io/${{ github.repository_owner }}/$IMAGE:${{ github.ref.replace('refs/tags/v', '') }} ghcr.io/${{ github.repository_owner }}/$IMAGE:latest
+            docker pull ghcr.io/${{ github.repository_owner }}/$IMAGE:${{ format('{0}', github.ref_name) }}
+            docker tag ghcr.io/${{ github.repository_owner }}/$IMAGE:${{ format('{0}', github.ref_name) }} ghcr.io/${{ github.repository_owner }}/$IMAGE:latest
             docker push ghcr.io/${{ github.repository_owner }}/$IMAGE:latest
           done
