@@ -157,7 +157,7 @@ jobs:
     strategy:
       matrix:
         # Only build microservices for two cases, just to
-        # ensure that the micro.Dockerfile is working.
+        # ensure that the build works.
         # If there is a problem with a specific app, it will fail
         # in the build-docker-microservices job.
         include:
