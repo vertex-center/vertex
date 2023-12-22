@@ -57,22 +57,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        app-id:
-          - admin
-          - auth
-          - client
-          - containers
-          - logs
-          - monitoring
-          - reverseproxy
-          - serviceeditor
-          - sql
-          - tunnels
-        app-kind:
-          - main
+        # Only build microservices for two cases, just to
+        # ensure that the micro.Dockerfile is working.
+        # If there is a problem with a specific app, it will fail
+        # in the call-build step.
         include:
           - app-id: admin
-            app-kind: kernel
+            app-kind: main
           - app-id: containers
             app-kind: kernel
     steps:

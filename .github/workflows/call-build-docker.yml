@@ -6,6 +6,9 @@ jobs:
   build-docker-bundle:
     name: Build Docker bundled
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     strategy:
       matrix:
         app-kind: [main, kernel]
@@ -16,28 +19,54 @@ jobs:
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build
+      - name: Setup metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/vertex-bundle${{ matrix.app-kind != 'main' && '-' + matrix.app-kind }}:main
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          push: false
+          push: true
           context: .
           file: docker/bundle.Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          no-cache: true
           build-args: |
             APP_KIND=${{ matrix.app-kind }}
-          tags: ${{ github.repository }}:latest
 
   build-docker-microservices:
     name: Build Docker microservices
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     strategy:
       matrix:
-        # Only build microservices for two cases, just to
-        # ensure that the micro.Dockerfile is working.
-        # If there is a problem with a specific app, it will fail
-        # in the call-build step.
+        app-id:
+          - admin
+          - auth
+          - client
+          - containers
+          - logs
+          - monitoring
+          - reverseproxy
+          - serviceeditor
+          - sql
+          - tunnels
+        app-kind:
+          - main
         include:
           - app-id: admin
-            app-kind: main
+            app-kind: kernel
           - app-id: containers
             app-kind: kernel
     steps:
@@ -47,13 +76,27 @@ jobs:
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build
+      - name: Setup metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/vertex-bundle${{ matrix.app-kind != 'main' && '-' + matrix.app-kind }}:main
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          push: false
+          push: true
           context: .
           file: docker/micro.Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          no-cache: true
           build-args: |
             APP_ID=${{ matrix.app-id }}
             APP_KIND=${{ matrix.app-kind }}
-          tags: ${{ github.repository }}:latest
