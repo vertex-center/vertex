@@ -5,7 +5,7 @@ services:
     image: vertex-admin
     build:
       context: ..
-      dockerfile: ./docker/app.Dockerfile
+      dockerfile: micro.Dockerfile
       args:
         - APP_ID=admin
     networks:
@@ -22,7 +22,7 @@ services:
     image: vertex-admin-kernel
     build:
       context: ..
-      dockerfile: ./docker/app.Dockerfile
+      dockerfile: micro.Dockerfile
       args:
         - APP_ID=admin
         - APP_KIND=kernel
@@ -35,7 +35,7 @@ services:
     image: vertex-auth
     build:
       context: ..
-      dockerfile: ./docker/app.Dockerfile
+      dockerfile: micro.Dockerfile
       args:
         - APP_ID=auth
     networks:
@@ -50,7 +50,7 @@ services:
     image: vertex-client
     build:
       context: ..
-      dockerfile: ./docker/app.Dockerfile
+      dockerfile: micro.Dockerfile
       args:
         - APP_ID=client
     networks:
@@ -74,7 +74,7 @@ services:
     image: vertex-containers
     build:
       context: ..
-      dockerfile: ./docker/app.Dockerfile
+      dockerfile: micro.Dockerfile
       args:
         - APP_ID=containers
     networks:
@@ -91,7 +91,7 @@ services:
     image: vertex-containers-kernel
     build:
       context: ..
-      dockerfile: ./docker/app.Dockerfile
+      dockerfile: micro.Dockerfile
       args:
         - APP_ID=containers
         - APP_KIND=kernel
@@ -104,7 +104,7 @@ services:
     image: vertex-monitoring
     build:
       context: ..
-      dockerfile: ./docker/app.Dockerfile
+      dockerfile: micro.Dockerfile
       args:
         - APP_ID=monitoring
     networks:
@@ -121,7 +121,7 @@ services:
     image: vertex-reverseproxy
     build:
       context: ..
-      dockerfile: ./docker/app.Dockerfile
+      dockerfile: micro.Dockerfile
       args:
         - APP_ID=reverseproxy
     networks:
@@ -137,7 +137,7 @@ services:
     image: vertex-serviceeditor
     build:
       context: ..
-      dockerfile: ./docker/app.Dockerfile
+      dockerfile: micro.Dockerfile
       args:
         - APP_ID=serviceeditor
     networks:
@@ -153,7 +153,7 @@ services:
     image: vertex-sql
     build:
       context: ..
-      dockerfile: ./docker/app.Dockerfile
+      dockerfile: micro.Dockerfile
       args:
         - APP_ID=sql
     networks:
@@ -170,7 +170,7 @@ services:
     image: vertex-tunnels
     build:
       context: ..
-      dockerfile: ./docker/app.Dockerfile
+      dockerfile: micro.Dockerfile
       args:
         - APP_ID=tunnels
     networks:
@@ -187,7 +187,7 @@ services:
     image: vertex-logs
     build:
       context: ..
-      dockerfile: ./docker/app.Dockerfile
+      dockerfile: micro.Dockerfile
       args:
         - APP_ID=logs
     networks:
