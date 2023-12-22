@@ -3,9 +3,12 @@ name: Build Docker
 on: [workflow_call, workflow_dispatch]
 
 jobs:
-  build-docker:
-    name: Build Docker image
+  build-docker-bundle:
+    name: Build Docker bundled
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app-kind: [main, kernel]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -16,6 +19,50 @@ jobs:
       - name: Build
         uses: docker/build-push-action@v5
         with:
-          context: .
           push: false
+          context: .
+          file: docker/bundle.Dockerfile
+          build-args: |
+            APP_KIND=${{ matrix.app-kind }}
+          tags: ${{ github.repository }}:latest
+
+  build-docker-compose:
+    name: Build Docker microservices
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app-id:
+          - admin
+          - auth
+          - client
+          - containers
+          - logs
+          - monitoring
+          - reverseproxy
+          - serviceeditor
+          - sql
+          - tunnels
+        app-kind:
+          - main
+        include:
+          - app-id: admin
+            app-kind: kernel
+          - app-id: containers
+            app-kind: kernel
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build
+        uses: docker/build-push-action@v5
+        with:
+          push: false
+          context: .
+          file: docker/micro.Dockerfile
+          build-args: |
+            APP_ID=${{ matrix.app-id }}
+            APP_KIND=${{ matrix.app-kind }}
           tags: ${{ github.repository }}:latest
