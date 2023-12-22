@@ -30,9 +30,12 @@ Vertex is designed to be installed on low-powered computers like Raspberry Pi, s
 ## Installation
 
 Vertex can be installed in multiple ways:
-- With binaries;
-- With Docker;
-- From sources, compiling with Go.
+- **From binaries**: Pre-compiled binaries are available for Linux, macOS and Windows
+- **With Docker**: Docker images are available on GitHub Container Registry
+
+Each of these methods can be used in two modes:
+- **Bundled**: All apps are included in one unique binary (or container). This is the simplest and lightest way to install Vertex.
+- **Microservices**: Each app is a separate binary (or container). This is the recommended way if you want to scale your installation horizontally.
 
 Everything about the installation process is available in the [Vertex Documentation](https://docs.vertex.arra.red/).
 
