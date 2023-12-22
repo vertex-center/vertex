@@ -1,0 +1,357 @@
+name: Development
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+
+jobs:
+  changes:
+    name: Check for changes
+    runs-on: ubuntu-latest
+    outputs:
+      workflows-changed: ${{ steps.changes.outputs.workflows-changed }}
+      go-changed: ${{ steps.changes.outputs.go-changed }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Check if workflow files changed
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            workflows-changed:
+              - '.github/workflows/**.yml'
+            go-changed:
+              - 'go.mod'
+              - 'go.sum'
+              - '**.go'
+
+  actionlint:
+    name: Run actionlint
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.workflows-changed == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run workflow linter
+        run: |
+          echo "::add-matcher::.github/actionlint-matcher.json"
+          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          ./actionlint -color
+        shell: bash
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.21'
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          args: --timeout 5m
+
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.21'
+
+      - name: Run test with coverage
+        run: |
+          go test -coverprofile=coverage.out -json ./... > report.json
+
+      - name: Run Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.21'
+
+      - name: Run tests
+        run: go test -v ./...
+
+  build-bundle:
+    name: Build bundle
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - GOOS: darwin
+            GOARCH: amd64
+            os: macos-latest
+          - GOOS: darwin
+            GOARCH: arm64
+            os: macos-latest
+
+          - GOOS: linux
+            GOARCH: amd64
+            os: ubuntu-latest
+          - GOOS: linux
+            GOARCH: arm64
+            os: ubuntu-latest
+          - GOOS: linux
+            GOARCH: arm
+            os: ubuntu-latest
+          - GOOS: linux
+            GOARCH: "386"
+            os: ubuntu-latest
+
+          - GOOS: windows
+            GOARCH: amd64
+            os: windows-latest
+          - GOOS: windows
+            GOARCH: arm64
+            os: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.21'
+
+      - name: Build
+        run: |
+          go build -o vertex ./cmd/main
+          go build -o vertex-kernel ./cmd/kernel
+        env:
+          GOOS: ${{ matrix.GOOS }}
+          GOARCH: ${{ matrix.GOARCH }}
+
+  build-microservices:
+    name: Build Microservices
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Only build microservices for two cases, just to
+        # ensure that the micro.Dockerfile is working.
+        # If there is a problem with a specific app, it will fail
+        # in the build-docker-microservices job.
+        include:
+          - app-id: admin
+            app-kind: main
+          - app-id: containers
+            app-kind: kernel
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.21'
+
+      - name: Build
+        run: |
+          go build -o app ./apps/${{ matrix.app-id }}/cmd/${{ matrix.app-kind }}
+
+  build-docker-bundle:
+    name: Build Docker bundled
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        app-kind: [main, kernel]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Setup metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/vertex-bundle${{ matrix.app-kind != 'main' && '-' + matrix.app-kind }}:${{ github.ref == 'refs/heads/main' && 'main' || startsWith(github.ref, 'refs/tags/v') && github.ref.replace('refs/tags/v', '') || github.sha }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          push: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') }}
+          context: .
+          file: docker/bundle.Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          no-cache: true
+          build-args: |
+            APP_KIND=${{ matrix.app-kind }}
+
+  build-docker-microservices:
+    name: Build Docker microservices
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        app-id:
+          - admin
+          - auth
+          - client
+          - containers
+          - logs
+          - monitoring
+          - reverseproxy
+          - serviceeditor
+          - sql
+          - tunnels
+        app-kind:
+          - main
+        include:
+          - app-id: admin
+            app-kind: kernel
+          - app-id: containers
+            app-kind: kernel
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Setup metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/vertex-bundle${{ matrix.app-kind != 'main' && '-' + matrix.app-kind }}:${{ github.ref == 'refs/heads/main' && 'main' || startsWith(github.ref, 'refs/tags/v') && github.ref.replace('refs/tags/v', '') || github.sha }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          push: ${{ github.ref == 'refs/heads/main' }}
+          context: .
+          file: docker/micro.Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          no-cache: true
+          build-args: |
+            APP_ID=${{ matrix.app-id }}
+            APP_KIND=${{ matrix.app-kind }}
+
+  trigger-docapi:
+    name: Trigger docapi
+    runs-on: ubuntu-latest
+    needs:
+      - build-bundle
+      - build-microservices
+      - build-docker-bundle
+      - build-docker-microservices
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Trigger docapi
+        run: |
+          curl \
+          -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Content-Type: application/javascript" \
+          -H "Authorization: Bearer ${{ secrets.PAT }}" \
+          https://api.github.com/repos/vertex-center/openapi/dispatches \
+          -d '{"event_type":"docapi","client_payload":{"ref":"${{ github.ref }}"}}'
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs:
+      - build-bundle
+      - build-microservices
+      - build-docker-bundle
+      - build-docker-microservices
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Fetch tags
+        run: git fetch --force --tags
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.21'
+
+      - name: Release
+        uses: goreleaser/goreleaser-action@v4
+        with:
+          version: latest
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  promote-docker:
+    name: Promote Docker images
+    runs-on: ubuntu-latest
+    needs:
+      - build-bundle
+      - build-microservices
+      - build-docker-bundle
+      - build-docker-microservices
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Promote images
+        run: |
+          IMAGES=vertex-bundle vertex-bundle-kernel vertex-admin vertex-auth vertex-client vertex-containers vertex-logs vertex-monitoring vertex-reverseproxy vertex-serviceeditor vertex-sql vertex-tunnels
+          for IMAGE in $IMAGES; do
+            docker pull ghcr.io/${{ github.repository_owner }}/$IMAGE:${{ github.ref.replace('refs/tags/v', '') }}
+            docker tag ghcr.io/${{ github.repository_owner }}/$IMAGE:${{ github.ref.replace('refs/tags/v', '') }} ghcr.io/${{ github.repository_owner }}/$IMAGE:latest
+            docker push ghcr.io/${{ github.repository_owner }}/$IMAGE:latest
+          done
