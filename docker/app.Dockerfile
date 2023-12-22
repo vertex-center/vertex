@@ -22,6 +22,7 @@ FROM scratch AS run-stage
 WORKDIR /
 
 COPY --from=build-stage /app /app
+COPY --from=build-stage /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 EXPOSE 8080
 
