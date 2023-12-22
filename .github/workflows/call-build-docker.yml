@@ -26,7 +26,7 @@ jobs:
             APP_KIND=${{ matrix.app-kind }}
           tags: ${{ github.repository }}:latest
 
-  build-docker-compose:
+  build-docker-microservices:
     name: Build Docker microservices
     runs-on: ubuntu-latest
     strategy:

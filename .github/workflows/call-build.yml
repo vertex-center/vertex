@@ -3,7 +3,7 @@ name: Build
 on: [workflow_call, workflow_dispatch]
 
 jobs:
-  build:
+  build-bundle:
     name: Build
     runs-on: ${{ matrix.os }}
     strategy:
@@ -51,3 +51,38 @@ jobs:
         env:
           GOOS: ${{ matrix.GOOS }}
           GOARCH: ${{ matrix.GOARCH }}
+
+  build-microservices:
+    name: Build Microservices
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app-id:
+          - admin
+          - auth
+          - client
+          - containers
+          - logs
+          - monitoring
+          - reverseproxy
+          - serviceeditor
+          - sql
+          - tunnels
+        app-kind:
+          - main
+        include:
+          - app-id: admin
+            app-kind: kernel
+          - app-id: containers
+            app-kind: kernel
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.21'
+
+      - name: Build
+        run: |
+          go build -o vertex ./apps/${{ matrix.app-id }}/cmd/${{ matrix.app-kind }}
