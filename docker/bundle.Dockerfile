@@ -20,6 +20,6 @@ WORKDIR /
 COPY --from=build-stage /app /app
 COPY --from=build-stage /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-EXPOSE 80 7500 7501 7502 7504 7505 7506 7508 7510 7512 7514 7516 7518
+EXPOSE 80 7500 7502 7504 7505 7506 7508 7510 7512 7514 7516 7518
 
 ENTRYPOINT [ "/app" ]

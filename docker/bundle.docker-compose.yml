@@ -19,7 +19,6 @@ services:
       - "7518:7518"
     environment:
       - VERTEX_ADMIN_ADDR=http://vertex:7500/api
-      - VERTEX_ADMIN_KERNEL_ADDR=http://vertex-kernel:7501/api
       - VERTEX_AUTH_ADDR=http://vertex:7502/api
       - VERTEX_CONTAINERS_ADDR=http://vertex:7504/api
       - VERTEX_CONTAINERS_KERNEL_ADDR=http://vertex-kernel:7505/api

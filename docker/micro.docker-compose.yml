@@ -11,14 +11,6 @@ services:
     environment:
       - VERTEX_LOGS_ADDR=http://logs:8080/api
       - VERTEX_AUTH_ADDR=http://auth:8080/api
-      - VERTEX_ADMIN_KERNEL_ADDR=http://admin-kernel:8080/api
-
-  admin-kernel:
-    image: ghcr.io/vertex-center/vertex-admin-kernel:main
-    networks:
-      - internal
-    environment:
-      - VERTEX_LOGS_ADDR=http://logs:8080/api
 
   auth:
     image: ghcr.io/vertex-center/vertex-auth:main

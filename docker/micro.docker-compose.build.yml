@@ -8,14 +8,6 @@ services:
       args:
         - APP_ID=admin
 
-  admin-kernel:
-    build:
-      context: ..
-      dockerfile: docker/micro.Dockerfile
-      args:
-        - APP_ID=admin
-        - APP_KIND=kernel
-
   auth:
     build:
       context: ..
