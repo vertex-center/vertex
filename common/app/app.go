@@ -95,6 +95,9 @@ func RunStandalone(app Interface, about common.About, waitInternet bool) {
 	for _, m := range meta.Dependencies {
 		config.RegisterHost(m.ID, m.DefaultPort)
 	}
+	if meta.DefaultKernelPort != "" {
+		config.RegisterHost(meta.ID+"-kernel", meta.DefaultKernelPort)
+	}
 	config.ParseArgs(about)
 	config.Current.RegisterAPIAddr(meta.ID, config.Current.DefaultApiAddr(config.Current.Port))
 
