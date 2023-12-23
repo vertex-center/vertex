@@ -36,6 +36,8 @@ services:
       - internal
     environment:
       - VERTEX_LOGS_ADDR=http://vertex:7516/api
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
 networks:
   external:

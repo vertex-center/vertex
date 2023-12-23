@@ -67,6 +67,8 @@ services:
       - internal
     environment:
       - VERTEX_LOGS_ADDR=http://logs:8080/api
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
   monitoring:
     image: ghcr.io/vertex-center/vertex-monitoring:main
