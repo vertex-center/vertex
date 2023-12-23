@@ -1,6 +1,5 @@
 export type Update = {
     baseline: Baseline;
-    updating: boolean;
 };
 
 export type Baseline = {

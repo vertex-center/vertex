@@ -19,11 +19,6 @@ const getUpdate = async () => {
     return data;
 };
 
-const installUpdate = async () => {
-    const { data } = await server.post("/update");
-    return data;
-};
-
 const getDatabases = async () => {
     const { data } = await server.get<string>("/db/dbms");
     return data;
@@ -39,7 +34,6 @@ export const API = {
     getSettings,
     patchSettings,
     getUpdate,
-    installUpdate,
     getDatabases,
     migrateDatabase,
 };
