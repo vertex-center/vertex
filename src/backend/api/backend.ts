@@ -1,4 +1,3 @@
-import { About } from "../../models/about";
 import { vxTunnelsRoutes } from "./vxTunnels";
 import { vxMonitoringRoutes } from "./vxMonitoring";
 import { vxSqlRoutes } from "./vxSql";
@@ -10,14 +9,7 @@ import { createServer } from "../server";
 // @ts-ignore
 export const server = createServer(window.api_urls.vertex);
 
-const getAbout = async () => {
-    const { data } = await server.get<About>("/about");
-    return data;
-};
-
 export const api = {
-    about: getAbout,
-
     vxTunnels: vxTunnelsRoutes,
     vxMonitoring: vxMonitoringRoutes,
     vxSql: vxSqlRoutes,

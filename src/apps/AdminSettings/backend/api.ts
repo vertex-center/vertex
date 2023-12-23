@@ -1,8 +1,13 @@
-import { Update } from "./models";
+import { About, Update } from "./models";
 import { createServer } from "../../../backend/server";
 
 // @ts-ignore
 const server = createServer(window.api_urls.admin);
+
+const getAbout = async () => {
+    const { data } = await server.get<About>("/about");
+    return data;
+};
 
 const getSettings = async () => {
     const { data } = await server.get<Settings>("/settings");
@@ -31,6 +36,7 @@ const migrateDatabase = async (dbms: string) => {
 };
 
 export const API = {
+    getAbout,
     getSettings,
     patchSettings,
     getUpdate,

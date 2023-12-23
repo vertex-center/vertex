@@ -1,4 +1,3 @@
-import { api } from "../../../backend/api/backend";
 import {
     KeyValueGroup,
     KeyValueInfo,
@@ -8,6 +7,7 @@ import { ProgressOverlay } from "../../../components/Progress/Progress";
 import { useQuery } from "@tanstack/react-query";
 import { Title } from "@vertex-center/components";
 import Content from "../../../components/Content/Content";
+import { API } from "../backend/api";
 
 export default function SettingsAbout() {
     const {
@@ -16,7 +16,7 @@ export default function SettingsAbout() {
         error,
     } = useQuery({
         queryKey: ["about"],
-        queryFn: api.about,
+        queryFn: API.getAbout,
     });
 
     return (
