@@ -7,13 +7,11 @@ import (
 	"github.com/vertex-center/vertex/apps/admin/database"
 	"github.com/vertex-center/vertex/apps/admin/handler"
 	"github.com/vertex-center/vertex/apps/admin/meta"
-	"github.com/vertex-center/vertex/apps/admin/updates"
 	authmiddleware "github.com/vertex-center/vertex/apps/auth/middleware"
 	"github.com/vertex-center/vertex/common/app"
 	"github.com/vertex-center/vertex/common/app/appmeta"
 	"github.com/vertex-center/vertex/common/middleware"
 	"github.com/vertex-center/vertex/common/storage"
-	"github.com/vertex-center/vertex/common/updater"
 	"github.com/wI2L/fizz"
 )
 
@@ -33,12 +31,6 @@ func NewApp() *App {
 
 func (a *App) Load(ctx *app.Context) {
 	a.ctx = ctx
-
-	if !ctx.Kernel() {
-		updateService = service.NewUpdateService(a.ctx, []updater.Updater{
-			updates.NewVertexUpdater(a.ctx.About()),
-		})
-	}
 }
 
 func (a *App) Meta() appmeta.Meta {
@@ -61,6 +53,7 @@ func (a *App) Initialize() error {
 
 	checksService = service.NewChecksService()
 	settingsService = service.NewSettingsService(settingsAdapter)
+	updateService = service.NewUpdateService(a.ctx)
 	_ = service.NewNotificationsService(a.ctx, settingsAdapter)
 
 	return nil
@@ -93,12 +86,6 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 		fizz.ID("getUpdate"),
 		fizz.Summary("Get the latest update information"),
 	}, updateHandler.Get())
-
-	update.POST("", []fizz.OperationOption{
-		fizz.ID("installUpdate"),
-		fizz.Summary("Install the latest version"),
-		fizz.Description("This endpoint will install the latest version of Vertex."),
-	}, updateHandler.Install())
 
 	checks.GET("", []fizz.OperationOption{
 		fizz.ID("check"),

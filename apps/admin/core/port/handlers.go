@@ -21,6 +21,5 @@ type (
 
 	UpdateHandler interface {
 		Get() gin.HandlerFunc
-		Install() gin.HandlerFunc
 	}
 )

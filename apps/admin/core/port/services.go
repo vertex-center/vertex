@@ -28,6 +28,5 @@ type (
 
 	UpdateService interface {
 		GetUpdate(channel baseline.Channel) (*types.Update, error)
-		InstallLatest(channel baseline.Channel) error
 	}
 )

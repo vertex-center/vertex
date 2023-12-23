@@ -32,13 +32,3 @@ func (h *updateHandler) Get() gin.HandlerFunc {
 		return update, nil
 	})
 }
-
-func (h *updateHandler) Install() gin.HandlerFunc {
-	return router.Handler(func(ctx *gin.Context) error {
-		channel, err := h.settingsService.GetChannel()
-		if err != nil {
-			return err
-		}
-		return h.updateService.InstallLatest(channel)
-	})
-}
