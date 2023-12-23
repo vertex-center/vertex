@@ -1,0 +1,88 @@
+version: "3.8"
+
+services:
+  admin:
+    build:
+      context: ..
+      dockerfile: docker/micro.Dockerfile
+      args:
+        - APP_ID=admin
+
+  admin-kernel:
+    build:
+      context: ..
+      dockerfile: docker/micro.Dockerfile
+      args:
+        - APP_ID=admin
+        - APP_KIND=kernel
+
+  auth:
+    build:
+      context: ..
+      dockerfile: docker/micro.Dockerfile
+      args:
+        - APP_ID=auth
+
+  client:
+    build:
+      context: ..
+      dockerfile: docker/micro.Dockerfile
+      args:
+        - APP_ID=client
+
+  containers:
+    build:
+      context: ..
+      dockerfile: docker/micro.Dockerfile
+      args:
+        - APP_ID=containers
+
+  containers-kernel:
+    build:
+      context: ..
+      dockerfile: docker/micro.Dockerfile
+      args:
+        - APP_ID=containers
+        - APP_KIND=kernel
+
+  monitoring:
+    build:
+      context: ..
+      dockerfile: docker/micro.Dockerfile
+      args:
+        - APP_ID=monitoring
+
+  reverseproxy:
+    build:
+      context: ..
+      dockerfile: docker/micro.Dockerfile
+      args:
+        - APP_ID=reverseproxy
+
+  serviceeditor:
+    build:
+      context: ..
+      dockerfile: docker/micro.Dockerfile
+      args:
+        - APP_ID=serviceeditor
+
+  sql:
+    build:
+      context: ..
+      dockerfile: docker/micro.Dockerfile
+      args:
+        - APP_ID=sql
+
+  tunnels:
+    build:
+      context: ..
+      dockerfile: docker/micro.Dockerfile
+      args:
+        - APP_ID=tunnels
+
+  logs:
+    build:
+      context: ..
+      dockerfile: docker/micro.Dockerfile
+      args:
+        - APP_ID=logs

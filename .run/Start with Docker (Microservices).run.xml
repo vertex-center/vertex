@@ -5,6 +5,11 @@
         <option name="composeProjectName" value="vertex" />
         <option name="envFilePath" value="" />
         <option name="commandLineOptions" value="--build" />
+        <option name="secondarySourceFiles">
+          <list>
+            <option value="docker/micro.docker-compose.build.yml" />
+          </list>
+        </option>
         <option name="sourceFilePath" value="docker/micro.docker-compose.yml" />
       </settings>
     </deployment>

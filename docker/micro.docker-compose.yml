@@ -2,12 +2,7 @@ version: "3.8"
 
 services:
   admin:
-    image: vertex-admin
-    build:
-      context: ..
-      dockerfile: docker/micro.Dockerfile
-      args:
-        - APP_ID=admin
+    image: ghcr.io/vertex-center/vertex-admin:main
     networks:
       - internal
       - external
@@ -19,25 +14,14 @@ services:
       - VERTEX_ADMIN_KERNEL_ADDR=http://admin-kernel:8080/api
 
   admin-kernel:
-    image: vertex-admin-kernel
-    build:
-      context: ..
-      dockerfile: docker/micro.Dockerfile
-      args:
-        - APP_ID=admin
-        - APP_KIND=kernel
+    image: ghcr.io/vertex-center/vertex-admin-kernel:main
     networks:
       - internal
     environment:
       - VERTEX_LOGS_ADDR=http://logs:8080/api
 
   auth:
-    image: vertex-auth
-    build:
-      context: ..
-      dockerfile: docker/micro.Dockerfile
-      args:
-        - APP_ID=auth
+    image: ghcr.io/vertex-center/vertex-auth:main
     networks:
       - internal
       - external
@@ -47,12 +31,7 @@ services:
       - VERTEX_LOGS_ADDR=http://logs:8080/api
 
   client:
-    image: vertex-client
-    build:
-      context: ..
-      dockerfile: docker/micro.Dockerfile
-      args:
-        - APP_ID=client
+    image: ghcr.io/vertex-center/vertex-client:main
     networks:
       - external
       - internal
@@ -71,12 +50,7 @@ services:
       - VERTEX_TUNNELS_ADDR=http://tunnels:8080/api
 
   containers:
-    image: vertex-containers
-    build:
-      context: ..
-      dockerfile: docker/micro.Dockerfile
-      args:
-        - APP_ID=containers
+    image: ghcr.io/vertex-center/vertex-containers:main
     networks:
       - internal
       - external
@@ -88,25 +62,14 @@ services:
       - VERTEX_CONTAINERS_KERNEL_ADDR=http://containers-kernel:8080/api
 
   containers-kernel:
-    image: vertex-containers-kernel
-    build:
-      context: ..
-      dockerfile: docker/micro.Dockerfile
-      args:
-        - APP_ID=containers
-        - APP_KIND=kernel
+    image: ghcr.io/vertex-center/vertex-containers-kernel:main
     networks:
       - internal
     environment:
       - VERTEX_LOGS_ADDR=http://logs:8080/api
 
   monitoring:
-    image: vertex-monitoring
-    build:
-      context: ..
-      dockerfile: docker/micro.Dockerfile
-      args:
-        - APP_ID=monitoring
+    image: ghcr.io/vertex-center/vertex-monitoring:main
     networks:
       - internal
       - external
@@ -118,12 +81,7 @@ services:
       - VERTEX_CONTAINERS_ADDR=http://containers:8080/api
 
   reverseproxy:
-    image: vertex-reverseproxy
-    build:
-      context: ..
-      dockerfile: docker/micro.Dockerfile
-      args:
-        - APP_ID=reverseproxy
+    image: ghcr.io/vertex-center/vertex-reverseproxy:main
     networks:
       - internal
       - external
@@ -134,12 +92,7 @@ services:
       - VERTEX_AUTH_ADDR=http://auth:8080/api
 
   serviceeditor:
-    image: vertex-serviceeditor
-    build:
-      context: ..
-      dockerfile: docker/micro.Dockerfile
-      args:
-        - APP_ID=serviceeditor
+    image: ghcr.io/vertex-center/vertex-serviceeditor:main
     networks:
       - internal
       - external
@@ -150,12 +103,7 @@ services:
       - VERTEX_AUTH_ADDR=http://auth:8080/api
 
   sql:
-    image: vertex-sql
-    build:
-      context: ..
-      dockerfile: docker/micro.Dockerfile
-      args:
-        - APP_ID=sql
+    image: ghcr.io/vertex-center/vertex-sql:main
     networks:
       - internal
       - external
@@ -167,12 +115,7 @@ services:
       - VERTEX_CONTAINERS_ADDR=http://containers:8080/api
 
   tunnels:
-    image: vertex-tunnels
-    build:
-      context: ..
-      dockerfile: docker/micro.Dockerfile
-      args:
-        - APP_ID=tunnels
+    image: ghcr.io/vertex-center/vertex-tunnels:main
     networks:
       - internal
       - external
@@ -184,12 +127,7 @@ services:
       - VERTEX_CONTAINERS_ADDR=http://containers:8080/api
 
   logs:
-    image: vertex-logs
-    build:
-      context: ..
-      dockerfile: docker/micro.Dockerfile
-      args:
-        - APP_ID=logs
+    image: ghcr.io/vertex-center/vertex-logs:main
     networks:
       - internal
 

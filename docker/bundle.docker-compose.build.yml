@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  vertex:
+    build:
+      context: ..
+      dockerfile: docker/bundle.Dockerfile
+      args:
+        - APP_KIND=main
+
+  vertex-kernel:
+    build:
+      context: ..
+      dockerfile: docker/bundle.Dockerfile
+      args:
+        - APP_KIND=kernel

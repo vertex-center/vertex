@@ -2,12 +2,7 @@ version: "3.8"
 
 services:
   vertex:
-    image: vertex-bundle
-    build:
-      context: ..
-      dockerfile: docker/bundle.Dockerfile
-      args:
-        - APP_KIND=main
+    image: ghcr.io/vertex-center/vertex-bundle:main
     networks:
       - internal
       - external
@@ -36,12 +31,7 @@ services:
       - VERTEX_LOGS_ADDR=http://vertex:7516/api
 
   vertex-kernel:
-    image: vertex-kernel-bundle
-    build:
-      context: ..
-      dockerfile: docker/bundle.Dockerfile
-      args:
-        - APP_KIND=kernel
+    image: ghcr.io/vertex-center/vertex-bundle-kernel:main
     networks:
       - internal
     environment:
