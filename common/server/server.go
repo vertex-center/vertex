@@ -3,17 +3,20 @@ package server
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"net/url"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/loopfz/gadgeto/tonic"
 	"github.com/vertex-center/vertex/common"
 	"github.com/vertex-center/vertex/common/event"
 	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/pkg/net"
 	"github.com/vertex-center/vertex/pkg/router"
 	"github.com/vertex-center/vlog"
+	"github.com/wI2L/fizz"
 	"github.com/wI2L/fizz/openapi"
 )
 
@@ -33,17 +36,27 @@ func New(id string, info *openapi.Info, u *url.URL, ctx *common.VertexContext) *
 	cfg.AddAllowHeaders("X-Request-ID")
 	cfg.AddAllowHeaders("X-Correlation-ID")
 
+	r := router.New(info,
+		router.WithMiddleware(cors.New(cfg)),
+		router.WithMiddleware(requestID()),
+		router.WithMiddleware(correlationID()),
+		router.WithMiddleware(logger(u, id)),
+		router.WithMiddleware(gin.Recovery()),
+	)
+
+	r.GET("/api/about", []fizz.OperationOption{
+		fizz.ID("getAbout"),
+		fizz.Summary("Get server info"),
+	}, tonic.Handler(func(c *gin.Context) (*common.About, error) {
+		a := ctx.About()
+		return &a, nil
+	}, http.StatusOK))
+
 	return &Server{
-		id:  id,
-		url: u,
-		ctx: ctx,
-		Router: router.New(info,
-			router.WithMiddleware(cors.New(cfg)),
-			router.WithMiddleware(requestID()),
-			router.WithMiddleware(correlationID()),
-			router.WithMiddleware(logger(u, id)),
-			router.WithMiddleware(gin.Recovery()),
-		),
+		id:     id,
+		url:    u,
+		ctx:    ctx,
+		Router: r,
 	}
 }
 
