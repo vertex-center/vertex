@@ -14,16 +14,6 @@ type (
 		MigrateTo() gin.HandlerFunc
 	}
 
-	HardwareHandler interface {
-		GetHost() gin.HandlerFunc
-		GetCPUs() gin.HandlerFunc
-		Reboot() gin.HandlerFunc
-	}
-
-	HardwareKernelHandler interface {
-		Reboot() gin.HandlerFunc
-	}
-
 	SettingsHandler interface {
 		Get() gin.HandlerFunc
 		Patch() gin.HandlerFunc

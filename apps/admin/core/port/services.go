@@ -18,16 +18,6 @@ type (
 		MigrateTo(dbms string) error
 	}
 
-	HardwareService interface {
-		GetHost() (types.Host, error)
-		GetCPUs() ([]types.CPU, error)
-		Reboot(ctx context.Context) error
-	}
-
-	HardwareKernelService interface {
-		Reboot() error
-	}
-
 	SettingsService interface {
 		Get() (types.AdminSettings, error)
 		Update(settings types.AdminSettings) error

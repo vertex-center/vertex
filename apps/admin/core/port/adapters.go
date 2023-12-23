@@ -9,14 +9,6 @@ import (
 )
 
 type (
-	HardwareAdapter interface {
-		Reboot(ctx context.Context) error
-	}
-
-	HardwareKernelAdapter interface {
-		Reboot() error
-	}
-
 	SettingsAdapter interface {
 		Get() (types.AdminSettings, error)
 		SetChannel(channel baseline.Channel) error

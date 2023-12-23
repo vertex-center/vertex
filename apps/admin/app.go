@@ -21,11 +21,9 @@ var (
 	updateService   port.UpdateService
 	checksService   port.ChecksService
 	settingsService port.SettingsService
-	hardwareService port.HardwareService
 	sshService      port.SshService
 
-	hardwareKernelService port.HardwareKernelService
-	sshKernelService      port.SshKernelService
+	sshKernelService port.SshKernelService
 )
 
 type App struct {
@@ -62,13 +60,11 @@ func (a *App) Initialize() error {
 
 	var (
 		settingsAdapter = adapter.NewSettingsDbAdapter(db)
-		hardwareAdapter = adapter.NewHardwareApiAdapter()
 		sshAdapter      = adapter.NewSshKernelApiAdapter()
 	)
 
 	checksService = service.NewChecksService()
 	settingsService = service.NewSettingsService(settingsAdapter)
-	hardwareService = service.NewHardwareService(hardwareAdapter)
 	sshService = service.NewSshService(sshAdapter)
 	_ = service.NewNotificationsService(a.ctx, settingsAdapter)
 
@@ -79,36 +75,16 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	r.Use(authmiddleware.ReadAuth)
 
 	var (
-		hardwareHandler = handler.NewHardwareHandler(hardwareService)
 		sshHandler      = handler.NewSshHandler(sshService)
 		settingsHandler = handler.NewSettingsHandler(settingsService)
 		updateHandler   = handler.NewUpdateHandler(updateService, settingsService)
 		checksHandler   = handler.NewChecksHandler(checksService)
 
-		hardware = r.Group("/hardware", "Hardware", "", authmiddleware.Authenticated)
 		ssh      = r.Group("/ssh", "SSH", "", authmiddleware.Authenticated)
 		settings = r.Group("/settings", "Settings", "", authmiddleware.Authenticated)
 		update   = r.Group("/update", "Update", "", authmiddleware.Authenticated)
 		checks   = r.Group("/admin/checks", "Checks", "", authmiddleware.Authenticated)
 	)
-
-	hardware.GET("/host", []fizz.OperationOption{
-		fizz.ID("getHost"),
-		fizz.Summary("Get host"),
-		fizz.Description("Get host information."),
-	}, hardwareHandler.GetHost())
-
-	hardware.GET("/cpus", []fizz.OperationOption{
-		fizz.ID("getCPUs"),
-		fizz.Summary("Get CPUs"),
-		fizz.Description("Get CPUs information."),
-	}, hardwareHandler.GetCPUs())
-
-	hardware.POST("/reboot", []fizz.OperationOption{
-		fizz.ID("reboot"),
-		fizz.Summary("Reboot"),
-		fizz.Description("Reboot the host."),
-	}, hardwareHandler.Reboot())
 
 	ssh.GET("", []fizz.OperationOption{
 		fizz.ID("getSSHKeys"),
@@ -161,31 +137,16 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 }
 
 func (a *App) InitializeKernel() error {
-	var (
-		hardwareAdapter = adapter.NewHardwareKernelAdapter()
-		sshAdapter      = adapter.NewSshFsAdapter()
-	)
-
-	hardwareKernelService = service.NewHardwareKernelService(hardwareAdapter)
+	sshAdapter := adapter.NewSshFsAdapter()
 	sshKernelService = service.NewSshKernelService(sshAdapter)
-
 	return nil
 }
 
 func (a *App) InitializeKernelRouter(r *fizz.RouterGroup) error {
 	var (
-		hardwareHandler = handler.NewHardwareKernelHandler(hardwareKernelService)
-		sshHandler      = handler.NewSshKernelHandler(sshKernelService)
-
-		hardware = r.Group("/hardware", "Hardware", "")
-		ssh      = r.Group("/ssh", "SSH", "")
+		sshHandler = handler.NewSshKernelHandler(sshKernelService)
+		ssh        = r.Group("/ssh", "SSH", "")
 	)
-
-	hardware.POST("/reboot", []fizz.OperationOption{
-		fizz.ID("reboot"),
-		fizz.Summary("Reboot"),
-		fizz.Description("Reboot the host."),
-	}, hardwareHandler.Reboot())
 
 	ssh.GET("", []fizz.OperationOption{
 		fizz.ID("getSSHKeys"),
