@@ -215,6 +215,7 @@ jobs:
           context: .
           file: docker/bundle.Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
+          platforms: linux/amd64,linux/arm64,linux/arm
           no-cache: true
           build-args: |
             APP_KIND=${{ matrix.app-kind }}
@@ -273,6 +274,7 @@ jobs:
           context: .
           file: docker/micro.Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
+          platforms: linux/amd64,linux/arm64,linux/arm
           no-cache: true
           build-args: |
             APP_ID=${{ matrix.app-id }}
