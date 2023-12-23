@@ -2,6 +2,7 @@
   <configuration default="false" name="Start with Docker (Bundle)" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
     <deployment type="docker-compose.yml">
       <settings>
+        <option name="composeProjectName" value="vertex" />
         <option name="envFilePath" value="" />
         <option name="commandLineOptions" value="--build" />
         <option name="sourceFilePath" value="docker/bundle.docker-compose.yml" />
