@@ -1,18 +1,8 @@
-import { CPU, Host, SSHKey, Update } from "./models";
+import { SSHKey, Update } from "./models";
 import { createServer } from "../../../backend/server";
 
 // @ts-ignore
 const server = createServer(window.api_urls.admin);
-
-const getHost = async () => {
-    const { data } = await server.get<Host>("/hardware/host");
-    return data;
-};
-
-const getCPUs = async () => {
-    const { data } = await server.get<CPU[]>("/hardware/cpus");
-    return data;
-};
 
 const getSSHKeys = async () => {
     const { data } = await server.get<SSHKey[]>("/ssh");
@@ -75,14 +65,7 @@ const migrateDatabase = async (dbms: string) => {
     return data;
 };
 
-const reboot = async () => {
-    const { data } = await server.post("/hardware/reboot");
-    return data;
-};
-
 export const API = {
-    getHost,
-    getCPUs,
     getSSHKeys,
     addSSHKey,
     deleteSSHKey,
@@ -93,5 +76,4 @@ export const API = {
     installUpdate,
     getDatabases,
     migrateDatabase,
-    reboot,
 };
