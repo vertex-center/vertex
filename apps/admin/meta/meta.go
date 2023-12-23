@@ -7,12 +7,11 @@ import (
 )
 
 var Meta = appmeta.Meta{
-	ID:                "admin",
-	Name:              "Vertex Admin",
-	Description:       "Administer Vertex",
-	Icon:              "admin_panel_settings",
-	DefaultPort:       "7500",
-	DefaultKernelPort: "7501",
+	ID:          "admin",
+	Name:        "Vertex Admin",
+	Description: "Administer Vertex",
+	Icon:        "admin_panel_settings",
+	DefaultPort: "7500",
 	Dependencies: []*appmeta.Meta{
 		&authmeta.Meta,
 		&logsmeta.Meta,

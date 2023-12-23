@@ -19,20 +19,6 @@ type (
 		Patch() gin.HandlerFunc
 	}
 
-	SshHandler interface {
-		Get() gin.HandlerFunc
-		Add() gin.HandlerFunc
-		Delete() gin.HandlerFunc
-		GetUsers() gin.HandlerFunc
-	}
-
-	SshKernelHandler interface {
-		Get() gin.HandlerFunc
-		Add() gin.HandlerFunc
-		Delete() gin.HandlerFunc
-		GetUsers() gin.HandlerFunc
-	}
-
 	UpdateHandler interface {
 		Get() gin.HandlerFunc
 		Install() gin.HandlerFunc

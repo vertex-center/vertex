@@ -4,7 +4,7 @@
 
 | App                   | Port | Kernel Port |
 |-----------------------|------|-------------|
-| Vertex Admin          | 7500 | 7501        |
+| Vertex Admin          | 7500 |             |
 | Vertex Auth           | 7502 |             |
 | Vertex Containers     | 7504 | 7505        |
 | Vertex Monitoring     | 7506 |             |

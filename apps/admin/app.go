@@ -21,9 +21,6 @@ var (
 	updateService   port.UpdateService
 	checksService   port.ChecksService
 	settingsService port.SettingsService
-	sshService      port.SshService
-
-	sshKernelService port.SshKernelService
 )
 
 type App struct {
@@ -60,12 +57,10 @@ func (a *App) Initialize() error {
 
 	var (
 		settingsAdapter = adapter.NewSettingsDbAdapter(db)
-		sshAdapter      = adapter.NewSshKernelApiAdapter()
 	)
 
 	checksService = service.NewChecksService()
 	settingsService = service.NewSettingsService(settingsAdapter)
-	sshService = service.NewSshService(sshAdapter)
 	_ = service.NewNotificationsService(a.ctx, settingsAdapter)
 
 	return nil
@@ -75,36 +70,14 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	r.Use(authmiddleware.ReadAuth)
 
 	var (
-		sshHandler      = handler.NewSshHandler(sshService)
 		settingsHandler = handler.NewSettingsHandler(settingsService)
 		updateHandler   = handler.NewUpdateHandler(updateService, settingsService)
 		checksHandler   = handler.NewChecksHandler(checksService)
 
-		ssh      = r.Group("/ssh", "SSH", "", authmiddleware.Authenticated)
 		settings = r.Group("/settings", "Settings", "", authmiddleware.Authenticated)
 		update   = r.Group("/update", "Update", "", authmiddleware.Authenticated)
 		checks   = r.Group("/admin/checks", "Checks", "", authmiddleware.Authenticated)
 	)
-
-	ssh.GET("", []fizz.OperationOption{
-		fizz.ID("getSSHKeys"),
-		fizz.Summary("Get all SSH keys"),
-	}, sshHandler.Get())
-
-	ssh.POST("", []fizz.OperationOption{
-		fizz.ID("addSSHKey"),
-		fizz.Summary("Add an SSH key"),
-	}, sshHandler.Add())
-
-	ssh.DELETE("", []fizz.OperationOption{
-		fizz.ID("deleteSSHKey"),
-		fizz.Summary("Delete SSH key"),
-	}, sshHandler.Delete())
-
-	ssh.GET("/users", []fizz.OperationOption{
-		fizz.ID("getSSHUsers"),
-		fizz.Summary("Get all users that can have SSH keys"),
-	}, sshHandler.GetUsers())
 
 	settings.GET("", []fizz.OperationOption{
 		fizz.ID("getSettings"),
@@ -132,41 +105,6 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 		fizz.Summary("Get all checks"),
 		fizz.Description("Check that all vertex requirements are met."),
 	}, middleware.SSE, checksHandler.Check())
-
-	return nil
-}
-
-func (a *App) InitializeKernel() error {
-	sshAdapter := adapter.NewSshFsAdapter()
-	sshKernelService = service.NewSshKernelService(sshAdapter)
-	return nil
-}
-
-func (a *App) InitializeKernelRouter(r *fizz.RouterGroup) error {
-	var (
-		sshHandler = handler.NewSshKernelHandler(sshKernelService)
-		ssh        = r.Group("/ssh", "SSH", "")
-	)
-
-	ssh.GET("", []fizz.OperationOption{
-		fizz.ID("getSSHKeys"),
-		fizz.Summary("Get all SSH keys"),
-	}, sshHandler.Get())
-
-	ssh.POST("", []fizz.OperationOption{
-		fizz.ID("addSSHKey"),
-		fizz.Summary("Add an SSH key to the authorized_keys file"),
-	}, sshHandler.Add())
-
-	ssh.DELETE("", []fizz.OperationOption{
-		fizz.ID("deleteSSHKey"),
-		fizz.Summary("Delete an SSH key from the authorized_keys file"),
-	}, sshHandler.Delete())
-
-	ssh.GET("/users", []fizz.OperationOption{
-		fizz.ID("getSSHUsers"),
-		fizz.Summary("Get all users that can have SSH keys"),
-	}, sshHandler.GetUsers())
 
 	return nil
 }

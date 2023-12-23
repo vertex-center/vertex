@@ -5,7 +5,6 @@ import (
 
 	"github.com/vertex-center/vertex/apps/admin/core/types"
 	"github.com/vertex-center/vertex/common/baseline"
-	"github.com/vertex-center/vertex/pkg/user"
 )
 
 type (
@@ -25,20 +24,6 @@ type (
 		SetWebhook(webhook string) error
 		GetChannel() (baseline.Channel, error)
 		SetChannel(channel baseline.Channel) error
-	}
-
-	SshService interface {
-		GetAll(ctx context.Context) ([]types.PublicKey, error)
-		Add(ctx context.Context, key string, username string) error
-		Delete(ctx context.Context, fingerprint string, username string) error
-		GetUsers(ctx context.Context) ([]string, error)
-	}
-
-	SshKernelService interface {
-		GetAll() ([]types.PublicKey, error)
-		Add(key string, username string) error
-		Delete(fingerprint string, username string) error
-		GetUsers() ([]user.User, error)
 	}
 
 	UpdateService interface {
