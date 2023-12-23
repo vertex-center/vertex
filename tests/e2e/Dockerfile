@@ -10,7 +10,7 @@ COPY . ./
 RUN go build -buildvcs=false -o /vertex ./cmd/main
 RUN go build -buildvcs=false -o /vertex-kernel ./cmd/kernel
 
-FROM alpine AS run-stage
+FROM alpine:3.19 AS run-stage
 
 RUN apk add --no-cache git sudo
 RUN addgroup -g 1000 nexa && \
