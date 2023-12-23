@@ -27,8 +27,6 @@ import ReverseProxyApp from "./apps/ReverseProxy/ReverseProxyApp/ReverseProxyApp
 import SettingsNotifications from "./apps/AdminSettings/SettingsNotifications/SettingsNotifications";
 import Header from "./components/Header/Header";
 import ContainerDetailsDatabase from "./apps/Containers/pages/ContainerDatabase/ContainerDetailsDatabase";
-import SettingsHardware from "./apps/AdminSettings/SettingsHardware/SettingsHardware";
-import SettingsSecurity from "./apps/AdminSettings/SettingsSecurity/SettingsSecurity";
 import MonitoringApp from "./apps/Monitoring/MonitoringApp/MonitoringApp";
 import Prometheus from "./apps/Monitoring/Prometheus/Prometheus";
 import Grafana from "./apps/Monitoring/Grafana/Grafana";
@@ -211,16 +209,8 @@ function AllRoutes() {
                                 element={<SettingsNotifications />}
                             />
                             <Route
-                                path="/app/admin/hardware"
-                                element={<SettingsHardware />}
-                            />
-                            <Route
                                 path="/app/admin/database"
                                 element={<SettingsDb />}
-                            />
-                            <Route
-                                path="/app/admin/security"
-                                element={<SettingsSecurity />}
                             />
                             <Route
                                 path="/app/admin/updates"

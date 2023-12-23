@@ -22,21 +22,6 @@ export default function SettingsApp() {
                     link={l("/app/admin/notifications")}
                 />
                 <Sidebar.Item
-                    label="Hardware"
-                    icon={<MaterialIcon icon="hard_drive" />}
-                    link={l("/app/admin/hardware")}
-                />
-                {/*<Sidebar.Item*/}
-                {/*    label="Database"*/}
-                {/*    icon={<MaterialIcon icon="database" />}*/}
-                {/*    link={l("/app/admin/database")}*/}
-                {/*/>*/}
-                <Sidebar.Item
-                    label="Security"
-                    icon={<MaterialIcon icon="key" />}
-                    link={l("/app/admin/security")}
-                />
-                <Sidebar.Item
                     label="Updates"
                     icon={<MaterialIcon icon="update" />}
                     link={l("/app/admin/updates")}
