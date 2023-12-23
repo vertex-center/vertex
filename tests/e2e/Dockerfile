@@ -12,7 +12,7 @@ RUN go build -buildvcs=false -o /vertex-kernel ./cmd/kernel
 
 FROM alpine AS run-stage
 
-RUN apk add git sudo
+RUN apk add --no-cache git sudo
 RUN addgroup -g 1000 nexa && \
     adduser -u 1000 -G nexa -s /bin/sh -D nexa && \
     echo "nexa ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
