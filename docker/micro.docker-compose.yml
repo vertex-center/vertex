@@ -11,6 +11,21 @@ services:
     environment:
       - VERTEX_LOGS_ADDR=http://logs:8080/api
       - VERTEX_AUTH_ADDR=http://auth:8080/api
+      - VERTEX_DB_HOST=admin-postgres
+      - VERTEX_DB_PORT=5432
+      - VERTEX_DB_USER=postgres
+      - VERTEX_DB_PASS=vx-pg-pass
+
+  admin-postgres:
+    image: postgres:16.1-alpine3.19
+    networks:
+      - internal
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=vx-pg-pass
+      - POSTGRES_DB=admin
+    volumes:
+      - admin_postgres:/var/lib/postgresql/data
 
   auth:
     image: ghcr.io/vertex-center/vertex-auth:main
@@ -21,6 +36,21 @@ services:
       - "7502:8080"
     environment:
       - VERTEX_LOGS_ADDR=http://logs:8080/api
+      - VERTEX_DB_HOST=auth-postgres
+      - VERTEX_DB_PORT=5432
+      - VERTEX_DB_USER=postgres
+      - VERTEX_DB_PASS=vx-pg-pass
+
+  auth-postgres:
+    image: postgres:16.1-alpine3.19
+    networks:
+      - internal
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=vx-pg-pass
+      - POSTGRES_DB=auth
+    volumes:
+      - auth_postgres:/var/lib/postgresql/data
 
   client:
     image: ghcr.io/vertex-center/vertex-client:main
@@ -52,6 +82,21 @@ services:
       - VERTEX_LOGS_ADDR=http://logs:8080/api
       - VERTEX_AUTH_ADDR=http://auth:8080/api
       - VERTEX_CONTAINERS_KERNEL_ADDR=http://containers-kernel:8080/api
+      - VERTEX_DB_HOST=containers-postgres
+      - VERTEX_DB_PORT=5432
+      - VERTEX_DB_USER=postgres
+      - VERTEX_DB_PASS=vx-pg-pass
+
+  containers-postgres:
+    image: postgres:16.1-alpine3.19
+    networks:
+      - internal
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=vx-pg-pass
+      - POSTGRES_DB=containers
+    volumes:
+      - containers_postgres:/var/lib/postgresql/data
 
   containers-kernel:
     image: ghcr.io/vertex-center/vertex-containers-kernel:main
@@ -128,3 +173,8 @@ services:
 networks:
   external:
   internal:
+
+volumes:
+  admin_postgres:
+  auth_postgres:
+  containers_postgres:
