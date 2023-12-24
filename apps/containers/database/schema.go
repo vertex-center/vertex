@@ -62,8 +62,7 @@ func GetSchema(driver vsql.Driver) string {
 		vsql.CreateTable("tags").
 			WithField("id", "VARCHAR(36)", "NOT NULL", "PRIMARY KEY").
 			WithField("user_id", "VARCHAR(36)", "NOT NULL").
-			WithField("name", "VARCHAR(255)", "NOT NULL").
-			WithForeignKey("user_id", "users", "id"),
+			WithField("name", "VARCHAR(255)", "NOT NULL"),
 
 		vsql.CreateTable("container_tags").
 			WithField("container_id", "VARCHAR(36)", "NOT NULL").
