@@ -7,6 +7,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/vertex-center/vertex/common/log"
+	"github.com/vertex-center/vertex/config"
 	"github.com/vertex-center/vertex/pkg/vsql"
 	"github.com/vertex-center/vlog"
 	_ "modernc.org/sqlite"
@@ -29,6 +30,19 @@ type DBParams struct {
 }
 
 func NewDB(params DBParams) (DB, error) {
+	host, port, user, pass := config.Current.DB()
+	if params.Host == "" {
+		params.Host = host
+	}
+	if params.Port == "" {
+		params.Port = port
+	}
+	if params.User == "" {
+		params.User = user
+	}
+	if params.Pass == "" {
+		params.Pass = pass
+	}
 	if params.Name == "" {
 		params.Name = "default"
 	}
