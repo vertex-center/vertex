@@ -104,6 +104,24 @@ func (s *containerService) CreateContainer(ctx context.Context, serviceID string
 		}
 	}
 
+	c := types.Container{
+		ID:              id,
+		ServiceID:       serviceID,
+		Image:           *service.Methods.Docker.Image,
+		ImageTag:        "latest",
+		Status:          types.ContainerStatusOff,
+		LaunchOnStartup: true,
+		Name:            service.Name,
+		Description:     &service.Description,
+		Color:           service.Color,
+		Icon:            service.Icon,
+		Command:         service.Methods.Docker.Cmd,
+	}
+	err = s.containers.CreateContainer(ctx, c)
+	if err != nil {
+		return nil, err
+	}
+
 	// Set default env
 	for _, e := range service.Env {
 		err = s.vars.CreateVariable(ctx, types.EnvVariable{
@@ -179,24 +197,6 @@ func (s *containerService) CreateContainer(ctx context.Context, serviceID string
 				return nil, err
 			}
 		}
-	}
-
-	c := types.Container{
-		ID:              id,
-		ServiceID:       serviceID,
-		Image:           *service.Methods.Docker.Image,
-		ImageTag:        "latest",
-		Status:          types.ContainerStatusOff,
-		LaunchOnStartup: true,
-		Name:            service.Name,
-		Description:     &service.Description,
-		Color:           service.Color,
-		Icon:            service.Icon,
-		Command:         service.Methods.Docker.Cmd,
-	}
-	err = s.containers.CreateContainer(ctx, c)
-	if err != nil {
-		return nil, err
 	}
 
 	err = s.logs.Register(id)
