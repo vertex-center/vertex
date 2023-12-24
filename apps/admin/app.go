@@ -12,6 +12,7 @@ import (
 	"github.com/vertex-center/vertex/common/app/appmeta"
 	"github.com/vertex-center/vertex/common/middleware"
 	"github.com/vertex-center/vertex/common/storage"
+	"github.com/vertex-center/vertex/config"
 	"github.com/wI2L/fizz"
 )
 
@@ -38,7 +39,12 @@ func (a *App) Meta() appmeta.Meta {
 }
 
 func (a *App) Initialize() error {
+	dbHost, dbPort, dbUser, dbPass := config.Current.DB()
 	db, err := storage.NewDB(storage.DBParams{
+		Host:       dbHost,
+		Port:       dbPort,
+		User:       dbUser,
+		Pass:       dbPass,
 		Name:       meta.Meta.ID,
 		SchemaFunc: database.GetSchema,
 		Migrations: database.Migrations,
