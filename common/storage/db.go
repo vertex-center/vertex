@@ -90,7 +90,7 @@ func (db *DB) ConnectTo(driver string, dataSource string, retries int) error {
 				return err
 			}
 			println("failed to connect to the database, retrying...")
-			<-time.After(1 * time.Second)
+			<-time.After(3 * time.Second)
 		} else {
 			db.DB = conn
 			println("connected to the database after some retries")
