@@ -39,7 +39,7 @@ func (a *App) Meta() appmeta.Meta {
 
 func (a *App) Initialize() error {
 	db, err := storage.NewDB(storage.DBParams{
-		ID:         meta.Meta.ID,
+		Name:       meta.Meta.ID,
 		SchemaFunc: database.GetSchema,
 		Migrations: database.Migrations,
 	})
