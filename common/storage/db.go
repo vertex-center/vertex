@@ -2,6 +2,7 @@ package storage
 
 import (
 	"fmt"
+	"path"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -16,11 +17,11 @@ import (
 type DB struct {
 	*sqlx.DB
 
-	host, port, user, pass, name string
+	host, port, user, pass, driver, name string
 }
 
 type DBParams struct {
-	Host, Port, User, Pass, Name string
+	Host, Port, User, Pass, Driver, Name string
 
 	// SchemaFunc is a function that returns the database schema depending on the driver.
 	SchemaFunc func(driver vsql.Driver) string
@@ -30,7 +31,10 @@ type DBParams struct {
 }
 
 func NewDB(params DBParams) (DB, error) {
-	host, port, user, pass := config.Current.DB()
+	driver, host, port, user, pass := config.Current.DB()
+	if params.Driver == "" {
+		params.Driver = driver
+	}
 	if params.Host == "" {
 		params.Host = host
 	}
@@ -48,11 +52,12 @@ func NewDB(params DBParams) (DB, error) {
 	}
 
 	db := DB{
-		host: params.Host,
-		port: params.Port,
-		user: params.User,
-		pass: params.Pass,
-		name: params.Name,
+		driver: params.Driver,
+		host:   params.Host,
+		port:   params.Port,
+		user:   params.User,
+		pass:   params.Pass,
+		name:   params.Name,
 	}
 
 	err := db.Connect()
@@ -65,9 +70,16 @@ func NewDB(params DBParams) (DB, error) {
 }
 
 func (db *DB) Connect() error {
-	driver := "postgres"
-	source := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", db.host, db.port, db.user, db.pass, db.name)
-	return db.ConnectTo(driver, source, 10)
+	switch db.driver {
+	case "sqlite":
+		filename := fmt.Sprintf("%s.db", db.name)
+		p := path.Join(FSPath, filename)
+		return db.ConnectTo(db.driver, p, 1)
+	case "postgres":
+		source := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", db.host, db.port, db.user, db.pass, db.name)
+		return db.ConnectTo(db.driver, source, 10)
+	}
+	return fmt.Errorf("unknown database driver %s", db.driver)
 }
 
 func (db *DB) ConnectTo(driver string, dataSource string, retries int) error {

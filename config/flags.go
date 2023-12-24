@@ -39,6 +39,7 @@ func RegisterHost(id, defaultPort string) {
 func (c *Config) RegisterDBArgs() {
 	mu.Lock()
 	defer mu.Unlock()
+	fields["VERTEX_DB_DRIVER"] = kingpin.Flag("db-driver", "Database driver.").Envar("VERTEX_DB_DRIVER").Default("postgres").Enum("postgres", "sqlite")
 	fields["VERTEX_DB_HOST"] = kingpin.Flag("db-host", "Database host.").Envar("VERTEX_DB_HOST").Default("localhost").String()
 	fields["VERTEX_DB_PORT"] = kingpin.Flag("db-port", "Database port.").Envar("VERTEX_DB_PORT").Default("5432").String()
 	fields["VERTEX_DB_USER"] = kingpin.Flag("db-user", "Database user.").Envar("VERTEX_DB_USER").Default("postgres").String()

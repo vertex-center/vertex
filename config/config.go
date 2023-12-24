@@ -92,9 +92,10 @@ func (c *Config) Debug() bool {
 	return c.mode == DebugMode
 }
 
-func (c *Config) DB() (host, port, user, pass string) {
+func (c *Config) DB() (driver, host, port, user, pass string) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
+	driver = c.fields["VERTEX_DB_DRIVER"]
 	host = c.fields["VERTEX_DB_HOST"]
 	port = c.fields["VERTEX_DB_PORT"]
 	user = c.fields["VERTEX_DB_USER"]
