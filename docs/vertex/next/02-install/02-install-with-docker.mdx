@@ -8,71 +8,17 @@ import { Tabs, TabItem } from "@vertex-center/components";
 
 # Install with Docker
 
-<Tabs groupId="docker-methods">
+1. Create a `docker-compose.yml` file.
 
-<TabItem value="docker-cli" label="Docker CLI">
+2. Copy/paste one of these two `docker-compose.yml` file in your own file.
 
-1. Pull the official image
+    | Method            | `docker-compose.yml`                                                                                     | Description                                                                                                                                                                                     |
+    |-------------------|----------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    | **Bundle**        | [docker-compose.yml](https://github.com/vertex-center/vertex/blob/main/docker/bundle.docker-compose.yml) | Run Vertex with the all-in-one images. This is the lightest method and the easiest to start with.                                                                                               |
+    | **Microservices** | [docker-compose.yml](https://github.com/vertex-center/vertex/blob/main/docker/micro.docker-compose.yml)  | Run one container for each Vertex application. This is the most flexible method, that allows you to scale Vertex horizontally. Also, if an application crashes, the others will still be alive. |
 
-    ```bash
-    docker pull ghcr.io/vertex-center/vertex
-    ```
-
-2. Run the image
-
-    ```bash
-    docker run -d \
-        -p 6130:6130 \
-        -e USER_ID=$(id -u) \
-        -e GROUP_ID=$(id -g) \
-        -e HOST=localhost \
-        -e PORT=6130 \
-        -v /var/run/docker.sock:/var/run/docker.sock \
-        -v ~/.ssh:/root/.ssh \
-        -v path_to_live:/live \
-        -v path_to_live_kernel:/live_kernel \
-        -v path_to_live_docker:/live_docker \
-        ghcr.io/vertex-center/vertex
-    ```
-
-</TabItem>
-
-<TabItem value="docker-compose" label="Docker Compose">
-
-1. Create a `docker-compose.yml` file if you don't have one already.
-
-2. Add the following to the file:
-
-    ```yaml title="docker-compose.yml"
-    version: "3.8"
-
-    services:
-      vertex:
-        image: ghcr.io/vertex-center/vertex
-        restart: always
-        environment:
-          PORT: 6130
-          HOST: localhost
-        ports:
-          - "6130:6130"
-        volumes:
-          - /var/run/docker.sock:/var/run/docker.sock
-          - ~/.ssh:/root/.ssh
-          - path_to_live:/live
-          - path_to_live_kernel:/live_kernel
-          - path_to_live_docker:/live_docker
-    ```
-
-3. Run Docker Compose
+3. Start
 
     ```bash
     docker-compose up
     ```
-
-</TabItem>
-
-</Tabs>
-
-:::tip{About sudo}
-To learn more about permissions, read [Security > Vertex Kernel](../security/vertex-kernel).
-:::
