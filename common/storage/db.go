@@ -33,7 +33,13 @@ func NewDB(params DBParams) (DB, error) {
 		params.Name = "default"
 	}
 
-	db := DB{}
+	db := DB{
+		host: params.Host,
+		port: params.Port,
+		user: params.User,
+		pass: params.Pass,
+		name: params.Name,
+	}
 
 	err := db.Connect()
 	if err != nil {
