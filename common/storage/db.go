@@ -2,6 +2,7 @@ package storage
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"time"
 
@@ -72,8 +73,13 @@ func NewDB(params DBParams) (DB, error) {
 func (db *DB) Connect() error {
 	switch db.driver {
 	case "sqlite":
+		dir := path.Join(FSPath, "db")
+		err := os.MkdirAll(dir, 0755)
+		if err != nil {
+			return err
+		}
 		filename := fmt.Sprintf("%s.db", db.name)
-		p := path.Join(FSPath, filename)
+		p := path.Join(dir, filename)
 		return db.ConnectTo(db.driver, p, 1)
 	case "postgres":
 		source := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", db.host, db.port, db.user, db.pass, db.name)
