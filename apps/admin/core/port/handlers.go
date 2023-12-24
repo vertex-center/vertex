@@ -9,11 +9,6 @@ type (
 		Check() gin.HandlerFunc
 	}
 
-	DatabaseHandler interface {
-		GetCurrentDbms() gin.HandlerFunc
-		MigrateTo() gin.HandlerFunc
-	}
-
 	SettingsHandler interface {
 		Get() gin.HandlerFunc
 		Patch() gin.HandlerFunc

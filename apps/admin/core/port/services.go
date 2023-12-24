@@ -12,11 +12,6 @@ type (
 		CheckAll(ctx context.Context) <-chan types.CheckResponse
 	}
 
-	DatabaseService interface {
-		GetCurrentDbms() string
-		MigrateTo(dbms string) error
-	}
-
 	SettingsService interface {
 		Get() (types.AdminSettings, error)
 		Update(settings types.AdminSettings) error
