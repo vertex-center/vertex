@@ -29,6 +29,7 @@ func main() {
 		config.RegisterHost(meta.ID, meta.DefaultPort)
 		config.RegisterHost(meta.ID+"-kernel", meta.DefaultKernelPort)
 	}
+	config.Current.RegisterDBArgs()
 	config.RegisterHost("vertex", "6130")
 	config.ParseArgs(about)
 
