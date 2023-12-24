@@ -16,8 +16,9 @@ var (
 	host   = kingpin.Flag("host", "Host to listen on.").Envar("VERTEX_HOST").Default("127.0.0.1").String()
 	port   = kingpin.Flag("port", "Port to listen on.").Envar("VERTEX_PORT").Default("8080").String()
 
-	mu    sync.RWMutex
-	hosts = map[string]*string{}
+	mu     sync.RWMutex
+	hosts  = map[string]*string{}
+	fields = map[string]*string{}
 )
 
 // RegisterHost registers a host flag with the given id and default port.
@@ -33,6 +34,15 @@ func RegisterHost(id, defaultPort string) {
 		Default(Current.DefaultApiAddr(defaultPort)).
 		String()
 	Current.RegisterAPIAddr(id, defaultPort)
+}
+
+func (c *Config) RegisterDBArgs() {
+	mu.Lock()
+	defer mu.Unlock()
+	fields["VERTEX_DB_HOST"] = kingpin.Flag("db-host", "Database host.").Envar("VERTEX_DB_HOST").Default("localhost").String()
+	fields["VERTEX_DB_PORT"] = kingpin.Flag("db-port", "Database port.").Envar("VERTEX_DB_PORT").Default("5432").String()
+	fields["VERTEX_DB_USER"] = kingpin.Flag("db-user", "Database user.").Envar("VERTEX_DB_USER").Default("postgres").String()
+	fields["VERTEX_DB_PASS"] = kingpin.Flag("db-pass", "Database pass.").Envar("VERTEX_DB_PASS").Default("postgres").String()
 }
 
 func ParseArgs(about common.About) {
@@ -61,5 +71,12 @@ func ParseArgs(about common.About) {
 			continue
 		}
 		Current.SetAPIAddr(id, *val)
+	}
+
+	for id, val := range fields {
+		if val == nil {
+			continue
+		}
+		Current.fields[id] = *val
 	}
 }

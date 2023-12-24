@@ -23,15 +23,17 @@ type Config struct {
 	host string
 	mu   sync.RWMutex
 
-	Port  string
-	hosts map[string]string
+	Port   string
+	hosts  map[string]string
+	fields map[string]string
 }
 
 func New() *Config {
 	c := &Config{
-		mode:  ProductionMode,
-		host:  "127.0.0.1",
-		hosts: map[string]string{},
+		mode:   ProductionMode,
+		host:   "127.0.0.1",
+		hosts:  map[string]string{},
+		fields: map[string]string{},
 	}
 
 	if os.Getenv("DEBUG") == "1" {
@@ -88,4 +90,14 @@ func (c *Config) LocalIP() string {
 
 func (c *Config) Debug() bool {
 	return c.mode == DebugMode
+}
+
+func (c *Config) DB() (host, port, user, pass string) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	host = c.fields["VERTEX_DB_HOST"]
+	port = c.fields["VERTEX_DB_PORT"]
+	user = c.fields["VERTEX_DB_USER"]
+	pass = c.fields["VERTEX_DB_PASS"]
+	return
 }
