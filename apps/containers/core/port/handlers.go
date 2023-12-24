@@ -52,5 +52,7 @@ type (
 		InfoImage() gin.HandlerFunc
 		PullImage() gin.HandlerFunc
 		BuildImage() gin.HandlerFunc
+		CreateVolume() gin.HandlerFunc
+		DeleteVolume() gin.HandlerFunc
 	}
 )

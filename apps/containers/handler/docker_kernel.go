@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 	"github.com/gin-gonic/gin"
 	apierrors "github.com/juju/errors"
@@ -246,5 +247,26 @@ func (h *dockerKernelHandler) BuildImage() gin.HandlerFunc {
 		})
 
 		return nil
+	})
+}
+
+type CreateVolumeParams struct {
+	Name string `json:"name"`
+}
+
+func (h *dockerKernelHandler) CreateVolume() gin.HandlerFunc {
+	return router.Handler(func(ctx *gin.Context, params *CreateVolumeParams) (*volume.Volume, error) {
+		res, err := h.dockerService.CreateVolume(params.Name)
+		return &res, err
+	})
+}
+
+type DeleteVolumeParams struct {
+	Name string `json:"name"`
+}
+
+func (h *dockerKernelHandler) DeleteVolume() gin.HandlerFunc {
+	return router.Handler(func(ctx *gin.Context, params *DeleteVolumeParams) error {
+		return h.dockerService.DeleteVolume(params.Name)
 	})
 }

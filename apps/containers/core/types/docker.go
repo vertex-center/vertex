@@ -3,6 +3,7 @@ package types
 import (
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/go-connections/nat"
 )
 
@@ -24,6 +25,7 @@ type CreateContainerOptions struct {
 	ExposedPorts  nat.PortSet       `json:"exposed_ports,omitempty"`
 	PortBindings  nat.PortMap       `json:"port_bindings,omitempty"`
 	Binds         []string          `json:"binds,omitempty"`
+	Mounts        []mount.Mount     `json:"mounts,omitempty"`
 	Env           []string          `json:"env,omitempty"`
 	CapAdd        []string          `json:"cap_add,omitempty"`
 	Sysctls       map[string]string `json:"sysctls,omitempty"`

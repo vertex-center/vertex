@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/docker/docker/api/types/volume"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 )
 
@@ -136,6 +137,36 @@ func (c *KernelClient) GetContainerStderr(ctx context.Context, id string) (io.Re
 func (c *KernelClient) DeleteMounts(ctx context.Context, id string) error {
 	return c.Request().
 		Pathf("./docker/containers/%s/mounts", id).
+		Delete().
+		Fetch(ctx)
+}
+
+func (c *KernelClient) DeleteContainerVolumes(ctx context.Context, id string) error {
+	return c.Request().
+		Pathf("./docker/containers/%s/volumes", id).
+		Delete().
+		Fetch(ctx)
+}
+
+func (c *KernelClient) CreateVolume(ctx context.Context, name string) (volume.Volume, error) {
+	var res volume.Volume
+	err := c.Request().
+		Path("./docker/volumes").
+		BodyJSON(map[string]string{
+			"name": name,
+		}).
+		ToJSON(&res).
+		Post().
+		Fetch(ctx)
+	return res, err
+}
+
+func (c *KernelClient) DeleteVolume(ctx context.Context, name string) error {
+	return c.Request().
+		Path("./docker/volumes").
+		BodyJSON(map[string]string{
+			"name": name,
+		}).
 		Delete().
 		Fetch(ctx)
 }

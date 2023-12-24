@@ -6,8 +6,10 @@ import (
 
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/volume"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 )
 
@@ -145,6 +147,8 @@ func (suite *DockerKernelServiceTestSuite) TestBuildImage() {
 
 type MockDockerAdapter struct{ mock.Mock }
 
+var _ port.DockerAdapter = (*MockDockerAdapter)(nil)
+
 func (m *MockDockerAdapter) ListContainers() ([]types.DockerContainer, error) {
 	args := m.Called()
 	return args.Get(0).([]types.DockerContainer), args.Error(1)
@@ -203,4 +207,14 @@ func (m *MockDockerAdapter) PullImage(options types.PullImageOptions) (io.ReadCl
 func (m *MockDockerAdapter) BuildImage(options types.BuildImageOptions) (dockertypes.ImageBuildResponse, error) {
 	args := m.Called(options)
 	return args.Get(0).(dockertypes.ImageBuildResponse), args.Error(1)
+}
+
+func (m *MockDockerAdapter) CreateVolume(options types.CreateVolumeOptions) (volume.Volume, error) {
+	args := m.Called(options)
+	return args.Get(0).(volume.Volume), args.Error(1)
+}
+
+func (m *MockDockerAdapter) DeleteVolume(name string) error {
+	args := m.Called(name)
+	return args.Error(0)
 }

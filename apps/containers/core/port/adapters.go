@@ -5,6 +5,7 @@ import (
 	"io"
 
 	dockertypes "github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/volume"
 	"github.com/vertex-center/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 )
@@ -72,7 +73,7 @@ type (
 	}
 
 	RunnerAdapter interface {
-		DeleteContainer(ctx context.Context, c *types.Container) error
+		DeleteContainer(ctx context.Context, c *types.Container, volumes []string) error
 		DeleteMounts(ctx context.Context, c *types.Container) error
 		Start(ctx context.Context, c *types.Container, ports types.Ports, volumes types.Volumes, env types.EnvVariables, caps types.Capabilities, sysctls types.Sysctls, setStatus func(status string)) (stdout io.ReadCloser, stderr io.ReadCloser, err error)
 		Stop(ctx context.Context, c *types.Container) error
@@ -103,5 +104,7 @@ type (
 		InfoImage(id string) (types.InfoImageResponse, error)
 		PullImage(options types.PullImageOptions) (io.ReadCloser, error)
 		BuildImage(options types.BuildImageOptions) (dockertypes.ImageBuildResponse, error)
+		CreateVolume(options types.CreateVolumeOptions) (volume.Volume, error)
+		DeleteVolume(name string) error
 	}
 )

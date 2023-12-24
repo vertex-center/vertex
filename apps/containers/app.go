@@ -346,5 +346,15 @@ func (a *App) InitializeKernelRouter(r *fizz.RouterGroup) error {
 		fizz.Summary("Build image"),
 	}, dockerHandler.BuildImage())
 
+	docker.POST("/volumes", []fizz.OperationOption{
+		fizz.ID("createVolume"),
+		fizz.Summary("Create volume"),
+	}, dockerHandler.CreateVolume())
+
+	docker.DELETE("/volumes", []fizz.OperationOption{
+		fizz.ID("deleteVolume"),
+		fizz.Summary("Delete volume"),
+	}, dockerHandler.DeleteVolume())
+
 	return nil
 }

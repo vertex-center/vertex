@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	goerrors "errors"
 	"fmt"
 	"io"
 	"path"
@@ -12,6 +13,7 @@ import (
 	"sync"
 
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/go-connections/nat"
 	"github.com/google/go-containerregistry/pkg/crane"
@@ -31,14 +33,26 @@ func NewRunnerDockerAdapter() port.RunnerAdapter {
 	return runnerDockerAdapter{}
 }
 
-func (a runnerDockerAdapter) DeleteContainer(ctx context.Context, c *types.Container) error {
+func (a runnerDockerAdapter) DeleteContainer(ctx context.Context, c *types.Container, volumes []string) error {
 	id, err := a.getContainerID(ctx, *c)
 	if err != nil {
 		return err
 	}
 
 	cli := containersapi.NewContainersKernelClient(ctx)
-	return cli.DeleteContainer(context.Background(), id)
+	err = cli.DeleteContainer(context.Background(), id)
+	if err != nil {
+		return err
+	}
+
+	var errs []error
+	for _, v := range volumes {
+		err = cli.DeleteVolume(context.Background(), v)
+		if err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return goerrors.Join(errs...)
 }
 
 func (a runnerDockerAdapter) DeleteMounts(ctx context.Context, c *types.Container) error {
@@ -163,6 +177,7 @@ func (a runnerDockerAdapter) Start(
 				ExposedPorts:  nat.PortSet{},
 				PortBindings:  nat.PortMap{},
 				Binds:         []string{},
+				Mounts:        []mount.Mount{},
 				Env:           []string{},
 				CapAdd:        []string{},
 			}
@@ -185,16 +200,24 @@ func (a runnerDockerAdapter) Start(
 			}
 
 			for _, v := range volumes {
-				out := v.Out
-				if !strings.HasPrefix(out, "/") {
-					volumePath := a.getVolumePath(ctx, c.ID)
-					out, err = filepath.Abs(path.Join(volumePath, out))
+				if v.Type == types.VolumeTypeBind {
+					out := v.Out
+					if !strings.HasPrefix(out, "/") {
+						volumePath := a.getVolumePath(ctx, c.ID)
+						out, err = filepath.Abs(path.Join(volumePath, out))
+					}
+					if err != nil {
+						log.Error(err)
+						return
+					}
+					options.Binds = append(options.Binds, out+":"+v.In)
+				} else {
+					options.Mounts = append(options.Mounts, mount.Mount{
+						Type:   mount.TypeVolume,
+						Source: v.Out,
+						Target: v.In,
+					})
 				}
-				if err != nil {
-					log.Error(err)
-					return
-				}
-				options.Binds = append(options.Binds, out+":"+v.In)
 			}
 			for _, e := range env {
 				options.Env = append(options.Env, e.Name+"="+e.Value)

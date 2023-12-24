@@ -7,6 +7,7 @@ import (
 
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
@@ -64,6 +65,7 @@ func (a dockerCliAdapter) CreateContainer(options types.CreateContainerOptions) 
 
 	hostConfig := container.HostConfig{
 		Binds:        options.Binds,
+		Mounts:       options.Mounts,
 		PortBindings: options.PortBindings,
 		CapAdd:       options.CapAdd,
 		Sysctls:      options.Sysctls,
@@ -173,4 +175,14 @@ func (a dockerCliAdapter) BuildImage(options types.BuildImageOptions) (dockertyp
 	}
 
 	return a.cli.ImageBuild(context.Background(), reader, buildOptions)
+}
+
+func (a dockerCliAdapter) CreateVolume(options types.CreateVolumeOptions) (volume.Volume, error) {
+	return a.cli.VolumeCreate(context.Background(), volume.CreateOptions{
+		Name: options.Name,
+	})
+}
+
+func (a dockerCliAdapter) DeleteVolume(name string) error {
+	return a.cli.VolumeRemove(context.Background(), name, true)
 }

@@ -5,6 +5,7 @@ import (
 	"io"
 
 	vtypes "github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/volume"
 	"github.com/vertex-center/uuid"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/apps/monitoring/core/types/metric"
@@ -59,9 +60,10 @@ type (
 		LogsStderrContainer(id string) (io.ReadCloser, error)
 		WaitContainer(id string, cond types.WaitContainerCondition) error
 		DeleteMounts(uuid string) error
-
 		InfoImage(id string) (types.InfoImageResponse, error)
 		PullImage(options types.PullImageOptions) (io.ReadCloser, error)
 		BuildImage(options types.BuildImageOptions) (vtypes.ImageBuildResponse, error)
+		CreateVolume(name string) (volume.Volume, error)
+		DeleteVolume(name string) error
 	}
 )

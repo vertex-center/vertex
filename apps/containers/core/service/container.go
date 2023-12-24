@@ -172,9 +172,15 @@ func (s *containerService) CreateContainer(ctx context.Context, serviceID string
 	// Set default volumes
 	if service.Methods.Docker.Volumes != nil {
 		for out, in := range *service.Methods.Docker.Volumes {
+			tp := types.VolumeTypeBind
+			if !strings.Contains(out, "/") {
+				tp = types.VolumeTypeVolume
+				out = "VERTEX_VOLUME_" + id.String() + "_" + out
+			}
 			err = s.volumes.CreateVolume(ctx, types.Volume{
 				ID:          uuid.New(),
 				ContainerID: id,
+				Type:        tp,
 				In:          in,
 				Out:         out,
 			})
@@ -225,7 +231,16 @@ func (s *containerService) Delete(ctx context.Context, id uuid.UUID) error {
 		return err
 	}
 
-	err = s.runner.DeleteContainer(ctx, c)
+	volumes, err := s.volumes.GetContainerVolumes(ctx, id)
+	if err != nil {
+		return err
+	}
+	var volNames []string
+	for _, v := range volumes {
+		volNames = append(volNames, v.Out)
+	}
+
+	err = s.runner.DeleteContainer(ctx, c, volNames)
 	if err != nil && !errors.Is(err, errors.NotFound) {
 		return err
 	}
@@ -508,7 +523,7 @@ func (s *containerService) RecreateContainer(ctx context.Context, id uuid.UUID) 
 
 	// Make sure to only delete the container!
 	// The volumes must be kept here.
-	err = s.runner.DeleteContainer(ctx, c)
+	err = s.runner.DeleteContainer(ctx, c, []string{})
 	if err != nil && !errors.Is(err, errors.NotFound) {
 		return err
 	}

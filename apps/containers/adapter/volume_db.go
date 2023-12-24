@@ -33,8 +33,8 @@ func (a *volumeDBAdapter) GetContainerVolumes(ctx context.Context, id uuid.UUID)
 
 func (a *volumeDBAdapter) CreateVolume(ctx context.Context, vol types.Volume) error {
 	_, err := a.db.NamedExec(`
-			INSERT INTO volumes (id, container_id, internal_path, external_path)
-			VALUES (:id, :container_id, :internal_path, :external_path)
+			INSERT INTO volumes (id, container_id, type, internal_path, external_path)
+			VALUES (:id, :container_id, :type, :internal_path, :external_path)
 		`, vol)
 	return err
 }

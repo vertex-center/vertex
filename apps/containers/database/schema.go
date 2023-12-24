@@ -48,6 +48,7 @@ func GetSchema(driver vsql.Driver) string {
 		vsql.CreateTable("volumes").
 			WithField("id", "VARCHAR(36)", "NOT NULL", "PRIMARY KEY").
 			WithField("container_id", "VARCHAR(36)", "NOT NULL").
+			WithField("type", "VARCHAR(255)", "NOT NULL").
 			WithField("internal_path", "VARCHAR(255)", "NOT NULL").
 			WithField("external_path", "VARCHAR(255)", "NOT NULL").
 			WithForeignKey("container_id", "containers", "id"),

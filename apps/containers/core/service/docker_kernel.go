@@ -7,6 +7,7 @@ import (
 	"path"
 
 	dockertypes "github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/volume"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 	"github.com/vertex-center/vertex/common/log"
@@ -78,4 +79,14 @@ func (s dockerKernelService) DeleteMounts(uuid string) error {
 		return err
 	}
 	return nil
+}
+
+func (s dockerKernelService) CreateVolume(name string) (volume.Volume, error) {
+	return s.adapter.CreateVolume(types.CreateVolumeOptions{
+		Name: name,
+	})
+}
+
+func (s dockerKernelService) DeleteVolume(name string) error {
+	return s.adapter.DeleteVolume(name)
 }
