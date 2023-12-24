@@ -1,16 +1,33 @@
 # IDE support
 
-## GoLand
+## Server with GoLand
 
 [GoLand](https://www.jetbrains.com/go/) is developed by JetBrains. It is a commercial IDE.
 
 Vertex is ready to use with GoLand. You can open the project by opening the `vertex` folder.
 
 - **Run configurations** are already set up for you:
-    - Use `Run Vertex Kernel` to run the kernel. Note that the kernel will also compile and start Vertex.
-    - Use `Run Vertex` if you only want to test Vertex without the kernel. Many features will not work, as they require the kernel.
+
+    | Run configuration                   | Description                                                              |
+    |-------------------------------------|--------------------------------------------------------------------------|
+    | `Run Vertex Kernel`                 | Run the Vertex kernel. You'll also need to Run Vertex separately.        |
+    | `Run Vertex`                        | Run the Vertex server. You'll also need to Run Vertex Kernel separately. |
+    | `Start with Docker (Bundle)`        | Run Vertex with the all-in-one images built with the local code.         |
+    | `Start with Docker (Microservices)` | Run Vertex with the microservices images built with the local code.      |
+
+## Client with WebStorm
+
+[WebStorm](https://www.jetbrains.com/webstorm/) is developed by JetBrains. It is a commercial IDE.
+
+The Vertex Client is ready to use with WebStorm. You can open the project by opening the `vertex-client` folder.
+
+- **Run configurations** are already set up for you.
+
+    | Run configuration | Description                            |
+    |-------------------|----------------------------------------|
+    | `dev`             | Run the Vertex UI in development mode. |
 
 ## Other IDEs
 
-If you use another IDE, you can still develop Vertex, as the project is a standard Go project.
+If you use another IDE, you can still develop Vertex without any issues.
 If you feel like an extra step is needed to make Vertex compatible with your IDE, please open an issue to [Vertex Documentation](https://github.com/vertex-center/docs).
