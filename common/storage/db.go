@@ -6,7 +6,9 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"github.com/vertex-center/vertex/common/log"
 	"github.com/vertex-center/vertex/pkg/vsql"
+	"github.com/vertex-center/vlog"
 	_ "modernc.org/sqlite"
 )
 
@@ -67,11 +69,13 @@ func (db *DB) ConnectTo(driver string, dataSource string, retries int) error {
 }
 
 func (db *DB) runMigrations(schemaFunc func(driver vsql.Driver) string, migrations []vsql.Migration) error {
+	log.Info("running migrations for database", vlog.String("db_name", db.name))
 	var current int
 	err := db.Get(&current, "SELECT version FROM migrations LIMIT 1")
 	if err != nil {
 		return db.createSchemas(schemaFunc)
 	}
+	log.Info("database already initialized, running migrations instead", vlog.Int("current", current))
 	return vsql.Migrate(migrations, db.DB, current)
 }
 
