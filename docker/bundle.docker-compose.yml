@@ -32,6 +32,8 @@ services:
       - VERTEX_DB_PORT=5432
       - VERTEX_DB_USER=postgres
       - VERTEX_DB_PASS=vx-pg-pass
+    volumes:
+      - logs:/live/logs
 
   vertex-kernel:
     image: ghcr.io/vertex-center/vertex-bundle-kernel:main
@@ -62,3 +64,4 @@ networks:
 
 volumes:
   postgres:
+  logs:

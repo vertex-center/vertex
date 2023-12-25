@@ -169,6 +169,8 @@ services:
     image: ghcr.io/vertex-center/vertex-logs:main
     networks:
       - internal
+    volumes:
+      - logs:/live/logs
 
 networks:
   external:
@@ -178,3 +180,4 @@ volumes:
   admin_postgres:
   auth_postgres:
   containers_postgres:
+  logs:
