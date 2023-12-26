@@ -7,23 +7,17 @@ import (
 	goerrors "errors"
 	"fmt"
 	"io"
-	"path"
-	"path/filepath"
-	"strings"
 	"sync"
 
 	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/pkg/jsonmessage"
-	"github.com/docker/go-connections/nat"
 	"github.com/google/go-containerregistry/pkg/crane"
 	"github.com/juju/errors"
-	"github.com/vertex-center/uuid"
 	containersapi "github.com/vertex-center/vertex/apps/containers/api"
 	"github.com/vertex-center/vertex/apps/containers/core/port"
 	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/apps/containers/core/types/builder"
 	"github.com/vertex-center/vertex/common/log"
-	"github.com/vertex-center/vertex/pkg/vdocker"
 	"github.com/vertex-center/vlog"
 )
 
@@ -168,72 +162,20 @@ func (a runnerDockerAdapter) Start(
 		if errors.Is(err, errors.NotFound) {
 			containerName := c.DockerContainerName()
 
-			log.Info("container doesn't exists, create it.",
-				vlog.String("container_name", containerName),
-			)
+			log.Info("container doesn't exists, create it.", vlog.String("name", containerName))
 
-			options := types.CreateContainerOptions{
-				ContainerName: containerName,
-				ExposedPorts:  nat.PortSet{},
-				PortBindings:  nat.PortMap{},
-				Binds:         []string{},
-				Mounts:        []mount.Mount{},
-				Env:           []string{},
-				CapAdd:        []string{},
-			}
+			opts := builder.NewContainerOpts().
+				WithName(containerName).
+				WithImage(c.GetImageNameWithTag()).
+				WithEnv(env).
+				WithCaps(caps).
+				WithSysctls(sysctls).
+				WithPorts(ports, env).
+				WithVolumes(volumes).
+				WithCommand(c.Command).
+				Build()
 
-			var all []string
-			for _, p := range ports {
-				for _, e := range env {
-					if e.Type == "port" && e.Name == p.Out {
-						in := e.Value
-						out := env.Get(e.Name)
-						all = append(all, out+":"+in)
-						break
-					}
-				}
-			}
-			options.ExposedPorts, options.PortBindings, err = nat.ParsePortSpecs(all)
-			if err != nil {
-				log.Error(err)
-				return
-			}
-
-			for _, v := range volumes {
-				if v.Type == types.VolumeTypeBind {
-					out := v.Out
-					if !strings.HasPrefix(out, "/") {
-						volumePath := a.getVolumePath(ctx, c.ID)
-						out, err = filepath.Abs(path.Join(volumePath, out))
-					}
-					if err != nil {
-						log.Error(err)
-						return
-					}
-					options.Binds = append(options.Binds, out+":"+v.In)
-				} else {
-					options.Mounts = append(options.Mounts, mount.Mount{
-						Type:   mount.TypeVolume,
-						Source: v.Out,
-						Target: v.In,
-					})
-				}
-			}
-			for _, e := range env {
-				options.Env = append(options.Env, e.Name+"="+e.Value)
-			}
-			for _, cp := range caps {
-				options.CapAdd = append(options.CapAdd, cp.Name)
-			}
-			for _, sysctl := range sysctls {
-				options.Sysctls[sysctl.Name] = sysctl.Value
-			}
-			if c.Command != nil {
-				options.Cmd = strings.Split(*c.Command, " ")
-			}
-			options.ImageName = c.GetImageNameWithTag()
-
-			id, err = a.createContainer(ctx, options)
+			id, err = a.createContainer(ctx, opts)
 			if err != nil {
 				log.Error(err)
 				return
@@ -463,31 +405,4 @@ func (a runnerDockerAdapter) readLogs(ctx context.Context, id string) (stdout io
 	}
 
 	return stdout, stderr, nil
-}
-
-func (a runnerDockerAdapter) getVolumePath(ctx context.Context, id uuid.UUID) string {
-	appPath := a.getAppPath(ctx, "live_docker")
-	return path.Join(appPath, "volumes", id.String())
-}
-
-func (a runnerDockerAdapter) getAppPath(ctx context.Context, base string) string {
-	// If Vertex is running itself inside Docker, the containers are stored in the Vertex container volume.
-	if vdocker.RunningInDocker() {
-		cli := containersapi.NewContainersKernelClient(ctx)
-		containers, err := cli.GetContainers(context.Background())
-		if err != nil {
-			log.Error(err)
-		} else {
-			for _, c := range containers {
-				// find the docker container that has a volume /live, which is the Vertex container.
-				for _, m := range c.Mounts {
-					if m.Destination == "/"+base {
-						base = m.Source
-					}
-				}
-			}
-		}
-	}
-
-	return path.Join(base, "apps", "containers")
 }
