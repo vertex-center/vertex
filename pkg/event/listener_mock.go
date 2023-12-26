@@ -7,6 +7,8 @@ import (
 
 type MockListener struct{ mock.Mock }
 
+var _ Listener = (*MockListener)(nil)
+
 func (m *MockListener) OnEvent(e Event) error {
 	args := m.Called(e)
 	return args.Error(0)

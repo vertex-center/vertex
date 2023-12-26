@@ -7,6 +7,8 @@ import (
 
 type MockAuthService struct{ mock.Mock }
 
+var _ AuthService = (*MockAuthService)(nil)
+
 func (m *MockAuthService) Login(login, password string) (types.Session, error) {
 	args := m.Called(login, password)
 	return args.Get(0).(types.Session), args.Error(1)

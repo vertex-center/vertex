@@ -4,6 +4,8 @@ import "github.com/stretchr/testify/mock"
 
 type MockBus struct{ mock.Mock }
 
+var _ Bus = (*MockBus)(nil)
+
 func (m *MockBus) AddListener(l Listener) {
 	m.Called(l)
 }
