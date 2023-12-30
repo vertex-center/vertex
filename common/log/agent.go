@@ -67,7 +67,7 @@ func NewAgent() (*Agent, error) {
 func (a *Agent) Start(u *url.URL) error {
 	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("dial to %s: %w", u.String(), err)
 	}
 	defer conn.Close()
 
