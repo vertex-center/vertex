@@ -7,7 +7,7 @@ require (
 	github.com/carlmjohnson/requests v0.23.5
 	github.com/disgoorg/disgo v0.17.0
 	github.com/docker/docker v24.0.7+incompatible
-	github.com/docker/go-connections v0.4.0
+	github.com/docker/go-connections v0.5.0
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-contrib/sse v0.1.0
 	github.com/gin-contrib/static v0.0.1
