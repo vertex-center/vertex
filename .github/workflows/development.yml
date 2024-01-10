@@ -9,6 +9,9 @@ jobs:
   build:
     name: Build and push container
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
