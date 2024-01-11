@@ -2,17 +2,21 @@ FROM --platform=$BUILDPLATFORM node:alpine3.19 AS build
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY ../package.json package-lock.json ./
 
 RUN npm install
 
-COPY . .
+COPY .. .
 
 RUN npm run build
 
 FROM nginx:alpine3.18-slim
 
 COPY --from=build /app/dist /usr/share/nginx/html
+COPY docker/entrypoint.sh /
+
+RUN ["chmod", "+x", "/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 80
 
