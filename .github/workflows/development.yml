@@ -38,7 +38,7 @@ jobs:
         with:
           push: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') }}
           context: .
-          file: Dockerfile
+          file: docker/Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
           platforms: linux/amd64,linux/arm64,linux/arm
           no-cache: true
