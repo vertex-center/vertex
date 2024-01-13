@@ -320,26 +320,31 @@ func (s *containerService) Start(ctx context.Context, id uuid.UUID) error {
 
 	ports, err := s.ports.GetContainerPorts(ctx, id)
 	if err != nil {
+		s.setStatus(c, types.ContainerStatusError)
 		return err
 	}
 
 	volumes, err := s.volumes.GetContainerVolumes(ctx, id)
 	if err != nil {
+		s.setStatus(c, types.ContainerStatusError)
 		return err
 	}
 
 	env, err := s.vars.GetContainerVariables(ctx, id)
 	if err != nil {
+		s.setStatus(c, types.ContainerStatusError)
 		return err
 	}
 
 	caps, err := s.caps.GetContainerCaps(ctx, id)
 	if err != nil {
+		s.setStatus(c, types.ContainerStatusError)
 		return err
 	}
 
 	sysctls, err := s.sysctls.GetContainerSysctls(ctx, id)
 	if err != nil {
+		s.setStatus(c, types.ContainerStatusError)
 		return err
 	}
 

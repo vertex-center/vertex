@@ -178,10 +178,12 @@ func (a runnerDockerAdapter) Start(
 			id, err = a.createContainer(ctx, opts)
 			if err != nil {
 				log.Error(err)
+				setStatus(types.ContainerStatusError)
 				return
 			}
 		} else if err != nil {
 			log.Error(err)
+			setStatus(types.ContainerStatusError)
 			return
 		}
 
@@ -199,6 +201,7 @@ func (a runnerDockerAdapter) Start(
 		stdout, stderr, err = a.readLogs(ctx, id)
 		if err != nil {
 			log.Error(err)
+			setStatus(types.ContainerStatusError)
 			return
 		}
 
