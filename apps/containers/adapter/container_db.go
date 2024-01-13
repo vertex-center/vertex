@@ -43,7 +43,7 @@ func (a *containerDBAdapter) GetContainersWithFilters(ctx context.Context, filte
 	if filters.Tags != nil {
 		query += ` INNER JOIN container_tags ct on containers.id = ct.container_id`
 		query += ` INNER JOIN tags t on ct.tag_id = t.id`
-		query += ` WHERE t.name IN (?)`
+		query += ` WHERE t.name IN ($1)`
 		tags := strings.Join(*filters.Tags, ", ")
 		args = append(args, tags)
 	}
