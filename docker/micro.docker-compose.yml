@@ -53,13 +53,12 @@ services:
       - auth_postgres:/var/lib/postgresql/data
 
   client:
-    image: ghcr.io/vertex-center/vertex-client:main
+    image: ghcr.io/vertex-center/client:main
     networks:
       - external
       - internal
     ports:
-      - "7518:8080"
-      - "6132:6132"
+      - "7518:80"
     environment:
       - VERTEX_ADMIN_ADDR=http://admin:8080/api
       - VERTEX_AUTH_ADDR=http://auth:8080/api

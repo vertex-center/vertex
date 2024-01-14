@@ -3,7 +3,6 @@ package apps
 import (
 	"github.com/vertex-center/vertex/apps/admin"
 	"github.com/vertex-center/vertex/apps/auth"
-	"github.com/vertex-center/vertex/apps/client"
 	"github.com/vertex-center/vertex/apps/containers"
 	"github.com/vertex-center/vertex/apps/logs"
 	"github.com/vertex-center/vertex/apps/monitoring"
@@ -17,7 +16,6 @@ import (
 var Apps = []app.Interface{
 	admin.NewApp(),
 	auth.NewApp(),
-	client.NewApp(),
 	sql.NewApp(),
 	tunnels.NewApp(),
 	logs.NewApp(),

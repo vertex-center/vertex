@@ -16,7 +16,6 @@ services:
       - "7512:7512"
       - "7514:7514"
       - "7516:7516"
-      - "7518:7518"
     environment:
       - VERTEX_ADMIN_ADDR=http://vertex:7500/api
       - VERTEX_AUTH_ADDR=http://vertex:7502/api
@@ -43,6 +42,24 @@ services:
       - VERTEX_LOGS_ADDR=http://vertex:7516/api
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+
+  client:
+    image: ghcr.io/vertex-center/client:main
+    networks:
+      - external
+      - internal
+    ports:
+      - "7518:80"
+    environment:
+      - VERTEX_ADMIN_ADDR=http://admin:8080/api
+      - VERTEX_AUTH_ADDR=http://auth:8080/api
+      - VERTEX_CONTAINERS_ADDR=http://containers:8080/api
+      - VERTEX_LOGS_ADDR=http://logs:8080/api
+      - VERTEX_MONITORING_ADDR=http://monitoring:8080/api
+      - VERTEX_REVERSE_PROXY_ADDR=http://reverseproxy:8080/api
+      - VERTEX_SERVICE_EDITOR_ADDR=http://serviceeditor:8080/api
+      - VERTEX_SQL_ADDR=http://sql:8080/api
+      - VERTEX_TUNNELS_ADDR=http://tunnels:8080/api
 
   postgres:
     image: postgres:16.1-alpine3.19

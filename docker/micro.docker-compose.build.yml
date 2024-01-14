@@ -15,13 +15,6 @@ services:
       args:
         - APP_ID=auth
 
-  client:
-    build:
-      context: ..
-      dockerfile: docker/micro.Dockerfile
-      args:
-        - APP_ID=client
-
   containers:
     build:
       context: ..
