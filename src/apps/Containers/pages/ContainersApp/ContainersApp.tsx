@@ -94,6 +94,8 @@ export default function ContainersApp() {
         });
     };
 
+    const noItems = containers === null || containers?.length === 0;
+
     return (
         <div className={styles.server}>
             <ProgressOverlay show={isLoading} />
@@ -115,7 +117,7 @@ export default function ContainersApp() {
                                 }}
                             />
                         ))}
-                        {containers?.length === 0 && (
+                        {noItems && (
                             <NoItems
                                 text="No containers found."
                                 icon="deployed_code"
