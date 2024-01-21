@@ -16,7 +16,7 @@ type (
 		Get(ctx context.Context, id uuid.UUID) (*types.Container, error)
 		GetContainers(ctx context.Context) (types.Containers, error)
 		GetContainersWithFilters(ctx context.Context, filters types.ContainerFilters) (types.Containers, error)
-		CreateContainer(ctx context.Context, templateID string) (*types.Container, error)
+		CreateContainer(ctx context.Context, opts types.CreateContainerOptions) (*types.Container, error)
 		Delete(ctx context.Context, id uuid.UUID) error
 		UpdateContainer(ctx context.Context, id uuid.UUID, c types.Container) error
 		Start(ctx context.Context, id uuid.UUID) error
@@ -52,7 +52,7 @@ type (
 	DockerService interface {
 		ListContainers() ([]types.DockerContainer, error)
 		DeleteContainer(id string) error
-		CreateContainer(options types.CreateContainerOptions) (types.CreateContainerResponse, error)
+		CreateContainer(options types.CreateDockerContainerOptions) (types.CreateContainerResponse, error)
 		StartContainer(id string) error
 		StopContainer(id string) error
 		InfoContainer(id string) (types.InfoContainerResponse, error)

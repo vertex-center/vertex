@@ -10,14 +10,14 @@ import (
 )
 
 type ContainerBuilder struct {
-	opts types.CreateContainerOptions
+	opts types.CreateDockerContainerOptions
 }
 
 func NewContainerOpts() *ContainerBuilder {
 	return &ContainerBuilder{}
 }
 
-func (b *ContainerBuilder) Build() types.CreateContainerOptions {
+func (b *ContainerBuilder) Build() types.CreateDockerContainerOptions {
 	return b.opts
 }
 

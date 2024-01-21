@@ -94,7 +94,7 @@ type (
 	DockerAdapter interface {
 		ListContainers() ([]types.DockerContainer, error)
 		DeleteContainer(id string) error
-		CreateContainer(options types.CreateContainerOptions) (types.CreateContainerResponse, error)
+		CreateContainer(options types.CreateDockerContainerOptions) (types.CreateContainerResponse, error)
 		StartContainer(id string) error
 		StopContainer(id string) error
 		InfoContainer(id string) (types.InfoContainerResponse, error)

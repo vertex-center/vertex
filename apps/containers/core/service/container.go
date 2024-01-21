@@ -88,42 +88,83 @@ func (s *containerService) GetContainersWithFilters(ctx context.Context, filters
 	return s.containers.GetContainersWithFilters(ctx, filters)
 }
 
-func (s *containerService) CreateContainer(ctx context.Context, templateID string) (*types.Container, error) {
+func (s *containerService) CreateContainer(ctx context.Context, opts types.CreateContainerOptions) (*types.Container, error) {
 	id := uuid.New()
 
-	template, err := s.templates.Get(templateID)
-	if err != nil {
-		return nil, err
-	}
+	var (
+		image       = opts.Image
+		name        = opts.Image
+		description *string
+		color       *string
+		icon        *string
+		cmd         *string
 
-	dir := path.Join(storage.FSPath, id.String())
-	if template.Methods.Docker.Clone != nil {
-		err := vstorage.CloneRepository(dir, template.Methods.Docker.Clone.Repository)
+		env     []types.TemplateEnv
+		caps    []string
+		ports   = map[string]string{}
+		volumes = map[string]string{}
+		sysctls = map[string]string{}
+	)
+
+	if opts.TemplateID != "" {
+		template, err := s.templates.Get(opts.TemplateID)
 		if err != nil {
 			return nil, err
+		}
+
+		image = *template.Methods.Docker.Image
+		name = template.Name
+		description = &template.Description
+		color = template.Color
+		icon = template.Icon
+		cmd = template.Methods.Docker.Cmd
+
+		if template.Methods.Docker.Environment != nil {
+			env = template.Env
+		}
+		if template.Methods.Docker.Capabilities != nil {
+			caps = *template.Methods.Docker.Capabilities
+		}
+		if template.Methods.Docker.Ports != nil {
+			ports = *template.Methods.Docker.Ports
+		}
+		if template.Methods.Docker.Volumes != nil {
+			volumes = *template.Methods.Docker.Volumes
+		}
+		if template.Methods.Docker.Sysctls != nil {
+			sysctls = *template.Methods.Docker.Sysctls
+		}
+
+		dir := path.Join(storage.FSPath, id.String())
+		if template.Methods.Docker.Clone != nil {
+			err := vstorage.CloneRepository(dir, template.Methods.Docker.Clone.Repository)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
 	c := types.Container{
 		ID:              id,
-		TemplateID:      templateID,
-		Image:           *template.Methods.Docker.Image,
+		TemplateID:      opts.TemplateID,
+		Image:           image,
 		ImageTag:        "latest",
 		Status:          types.ContainerStatusOff,
 		LaunchOnStartup: true,
-		Name:            template.Name,
-		Description:     &template.Description,
-		Color:           template.Color,
-		Icon:            template.Icon,
-		Command:         template.Methods.Docker.Cmd,
+		Name:            name,
+		Description:     description,
+		Color:           color,
+		Icon:            icon,
+		Command:         cmd,
 	}
-	err = s.containers.CreateContainer(ctx, c)
+
+	err := s.containers.CreateContainer(ctx, c)
 	if err != nil {
 		return nil, err
 	}
 
 	// Set default env
-	for _, e := range template.Env {
+	for _, e := range env {
 		err = s.vars.CreateVariable(ctx, types.EnvVariable{
 			ID:          uuid.New(),
 			ContainerID: id,
@@ -141,67 +182,59 @@ func (s *containerService) CreateContainer(ctx context.Context, templateID strin
 	}
 
 	// Set default capabilities
-	if template.Methods.Docker.Capabilities != nil {
-		for _, cp := range *template.Methods.Docker.Capabilities {
-			err = s.caps.CreateCap(ctx, types.Capability{
-				ID:          uuid.New(),
-				ContainerID: id,
-				Name:        cp,
-			})
-			if err != nil {
-				return nil, err
-			}
+	for _, cp := range caps {
+		err = s.caps.CreateCap(ctx, types.Capability{
+			ID:          uuid.New(),
+			ContainerID: id,
+			Name:        cp,
+		})
+		if err != nil {
+			return nil, err
 		}
 	}
 
 	// Set default ports
-	if template.Methods.Docker.Ports != nil {
-		for in, out := range *template.Methods.Docker.Ports {
-			err = s.ports.CreatePort(ctx, types.Port{
-				ID:          uuid.New(),
-				ContainerID: id,
-				In:          in,
-				Out:         out,
-			})
-			if err != nil {
-				return nil, err
-			}
+	for in, out := range ports {
+		err = s.ports.CreatePort(ctx, types.Port{
+			ID:          uuid.New(),
+			ContainerID: id,
+			In:          in,
+			Out:         out,
+		})
+		if err != nil {
+			return nil, err
 		}
 	}
 
 	// Set default volumes
-	if template.Methods.Docker.Volumes != nil {
-		for out, in := range *template.Methods.Docker.Volumes {
-			tp := types.VolumeTypeBind
-			if !strings.Contains(out, "/") {
-				tp = types.VolumeTypeVolume
-				out = "VERTEX_VOLUME_" + id.String() + "_" + out
-			}
-			err = s.volumes.CreateVolume(ctx, types.Volume{
-				ID:          uuid.New(),
-				ContainerID: id,
-				Type:        tp,
-				In:          in,
-				Out:         out,
-			})
-			if err != nil {
-				return nil, err
-			}
+	for out, in := range volumes {
+		tp := types.VolumeTypeBind
+		if !strings.Contains(out, "/") {
+			tp = types.VolumeTypeVolume
+			out = "VERTEX_VOLUME_" + id.String() + "_" + out
+		}
+		err = s.volumes.CreateVolume(ctx, types.Volume{
+			ID:          uuid.New(),
+			ContainerID: id,
+			Type:        tp,
+			In:          in,
+			Out:         out,
+		})
+		if err != nil {
+			return nil, err
 		}
 	}
 
 	// Set default sysctls
-	if template.Methods.Docker.Sysctls != nil {
-		for name, value := range *template.Methods.Docker.Sysctls {
-			err = s.sysctls.CreateSysctl(ctx, types.Sysctl{
-				ID:          uuid.New(),
-				ContainerID: id,
-				Name:        name,
-				Value:       value,
-			})
-			if err != nil {
-				return nil, err
-			}
+	for name, value := range sysctls {
+		err = s.sysctls.CreateSysctl(ctx, types.Sysctl{
+			ID:          uuid.New(),
+			ContainerID: id,
+			Name:        name,
+			Value:       value,
+		})
+		if err != nil {
+			return nil, err
 		}
 	}
 

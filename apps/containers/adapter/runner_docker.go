@@ -380,7 +380,7 @@ func (a runnerDockerAdapter) buildImageFromName(ctx context.Context, imageName s
 	return res, nil
 }
 
-func (a runnerDockerAdapter) createContainer(ctx context.Context, options types.CreateContainerOptions) (string, error) {
+func (a runnerDockerAdapter) createContainer(ctx context.Context, options types.CreateDockerContainerOptions) (string, error) {
 	cli := containersapi.NewContainersKernelClient(ctx)
 	res, err := cli.CreateContainer(context.Background(), options)
 	if err != nil {

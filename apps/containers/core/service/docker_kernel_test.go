@@ -51,7 +51,7 @@ func (suite *DockerKernelServiceTestSuite) TestDeleteContainer() {
 func (suite *DockerKernelServiceTestSuite) TestCreateContainer() {
 	suite.adapter.On("CreateContainer", mock.Anything).Return(types.CreateContainerResponse{}, nil)
 
-	cont, err := suite.service.CreateContainer(types.CreateContainerOptions{})
+	cont, err := suite.service.CreateContainer(types.CreateDockerContainerOptions{})
 
 	suite.Require().NoError(err)
 	suite.Equal(types.CreateContainerResponse{}, cont)
@@ -159,7 +159,7 @@ func (m *MockDockerAdapter) DeleteContainer(id string) error {
 	return args.Error(0)
 }
 
-func (m *MockDockerAdapter) CreateContainer(options types.CreateContainerOptions) (types.CreateContainerResponse, error) {
+func (m *MockDockerAdapter) CreateContainer(options types.CreateDockerContainerOptions) (types.CreateContainerResponse, error) {
 	args := m.Called(options)
 	return args.Get(0).(types.CreateContainerResponse), args.Error(1)
 }

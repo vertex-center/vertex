@@ -58,11 +58,15 @@ func (h *containerHandler) GetContainers() gin.HandlerFunc {
 
 type CreateContainerParams struct {
 	TemplateID string `json:"template_id"`
+	Image      string `json:"image"`
 }
 
 func (h *containerHandler) CreateContainer() gin.HandlerFunc {
 	return tonic.Handler(func(ctx *gin.Context, params *CreateContainerParams) (*types.Container, error) {
-		return h.containerService.CreateContainer(ctx, params.TemplateID)
+		return h.containerService.CreateContainer(ctx, types.CreateContainerOptions{
+			TemplateID: params.TemplateID,
+			Image:      params.Image,
+		})
 	}, http.StatusCreated)
 }
 

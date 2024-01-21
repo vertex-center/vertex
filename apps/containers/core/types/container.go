@@ -56,6 +56,11 @@ type (
 		Current int64  `json:"current,omitempty"`
 		Total   int64  `json:"total,omitempty"`
 	}
+
+	CreateContainerOptions struct {
+		TemplateID string
+		Image      string
+	}
 )
 
 func (i *Container) DockerImageVertexName() string { return "vertex_image_" + i.ID.String() }

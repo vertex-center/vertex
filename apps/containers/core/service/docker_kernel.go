@@ -30,7 +30,7 @@ func (s dockerKernelService) DeleteContainer(id string) error {
 	return s.adapter.DeleteContainer(id)
 }
 
-func (s dockerKernelService) CreateContainer(options types.CreateContainerOptions) (types.CreateContainerResponse, error) {
+func (s dockerKernelService) CreateContainer(options types.CreateDockerContainerOptions) (types.CreateContainerResponse, error) {
 	return s.adapter.CreateContainer(options)
 }
 

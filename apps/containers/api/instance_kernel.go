@@ -9,7 +9,7 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 )
 
-func (c *KernelClient) CreateContainer(ctx context.Context, options types.CreateContainerOptions) (types.CreateContainerResponse, error) {
+func (c *KernelClient) CreateContainer(ctx context.Context, options types.CreateDockerContainerOptions) (types.CreateContainerResponse, error) {
 	var res types.CreateContainerResponse
 	err := c.Request().
 		Pathf("./docker/containers").

@@ -19,7 +19,7 @@ type Mount struct {
 	Destination string `json:"destination,omitempty"`
 }
 
-type CreateContainerOptions struct {
+type CreateDockerContainerOptions struct {
 	ImageName     string            `json:"image_name,omitempty"`
 	ContainerName string            `json:"container_name,omitempty"`
 	ExposedPorts  nat.PortSet       `json:"exposed_ports,omitempty"`

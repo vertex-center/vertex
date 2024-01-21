@@ -36,8 +36,8 @@ func (m *MockContainerService) GetContainersWithFilters(ctx context.Context, fil
 	return args.Get(0).(types.Containers), args.Error(1)
 }
 
-func (m *MockContainerService) CreateContainer(ctx context.Context, templateID string) (*types.Container, error) {
-	args := m.Called(ctx, templateID)
+func (m *MockContainerService) CreateContainer(ctx context.Context, opts types.CreateContainerOptions) (*types.Container, error) {
+	args := m.Called(ctx, opts)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}

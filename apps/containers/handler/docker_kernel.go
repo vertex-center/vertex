@@ -32,7 +32,7 @@ func (h *dockerKernelHandler) GetContainers() gin.HandlerFunc {
 }
 
 func (h *dockerKernelHandler) CreateContainer() gin.HandlerFunc {
-	return router.Handler(func(ctx *gin.Context, params *types.CreateContainerOptions) (*types.CreateContainerResponse, error) {
+	return router.Handler(func(ctx *gin.Context, params *types.CreateDockerContainerOptions) (*types.CreateContainerResponse, error) {
 		res, err := h.dockerService.CreateContainer(*params)
 		return &res, err
 	})

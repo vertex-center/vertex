@@ -52,7 +52,7 @@ func (a dockerCliAdapter) DeleteContainer(id string) error {
 	return a.cli.ContainerRemove(context.Background(), id, dockertypes.ContainerRemoveOptions{})
 }
 
-func (a dockerCliAdapter) CreateContainer(options types.CreateContainerOptions) (types.CreateContainerResponse, error) {
+func (a dockerCliAdapter) CreateContainer(options types.CreateDockerContainerOptions) (types.CreateContainerResponse, error) {
 	config := container.Config{
 		Image:        options.ImageName,
 		ExposedPorts: options.ExposedPorts,
