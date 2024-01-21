@@ -106,14 +106,14 @@ func (s *containerService) CreateContainer(ctx context.Context, opts types.Creat
 		sysctls = map[string]string{}
 	)
 
-	if opts.TemplateID != "" {
-		template, err := s.templates.Get(opts.TemplateID)
+	if opts.TemplateID != nil {
+		template, err := s.templates.Get(*opts.TemplateID)
 		if err != nil {
 			return nil, err
 		}
 
-		image = *template.Methods.Docker.Image
-		name = template.Name
+		image = template.Methods.Docker.Image
+		name = &template.Name
 		description = &template.Description
 		color = template.Color
 		icon = template.Icon
@@ -147,11 +147,11 @@ func (s *containerService) CreateContainer(ctx context.Context, opts types.Creat
 	c := types.Container{
 		ID:              id,
 		TemplateID:      opts.TemplateID,
-		Image:           image,
+		Image:           *image,
 		ImageTag:        "latest",
 		Status:          types.ContainerStatusOff,
 		LaunchOnStartup: true,
-		Name:            name,
+		Name:            *name,
 		Description:     description,
 		Color:           color,
 		Icon:            icon,
@@ -601,13 +601,17 @@ func (s *containerService) CheckForUpdates(ctx context.Context) (types.Container
 }
 
 func (s *containerService) SetDatabases(ctx context.Context, c *types.Container, databases map[string]uuid.UUID, options map[string]*types.SetDatabasesOptions) error {
-	service, err := s.templates.Get(c.TemplateID)
+	if c.TemplateID == nil {
+		return nil
+	}
+
+	template, err := s.templates.Get(*c.TemplateID)
 	if err != nil {
 		return err
 	}
 
 	for db := range databases {
-		if _, ok := service.Databases[db]; !ok {
+		if _, ok := template.Databases[db]; !ok {
 			return types.ErrDatabaseIDNotFound
 		}
 	}
@@ -629,12 +633,12 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 			return err
 		}
 
-		dbService, err := s.templates.Get(db.TemplateID)
+		dbService, err := s.templates.Get(*db.TemplateID)
 		if err != nil {
 			return err
 		}
 
-		cService, err := s.templates.Get(c.TemplateID)
+		cService, err := s.templates.Get(*c.TemplateID)
 		if err != nil {
 			return err
 		}

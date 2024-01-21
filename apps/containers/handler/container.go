@@ -57,8 +57,8 @@ func (h *containerHandler) GetContainers() gin.HandlerFunc {
 }
 
 type CreateContainerParams struct {
-	TemplateID string `json:"template_id"`
-	Image      string `json:"image"`
+	TemplateID *string `json:"template_id,omitempty"`
+	Image      *string `json:"image,omitempty"`
 }
 
 func (h *containerHandler) CreateContainer() gin.HandlerFunc {
