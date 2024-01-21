@@ -1,6 +1,9 @@
 import Popup from "../../../../components/Popup/Popup";
 import { Button, Input, MaterialIcon } from "@vertex-center/components";
-import { Fragment } from "react";
+import { ChangeEvent, Fragment, useState } from "react";
+import { APIError } from "../../../../components/Error/APIError";
+import { useCreateContainer } from "../../hooks/useCreateContainer";
+import { ProgressOverlay } from "../../../../components/Progress/Progress";
 
 type Props = {
     show: boolean;
@@ -10,6 +13,17 @@ type Props = {
 export default function ManualInstallPopup(props: Readonly<Props>) {
     const { show, dismiss } = props;
 
+    const [image, setImage] = useState<string>();
+
+    const { createContainer, isCreatingContainer, errorCreatingContainer } =
+        useCreateContainer({});
+
+    const create = () => createContainer({ image });
+
+    const onImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setImage(e.target.value);
+    };
+
     const actions = (
         <Fragment>
             <Button variant="outlined" onClick={dismiss}>
@@ -17,7 +31,7 @@ export default function ManualInstallPopup(props: Readonly<Props>) {
             </Button>
             <Button
                 variant="colored"
-                onClick={dismiss}
+                onClick={create}
                 rightIcon={<MaterialIcon icon="download" />}
             >
                 Install
@@ -32,7 +46,17 @@ export default function ManualInstallPopup(props: Readonly<Props>) {
             title="Install from Docker Registry"
             actions={actions}
         >
-            <Input id="image" label="Image" placeholder="postgres" required />
+            <Input
+                id="image"
+                label="Image"
+                placeholder="postgres"
+                value={image}
+                onChange={onImageChange}
+                disabled={isCreatingContainer}
+                required
+            />
+            <ProgressOverlay show={isCreatingContainer} />
+            <APIError error={errorCreatingContainer} />
         </Popup>
     );
 }

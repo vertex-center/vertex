@@ -5,7 +5,7 @@ import Service from "../../../../components/Service/Service";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import ServiceInstallPopup from "../../../../components/ServiceInstallPopup/ServiceInstallPopup";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
     List,
     ListActions,
@@ -23,6 +23,7 @@ import { API } from "../../backend/api";
 import Content from "../../../../components/Content/Content";
 import { SiDocker } from "@icons-pack/react-simple-icons";
 import ManualInstallPopup from "./ManualInstallPopup";
+import { useCreateContainer } from "../../hooks/useCreateContainer";
 
 type Downloading = {
     service: ServiceModel;
@@ -53,40 +54,39 @@ export default function ContainersStore() {
         error: containersError,
     } = queryContainers;
 
-    const mutationCreateContainer = useMutation({
-        mutationFn: API.createContainer,
-        onSettled: (data, error, templateID) => {
-            setDownloading(
-                downloading.filter(({ service: s }) => s.id !== templateID)
-            );
-            queryClient.invalidateQueries({
-                queryKey: ["containers"],
-            });
-        },
-    });
-    const { isLoading: isInstalling, error: installError } =
-        mutationCreateContainer;
+    const { createContainer, isCreatingContainer, errorCreatingContainer } =
+        useCreateContainer({
+            onSettled: (data, error, options) => {
+                setDownloading(
+                    downloading.filter(
+                        ({ service: s }) => s.id !== options.template_id
+                    )
+                );
+            },
+        });
 
     const install = () => {
-        const service = selectedService;
-        setDownloading((prev) => [...prev, { service }]);
+        const template = selectedTemplate;
+        setDownloading((prev) => [...prev, { service: template }]);
         setShowInstallPopup(false);
-        mutationCreateContainer.mutate(service.id);
+        createContainer({
+            template_id: template.id,
+        });
     };
 
     const [showInstallPopup, setShowInstallPopup] = useState<boolean>(false);
     const [showManualInstallPopup, setShowManualInstallPopup] =
         useState<boolean>(false);
-    const [selectedService, setSelectedService] = useState<ServiceModel>();
+    const [selectedTemplate, setSelectedTemplate] = useState<ServiceModel>();
     const [downloading, setDownloading] = useState<Downloading[]>([]);
 
-    const openInstallPopup = (service: ServiceModel) => {
-        setSelectedService(service);
+    const openInstallPopup = (template: ServiceModel) => {
+        setSelectedTemplate(template);
         setShowInstallPopup(true);
     };
 
     const closeInstallPopup = () => {
-        setSelectedService(undefined);
+        setSelectedTemplate(undefined);
         setShowInstallPopup(false);
     };
 
@@ -98,12 +98,16 @@ export default function ContainersStore() {
         setShowManualInstallPopup(false);
     };
 
-    const error = servicesError ?? containersError ?? installError;
+    const error = servicesError ?? containersError ?? errorCreatingContainer;
 
     return (
         <Content>
             <ProgressOverlay
-                show={isContainersLoading ?? isServicesLoading ?? isInstalling}
+                show={
+                    isContainersLoading ??
+                    isServicesLoading ??
+                    isCreatingContainer
+                }
             />
             <Vertical gap={30} className={styles.content}>
                 <List>
@@ -145,7 +149,7 @@ export default function ContainersStore() {
                 </List>
             </Vertical>
             <ServiceInstallPopup
-                service={selectedService}
+                service={selectedTemplate}
                 show={showInstallPopup}
                 dismiss={closeInstallPopup}
                 install={install}

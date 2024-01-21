@@ -34,8 +34,13 @@ const getContainer = async (id: string) => {
     return data;
 };
 
-const createContainer = async (template_id: string) => {
-    const { data } = await server.post(`/containers`, { template_id });
+export type CreateContainerOptions = {
+    template_id?: string;
+    image?: string;
+};
+
+const createContainer = async (options: CreateContainerOptions) => {
+    const { data } = await server.post(`/containers`, options);
     return data;
 };
 
