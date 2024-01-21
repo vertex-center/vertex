@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	PathServices = "tests/templates"
+	PathServices = "tests/services"
 )
 
 type AvailableTestSuite struct {
