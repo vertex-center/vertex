@@ -16,7 +16,9 @@ export default function ManualInstallPopup(props: Readonly<Props>) {
     const [image, setImage] = useState<string>();
 
     const { createContainer, isCreatingContainer, errorCreatingContainer } =
-        useCreateContainer({});
+        useCreateContainer({
+            onSuccess: dismiss,
+        });
 
     const create = () => createContainer({ image });
 
