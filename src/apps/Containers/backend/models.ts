@@ -34,7 +34,7 @@ export type EnvVariable = {
 export type Containers = Container[];
 export type Container = {
     id: string;
-    service_id: string;
+    template_id: string;
     user_id: string;
     image: string;
     image_tag: string;

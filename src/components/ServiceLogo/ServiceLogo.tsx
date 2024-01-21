@@ -1,27 +1,27 @@
-import { Service } from "../../apps/Containers/backend/service";
+import { Template } from "../../apps/Containers/backend/template";
 import { MaterialIcon } from "@vertex-center/components";
 
 type Props = {
-    service?: Service;
+    template?: Template;
 };
 
 export default function ServiceLogo(props: Readonly<Props>) {
-    const { service } = props;
+    const { template } = props;
 
     // @ts-ignore
     const iconURL = new URL(window.api_urls.containers);
-    iconURL.pathname = `/api/services/icons/${service?.icon}`;
+    iconURL.pathname = `/api/templates/icons/${template?.icon}`;
 
-    if (!service?.icon) {
+    if (!template?.icon) {
         return <MaterialIcon icon="extension" style={{ opacity: 0.8 }} />;
     }
 
-    if (service?.icon.endsWith(".svg")) {
+    if (template?.icon.endsWith(".svg")) {
         return (
             <span
                 style={{
                     maskImage: `url(${iconURL.href})`,
-                    backgroundColor: service?.color,
+                    backgroundColor: template?.color,
                     width: 24,
                     height: 24,
                 }}

@@ -1,7 +1,7 @@
 import { api } from "../../../backend/api/backend";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import Service from "../../../components/Service/Service";
-import { Service as ServiceModel } from "../../Containers/backend/service";
+import { Template as ServiceModel } from "../../Containers/backend/template";
 import ServiceInstallPopup from "../../../components/ServiceInstallPopup/ServiceInstallPopup";
 import { useState } from "react";
 import { APIError } from "../../../components/Error/APIError";
@@ -15,11 +15,11 @@ export default function SqlInstaller() {
     const queryClient = useQueryClient();
 
     const queryServices = useQuery({
-        queryKey: ["services"],
-        queryFn: API.getAllServices,
+        queryKey: ["templates"],
+        queryFn: API.getAllTemplates,
     });
     const {
-        data: services,
+        data: templates,
         isLoading: isServicesLoading,
         error: servicesError,
     } = queryServices;
@@ -49,12 +49,12 @@ export default function SqlInstaller() {
     };
 
     const mutationCreateContainer = useMutation({
-        mutationFn: async (serviceId: string) => {
-            await api.vxSql.dbms(serviceId).install();
+        mutationFn: async (templateID: string) => {
+            await api.vxSql.dbms(templateID).install();
         },
-        onSettled: (data, error, serviceId) => {
+        onSettled: (data, error, templateID) => {
             setDownloading(
-                downloading.filter(({ service: s }) => s.id !== serviceId)
+                downloading.filter(({ service: s }) => s.id !== templateID)
             );
             queryClient.invalidateQueries({
                 queryKey: ["containers"],
@@ -79,21 +79,21 @@ export default function SqlInstaller() {
             <Title variant="h2">Installer</Title>
             <APIError error={error} />
             <List>
-                {services
+                {templates
                     ?.filter((s) => s?.features?.databases?.length >= 1)
                     ?.filter((s) =>
                         s?.features?.databases?.some(
                             (d) => d.category === "sql"
                         )
                     )
-                    ?.map((service) => {
+                    ?.map((template) => {
                         return (
                             <Service
-                                key={service.id}
-                                service={service}
-                                onInstall={() => open(service)}
+                                key={template.id}
+                                template={template}
+                                onInstall={() => open(template)}
                                 downloading={downloading.some(
-                                    ({ service: s }) => s.id === service.id
+                                    ({ service: s }) => s.id === template.id
                                 )}
                                 installedCount={
                                     containers === undefined
@@ -101,8 +101,8 @@ export default function SqlInstaller() {
                                         : Object.values(
                                               containers ?? []
                                           )?.filter(
-                                              ({ service_id }) =>
-                                                  service_id === service.id
+                                              ({ template_id }) =>
+                                                  template_id === template.id
                                           )?.length
                                 }
                             />

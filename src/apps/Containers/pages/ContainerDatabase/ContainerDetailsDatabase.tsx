@@ -16,7 +16,7 @@ import {
     Title,
 } from "@vertex-center/components";
 import { api } from "../../../../backend/api/backend";
-import { DatabaseEnvironment } from "../../backend/service";
+import { DatabaseEnvironment } from "../../backend/template";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

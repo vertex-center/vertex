@@ -7,7 +7,7 @@ import {
     Tags,
 } from "./models";
 import { DockerContainerInfo } from "../../../models/docker";
-import { Service } from "./service";
+import { Template } from "./template";
 
 // @ts-ignore
 const server = createServer(window.api_urls.containers);
@@ -24,8 +24,8 @@ const getAllTags = async () => {
     return data;
 };
 
-const getAllServices = async () => {
-    const { data } = await server.get<Service[]>(`/services`);
+const getAllTemplates = async () => {
+    const { data } = await server.get<Template[]>(`/templates`);
     return data;
 };
 
@@ -34,8 +34,8 @@ const getContainer = async (id: string) => {
     return data;
 };
 
-const createContainer = async (service_id: string) => {
-    const { data } = await server.post(`/containers`, { service_id });
+const createContainer = async (template_id: string) => {
+    const { data } = await server.post(`/containers`, { template_id });
     return data;
 };
 
@@ -109,5 +109,5 @@ export const API = {
     recreateDocker,
     updateService,
     getVersions,
-    getAllServices,
+    getAllTemplates,
 };

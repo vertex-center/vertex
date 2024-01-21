@@ -1,4 +1,4 @@
-import { Service as ServiceModel } from "../../apps/Containers/backend/service";
+import { Template as TemplateModel } from "../../apps/Containers/backend/template";
 
 import styles from "./Service.module.sass";
 import { Caption } from "../Text/Text";
@@ -14,14 +14,14 @@ import {
 } from "@vertex-center/components";
 
 type Props = {
-    service: ServiceModel;
+    template: TemplateModel;
     onInstall: () => void;
     downloading?: boolean;
     installedCount?: number;
 };
 
 export default function Service(props: Readonly<Props>) {
-    const { service, onInstall, downloading, installedCount } = props;
+    const { template, onInstall, downloading, installedCount } = props;
 
     let installedCountText = "";
     if (installedCount === 1) {
@@ -33,11 +33,11 @@ export default function Service(props: Readonly<Props>) {
     return (
         <ListItem onClick={onInstall}>
             <ListIcon>
-                <ServiceLogo service={service} />
+                <ServiceLogo template={template} />
             </ListIcon>
             <ListInfo>
-                <ListTitle>{service?.name}</ListTitle>
-                <Caption>{service?.description}</Caption>
+                <ListTitle>{template?.name}</ListTitle>
+                <Caption>{template?.description}</Caption>
             </ListInfo>
             <ListActions>
                 {installedCountText && (

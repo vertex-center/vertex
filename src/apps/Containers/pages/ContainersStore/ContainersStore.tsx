@@ -1,4 +1,4 @@
-import { Service as ServiceModel } from "../../backend/service";
+import { Template as ServiceModel } from "../../backend/template";
 import React, { useState } from "react";
 import styles from "./ContainersStore.module.sass";
 import Service from "../../../../components/Service/Service";
@@ -35,7 +35,7 @@ export default function ContainersStore() {
 
     const queryServices = useQuery({
         queryKey: ["services"],
-        queryFn: API.getAllServices,
+        queryFn: API.getAllTemplates,
     });
     const {
         data: services,
@@ -55,9 +55,9 @@ export default function ContainersStore() {
 
     const mutationCreateContainer = useMutation({
         mutationFn: API.createContainer,
-        onSettled: (data, error, serviceID) => {
+        onSettled: (data, error, templateID) => {
             setDownloading(
-                downloading.filter(({ service: s }) => s.id !== serviceID)
+                downloading.filter(({ service: s }) => s.id !== templateID)
             );
             queryClient.invalidateQueries({
                 queryKey: ["containers"],
@@ -127,17 +127,17 @@ export default function ContainersStore() {
                 <Title variant="h2">From template</Title>
                 <APIError error={error} />
                 <List>
-                    {services?.map((serv) => (
+                    {services?.map((template) => (
                         <Service
-                            key={serv.id}
-                            service={serv}
-                            onInstall={() => openInstallPopup(serv)}
+                            key={template.id}
+                            template={template}
+                            onInstall={() => openInstallPopup(template)}
                             downloading={downloading.some(
-                                ({ service: s }) => s.id === serv.id
+                                ({ service: s }) => s.id === template.id
                             )}
                             installedCount={
                                 containers?.filter(
-                                    (c) => c.service_id === serv.id
+                                    (c) => c.template_id === template.id
                                 )?.length
                             }
                         />

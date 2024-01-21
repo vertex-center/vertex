@@ -1,7 +1,7 @@
 import { APIError } from "../Error/APIError";
 import { Button, MaterialIcon, Paragraph } from "@vertex-center/components";
 import Popup from "../Popup/Popup";
-import { Service as ServiceModel } from "../../apps/Containers/backend/service";
+import { Template as ServiceModel } from "../../apps/Containers/backend/template";
 import { Fragment, useState } from "react";
 
 type Props = {

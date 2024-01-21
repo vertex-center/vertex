@@ -57,7 +57,7 @@ export type DatabaseEnvironment = {
     names?: { [name: string]: string };
 };
 
-export type Service = {
+export type Template = {
     id: string;
     name: string;
     repository: string;
