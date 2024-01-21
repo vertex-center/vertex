@@ -22,9 +22,9 @@ import (
 )
 
 var (
-	containerService port.ContainerService
-	tagsService      port.TagsService
-	metricsService   port.MetricsService
+	containerTemplate port.ContainerService
+	tagsService       port.TagsService
+	metricsService    port.MetricsService
 
 	dockerKernelService port.DockerService
 )
@@ -79,10 +79,10 @@ func (a *App) Initialize() error {
 		env        = adapter.NewEnvDBAdapter(db)
 		logs       = adapter.NewLogsFSAdapter(nil)
 		runner     = adapter.NewRunnerDockerAdapter()
-		services   = adapter.NewServiceFSAdapter(nil)
+		services   = adapter.NewTemplateFSAdapter(nil)
 	)
 
-	containerService = service.NewContainerService(a.ctx, caps, containers, env, ports, volumes, tags, sysctls, runner, services, logs)
+	containerTemplate = service.NewContainerService(a.ctx, caps, containers, env, ports, volumes, tags, sysctls, runner, services, logs)
 	tagsService = service.NewTagsService(tags)
 	metricsService = service.NewMetricsService(a.ctx)
 
@@ -95,13 +95,13 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	metric.Serve(r, metricsService)
 
 	var (
-		servicesHandler   = handler.NewServiceHandler(containerService)
+		templatesHandler  = handler.NewTemplateHandler(containerTemplate)
 		tagsHandler       = handler.NewTagsHandler(tagsService)
-		containersHandler = handler.NewContainerHandler(a.ctx, containerService)
+		containersHandler = handler.NewContainerHandler(a.ctx, containerTemplate)
 
 		containers = r.Group("/containers", "Containers", "", authmiddleware.Authenticated)
 		tags       = r.Group("/tags", "Tags", "", authmiddleware.Authenticated)
-		services   = r.Group("/services", "Services", "")
+		templates  = r.Group("/templates", "Templates", "")
 	)
 
 	// Container
@@ -252,17 +252,17 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 
 	// Services
 
-	services.GET("/:service_id", []fizz.OperationOption{
-		fizz.ID("getService"),
-		fizz.Summary("Get service"),
-	}, servicesHandler.GetService())
+	templates.GET("/:template_id", []fizz.OperationOption{
+		fizz.ID("getTemplate"),
+		fizz.Summary("Get template"),
+	}, templatesHandler.GetTemplate())
 
-	services.GET("", []fizz.OperationOption{
-		fizz.ID("getServices"),
-		fizz.Summary("Get services"),
-	}, authmiddleware.Authenticated, servicesHandler.GetServices())
+	templates.GET("", []fizz.OperationOption{
+		fizz.ID("getTemplates"),
+		fizz.Summary("Get templates"),
+	}, authmiddleware.Authenticated, templatesHandler.GetTemplates())
 
-	services.GinRouterGroup().Static("/icons", "./live/services/icons")
+	templates.GinRouterGroup().Static("/icons", "./live/services/icons")
 
 	return nil
 }

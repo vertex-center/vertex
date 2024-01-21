@@ -7,13 +7,13 @@ import (
 )
 
 const (
-	PathServices = "tests/services"
+	PathServices = "tests/templates"
 )
 
 type AvailableTestSuite struct {
 	suite.Suite
 
-	adapter serviceFSAdapter
+	adapter templateFSAdapter
 }
 
 func TestAvailableTestSuite(t *testing.T) {
@@ -21,13 +21,13 @@ func TestAvailableTestSuite(t *testing.T) {
 }
 
 func (suite *AvailableTestSuite) SetupSuite() {
-	suite.adapter = *NewServiceFSAdapter(&ServiceFSAdapterParams{
-		servicesPath: PathServices,
-	}).(*serviceFSAdapter)
+	suite.adapter = *NewTemplateFSAdapter(&TemplateFSAdapterParams{
+		templatesPath: PathServices,
+	}).(*templateFSAdapter)
 
 	err := suite.adapter.Reload()
 	suite.Require().NoError(err)
-	suite.NotZero(len(suite.adapter.services))
+	suite.NotZero(len(suite.adapter.templates))
 }
 
 func (suite *AvailableTestSuite) TestGetAvailable() {

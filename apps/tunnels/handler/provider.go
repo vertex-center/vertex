@@ -23,7 +23,7 @@ func (r *providerHandler) Install() gin.HandlerFunc {
 	return router.Handler(func(ctx *gin.Context, params *InstallParams) error {
 		cli := containersapi.NewContainersClient(ctx)
 
-		serv, err := cli.GetService(ctx, params.Provider)
+		serv, err := cli.GetTemplate(ctx, params.Provider)
 		if err != nil {
 			return err
 		}

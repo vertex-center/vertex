@@ -12,6 +12,6 @@ func NewEditorService() port.EditorService {
 	return &editorService{}
 }
 
-func (s *editorService) ToYaml(serv containerstypes.Service) ([]byte, error) {
-	return yaml.Marshal(serv)
+func (s *editorService) ToYaml(template containerstypes.Template) ([]byte, error) {
+	return yaml.Marshal(template)
 }

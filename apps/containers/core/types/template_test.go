@@ -7,20 +7,20 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type ServiceTestSuite struct {
+type TemplateTestSuite struct {
 	suite.Suite
 }
 
-func TestServiceTestSuite(t *testing.T) {
-	suite.Run(t, new(ServiceTestSuite))
+func TestTemplateTestSuite(t *testing.T) {
+	suite.Run(t, new(TemplateTestSuite))
 }
 
-func (suite *ServiceTestSuite) TestServiceUpgrade() {
-	s := ServiceV1{
-		ServiceVersioning: ServiceVersioning{
+func (suite *TemplateTestSuite) TestTemplateUpgrade() {
+	t := TemplateV1{
+		TemplateVersioning: TemplateVersioning{
 			Version: 1,
 		},
-		Env: []ServiceEnv{
+		Env: []TemplateEnv{
 			{
 				Type:    "port",
 				Name:    "PORT_22",
@@ -40,8 +40,8 @@ func (suite *ServiceTestSuite) TestServiceUpgrade() {
 				Port: "80",
 			},
 		},
-		Methods: ServiceMethods{
-			Docker: &ServiceMethodDocker{
+		Methods: TemplateMethods{
+			Docker: &TemplateMethodDocker{
 				Ports: &map[string]string{
 					"22": "22",
 					"80": "80",
@@ -50,17 +50,17 @@ func (suite *ServiceTestSuite) TestServiceUpgrade() {
 		},
 	}
 
-	bytes, err := yaml.Marshal(&s)
+	bytes, err := yaml.Marshal(&t)
 	suite.Require().NoError(err)
 
-	var service Service
-	err = yaml.Unmarshal(bytes, &service)
+	var template Template
+	err = yaml.Unmarshal(bytes, &template)
 	suite.Require().NoError(err)
-	suite.Equal(2, int(service.Version))
+	suite.Equal(2, int(template.Version))
 	suite.Equal(&map[string]string{
 		"22": "PORT_22",
 		"80": "PORT_80",
-	}, service.Methods.Docker.Ports)
+	}, template.Methods.Docker.Ports)
 	suite.Equal([]URL{
 		{
 			Port: "PORT_22",
@@ -68,5 +68,5 @@ func (suite *ServiceTestSuite) TestServiceUpgrade() {
 		{
 			Port: "PORT_80",
 		},
-	}, service.URLs)
+	}, template.URLs)
 }

@@ -4,6 +4,6 @@ import containerstypes "github.com/vertex-center/vertex/apps/containers/core/typ
 
 type (
 	EditorService interface {
-		ToYaml(serv containerstypes.Service) ([]byte, error)
+		ToYaml(template containerstypes.Template) ([]byte, error)
 	}
 )

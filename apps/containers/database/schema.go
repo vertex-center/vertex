@@ -8,7 +8,7 @@ func GetSchema(driver vsql.Driver) string {
 
 		vsql.CreateTable("containers").
 			WithField("id", "VARCHAR(36)", "NOT NULL", "PRIMARY KEY").
-			WithField("service_id", "VARCHAR(255)", "NOT NULL").
+			WithField("template_id", "VARCHAR(255)", "NOT NULL").
 			WithField("user_id", "VARCHAR(36)", "NOT NULL").
 			WithField("image", "VARCHAR(255)", "NOT NULL").
 			WithField("image_tag", "VARCHAR(255)", "NOT NULL").

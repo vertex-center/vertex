@@ -16,7 +16,7 @@ type (
 		Get(ctx context.Context, id uuid.UUID) (*types.Container, error)
 		GetContainers(ctx context.Context) (types.Containers, error)
 		GetContainersWithFilters(ctx context.Context, filters types.ContainerFilters) (types.Containers, error)
-		CreateContainer(ctx context.Context, serviceID string) (*types.Container, error)
+		CreateContainer(ctx context.Context, templateID string) (*types.Container, error)
 		Delete(ctx context.Context, id uuid.UUID) error
 		UpdateContainer(ctx context.Context, id uuid.UUID, c types.Container) error
 		Start(ctx context.Context, id uuid.UUID) error
@@ -34,8 +34,8 @@ type (
 		GetContainerInfo(ctx context.Context, id uuid.UUID) (map[string]any, error)
 		WaitStatus(ctx context.Context, id uuid.UUID, status string) error
 		GetLatestLogs(id uuid.UUID) ([]types.LogLine, error)
-		GetServiceByID(ctx context.Context, id string) (*types.Service, error)
-		GetServices(ctx context.Context) []types.Service
+		GetTemplateByID(ctx context.Context, id string) (*types.Template, error)
+		GetTemplates(ctx context.Context) []types.Template
 	}
 
 	MetricsService interface {

@@ -34,11 +34,11 @@ func New(ctx *app.Context) port.SqlService {
 }
 
 func (s *sqlService) getDbFeature(c *containerstypes.Container) (containerstypes.DatabaseFeature, error) {
-	//if c.Service.Features == nil || c.Service.Features.Databases == nil {
+	//if c.Template.Features == nil || c.Template.Features.Databases == nil {
 	//	return types.DatabaseFeature{}, errors.New("no databases found")
 	//}
 	//
-	//dbFeatures := *c.Service.Features.Databases
+	//dbFeatures := *c.Template.Features.Databases
 	//for _, dbFeature := range dbFeatures {
 	//	if dbFeature.Category == "sql" {
 	//		return dbFeature, nil
@@ -80,7 +80,7 @@ func (s *sqlService) Install(ctx context.Context, dbms string) (containerstypes.
 	var c containerstypes.Container
 	client := containersapi.NewContainersClient(ctx)
 
-	serv, err := client.GetService(ctx, dbms)
+	serv, err := client.GetTemplate(ctx, dbms)
 	if err != nil {
 		return c, err
 	}

@@ -19,17 +19,12 @@ type (
 
 	EventContainerStatusChange struct {
 		ContainerID uuid.UUID
-		ServiceID   string
 		Container   Container
 		Name        string
 		Status      string
 	}
 
-	EventContainerDeleted struct {
-		ContainerID uuid.UUID
-		ServiceID   string
-	}
-
+	EventContainerDeleted struct{ ContainerID uuid.UUID }
 	EventContainersLoaded struct{ Count int }
 	EventContainerCreated struct{}
 	EventContainersChange struct{}

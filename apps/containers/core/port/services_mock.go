@@ -36,8 +36,8 @@ func (m *MockContainerService) GetContainersWithFilters(ctx context.Context, fil
 	return args.Get(0).(types.Containers), args.Error(1)
 }
 
-func (m *MockContainerService) CreateContainer(ctx context.Context, serviceID string) (*types.Container, error) {
-	args := m.Called(ctx, serviceID)
+func (m *MockContainerService) CreateContainer(ctx context.Context, templateID string) (*types.Container, error) {
+	args := m.Called(ctx, templateID)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
@@ -134,17 +134,17 @@ func (m *MockContainerService) GetLatestLogs(id uuid.UUID) ([]types.LogLine, err
 	return args.Get(0).([]types.LogLine), args.Error(1)
 }
 
-func (m *MockContainerService) GetServiceByID(ctx context.Context, id string) (*types.Service, error) {
+func (m *MockContainerService) GetTemplateByID(ctx context.Context, id string) (*types.Template, error) {
 	args := m.Called(ctx, id)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*types.Service), args.Error(1)
+	return args.Get(0).(*types.Template), args.Error(1)
 }
 
-func (m *MockContainerService) GetServices(ctx context.Context) []types.Service {
+func (m *MockContainerService) GetTemplates(ctx context.Context) []types.Template {
 	args := m.Called(ctx)
-	return args.Get(0).([]types.Service)
+	return args.Get(0).([]types.Template)
 }
 
 func (m *MockTagsService) GetTag(ctx context.Context, userID uuid.UUID, name string) (types.Tag, error) {

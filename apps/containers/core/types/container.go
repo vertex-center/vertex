@@ -24,7 +24,7 @@ type (
 	Containers []Container
 	Container  struct {
 		ID              uuid.UUID `json:"id"                  db:"id"                 example:"1cb8c970-395f-4810-8c9e-e4df35f456e1"`
-		ServiceID       string    `json:"service_id"          db:"service_id"         example:"postgres"`
+		TemplateID      string    `json:"template_id"         db:"template_id"        example:"postgres"`
 		UserID          uuid.UUID `json:"user_id"             db:"user_id"            example:"596ecff2-ca67-4194-947d-59e90920680f"`
 		Image           string    `json:"image"               db:"image"              example:"postgres"`
 		ImageTag        string    `json:"image_tag,omitempty" db:"image_tag"          example:"latest"`

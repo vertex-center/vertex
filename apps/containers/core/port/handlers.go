@@ -26,9 +26,9 @@ type (
 		ContainersEvents() gin.HandlerFunc
 	}
 
-	ServiceHandler interface {
-		GetService() gin.HandlerFunc
-		GetServices() gin.HandlerFunc
+	TemplateHandler interface {
+		GetTemplate() gin.HandlerFunc
+		GetTemplates() gin.HandlerFunc
 	}
 
 	TagsHandler interface {

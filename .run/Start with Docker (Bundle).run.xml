@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Start with Docker (Bundle)" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
+  <configuration default="false" name="Start with Docker (Bundle)" type="docker-deploy" factoryName="docker-compose.yml" singleton="true" server-name="Docker">
     <deployment type="docker-compose.yml">
       <settings>
         <option name="composeProjectName" value="vertex" />
@@ -20,6 +20,7 @@
           </list>
         </option>
         <option name="sourceFilePath" value="docker/bundle.docker-compose.yml" />
+        <option name="upDetach" value="false" />
       </settings>
     </deployment>
     <method v="2" />

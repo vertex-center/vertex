@@ -38,7 +38,7 @@ type containerService struct {
 	tags       port.TagAdapter
 	sysctls    port.SysctlAdapter
 	runner     port.RunnerAdapter
-	services   port.ServiceAdapter
+	templates  port.TemplateAdapter
 	logs       port.LogsAdapter
 
 	cacheImageTags map[string][]string
@@ -54,7 +54,7 @@ func NewContainerService(ctx *app.Context,
 	tags port.TagAdapter,
 	sysctls port.SysctlAdapter,
 	runner port.RunnerAdapter,
-	services port.ServiceAdapter,
+	services port.TemplateAdapter,
 	logs port.LogsAdapter,
 ) port.ContainerService {
 	s := &containerService{
@@ -68,7 +68,7 @@ func NewContainerService(ctx *app.Context,
 		tags:           tags,
 		sysctls:        sysctls,
 		runner:         runner,
-		services:       services,
+		templates:      services,
 		logs:           logs,
 		cacheImageTags: make(map[string][]string),
 	}
@@ -88,17 +88,17 @@ func (s *containerService) GetContainersWithFilters(ctx context.Context, filters
 	return s.containers.GetContainersWithFilters(ctx, filters)
 }
 
-func (s *containerService) CreateContainer(ctx context.Context, serviceID string) (*types.Container, error) {
+func (s *containerService) CreateContainer(ctx context.Context, templateID string) (*types.Container, error) {
 	id := uuid.New()
 
-	service, err := s.services.Get(serviceID)
+	template, err := s.templates.Get(templateID)
 	if err != nil {
 		return nil, err
 	}
 
 	dir := path.Join(storage.FSPath, id.String())
-	if service.Methods.Docker.Clone != nil {
-		err := vstorage.CloneRepository(dir, service.Methods.Docker.Clone.Repository)
+	if template.Methods.Docker.Clone != nil {
+		err := vstorage.CloneRepository(dir, template.Methods.Docker.Clone.Repository)
 		if err != nil {
 			return nil, err
 		}
@@ -106,16 +106,16 @@ func (s *containerService) CreateContainer(ctx context.Context, serviceID string
 
 	c := types.Container{
 		ID:              id,
-		ServiceID:       serviceID,
-		Image:           *service.Methods.Docker.Image,
+		TemplateID:      templateID,
+		Image:           *template.Methods.Docker.Image,
 		ImageTag:        "latest",
 		Status:          types.ContainerStatusOff,
 		LaunchOnStartup: true,
-		Name:            service.Name,
-		Description:     &service.Description,
-		Color:           service.Color,
-		Icon:            service.Icon,
-		Command:         service.Methods.Docker.Cmd,
+		Name:            template.Name,
+		Description:     &template.Description,
+		Color:           template.Color,
+		Icon:            template.Icon,
+		Command:         template.Methods.Docker.Cmd,
 	}
 	err = s.containers.CreateContainer(ctx, c)
 	if err != nil {
@@ -123,7 +123,7 @@ func (s *containerService) CreateContainer(ctx context.Context, serviceID string
 	}
 
 	// Set default env
-	for _, e := range service.Env {
+	for _, e := range template.Env {
 		err = s.vars.CreateVariable(ctx, types.EnvVariable{
 			ID:          uuid.New(),
 			ContainerID: id,
@@ -141,8 +141,8 @@ func (s *containerService) CreateContainer(ctx context.Context, serviceID string
 	}
 
 	// Set default capabilities
-	if service.Methods.Docker.Capabilities != nil {
-		for _, cp := range *service.Methods.Docker.Capabilities {
+	if template.Methods.Docker.Capabilities != nil {
+		for _, cp := range *template.Methods.Docker.Capabilities {
 			err = s.caps.CreateCap(ctx, types.Capability{
 				ID:          uuid.New(),
 				ContainerID: id,
@@ -155,8 +155,8 @@ func (s *containerService) CreateContainer(ctx context.Context, serviceID string
 	}
 
 	// Set default ports
-	if service.Methods.Docker.Ports != nil {
-		for in, out := range *service.Methods.Docker.Ports {
+	if template.Methods.Docker.Ports != nil {
+		for in, out := range *template.Methods.Docker.Ports {
 			err = s.ports.CreatePort(ctx, types.Port{
 				ID:          uuid.New(),
 				ContainerID: id,
@@ -170,8 +170,8 @@ func (s *containerService) CreateContainer(ctx context.Context, serviceID string
 	}
 
 	// Set default volumes
-	if service.Methods.Docker.Volumes != nil {
-		for out, in := range *service.Methods.Docker.Volumes {
+	if template.Methods.Docker.Volumes != nil {
+		for out, in := range *template.Methods.Docker.Volumes {
 			tp := types.VolumeTypeBind
 			if !strings.Contains(out, "/") {
 				tp = types.VolumeTypeVolume
@@ -191,8 +191,8 @@ func (s *containerService) CreateContainer(ctx context.Context, serviceID string
 	}
 
 	// Set default sysctls
-	if service.Methods.Docker.Sysctls != nil {
-		for name, value := range *service.Methods.Docker.Sysctls {
+	if template.Methods.Docker.Sysctls != nil {
+		for name, value := range *template.Methods.Docker.Sysctls {
 			err = s.sysctls.CreateSysctl(ctx, types.Sysctl{
 				ID:          uuid.New(),
 				ContainerID: id,
@@ -268,7 +268,6 @@ func (s *containerService) Delete(ctx context.Context, id uuid.UUID) error {
 
 	s.ctx.DispatchEvent(types.EventContainerDeleted{
 		ContainerID: id,
-		ServiceID:   c.ServiceID,
 	})
 	s.ctx.DispatchEvent(types.EventContainersChange{})
 
@@ -569,7 +568,7 @@ func (s *containerService) CheckForUpdates(ctx context.Context) (types.Container
 }
 
 func (s *containerService) SetDatabases(ctx context.Context, c *types.Container, databases map[string]uuid.UUID, options map[string]*types.SetDatabasesOptions) error {
-	service, err := s.services.Get(c.ServiceID)
+	service, err := s.templates.Get(c.TemplateID)
 	if err != nil {
 		return err
 	}
@@ -597,12 +596,12 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 			return err
 		}
 
-		dbService, err := s.services.Get(db.ServiceID)
+		dbService, err := s.templates.Get(db.TemplateID)
 		if err != nil {
 			return err
 		}
 
-		cService, err := s.services.Get(c.ServiceID)
+		cService, err := s.templates.Get(c.TemplateID)
 		if err != nil {
 			return err
 		}
@@ -744,16 +743,16 @@ func (s *containerService) GetLatestLogs(id uuid.UUID) ([]types.LogLine, error) 
 	return s.logs.LoadBuffer(id)
 }
 
-func (s *containerService) GetServiceByID(ctx context.Context, id string) (*types.Service, error) {
-	serv, err := s.services.Get(id)
+func (s *containerService) GetTemplateByID(ctx context.Context, id string) (*types.Template, error) {
+	serv, err := s.templates.Get(id)
 	if err != nil {
 		return nil, err
 	}
 	return &serv, nil
 }
 
-func (s *containerService) GetServices(ctx context.Context) []types.Service {
-	return s.services.GetAll()
+func (s *containerService) GetTemplates(ctx context.Context) []types.Template {
+	return s.templates.GetAll()
 }
 
 func (s *containerService) setStatus(c *types.Container, status string) {
@@ -772,7 +771,6 @@ func (s *containerService) setStatus(c *types.Container, status string) {
 	s.ctx.DispatchEvent(types.EventContainersChange{})
 	s.ctx.DispatchEvent(types.EventContainerStatusChange{
 		ContainerID: c.ID,
-		ServiceID:   c.ServiceID,
 		Container:   *c,
 		Name:        c.Name,
 		Status:      status,

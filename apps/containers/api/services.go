@@ -6,11 +6,11 @@ import (
 	"github.com/vertex-center/vertex/apps/containers/core/types"
 )
 
-func (c *Client) GetService(ctx context.Context, serviceId string) (types.Service, error) {
-	var service types.Service
+func (c *Client) GetTemplate(ctx context.Context, templateID string) (types.Template, error) {
+	var template types.Template
 	err := c.Request().
-		Pathf("./services/%s", serviceId).
-		ToJSON(&service).
+		Pathf("./templates/%s", templateID).
+		ToJSON(&template).
 		Fetch(ctx)
-	return service, err
+	return template, err
 }

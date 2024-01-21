@@ -84,10 +84,10 @@ type (
 		GetAllVersions(ctx context.Context, c types.Container) ([]string, error)
 	}
 
-	ServiceAdapter interface {
-		Get(id string) (types.Service, error)
+	TemplateAdapter interface {
+		Get(id string) (types.Template, error)
 		GetRaw(id string) (interface{}, error)
-		GetAll() []types.Service
+		GetAll() []types.Template
 		Reload() error
 	}
 

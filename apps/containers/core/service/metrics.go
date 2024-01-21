@@ -47,24 +47,24 @@ func (s *metricsService) GetUUID() uuid.UUID {
 func (s *metricsService) OnEvent(e event.Event) error {
 	switch e := e.(type) {
 	case types.EventContainerStatusChange:
-		s.updateStatus(e.ContainerID, e.ServiceID, e.Status)
+		s.updateStatus(e.ContainerID, e.Status)
 	case types.EventContainerCreated:
 		s.metricsRegistry.Inc(MetricIDContainersCount)
 	case types.EventContainerDeleted:
 		s.metricsRegistry.Dec(MetricIDContainersCount)
-		s.metricsRegistry.Set(MetricIDContainerStatus, math.NaN(), e.ContainerID.String(), e.ServiceID)
+		s.metricsRegistry.Set(MetricIDContainerStatus, math.NaN(), e.ContainerID.String())
 	case types.EventContainersLoaded:
 		s.metricsRegistry.Set(MetricIDContainersCount, float64(e.Count))
 	}
 	return nil
 }
 
-func (s *metricsService) updateStatus(uuid uuid.UUID, serviceId string, status string) {
+func (s *metricsService) updateStatus(uuid uuid.UUID, status string) {
 	switch status {
 	case types.ContainerStatusRunning:
-		s.metricsRegistry.Set(MetricIDContainerStatus, metric.StatusOn, uuid.String(), serviceId)
+		s.metricsRegistry.Set(MetricIDContainerStatus, metric.StatusOn, uuid.String())
 	default:
-		s.metricsRegistry.Set(MetricIDContainerStatus, metric.StatusOff, uuid.String(), serviceId)
+		s.metricsRegistry.Set(MetricIDContainerStatus, metric.StatusOff, uuid.String())
 	}
 }
 
@@ -75,7 +75,7 @@ func (s *metricsService) Register() error {
 			Name:        "Container Status",
 			Description: "The status of the container",
 			Type:        metric.TypeGauge,
-			Labels:      []string{"uuid", "service_id"},
+			Labels:      []string{"uuid"},
 		},
 		{
 			ID:          MetricIDContainersCount,

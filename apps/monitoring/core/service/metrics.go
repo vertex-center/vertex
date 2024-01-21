@@ -61,15 +61,15 @@ func (s *metricsService) ConfigureVisualizer(inst *containerstypes.Container) er
 	return nil
 }
 
-func (s *metricsService) install(ctx context.Context, serviceID string) error {
+func (s *metricsService) install(ctx context.Context, templateID string) error {
 	cli := containersapi.NewContainersClient(ctx)
 
-	serv, err := cli.GetService(ctx, serviceID)
+	template, err := cli.GetTemplate(ctx, templateID)
 	if err != nil {
 		return err
 	}
 
-	c, err := cli.CreateContainer(ctx, serv.ID)
+	c, err := cli.CreateContainer(ctx, template.ID)
 	if err != nil {
 		return err
 	}

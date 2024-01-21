@@ -18,7 +18,7 @@ func NewEditorHandler(editorService port.EditorService) port.EditorHandler {
 }
 
 func (h *editorHandler) ToYaml() gin.HandlerFunc {
-	return router.Handler(func(ctx *gin.Context, serv *containerstypes.Service) ([]byte, error) {
-		return h.editorService.ToYaml(*serv)
+	return router.Handler(func(ctx *gin.Context, template *containerstypes.Template) ([]byte, error) {
+		return h.editorService.ToYaml(*template)
 	})
 }

@@ -56,8 +56,8 @@ func (a *containerDBAdapter) GetContainersWithFilters(ctx context.Context, filte
 
 func (a *containerDBAdapter) CreateContainer(ctx context.Context, c types.Container) error {
 	_, err := a.db.NamedExec(`
-		INSERT INTO containers (id, service_id, user_id, image, image_tag, status, launch_on_startup, name, description, color, icon, command)
-		VALUES (:id, :service_id, :user_id, :image, :image_tag, :status, :launch_on_startup, :name, :description, :color, :icon, :command)
+		INSERT INTO containers (id, template_id, user_id, image, image_tag, status, launch_on_startup, name, description, color, icon, command)
+		VALUES (:id, :template_id, :user_id, :image, :image_tag, :status, :launch_on_startup, :name, :description, :color, :icon, :command)
 	`, c)
 	return err
 }
@@ -65,7 +65,7 @@ func (a *containerDBAdapter) CreateContainer(ctx context.Context, c types.Contai
 func (a *containerDBAdapter) UpdateContainer(ctx context.Context, c types.Container) error {
 	_, err := a.db.NamedExec(`
 		UPDATE containers
-		SET service_id = :service_id,
+		SET template_id = :template_id,
 			user_id = :user_id,
 			image = :image,
 			image_tag = :image_tag,
