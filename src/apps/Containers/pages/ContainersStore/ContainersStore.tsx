@@ -1,14 +1,28 @@
 import { Service as ServiceModel } from "../../backend/service";
-import { Fragment, useState } from "react";
+import React, { useState } from "react";
 import styles from "./ContainersStore.module.sass";
 import Service from "../../../../components/Service/Service";
-import { Vertical } from "../../../../components/Layouts/Layouts";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import ServiceInstallPopup from "../../../../components/ServiceInstallPopup/ServiceInstallPopup";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { List, useTitle } from "@vertex-center/components";
+import {
+    List,
+    ListActions,
+    ListDescription,
+    ListIcon,
+    ListInfo,
+    ListItem,
+    ListTitle,
+    MaterialIcon,
+    Title,
+    useTitle,
+    Vertical,
+} from "@vertex-center/components";
 import { API } from "../../backend/api";
+import Content from "../../../../components/Content/Content";
+import { SiDocker } from "@icons-pack/react-simple-icons";
+import ManualInstallPopup from "./ManualInstallPopup";
 
 type Downloading = {
     service: ServiceModel;
@@ -61,6 +75,8 @@ export default function ContainersStore() {
     };
 
     const [showInstallPopup, setShowInstallPopup] = useState<boolean>(false);
+    const [showManualInstallPopup, setShowManualInstallPopup] =
+        useState<boolean>(false);
     const [selectedService, setSelectedService] = useState<ServiceModel>();
     const [downloading, setDownloading] = useState<Downloading[]>([]);
 
@@ -74,14 +90,41 @@ export default function ContainersStore() {
         setShowInstallPopup(false);
     };
 
+    const openManualInstallPopup = () => {
+        setShowManualInstallPopup(true);
+    };
+
+    const closeManualInstallPopup = () => {
+        setShowManualInstallPopup(false);
+    };
+
     const error = servicesError ?? containersError ?? installError;
 
     return (
-        <Fragment>
+        <Content>
             <ProgressOverlay
                 show={isContainersLoading ?? isServicesLoading ?? isInstalling}
             />
-            <Vertical className={styles.content} gap={10}>
+            <Vertical gap={30} className={styles.content}>
+                <List>
+                    <ListItem onClick={openManualInstallPopup}>
+                        <ListIcon>
+                            <SiDocker />
+                        </ListIcon>
+                        <ListInfo>
+                            <ListTitle>
+                                Manually from a Docker Registry
+                            </ListTitle>
+                            <ListDescription>
+                                This will need manual configuration
+                            </ListDescription>
+                        </ListInfo>
+                        <ListActions>
+                            <MaterialIcon icon="download" />
+                        </ListActions>
+                    </ListItem>
+                </List>
+                <Title variant="h2">From template</Title>
                 <APIError error={error} />
                 <List>
                     {services?.map((serv) => (
@@ -107,6 +150,10 @@ export default function ContainersStore() {
                 dismiss={closeInstallPopup}
                 install={install}
             />
-        </Fragment>
+            <ManualInstallPopup
+                show={showManualInstallPopup}
+                dismiss={closeManualInstallPopup}
+            />
+        </Content>
     );
 }
