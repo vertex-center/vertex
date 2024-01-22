@@ -69,7 +69,9 @@ func (s *metricsService) install(ctx context.Context, templateID string) error {
 		return err
 	}
 
-	c, err := cli.CreateContainer(ctx, template.ID)
+	c, err := cli.CreateContainer(ctx, containerstypes.CreateContainerOptions{
+		TemplateID: &template.ID,
+	})
 	if err != nil {
 		return err
 	}

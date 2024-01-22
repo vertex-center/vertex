@@ -80,12 +80,14 @@ func (s *sqlService) Install(ctx context.Context, dbms string) (containerstypes.
 	var c containerstypes.Container
 	client := containersapi.NewContainersClient(ctx)
 
-	serv, err := client.GetTemplate(ctx, dbms)
+	template, err := client.GetTemplate(ctx, dbms)
 	if err != nil {
 		return c, err
 	}
 
-	c, err = client.CreateContainer(ctx, serv.ID)
+	c, err = client.CreateContainer(ctx, containerstypes.CreateContainerOptions{
+		TemplateID: &template.ID,
+	})
 	if err != nil {
 		return c, err
 	}

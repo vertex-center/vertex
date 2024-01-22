@@ -58,8 +58,8 @@ type (
 	}
 
 	CreateContainerOptions struct {
-		TemplateID *string
-		Image      *string
+		TemplateID *string `json:"template_id,omitempty"`
+		Image      *string `json:"image,omitempty"`
 	}
 )
 

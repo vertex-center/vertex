@@ -23,12 +23,14 @@ func (r *providerHandler) Install() gin.HandlerFunc {
 	return router.Handler(func(ctx *gin.Context, params *InstallParams) error {
 		cli := containersapi.NewContainersClient(ctx)
 
-		serv, err := cli.GetTemplate(ctx, params.Provider)
+		template, err := cli.GetTemplate(ctx, params.Provider)
 		if err != nil {
 			return err
 		}
 
-		c, err := cli.CreateContainer(ctx, serv.ID)
+		c, err := cli.CreateContainer(ctx, containerstypes.CreateContainerOptions{
+			TemplateID: &template.ID,
+		})
 		if err != nil {
 			return err
 		}

@@ -26,13 +26,11 @@ func (c *Client) GetContainers(ctx context.Context) (map[uuid.UUID]*types.Contai
 	return insts, err
 }
 
-func (c *Client) CreateContainer(ctx context.Context, templateID string) (types.Container, error) {
+func (c *Client) CreateContainer(ctx context.Context, opts types.CreateContainerOptions) (types.Container, error) {
 	var ctr types.Container
 	err := c.Request().
 		Path("./containers").
-		BodyJSON(map[string]string{
-			"template_id": templateID,
-		}).
+		BodyJSON(&opts).
 		Post().
 		ToJSON(&ctr).
 		Fetch(ctx)
