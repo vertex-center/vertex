@@ -12,7 +12,6 @@ services:
       - "7504:7504"
       - "7506:7506"
       - "7508:7508"
-      - "7510:7510"
       - "7512:7512"
       - "7514:7514"
       - "7516:7516"
@@ -23,7 +22,6 @@ services:
       - VERTEX_CONTAINERS_KERNEL_ADDR=http://vertex-kernel:7505/api
       - VERTEX_MONITORING_ADDR=http://vertex:7506/api
       - VERTEX_REVERSE_PROXY_ADDR=http://vertex:7508/api
-      - VERTEX_SERVICE_EDITOR_ADDR=http://vertex:7510/api
       - VERTEX_SQL_ADDR=http://vertex:7512/api
       - VERTEX_TUNNELS_ADDR=http://vertex:7514/api
       - VERTEX_LOGS_ADDR=http://vertex:7516/api
@@ -57,7 +55,6 @@ services:
       - VERTEX_LOGS_ADDR=http://localhost:7516/api
       - VERTEX_MONITORING_ADDR=http://localhost:7506/api
       - VERTEX_REVERSE_PROXY_ADDR=http://localhost:7508/api
-      - VERTEX_SERVICE_EDITOR_ADDR=http://localhost:7510/api
       - VERTEX_SQL_ADDR=http://localhost:7512/api
       - VERTEX_TUNNELS_ADDR=http://localhost:7514/api
 

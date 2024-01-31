@@ -44,13 +44,6 @@ services:
       args:
         - APP_ID=reverseproxy
 
-  serviceeditor:
-    build:
-      context: ..
-      dockerfile: docker/micro.Dockerfile
-      args:
-        - APP_ID=serviceeditor
-
   sql:
     build:
       context: ..

@@ -66,7 +66,6 @@ services:
       - VERTEX_LOGS_ADDR=http://localhost:7516/api
       - VERTEX_MONITORING_ADDR=http://localhost:7506/api
       - VERTEX_REVERSE_PROXY_ADDR=http://localhost:7508/api
-      - VERTEX_SERVICE_EDITOR_ADDR=http://localhost:7510/api
       - VERTEX_SQL_ADDR=http://localhost:7512/api
       - VERTEX_TUNNELS_ADDR=http://localhost:7514/api
 
@@ -125,17 +124,6 @@ services:
       - external
     ports:
       - "7508:8080"
-    environment:
-      - VERTEX_LOGS_ADDR=http://logs:8080/api
-      - VERTEX_AUTH_ADDR=http://auth:8080/api
-
-  serviceeditor:
-    image: ghcr.io/vertex-center/vertex-serviceeditor:main
-    networks:
-      - internal
-      - external
-    ports:
-      - "7510:8080"
     environment:
       - VERTEX_LOGS_ADDR=http://logs:8080/api
       - VERTEX_AUTH_ADDR=http://auth:8080/api
