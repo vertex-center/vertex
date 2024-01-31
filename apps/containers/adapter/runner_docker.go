@@ -72,7 +72,7 @@ func (a runnerDockerAdapter) Start(
 	rErr, wErr := io.Pipe()
 	rOut, wOut := io.Pipe()
 
-	go func() {
+	go func(ctx context.Context) {
 		imageName := c.DockerImageVertexName()
 
 		setStatus(types.ContainerStatusBuilding)
@@ -234,7 +234,7 @@ func (a runnerDockerAdapter) Start(
 		} else {
 			setStatus(types.ContainerStatusOff)
 		}
-	}()
+	}(ctx)
 
 	return rOut, rErr, nil
 }
