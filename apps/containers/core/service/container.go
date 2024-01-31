@@ -119,9 +119,7 @@ func (s *containerService) CreateContainer(ctx context.Context, opts types.Creat
 		icon = template.Icon
 		cmd = template.Methods.Docker.Cmd
 
-		if template.Methods.Docker.Environment != nil {
-			env = template.Env
-		}
+		env = template.Env
 		if template.Methods.Docker.Capabilities != nil {
 			caps = *template.Methods.Docker.Capabilities
 		}
