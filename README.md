@@ -27,6 +27,14 @@ Vertex is designed to be installed on low-powered computers like Raspberry Pi, s
 <img src="https://github.com/vertex-center/docs/assets/12123721/abbce3bc-01ef-4d86-b79e-0eefe57e08ce" alt="Vertex screenshot" />
 <img src="https://github.com/vertex-center/docs/assets/12123721/f0cfe161-e015-4eee-86fc-ffffb9235d4e" alt="Vertex screenshot" />
 
+## Features
+
+- Install containers in one click from templates!
+- Manage your containers easily (env, ports, etc)
+- Receive alerts on Discord when a container is down
+- Easy setup on Kubernetes with [Helm Charts](https://github.com/vertex-center/charts)
+- _And more to come! (Database, Monitoring, etc)_
+
 ## Installation
 
 Vertex can be installed in multiple ways:
