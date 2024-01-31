@@ -36,7 +36,7 @@ func NewDockerCliAdapter() port.DockerAdapter {
 }
 
 func (a dockerCliAdapter) ListContainers() ([]types.DockerContainer, error) {
-	res, err := a.cli.ContainerList(context.Background(), dockertypes.ContainerListOptions{All: true})
+	res, err := a.cli.ContainerList(context.Background(), container.ListOptions{All: true})
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (a dockerCliAdapter) ListContainers() ([]types.DockerContainer, error) {
 }
 
 func (a dockerCliAdapter) DeleteContainer(id string) error {
-	return a.cli.ContainerRemove(context.Background(), id, dockertypes.ContainerRemoveOptions{})
+	return a.cli.ContainerRemove(context.Background(), id, container.RemoveOptions{})
 }
 
 func (a dockerCliAdapter) CreateContainer(options types.CreateDockerContainerOptions) (types.CreateContainerResponse, error) {
@@ -83,7 +83,7 @@ func (a dockerCliAdapter) CreateContainer(options types.CreateDockerContainerOpt
 }
 
 func (a dockerCliAdapter) StartContainer(id string) error {
-	return a.cli.ContainerStart(context.Background(), id, dockertypes.ContainerStartOptions{})
+	return a.cli.ContainerStart(context.Background(), id, container.StartOptions{})
 }
 
 func (a dockerCliAdapter) StopContainer(id string) error {
@@ -111,7 +111,7 @@ func (a dockerCliAdapter) InfoContainer(id string) (types.InfoContainerResponse,
 }
 
 func (a dockerCliAdapter) LogsStdoutContainer(id string) (io.ReadCloser, error) {
-	return a.cli.ContainerLogs(context.Background(), id, dockertypes.ContainerLogsOptions{
+	return a.cli.ContainerLogs(context.Background(), id, container.LogsOptions{
 		ShowStdout: true,
 		Timestamps: false,
 		Follow:     true,
@@ -120,7 +120,7 @@ func (a dockerCliAdapter) LogsStdoutContainer(id string) (io.ReadCloser, error) 
 }
 
 func (a dockerCliAdapter) LogsStderrContainer(id string) (io.ReadCloser, error) {
-	return a.cli.ContainerLogs(context.Background(), id, dockertypes.ContainerLogsOptions{
+	return a.cli.ContainerLogs(context.Background(), id, container.LogsOptions{
 		ShowStderr: true,
 		Timestamps: false,
 		Follow:     true,
