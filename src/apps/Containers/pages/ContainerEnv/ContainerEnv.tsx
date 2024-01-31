@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import EnvVariableInput from "../../components/EnvVariableInput/EnvVariableInput";
-import { Button, MaterialIcon, Table, Title } from "@vertex-center/components";
+import {
+    Button,
+    InlineCode,
+    MaterialIcon,
+    Table,
+    Title,
+} from "@vertex-center/components";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
 import { useContainerEnv } from "../../hooks/useContainer";
 import styles from "./ContainerEnv.module.sass";
@@ -62,7 +68,9 @@ export default function ContainerEnv() {
                 <tbody>
                     {env?.map((env, i) => (
                         <tr key={env.name}>
-                            <td>{env.display_name}</td>
+                            <td>
+                                <InlineCode>{env.name}</InlineCode>
+                            </td>
                             <td>
                                 <EnvVariableInput
                                     id={env.name}
