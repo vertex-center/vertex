@@ -16,9 +16,7 @@ export default function EnvVariableInput(props: Readonly<Props>) {
     const inputProps = {
         id,
         value,
-        label: env.display_name,
         name: env.name,
-        description: env.description,
         onChange: (e: any) => onChange(e.target.value),
         type: env.secret ? "password" : undefined,
         disabled,

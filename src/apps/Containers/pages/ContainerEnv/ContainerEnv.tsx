@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import EnvVariableInput from "../../components/EnvVariableInput/EnvVariableInput";
-import { Button, MaterialIcon, Title } from "@vertex-center/components";
+import { Button, MaterialIcon, Table, Title } from "@vertex-center/components";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
 import { useContainerEnv } from "../../hooks/useContainer";
 import styles from "./ContainerEnv.module.sass";
@@ -52,16 +52,30 @@ export default function ContainerEnv() {
     return (
         <Content>
             <Title variant="h2">Environment</Title>
-            {env?.map((env, i) => (
-                <EnvVariableInput
-                    id={env.name}
-                    key={env.name}
-                    env={env}
-                    value={env.value}
-                    onChange={(v) => onChange(i, v)}
-                    disabled={isUploading}
-                />
-            ))}
+            <Table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {env?.map((env, i) => (
+                        <tr key={env.name}>
+                            <td>{env.display_name}</td>
+                            <td>
+                                <EnvVariableInput
+                                    id={env.name}
+                                    env={env}
+                                    value={env.value}
+                                    onChange={(v) => onChange(i, v)}
+                                    disabled={isUploading}
+                                />
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </Table>
             <ProgressOverlay show={isLoadingEnv ?? isUploading} />
             <Horizontal justifyContent="flex-end">
                 {saved && (
