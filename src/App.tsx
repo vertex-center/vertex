@@ -38,7 +38,6 @@ import SqlInstaller from "./apps/Sql/Installer/SqlInstaller";
 import SqlDatabase from "./apps/Sql/SqlDatabase/SqlDatabase";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import ServiceEditor from "./apps/DevToolsServiceEditor/ServiceEditor/ServiceEditor";
 import Login from "./apps/Auth/pages/Login/Login";
 import SettingsDb from "./apps/AdminSettings/SettingsData/SettingsDb";
 import SettingsChecks from "./apps/AdminSettings/SettingsChecks/SettingsChecks";
@@ -120,10 +119,6 @@ function AllRoutes() {
                         <Route
                             path="/containers/add"
                             element={<ContainersStore />}
-                        />
-                        <Route
-                            path="/devtools-service-editor"
-                            element={<ServiceEditor />}
                         />
                         <Route path="/sql" element={<SqlApp />}>
                             <Route

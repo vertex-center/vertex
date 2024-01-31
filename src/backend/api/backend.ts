@@ -3,7 +3,6 @@ import { vxMonitoringRoutes } from "./vxMonitoring";
 import { vxSqlRoutes } from "./vxSql";
 import { vxReverseProxyRoutes } from "./vxReverseProxy";
 import { VertexApp } from "../../models/app";
-import { vxServiceEditorRoutes } from "./vxServiceEditor";
 import { createServer } from "../server";
 
 // @ts-ignore
@@ -14,7 +13,6 @@ export const api = {
     vxMonitoring: vxMonitoringRoutes,
     vxSql: vxSqlRoutes,
     vxReverseProxy: vxReverseProxyRoutes,
-    vxServiceEditor: vxServiceEditorRoutes,
 
     apps: {
         all: async () => {
