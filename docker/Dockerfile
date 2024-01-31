@@ -13,6 +13,7 @@ RUN npm run build
 FROM nginx:alpine3.18-slim
 
 COPY --from=build /app/dist /usr/share/nginx/html
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 COPY docker/entrypoint.sh /
 
 RUN ["chmod", "+x", "/entrypoint.sh"]
