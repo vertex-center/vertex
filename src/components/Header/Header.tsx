@@ -28,14 +28,10 @@ export default function (props: Readonly<Props>) {
     const navigate = useNavigate();
     const location = useLocation();
 
-    let to = "/app/containers";
-    let app = undefined;
-    if (location.pathname.startsWith("/app/")) {
-        app = apps?.find((app) => location.pathname.includes(`/app/${app.id}`));
-    }
-
+    let to = "/containers";
+    let app = apps?.find((app) => location.pathname.includes(`/${app.id}`));
     if (app) {
-        to = `/app/${app.id}`;
+        to = `/${app.id}`;
     }
 
     const linkLogo: LinkProps<RouterLinkProps> = {

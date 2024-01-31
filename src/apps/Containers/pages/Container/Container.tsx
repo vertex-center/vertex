@@ -59,7 +59,7 @@ export default function ContainerDetails() {
 
     const mutationDeleteContainer = useMutation({
         mutationFn: () => API.deleteContainer(uuid),
-        onSuccess: () => navigate("/app/containers"),
+        onSuccess: () => navigate("/containers"),
     });
     const {
         isLoading: isDeleting,
@@ -78,38 +78,38 @@ export default function ContainerDetails() {
                 <Sidebar.Item
                     label="Home"
                     icon={<MaterialIcon icon="home" />}
-                    link={l(`/app/containers/${uuid}/home`)}
+                    link={l(`/containers/${uuid}/home`)}
                 />
             </Sidebar.Group>
             <Sidebar.Group title="Analyze">
                 <Sidebar.Item
                     label="Logs"
                     icon={<MaterialIcon icon="terminal" />}
-                    link={l(`/app/containers/${uuid}/logs`)}
+                    link={l(`/containers/${uuid}/logs`)}
                 />
                 <Sidebar.Item
                     label="Docker"
                     icon={<SiDocker size={20} />}
-                    link={l(`/app/containers/${uuid}/docker`)}
+                    link={l(`/containers/${uuid}/docker`)}
                 />
             </Sidebar.Group>
             <Sidebar.Group title="Manage">
                 <Sidebar.Item
                     label="Environment"
                     icon={<MaterialIcon icon="tune" />}
-                    link={l(`/app/containers/${uuid}/environment`)}
+                    link={l(`/containers/${uuid}/environment`)}
                 />
                 {container?.databases && (
                     <Sidebar.Item
                         label="Database"
                         icon={<MaterialIcon icon="database" />}
-                        link={l(`/app/containers/${uuid}/database`)}
+                        link={l(`/containers/${uuid}/database`)}
                     />
                 )}
                 <Sidebar.Item
                     icon={<MaterialIcon icon="update" />}
                     label="Update"
-                    link={l(`/app/containers/${uuid}/update`)}
+                    link={l(`/containers/${uuid}/update`)}
                     notifications={
                         container?.service_update?.available ? 1 : undefined
                     }
@@ -117,7 +117,7 @@ export default function ContainerDetails() {
                 <Sidebar.Item
                     label="Settings"
                     icon={<MaterialIcon icon="settings" />}
-                    link={l(`/app/containers/${uuid}/settings`)}
+                    link={l(`/containers/${uuid}/settings`)}
                 />
                 <Sidebar.Item
                     label="Delete"

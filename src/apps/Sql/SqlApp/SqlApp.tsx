@@ -36,7 +36,7 @@ export default function SqlApp() {
                                 key={c?.id}
                                 label={c?.name}
                                 icon={icon}
-                                link={l(`/app/sql/db/${c?.id}`)}
+                                link={l(`/sql/db/${c?.id}`)}
                                 trailing={
                                     c && (
                                         <ContainerLed
@@ -54,7 +54,7 @@ export default function SqlApp() {
                 <Sidebar.Item
                     label="Installer"
                     icon={<MaterialIcon icon="download" />}
-                    link={l("/app/sql/install")}
+                    link={l("/sql/install")}
                 />
             </Sidebar.Group>
         </Sidebar>

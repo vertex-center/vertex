@@ -98,7 +98,7 @@ export default function SqlDatabase() {
                         value: container ?? {
                             id: uuidv4(),
                         },
-                        to: `/app/containers/${container?.id}`,
+                        to: `/containers/${container?.id}`,
                         onPower: () => onPower(container),
                     }}
                 />

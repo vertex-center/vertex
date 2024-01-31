@@ -36,7 +36,7 @@ export default function TunnelsApp() {
                 <Sidebar.Item
                     label="Cloudflare Tunnel"
                     icon={<SiCloudflare size={20} />}
-                    link={l("/app/tunnels/cloudflare")}
+                    link={l("/tunnels/cloudflare")}
                     trailing={
                         container && (
                             <ContainerLed small status={container?.status} />

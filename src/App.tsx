@@ -113,115 +113,109 @@ function AllRoutes() {
                         </Route>
                         <Route
                             path="/"
-                            element={<Navigate to="/app/containers" />}
+                            element={<Navigate to="/containers" />}
                             index
                         />
+                        <Route path="/containers" element={<ContainersApp />} />
                         <Route
-                            path="/app/containers"
-                            element={<ContainersApp />}
-                        />
-                        <Route
-                            path="/app/containers/add"
+                            path="/containers/add"
                             element={<ContainersStore />}
                         />
                         <Route
-                            path="/app/devtools-service-editor"
+                            path="/devtools-service-editor"
                             element={<ServiceEditor />}
                         />
-                        <Route path="/app/sql" element={<SqlApp />}>
+                        <Route path="/sql" element={<SqlApp />}>
                             <Route
-                                path="/app/sql/install"
+                                path="/sql/install"
                                 element={<SqlInstaller />}
                             />
                             <Route
-                                path="/app/sql/db/:uuid"
+                                path="/sql/db/:uuid"
                                 element={<SqlDatabase />}
                             />
                         </Route>
-                        <Route
-                            path="/app/monitoring"
-                            element={<MonitoringApp />}
-                        >
+                        <Route path="/monitoring" element={<MonitoringApp />}>
                             <Route
-                                path="/app/monitoring/prometheus"
+                                path="/monitoring/prometheus"
                                 element={<Prometheus />}
                             />
                             <Route
-                                path="/app/monitoring/grafana"
+                                path="/monitoring/grafana"
                                 element={<Grafana />}
                             />
                         </Route>
-                        <Route path="/app/tunnels" element={<TunnelsApp />}>
+                        <Route path="/tunnels" element={<TunnelsApp />}>
                             <Route
-                                path="/app/tunnels/cloudflare"
+                                path="/tunnels/cloudflare"
                                 element={<CloudflareTunnels />}
                             />
                         </Route>
                         <Route
-                            path="/app/reverse-proxy"
+                            path="/reverse-proxy"
                             element={<ReverseProxyApp />}
                         >
                             <Route
-                                path="/app/reverse-proxy/vertex"
+                                path="/reverse-proxy/vertex"
                                 element={<VertexReverseProxy />}
                             />
                         </Route>
                         <Route
-                            path="/app/containers/:uuid/"
+                            path="/containers/:uuid/"
                             element={<ContainerDetails />}
                         >
                             <Route
-                                path="/app/containers/:uuid/home"
+                                path="/containers/:uuid/home"
                                 element={<ContainerHome />}
                             />
                             <Route
-                                path="/app/containers/:uuid/docker"
+                                path="/containers/:uuid/docker"
                                 element={<ContainerDocker />}
                             />
                             <Route
-                                path="/app/containers/:uuid/logs"
+                                path="/containers/:uuid/logs"
                                 element={<ContainerLogs />}
                             />
                             <Route
-                                path="/app/containers/:uuid/environment"
+                                path="/containers/:uuid/environment"
                                 element={<ContainerEnv />}
                             />
                             <Route
-                                path="/app/containers/:uuid/database"
+                                path="/containers/:uuid/database"
                                 element={<ContainerDetailsDatabase />}
                             />
                             <Route
-                                path="/app/containers/:uuid/update"
+                                path="/containers/:uuid/update"
                                 element={<ContainerUpdate />}
                             />
                             <Route
-                                path="/app/containers/:uuid/settings"
+                                path="/containers/:uuid/settings"
                                 element={<ContainerSettings />}
                             />
                         </Route>
-                        <Route path="/app/admin" element={<SettingsApp />}>
+                        <Route path="/admin" element={<SettingsApp />}>
                             <Route
-                                path="/app/admin/theme"
+                                path="/admin/theme"
                                 element={<SettingsTheme />}
                             />
                             <Route
-                                path="/app/admin/notifications"
+                                path="/admin/notifications"
                                 element={<SettingsNotifications />}
                             />
                             <Route
-                                path="/app/admin/database"
+                                path="/admin/database"
                                 element={<SettingsDb />}
                             />
                             <Route
-                                path="/app/admin/updates"
+                                path="/admin/updates"
                                 element={<SettingsUpdates />}
                             />
                             <Route
-                                path="/app/admin/checks"
+                                path="/admin/checks"
                                 element={<SettingsChecks />}
                             />
                             <Route
-                                path="/app/admin/about"
+                                path="/admin/about"
                                 element={<SettingsAbout />}
                             />
                         </Route>

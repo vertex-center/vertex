@@ -12,29 +12,29 @@ export default function SettingsApp() {
                 <Sidebar.Item
                     label="Theme"
                     icon={<MaterialIcon icon="palette" />}
-                    link={l("/app/admin/theme")}
+                    link={l("/admin/theme")}
                 />
             </Sidebar.Group>
             <Sidebar.Group title="Administration">
                 <Sidebar.Item
                     label="Notifications"
                     icon={<MaterialIcon icon="notifications" />}
-                    link={l("/app/admin/notifications")}
+                    link={l("/admin/notifications")}
                 />
                 <Sidebar.Item
                     label="Updates"
                     icon={<MaterialIcon icon="update" />}
-                    link={l("/app/admin/updates")}
+                    link={l("/admin/updates")}
                 />
                 <Sidebar.Item
                     label="Checks"
                     icon={<MaterialIcon icon="checklist" />}
-                    link={l("/app/admin/checks")}
+                    link={l("/admin/checks")}
                 />
                 <Sidebar.Item
                     label="About"
                     icon={<MaterialIcon icon="info" />}
-                    link={l("/app/admin/about")}
+                    link={l("/admin/about")}
                 />
             </Sidebar.Group>
         </Sidebar>

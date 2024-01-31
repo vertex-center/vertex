@@ -42,7 +42,7 @@ export default function MonitoringApp() {
                 <Sidebar.Item
                     label="Prometheus"
                     icon={<SiPrometheus size={20} />}
-                    link={l("/app/monitoring/prometheus")}
+                    link={l("/monitoring/prometheus")}
                     trailing={
                         prometheusContainer && (
                             <ContainerLed
@@ -57,7 +57,7 @@ export default function MonitoringApp() {
                 <Sidebar.Item
                     label="Grafana"
                     icon={<SiGrafana size={20} />}
-                    link={l("/app/monitoring/grafana")}
+                    link={l("/monitoring/grafana")}
                     trailing={
                         grafanaContainer && (
                             <ContainerLed

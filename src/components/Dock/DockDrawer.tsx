@@ -60,7 +60,7 @@ export default function DockDrawer(props: Props) {
                     ?.map((app) => (
                         <DrawerApp
                             key={app.id}
-                            to={`/app/${app.id}`}
+                            to={`/${app.id}`}
                             {...app}
                             onClick={onClose}
                         />

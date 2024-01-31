@@ -37,7 +37,7 @@ const ToolbarContainers = (props: ToolbarProps) => {
             <Spacer />
             <Button
                 variant="colored"
-                onClick={() => navigate("/app/containers/add")}
+                onClick={() => navigate("/containers/add")}
                 rightIcon={<MaterialIcon icon="add" />}
             >
                 Create container
@@ -111,7 +111,7 @@ export default function ContainersApp() {
                                 key={c.id}
                                 container={{
                                     value: c,
-                                    to: `/app/containers/${c.id}/`,
+                                    to: `/containers/${c.id}/`,
                                     onPower: async () =>
                                         mutationPower.mutate(c.id),
                                 }}

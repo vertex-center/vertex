@@ -82,7 +82,7 @@ export default function Dock() {
                                 ?.map((app) => (
                                     <DockApp
                                         key={app.id}
-                                        to={`/app/${app.id}`}
+                                        to={`/${app.id}`}
                                         {...app}
                                         onClick={() => setDrawerOpen(false)}
                                     />
