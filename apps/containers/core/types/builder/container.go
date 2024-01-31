@@ -53,6 +53,10 @@ func (b *ContainerBuilder) WithCaps(caps types.Capabilities) *ContainerBuilder {
 }
 
 func (b *ContainerBuilder) WithSysctls(sysctls types.Sysctls) *ContainerBuilder {
+	if len(sysctls) == 0 {
+		return b
+	}
+	b.opts.Sysctls = make(map[string]string)
 	for _, sysctl := range sysctls {
 		b.opts.Sysctls[sysctl.Name] = sysctl.Value
 	}
