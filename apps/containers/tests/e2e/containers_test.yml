@@ -10,12 +10,59 @@ testcases:
     steps:
       - type: login
 
-  - name: get-containers
+  - name: create-container
     steps:
       - type: http
         url: http://localhost:7504/api/containers
+        method: POST
+        headers:
+          Authorization: "{{.login.result.auth}}"
+        body: |
+          {
+            "template_id": "redis"
+          }
+        assertions:
+          - result.statuscode ShouldEqual 201
+          - result.bodyjson ShouldContainKey "id"
+
+  - name: get-container
+    steps:
+      - type: http
+        url: http://localhost:7504/api/containers/{{.create-container.result.bodyjson.id}}
         headers:
           Authorization: "{{.login.result.auth}}"
         assertions:
           - result.statuscode ShouldEqual 200
-          - result.bodyjson ShouldBeZeroValue
+          - result.bodyjson ShouldContainKey "id"
+          - result.bodyjson.name ShouldEqual "Redis"
+
+  - name: patch-container
+    steps:
+      - type: http
+        url: http://localhost:7504/api/containers/{{.create-container.result.bodyjson.id}}
+        method: PATCH
+        headers:
+          Authorization: "{{.login.result.auth}}"
+        body: |
+          {
+            "name": "Redis Database"
+          }
+
+  - name: get-container-patched
+    steps:
+      - type: http
+        url: http://localhost:7504/api/containers/{{.create-container.result.bodyjson.id}}
+        headers:
+          Authorization: "{{.login.result.auth}}"
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey "id"
+          - result.bodyjson.name ShouldEqual "Redis Database"
+
+  - name: delete-container
+    steps:
+      - type: http
+        url: http://localhost:7504/api/containers/{{.create-container.result.bodyjson.id}}
+        method: DELETE
+        headers:
+          Authorization: "{{.login.result.auth}}"
