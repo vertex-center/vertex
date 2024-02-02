@@ -1,0 +1,10 @@
+executor: wait
+input:
+  port: ''
+steps:
+  - type: http
+    url: http://localhost:{{.input.port}}/api/ping
+    retry: 20
+    delay: 1
+    assertions:
+      - result.statuscode ShouldEqual 204

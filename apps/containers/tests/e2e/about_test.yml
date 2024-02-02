@@ -1,0 +1,19 @@
+name: About
+
+testcases:
+  - name: wait
+    steps:
+      - type: wait
+        port: 7504
+
+  - name: get-about
+    steps:
+      - type: http
+        url: http://localhost:7504/api/about
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey "version"
+          - result.bodyjson ShouldContainKey "commit"
+          - result.bodyjson ShouldContainKey "date"
+          - result.bodyjson ShouldContainKey "os"
+          - result.bodyjson ShouldContainKey "arch"

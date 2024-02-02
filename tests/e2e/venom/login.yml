@@ -1,0 +1,22 @@
+executor: login
+steps:
+  - type: http
+    url: http://localhost:7502/api/register
+    method: POST
+    headers:
+      Authorization: "Basic dmVydGV4LWFkbWluOnZlcnRleC1hZG1pbg=="
+    assertions:
+      - result.statuscode ShouldNotBeNil
+
+  - type: http
+    url: http://localhost:7502/api/login
+    method: POST
+    headers:
+      Authorization: "Basic dmVydGV4LWFkbWluOnZlcnRleC1hZG1pbg=="
+    vars:
+      token:
+        from: result.bodyjson.token
+
+output:
+  token: "{{.token}}"
+  auth: "Bearer {{.token}}"

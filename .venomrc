@@ -1,0 +1,2 @@
+output_dir: out/venom
+lib_dir: tests/e2e/venom

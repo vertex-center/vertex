@@ -1,0 +1,21 @@
+name: Containers
+
+testcases:
+  - name: wait
+    steps:
+      - type: wait
+        port: 7504
+
+  - name: login
+    steps:
+      - type: login
+
+  - name: get-containers
+    steps:
+      - type: http
+        url: http://localhost:7504/api/containers
+        headers:
+          Authorization: "{{.login.result.auth}}"
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldBeZeroValue
