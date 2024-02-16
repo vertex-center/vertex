@@ -70,10 +70,10 @@ func (suite *EmailTestSuite) TestCreateEmail() {
 	})
 
 	suite.Run("error", func() {
-		err := errors.AlreadyExistsf("email")
-		suite.adapter.On("CreateEmail", mock.AnythingOfType("*types.Email")).Return(err)
+		targetErr := errors.AlreadyExistsf("email")
+		suite.adapter.On("CreateEmail", mock.AnythingOfType("*types.Email")).Return(targetErr)
 		email, err := suite.service.CreateEmail(suite.testEmail.UserID, suite.testEmail.Email)
-		suite.Require().ErrorIs(err, err)
+		suite.Require().ErrorIs(err, targetErr)
 		suite.Equal(types.Email{}, email)
 	})
 }
@@ -86,9 +86,9 @@ func (suite *EmailTestSuite) TestDeleteEmail() {
 	})
 
 	suite.Run("error", func() {
-		err := errors.NotFoundf("email")
-		suite.adapter.On("DeleteEmail", suite.testEmail.UserID, suite.testEmail.Email).Return(err)
-		err = suite.service.DeleteEmail(suite.testEmail.UserID, suite.testEmail.Email)
-		suite.Require().ErrorIs(err, err)
+		targetErr := errors.NotFoundf("email")
+		suite.adapter.On("DeleteEmail", suite.testEmail.UserID, suite.testEmail.Email).Return(targetErr)
+		err := suite.service.DeleteEmail(suite.testEmail.UserID, suite.testEmail.Email)
+		suite.Require().ErrorIs(err, targetErr)
 	})
 }
