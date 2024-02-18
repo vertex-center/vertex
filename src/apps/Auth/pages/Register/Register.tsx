@@ -5,9 +5,9 @@ import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import {
     Button,
     Horizontal,
+    Input,
     Logo,
     MaterialIcon,
-    TextField,
     Title,
     Vertical,
 } from "@vertex-center/components";
@@ -38,13 +38,13 @@ export default function Register() {
                     <Title variant="h1">Register</Title>
                 </Horizontal>
                 <Vertical gap={20}>
-                    <TextField
+                    <Input
                         id="username"
                         label="Username"
                         onChange={onUsernameChange}
                         required
                     />
-                    <TextField
+                    <Input
                         id="password"
                         label="Password"
                         onChange={onPasswordChange}

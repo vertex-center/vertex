@@ -9,12 +9,7 @@ import ContainerSelect from "../../components/ContainerSelect/ContainerSelect";
 import { ChangeEvent, Fragment, useEffect, useState } from "react";
 import { Container } from "../../../../models/container";
 import Progress from "../../../../components/Progress";
-import {
-    Button,
-    MaterialIcon,
-    TextField,
-    Title,
-} from "@vertex-center/components";
+import { Button, Input, MaterialIcon, Title } from "@vertex-center/components";
 import { api } from "../../../../backend/api/backend";
 import { DatabaseEnvironment } from "../../backend/template";
 import { APIError } from "../../../../components/Error/APIError";
@@ -165,7 +160,7 @@ export default function ContainerDetailsDatabase() {
                                 onChange={onChange}
                             />
                             {databases?.[dbID]?.container_id && (
-                                <TextField
+                                <Input
                                     label="Database name"
                                     onChange={(e: any) =>
                                         onChangeDbName(e, dbID)

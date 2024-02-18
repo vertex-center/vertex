@@ -2,6 +2,7 @@ import Content from "../../../../components/Content/Content";
 import {
     Button,
     Code,
+    Input,
     List,
     ListActions,
     ListDescription,
@@ -10,7 +11,6 @@ import {
     ListTitle,
     MaterialIcon,
     Paragraph,
-    TextField,
     Title,
 } from "@vertex-center/components";
 import {
@@ -154,7 +154,7 @@ export default function AccountEmails() {
                 title="Add email address"
                 actions={popupCreateActions}
             >
-                <TextField
+                <Input
                     label="Email address"
                     type="email"
                     value={email}

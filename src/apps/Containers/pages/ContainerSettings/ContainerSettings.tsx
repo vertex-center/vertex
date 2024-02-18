@@ -3,11 +3,11 @@ import { Horizontal } from "../../../../components/Layouts/Layouts";
 import Spacer from "../../../../components/Spacer/Spacer";
 import {
     Button,
+    Input,
     MaterialIcon,
     Paragraph,
     SelectField,
     SelectOption,
-    TextField,
     Title,
 } from "@vertex-center/components";
 import { useParams } from "react-router-dom";
@@ -115,7 +115,7 @@ export default function ContainerSettings() {
                     disabled={isLoadingContainer}
                 />
             </Horizontal>
-            <TextField
+            <Input
                 id="container-name"
                 label="Container name"
                 description="The custom name of your choice for this service"

@@ -69,7 +69,6 @@ import {
     TableRow,
     TableRowProps,
 } from "./components/Table/Table";
-import { TextField } from "./components/TextField/TextField";
 import { Title, TitleType } from "./components/Title/Title";
 import { PageContext, PageProvider } from "./contexts/PageContext";
 import { useHasSidebar } from "./hooks/useHasSidebar";
@@ -155,7 +154,6 @@ export {
     TableHead,
     TableBody,
     TableHeadCell,
-    TextField,
     Title,
     Vertical,
     useHasSidebar,

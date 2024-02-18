@@ -1,10 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import {
-    Button,
-    MaterialIcon,
-    TextField,
-    Title,
-} from "@vertex-center/components";
+import { Button, Input, MaterialIcon, Title } from "@vertex-center/components";
 import { Horizontal } from "../../../components/Layouts/Layouts";
 import { APIError } from "../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
@@ -42,7 +37,7 @@ export default function SettingsNotifications() {
             <APIError error={error} />
             {!error && (
                 <Fragment>
-                    <TextField
+                    <Input
                         id="webhook"
                         label="Webhook"
                         value={webhook}

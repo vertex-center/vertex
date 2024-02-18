@@ -2,8 +2,8 @@ import Content from "../../../../components/Content/Content";
 import {
     Button,
     Horizontal,
+    Input,
     MaterialIcon,
-    TextField,
     Title,
     Vertical,
 } from "@vertex-center/components";
@@ -55,7 +55,7 @@ export default function AccountInfo() {
             <ProgressOverlay show={isLoading} />
             <APIError error={error} />
             <Vertical gap={20}>
-                <TextField
+                <Input
                     id="username"
                     label="Username"
                     value={username}

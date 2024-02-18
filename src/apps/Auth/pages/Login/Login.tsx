@@ -2,9 +2,9 @@ import "./Login.sass";
 import {
     Button,
     Horizontal,
+    Input,
     Logo,
     MaterialIcon,
-    TextField,
     Title,
     Vertical,
 } from "@vertex-center/components";
@@ -38,13 +38,13 @@ export default function Login() {
                     <Title variant="h1">Login</Title>
                 </Horizontal>
                 <Vertical gap={20}>
-                    <TextField
+                    <Input
                         id="username"
                         label="Username"
                         onChange={onUsernameChange}
                         required
                     />
-                    <TextField
+                    <Input
                         id="password"
                         label="Password"
                         onChange={onPasswordChange}

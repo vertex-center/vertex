@@ -1,4 +1,4 @@
-import { TextField } from "@vertex-center/components";
+import { Input } from "@vertex-center/components";
 import TimezoneField from "../../../../components/TimezoneField/TimezoneField";
 import { EnvVariable } from "../../backend/models";
 
@@ -32,7 +32,7 @@ export default function EnvVariableInput(props: Readonly<Props>) {
             />
         );
     } else {
-        input = <TextField {...inputProps} />;
+        input = <Input {...inputProps} />;
     }
 
     return input;
