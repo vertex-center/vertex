@@ -5,53 +5,31 @@
 
 .input
     display: flex
-    flex-direction: column
+    flex-direction: row
+    align-items: center
+    padding: 0 15px
+    margin: 0
+    outline: 0
+    border-radius: dimensions.$border-radius
+    height: dimensions.$component-height
+    background-color: colors.$bg-primary
+    border: 1px solid colors.$bg-tertiary
+    color: colors.$fg-primary
+    -webkit-appearance: none
+    box-sizing: border-box
+    font-size: fonts.$size-normal
+    @include presets.control-shadow
 
-    &-field
-        display: flex
-        flex-direction: row
-        align-items: center
-        padding: 0 15px
-        margin: 0
-        outline: 0
-        border-radius: dimensions.$border-radius
-        height: dimensions.$component-height
-        background-color: colors.$bg-primary
-        border: 1px solid colors.$bg-tertiary
-        color: colors.$fg-primary
-        -webkit-appearance: none
-        box-sizing: border-box
-        font-size: fonts.$size-normal
-        @include presets.control-shadow
+    &:hover:not(:disabled)
+        background-color: colors.$bg-primary-hover
+        border-color: colors.$bg-tertiary-hover
 
-        &:hover:not(:disabled)
-            background-color: colors.$bg-primary-hover
-            border-color: colors.$bg-tertiary-hover
+    &:focus
+        background-color: colors.$bg-primary-hover
 
-        &:focus
-            background-color: colors.$bg-primary-hover
-
-        &::placeholder
-            color: colors.$fg-tertiary
-
-        &:disabled
-            opacity: 0.5
-            cursor: not-allowed
-
-    &-label
-        color: colors.$fg-secondary
-        margin-bottom: 8px
-
-    &-required
-        color: colors.$red
-
-    &-optional
+    &::placeholder
         color: colors.$fg-tertiary
 
-    &-description, &-error
-        margin-top: 7px
-        color: colors.$fg-tertiary
-        font-size: 14px
-
-    &-error
-        color: colors.$red
+    &:disabled
+        opacity: 0.5
+        cursor: not-allowed

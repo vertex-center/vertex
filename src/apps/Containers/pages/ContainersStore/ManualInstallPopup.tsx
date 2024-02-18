@@ -1,5 +1,10 @@
 import Popup from "../../../../components/Popup/Popup";
-import { Button, Input, MaterialIcon } from "@vertex-center/components";
+import {
+    Button,
+    FormItem,
+    Input,
+    MaterialIcon,
+} from "@vertex-center/components";
 import { ChangeEvent, Fragment, useState } from "react";
 import { APIError } from "../../../../components/Error/APIError";
 import { useCreateContainer } from "../../hooks/useCreateContainer";
@@ -48,15 +53,14 @@ export default function ManualInstallPopup(props: Readonly<Props>) {
             title="Install from Docker Registry"
             actions={actions}
         >
-            <Input
-                id="image"
-                label="Image"
-                placeholder="postgres"
-                value={image}
-                onChange={onImageChange}
-                disabled={isCreatingContainer}
-                required
-            />
+            <FormItem label="Image" required>
+                <Input
+                    placeholder="postgres"
+                    value={image}
+                    onChange={onImageChange}
+                    disabled={isCreatingContainer}
+                />
+            </FormItem>
             <ProgressOverlay show={isCreatingContainer} />
             <APIError error={errorCreatingContainer} />
         </Popup>

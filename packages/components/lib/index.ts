@@ -8,6 +8,7 @@ import {
     DropdownItemProps,
     DropdownProps,
 } from "./components/Dropdown/Dropdown";
+import { FormItem, FormItemProps } from "./components/FormItem/FormItem.tsx";
 import { Header, HeaderProps } from "./components/Header/Header";
 import { HeaderItem, HeaderItemProps } from "./components/Header/HeaderItem";
 import {
@@ -86,6 +87,7 @@ export type {
     CodeProps,
     DropdownProps,
     DropdownItemProps,
+    FormItemProps,
     HeaderProps,
     HeaderItemProps,
     InlineCodeProps,
@@ -123,6 +125,7 @@ export {
     Code,
     Dropdown,
     DropdownItem,
+    FormItem,
     Header,
     HeaderItem,
     PageContext,

@@ -3,6 +3,7 @@ import { Horizontal } from "../../../../components/Layouts/Layouts";
 import Spacer from "../../../../components/Spacer/Spacer";
 import {
     Button,
+    FormItem,
     Input,
     MaterialIcon,
     Paragraph,
@@ -115,42 +116,43 @@ export default function ContainerSettings() {
                     disabled={isLoadingContainer}
                 />
             </Horizontal>
-            <Input
-                id="container-name"
+            <FormItem
                 label="Container name"
                 description="The custom name of your choice for this service"
-                value={name}
-                onChange={(e: any) => {
-                    setName(e.target.value);
-                    setSaved(false);
-                }}
-                disabled={isLoadingContainer}
-            />
+            >
+                <Input
+                    value={name}
+                    onChange={(e: any) => {
+                        setName(e.target.value);
+                        setSaved(false);
+                    }}
+                    disabled={isLoadingContainer}
+                />
+            </FormItem>
             <div className={styles.versionSelect}>
-                <SelectField
-                    id="container-version"
-                    label="Version"
-                    onChange={onVersionChange}
-                    disabled={isLoadingContainer || imageTagsLoading}
-                    // @ts-ignore
-                    value={versionValue}
-                >
-                    {imageTags?.includes("latest") && (
-                        <SelectOption value="latest">
-                            Always pull latest
-                        </SelectOption>
-                    )}
-                    {imageTags?.map((v) => {
-                        if (v === "latest") {
-                            return null;
-                        }
-                        return (
-                            <SelectOption key={v} value={v}>
-                                <VersionTag>{v}</VersionTag>
+                <FormItem label="Version">
+                    <SelectField
+                        id="container-version"
+                        onChange={onVersionChange}
+                        disabled={isLoadingContainer || imageTagsLoading}
+                        // @ts-ignore
+                        value={versionValue}
+                    >
+                        {imageTags?.includes("latest") && (
+                            <SelectOption value="latest">
+                                Always pull latest
                             </SelectOption>
-                        );
-                    })}
-                </SelectField>
+                        )}
+                        {imageTags?.map((v) => {
+                            if (v === "latest") return null;
+                            return (
+                                <SelectOption key={v} value={v}>
+                                    <VersionTag>{v}</VersionTag>
+                                </SelectOption>
+                            );
+                        })}
+                    </SelectField>
+                </FormItem>
                 <Button
                     rightIcon={<MaterialIcon icon="refresh" />}
                     onClick={() => reloadVersions(false)}

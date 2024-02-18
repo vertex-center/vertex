@@ -40,7 +40,7 @@ export function SelectOption<T>(props: Readonly<SelectOptionProps<T>>) {
                 {
                     "select-field-option-multiple": multiple,
                 },
-                className,
+                className
             )}
             {...others}
         >
@@ -61,7 +61,7 @@ export type SelectFieldProps = Omit<InputProps, "onChange" | "value"> &
 
 function _SelectField<T>(
     props: Readonly<SelectFieldProps>,
-    ref: SelectFieldRef,
+    ref: SelectFieldRef
 ) {
     const {
         children,
@@ -101,7 +101,7 @@ function _SelectField<T>(
                 <div className="select-field-values">
                     {Children.map(children, (child) => {
                         if (!child) return;
-                        // @ts-ignore
+                        // @ts-expect-error cloneElement is too hard to type
                         return cloneElement(child, {
                             onClick: onChange,
                             multiple: multiple,

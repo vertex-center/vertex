@@ -14,10 +14,7 @@ export const Normal: Story = {
         id: "input",
         placeholder: "Placeholder",
         disabled: false,
-        label: "Label",
         required: true,
-        description: "A short description",
-        error: "",
     },
     argTypes: {
         placeholder: {

@@ -4,6 +4,7 @@ import { useRegister } from "../../hooks/useRegister";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import {
     Button,
+    FormItem,
     Horizontal,
     Input,
     Logo,
@@ -38,19 +39,12 @@ export default function Register() {
                     <Title variant="h1">Register</Title>
                 </Horizontal>
                 <Vertical gap={20}>
-                    <Input
-                        id="username"
-                        label="Username"
-                        onChange={onUsernameChange}
-                        required
-                    />
-                    <Input
-                        id="password"
-                        label="Password"
-                        onChange={onPasswordChange}
-                        type="password"
-                        required
-                    />
+                    <FormItem label="Username" required>
+                        <Input onChange={onUsernameChange} />
+                    </FormItem>
+                    <FormItem label="Password" required>
+                        <Input onChange={onPasswordChange} type="password" />
+                    </FormItem>
                     <APIError error={errorRegister} />
                     <Link to="/login">I already have an account</Link>
                     <Horizontal>

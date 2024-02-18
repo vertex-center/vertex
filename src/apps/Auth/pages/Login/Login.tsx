@@ -1,6 +1,7 @@
 import "./Login.sass";
 import {
     Button,
+    FormItem,
     Horizontal,
     Input,
     Logo,
@@ -38,19 +39,12 @@ export default function Login() {
                     <Title variant="h1">Login</Title>
                 </Horizontal>
                 <Vertical gap={20}>
-                    <Input
-                        id="username"
-                        label="Username"
-                        onChange={onUsernameChange}
-                        required
-                    />
-                    <Input
-                        id="password"
-                        label="Password"
-                        onChange={onPasswordChange}
-                        type="password"
-                        required
-                    />
+                    <FormItem label="Username" required>
+                        <Input onChange={onUsernameChange} />
+                    </FormItem>
+                    <FormItem label="Password" required>
+                        <Input onChange={onPasswordChange} type="password" />
+                    </FormItem>
                     <APIError error={errorLogin} />
                     <Link to="/register">I don't have an account</Link>
                     <Horizontal>

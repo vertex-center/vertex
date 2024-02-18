@@ -14,25 +14,16 @@ export type InputRef = Ref<HTMLInputElement>;
 export type InputProps = InputHTMLAttributes<HTMLInputElement> & {
     divRef?: Ref<HTMLDivElement>;
     divProps?: InputHTMLAttributes<HTMLDivElement>;
-    label?: string;
-    description?: string;
-    error?: string;
     as?: ElementType;
 };
 
 function _Input(props: Readonly<InputProps>, ref: InputRef) {
     const {
-        divRef,
         id,
         as,
-        required,
         className,
         value: _,
         onChange: __,
-        label,
-        description,
-        error,
-        divProps,
         children,
         ...others
     } = props;
@@ -49,42 +40,16 @@ function _Input(props: Readonly<InputProps>, ref: InputRef) {
 
     const Component = as ?? "input";
 
-    if (!id) {
-        console.warn("Input is missing an id", { label, description });
-    }
-
-    let indicator;
-    if (required) {
-        indicator = <span className="input-required">*</span>;
-    } else {
-        indicator = <span className="input-optional">(optional)</span>;
-    }
-
     return (
-        <div
-            ref={divRef}
-            {...divProps}
-            className={cx("input", divProps?.className)}
-        >
-            {label && (
-                <label htmlFor={id} className="input-label">
-                    {label} {indicator}
-                </label>
-            )}
-            <Component
-                ref={ref}
-                id={id}
-                value={value}
-                onChange={onChange}
-                className={cx("input-field", className)}
-                children={children}
-                {...others}
-            />
-            {description && !error && (
-                <div className="input-description">{description}</div>
-            )}
-            {error && <div className="input-error">{error}</div>}
-        </div>
+        <Component
+            ref={ref}
+            id={id}
+            value={value}
+            onChange={onChange}
+            className={cx("input", className)}
+            children={children}
+            {...others}
+        />
     );
 }
 

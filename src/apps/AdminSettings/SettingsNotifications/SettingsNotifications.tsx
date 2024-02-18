@@ -1,5 +1,11 @@
 import { Fragment, useEffect, useState } from "react";
-import { Button, Input, MaterialIcon, Title } from "@vertex-center/components";
+import {
+    Button,
+    FormItem,
+    Input,
+    MaterialIcon,
+    Title,
+} from "@vertex-center/components";
 import { Horizontal } from "../../../components/Layouts/Layouts";
 import { APIError } from "../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
@@ -37,14 +43,14 @@ export default function SettingsNotifications() {
             <APIError error={error} />
             {!error && (
                 <Fragment>
-                    <Input
-                        id="webhook"
-                        label="Webhook"
-                        value={webhook}
-                        onChange={onWebhookChange}
-                        disabled={isLoading}
-                        placeholder={isLoading && "Loading..."}
-                    />
+                    <FormItem label="Webhook">
+                        <Input
+                            value={webhook}
+                            onChange={onWebhookChange}
+                            disabled={isLoading}
+                            placeholder={isLoading && "Loading..."}
+                        />
+                    </FormItem>
                     <Horizontal
                         gap={20}
                         justifyContent="flex-end"

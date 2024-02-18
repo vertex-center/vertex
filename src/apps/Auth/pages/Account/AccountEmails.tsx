@@ -2,6 +2,7 @@ import Content from "../../../../components/Content/Content";
 import {
     Button,
     Code,
+    FormItem,
     Input,
     List,
     ListActions,
@@ -154,13 +155,13 @@ export default function AccountEmails() {
                 title="Add email address"
                 actions={popupCreateActions}
             >
-                <Input
-                    label="Email address"
-                    type="email"
-                    value={email}
-                    onChange={onEmailChange}
-                    required
-                />
+                <FormItem label="Email address" required>
+                    <Input
+                        type="email"
+                        value={email}
+                        onChange={onEmailChange}
+                    />
+                </FormItem>
                 <APIError error={errorCreateEmail} />
                 {isCreatingEmail && <Progress />}
             </Popup>

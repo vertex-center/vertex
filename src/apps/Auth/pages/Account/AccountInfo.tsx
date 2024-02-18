@@ -1,6 +1,7 @@
 import Content from "../../../../components/Content/Content";
 import {
     Button,
+    FormItem,
     Horizontal,
     Input,
     MaterialIcon,
@@ -55,13 +56,14 @@ export default function AccountInfo() {
             <ProgressOverlay show={isLoading} />
             <APIError error={error} />
             <Vertical gap={20}>
-                <Input
-                    id="username"
-                    label="Username"
-                    value={username}
-                    onChange={onChangeUsername}
-                    disabled={isLoading}
-                />
+                <FormItem label="Username">
+                    <Input
+                        value={username}
+                        onChange={onChangeUsername}
+                        disabled={isLoading}
+                        required
+                    />
+                </FormItem>
                 <Horizontal gap={20}>
                     <Spacer />
                     <Saved show={saved} />
