@@ -55,7 +55,20 @@ import { SidebarItemProps } from "./components/Sidebar/SidebarItem";
 import { SidebarGroupProps } from "./components/Sidebar/SidebarGroup";
 import { Tabs } from "./components/Tabs/Tabs";
 import { TabItem } from "./components/Tabs/TabItem";
-import { Table, TableProps } from "./components/Table/Table";
+import {
+    Table,
+    TableBody,
+    TableBodyProps,
+    TableCell,
+    TableCellProps,
+    TableHead,
+    TableHeadCell,
+    TableHeadCellProps,
+    TableHeadProps,
+    TableProps,
+    TableRow,
+    TableRowProps,
+} from "./components/Table/Table";
 import { TextField } from "./components/TextField/TextField";
 import { Title, TitleType } from "./components/Title/Title";
 import { PageContext, PageProvider } from "./contexts/PageContext";
@@ -96,6 +109,11 @@ export type {
     SidebarItemProps,
     SidebarGroupProps,
     TableProps,
+    TableRowProps,
+    TableCellProps,
+    TableHeadProps,
+    TableBodyProps,
+    TableHeadCellProps,
     TitleType,
 };
 
@@ -132,6 +150,11 @@ export {
     Tabs,
     TabItem,
     Table,
+    TableRow,
+    TableCell,
+    TableHead,
+    TableBody,
+    TableHeadCell,
     TextField,
     Title,
     Vertical,

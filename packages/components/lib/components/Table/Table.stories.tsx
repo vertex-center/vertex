@@ -1,5 +1,12 @@
 import { Meta, StoryObj } from "@storybook/react";
-import { Table } from "./Table.tsx";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeadCell,
+    TableRow,
+} from "./Table.tsx";
 
 const meta: Meta<typeof Table> = {
     title: "Components/Table",
@@ -13,22 +20,22 @@ export const Normal: Story = {
     render: function Render(props) {
         return (
             <Table {...props}>
-                <thead>
-                    <tr>
-                        <th>Header 1</th>
-                        <th>Header 2</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Cell A1</td>
-                        <td>Cell B1</td>
-                    </tr>
-                    <tr>
-                        <td>Cell A2</td>
-                        <td>Cell B2</td>
-                    </tr>
-                </tbody>
+                <TableHead>
+                    <TableRow>
+                        <TableHeadCell>Header 1</TableHeadCell>
+                        <TableHeadCell>Header 2</TableHeadCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    <TableRow>
+                        <TableCell>Cell A1</TableCell>
+                        <TableCell>Cell B1</TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell>Cell A2</TableCell>
+                        <TableCell>Cell B2</TableCell>
+                    </TableRow>
+                </TableBody>
             </Table>
         );
     },

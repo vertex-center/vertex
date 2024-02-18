@@ -6,6 +6,11 @@ import {
     InlineCode,
     MaterialIcon,
     Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeadCell,
+    TableRow,
     Title,
 } from "@vertex-center/components";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
@@ -59,19 +64,19 @@ export default function ContainerEnv() {
         <Content>
             <Title variant="h2">Environment</Title>
             <Table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-                <tbody>
+                <TableHead>
+                    <TableRow>
+                        <TableHeadCell>Name</TableHeadCell>
+                        <TableHeadCell>Value</TableHeadCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
                     {env?.map((env, i) => (
-                        <tr key={env.name}>
-                            <td>
+                        <TableRow key={env.name}>
+                            <TableCell>
                                 <InlineCode>{env.name}</InlineCode>
-                            </td>
-                            <td>
+                            </TableCell>
+                            <TableCell>
                                 <EnvVariableInput
                                     id={env.name}
                                     env={env}
@@ -79,10 +84,10 @@ export default function ContainerEnv() {
                                     onChange={(v) => onChange(i, v)}
                                     disabled={isUploading}
                                 />
-                            </td>
-                        </tr>
+                            </TableCell>
+                        </TableRow>
                     ))}
-                </tbody>
+                </TableBody>
             </Table>
             <ProgressOverlay show={isLoadingEnv ?? isUploading} />
             <Horizontal justifyContent="flex-end">
