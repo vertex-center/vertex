@@ -20,21 +20,21 @@ export const useApps = () => {
                 name: "Vertex SQL",
                 description: "Create and manage SQL databases.",
                 icon: "database",
-                hidden: false,
+                hidden: true,
             },
             {
                 id: "tunnels",
                 name: "Vertex Tunnels",
                 description: "Create and manage tunnels.",
                 icon: "subway",
-                hidden: false,
+                hidden: true,
             },
             {
                 id: "monitoring",
                 name: "Vertex Monitoring",
                 description: "Create and manage containers.",
                 icon: "monitoring",
-                hidden: false,
+                hidden: true,
             },
             {
                 id: "containers",
@@ -48,7 +48,7 @@ export const useApps = () => {
                 name: "Vertex Reverse Proxy",
                 description: "Redirect traffic to your containers.",
                 icon: "router",
-                hidden: false,
+                hidden: true,
             },
         ],
     };
