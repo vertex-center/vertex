@@ -47,11 +47,20 @@ func (a *envDBAdapter) DeleteContainerVariables(ctx context.Context, id uuid.UUI
 	return err
 }
 
-func (a *envDBAdapter) UpdateContainerVariable(ctx context.Context, id uuid.UUID, key, value string) error {
+func (a *envDBAdapter) UpdateContainerVariableByID(ctx context.Context, v types.EnvVariable) error {
+	_, err := a.db.Exec(`
+		UPDATE env_variables
+		SET name = $1, value = $2
+		WHERE id = $3
+	`, v.Name, v.Value, v.ID)
+	return err
+}
+
+func (a *envDBAdapter) UpdateContainerVariableByName(ctx context.Context, v types.EnvVariable) error {
 	_, err := a.db.Exec(`
 		UPDATE env_variables
 		SET value = $1
 		WHERE container_id = $2 AND name = $3
-	`, value, id, key)
+	`, v.Value, v.ContainerID, v.Name)
 	return err
 }

@@ -46,7 +46,8 @@ type (
 		GetContainerVariables(ctx context.Context, id uuid.UUID) (types.EnvVariables, error)
 		CreateVariable(ctx context.Context, variable types.EnvVariable) error
 		DeleteContainerVariables(ctx context.Context, id uuid.UUID) error
-		UpdateContainerVariable(ctx context.Context, id uuid.UUID, key, value string) error
+		UpdateContainerVariableByID(ctx context.Context, variable types.EnvVariable) error
+		UpdateContainerVariableByName(ctx context.Context, variable types.EnvVariable) error
 	}
 
 	CapAdapter interface {
