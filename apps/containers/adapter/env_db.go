@@ -24,6 +24,7 @@ func (a *envDBAdapter) GetContainerVariables(ctx context.Context, id uuid.UUID) 
 	err := a.db.Select(&env, `
 		SELECT * FROM env_variables
 		WHERE container_id = $1
+		ORDER BY name
 	`, id)
 	if errors.Is(err, sql.ErrNoRows) {
 		return env, nil
