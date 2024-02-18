@@ -21,6 +21,7 @@ export type Tag = {
 
 export type EnvVariables = EnvVariable[];
 export type EnvVariable = {
+    id: string;
     container_id: string;
     type: string;
     name: string;

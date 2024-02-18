@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
     Button,
@@ -32,7 +32,7 @@ export default function ContainerEnv() {
     useEffect(() => {
         if (!currentEnv) return;
         setEnv(JSON.parse(JSON.stringify(currentEnv)));
-        setSaved(undefined);
+        setSaved(true);
     }, [currentEnv]);
 
     const [saved, setSaved] = useState<boolean>(true);
@@ -53,20 +53,37 @@ export default function ContainerEnv() {
     });
     const { isLoading: isUploading } = mutationSaveEnv;
 
-    const save = () => mutationSaveEnv.mutate(env ?? []);
+    const save = () => {
+        let patch = [...env];
+        patch = patch.filter(
+            (env, i) =>
+                env.name !== currentEnv[i].name ||
+                env.value !== currentEnv[i].value
+        );
+        mutationSaveEnv.mutate(patch);
+    };
 
-    const onChange = (i: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const onNameChange = (i: number, e: ChangeEvent<HTMLInputElement>) => {
+        const newEnv = [...env];
+        newEnv[i].name = e.target.value;
+        updateEnv(newEnv);
+    };
+
+    const onValueChange = (i: number, e: ChangeEvent<HTMLInputElement>) => {
         const newEnv = [...env];
         newEnv[i].value = e.target.value;
-        setEnv(newEnv);
+        updateEnv(newEnv);
+    };
+
+    const updateEnv = (env: EnvVariables) => {
+        setEnv(env);
         setSaved(isSaved());
     };
 
     const isSaved = () => {
         for (let i = 0; i < env.length; i++) {
-            if (env[i].value !== currentEnv[i].value) {
-                return false;
-            }
+            if (env[i].value !== currentEnv[i].value) return false;
+            if (env[i].name !== currentEnv[i].name) return false;
         }
         return true;
     };
@@ -86,19 +103,24 @@ export default function ContainerEnv() {
                         <TableRow key={env.name}>
                             <TableCell>
                                 <Input
-                                    id={env.name}
                                     value={env.name}
+                                    name={currentEnv[i].name + "_name"}
+                                    onChange={(e) => onNameChange(i, e)}
+                                    disabled={isUploading}
                                     className={styles.input}
-                                    disabled
+                                    style={{
+                                        color:
+                                            env.name !== currentEnv[i].name &&
+                                            "var(--blue)",
+                                    }}
                                 />
                             </TableCell>
                             <TableCell>
                                 <Input
-                                    id={env.name}
                                     value={env.value}
-                                    name={env.name}
+                                    name={currentEnv[i].name}
                                     placeholder={env.default}
-                                    onChange={(v) => onChange(i, v)}
+                                    onChange={(e) => onValueChange(i, e)}
                                     type={env.secret ? "password" : undefined}
                                     disabled={isUploading}
                                     className={styles.input}
