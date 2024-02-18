@@ -8,7 +8,6 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./reset.css";
 import "./index.sass";
-import "@vertex-center/components/dist/style.css";
 import { useCookies } from "react-cookie";
 import { themes } from "./models/theme";
 import { PageProvider } from "@vertex-center/components";

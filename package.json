@@ -2,6 +2,9 @@
     "name": "@vertex-center/client",
     "version": "0.16.1",
     "private": true,
+    "workspaces": [
+        "packages/*"
+    ],
     "dependencies": {
         "@hookform/resolvers": "^3.3.2",
         "@icons-pack/react-simple-icons": "^7.1.1",
@@ -12,7 +15,7 @@
         "@testing-library/user-event": "^13.5.0",
         "@types/byte-size": "^8.1.0",
         "@types/uuid": "^9.0.1",
-        "@vertex-center/components": "^0.8.0",
+        "@vertex-center/components": "workspace:packages/components",
         "axios": "^1.3.4",
         "byte-size": "^8.1.1",
         "event-source-polyfill": "^1.0.31",
@@ -37,12 +40,6 @@
         "test-e2e": "start-server-and-test dev http://localhost:5173/ cypress:run",
         "cypress": "cypress open",
         "cypress:run": "cypress run"
-    },
-    "eslintConfig": {
-        "extends": [
-            "react-app",
-            "react-app/jest"
-        ]
     },
     "browserslist": {
         "production": [

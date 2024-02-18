@@ -19,7 +19,14 @@
         "jsx": "react-jsx",
         "types": [
             "cypress"
-        ]
+        ],
+        "baseUrl": ".",
+        "paths": {
+            "@vertex-center/components": [
+                "./packages/components",
+                "./packages/components/lib"
+            ]
+        }
     },
     "include": [
         "src"
