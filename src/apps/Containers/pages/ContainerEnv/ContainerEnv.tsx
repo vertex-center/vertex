@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import EnvVariableInput from "../../components/EnvVariableInput/EnvVariableInput";
 import {
     Button,
-    InlineCode,
+    Input,
     MaterialIcon,
     Table,
     TableBody,
@@ -74,7 +74,11 @@ export default function ContainerEnv() {
                     {env?.map((env, i) => (
                         <TableRow key={env.name}>
                             <TableCell>
-                                <InlineCode>{env.name}</InlineCode>
+                                <Input
+                                    id={env.name}
+                                    value={env.name}
+                                    disabled
+                                />
                             </TableCell>
                             <TableCell>
                                 <EnvVariableInput

@@ -12,6 +12,18 @@
         padding: 10px 20px
         line-height: fonts.$line-height-normal
 
+        &:has(> .input)
+            padding: 0
+
+            & > .input
+                width: 100%
+                border-radius: 0
+                border: none
+                background-color: transparent
+
+                &:hover
+                    background-color: colors.$bg-secondary-hover
+
     & &-cell:not(:last-child), & &-head-cell:not(:last-child)
         border-right: none
 

@@ -1,5 +1,4 @@
 import { Input } from "@vertex-center/components";
-import TimezoneField from "../../../../components/TimezoneField/TimezoneField";
 import { EnvVariable } from "../../backend/models";
 
 type Props = {
@@ -23,17 +22,5 @@ export default function EnvVariableInput(props: Readonly<Props>) {
         disabled,
     };
 
-    let input: any;
-    if (env.type === "timezone") {
-        input = (
-            <TimezoneField
-                {...inputProps}
-                onChange={(value: any) => onChange(value)}
-            />
-        );
-    } else {
-        input = <Input {...inputProps} />;
-    }
-
-    return input;
+    return <Input {...inputProps} />;
 }
