@@ -2,12 +2,9 @@ FROM --platform=$BUILDPLATFORM node:alpine3.19 AS build
 
 WORKDIR /app
 
-COPY ../package.json package-lock.json ./
-
-RUN npm install
-
 COPY .. .
 
+RUN npm install
 RUN npm run build
 
 FROM nginx:alpine3.18-slim
