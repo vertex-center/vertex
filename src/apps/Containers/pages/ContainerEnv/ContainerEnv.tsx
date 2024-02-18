@@ -20,6 +20,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Content from "../../../../components/Content/Content";
 import { API } from "../../backend/api";
 import { EnvVariables } from "../../backend/models";
+import styles from "./ContainerEnv.module.sass";
 
 export default function ContainerEnv() {
     const { uuid } = useParams();
@@ -87,6 +88,7 @@ export default function ContainerEnv() {
                                 <Input
                                     id={env.name}
                                     value={env.name}
+                                    className={styles.input}
                                     disabled
                                 />
                             </TableCell>
@@ -99,6 +101,7 @@ export default function ContainerEnv() {
                                     onChange={(v) => onChange(i, v)}
                                     type={env.secret ? "password" : undefined}
                                     disabled={isUploading}
+                                    className={styles.input}
                                     style={{
                                         color:
                                             env.value !== currentEnv[i].value &&
