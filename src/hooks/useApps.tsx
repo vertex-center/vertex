@@ -50,14 +50,6 @@ export const useApps = () => {
                 icon: "router",
                 hidden: false,
             },
-            {
-                id: "devtools-service-editor",
-                name: "Vertex Service Editor",
-                description: "Create services for publishing.",
-                icon: "frame_source",
-                category: "devtools",
-                hidden: false,
-            },
         ],
     };
 };
