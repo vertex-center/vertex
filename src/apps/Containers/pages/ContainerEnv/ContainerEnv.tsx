@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import EnvVariableInput from "../../components/EnvVariableInput/EnvVariableInput";
 import {
     Button,
     Input,
@@ -15,7 +14,6 @@ import {
 } from "@vertex-center/components";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
 import { useContainerEnv } from "../../hooks/useContainer";
-import styles from "./ContainerEnv.module.sass";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -28,15 +26,15 @@ export default function ContainerEnv() {
     const queryClient = useQueryClient();
 
     const { env: currentEnv, isLoadingEnv, errorEnv } = useContainerEnv(uuid);
-    const [env, setEnv] = useState<EnvVariables>(currentEnv);
+    const [env, setEnv] = useState<EnvVariables>();
 
     useEffect(() => {
-        setEnv(currentEnv);
+        if (!currentEnv) return;
+        setEnv(JSON.parse(JSON.stringify(currentEnv)));
         setSaved(undefined);
     }, [currentEnv]);
 
-    // undefined = not saved AND never modified
-    const [saved, setSaved] = useState<boolean>(undefined);
+    const [saved, setSaved] = useState<boolean>(true);
 
     const mutationSaveEnv = useMutation({
         mutationFn: async (env: EnvVariables) => {
@@ -47,17 +45,29 @@ export default function ContainerEnv() {
             queryClient.invalidateQueries({
                 queryKey: ["containers", uuid],
             });
+            queryClient.invalidateQueries({
+                queryKey: ["container_env", uuid],
+            });
         },
     });
     const { isLoading: isUploading } = mutationSaveEnv;
 
     const save = () => mutationSaveEnv.mutate(env ?? []);
 
-    const onChange = (i: number, value: any) => {
+    const onChange = (i: number, e: React.ChangeEvent<HTMLInputElement>) => {
         const newEnv = [...env];
-        newEnv[i].value = value;
+        newEnv[i].value = e.target.value;
         setEnv(newEnv);
-        setSaved(false);
+        setSaved(isSaved());
+    };
+
+    const isSaved = () => {
+        for (let i = 0; i < env.length; i++) {
+            if (env[i].value !== currentEnv[i].value) {
+                return false;
+            }
+        }
+        return true;
     };
 
     return (
@@ -81,12 +91,19 @@ export default function ContainerEnv() {
                                 />
                             </TableCell>
                             <TableCell>
-                                <EnvVariableInput
+                                <Input
                                     id={env.name}
-                                    env={env}
                                     value={env.value}
+                                    name={env.name}
+                                    placeholder={env.default}
                                     onChange={(v) => onChange(i, v)}
+                                    type={env.secret ? "password" : undefined}
                                     disabled={isUploading}
+                                    style={{
+                                        color:
+                                            env.value !== currentEnv[i].value &&
+                                            "var(--blue)",
+                                    }}
                                 />
                             </TableCell>
                         </TableRow>
@@ -95,16 +112,6 @@ export default function ContainerEnv() {
             </Table>
             <ProgressOverlay show={isLoadingEnv ?? isUploading} />
             <Horizontal justifyContent="flex-end">
-                {saved && (
-                    <Horizontal
-                        className={styles.saved}
-                        alignItems="center"
-                        gap={4}
-                    >
-                        <MaterialIcon icon="check" />
-                        Saved!
-                    </Horizontal>
-                )}
                 <Button
                     variant="colored"
                     onClick={save}
