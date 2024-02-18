@@ -7,7 +7,7 @@ import useContainer from "../../hooks/useContainer";
 import { useParams } from "react-router-dom";
 import ContainerSelect from "../../components/ContainerSelect/ContainerSelect";
 import { ChangeEvent, Fragment, useEffect, useState } from "react";
-import { Container } from "../../../../models/container";
+import { Container } from "../../backend/models";
 import Progress from "../../../../components/Progress";
 import {
     Button,
@@ -16,13 +16,13 @@ import {
     MaterialIcon,
     Title,
 } from "@vertex-center/components";
-import { api } from "../../../../backend/api/backend";
 import { DatabaseEnvironment } from "../../backend/template";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Spacer from "../../../../components/Spacer/Spacer";
 import Content from "../../../../components/Content/Content";
+import { API } from "../../backend/api";
 
 type DatabaseProps = {
     container?: Container;
@@ -39,14 +39,12 @@ function Database(props: Readonly<DatabaseProps>) {
     const [database, setDatabase] = useState<Container>();
     const [error, setError] = useState();
 
-    const env = database?.env;
+    const env = database?.environment;
 
     useEffect(() => {
         const uuid = container?.databases?.[dbID];
         if (uuid === undefined) return;
-        api.vxContainers
-            .container(uuid)
-            .get()
+        API.getContainer(uuid)
             .then((data) => {
                 setDatabase(data);
             })
@@ -115,7 +113,7 @@ export default function ContainerDetailsDatabase() {
 
     const mutationSaveDatabase = useMutation({
         mutationFn: async () => {
-            await api.vxContainers.container(uuid).patch({ databases });
+            await API.patchContainer(uuid, { databases });
         },
         onSuccess: () => {
             setSaved(true);
@@ -187,9 +185,7 @@ export default function ContainerDetailsDatabase() {
                     rightIcon={<MaterialIcon icon="save" />}
                     disabled={isUploading || saved || saved === undefined}
                 >
-                    Save{" "}
-                    {container?.install_method === "docker" &&
-                        "+ Recreate container"}
+                    Save and recreate
                 </Button>
             </Horizontal>
         </Vertical>
