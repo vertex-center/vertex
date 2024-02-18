@@ -1,0 +1,51 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  build:
+    name: Build
+    uses: ./.github/workflows/call-build.yml
+  test:
+    name: Test
+    uses: ./.github/workflows/call-test.yml
+
+  publish:
+    needs: [ build, test ]
+    strategy:
+      matrix:
+        include:
+          - registry: "https://registry.npmjs.org/"
+            token: NPM_TOKEN
+          - registry: "https://npm.pkg.github.com/"
+            token: GITHUB_TOKEN
+
+    permissions:
+      contents: read
+      packages: write
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: dist
+          path: dist
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: ${{ matrix.registry }}
+
+      - name: Publish
+        run: |
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets[matrix.token] }}

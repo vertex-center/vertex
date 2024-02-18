@@ -1,0 +1,165 @@
+@use "../../styles/colors"
+@use "../../styles/fonts"
+@use "../../styles/dimensions"
+
+.sidebar
+    display: flex
+    flex-direction: column
+    min-width: 340px
+    max-width: 340px
+    padding: 0 15px 10px 30px
+    box-sizing: border-box
+    transition: max-width 0.1s ease, min-width 0.1s ease, padding 0.1s ease, padding 0.1s ease
+    overflow: hidden
+    overflow-y: scroll
+
+    &-overlay
+        display: none
+
+    &-groups
+        display: flex
+        flex-direction: column
+        gap: 15px
+
+    @include dimensions.small-or-less
+        position: fixed
+        top: 0
+        left: 0
+        bottom: 0
+        padding: 0
+        min-width: 0
+        max-width: 0
+        z-index: 50
+        background-color: colors.$bg-primary
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2)
+
+        &-visible
+            max-width: 300px
+            min-width: 300px
+            padding: 10px 15px 10px 20px
+
+        &-overlay-visible
+            display: block
+            position: absolute
+            top: 0
+            left: 0
+            bottom: 0
+            right: 0
+            z-index: 40
+            background-color: rgba(0, 0, 0, 0.2)
+
+    &-group
+        display: flex
+        flex-direction: column
+        gap: 2px
+        border-radius: dimensions.$border-radius-lg
+        margin-bottom: 10px
+
+    &-title
+        margin: 0 10px 8px 0
+        color: colors.$fg-secondary
+        font-size: 14px
+
+    &-item
+        display: flex
+        flex-direction: row
+        gap: 12px
+        height: dimensions.$component-height
+        box-sizing: border-box
+        align-items: center
+        cursor: pointer
+        padding: 0 12px
+        border: 1px solid transparent
+        transition: all 0.1s ease
+        -webkit-user-select: none
+        -ms-user-select: none
+        user-select: none
+        position: relative
+        border-radius: dimensions.$border-radius
+        text-decoration: none
+        color: colors.$fg-primary
+
+        &-label
+            min-width: 0
+            white-space: nowrap
+            overflow: hidden
+            text-overflow: ellipsis
+
+        &-trailing
+            margin-left: auto
+
+        &-children
+            display: none
+
+            &-expanded
+                display: block
+
+        &-expand
+            transform: rotate(-90deg)
+            transition: transform 0.1s ease
+
+        &-expanded > &-expand
+            transform: rotate(0)
+
+        &-red
+            color: colors.$red
+
+        &:hover
+            background-color: colors.$bg-secondary-hover
+
+        &.active
+            position: relative
+            background-color: colors.$bg-tertiary
+
+            &:hover
+                background-color: colors.$bg-tertiary-hover
+
+            &::after
+                top: 12px
+                bottom: 12px
+
+        &::after
+            position: absolute
+            content: ''
+            top: 50%
+            bottom: 50%
+            left: 0
+            width: 3px
+            border-radius: 2px
+            background-color: colors.$bg-accent
+            transition: all 0.1s ease-in-out
+
+        &-icon
+            margin-top: -1px
+            width: 20px
+            height: 20px
+
+            & > *
+                font-size: 20px
+
+        &-children
+            margin-left: 20px
+
+.notifications
+    display: flex
+    align-items: center
+    justify-content: center
+    color: colors.$red
+    position: relative
+
+    &::after
+        position: absolute
+        content: ''
+        top: 50%
+        transform: translateY(-50%)
+        left: -15px
+        width: 6px
+        height: 6px
+        border-radius: 50%
+        background-color: colors.$red
+
+.dot
+    width: 6px
+    height: 6px
+    border-radius: 50%
+    background-color: colors.$red

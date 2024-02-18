@@ -1,0 +1,59 @@
+$border-radius: 12px
+$border-radius-lg: 16px
+
+$component-height: 40px
+$component-small-height: 28px
+
+@mixin extra-small
+    @media (min-width: 0px) and (max-width: 480px)
+        @content
+
+@mixin small
+    @media (min-width: 481px) and (max-width: 768px)
+        @content
+
+@mixin medium
+    @media (min-width: 769px) and (max-width: 1024px)
+        @content
+
+@mixin large
+    @media (min-width: 1025px) and (max-width: 1200px)
+        @content
+
+@mixin extra-large
+    @media (min-width: 1201px)
+        @content
+
+
+@mixin extra-small-or-less
+    @media (max-width: 480px)
+        @content
+
+@mixin small-or-less
+    @media (max-width: 768px)
+        @content
+
+@mixin medium-or-less
+    @media (max-width: 1024px)
+        @content
+
+@mixin large-or-less
+    @media (max-width: 1200px)
+        @content
+
+
+@mixin small-or-greater
+    @media (min-width: 481px)
+        @content
+
+@mixin medium-or-greater
+    @media (min-width: 769px)
+        @content
+
+@mixin large-or-greater
+    @media (min-width: 1025px)
+        @content
+
+@mixin extra-large-or-greater
+    @media (min-width: 1201px)
+        @content
