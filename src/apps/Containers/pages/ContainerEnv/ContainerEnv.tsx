@@ -100,7 +100,7 @@ export default function ContainerEnv() {
                 </TableHead>
                 <TableBody>
                     {env?.map((env, i) => (
-                        <TableRow key={env.name}>
+                        <TableRow key={currentEnv[i].name}>
                             <TableCell>
                                 <Input
                                     value={env.name}
