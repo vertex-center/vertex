@@ -27,6 +27,7 @@ import NoItems from "../../../../components/NoItems/NoItems";
 import Popup from "../../../../components/Popup/Popup";
 import { ChangeEvent, Fragment, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { Plus } from "@phosphor-icons/react";
 
 export default function AccountEmails() {
     const queryClient = useQueryClient();
@@ -142,7 +143,7 @@ export default function AccountEmails() {
             <div>
                 <Button
                     variant="colored"
-                    leftIcon={<MaterialIcon icon="add" />}
+                    leftIcon={<Plus />}
                     disabled={isLoadingEmails}
                     onClick={() => setShowCreatePopup(true)}
                 >
