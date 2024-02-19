@@ -1,12 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-    Button,
-    Horizontal,
-    MaterialIcon,
-    Title,
-    Vertical,
-} from "@vertex-center/components";
+import { Button, Horizontal, Title, Vertical } from "@vertex-center/components";
 import {
     KeyValueGroup,
     KeyValueInfo,
@@ -17,6 +11,14 @@ import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useDockerInfo } from "../../hooks/useContainer";
 import Content from "../../../../components/Content/Content";
 import { API } from "../../backend/api";
+import {
+    AppWindow,
+    ArrowClockwise,
+    ArrowsOut,
+    Cpu,
+    IdentificationBadge,
+    Tag,
+} from "@phosphor-icons/react";
 
 export default function ContainerDocker() {
     const { uuid } = useParams();
@@ -51,7 +53,7 @@ export default function ContainerDocker() {
                 <KeyValueInfo
                     name="ID"
                     type="code"
-                    icon="tag"
+                    icon={<Tag />}
                     loading={isLoading}
                 >
                     {info?.container?.id}
@@ -59,7 +61,7 @@ export default function ContainerDocker() {
                 <KeyValueInfo
                     name="Container Name"
                     type="code"
-                    icon="badge"
+                    icon={<IdentificationBadge />}
                     loading={isLoading}
                 >
                     {info?.container?.name}
@@ -67,7 +69,7 @@ export default function ContainerDocker() {
                 <KeyValueInfo
                     name="Platform"
                     type="code"
-                    icon="computer"
+                    icon={<Cpu />}
                     loading={isLoading}
                 >
                     {info?.container?.platform}
@@ -79,7 +81,7 @@ export default function ContainerDocker() {
                 <KeyValueInfo
                     name="ID"
                     type="code"
-                    icon="tag"
+                    icon={<Tag />}
                     loading={isLoading}
                 >
                     {info?.image?.id}
@@ -87,7 +89,7 @@ export default function ContainerDocker() {
                 <KeyValueInfo
                     name="Architecture"
                     type="code"
-                    icon="memory"
+                    icon={<Cpu />}
                     loading={isLoading}
                 >
                     {info?.image?.architecture}
@@ -95,7 +97,7 @@ export default function ContainerDocker() {
                 <KeyValueInfo
                     name="OS"
                     type="code"
-                    icon="computer"
+                    icon={<AppWindow />}
                     loading={isLoading}
                 >
                     {info?.image?.os}
@@ -103,7 +105,7 @@ export default function ContainerDocker() {
                 <KeyValueInfo
                     name="Size"
                     type="code"
-                    icon="straighten"
+                    icon={<ArrowsOut />}
                     loading={isLoading}
                 >
                     {byteSize(info?.image?.size).toString()}
@@ -111,7 +113,7 @@ export default function ContainerDocker() {
                 <KeyValueInfo
                     name="Tags"
                     type="code"
-                    icon="sell"
+                    icon={<Tag />}
                     loading={isLoading}
                 >
                     {info?.image?.tags?.join(", ")}
@@ -122,7 +124,7 @@ export default function ContainerDocker() {
             <Vertical gap={8}>
                 <Horizontal alignItems="center" gap={20}>
                     <Button
-                        leftIcon={<MaterialIcon icon="restart_alt" />}
+                        leftIcon={<ArrowClockwise />}
                         onClick={recreateContainer}
                         disabled={recreatingContainer ?? isLoading}
                     >

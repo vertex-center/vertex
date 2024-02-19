@@ -1,8 +1,7 @@
 import cx from "classnames";
 import "./Dropdown.sass";
-import { Fragment, HTMLProps } from "react";
+import React, { Fragment, HTMLProps } from "react";
 import { Overlay } from "../Overlay/Overlay.tsx";
-import { MaterialIcon } from "../MaterialIcon/MaterialIcon.tsx";
 
 export type DropdownProps = HTMLProps<HTMLDivElement> & {
     opened?: boolean;
@@ -20,7 +19,7 @@ export function Dropdown(props: Readonly<DropdownProps>) {
                     {
                         "dropdown-opened": opened,
                     },
-                    className,
+                    className
                 )}
                 {...others}
             />
@@ -30,7 +29,7 @@ export function Dropdown(props: Readonly<DropdownProps>) {
 }
 
 export type DropdownItemProps = HTMLProps<HTMLDivElement> & {
-    icon?: string;
+    icon?: React.JSX.Element;
     red?: boolean;
 };
 
@@ -44,11 +43,11 @@ export function DropdownItem(props: Readonly<DropdownItemProps>) {
                 {
                     "dropdown-item-red": red,
                 },
-                className,
+                className
             )}
             {...others}
         >
-            {icon && <MaterialIcon icon={icon} />}
+            {icon}
             {children}
         </div>
     );

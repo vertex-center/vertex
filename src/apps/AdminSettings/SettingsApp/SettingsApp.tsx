@@ -1,7 +1,14 @@
 import PageWithSidebar from "../../../components/PageWithSidebar/PageWithSidebar";
-import { MaterialIcon, Sidebar, useTitle } from "@vertex-center/components";
+import { Sidebar, useTitle } from "@vertex-center/components";
 import l from "../../../components/NavLink/navlink";
 import { useSidebar } from "../../../hooks/useSidebar";
+import {
+    ClockClockwise,
+    Info,
+    ListChecks,
+    Notification,
+    Palette,
+} from "@phosphor-icons/react";
 
 export default function SettingsApp() {
     useTitle("Settings");
@@ -11,29 +18,29 @@ export default function SettingsApp() {
             <Sidebar.Group title="Settings">
                 <Sidebar.Item
                     label="Theme"
-                    icon={<MaterialIcon icon="palette" />}
+                    icon={<Palette />}
                     link={l("/admin/theme")}
                 />
             </Sidebar.Group>
             <Sidebar.Group title="Administration">
                 <Sidebar.Item
                     label="Notifications"
-                    icon={<MaterialIcon icon="notifications" />}
+                    icon={<Notification />}
                     link={l("/admin/notifications")}
                 />
                 <Sidebar.Item
                     label="Updates"
-                    icon={<MaterialIcon icon="update" />}
+                    icon={<ClockClockwise />}
                     link={l("/admin/updates")}
                 />
                 <Sidebar.Item
                     label="Checks"
-                    icon={<MaterialIcon icon="checklist" />}
+                    icon={<ListChecks />}
                     link={l("/admin/checks")}
                 />
                 <Sidebar.Item
                     label="About"
-                    icon={<MaterialIcon icon="info" />}
+                    icon={<Info />}
                     link={l("/admin/about")}
                 />
             </Sidebar.Group>

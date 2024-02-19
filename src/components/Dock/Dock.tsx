@@ -2,13 +2,13 @@ import styles from "./Dock.module.sass";
 import { NavLink, useLocation } from "react-router-dom";
 import classNames from "classnames";
 import DockDrawer from "./DockDrawer";
-import { Fragment, useState } from "react";
+import React, { Fragment, useState } from "react";
 import { useApps } from "../../hooks/useApps";
-import { MaterialIcon } from "@vertex-center/components";
+import { IconContext, SquaresFour } from "@phosphor-icons/react";
 
 type DockAppProps = {
     to?: string;
-    icon: string;
+    icon: React.JSX.Element;
     name: string;
     onClick?: () => void;
 };
@@ -18,7 +18,9 @@ export function DockApp(props: Readonly<DockAppProps>) {
 
     const content = (
         <Fragment>
-            <MaterialIcon icon={icon} className={styles.icon} />
+            <IconContext.Provider value={{ size: 24 }}>
+                {icon}
+            </IconContext.Provider>
             <span className={styles.name}>{name}</span>
         </Fragment>
     );
@@ -93,7 +95,7 @@ export default function Dock() {
                         </div>
                     )}
                     <DockApp
-                        icon="apps"
+                        icon={<SquaresFour />}
                         name="Apps"
                         onClick={() => {
                             setDrawerOpen((o) => !o);

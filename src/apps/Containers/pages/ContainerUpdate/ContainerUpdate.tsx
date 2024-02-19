@@ -12,11 +12,11 @@ import {
     ListInfo,
     ListItem,
     ListTitle,
-    MaterialIcon,
     Title,
 } from "@vertex-center/components";
 import Content from "../../../../components/Content/Content";
 import { API } from "../../backend/api";
+import { DownloadSimple } from "@phosphor-icons/react";
 
 export default function ContainerUpdate() {
     const { uuid } = useParams();
@@ -47,7 +47,7 @@ export default function ContainerUpdate() {
                     <ListActions>
                         <Button
                             onClick={updateVertexIntegration}
-                            rightIcon={<MaterialIcon icon="download" />}
+                            rightIcon={<DownloadSimple />}
                         >
                             Update
                         </Button>

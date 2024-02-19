@@ -5,7 +5,7 @@ import Service from "../../../../components/Service/Service";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import ServiceInstallPopup from "../../../../components/ServiceInstallPopup/ServiceInstallPopup";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
     List,
     ListActions,
@@ -14,7 +14,6 @@ import {
     ListInfo,
     ListItem,
     ListTitle,
-    MaterialIcon,
     Title,
     useTitle,
     Vertical,
@@ -24,6 +23,7 @@ import Content from "../../../../components/Content/Content";
 import { SiDocker } from "@icons-pack/react-simple-icons";
 import ManualInstallPopup from "./ManualInstallPopup";
 import { useCreateContainer } from "../../hooks/useCreateContainer";
+import { DownloadSimple } from "@phosphor-icons/react";
 
 type Downloading = {
     service: ServiceModel;
@@ -31,8 +31,6 @@ type Downloading = {
 
 export default function ContainersStore() {
     useTitle("Create container");
-
-    const queryClient = useQueryClient();
 
     const queryServices = useQuery({
         queryKey: ["services"],
@@ -124,7 +122,7 @@ export default function ContainersStore() {
                             </ListDescription>
                         </ListInfo>
                         <ListActions>
-                            <MaterialIcon icon="download" />
+                            <DownloadSimple />
                         </ListActions>
                     </ListItem>
                 </List>

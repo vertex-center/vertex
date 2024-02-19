@@ -4,11 +4,12 @@ import { Caption } from "../Text/Text";
 import { Link } from "react-router-dom";
 import { Vertical } from "../Layouts/Layouts";
 import { useApps } from "../../hooks/useApps";
-import { Logo, MaterialIcon, Title } from "@vertex-center/components";
+import { Logo, Title } from "@vertex-center/components";
+import React from "react";
 
 type AppProps = {
     to: string;
-    icon: string;
+    icon: React.JSX.Element;
     name: string;
     description: string;
     onClick?: () => void;
@@ -19,7 +20,7 @@ function DrawerApp(props: AppProps) {
 
     return (
         <Link to={to} className={styles.app} onClick={onClick}>
-            <MaterialIcon icon={icon} className={styles.appIcon} />
+            <div className={styles.appIcon}>{icon}</div>
             <Vertical>
                 <Title variant="h4" className={styles.appName}>
                     {name}
@@ -54,7 +55,6 @@ export default function DockDrawer(props: Props) {
             </div>
             <div className={styles.apps}>
                 {[...(apps ?? [])]
-                    ?.filter((app) => app.category !== "devtools")
                     ?.filter((app) => !app.hidden)
                     ?.sort((a, b) => (a.name > b.name ? 1 : -1))
                     ?.map((app) => (

@@ -8,13 +8,13 @@ import {
     Horizontal,
     Input,
     Logo,
-    MaterialIcon,
     Title,
     Vertical,
 } from "@vertex-center/components";
 import { APIError } from "../../../../components/Error/APIError";
 import Spacer from "../../../../components/Spacer/Spacer";
 import { Link, useNavigate } from "react-router-dom";
+import { SignIn } from "@phosphor-icons/react";
 
 export default function Register() {
     const [username, setUsername] = useState("");
@@ -51,7 +51,7 @@ export default function Register() {
                         <Spacer />
                         <Button
                             variant="colored"
-                            rightIcon={<MaterialIcon icon="login" />}
+                            rightIcon={<SignIn />}
                             onClick={onRegister}
                         >
                             Register

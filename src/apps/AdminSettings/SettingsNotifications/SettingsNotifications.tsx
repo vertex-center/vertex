@@ -1,17 +1,12 @@
 import { Fragment, useEffect, useState } from "react";
-import {
-    Button,
-    FormItem,
-    Input,
-    MaterialIcon,
-    Title,
-} from "@vertex-center/components";
+import { Button, FormItem, Input, Title } from "@vertex-center/components";
 import { Horizontal } from "../../../components/Layouts/Layouts";
 import { APIError } from "../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import Content from "../../../components/Content/Content";
 import { useSettings } from "../hooks/useSettings";
 import { usePatchSettings } from "../hooks/usePatchSettings";
+import { FloppyDiskBack } from "@phosphor-icons/react";
 
 export default function SettingsNotifications() {
     const [webhook, setWebhook] = useState<string>();
@@ -58,7 +53,7 @@ export default function SettingsNotifications() {
                     >
                         <Button
                             variant="colored"
-                            rightIcon={<MaterialIcon icon="save" />}
+                            rightIcon={<FloppyDiskBack />}
                             onClick={() => patchSettings({ webhook })}
                             disabled={!changed || isPatchingSettings}
                         >

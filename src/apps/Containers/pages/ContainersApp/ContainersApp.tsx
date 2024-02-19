@@ -8,18 +8,14 @@ import { useServerEvent } from "../../../../hooks/useEvent";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Toolbar from "../../../../components/Toolbar/Toolbar";
 import Spacer from "../../../../components/Spacer/Spacer";
-import {
-    Button,
-    MaterialIcon,
-    useTitle,
-    Vertical,
-} from "@vertex-center/components";
+import { Button, useTitle, Vertical } from "@vertex-center/components";
 import SelectTags from "../../components/SelectTags/SelectTags";
 import { useState } from "react";
 import NoItems from "../../../../components/NoItems/NoItems";
 import { useContainers } from "../../hooks/useContainers";
 import { useNavigate } from "react-router-dom";
 import { API } from "../../backend/api";
+import { Plus } from "@phosphor-icons/react";
 
 type ToolbarProps = {
     tags?: string[];
@@ -38,7 +34,7 @@ const ToolbarContainers = (props: ToolbarProps) => {
             <Button
                 variant="colored"
                 onClick={() => navigate("/containers/add")}
-                rightIcon={<MaterialIcon icon="add" />}
+                rightIcon={<Plus />}
             >
                 Create container
             </Button>

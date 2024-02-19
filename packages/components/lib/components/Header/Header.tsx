@@ -5,7 +5,7 @@ import { Logo } from "../Logo/Logo.tsx";
 import { Title } from "../Title/Title.tsx";
 import { Link, LinkProps } from "../Link/Link.tsx";
 import { PageContext } from "../../contexts/PageContext";
-import { MaterialIcon } from "../MaterialIcon/MaterialIcon.tsx";
+import { List } from "@phosphor-icons/react";
 
 interface IHeaderLink {
     className?: string;
@@ -20,7 +20,7 @@ export type HeaderProps<T, U> = HTMLProps<HTMLDivElement> & {
 };
 
 export function Header<T extends IHeaderLink, U extends IHeaderLink>(
-    props: Readonly<HeaderProps<T, U>>,
+    props: Readonly<HeaderProps<T, U>>
 ) {
     const {
         className,
@@ -48,7 +48,7 @@ export function Header<T extends IHeaderLink, U extends IHeaderLink>(
                     {...linkBackProps}
                 >
                     <div className="header-leading">{leading}</div>
-                </Link>,
+                </Link>
             );
         } else if (hasSidebar) {
             setLeadingElement(
@@ -56,8 +56,8 @@ export function Header<T extends IHeaderLink, U extends IHeaderLink>(
                     className="header-leading header-leading-menu"
                     onClick={() => setShowSidebar?.(true)}
                 >
-                    <MaterialIcon icon="menu" />
-                </div>,
+                    <List size={20} />
+                </div>
             );
         } else {
             setLeadingElement(null);

@@ -29,6 +29,7 @@
     "main": "./lib/index.ts",
     "types": "dist/vertex-components.d.ts",
     "dependencies": {
+        "@phosphor-icons/react": "^2.0.15",
         "classnames": "^2.3.2",
         "react-syntax-highlighter": "^15.5.0"
     },

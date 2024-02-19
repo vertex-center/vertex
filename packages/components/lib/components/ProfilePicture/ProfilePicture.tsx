@@ -1,7 +1,7 @@
 import "./ProfilePicture.sass";
 import cx from "classnames";
 import { HTMLProps } from "react";
-import { MaterialIcon } from "../MaterialIcon/MaterialIcon";
+import { User } from "@phosphor-icons/react";
 
 export type ProfilePictureProps = HTMLProps<HTMLImageElement> & {
     size?: number;
@@ -18,7 +18,7 @@ export function ProfilePicture(props: Readonly<ProfilePictureProps>) {
     if (props.src === undefined) {
         return (
             <div style={{ width: size, height: size }} {...properties}>
-                <MaterialIcon icon="person" />
+                <User size={20} />
             </div>
         );
     }

@@ -5,7 +5,6 @@ import {
     Horizontal,
     Input,
     Logo,
-    MaterialIcon,
     Title,
     Vertical,
 } from "@vertex-center/components";
@@ -15,6 +14,7 @@ import { useState } from "react";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useLogin } from "../../hooks/useLogin";
 import { Link, useNavigate } from "react-router-dom";
+import { SignIn } from "@phosphor-icons/react";
 
 export default function Login() {
     const [username, setUsername] = useState("");
@@ -51,7 +51,7 @@ export default function Login() {
                         <Spacer />
                         <Button
                             variant="colored"
-                            rightIcon={<MaterialIcon icon="login" />}
+                            rightIcon={<SignIn />}
                             onClick={onRegister}
                         >
                             Login

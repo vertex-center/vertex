@@ -1,6 +1,7 @@
 import styles from "./ProxyRedirect.module.sass";
 import classNames from "classnames";
 import { MaterialIcon } from "@vertex-center/components";
+import { Cross, LinkSimple } from "@phosphor-icons/react";
 
 type Props = {
     source: string;
@@ -21,7 +22,7 @@ export default function ProxyRedirect(props: Readonly<Props>) {
         >
             <div className={styles.wrapper}>
                 <div className={styles.url}>
-                    <MaterialIcon icon="link" />
+                    <LinkSimple />
                     {source}
                 </div>
                 <div className={styles.line} />
@@ -33,7 +34,7 @@ export default function ProxyRedirect(props: Readonly<Props>) {
                 </div>
             </div>
             <div className={styles.delete} onClick={onDelete}>
-                <MaterialIcon icon="close" />
+                <Cross />
             </div>
         </div>
     );

@@ -14,6 +14,7 @@ import {
 } from "@vertex-center/components";
 import useAuth from "../../apps/Auth/hooks/useAuth";
 import { Fragment } from "react";
+import { Gear, SignIn, SignOut } from "@phosphor-icons/react";
 
 type Props = {
     title?: string;
@@ -44,13 +45,13 @@ export default function (props: Readonly<Props>) {
         accountItems = (
             <Fragment>
                 <DropdownItem
-                    icon="settings"
+                    icon={<Gear />}
                     onClick={() => navigate("/account/info")}
                 >
                     Settings
                 </DropdownItem>
                 <DropdownItem
-                    icon="logout"
+                    icon={<SignOut />}
                     red
                     onClick={() => navigate("/logout")}
                 >
@@ -60,7 +61,7 @@ export default function (props: Readonly<Props>) {
         );
     } else {
         accountItems = (
-            <DropdownItem icon="login" onClick={() => navigate("/login")}>
+            <DropdownItem icon={<SignIn />} onClick={() => navigate("/login")}>
                 Login
             </DropdownItem>
         );

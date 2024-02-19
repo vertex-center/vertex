@@ -1,5 +1,5 @@
 import { Horizontal } from "../Layouts/Layouts";
-import { MaterialIcon } from "@vertex-center/components";
+import { Check } from "@phosphor-icons/react";
 
 export type SavedProps = {
     show?: boolean;
@@ -12,7 +12,7 @@ export default function Saved(props: SavedProps) {
 
     return (
         <Horizontal alignItems="center" gap={4}>
-            <MaterialIcon icon="check" />
+            <Check />
             Saved
         </Horizontal>
     );

@@ -1,7 +1,7 @@
 import cx from "classnames";
 import { HTMLProps } from "react";
 import "./Box.sass";
-import { MaterialIcon } from "../MaterialIcon/MaterialIcon";
+import { Info, Lightbulb, Warning, WarningCircle } from "@phosphor-icons/react";
 
 export type BoxType = "info" | "tip" | "warning" | "error";
 
@@ -13,31 +13,31 @@ export function Box(props: Readonly<BoxProps>) {
     const { className, type, children, ...others } = props;
 
     let label = "",
-        icon = "";
+        icon = null;
 
     switch (type) {
         case "info":
             label = "Info";
-            icon = "info";
+            icon = <Info />;
             break;
         case "tip":
             label = "Tip";
-            icon = "lightbulb";
+            icon = <Lightbulb />;
             break;
         case "warning":
             label = "Warning";
-            icon = "warning";
+            icon = <Warning />;
             break;
         case "error":
             label = "Error";
-            icon = "error";
+            icon = <WarningCircle />;
             break;
     }
 
     return (
         <div className={cx("box", `box-${type}`, className)} {...others}>
             <div className="box-header">
-                <MaterialIcon icon={icon} />
+                {icon}
                 {label}
             </div>
             <div className="box-content">{children}</div>

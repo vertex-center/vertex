@@ -1,4 +1,5 @@
 import { createContext, PropsWithChildren, useMemo, useState } from "react";
+import { IconContext } from "@phosphor-icons/react";
 
 export const PageContext = createContext<{
     title?: string;
@@ -41,10 +42,14 @@ export function PageProvider(props: PropsWithChildren) {
             setHasSidebar,
             showSidebar,
             setShowSidebar,
-        ],
+        ]
     );
 
     return (
-        <PageContext.Provider value={value}>{children}</PageContext.Provider>
+        <PageContext.Provider value={value}>
+            <IconContext.Provider value={{ size: 20 }}>
+                {children}
+            </IconContext.Provider>
+        </PageContext.Provider>
     );
 }

@@ -1,9 +1,8 @@
-import { PropsWithChildren } from "react";
+import React, { PropsWithChildren } from "react";
 
 import styles from "./KeyValueInfo.module.sass";
 import Spacer from "../Spacer/Spacer";
 import LoadingValue from "../LoadingValue/LoadingValue";
-import { MaterialIcon } from "@vertex-center/components";
 
 export function KeyValueGroup(props: Readonly<PropsWithChildren>) {
     const { children } = props;
@@ -15,7 +14,7 @@ type Type = "code";
 type Props = PropsWithChildren<{
     name: string;
     type?: Type;
-    icon?: string;
+    icon?: React.JSX.Element;
     loading?: boolean;
 }>;
 
@@ -30,7 +29,7 @@ export function KeyValueInfo(props: Readonly<Props>) {
     return (
         <div className={styles.info}>
             <div className={styles.key}>
-                {icon && <MaterialIcon icon={icon} className={styles.icon} />}
+                {icon}
                 <div className={styles.name}>{name}</div>
             </div>
             <Spacer />

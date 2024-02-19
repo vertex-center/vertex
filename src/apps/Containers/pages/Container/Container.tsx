@@ -11,7 +11,6 @@ import {
 } from "@vertex-center/components";
 import l from "../../../../components/NavLink/navlink";
 import Progress from "../../../../components/Progress";
-import { SiDocker } from "@icons-pack/react-simple-icons";
 import useContainer from "../../hooks/useContainer";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
@@ -21,6 +20,15 @@ import { Container as ContainerModel } from "../../backend/models";
 import Container from "../../../../components/Container/Container";
 import { useSidebar } from "../../../../hooks/useSidebar";
 import { API } from "../../backend/api";
+import {
+    ClockClockwise,
+    Cube,
+    Gear,
+    House,
+    TerminalWindow,
+    Textbox,
+    Trash,
+} from "@phosphor-icons/react";
 
 export default function ContainerDetails() {
     const { uuid } = useParams();
@@ -77,26 +85,26 @@ export default function ContainerDetails() {
             <Sidebar.Group>
                 <Sidebar.Item
                     label="Home"
-                    icon={<MaterialIcon icon="home" />}
+                    icon={<House />}
                     link={l(`/containers/${uuid}/home`)}
                 />
             </Sidebar.Group>
             <Sidebar.Group title="Analyze">
                 <Sidebar.Item
                     label="Logs"
-                    icon={<MaterialIcon icon="terminal" />}
+                    icon={<TerminalWindow />}
                     link={l(`/containers/${uuid}/logs`)}
                 />
                 <Sidebar.Item
                     label="Docker"
-                    icon={<SiDocker size={20} />}
+                    icon={<Cube />}
                     link={l(`/containers/${uuid}/docker`)}
                 />
             </Sidebar.Group>
             <Sidebar.Group title="Manage">
                 <Sidebar.Item
                     label="Environment"
-                    icon={<MaterialIcon icon="tune" />}
+                    icon={<Textbox />}
                     link={l(`/containers/${uuid}/environment`)}
                 />
                 {container?.databases && (
@@ -107,7 +115,7 @@ export default function ContainerDetails() {
                     />
                 )}
                 <Sidebar.Item
-                    icon={<MaterialIcon icon="update" />}
+                    icon={<ClockClockwise />}
                     label="Update"
                     link={l(`/containers/${uuid}/update`)}
                     notifications={
@@ -116,12 +124,12 @@ export default function ContainerDetails() {
                 />
                 <Sidebar.Item
                     label="Settings"
-                    icon={<MaterialIcon icon="settings" />}
+                    icon={<Gear />}
                     link={l(`/containers/${uuid}/settings`)}
                 />
                 <Sidebar.Item
                     label="Delete"
-                    icon={<MaterialIcon icon="delete" />}
+                    icon={<Trash />}
                     onClick={() => setShowDeletePopup(true)}
                     variant="red"
                 />
@@ -138,7 +146,7 @@ export default function ContainerDetails() {
                 variant="danger"
                 onClick={async () => mutationDeleteContainer.mutate()}
                 disabled={isDeleting}
-                rightIcon={<MaterialIcon icon="delete" />}
+                rightIcon={<Trash />}
             >
                 Confirm
             </Button>

@@ -22,6 +22,7 @@ import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Content from "../../../../components/Content/Content";
 import { API } from "../../backend/api";
+import { ArrowClockwise, FloppyDiskBack } from "@phosphor-icons/react";
 
 export default function ContainerSettings() {
     const { uuid } = useParams();
@@ -154,7 +155,7 @@ export default function ContainerSettings() {
                     </SelectField>
                 </FormItem>
                 <Button
-                    rightIcon={<MaterialIcon icon="refresh" />}
+                    rightIcon={<ArrowClockwise />}
                     onClick={() => reloadVersions(false)}
                     disabled={isLoadingContainer || imageTagsLoading}
                 >
@@ -175,7 +176,7 @@ export default function ContainerSettings() {
                 <Button
                     variant="colored"
                     onClick={async () => mutationSave.mutate()}
-                    rightIcon={<MaterialIcon icon="save" />}
+                    rightIcon={<FloppyDiskBack />}
                     disabled={isUploading || saved || saved === undefined}
                 >
                     Save

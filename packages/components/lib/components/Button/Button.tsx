@@ -29,11 +29,9 @@ export function Button(props: Readonly<ButtonProps>) {
             })}
             {...others}
         >
-            {leftIcon && <span className="button-icon-left">{leftIcon}</span>}
+            {leftIcon}
             <span className="button-content">{children}</span>
-            {rightIcon && (
-                <span className="button-icon-right">{rightIcon}</span>
-            )}
+            {rightIcon}
         </button>
     );
 }

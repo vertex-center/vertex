@@ -9,13 +9,7 @@ import ContainerSelect from "../../components/ContainerSelect/ContainerSelect";
 import { ChangeEvent, Fragment, useEffect, useState } from "react";
 import { Container } from "../../backend/models";
 import Progress from "../../../../components/Progress";
-import {
-    Button,
-    FormItem,
-    Input,
-    MaterialIcon,
-    Title,
-} from "@vertex-center/components";
+import { Button, FormItem, Input, Title } from "@vertex-center/components";
 import { DatabaseEnvironment } from "../../backend/template";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
@@ -23,6 +17,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Spacer from "../../../../components/Spacer/Spacer";
 import Content from "../../../../components/Content/Content";
 import { API } from "../../backend/api";
+import { FloppyDiskBack } from "@phosphor-icons/react";
 
 type DatabaseProps = {
     container?: Container;
@@ -182,7 +177,7 @@ export default function ContainerDetailsDatabase() {
                 <Button
                     variant="colored"
                     onClick={async () => mutationSaveDatabase.mutate()}
-                    rightIcon={<MaterialIcon icon="save" />}
+                    rightIcon={<FloppyDiskBack />}
                     disabled={isUploading || saved || saved === undefined}
                 >
                     Save and recreate

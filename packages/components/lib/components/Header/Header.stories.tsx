@@ -7,6 +7,7 @@ import { MaterialIcon } from "../MaterialIcon/MaterialIcon.tsx";
 import { ProfilePicture } from "../ProfilePicture/ProfilePicture.tsx";
 import { HeaderItem } from "./HeaderItem.tsx";
 import { DropdownItem } from "../Dropdown/Dropdown.tsx";
+import { SignOut } from "@phosphor-icons/react";
 
 const meta: Meta<typeof Header> = {
     title: "Components/Header",
@@ -29,7 +30,7 @@ const linkBackProps: LinkProps<HTMLProps<HTMLAnchorElement>> = {
 };
 
 const items = (
-    <DropdownItem icon="logout" red>
+    <DropdownItem icon={<SignOut />} red>
         Logout
     </DropdownItem>
 );

@@ -15,6 +15,7 @@ import { useServerEvent } from "../../../hooks/useEvent";
 import { useState } from "react";
 import NoItems from "../../../components/NoItems/NoItems";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
+import { Play } from "@phosphor-icons/react";
 
 export default function SettingsChecks() {
     const [isChecking, setIsChecking] = useState(false);
@@ -47,7 +48,7 @@ export default function SettingsChecks() {
             <Horizontal>
                 <Button
                     variant="colored"
-                    rightIcon={<MaterialIcon icon="play_arrow" />}
+                    rightIcon={<Play />}
                     onClick={runChecks}
                     disabled={isChecking}
                 >

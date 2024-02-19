@@ -10,8 +10,8 @@ import {
     ListInfo,
     ListItem,
     ListTitle,
-    MaterialIcon,
 } from "@vertex-center/components";
+import { DownloadSimple } from "@phosphor-icons/react";
 
 type Props = {
     template: TemplateModel;
@@ -46,7 +46,7 @@ export default function Service(props: Readonly<Props>) {
                     </Caption>
                 )}
                 {downloading && <Progress infinite />}
-                <MaterialIcon icon="download" />
+                <DownloadSimple />
             </ListActions>
         </ListItem>
     );

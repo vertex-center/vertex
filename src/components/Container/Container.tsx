@@ -2,30 +2,33 @@ import styles from "./Container.module.sass";
 import classNames from "classnames";
 import { Horizontal, Vertical } from "../Layouts/Layouts";
 import { Link } from "react-router-dom";
-import { Fragment, HTMLProps, MouseEventHandler } from "react";
+import React, { Fragment, HTMLProps, MouseEventHandler } from "react";
 import LoadingValue from "../LoadingValue/LoadingValue";
 import { Container as ContainerModel } from "../../apps/Containers/backend/models";
 import LogoIcon from "../Logo/LogoIcon";
 import { ContainerLed } from "../ContainerLed/ContainerLed";
 import { v4 as uuidv4 } from "uuid";
-import { MaterialIcon } from "@vertex-center/components";
+import { Download, IconContext, Power } from "@phosphor-icons/react";
 
 type ButtonProps = {
-    icon: string;
+    icon: React.JSX.Element;
     onClick: MouseEventHandler<HTMLSpanElement>;
     disabled?: boolean;
 };
 
 function Button({ icon, onClick, disabled }: Readonly<ButtonProps>) {
     return (
-        <MaterialIcon
+        <div
             className={classNames({
                 [styles.button]: true,
                 [styles.buttonDisabled]: disabled,
             })}
-            icon={icon}
             onClick={onClick}
-        />
+        >
+            <IconContext.Provider value={{ size: 22 }}>
+                {icon}
+            </IconContext.Provider>
+        </div>
     );
 }
 
@@ -132,7 +135,7 @@ export default function Container(props: Readonly<Props>) {
 
             {container?.onPower && c?.status !== "not-installed" && (
                 <Button
-                    icon="power_rounded"
+                    icon={<Power />}
                     onClick={(e: any) => onPower(e, container)}
                     disabled={
                         c?.status === "building" ||
@@ -142,7 +145,7 @@ export default function Container(props: Readonly<Props>) {
                 />
             )}
             {container?.onInstall && c?.status === "not-installed" && (
-                <Button icon="download" onClick={container.onInstall} />
+                <Button icon={<Download />} onClick={container.onInstall} />
             )}
         </Fragment>
     );

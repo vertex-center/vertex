@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Title } from "@vertex-center/components";
 import Content from "../../../components/Content/Content";
 import { API } from "../backend/api";
+import { Calendar, Cpu, GitCommit, Tag } from "@phosphor-icons/react";
 
 export default function SettingsAbout() {
     const {
@@ -28,7 +29,7 @@ export default function SettingsAbout() {
                 <KeyValueInfo
                     name="Version"
                     type="code"
-                    icon="tag"
+                    icon={<Tag />}
                     loading={isLoading}
                 >
                     {about?.version}
@@ -36,7 +37,7 @@ export default function SettingsAbout() {
                 <KeyValueInfo
                     name="Commit"
                     type="code"
-                    icon="commit"
+                    icon={<GitCommit />}
                     loading={isLoading}
                 >
                     {about?.commit}
@@ -44,7 +45,7 @@ export default function SettingsAbout() {
                 <KeyValueInfo
                     name="Release date"
                     type="code"
-                    icon="calendar_month"
+                    icon={<Calendar />}
                     loading={isLoading}
                 >
                     {about?.date}
@@ -52,7 +53,7 @@ export default function SettingsAbout() {
                 <KeyValueInfo
                     name="Compiled for"
                     type="code"
-                    icon="memory"
+                    icon={<Cpu />}
                     loading={isLoading}
                 >
                     {about?.os}

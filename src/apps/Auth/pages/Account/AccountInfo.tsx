@@ -4,7 +4,6 @@ import {
     FormItem,
     Horizontal,
     Input,
-    MaterialIcon,
     Title,
     Vertical,
 } from "@vertex-center/components";
@@ -16,6 +15,7 @@ import { usePatchUser } from "../../hooks/usePatchUser";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import Saved from "../../../../components/Saved/Saved";
+import { FloppyDiskBack } from "@phosphor-icons/react";
 
 export default function AccountInfo() {
     const queryClient = useQueryClient();
@@ -69,7 +69,7 @@ export default function AccountInfo() {
                     <Saved show={saved} />
                     <Button
                         variant="colored"
-                        rightIcon={<MaterialIcon icon="save" />}
+                        rightIcon={<FloppyDiskBack />}
                         onClick={save}
                         disabled={
                             isLoading || saved === true || saved === undefined

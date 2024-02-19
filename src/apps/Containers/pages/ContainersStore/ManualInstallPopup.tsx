@@ -1,14 +1,10 @@
 import Popup from "../../../../components/Popup/Popup";
-import {
-    Button,
-    FormItem,
-    Input,
-    MaterialIcon,
-} from "@vertex-center/components";
+import { Button, FormItem, Input } from "@vertex-center/components";
 import { ChangeEvent, Fragment, useState } from "react";
 import { APIError } from "../../../../components/Error/APIError";
 import { useCreateContainer } from "../../hooks/useCreateContainer";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
+import { DownloadSimple } from "@phosphor-icons/react";
 
 type Props = {
     show: boolean;
@@ -39,7 +35,7 @@ export default function ManualInstallPopup(props: Readonly<Props>) {
             <Button
                 variant="colored"
                 onClick={create}
-                rightIcon={<MaterialIcon icon="download" />}
+                rightIcon={<DownloadSimple />}
             >
                 Install
             </Button>

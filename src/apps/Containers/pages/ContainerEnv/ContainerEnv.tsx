@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import {
     Button,
     Input,
-    MaterialIcon,
     Table,
     TableBody,
     TableCell,
@@ -21,6 +20,7 @@ import Content from "../../../../components/Content/Content";
 import { API } from "../../backend/api";
 import { EnvVariables } from "../../backend/models";
 import styles from "./ContainerEnv.module.sass";
+import { ArrowUUpLeft, FloppyDiskBack } from "@phosphor-icons/react";
 
 export default function ContainerEnv() {
     const { uuid } = useParams();
@@ -145,7 +145,7 @@ export default function ContainerEnv() {
                 <Button
                     variant="outlined"
                     onClick={reset}
-                    rightIcon={<MaterialIcon icon="undo" />}
+                    rightIcon={<ArrowUUpLeft />}
                     disabled={isUploading || saved}
                 >
                     Cancel
@@ -153,7 +153,7 @@ export default function ContainerEnv() {
                 <Button
                     variant="colored"
                     onClick={save}
-                    rightIcon={<MaterialIcon icon="save" />}
+                    rightIcon={<FloppyDiskBack />}
                     disabled={isUploading || saved || saved === undefined}
                 >
                     Save
