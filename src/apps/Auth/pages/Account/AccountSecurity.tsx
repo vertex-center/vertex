@@ -6,13 +6,13 @@ import {
     ListInfo,
     ListItem,
     ListTitle,
-    MaterialIcon,
     Paragraph,
     Title,
 } from "@vertex-center/components";
 import { useCredentials } from "../../hooks/useCredentials";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
+import { Password } from "@phosphor-icons/react";
 
 export default function AccountSecurity() {
     const { credentials, isLoadingCredentials, errorCredentials } =
@@ -34,7 +34,7 @@ export default function AccountSecurity() {
                 {credentials?.map((cred, i) => (
                     <ListItem key={i}>
                         <ListIcon>
-                            <MaterialIcon icon="password" />
+                            <Password />
                         </ListIcon>
                         <ListInfo>
                             <ListTitle>{cred.name}</ListTitle>
