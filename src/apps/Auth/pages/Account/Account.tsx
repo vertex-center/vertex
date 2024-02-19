@@ -2,6 +2,7 @@ import PageWithSidebar from "../../../../components/PageWithSidebar/PageWithSide
 import { useSidebar } from "../../../../hooks/useSidebar";
 import { MaterialIcon, Sidebar, useTitle } from "@vertex-center/components";
 import l from "../../../../components/NavLink/navlink";
+import { Palette } from "@phosphor-icons/react";
 
 export default function Account() {
     useTitle("My Account");
@@ -23,6 +24,13 @@ export default function Account() {
                     label="Emails"
                     icon={<MaterialIcon icon="email" />}
                     link={l("/account/emails")}
+                />
+            </Sidebar.Group>
+            <Sidebar.Group title="Appearance">
+                <Sidebar.Item
+                    label="Theme"
+                    icon={<Palette />}
+                    link={l("/account/theme")}
                 />
             </Sidebar.Group>
         </Sidebar>

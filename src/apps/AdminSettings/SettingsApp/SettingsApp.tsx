@@ -7,7 +7,6 @@ import {
     Info,
     ListChecks,
     Notification,
-    Palette,
 } from "@phosphor-icons/react";
 
 export default function SettingsApp() {
@@ -15,13 +14,6 @@ export default function SettingsApp() {
 
     let sidebar = useSidebar(
         <Sidebar>
-            <Sidebar.Group title="Settings">
-                <Sidebar.Item
-                    label="Theme"
-                    icon={<Palette />}
-                    link={l("/admin/theme")}
-                />
-            </Sidebar.Group>
             <Sidebar.Group title="Administration">
                 <Sidebar.Item
                     label="Notifications"

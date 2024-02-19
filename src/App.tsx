@@ -12,7 +12,6 @@ import ContainerLogs from "./apps/Containers/pages/ContainerLogs/ContainerLogs";
 import ContainerEnv from "./apps/Containers/pages/ContainerEnv/ContainerEnv";
 import ContainerHome from "./apps/Containers/pages/ContainerHome/ContainerHome";
 import SettingsApp from "./apps/AdminSettings/SettingsApp/SettingsApp";
-import SettingsTheme from "./apps/AdminSettings/SettingsTheme/SettingsTheme";
 import { Fragment, useContext } from "react";
 import { ThemeContext } from "./main";
 import classNames from "classnames";
@@ -49,6 +48,7 @@ import AccountSecurity from "./apps/Auth/pages/Account/AccountSecurity";
 import useUser from "./apps/Auth/hooks/useUser";
 import AccountEmails from "./apps/Auth/pages/Account/AccountEmails";
 import { getAuthToken } from "./backend/server";
+import AccountTheme from "./apps/Auth/pages/Account/AccountTheme";
 
 const queryClient = new QueryClient();
 
@@ -108,6 +108,10 @@ function AllRoutes() {
                             <Route
                                 path="/account/emails"
                                 element={<AccountEmails />}
+                            />
+                            <Route
+                                path="/account/theme"
+                                element={<AccountTheme />}
                             />
                         </Route>
                         <Route
@@ -189,10 +193,6 @@ function AllRoutes() {
                             />
                         </Route>
                         <Route path="/admin" element={<SettingsApp />}>
-                            <Route
-                                path="/admin/theme"
-                                element={<SettingsTheme />}
-                            />
                             <Route
                                 path="/admin/notifications"
                                 element={<SettingsNotifications />}

@@ -1,12 +1,11 @@
 import { useContext } from "react";
-import { Button, Title } from "@vertex-center/components";
-import { Vertical } from "../../../components/Layouts/Layouts";
-import { ThemeContext } from "../../../main";
-import { themes } from "../../../models/theme";
-import Content from "../../../components/Content/Content";
+import { Button, Title, Vertical } from "@vertex-center/components";
+import { ThemeContext } from "../../../../main";
+import { themes } from "../../../../models/theme";
+import Content from "../../../../components/Content/Content";
 import { RadioButton } from "@phosphor-icons/react";
 
-export default function SettingsTheme() {
+export default function AccountTheme() {
     const { theme, setTheme } = useContext(ThemeContext);
 
     return (
