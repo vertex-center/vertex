@@ -88,6 +88,11 @@ export default function ContainerEnv() {
         return true;
     };
 
+    const reset = () => {
+        setEnv(JSON.parse(JSON.stringify(currentEnv)));
+        setSaved(true);
+    };
+
     return (
         <Content>
             <Title variant="h2">Environment</Title>
@@ -136,7 +141,15 @@ export default function ContainerEnv() {
                 </TableBody>
             </Table>
             <ProgressOverlay show={isLoadingEnv ?? isUploading} />
-            <Horizontal justifyContent="flex-end">
+            <Horizontal justifyContent="flex-end" gap={10}>
+                <Button
+                    variant="outlined"
+                    onClick={reset}
+                    rightIcon={<MaterialIcon icon="undo" />}
+                    disabled={isUploading || saved}
+                >
+                    Cancel
+                </Button>
                 <Button
                     variant="colored"
                     onClick={save}
