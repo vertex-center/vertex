@@ -82,7 +82,7 @@ export default function AccountEmails() {
             <Button
                 variant="colored"
                 onClick={() => createEmail({ email })}
-                rightIcon={<MaterialIcon icon="add" />}
+                rightIcon={<Plus />}
             >
                 Add
             </Button>

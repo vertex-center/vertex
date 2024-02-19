@@ -1,8 +1,9 @@
 import { APIError } from "../Error/APIError";
-import { Button, MaterialIcon, Paragraph } from "@vertex-center/components";
+import { Button, Paragraph } from "@vertex-center/components";
 import Popup from "../Popup/Popup";
 import { Template as ServiceModel } from "../../apps/Containers/backend/template";
 import { Fragment, useState } from "react";
+import { Plus } from "@phosphor-icons/react";
 
 type Props = {
     service: ServiceModel;
@@ -32,7 +33,7 @@ export default function ServiceInstallPopup(props: Readonly<Props>) {
             <Button
                 variant="colored"
                 onClick={install}
-                rightIcon={<MaterialIcon icon="add" />}
+                rightIcon={<Plus />}
                 disabled={error !== undefined}
             >
                 Create container
