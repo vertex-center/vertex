@@ -16,6 +16,7 @@ import Popup from "../../../components/Popup/Popup";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import NoItems from "../../../components/NoItems/NoItems";
 import Content from "../../../components/Content/Content";
+import { ShareNetwork } from "@phosphor-icons/react";
 
 export default function VertexReverseProxy() {
     const queryClient = useQueryClient();
@@ -102,7 +103,7 @@ export default function VertexReverseProxy() {
                         Object.keys(redirects).length === 0 && (
                             <NoItems
                                 text="No redirections found."
-                                icon="settings_ethernet"
+                                icon={<ShareNetwork />}
                             />
                         )}
                 </div>

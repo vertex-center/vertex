@@ -24,6 +24,7 @@ import NoItems from "../../../components/NoItems/NoItems";
 import Content from "../../../components/Content/Content";
 import useContainer from "../../Containers/hooks/useContainer";
 import { API } from "../../Containers/backend/api";
+import { Database } from "@phosphor-icons/react";
 
 export default function SqlDatabase() {
     const { uuid } = useParams();
@@ -69,7 +70,7 @@ export default function SqlDatabase() {
 
     let databases;
     if (db?.databases?.length === 0) {
-        databases = <NoItems text="No databases yet." icon="database" />;
+        databases = <NoItems text="No databases yet." icon={<Database />} />;
     } else {
         databases = (
             <List>

@@ -7,7 +7,6 @@ import {
     ListInfo,
     ListItem,
     ListTitle,
-    MaterialIcon,
     Title,
 } from "@vertex-center/components";
 import Content from "../../../components/Content/Content";
@@ -15,7 +14,7 @@ import { useServerEvent } from "../../../hooks/useEvent";
 import { useState } from "react";
 import NoItems from "../../../components/NoItems/NoItems";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
-import { Play } from "@phosphor-icons/react";
+import { Check, ListChecks, Play, WarningCircle } from "@phosphor-icons/react";
 
 export default function SettingsChecks() {
     const [isChecking, setIsChecking] = useState(false);
@@ -57,7 +56,7 @@ export default function SettingsChecks() {
             </Horizontal>
             {checks && Object.keys(checks).length === 0 && !isChecking && (
                 <NoItems
-                    icon="checklist"
+                    icon={<ListChecks />}
                     text="Run checks to see if there are any issues with your installation."
                 />
             )}
@@ -65,9 +64,11 @@ export default function SettingsChecks() {
                 {Object.values(checks ?? {}).map((check: any) => (
                     <ListItem key={check?.id}>
                         <ListIcon>
-                            <MaterialIcon
-                                icon={check?.error !== "" ? "error" : "check"}
-                            />
+                            {check?.error === "" ? (
+                                <Check />
+                            ) : (
+                                <WarningCircle />
+                            )}
                         </ListIcon>
                         <ListInfo>
                             <ListTitle>{check?.name}</ListTitle>

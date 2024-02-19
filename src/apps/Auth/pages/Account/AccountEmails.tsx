@@ -27,7 +27,7 @@ import NoItems from "../../../../components/NoItems/NoItems";
 import Popup from "../../../../components/Popup/Popup";
 import { ChangeEvent, Fragment, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus } from "@phosphor-icons/react";
+import { Envelope, Plus } from "@phosphor-icons/react";
 
 export default function AccountEmails() {
     const queryClient = useQueryClient();
@@ -112,7 +112,7 @@ export default function AccountEmails() {
             {!isLoadingEmails && !emails?.length ? (
                 <NoItems
                     text="You don't have any email address yet."
-                    icon="email"
+                    icon={<Envelope />}
                 />
             ) : (
                 <List>

@@ -15,7 +15,7 @@ import NoItems from "../../../../components/NoItems/NoItems";
 import { useContainers } from "../../hooks/useContainers";
 import { useNavigate } from "react-router-dom";
 import { API } from "../../backend/api";
-import { Plus } from "@phosphor-icons/react";
+import { Cube, Plus } from "@phosphor-icons/react";
 
 type ToolbarProps = {
     tags?: string[];
@@ -116,7 +116,7 @@ export default function ContainersApp() {
                         {noItems && (
                             <NoItems
                                 text="No containers found."
-                                icon="deployed_code"
+                                icon={<Cube />}
                             />
                         )}
                     </Containers>
