@@ -26,7 +26,7 @@
         "react-cookie": "^4.1.1",
         "react-dom": "^18.2.0",
         "react-hook-form": "^7.47.0",
-        "react-router-dom": "^6.8.1",
+        "react-router-dom": "^6.22.1",
         "react-scroll-percentage-hook": "^1.1.0",
         "react-syntax-highlighter": "^15.5.0",
         "timezones.json": "^1.7.0",
