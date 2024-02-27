@@ -28,12 +28,12 @@ require (
 	github.com/vertex-center/vlog v1.0.4
 	github.com/wI2L/fizz v0.22.0
 	go.uber.org/atomic v1.11.0
-	golang.org/x/crypto v0.19.0
+	golang.org/x/crypto v0.20.0
 	golang.org/x/net v0.21.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/postgres v1.5.6
-	gorm.io/gorm v1.25.7-0.20240204074919-46816ad31dde
-	modernc.org/sqlite v1.29.1
+	gorm.io/gorm v1.25.7
+	modernc.org/sqlite v1.29.2
 )
 
 require (
