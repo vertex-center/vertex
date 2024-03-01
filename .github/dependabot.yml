@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/" # Location of package manifests
     schedule:
-      interval: "daily"
+      interval: "weekly"
     groups:
       main:
         patterns:
@@ -12,7 +12,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/packages/components"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     groups:
       main:
         patterns:
