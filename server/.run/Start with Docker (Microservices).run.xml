@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Start with Docker (Bundle)" type="docker-deploy" factoryName="docker-compose.yml" singleton="true" server-name="Docker">
+  <configuration default="false" name="docker/micro.docker-compose.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
     <deployment type="docker-compose.yml">
       <settings>
         <option name="composeProjectName" value="vertex" />
@@ -16,11 +16,10 @@
         <option name="commandLineOptions" value="--build" />
         <option name="secondarySourceFiles">
           <list>
-            <option value="docker/bundle.docker-compose.build.yml" />
+            <option value="docker/micro.docker-compose.build.yml" />
           </list>
         </option>
-        <option name="sourceFilePath" value="docker/bundle.docker-compose.yml" />
-        <option name="upDetach" value="false" />
+        <option name="sourceFilePath" value="server/docker/micro.docker-compose.yml" />
       </settings>
     </deployment>
     <method v="2" />
