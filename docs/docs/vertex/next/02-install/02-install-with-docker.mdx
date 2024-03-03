@@ -8,17 +8,22 @@ import { Tabs, TabItem } from "@vertex-center/components";
 
 # Install with Docker
 
-1. Create a `docker-compose.yml` file.
+<Tabs>
 
-2. Copy/paste one of these two `docker-compose.yml` file in your own file.
+<TabItem value="bundle" label="Bundle">
 
-    | Method            | `docker-compose.yml`                                                                                     | Description                                                                                                                                                                                     |
-    |-------------------|----------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-    | **Bundle**        | [docker-compose.yml](https://github.com/vertex-center/vertex/blob/main/docker/bundle.docker-compose.yml) | Run Vertex with the all-in-one images. This is the lightest method and the easiest to start with.                                                                                               |
-    | **Microservices** | [docker-compose.yml](https://github.com/vertex-center/vertex/blob/main/docker/micro.docker-compose.yml)  | Run one container for each Vertex application. This is the most flexible method, that allows you to scale Vertex horizontally. Also, if an application crashes, the others will still be alive. |
+1. Be sure to have [Docker](https://docs.docker.com/get-docker/) installed and running.
 
-3. Start
+2. Download [this docker-compose.yml](https://github.com/vertex-center/vertex/blob/main/docker/docker-compose.yml) file.
+
+3. In a terminal, in the same directory as the `docker-compose.yml` file, run the following command:
 
     ```bash
     docker-compose up
     ```
+
+4. Open [http://localhost:6133](http://localhost:6133) in your browser and start using Vertex!
+
+</TabItem>
+
+</Tabs>
