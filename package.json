@@ -4,6 +4,7 @@
     "private": true,
     "workspaces": [
         "client",
+        "docs",
         "packages/*"
     ],
     "packageManager": "yarn@4.1.0"
