@@ -14,13 +14,17 @@ services:
   vertex:
     build:
       context: ../server
-      dockerfile: docker/bundle.Dockerfile
-      args:
-        - APP_KIND=main
+      dockerfile: docker/bundle.dev.Dockerfile
+    environment:
+      - APP_KIND=main
+    volumes:
+      - ../server:/build/server
 
   vertex-kernel:
     build:
       context: ../server
-      dockerfile: docker/bundle.Dockerfile
-      args:
-        - APP_KIND=kernel
+      dockerfile: docker/bundle.dev.Dockerfile
+    environment:
+      - APP_KIND=kernel
+    volumes:
+      - ../server:/build/server
