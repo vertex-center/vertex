@@ -22,13 +22,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Go to server directory
+        run: cd server
+
       - name: Check if workflow files changed
         uses: dorny/paths-filter@v2
         id: changes
         with:
           filters: |
-            workflows-changed:
-              - '.github/workflows/**.yml'
             go-changed:
               - 'go.mod'
               - 'go.sum'
@@ -46,34 +47,14 @@ jobs:
         with:
           go-version: '1.21'
 
+      - name: Go to server directory
+        run: cd server
+
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
           working-directory: server
           args: --timeout 5m
-
-  sonarcloud:
-    name: SonarCloud
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: '1.21'
-
-      - name: Run test with coverage
-        run: |
-          go test -coverprofile=coverage.out -json ./... > report.json
-
-      - name: Run Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   test:
     name: Test
@@ -88,7 +69,9 @@ jobs:
           go-version: '1.21'
 
       - name: Run tests
-        run: go test -v ./...
+        run: |
+          cd server
+          go test -v ./...
 
   build-bundle:
     name: Build bundle
@@ -133,6 +116,7 @@ jobs:
 
       - name: Build
         run: |
+          cd server
           go build -o vertex ./cmd/main
           go build -o vertex-kernel ./cmd/kernel
         env:
@@ -164,6 +148,7 @@ jobs:
 
       - name: Build
         run: |
+          cd server
           go build -o app ./apps/${{ matrix.app-id }}/cmd/${{ matrix.app-kind }}
 
   build-docker-bundle:
@@ -180,7 +165,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Docker Buildx
-        uses: server/docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v3
 
       - name: Setup metadata
         id: meta
@@ -200,7 +185,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') }}
-          context: .
+          context: server
           file: server/docker/bundle.Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
           platforms: linux/amd64,linux/arm64,linux/arm
@@ -255,7 +240,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: ${{ github.ref == 'refs/heads/main' }}
-          context: .
+          context: server
           file: server/docker/micro.Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
           platforms: linux/amd64,linux/arm64,linux/arm
