@@ -18,7 +18,7 @@ export default class APIs {
         Object.entries(imported ?? {}).forEach(
             ([fsPath, api]: [string, any]) => {
                 this.files[fsPath] = api.default;
-            },
+            }
         );
 
         this.apis = {};
@@ -115,7 +115,7 @@ export default class APIs {
                             api: api,
                         });
                     });
-                },
+                }
             );
         });
         return routes;
