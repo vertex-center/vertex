@@ -132,11 +132,7 @@ function Docs() {
     return (
         <Fragment>
             <Sidebar>
-                <SelectField
-                    label="Version"
-                    onChange={onVersionChange}
-                    value={version}
-                >
+                <SelectField onChange={onVersionChange} value={version}>
                     {Object.keys(hierarchy).map((version) => (
                         <SelectOption key={version} value={version}>
                             {version}

@@ -10,6 +10,7 @@ import {
 import "./Documentation.sass";
 import { useMemo } from "react";
 import { useLocation } from "react-router-dom";
+import { Mermaid } from "mdx-mermaid/lib/Mermaid";
 
 type Props = {
     content: any;
@@ -49,6 +50,19 @@ export default function Documentation(props: Props) {
                 if (props.className === undefined)
                     return <InlineCode {...props} />;
                 const language = /language-(\w+)/.exec(props.className || "");
+                console.log(language);
+                if (language?.some((l) => l === "mermaid"))
+                    return (
+                        <Mermaid
+                            chart={props.children}
+                            config={{
+                                theme: {
+                                    light: "dark",
+                                    dark: "dark",
+                                },
+                            }}
+                        />
+                    );
                 return (
                     <Code
                         style={{ marginBottom: 15 }}

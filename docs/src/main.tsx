@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./reset.css";
-import "@vertex-center/components/dist/style.css";
 import "./styles/index.sass";
 import { ThemeProvider } from "./theme.tsx";
 import { App } from "./App.tsx";

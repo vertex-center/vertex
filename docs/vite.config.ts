@@ -4,7 +4,6 @@ import mdx from "@mdx-js/rollup";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
 import remarkDirective from "remark-directive";
-import remarkMermaid from "remark-mermaidjs";
 import yaml from "@rollup/plugin-yaml";
 import { visit } from "unist-util-visit";
 import SwaggerParser from "@apidevtools/swagger-parser";
@@ -49,14 +48,6 @@ export default defineConfig(async () => ({
                 remarkGfm,
                 remarkDirective,
                 remarkDirectiveBlocks,
-                [
-                    remarkMermaid,
-                    {
-                        mermaidConfig: {
-                            theme: "dark",
-                        },
-                    },
-                ],
             ],
         }),
         yaml(),
