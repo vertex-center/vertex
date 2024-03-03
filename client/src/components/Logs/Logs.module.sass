@@ -1,0 +1,27 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+@use "../../styles/fonts"
+
+.logs
+    line-height: 2
+    font-size: 13px
+    font-family: fonts.$font-family-code
+    border: 1px solid colors.$bg-tertiary
+    padding: 10px
+    border-radius: dimensions.$border-radius-lg
+    overflow: scroll
+    white-space: break-spaces
+
+.line
+    display: flex
+    flex-direction: row
+    gap: 10px
+    padding: 0 10px
+    border-radius: 4px
+
+    &Error
+        color: colors.$red
+
+.number
+    color: colors.$fg-primary
+    opacity: 0.4
