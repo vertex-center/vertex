@@ -3,8 +3,21 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: weekly
     groups:
       node-dependencies:
         patterns:
           - "*"
+    labels:
+      - "type: Dependencies"
+
+  - package-ecosystem: gomod
+    directory: "server"
+    schedule:
+      interval: weekly
+    groups:
+      gomod-dependencies:
+        patterns:
+          - "*"
+    labels:
+      - "type: Dependencies"

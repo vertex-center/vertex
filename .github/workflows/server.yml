@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '.github/workflows/server.yml'
+      - 'server/**'
     tags:
       - "v*"
 
@@ -192,7 +195,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: server/docker/setup-buildx-action@v3
 
       - name: Setup metadata
         id: meta
@@ -213,7 +216,7 @@ jobs:
         with:
           push: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') }}
           context: .
-          file: docker/bundle.Dockerfile
+          file: server/docker/bundle.Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
           platforms: linux/amd64,linux/arm64,linux/arm
           no-cache: true
@@ -268,7 +271,7 @@ jobs:
         with:
           push: ${{ github.ref == 'refs/heads/main' }}
           context: .
-          file: docker/micro.Dockerfile
+          file: server/docker/micro.Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
           platforms: linux/amd64,linux/arm64,linux/arm
           no-cache: true

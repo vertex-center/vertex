@@ -1,5 +1,6 @@
 builds:
   - main: ./cmd/kernel
+    dir: server
     id: "vertex-kernel"
     binary: vertex-kernel
     goos:
@@ -18,6 +19,7 @@ builds:
         goarch: "386"
 
   - main: ./cmd/main
+    dir: server
     id: "vertex"
     binary: vertex
     goos:
