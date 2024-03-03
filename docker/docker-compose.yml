@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   client:
-#    image: ghcr.io/vertex-center/client:main
+    image: ghcr.io/vertex-center/client:main
     networks:
       - external
       - internal
@@ -19,7 +19,7 @@ services:
       VERTEX_MONITORING_ADDR: http://localhost:7506/api
 
   vertex:
-#    image: ghcr.io/vertex-center/vertex-bundle:main
+    image: ghcr.io/vertex-center/vertex-bundle:main
     networks:
       - internal
       - external
@@ -50,7 +50,7 @@ services:
       - logs:/live/logs
 
   vertex-kernel:
-#    image: ghcr.io/vertex-center/vertex-bundle-kernel:main
+    image: ghcr.io/vertex-center/vertex-bundle-kernel:main
     networks:
       - internal
     environment:
