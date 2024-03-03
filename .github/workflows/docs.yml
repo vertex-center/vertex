@@ -27,7 +27,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Install Playwright
-        run: npx playwright@1.39.0 install --with-deps
+        run: yarn workspace @vertex-center/docs dlx playwright install --with-deps chromium
 
       - name: Download OpenAPI specs
         run: ./docs/scripts/download-openapi-specs.sh
