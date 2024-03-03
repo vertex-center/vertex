@@ -1,0 +1,125 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+@use "../../styles/fonts"
+
+.containers
+    display: flex
+    flex-direction: column
+    gap: 5px
+
+    @include dimensions.extra-small-or-less
+        padding: 0
+
+.container
+    background-color: colors.$bg-secondary
+    display: flex
+    flex-direction: row
+    align-items: center
+    gap: 30px
+    position: relative
+    border: 1px solid transparent
+    padding: 0 100px 0 40px
+    height: 84px
+
+    &Clickable
+        cursor: pointer
+
+        &:hover
+            background-color: colors.$bg-secondary-hover
+
+    &:first-child
+        border-top-left-radius: dimensions.$border-radius-lg
+        border-top-right-radius: dimensions.$border-radius-lg
+
+    &:last-child
+        border-bottom-left-radius: dimensions.$border-radius-lg
+        border-bottom-right-radius: dimensions.$border-radius-lg
+
+    &:not(&:last-of-type)
+        border-bottom: none
+
+    &::before
+        position: absolute
+        content: ''
+        height: 2px
+        width: 0
+        max-width: 0
+        background-color: colors.$bg-tertiary
+        right: 100%
+        transition: max-width 0.3s ease
+
+.lcd
+    display: flex
+    flex-direction: column
+    align-items: stretch
+    flex-grow: 1
+    gap: 10px
+    color: colors.$fg-primary
+    transition: all 0.1s ease
+
+    &Gray
+        color: colors.$fg-secondary
+        opacity: 0.6
+
+    &Red
+        color: colors.$red
+        opacity: 1
+
+    &Green
+        color: colors.$green
+        opacity: 1
+
+    &Yellow
+        color: colors.$yellow
+        opacity: 1
+
+    &Orange
+        color: colors.$orange
+        opacity: 1
+
+    &Tag
+        display: flex
+        flex-direction: row
+        gap: 10px
+        align-items: center
+        white-space: nowrap
+        color: colors.$fg-secondary
+        overflow: hidden
+
+        @include dimensions.extra-small-or-less
+            display: none
+
+
+@keyframes loading
+    0%
+        opacity: 0.7
+    50%
+        opacity: 1
+    100%
+        opacity: 0.7
+
+.button
+    position: absolute
+    display: flex
+    align-items: center
+    justify-content: center
+    right: 8px
+    top: 8px
+    bottom: 8px
+    aspect-ratio: 1
+    cursor: pointer
+    color: colors.$fg-primary
+    border-radius: calc(dimensions.$border-radius-lg - 4px)
+    -webkit-user-select: none
+    -ms-user-select: none
+    user-select: none
+
+    &:hover
+        background-color: colors.$bg-tertiary-hover
+
+    &Disabled
+        cursor: not-allowed
+        opacity: 0.3
+
+        &:hover
+            background-color: colors.$bg-secondary

@@ -1,0 +1,64 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+@use "../../styles/fonts"
+
+.table
+    background-color: colors.$bg-primary-hover
+    border-collapse: separate
+    border-radius: dimensions.$border-radius
+
+    &-cell, &-head-cell
+        border: 1px solid colors.$bg-tertiary
+        padding: 10px 15px
+        line-height: fonts.$line-height-normal
+
+        &:has(> .input)
+            padding: 0
+
+            & > .input
+                width: 100%
+                border-radius: 0
+                border: none
+                background-color: transparent
+
+                &:hover
+                    background-color: colors.$bg-secondary-hover
+
+    & &-cell:not(:last-child), & &-head-cell:not(:last-child)
+        border-right: none
+
+    & &-cell:not(:first-child), & &-head-cell:not(:first-child)
+        border-left: none
+
+    & &-head-cell
+        background-color: colors.$bg-secondary
+        color: colors.$fg-secondary
+        font-weight: bold
+        text-align: left
+
+    & &-row:not(:last-child) > &-cell
+        border-bottom: none
+
+    & &-head > &-row:first-child > &-head-cell:first-child
+        border-top-left-radius: dimensions.$border-radius
+
+        & > .input
+            border-top-left-radius: dimensions.$border-radius
+
+    & &-head > &-row:first-child > &-head-cell:last-child
+        border-top-right-radius: dimensions.$border-radius
+
+        & > .input
+            border-top-right-radius: dimensions.$border-radius
+
+    & &-body > &-row:last-child > &-cell:first-child
+        border-bottom-left-radius: dimensions.$border-radius
+
+        & > .input
+            border-bottom-left-radius: dimensions.$border-radius
+
+    & &-body > &-row:last-child > &-cell:last-child
+        border-bottom-right-radius: dimensions.$border-radius
+
+        & > .input
+            border-bottom-right-radius: dimensions.$border-radius

@@ -1,0 +1,11 @@
+node_modules
+yarn-debug.log*
+yarn-error.log*
+.pnp.*
+.yarn
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store

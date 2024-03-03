@@ -1,0 +1,17 @@
+@use "../../../../styles/colors"
+@use "../../../../styles/dimensions"
+
+.saved
+    margin: 0 20px
+
+    @include dimensions.extra-small-or-less
+        margin: 0 10px
+
+.versionSelect
+    display: flex
+    flex-direction: row
+    align-items: flex-end
+    gap: 10px
+
+    & > :first-child
+        flex-grow: 1

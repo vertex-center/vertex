@@ -1,0 +1,10 @@
+{
+    "name": "@vertex-center/monorepo",
+    "license": "MIT",
+    "private": true,
+    "workspaces": [
+        "client",
+        "packages/*"
+    ],
+    "packageManager": "yarn@4.1.0"
+}

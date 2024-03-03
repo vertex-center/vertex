@@ -1,0 +1,93 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+
+.drawer
+    position: fixed
+    top: 100px
+    bottom: 0
+    left: 0
+    right: 0
+    opacity: 0
+    width: 100vw
+    pointer-events: none
+    background-color: colors.$bg-primary
+    z-index: 99
+    transition: all 0.15s ease-in
+    transform: scale(0.95)
+    overflow: hidden
+    padding-bottom: 100px
+
+    &Open
+        top: 0
+        pointer-events: inherit
+        transform: scale(1)
+        opacity: 1
+        overflow: scroll
+        transition: all 0.15s ease-out
+
+.header
+    display: flex
+    flex-direction: row
+    align-items: center
+    gap: 10px
+    padding: 20px 30px
+    cursor: pointer
+
+.apps
+    display: grid
+    grid-template-columns: repeat(3, 1fr)
+    padding: 10px 25px
+    gap: 10px
+    overflow: hidden
+
+    @include dimensions.large-or-less
+        grid-template-columns: repeat(2, 1fr)
+
+    @include dimensions.small-or-less
+        grid-template-columns: repeat(1, 1fr)
+
+    @include dimensions.extra-small-or-less
+        padding: 0 30px
+
+.app
+    display: flex
+    flex-direction: row
+    gap: 20px
+    align-items: center
+    border-radius: calc(dimensions.$border-radius-lg + 4px)
+    transition: all 0.05s linear
+    min-width: 0
+    border: 1px solid transparent
+    color: colors.$fg-primary
+
+    & > *
+        white-space: nowrap
+        overflow: hidden
+
+    &Icon
+        min-width: 60px
+        max-width: 60px
+        min-height: 60px
+        max-height: 60px
+        border-radius: dimensions.$border-radius-lg
+        background: colors.$bg-secondary
+        display: flex
+        align-items: center
+        justify-content: center
+        transition: all 0.05s linear
+
+    &Name
+        display: flex
+        flex-direction: row
+        align-items: center
+        gap: 6px
+        font-size: 17px
+        line-height: 1 !important
+        margin-bottom: 5px !important
+
+        & > :first-child
+            margin-bottom: -2px
+
+    &:hover
+        & > :nth-child(2)
+            color: colors.$bg-accent-hover

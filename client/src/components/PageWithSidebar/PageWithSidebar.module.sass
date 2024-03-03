@@ -1,0 +1,23 @@
+@use "../../styles/dimensions"
+
+.content
+    display: flex
+    flex-direction: row
+    flex-grow: 1
+    align-items: stretch
+
+    @include dimensions.extra-small-or-less
+        margin-left: 0
+
+.side
+    display: flex
+    flex-direction: column
+    overflow: auto
+    gap: 20px
+    width: 100%
+
+    & > *
+        margin: 0 20px
+
+        @include dimensions.extra-small-or-less
+            margin: 0 18px

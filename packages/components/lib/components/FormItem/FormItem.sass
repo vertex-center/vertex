@@ -1,0 +1,23 @@
+@use "../../styles/colors"
+
+.form-item
+    display: flex
+    flex-direction: column
+
+    &-label
+        color: colors.$fg-secondary
+        padding-bottom: 8px
+
+    &-required
+        color: colors.$red
+
+    &-optional
+        color: colors.$fg-tertiary
+
+    &-description, &-error
+        margin-top: 7px
+        color: colors.$fg-tertiary
+        font-size: 14px
+
+    &-error
+        color: colors.$red

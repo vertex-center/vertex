@@ -1,0 +1,45 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+
+.toggle
+    background-color: colors.$bg-tertiary
+    border-radius: 50px
+    height: dimensions.$component-small-height
+    width: 50px
+    position: relative
+    cursor: pointer
+    user-select: none
+    transition: background-color 0.15s ease-in-out
+
+.disabled
+    cursor: not-allowed
+    opacity: 0.5
+
+.on
+    background-color: colors.$bg-accent
+
+.dot
+    display: flex
+    align-items: center
+    justify-content: center
+    position: absolute
+    width: 28px
+    height: 28px
+    left: 0
+    border-radius: 50%
+    transition: all 0.15s ease-in-out
+    user-select: none
+
+.on .dot
+    left: 20px
+
+.icon
+    font-size: 16px
+    color: colors.$fg-primary
+    font-weight: bold
+    -webkit-user-select: none
+    -ms-user-select: none
+    user-select: none
+
+.on .icon
+    color: colors.$fg-accent

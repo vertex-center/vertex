@@ -1,0 +1,31 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+@use "../../styles/fonts"
+
+.downloads
+    display: flex
+    flex-direction: column
+    margin: 0 10px
+    line-height: 2
+
+    &List
+        display: flex
+        flex-direction: column
+
+.download
+    display: flex
+    flex-direction: row
+    align-items: center
+    gap: 10px
+
+    &ID
+        font-family: fonts.$font-family-code
+        color: colors.$fg-primary
+        opacity: 0.4
+
+    &Progress
+        flex-grow: 1
+
+    &Status
+        color: colors.$fg-secondary
+        font-size: 13px

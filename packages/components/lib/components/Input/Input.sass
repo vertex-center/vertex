@@ -1,0 +1,35 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+@use "../../styles/fonts"
+@use "../../styles/presets"
+
+.input
+    display: flex
+    flex-direction: row
+    align-items: center
+    padding: 0 15px
+    margin: 0
+    outline: 0
+    border-radius: dimensions.$border-radius
+    height: dimensions.$component-height
+    background-color: colors.$bg-primary
+    border: 1px solid colors.$bg-tertiary
+    color: colors.$fg-primary
+    -webkit-appearance: none
+    box-sizing: border-box
+    font-size: fonts.$size-normal
+    @include presets.control-shadow
+
+    &:hover:not(:disabled)
+        background-color: colors.$bg-primary-hover
+        border-color: colors.$bg-tertiary-hover
+
+    &:focus
+        background-color: colors.$bg-primary-hover
+
+    &::placeholder
+        color: colors.$fg-tertiary
+
+    &:disabled
+        opacity: 0.5
+        cursor: not-allowed

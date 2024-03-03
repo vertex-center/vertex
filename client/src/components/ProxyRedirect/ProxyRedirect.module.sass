@@ -1,0 +1,100 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+
+.redirect
+    display: flex
+    flex-direction: row
+    align-items: center
+    gap: 6px
+
+    @include dimensions.medium-or-less
+        align-items: stretch
+
+.wrapper
+    display: flex
+    flex-direction: row
+    align-items: center
+    gap: 6px
+    flex-grow: 1
+
+    @include dimensions.medium-or-less
+        flex-direction: column
+        align-items: center
+        gap: 2px
+
+.url
+    background-color: colors.$bg-secondary
+    border-radius: dimensions.$border-radius-lg
+    display: flex
+    align-items: center
+    padding: 15px 30px
+    box-sizing: border-box
+    flex: 1 1 0
+    width: 0
+    height: 60px
+    overflow: hidden
+    gap: 20px
+
+    // Hide icons when not on mobile
+    & > *:first-child
+        display: none
+
+    @include dimensions.medium-or-less
+        width: 100%
+        padding: 25px
+        gap: 15px
+        border-radius: 0
+
+        & > *:first-child
+            display: inline-block
+            color: colors.$green
+
+        &:first-child
+            border-top-left-radius: dimensions.$border-radius-lg
+            border-top-right-radius: dimensions.$border-radius-lg
+
+        &:last-child
+            border-bottom-left-radius: dimensions.$border-radius-lg
+            border-bottom-right-radius: dimensions.$border-radius-lg
+
+.line
+    height: 1px
+    width: 100px
+    background-color: colors.$bg-tertiary
+    margin: 0 10px
+
+    @include dimensions.large-or-less
+        width: 50px
+
+    @include dimensions.medium-or-less
+        display: none
+
+.arrow
+    color: colors.$bg-tertiary
+
+    @include dimensions.medium-or-less
+        display: none
+
+.enabled
+    & > .wrapper > .line
+        background-color: colors.$green
+
+    & > .wrapper > .arrow
+        color: colors.$green
+
+.delete
+    display: flex
+    align-items: center
+    justify-content: center
+    height: 60px
+    aspect-ratio: 1
+    background-color: colors.$bg-secondary
+    border-radius: dimensions.$border-radius-lg
+    cursor: pointer
+
+    &:hover
+        background-color: colors.$bg-secondary-hover
+
+    @include dimensions.medium-or-less
+        height: auto
+        width: 60px

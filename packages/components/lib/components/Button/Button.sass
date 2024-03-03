@@ -1,0 +1,57 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+@use "../../styles/fonts"
+@use "../../styles/presets"
+
+.button
+    display: flex
+    flex-direction: row
+    align-items: center
+    gap: 5px
+    padding: 0 12px
+    height: dimensions.$component-height
+    outline: none
+    border: 1px solid transparent
+    border-radius: dimensions.$border-radius
+    font-size: fonts.$size-normal
+    color: colors.$fg-primary
+    cursor: pointer
+    @include presets.control-shadow
+
+    &:disabled
+        cursor: not-allowed
+        user-select: none
+        opacity: 0.5
+
+    &-colored
+        background-color: colors.$bg-accent
+        border-color: colors.$bg-accent
+        color: colors.$fg-accent
+
+        &:hover
+            background-color: colors.$bg-accent-hover
+            border-color: colors.$bg-primary
+
+    &-outlined
+        background-color: transparent
+        border-color: colors.$bg-tertiary
+        color: colors.$fg-primary
+        @include presets.control-shadow
+
+        &:hover
+            background-color: colors.$bg-primary-hover
+            border-color: colors.$bg-accent
+
+    &-danger
+        background-color: transparent
+        border-color: colors.$bg-tertiary
+        color: colors.$red
+        @include presets.control-shadow(colors.$red-hover)
+
+        &:hover
+            color: colors.$fg-primary
+            background-color: colors.$red-hover
+            border-color: colors.$red
+
+    &-content
+        margin: 0 3px
