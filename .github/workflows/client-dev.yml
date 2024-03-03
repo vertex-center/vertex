@@ -1,4 +1,4 @@
-name: Development
+name: Client (dev)
 
 on:
   push:

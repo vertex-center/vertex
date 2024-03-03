@@ -1,4 +1,4 @@
-name: Development
+name: Server
 
 on:
   pull_request:
