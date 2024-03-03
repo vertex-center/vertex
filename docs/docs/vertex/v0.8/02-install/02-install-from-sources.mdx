@@ -1,0 +1,25 @@
+---
+description: Install Vertex by building it manually from sources.
+---
+
+# Install from sources
+
+1. Install Go using the [official documentation](https://go.dev/doc/install).
+
+2. Download the project
+    ```bash
+    git clone https://github.com/vertex-center/vertex.git
+    cd vertex
+    ```
+
+3. Run Vertex
+    ```bash
+    go run .
+    ```
+
+    or if you want to use a custom host/port:
+    ```bash
+    go run . --host localhost:6130 --port 6130
+    ```
+
+4. Open the UI in your browser: [http://localhost:6130](http://localhost:6130)

@@ -1,0 +1,24 @@
+---
+description: Install Vertex automatically with Docker.
+pagination_prev: about
+pagination_next: security/vertex-kernel
+---
+
+import { Tabs, TabItem } from "@vertex-center/components";
+
+# Install with Docker
+
+1. Create a `docker-compose.yml` file.
+
+2. Copy/paste one of these two `docker-compose.yml` file in your own file.
+
+    | Method            | `docker-compose.yml`                                                                                     | Description                                                                                                                                                                                     |
+    |-------------------|----------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    | **Bundle**        | [docker-compose.yml](https://github.com/vertex-center/vertex/blob/main/docker/bundle.docker-compose.yml) | Run Vertex with the all-in-one images. This is the lightest method and the easiest to start with.                                                                                               |
+    | **Microservices** | [docker-compose.yml](https://github.com/vertex-center/vertex/blob/main/docker/micro.docker-compose.yml)  | Run one container for each Vertex application. This is the most flexible method, that allows you to scale Vertex horizontally. Also, if an application crashes, the others will still be alive. |
+
+3. Start
+
+    ```bash
+    docker-compose up
+    ```

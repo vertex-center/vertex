@@ -1,0 +1,41 @@
+# Vertex Logs
+
+Vertex Logs is an application that gathers all logs from Vertex.
+
+## How to access the logs
+
+Accessing the logs depends on how you installed Vertex.
+
+* If you installed with **Docker**, logs are available in the vertex_logs volume.
+* If you installed from **precompiles binaries**, logs are available in the `live/logs/` folder.
+
+## How to read the logs
+
+Vertex Logs will output the logs in three different ways simultaneously. Note that the two last methods are using one file per day (and changes automatically at midnight).
+
+* **In the terminal (stdout/stderr)**. You can directly read them from the console.
+
+* **In `vertex_logs_YYYY-MM-DD.txt` files**: this file is useful to analyze the logs manually, or to check why previous errors happened.
+  ```json lines title="vertex_logs_YYYY-MM-DD.txt"
+  2023-04-23 10:51:03 INF msg=stopping instance uuid=3d6a8d32-afe2-41a9-a94e-e00c17082d48
+  2023-04-23 10:51:03 INF msg=instance stopped uuid=3d6a8d32-afe2-41a9-a94e-e00c17082d48
+  2023-04-23 10:51:03 REQ method=POST status=200 path=/api/instance/3d6a8d32-afe2-41a9-a94e-e00c17082d48/stop latency=512.5µs ip=::1 size=-1
+  2023-04-23 10:51:03 REQ method=GET status=200 path=/api/instances latency=65.583µs ip=::1 size=1728
+    ```
+
+* **In `vertex_logs_YYYY-MM-DD.jsonl` files**: this file, in the [JSON Lines](https://jsonlines.org) format, is useful if you want to parse the logs easily to use them from another service, or to analyze the logs from a programming language.
+
+  ```json lines title="vertex_logs_YYYY-MM-DD.jsonl"
+  {"kind":"INF","msg":"stopping instance","nanoseconds":1682261463013864000,"seconds":1682261463,"uuid":"3d6a8d32-afe2-41a9-a94e-e00c17082d48"}
+  {"kind":"INF","msg":"instance stopped","nanoseconds":1682261463014099000,"seconds":1682261463,"uuid":"3d6a8d32-afe2-41a9-a94e-e00c17082d48"}
+  {"ip":"::1","kind":"REQ","latency":512500,"method":"POST","nanoseconds":1682261463014347000,"path":"/api/instance/3d6a8d32-afe2-41a9-a94e-e00c17082d48/stop","seconds":1682261463,"size":-1,"status":200}
+  {"ip":"::1","kind":"REQ","latency":65583,"method":"GET","nanoseconds":1682261463015792000,"path":"/api/instances","seconds":1682261463,"size":1728,"status":200}
+    ```
+
+| Key           | Notes                                                                                 |
+|---------------|---------------------------------------------------------------------------------------|
+| `kind`        | Values: `DBG` (debug), `INF` (info), `REQ` (request), `WRN` (warning), `ERR` (error). |
+| `msg?`        | The log message _(optional)_.                                                         |
+| `seconds`     | The timestamp in Unix format                                                          |
+| `nanoseconds` | The timestamp in Unix nanoseconds format                                              |
+| `...others`   | Other keys, depending on the message.                                                 |

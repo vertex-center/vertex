@@ -1,0 +1,32 @@
+@use "../../styles/colors"
+
+.all
+    display: flex
+    flex-direction: column
+    width: 100%
+    margin: 0 30px
+    gap: 30px
+
+    & > *:last-child
+        padding-bottom: 30px
+
+    @media (max-width: 480px)
+        margin: 0 20px
+
+.category
+    display: flex
+    flex-direction: column
+    gap: 20px
+
+.grid
+    display: grid
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr))
+    gap: 15px
+
+    & > *
+        border-radius: 12px
+        border: 1px solid colors.$bg-tertiary
+
+    @media (max-width: 900px)
+        grid-template-columns: 1fr
+        gap: 10px

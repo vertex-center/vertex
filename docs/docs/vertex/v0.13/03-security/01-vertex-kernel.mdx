@@ -1,0 +1,57 @@
+---
+description: Some information about the Kernel.
+---
+
+# Vertex Kernel
+
+The Vertex Kernel is a major component of Vertex, that is responsible for running all the tasks that need sudo permissions:
+- Managing your SSH keys;
+- Managing your Docker containers;
+- Allowing vertex to use port 80;
+- And finally, running Vertex.
+
+While the **Vertex-Kernel is running as root, Vertex is _not_ running as root**, but as the user you mentioned to the kernel while launching it (with the `--user` flag).
+
+This is done by dropping privileges while launching Vertex.
+
+The Vertex Kernel must **NEVER** be exposed to the internet. It must only be accessible by Vertex.
+
+```mermaid
+flowchart TB
+    subgraph Your server
+        subgraph vertex [<b>Vertex</b>]
+        end
+        subgraph proxy [<b>Vertex Proxy</b>]
+        end
+        subgraph sudo ["Superuser zone"]
+            style sudo fill:#ff000040,stroke:#ff000090,color:#ff0000
+            subgraph kernel [<b>Vertex Kernel</b>]
+            end
+            subgraph docker [Docker Engine]
+                style docker fill:#0055bb40,stroke:#0055bb90,color:#0055bb
+            end
+            subgraph ssh [SSH keys]
+            end
+            kernel --> docker
+            kernel --> ssh
+        end
+        subgraph prometheus [<b>Prometheus /metrics</b>]
+        end
+        subgraph instances [Instance A<br>Instance B<br>...<br>Instance N]
+            style instances fill:#0055bb40,stroke:#0055bb90,color:#0055bb
+        end
+        vertex -- Manages ---> instances
+        vertex -- "Send sensitive requests (port 6131)" ---> kernel
+        vertex -- "Makes accessible (port 2112)" ---> prometheus
+        proxy -- Forwards requests ---> instances
+        docker --- instances
+    end
+    You -- "Send requests (port 6130)" ---> vertex
+    You -- "Send requests (port 80)" ---> proxy
+```
+
+:::danger
+**Please do NOT expose any ports at the moment**, as Vertex Authentication is not yet implemented.
+
+If you want to use Vertex from outside your local network, please install the WireGuard instance and only expose the port 51820.
+:::

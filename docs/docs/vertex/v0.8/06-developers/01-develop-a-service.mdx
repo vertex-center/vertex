@@ -1,0 +1,89 @@
+# Develop a service
+
+To create a basic service, you'll need this hierarchy:
+
+```
+service-id
+├── service.yml
+├── start.sh
+```
+
+1. `service.yml`
+
+    This file allows you to describe your service to Vertex (name, description, dependencies...). Below is an example of `service.yml` file.
+
+    ```yaml
+    version: 1
+
+    id: service-id
+    name: Service Name
+    repository: github.com/vertex-center/service-repository
+    description: A small description of your service.
+    color: '#DC382D'
+    icon: simpleicons/redis.svg
+
+    features:
+      databases:
+        - type: redis
+          port: PORT
+
+    environment:
+      - type: port
+        name: PORT
+        display_name: Server Port
+        default: 8080
+        description: The port to expose the API of this server.
+
+    databases:
+      main:
+        display_name: Database
+        types:
+          - postgres
+        names:
+          host: DB_HOST
+          port: DB_PORT
+          username: DB_USER
+          password: DB_PASSWORD
+          database: DB_NAME
+
+    urls:
+      - name: Redis
+        port: 6610
+        ping: /
+        kind: server
+
+    methods:
+      script:
+        file: start.sh
+        dependencies:
+          redis:
+
+      release:
+        dependencies":
+          redis:
+
+      docker:
+        image: redis:latest
+        dockerfile: Dockerfile
+        ports:
+          6379: 6379
+        volumes:
+          data: /opt/storage
+    ```
+
+2. `start.sh`
+
+    This file is the script that Vertex will use to start your service.
+    For example, if you want to run a go server, use this:
+
+        ```Shell
+        #!/bin/bash
+
+        exec go run .
+        ```
+
+    :::info
+    This script will only be used if the service is installed from sources, or if there are no binaries available in the GitHub releases of the repository.
+    :::
+
+These two files are everything you need to convert your program to a Vertex service!

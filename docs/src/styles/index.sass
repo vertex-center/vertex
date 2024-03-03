@@ -1,0 +1,22 @@
+@use "colors"
+@use "fonts"
+
+.app
+    display: flex
+    flex-direction: column
+    min-height: 100vh
+    max-height: 100vh
+    overflow: hidden
+    background-color: colors.$bg-primary
+    color: colors.$fg-primary
+    font-family: fonts.$font-family
+
+    &-content
+        display: flex
+        flex-direction: row
+        overflow: scroll
+
+.tabs > :last-child
+    display: flex
+    flex-direction: column
+    gap: 18px

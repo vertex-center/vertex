@@ -1,0 +1,97 @@
+---
+description: Install Vertex using precompiled releases available on GitHub.
+pagination_prev: about
+pagination_next: security/vertex-kernel
+---
+
+import { Tabs, TabItem } from "@vertex-center/components";
+
+# Install with binaries
+
+<Tabs groupId="operating-systems">
+
+<TabItem value="linux" label="Linux">
+
+1. Install [Docker](https://docs.docker.com/desktop/install/linux-install/) or [Docker Engine](https://docs.docker.com/engine/install/).
+
+2. Download the precompiled binaries for your system from [GitHub Releases](https://github.com/vertex-center/vertex/releases/latest).
+
+    :::info
+    - **Raspberry Pi** - Download the `linux_armv6` version.
+    :::
+
+3. Run **Vertex Kernel as sudo**:
+    ```bash
+    sudo ./vertex-kernel --user $(whoami)
+    ```
+
+    or if you want to use a custom host/port:
+    ```bash
+    sudo ./vertex-kernel \
+        --host localhost:6130 \
+        --port 6130 \
+        --user $(whoami)
+    ```
+
+4. Open the UI in your browser: [http://localhost:6130](http://localhost:6130)
+
+</TabItem>
+
+<TabItem value="macos" label="macOS">
+
+1. Install Docker:
+    - With [Docker for macOS](https://docs.docker.com/desktop/install/mac-install/)
+    - **Or** with Homebrew: `brew install --cask docker`.
+
+2. Download the precompiled binaries for your system from [GitHub Releases](https://github.com/vertex-center/vertex/releases/latest).
+
+    :::info
+    - **Intel** - Download the `darwin_amd64` version.
+    - **M1/M2** (or newer) - Download the `darwin_arm64` version.
+    :::
+
+3. Run **Vertex Kernel as sudo**:
+    ```bash
+    sudo ./vertex-kernel --user $(whoami)
+    ```
+
+    or if you want to use a custom host/port:
+    ```bash
+    sudo ./vertex-kernel \
+        --host localhost:6130 \
+        --port 6130 \
+        --user $(whoami)
+    ```
+
+4. Open the UI in your browser: [http://localhost:6130](http://localhost:6130)
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+
+1. Install [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/).
+
+2. Download the precompiled binaries for your system from [GitHub Releases](https://github.com/vertex-center/vertex/releases/latest).
+
+3. Run **Vertex Kernel as administrator**:
+    ```bash
+    .\vertex-kernel.exe --user YOUR_USERNAME
+    ```
+
+    or if you want to use a custom host/port:
+    ```bash
+    .\vertex-kernel.exe \
+        --host localhost:6130 \
+        --port 6130 \
+        --user YOUR_USERNAME
+    ```
+
+4. Open the UI in your browser: [http://localhost:6130](http://localhost:6130).
+
+</TabItem>
+
+</Tabs>
+
+:::tip{About sudo}
+To learn more about permissions, read [Security > Vertex Kernel](../security/vertex-kernel).
+:::
