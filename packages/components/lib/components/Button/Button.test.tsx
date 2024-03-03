@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import { Button, ButtonType } from "./Button";
-import { MaterialIcon } from "../../index";
+import { MaterialIcon } from "../../../index.ts";
 
 test("it renders", () => {
     render(<Button>Button</Button>);
@@ -22,7 +22,7 @@ test("it can be disabled", () => {
     render(
         <Button onClick={onClick} disabled>
             Button
-        </Button>,
+        </Button>
     );
     const button = screen.getByRole("button");
     button.click();
@@ -60,7 +60,7 @@ test("it can have an icon", () => {
             rightIcon={<MaterialIcon icon="arrow_forward" />}
         >
             Button
-        </Button>,
+        </Button>
     );
     const button = screen.getByRole("button");
     expect(button.children).toHaveLength(3);

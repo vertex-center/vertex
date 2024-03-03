@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { Sidebar } from "./Sidebar.tsx";
-import { MaterialIcon } from "../../index";
+import { MaterialIcon } from "../../../index.ts";
 
 const meta: Meta<typeof Sidebar> = {
     title: "Components/Sidebar",

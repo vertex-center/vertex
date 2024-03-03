@@ -1,6 +1,5 @@
 {
     "name": "@vertex-center/components",
-    "private": false,
     "version": "0.8.0",
     "homepage": "https://github.com/vertex-center/components",
     "description": "React components shared for all Vertex projects.",
@@ -26,7 +25,7 @@
     "files": [
         "dist/**"
     ],
-    "main": "./lib/index.ts",
+    "main": "index.ts",
     "types": "dist/vertex-components.d.ts",
     "dependencies": {
         "@phosphor-icons/react": "^2.0.15",

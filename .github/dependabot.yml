@@ -1,19 +1,10 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "/" # Location of package manifests
+    directory: "/"
     schedule:
       interval: "weekly"
     groups:
-      main:
-        patterns:
-          - "*"
-
-  - package-ecosystem: "npm"
-    directory: "/packages/components"
-    schedule:
-      interval: "weekly"
-    groups:
-      main:
+      node-dependencies:
         patterns:
           - "*"

@@ -17,7 +17,7 @@ export function Checkbox(props: Readonly<CheckboxProps>) {
                 {
                     "checkbox-checked": checked,
                 },
-                className,
+                className
             )}
             {...others}
         >
