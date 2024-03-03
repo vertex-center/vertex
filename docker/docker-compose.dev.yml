@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  client:
+    build:
+      context: ..
+      dockerfile: client/docker/dev.Dockerfile
+    volumes:
+      - ../client:/app/client
+      - ../packages:/app/packages
+    ports:
+      - "5173:5173"
+
+  vertex:
+    build:
+      context: ../server
+      dockerfile: docker/bundle.Dockerfile
+      args:
+        - APP_KIND=main
+
+  vertex-kernel:
+    build:
+      context: ../server
+      dockerfile: docker/bundle.Dockerfile
+      args:
+        - APP_KIND=kernel
