@@ -26,17 +26,20 @@ jobs:
         with:
           node-version: 16
 
+      - name: Enable corepack
+        run: corepack enable
+
       - name: Install dependencies
-        run: npm ci
+        run: yarn install --frozen-lockfile
 
       - name: Build
-        run: npm run build
+        run: yarn workspace @vertex-center/client build
 
       - name: Add version file
-        run: echo ${{ github.ref_name }} > ./dist/version.txt
+        run: echo ${{ github.ref_name }} > ./client/dist/version.txt
 
       - name: Create .zip
-        run: zip client.zip ./dist -r
+        run: zip client.zip ./client/dist -r
 
       - name: Publish
         uses: softprops/action-gh-release@v1
