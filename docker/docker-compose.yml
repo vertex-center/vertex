@@ -1,8 +1,25 @@
-version: "3.8"
+version: '3.8'
 
 services:
+  client:
+#    image: ghcr.io/vertex-center/client:main
+    networks:
+      - external
+      - internal
+    ports:
+      - "6133:80"
+    environment:
+      VERTEX_SQL_ADDR: http://localhost:7512/api
+      VERTEX_REVERSE_PROXY_ADDR: http://localhost:7508/api
+      VERTEX_SERVICE_EDITOR_ADDR: http://localhost:7510/api
+      VERTEX_CONTAINERS_ADDR: http://localhost:7504/api
+      VERTEX_ADMIN_ADDR: http://localhost:7500/api
+      VERTEX_AUTH_ADDR: http://localhost:7502/api
+      VERTEX_TUNNELS_ADDR: http://localhost:7514/api
+      VERTEX_MONITORING_ADDR: http://localhost:7506/api
+
   vertex:
-    image: ghcr.io/vertex-center/vertex-bundle:main
+#    image: ghcr.io/vertex-center/vertex-bundle:main
     networks:
       - internal
       - external
@@ -33,30 +50,13 @@ services:
       - logs:/live/logs
 
   vertex-kernel:
-    image: ghcr.io/vertex-center/vertex-bundle-kernel:main
+#    image: ghcr.io/vertex-center/vertex-bundle-kernel:main
     networks:
       - internal
     environment:
       - VERTEX_LOGS_ADDR=http://vertex:7516/api
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-
-  client:
-    image: ghcr.io/vertex-center/client:main
-    networks:
-      - external
-      - internal
-    ports:
-      - "7518:80"
-    environment:
-      - VERTEX_ADMIN_ADDR=http://localhost:7500/api
-      - VERTEX_AUTH_ADDR=http://localhost:7502/api
-      - VERTEX_CONTAINERS_ADDR=http://localhost:7504/api
-      - VERTEX_LOGS_ADDR=http://localhost:7516/api
-      - VERTEX_MONITORING_ADDR=http://localhost:7506/api
-      - VERTEX_REVERSE_PROXY_ADDR=http://localhost:7508/api
-      - VERTEX_SQL_ADDR=http://localhost:7512/api
-      - VERTEX_TUNNELS_ADDR=http://localhost:7514/api
 
   postgres:
     image: postgres:16.1-alpine3.19
