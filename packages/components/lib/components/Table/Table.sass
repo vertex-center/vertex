@@ -7,7 +7,7 @@
     border-collapse: separate
     border-radius: dimensions.$border-radius
 
-    &-cell, &-head-cell
+    &-cell, &-head-cell, th, td
         border: 1px solid colors.$bg-tertiary
         padding: 10px 15px
         line-height: fonts.$line-height-normal
@@ -24,40 +24,40 @@
                 &:hover
                     background-color: colors.$bg-secondary-hover
 
-    & &-cell:not(:last-child), & &-head-cell:not(:last-child)
+    & &-cell:not(:last-child), & &-head-cell:not(:last-child), th:not(:last-child), td:not(:last-child)
         border-right: none
 
-    & &-cell:not(:first-child), & &-head-cell:not(:first-child)
+    & &-cell:not(:first-child), & &-head-cell:not(:first-child), th:not(:first-child), td:not(:first-child)
         border-left: none
 
-    & &-head-cell
+    & &-head-cell, th
         background-color: colors.$bg-secondary
         color: colors.$fg-secondary
         font-weight: bold
         text-align: left
 
-    & &-row:not(:last-child) > &-cell
+    & &-row:not(:last-child) > &-cell, tr:not(:last-child) > td
         border-bottom: none
 
-    & &-head > &-row:first-child > &-head-cell:first-child
+    & &-head > &-row:first-child > &-head-cell:first-child, thead > tr:first-child > th:first-child
         border-top-left-radius: dimensions.$border-radius
 
         & > .input
             border-top-left-radius: dimensions.$border-radius
 
-    & &-head > &-row:first-child > &-head-cell:last-child
+    & &-head > &-row:first-child > &-head-cell:last-child, thead > tr:first-child > th:last-child
         border-top-right-radius: dimensions.$border-radius
 
         & > .input
             border-top-right-radius: dimensions.$border-radius
 
-    & &-body > &-row:last-child > &-cell:first-child
+    & &-body > &-row:last-child > &-cell:first-child, tbody > tr:last-child > td:first-child
         border-bottom-left-radius: dimensions.$border-radius
 
         & > .input
             border-bottom-left-radius: dimensions.$border-radius
 
-    & &-body > &-row:last-child > &-cell:last-child
+    & &-body > &-row:last-child > &-cell:last-child, tbody > tr:last-child > td:last-child
         border-bottom-right-radius: dimensions.$border-radius
 
         & > .input
