@@ -9,3 +9,6 @@ yarn-error.log*
 !.vscode/extensions.json
 .idea
 .DS_Store
+
+# Running environment
+live
