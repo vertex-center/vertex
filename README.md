@@ -37,15 +37,69 @@ Vertex is designed to be installed on low-powered computers like Raspberry Pi, s
 
 ## Installation
 
-Vertex can be installed in multiple ways:
-- **From binaries**: Pre-compiled binaries are available for Linux, macOS and Windows
-- **With Docker**: Docker images are available on GitHub Container Registry
+> [!NOTE]
+> Everything about the installation process is available in the [Vertex Documentation](https://docs.vertex.arra.red/).
 
-Each of these methods can be used in two modes:
-- **Bundled**: All apps are included in one unique binary (or container). This is the simplest and lightest way to install Vertex.
-- **Microservices**: Each app is a separate binary (or container). This is the recommended way if you want to scale your installation horizontally.
+Vertex can be installed easily using Docker. We provide three different infrastructure setups:
 
-Everything about the installation process is available in the [Vertex Documentation](https://docs.vertex.arra.red/).
+- **Bundle**: Includes all the services in a minimal number of containers. This is the recommended setup for small deployments.
+- **Microservices**: A more complex setup that separates the services into different containers. This is the recommended setup for large deployments, if you want to scale the services independently, or if you want more reliability.
+- **Development**: A setup for development purposes. This is the recommended setup if you want to contribute to the project.
+
+### Method A - Bundle
+
+1. Be sure to have [Docker](https://docs.docker.com/get-docker/) installed and running.
+
+2. Download the [docker-compose.yml](https://github.com/vertex-center/vertex/blob/main/docker/docker-compose.yml) and the [setup_postgres.sh](https://github.com/vertex-center/vertex/blob/main/docker/multidb/setup_postgres.sh) files.
+
+   You should have the following directory structure:
+
+    ```plaintext
+    docker-compose.yml
+    multidb/
+        setup_postgres.sh
+    ```
+
+3. In a terminal, in the same directory as the `docker-compose.yml` file, run the following command:
+
+    ```bash
+    docker-compose up
+    ```
+
+4. Open [http://localhost:6133](http://localhost:6133) in your browser and start using Vertex!
+
+### Method B - Microservices
+
+1. Be sure to have [Docker](https://docs.docker.com/get-docker/) installed and running.
+
+2. Download the [micro.docker-compose.yml](https://github.com/vertex-center/vertex/blob/main/docker/micro.docker-compose.yml) file.
+
+3. In a terminal, in the same directory as the `micro.docker-compose.yml` file, run the following command:
+
+    ```bash
+    docker-compose -f micro.docker-compose.yml up
+    ```
+
+4. Open [http://localhost:7518](http://localhost:7518) in your browser and start using Vertex!
+
+### Method C - Install for development
+
+1. Be sure to have [Docker](https://docs.docker.com/get-docker/) installed and running.
+
+2. Clone the repository:
+
+    ```bash
+    git clone https://github.com/vertex-center/vertex
+    cd vertex
+    ```
+   
+3. Run the following command:
+
+    ```bash
+    make run-dev
+    ```
+
+4. Open [http://localhost:5173](http://localhost:5173) in your browser and start using Vertex!
 
 ## License
 
