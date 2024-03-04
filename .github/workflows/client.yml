@@ -5,19 +5,13 @@ on:
     branches:
       - main
     paths:
-      - "client/**"
-      - "packages/**"
-      - ".github/workflows/client-dev.yml"
+      - '.github/workflows/client-dev.yml'
+      - 'client/**'
+      - 'packages/**'
 
   push:
     branches:
       - main
-    paths:
-      - "client/**"
-      - "packages/**"
-      - ".github/workflows/client-dev.yml"
-
-  push:
     tags:
       - "v*"
 

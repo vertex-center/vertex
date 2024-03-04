@@ -9,38 +9,10 @@ on:
   push:
     branches:
       - main
-    paths:
-      - '.github/workflows/server.yml'
-      - 'server/**'
-
-  push:
     tags:
       - "v*"
 
 jobs:
-  changes:
-    name: Check for changes
-    runs-on: ubuntu-latest
-    outputs:
-      workflows-changed: ${{ steps.changes.outputs.workflows-changed }}
-      go-changed: ${{ steps.changes.outputs.go-changed }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Go to server directory
-        run: cd server
-
-      - name: Check if workflow files changed
-        uses: dorny/paths-filter@v2
-        id: changes
-        with:
-          filters: |
-            go-changed:
-              - 'go.mod'
-              - 'go.sum'
-              - '**.go'
-
   lint:
     name: Lint
     runs-on: ubuntu-latest
