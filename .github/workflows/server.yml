@@ -2,6 +2,9 @@ name: Server
 
 on:
   pull_request:
+    paths:
+      - '.github/workflows/server.yml'
+      - 'server/**'
   push:
     branches:
       - main
