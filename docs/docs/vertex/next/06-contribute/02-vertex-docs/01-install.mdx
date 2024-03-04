@@ -10,26 +10,27 @@ To download and start the documentation locally, you need to install [Node.js](h
 Then, you can download the repository in your terminal:
 
 ```bash
-git clone https://github.com/vertex-center/docs.git vertex-docs
-cd vertex-docs
+git clone https://github.com/vertex-center/vertex.git
+cd vertex
 ```
 
 Then, install the dependencies:
 
 ```bash
-npm install
+corepack enable
+yarn install --frozen-lockfile
 ```
 
 Finally, you can start the documentation locally:
 
 ```bash
-npm run dev
+yarn workspace @vertex-center/docs dev
 ```
 
 The documentation can then be accessed at [http://localhost:5173](http://localhost:5173).
 
 ## Contributing
 
-To improve the documentation, the recommended way is to edit the markdown files in the `/docs/next` folder. The changes will be available for the next major release of the documentation.
+To improve the documentation, the recommended way is to edit the markdown files in the `/docs/docs/next` folder. The changes will be available for the next major release of the documentation.
 
 However, if there is an issue to the current documentation, you can also edit the documentation(s) in the previous versions (`/docs/v*`). This way, the changes will be also available for the previous versions.
