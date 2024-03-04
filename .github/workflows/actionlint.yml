@@ -2,6 +2,8 @@ name: Workflows Linter
 
 on:
   pull_request:
+    paths:
+      - '.github/workflows/**.yml'
   push:
     branches:
       - main
