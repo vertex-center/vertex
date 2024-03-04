@@ -2,63 +2,23 @@
 title: Dev installation
 ---
 
-import { Tabs, TabItem } from "@vertex-center/components";
-
 # Install for development
 
-To install Vertex for development, you will need to install both the Vertex Client and the Vertex Server.
+To install Vertex for development:
 
-<Tabs>
+1. Be sure to have [Docker](https://docs.docker.com/get-docker/) installed and running.
 
-<TabItem value="go-run" label="With go run">
+2. Clone the repository:
 
-1. Install Dependencies:
-    - Go using the [official documentation](https://go.dev/doc/install).
-    - Node.js using the [official documentation](https://nodejs.org/en/download/).
-
-2. Download the project
     ```bash
-    git clone https://github.com/vertex-center/vertex.git vertex
-    git clone https://github.com/vertex-center/client.git vertex-client
-    ```
-
-3. In a terminal, run **Vertex**:
-    ```bash
-    cd vertex
-    go run ./cmd/main --db-driver sqlite
-    ```
-
-4. In another terminal, run **Vertex Kernel as sudo**:
-    ```bash
-    cd vertex
-    sudo go run ./cmd/kernel
-    ```
-5. In another terminal, install and run the client:
-    ```bash
-    cd vertex-client
-    npm install
-    npm run dev
-    ```
-
-6. Open the UI in your browser: [http://localhost:5173](http://localhost:5173)
-
-</TabItem>
-
-<TabItem value="docker" label="With Docker">
-
-1. Download the project
-    ```bash
-    git clone https://github.com/vertex-center/vertex.git
+    git clone https://github.com/vertex-center/vertex
     cd vertex
     ```
 
-2. Run **Vertex**:
+3. Run the following command:
+
     ```bash
-    COMPOSE_PARALLEL_LIMIT=1 docker-compose -f docker/bundle.docker-compose.yml -f docker/bundle.docker-compose.build.yml down
-    COMPOSE_PARALLEL_LIMIT=1 docker-compose -f docker/bundle.docker-compose.yml -f docker/bundle.docker-compose.build.yml build
-    COMPOSE_PARALLEL_LIMIT=1 docker-compose -f docker/bundle.docker-compose.yml -f docker/bundle.docker-compose.build.yml up
+    make run-dev
     ```
 
-</TabItem>
-
-</Tabs>
+4. Open [http://localhost:5173](http://localhost:5173) in your browser and start using Vertex!
