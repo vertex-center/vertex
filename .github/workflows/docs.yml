@@ -8,9 +8,15 @@ on:
       - '.github/workflows/docs.yml'
       - 'docs/**'
       - 'packages/**'
+  pull_request:
+    paths:
+      - '.github/workflows/docs.yml'
+      - 'docs/**'
+      - 'packages/**'
 
 jobs:
-  build_and_deploy:
+  build_deploy:
+    name: ${{ github.ref == 'refs/heads/main' && 'Build and deploy' || 'Build' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,6 +43,7 @@ jobs:
         run: yarn workspace @vertex-center/docs build
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
+        if: github.ref == 'refs/heads/main'
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_VERTEX_CENTER }}'
