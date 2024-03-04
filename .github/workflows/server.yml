@@ -5,12 +5,15 @@ on:
     paths:
       - '.github/workflows/server.yml'
       - 'server/**'
+
   push:
     branches:
       - main
     paths:
       - '.github/workflows/server.yml'
       - 'server/**'
+
+  push:
     tags:
       - "v*"
 

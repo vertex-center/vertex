@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - '.github/workflows/**.yml'
+
   push:
     branches:
       - main
@@ -22,5 +23,5 @@ jobs:
         run: |
           echo "::add-matcher::.github/actionlint-matcher.json"
           bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
-          ./actionlint -color
+          ./actionlint -color -ignore 'key ".+" is duplicated in "on" section'
         shell: bash

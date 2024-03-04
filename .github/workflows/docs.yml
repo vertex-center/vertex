@@ -1,6 +1,12 @@
 name: Docs
 
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/docs.yml'
+      - 'docs/**'
+      - 'packages/**'
+
   push:
     branches:
       - main
@@ -8,11 +14,10 @@ on:
       - '.github/workflows/docs.yml'
       - 'docs/**'
       - 'packages/**'
-  pull_request:
-    paths:
-      - '.github/workflows/docs.yml'
-      - 'docs/**'
-      - 'packages/**'
+
+  push:
+    tags:
+      - "v*"
 
 jobs:
   build_deploy:

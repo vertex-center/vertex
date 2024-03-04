@@ -1,16 +1,6 @@
 name: Client (dev)
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "client/**"
-      - "packages/**"
-      - ".github/workflows/client-dev.yml"
-    tags:
-      - "v*"
-
   pull_request:
     branches:
       - main
@@ -18,6 +8,18 @@ on:
       - "client/**"
       - "packages/**"
       - ".github/workflows/client-dev.yml"
+
+  push:
+    branches:
+      - main
+    paths:
+      - "client/**"
+      - "packages/**"
+      - ".github/workflows/client-dev.yml"
+
+  push:
+    tags:
+      - "v*"
 
 jobs:
   build:
