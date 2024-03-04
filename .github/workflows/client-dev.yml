@@ -7,6 +7,12 @@ on:
     paths:
       - "client/**"
       - ".github/workflows/client-dev.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "client/**"
+      - ".github/workflows/client-dev.yml"
 
 jobs:
   build:
