@@ -1,0 +1,58 @@
+---
+description: Install Vertex with Docker.
+pagination_prev: about
+pagination_next: security/vertex-kernel
+---
+
+import { Tabs, TabItem } from "@vertex-center/components";
+
+# Install
+
+Vertex can be installed easily using Docker. We provide two different infrastructure setups:
+
+- **Bundle**: Includes all the services in a minimal number of containers. This is the recommended setup for small deployments.
+- **Microservices**: A more complex setup that separates the services into different containers. This is the recommended setup for large deployments, if you want to scale the services independently, or if you want more reliability.
+
+<Tabs groupId="docker">
+
+<TabItem value="bundle" label="Bundle">
+
+1. Be sure to have [Docker](https://docs.docker.com/get-docker/) installed and running.
+
+2. Download the [docker-compose.yml](https://github.com/vertex-center/vertex/blob/main/docker/docker-compose.yml) and the [setup_postgres.sh](https://github.com/vertex-center/vertex/blob/main/docker/multidb/setup_postgres.sh) files.
+
+    You should have the following directory structure:
+
+    ```plaintext
+    docker-compose.yml
+    multidb/
+        setup_postgres.sh
+    ```
+
+3. In a terminal, in the same directory as the `docker-compose.yml` file, run the following command:
+
+    ```bash
+    docker-compose up
+    ```
+
+4. Open [http://localhost:6133](http://localhost:6133) in your browser and start using Vertex!
+
+</TabItem>
+
+<TabItem value="micro" label="Microservices">
+
+1. Be sure to have [Docker](https://docs.docker.com/get-docker/) installed and running.
+
+2. Download the [micro.docker-compose.yml](https://github.com/vertex-center/vertex/blob/main/docker/micro.docker-compose.yml) file.
+
+3. In a terminal, in the same directory as the `micro.docker-compose.yml` file, run the following command:
+
+    ```bash
+    docker-compose -f micro.docker-compose.yml up
+    ```
+
+4. Open [http://localhost:7518](http://localhost:7518) in your browser and start using Vertex!
+
+</TabItem>
+
+</Tabs>
