@@ -1,0 +1,19 @@
+'repo: Client':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'client/**'
+
+'repo: Server':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'server/**'
+
+'repo: Docs':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'docs/**'
+
+'repo: Components':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'packages/components/**'
