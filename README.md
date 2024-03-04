@@ -35,6 +35,16 @@ Vertex is designed to be installed on low-powered computers like Raspberry Pi, s
 - Easy setup on Kubernetes with [Helm Charts](https://github.com/vertex-center/charts)
 - _And more to come! (Database, Monitoring, etc)_
 
+## Repository structure
+
+The major part of the Vertex source code is organized as a monorepo.
+
+- [client](https://github.com/vertex-center/vertex/tree/main/client): The web client.
+- [docs](https://github.com/vertex-center/vertex/tree/main/docs): The documentation, hosted on [docs.vertex.arra.red](https://docs.vertex.arra.red/).
+- [server](https://github.com/vertex-center/vertex/tree/main/server): The server of Vertex.
+- [packages](https://github.com/vertex-center/vertex/tree/main/packages)
+  - [components](https://github.com/vertex-center/vertex/tree/main/packages/components): The shared UI components.
+
 ## Installation
 
 > [!NOTE]
