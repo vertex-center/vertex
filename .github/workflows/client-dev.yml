@@ -6,12 +6,14 @@ on:
       - main
     paths:
       - "client/**"
+      - "packages/**"
       - ".github/workflows/client-dev.yml"
   pull_request:
     branches:
       - main
     paths:
       - "client/**"
+      - "packages/**"
       - ".github/workflows/client-dev.yml"
 
 jobs:
