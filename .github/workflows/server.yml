@@ -20,7 +20,7 @@ jobs:
       go-changed: ${{ steps.changes.outputs.go-changed }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Go to server directory
         run: cd server
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Go
         uses: actions/setup-go@v3
@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Go
         uses: actions/setup-go@v3
@@ -107,7 +107,7 @@ jobs:
             os: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Go
         uses: actions/setup-go@v3
@@ -139,7 +139,7 @@ jobs:
             app-kind: kernel
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Go
         uses: actions/setup-go@v3
@@ -162,7 +162,7 @@ jobs:
         app-kind: [main, kernel]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -217,7 +217,7 @@ jobs:
             app-kind: kernel
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -280,7 +280,7 @@ jobs:
       - build-docker-microservices
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
