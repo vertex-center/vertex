@@ -1,3 +1,44 @@
+# Vertex 0.17
+
+## 0.17.0
+
+### Added
+
+- Each app can now run as microservices instead of a single process if scalability is needed.
+- Ability to run apps in Kubernetes.
+- New Vertex Logs app, aggregating all the logs from the server.
+- Requests can be followed with `X-Request-ID` and `X-Correlation-ID` headers.
+- Multiple emails per user.
+- Create container from image name.
+- Move the container app to a new database storage, allowing for more flexibility and scalability.
+- The container owner is stored.
+- Tags can be shared between containers.
+- Use of the [vertex-center/uuid](github.com/vertex-center/uuid) library for better UUID documentation in the OpenAPI specs.
+- Better errors propagation.
+- More flexible API domains.
+- Improved environment variables display.
+
+### Changed
+
+- Services are now called templates.
+- URL paths are simplified.
+- The containers API returns smaller responses.
+- The containers search and getAll endpoints are now merged.
+- Containers now use Volumes instead of Binds.
+
+### Removed
+
+- Vertex Service Editor removed.
+- Vertex Admin Kernel removed.
+- Admin: Remove the ability to add ssh keys. This is because is is harder to maintain from a Docker container.
+- Admin: Remove the ability to see hardware information. This is because this was not reliable enough.
+
+:::warning
+This release introduces breaking changes. Please proceed with a backup of your volumes and data before updating.
+:::
+
+---
+
 # Vertex 0.16
 
 ## 0.16.0
