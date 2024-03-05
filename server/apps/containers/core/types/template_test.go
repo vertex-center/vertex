@@ -115,4 +115,5 @@ func (suite *TemplateTestSuite) TestTemplateUpgradeV3() {
 		},
 	}, template.Ports)
 	suite.Empty(template.Env)
+	suite.Empty(template.URLs)
 }

@@ -53,6 +53,7 @@ type Template struct {
 	Ports []TemplatePort `yaml:"ports,omitempty" json:"ports,omitempty"`
 
 	// URLs defines all template urls.
+	// Deprecated: URLs are deleted in version 3.
 	URLs []URL `yaml:"urls,omitempty" json:"urls,omitempty"`
 
 	// Methods define different methods to install the template.
@@ -106,6 +107,7 @@ func (s *TemplateV2) Upgrade() *TemplateV3 {
 		}
 	}
 	s.Env = envs
+	s.URLs = []URL{}
 	return (*TemplateV3)(s)
 }
 
@@ -289,6 +291,7 @@ type TemplateMethods struct {
 	Docker *TemplateMethodDocker `yaml:"docker,omitempty" json:"docker,omitempty"`
 }
 
+// Deprecated: Deleted in version 3.
 type URL struct {
 	// Name is the name displayed to the used describing this URL.
 	Name string `yaml:"name" json:"name" example:"Vertex Client"`

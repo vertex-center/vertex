@@ -67,6 +67,5 @@ export type Template = {
     features: Features;
     environment: EnvVariable[];
     databases: { [name: string]: DatabaseEnvironment };
-    urls?: URL[];
     methods?: ServiceMethods;
 };

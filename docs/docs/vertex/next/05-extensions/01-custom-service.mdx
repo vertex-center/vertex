@@ -27,7 +27,8 @@ To upgrade from `v2` to `v3`, you need to:
 1. Change the `version` field to `3`
 2. Remove all `environment` of type `port`
 3. Remove all `methods.docker.ports`
-4. Create a new `ports` field with the port name and the port number
+4. Remove all `urls`
+5. Create a new `ports` field with the port name and the port number
 :::
 
 ```yaml title="service.yml"
@@ -74,13 +75,6 @@ databases:
 ports:
   - name: PORT_NAME
     port: 8080
-
-# The urls that this service exposes.
-urls:
-  - name: Redis
-    port: PORT_NAME
-    ping: /
-    kind: server
 
 # The methods to run the service.
 methods:
