@@ -13,8 +13,8 @@ export const useCreateContainer = (
     const mutation = useMutation({
         mutationKey: ["containers_create"],
         mutationFn: API.createContainer,
-        onSuccess: (...args) => {
-            queryClient.invalidateQueries({ queryKey: ["containers"] });
+        onSuccess: async (...args) => {
+            await queryClient.invalidateQueries({ queryKey: ["containers"] });
             options.onSuccess?.(...args);
         },
         ...others,

@@ -16,7 +16,7 @@ import {
 } from "@vertex-center/components";
 import { SiPostgresql, SiSqlite } from "@icons-pack/react-simple-icons";
 import styles from "./SettingsDb.module.sass";
-import Popup from "../../../components/Popup/Popup";
+import Popup, { PopupActions } from "../../../components/Popup/Popup";
 import { Fragment, useState } from "react";
 import { useDBMS } from "../hooks/useDBMS";
 import Progress, {
@@ -104,21 +104,6 @@ export default function SettingsDb() {
 
     const dismissPopup = () => setShowPopup(false);
 
-    const askMigrateActions = (
-        <Fragment>
-            <Button variant="outlined" onClick={dismissPopup}>
-                Cancel
-            </Button>
-            <Button
-                variant="danger"
-                rightIcon={<MaterialIcon icon="restart_alt" />}
-                onClick={() => migrate(selectedDB)}
-            >
-                Migrate
-            </Button>
-        </Fragment>
-    );
-
     return (
         <Content>
             <Title variant="h2">Database</Title>
@@ -160,7 +145,6 @@ export default function SettingsDb() {
                 show={showPopup}
                 onDismiss={dismissPopup}
                 title="Migrate database?"
-                actions={askMigrateActions}
             >
                 <Paragraph>
                     Are you sure you want to migrate from {dbms} to {selectedDB}
@@ -168,6 +152,18 @@ export default function SettingsDb() {
                     previous database will deleted if the migration is
                     successful.
                 </Paragraph>
+                <PopupActions>
+                    <Button variant="outlined" onClick={dismissPopup}>
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="danger"
+                        rightIcon={<MaterialIcon icon="restart_alt" />}
+                        onClick={() => migrate(selectedDB)}
+                    >
+                        Migrate
+                    </Button>
+                </PopupActions>
             </Popup>
         </Content>
     );

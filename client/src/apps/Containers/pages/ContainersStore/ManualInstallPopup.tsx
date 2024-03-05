@@ -1,62 +1,106 @@
-import Popup from "../../../../components/Popup/Popup";
-import { Button, FormItem, Input } from "@vertex-center/components";
-import { ChangeEvent, Fragment, useState } from "react";
+import Popup, { PopupActions } from "../../../../components/Popup/Popup";
+import { Button, FormItem, Input, Vertical } from "@vertex-center/components";
+import { Fragment } from "react";
 import { APIError } from "../../../../components/Error/APIError";
 import { useCreateContainer } from "../../hooks/useCreateContainer";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { DownloadSimple } from "@phosphor-icons/react";
+import * as yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 type Props = {
     show: boolean;
     dismiss: () => void;
 };
 
+const schema = yup
+    .object({
+        image: yup.string().required(),
+    })
+    .required();
+
 export default function ManualInstallPopup(props: Readonly<Props>) {
     const { show, dismiss } = props;
 
-    const [image, setImage] = useState<string>();
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(schema),
+    });
 
     const { createContainer, isCreatingContainer, errorCreatingContainer } =
         useCreateContainer({
             onSuccess: dismiss,
         });
 
-    const create = () => createContainer({ image });
+    const onSubmit = handleSubmit((data) => {
+        const req = formattedImage(data.image);
+        createContainer(req);
+    });
 
-    const onImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setImage(e.target.value);
+    const formattedImage = (image?: string) => {
+        if (!image) return;
+        const fmt = {
+            image: image,
+            image_tag: "latest",
+        };
+        const split = image.split(":");
+        if (split.length === 2) {
+            fmt.image = split[0];
+            fmt.image_tag = split[1];
+        }
+        return fmt;
     };
 
     const actions = (
-        <Fragment>
+        <PopupActions>
             <Button variant="outlined" onClick={dismiss}>
                 Cancel
             </Button>
             <Button
+                type="submit"
                 variant="colored"
-                onClick={create}
                 rightIcon={<DownloadSimple />}
             >
                 Install
             </Button>
-        </Fragment>
+        </PopupActions>
     );
+
+    const image = watch("image");
+    const formatted = formattedImage(image);
+    let description = undefined;
+    if (image) {
+        description = `${formatted?.image}:${formatted?.image_tag}`;
+    }
 
     return (
         <Popup
             show={show}
             onDismiss={dismiss}
             title="Install from Docker Registry"
-            actions={actions}
         >
-            <FormItem label="Image" required>
-                <Input
-                    placeholder="postgres"
-                    value={image}
-                    onChange={onImageChange}
-                    disabled={isCreatingContainer}
-                />
-            </FormItem>
+            <form onSubmit={onSubmit}>
+                <Vertical gap={20}>
+                    <FormItem
+                        label="Image"
+                        error={errors.image?.message?.toString()}
+                        description={description}
+                        required
+                    >
+                        <Input
+                            {...register("image")}
+                            placeholder="postgres"
+                            disabled={isCreatingContainer}
+                        />
+                    </FormItem>
+                    {actions}
+                </Vertical>
+            </form>
             <ProgressOverlay show={isCreatingContainer} />
             <APIError error={errorCreatingContainer} />
         </Popup>

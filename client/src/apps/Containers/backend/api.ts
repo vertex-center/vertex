@@ -37,6 +37,7 @@ const getContainer = async (id: string) => {
 export type CreateContainerOptions = {
     template_id?: string;
     image?: string;
+    image_tag?: string;
 };
 
 const createContainer = async (options: CreateContainerOptions) => {

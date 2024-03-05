@@ -12,7 +12,7 @@ import {
     MaterialIcon,
     Title,
 } from "@vertex-center/components";
-import Popup from "../../../components/Popup/Popup";
+import Popup, { PopupActions } from "../../../components/Popup/Popup";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import NoItems from "../../../components/NoItems/NoItems";
 import Content from "../../../components/Content/Content";
@@ -65,19 +65,6 @@ export default function VertexReverseProxy() {
     const openNewRedirectPopup = () => setShowNewRedirectPopup(true);
     const closeNewRedirectPopup = () => setShowNewRedirectPopup(false);
 
-    const popupActions = (
-        <Fragment>
-            <Button onClick={closeNewRedirectPopup}>Cancel</Button>
-            <Button
-                variant="colored"
-                onClick={async () => mutationAdd.mutate({ source, target })}
-                rightIcon={<MaterialIcon icon="send" />}
-            >
-                Send
-            </Button>
-        </Fragment>
-    );
-
     return (
         <Content>
             <ProgressOverlay show={isLoading} />
@@ -120,7 +107,6 @@ export default function VertexReverseProxy() {
             <Popup
                 show={showNewRedirectPopup}
                 onDismiss={closeNewRedirectPopup}
-                actions={popupActions}
                 title="New redirection"
             >
                 <FormItem label="Source">
@@ -133,6 +119,18 @@ export default function VertexReverseProxy() {
                 <FormItem label="Target">
                     <Input value={target} onChange={onTargetChange} />
                 </FormItem>
+                <PopupActions>
+                    <Button onClick={closeNewRedirectPopup}>Cancel</Button>
+                    <Button
+                        variant="colored"
+                        onClick={async () =>
+                            mutationAdd.mutate({ source, target })
+                        }
+                        rightIcon={<MaterialIcon icon="send" />}
+                    >
+                        Send
+                    </Button>
+                </PopupActions>
             </Popup>
         </Content>
     );

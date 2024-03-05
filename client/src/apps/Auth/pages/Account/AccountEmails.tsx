@@ -24,7 +24,7 @@ import Progress, {
 } from "../../../../components/Progress/Progress";
 import { APIError } from "../../../../components/Error/APIError";
 import NoItems from "../../../../components/NoItems/NoItems";
-import Popup from "../../../../components/Popup/Popup";
+import Popup, { PopupActions } from "../../../../components/Popup/Popup";
 import { ChangeEvent, Fragment, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Envelope, Plus } from "@phosphor-icons/react";
@@ -73,36 +73,6 @@ export default function AccountEmails() {
     const onEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value);
     };
-
-    const popupCreateActions = (
-        <Fragment>
-            <Button variant="outlined" onClick={dismissCreatePopup}>
-                Cancel
-            </Button>
-            <Button
-                variant="colored"
-                onClick={() => createEmail({ email })}
-                rightIcon={<Plus />}
-            >
-                Add
-            </Button>
-        </Fragment>
-    );
-
-    const popupDeleteActions = (
-        <Fragment>
-            <Button variant="outlined" onClick={dismissDeletePopup}>
-                Cancel
-            </Button>
-            <Button
-                variant="danger"
-                onClick={() => deleteEmail({ email })}
-                rightIcon={<MaterialIcon icon="delete" />}
-            >
-                Delete
-            </Button>
-        </Fragment>
-    );
 
     return (
         <Content>
@@ -154,7 +124,6 @@ export default function AccountEmails() {
                 show={showCreatePopup}
                 onDismiss={dismissCreatePopup}
                 title="Add email address"
-                actions={popupCreateActions}
             >
                 <FormItem label="Email address" required>
                     <Input
@@ -165,12 +134,23 @@ export default function AccountEmails() {
                 </FormItem>
                 <APIError error={errorCreateEmail} />
                 {isCreatingEmail && <Progress />}
+                <PopupActions>
+                    <Button variant="outlined" onClick={dismissCreatePopup}>
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="colored"
+                        onClick={() => createEmail({ email })}
+                        rightIcon={<Plus />}
+                    >
+                        Add
+                    </Button>
+                </PopupActions>
             </Popup>
             <Popup
                 show={showDeletePopup}
                 onDismiss={dismissDeletePopup}
                 title="Delete email?"
-                actions={popupDeleteActions}
             >
                 <Paragraph>
                     Are you sure you want to delete this email address?
@@ -178,6 +158,18 @@ export default function AccountEmails() {
                 <Code language={"text"}>{email}</Code>
                 <APIError error={errorDeleteEmail} />
                 {isDeletingEmail && <Progress />}
+                <PopupActions>
+                    <Button variant="outlined" onClick={dismissDeletePopup}>
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="danger"
+                        onClick={() => deleteEmail({ email })}
+                        rightIcon={<MaterialIcon icon="delete" />}
+                    >
+                        Delete
+                    </Button>
+                </PopupActions>
             </Popup>
         </Content>
     );

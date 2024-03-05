@@ -1,8 +1,8 @@
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { Outlet, useNavigate, useOutlet, useParams } from "react-router-dom";
 import styles from "./Container.module.sass";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
-import Popup from "../../../../components/Popup/Popup";
+import Popup, { PopupActions } from "../../../../components/Popup/Popup";
 import {
     Button,
     MaterialIcon,
@@ -137,22 +137,6 @@ export default function ContainerDetails() {
         </Sidebar>
     );
 
-    const popupActions = (
-        <Fragment>
-            <Button onClick={dismissDeletePopup} disabled={isDeleting}>
-                Cancel
-            </Button>
-            <Button
-                variant="danger"
-                onClick={async () => mutationDeleteContainer.mutate()}
-                disabled={isDeleting}
-                rightIcon={<Trash />}
-            >
-                Confirm
-            </Button>
-        </Fragment>
-    );
-
     const content = (
         <Horizontal className={styles.content}>
             {sidebar}
@@ -165,7 +149,6 @@ export default function ContainerDetails() {
                 show={showDeletePopup}
                 onDismiss={dismissDeletePopup}
                 title={`Delete ${container?.name}?`}
-                actions={popupActions}
             >
                 <Paragraph>
                     Are you sure you want to delete {container?.name}? All data
@@ -173,6 +156,19 @@ export default function ContainerDetails() {
                 </Paragraph>
                 {isDeleting && <Progress infinite />}
                 <APIError style={{ margin: 0 }} error={errorDeleting} />
+                <PopupActions>
+                    <Button onClick={dismissDeletePopup} disabled={isDeleting}>
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="danger"
+                        onClick={async () => mutationDeleteContainer.mutate()}
+                        disabled={isDeleting}
+                        rightIcon={<Trash />}
+                    >
+                        Confirm
+                    </Button>
+                </PopupActions>
             </Popup>
         </Horizontal>
     );
