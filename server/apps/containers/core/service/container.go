@@ -103,7 +103,7 @@ func (s *containerService) CreateContainer(ctx context.Context, opts types.Creat
 
 		env     []types.TemplateEnv
 		caps    []string
-		ports   = map[string]string{}
+		ports   []types.TemplatePort
 		volumes = map[string]string{}
 		sysctls = map[string]string{}
 	)
@@ -122,11 +122,9 @@ func (s *containerService) CreateContainer(ctx context.Context, opts types.Creat
 		cmd = template.Methods.Docker.Cmd
 
 		env = template.Env
+		ports = template.Ports
 		if template.Methods.Docker.Capabilities != nil {
 			caps = *template.Methods.Docker.Capabilities
-		}
-		if template.Methods.Docker.Ports != nil {
-			ports = *template.Methods.Docker.Ports
 		}
 		if template.Methods.Docker.Volumes != nil {
 			volumes = *template.Methods.Docker.Volumes
@@ -194,12 +192,12 @@ func (s *containerService) CreateContainer(ctx context.Context, opts types.Creat
 	}
 
 	// Set default ports
-	for in, out := range ports {
+	for _, p := range ports {
 		err = s.ports.CreatePort(ctx, types.Port{
 			ID:          uuid.New(),
 			ContainerID: id,
-			In:          in,
-			Out:         out,
+			In:          p.Port,
+			Out:         p.Port,
 		})
 		if err != nil {
 			return nil, err

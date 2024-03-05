@@ -170,7 +170,7 @@ func (a runnerDockerAdapter) Start(
 				WithEnv(env).
 				WithCaps(caps).
 				WithSysctls(sysctls).
-				WithPorts(ports, env).
+				WithPorts(ports).
 				WithVolumes(volumes).
 				WithCommand(c.Command).
 				Build()
