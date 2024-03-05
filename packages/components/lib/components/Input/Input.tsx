@@ -12,8 +12,6 @@ import cx from "classnames";
 export type InputRef = Ref<HTMLInputElement>;
 
 export type InputProps = InputHTMLAttributes<HTMLInputElement> & {
-    divRef?: Ref<HTMLDivElement>;
-    divProps?: InputHTMLAttributes<HTMLDivElement>;
     as?: ElementType;
 };
 
