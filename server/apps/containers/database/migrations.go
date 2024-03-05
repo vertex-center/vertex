@@ -46,12 +46,14 @@ type v3 struct{}
 func (m *v3) Up(tx *sqlx.Tx) error {
 	_, err := tx.Exec(`
         UPDATE ports
-        SET external_port = (
-            SELECT value AS external_port
-            FROM env_variables
-            WHERE type = 'port' AND container_id = ports.container_id AND default_value = ports.internal_port
+        SET external_port = COALESCE(
+            (
+                SELECT value AS external_port
+                FROM env_variables
+                WHERE type = 'port' AND name = ports.external_port AND container_id = ports.container_id AND default_value = ports.internal_port
+            ),
+            '8000'
         )
-        WHERE true
     `)
 	if err != nil {
 		return err
