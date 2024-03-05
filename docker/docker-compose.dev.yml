@@ -18,7 +18,7 @@ services:
     environment:
       - APP_KIND=main
     volumes:
-      - ../server:/build/server
+      - ../server:/build
 
   vertex-kernel:
     build:
@@ -27,4 +27,4 @@ services:
     environment:
       - APP_KIND=kernel
     volumes:
-      - ../server:/build/server
+      - ../server:/build
