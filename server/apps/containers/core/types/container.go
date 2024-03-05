@@ -60,6 +60,7 @@ type (
 	CreateContainerOptions struct {
 		TemplateID *string `json:"template_id,omitempty"`
 		Image      *string `json:"image,omitempty"`
+		ImageTag   *string `json:"image_tag,omitempty"`
 	}
 )
 
@@ -73,4 +74,11 @@ func (i *Container) IsRunning() bool {
 
 func (i *Container) IsBusy() bool {
 	return i.Status == ContainerStatusBuilding || i.Status == ContainerStatusStarting || i.Status == ContainerStatusStopping
+}
+
+func (o *CreateContainerOptions) FillDefaults() {
+	if o.ImageTag == nil {
+		o.ImageTag = new(string)
+		*o.ImageTag = "latest"
+	}
 }

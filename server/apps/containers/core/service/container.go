@@ -89,10 +89,12 @@ func (s *containerService) GetContainersWithFilters(ctx context.Context, filters
 }
 
 func (s *containerService) CreateContainer(ctx context.Context, opts types.CreateContainerOptions) (*types.Container, error) {
-	id := uuid.New()
+	opts.FillDefaults()
 
 	var (
+		id          = uuid.New()
 		image       = opts.Image
+		imageTag    = opts.ImageTag
 		name        = opts.Image
 		description *string
 		color       *string
@@ -146,7 +148,7 @@ func (s *containerService) CreateContainer(ctx context.Context, opts types.Creat
 		ID:              id,
 		TemplateID:      opts.TemplateID,
 		Image:           *image,
-		ImageTag:        "latest",
+		ImageTag:        *imageTag,
 		Status:          types.ContainerStatusOff,
 		LaunchOnStartup: true,
 		Name:            *name,

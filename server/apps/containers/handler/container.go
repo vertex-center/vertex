@@ -59,6 +59,7 @@ func (h *containerHandler) GetContainers() gin.HandlerFunc {
 type CreateContainerParams struct {
 	TemplateID *string `json:"template_id,omitempty"`
 	Image      *string `json:"image,omitempty"`
+	ImageTag   *string `json:"image_tag,omitempty"`
 }
 
 func (h *containerHandler) CreateContainer() gin.HandlerFunc {
@@ -66,6 +67,7 @@ func (h *containerHandler) CreateContainer() gin.HandlerFunc {
 		return h.containerService.CreateContainer(ctx, types.CreateContainerOptions{
 			TemplateID: params.TemplateID,
 			Image:      params.Image,
+			ImageTag:   params.ImageTag,
 		})
 	}, http.StatusCreated)
 }
