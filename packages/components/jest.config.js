@@ -1,6 +1,4 @@
-import { JestConfigWithTsJest } from "ts-jest";
-
-const config: JestConfigWithTsJest = {
+const config = {
     transform: {
         "^.+\\.svg$": "jest-transform-stub",
     },
