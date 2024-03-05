@@ -30,6 +30,8 @@ type (
 		SetDatabases(ctx context.Context, c *types.Container, databases map[string]uuid.UUID, options map[string]*types.SetDatabasesOptions) error
 		GetContainerEnv(ctx context.Context, id uuid.UUID) (types.EnvVariables, error)
 		SaveEnv(ctx context.Context, id uuid.UUID, env types.EnvVariables) error
+		GetContainerPorts(ctx context.Context, id uuid.UUID) (types.Ports, error)
+		SaveContainerPorts(ctx context.Context, id uuid.UUID, ports []types.Port) error
 		GetAllVersions(ctx context.Context, id uuid.UUID, useCache bool) ([]string, error)
 		GetContainerInfo(ctx context.Context, id uuid.UUID) (map[string]any, error)
 		WaitStatus(ctx context.Context, id uuid.UUID, status string) error

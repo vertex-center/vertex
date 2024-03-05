@@ -32,6 +32,13 @@ export type EnvVariable = {
     secret: boolean;
 };
 
+export type Port = {
+    id: string;
+    container_id: string;
+    in: string;
+    out: string;
+};
+
 export type Containers = Container[];
 export type Container = {
     id: string;

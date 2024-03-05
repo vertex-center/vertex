@@ -9,6 +9,7 @@ var Migrations = []vsql.Migration{
 	// 0.16
 	&v1{}, // Rename service_id to template_id
 	&v2{}, // Make template_id nullable
+	&v3{}, // Move external port from env variable to ports table
 }
 
 type v1 struct{}
@@ -37,5 +38,28 @@ func (m *v2) Up(tx *sqlx.Tx) error {
 		SET template_id = NULL
 		WHERE template_id = '';
 	`)
+	return err
+}
+
+type v3 struct{}
+
+func (m *v3) Up(tx *sqlx.Tx) error {
+	_, err := tx.Exec(`
+        UPDATE ports
+        SET external_port = (
+            SELECT value AS external_port
+            FROM env_variables
+            WHERE type = 'port' AND container_id = ports.container_id AND default_value = ports.internal_port
+        )
+        WHERE true
+    `)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec(`
+        DELETE FROM env_variables
+        WHERE type = 'port'
+    `)
 	return err
 }

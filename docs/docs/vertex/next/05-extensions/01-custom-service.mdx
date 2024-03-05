@@ -15,6 +15,79 @@ This file allows you to describe your service to Vertex (name, description, depe
 
 <Tabs>
 
+<TabItem value="v3" label="Version 3">
+
+:::info
+The `v3` is only supported by Vertex v0.18 and above.
+:::
+
+:::tip
+To upgrade from `v2` to `v3`, you need to:
+
+1. Change the `version` field to `3`
+2. Remove all `environment` of type `port`
+3. Remove all `methods.docker.ports`
+4. Remove all `urls`
+5. Create a new `ports` field with the port name and the port number
+:::
+
+```yaml title="service.yml"
+# The version of the service.yml schema.
+# This is not the version of the service.
+version: 3
+
+# Some metadata about the service.
+id: service-id
+name: Service Name
+repository: github.com/vertex-center/service-repository
+description: A small description of your service.
+color: '#DC382D'
+icon: simpleicons/redis.svg
+
+# Features allows you to describe some features of your service,
+# like databases, that can then be used by other services.
+features:
+  databases:
+    - type: redis
+      port: PORT_NAME
+
+# The environment variables of the service.
+environment:
+  - type: string
+    name: API_TOKEN
+    display_name: API Token
+    default: 'my-token'
+    description: The token of my API.
+
+# The databases that this service uses.
+databases:
+  main:
+    display_name: Database
+    types:
+      - postgres
+    names:
+      host: DB_HOST
+      port: DB_PORT
+      username: DB_USER
+      password: DB_PASSWORD
+      database: DB_NAME
+
+ports:
+  - name: PORT_NAME
+    port: 8080
+
+# The methods to run the service.
+methods:
+  # Describe how to run it with a Docker image.
+  docker:
+    image: redis:latest
+    dockerfile: Dockerfile
+    volumes:
+      data: /opt/storage
+```
+
+</TabItem>
+
 <TabItem value="v2" label="Version 2">
 
 :::info

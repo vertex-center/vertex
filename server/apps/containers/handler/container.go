@@ -167,6 +167,27 @@ func (h *containerHandler) PatchEnvironment() gin.HandlerFunc {
 	}, http.StatusOK)
 }
 
+type GetContainerPortsParams struct {
+	ContainerID uuid.NullUUID `path:"container_id"`
+}
+
+func (h *containerHandler) GetContainerPorts() gin.HandlerFunc {
+	return tonic.Handler(func(ctx *gin.Context, params *GetContainerPortsParams) (types.Ports, error) {
+		return h.containerService.GetContainerPorts(ctx, params.ContainerID.UUID)
+	}, http.StatusOK)
+}
+
+type PatchContainerPortsParams struct {
+	ContainerID uuid.NullUUID `path:"container_id"`
+	Ports       []types.Port  `body:"ports"`
+}
+
+func (h *containerHandler) PatchContainerPorts() gin.HandlerFunc {
+	return tonic.Handler(func(ctx *gin.Context, params *PatchContainerPortsParams) error {
+		return h.containerService.SaveContainerPorts(ctx, params.ContainerID.UUID, params.Ports)
+	}, http.StatusOK)
+}
+
 func (h *containerHandler) GetDocker() gin.HandlerFunc {
 	return tonic.Handler(func(ctx *gin.Context, params *GetContainerParams) (map[string]any, error) {
 		return h.containerService.GetContainerInfo(ctx, params.ContainerID.UUID)

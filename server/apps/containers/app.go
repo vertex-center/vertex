@@ -171,6 +171,19 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to patch container environment"}),
 	}, containersHandler.PatchEnvironment())
 
+	containers.GET("/:container_id/ports", []fizz.OperationOption{
+		fizz.ID("getContainerPorts"),
+		fizz.Summary("Get container ports"),
+		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
+	}, containersHandler.GetContainerPorts())
+
+	containers.PATCH("/:container_id/ports", []fizz.OperationOption{
+		fizz.ID("patchContainerPorts"),
+		fizz.Summary("Patch container ports"),
+		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
+		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to patch container ports"}),
+	}, containersHandler.PatchContainerPorts())
+
 	containers.GET("/:container_id/events", []fizz.OperationOption{
 		fizz.ID("eventsContainer"),
 		fizz.Summary("Get container events"),

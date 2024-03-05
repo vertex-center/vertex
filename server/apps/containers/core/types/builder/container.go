@@ -63,13 +63,10 @@ func (b *ContainerBuilder) WithSysctls(sysctls types.Sysctls) *ContainerBuilder 
 	return b
 }
 
-func (b *ContainerBuilder) WithPorts(ports types.Ports, env types.EnvVariables) *ContainerBuilder {
+func (b *ContainerBuilder) WithPorts(ports types.Ports) *ContainerBuilder {
 	var all []string
 	for _, p := range ports {
-		out := env.Get(p.Out)
-		if out == "" {
-			continue
-		}
+		out := p.Out
 		in := p.In
 		all = append(all, out+":"+in)
 	}

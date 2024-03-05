@@ -1,5 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import {
+    useMutation,
+    UseMutationOptions,
+    useQuery,
+    useQueryClient,
+} from "@tanstack/react-query";
 import { API } from "../backend/api";
+import { Port } from "../backend/models";
 
 export default function useContainer(id?: string) {
     const queryContainer = useQuery({
@@ -35,4 +41,34 @@ export function useContainerEnv(id?: string) {
         isLoadingEnv: queryEnv.isLoading,
         errorEnv: queryEnv.error,
     };
+}
+
+export function useContainerPorts(id?: string) {
+    const queryPorts = useQuery({
+        queryKey: ["container_ports", id],
+        queryFn: () => API.getContainerPorts(id),
+    });
+    return {
+        ports: queryPorts.data,
+        isLoadingPorts: queryPorts.isLoading,
+        errorPorts: queryPorts.error,
+    };
+}
+
+export function useSaveContainerPorts(
+    id?: string,
+    options?: UseMutationOptions<unknown, unknown, Port[]>
+) {
+    const queryClient = useQueryClient();
+    const { mutate: savePorts, ...rest } = useMutation({
+        ...options,
+        mutationFn: (ports: Port[]) => API.saveContainerPorts(id, ports),
+        onSettled: async (...args) => {
+            await queryClient.invalidateQueries({
+                queryKey: ["container_ports", id],
+            });
+            options?.onSettled?.(...args);
+        },
+    });
+    return { savePorts, ...rest };
 }

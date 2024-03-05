@@ -4,6 +4,7 @@ import {
     ContainerFilters,
     Containers,
     EnvVariables,
+    Port,
     Tags,
 } from "./models";
 import { DockerContainerInfo } from "../../../models/docker";
@@ -77,6 +78,15 @@ const saveEnv = (id: string, env: EnvVariables) => {
     return server.patch(`/containers/${id}/environment`, { env });
 };
 
+const getContainerPorts = async (id: string) => {
+    const { data } = await server.get(`/containers/${id}/ports`);
+    return data;
+};
+
+const saveContainerPorts = (id: string, ports: Port[]) => {
+    return server.patch(`/containers/${id}/ports`, { ports });
+};
+
 const getDocker = async (id: string) => {
     const { data } = await server.get<DockerContainerInfo>(
         `/containers/${id}/docker`
@@ -111,6 +121,8 @@ export const API = {
     getLogs,
     getContainerEnvironment,
     saveEnv,
+    getContainerPorts,
+    saveContainerPorts,
     getDockerInfo: getDocker,
     recreateDocker,
     updateService,

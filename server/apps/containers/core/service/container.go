@@ -103,7 +103,7 @@ func (s *containerService) CreateContainer(ctx context.Context, opts types.Creat
 
 		env     []types.TemplateEnv
 		caps    []string
-		ports   = map[string]string{}
+		ports   []types.TemplatePort
 		volumes = map[string]string{}
 		sysctls = map[string]string{}
 	)
@@ -122,11 +122,9 @@ func (s *containerService) CreateContainer(ctx context.Context, opts types.Creat
 		cmd = template.Methods.Docker.Cmd
 
 		env = template.Env
+		ports = template.Ports
 		if template.Methods.Docker.Capabilities != nil {
 			caps = *template.Methods.Docker.Capabilities
-		}
-		if template.Methods.Docker.Ports != nil {
-			ports = *template.Methods.Docker.Ports
 		}
 		if template.Methods.Docker.Volumes != nil {
 			volumes = *template.Methods.Docker.Volumes
@@ -194,12 +192,12 @@ func (s *containerService) CreateContainer(ctx context.Context, opts types.Creat
 	}
 
 	// Set default ports
-	for in, out := range ports {
+	for _, p := range ports {
 		err = s.ports.CreatePort(ctx, types.Port{
 			ID:          uuid.New(),
 			ContainerID: id,
-			In:          in,
-			Out:         out,
+			In:          p.Port,
+			Out:         p.Port,
 		})
 		if err != nil {
 			return nil, err
@@ -727,6 +725,20 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 func (s *containerService) SaveEnv(ctx context.Context, id uuid.UUID, env types.EnvVariables) error {
 	for _, e := range env {
 		err := s.vars.UpdateContainerVariableByID(ctx, e)
+		if err != nil {
+			return err
+		}
+	}
+	return s.RecreateContainer(ctx, id)
+}
+
+func (s *containerService) GetContainerPorts(ctx context.Context, id uuid.UUID) (types.Ports, error) {
+	return s.ports.GetContainerPorts(ctx, id)
+}
+
+func (s *containerService) SaveContainerPorts(ctx context.Context, id uuid.UUID, ports []types.Port) error {
+	for _, p := range ports {
+		err := s.ports.UpdateContainerPortByID(ctx, p)
 		if err != nil {
 			return err
 		}

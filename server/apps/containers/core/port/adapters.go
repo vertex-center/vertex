@@ -28,6 +28,7 @@ type (
 		GetContainerPorts(ctx context.Context, id uuid.UUID) (types.Ports, error)
 		CreatePort(ctx context.Context, port types.Port) error
 		DeleteContainerPorts(ctx context.Context, id uuid.UUID) error
+		UpdateContainerPortByID(ctx context.Context, port types.Port) error
 	}
 
 	VolumeAdapter interface {

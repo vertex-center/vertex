@@ -8,7 +8,7 @@ import (
 	"github.com/vertex-center/vlog"
 )
 
-const MaxSupportedVersion Version = 2
+const MaxSupportedVersion Version = 3
 
 var ErrTemplateNotFound = errors.NotFoundf("template")
 
@@ -16,7 +16,7 @@ type Version int
 
 type TemplateVersioning struct {
 	// Version of the template format used.
-	Version Version `yaml:"version" json:"version" example:"2"`
+	Version Version `yaml:"version" json:"version" example:"3"`
 }
 
 type Template struct {
@@ -49,7 +49,11 @@ type Template struct {
 	// Databases defines all databases used by the template.
 	Databases map[string]DatabaseEnvironment `yaml:"databases,omitempty" json:"databases,omitempty"`
 
+	// Ports defines all ports that should be exposed by the container.
+	Ports []TemplatePort `yaml:"ports,omitempty" json:"ports,omitempty"`
+
 	// URLs defines all template urls.
+	// Deprecated: URLs are deleted in version 3.
 	URLs []URL `yaml:"urls,omitempty" json:"urls,omitempty"`
 
 	// Methods define different methods to install the template.
@@ -87,7 +91,29 @@ func (s *TemplateV1) Upgrade() *TemplateV2 {
 
 type TemplateV2 Template
 
-func (s *TemplateV2) Upgrade() *Template {
+// Upgrade TemplateV2 to TemplateV3.
+// Ports are now an array in the root of the template.
+func (s *TemplateV2) Upgrade() *TemplateV3 {
+	s.Version = 3
+	envs := make([]TemplateEnv, 0)
+	for _, env := range s.Env {
+		if env.Type == "port" {
+			s.Ports = append(s.Ports, TemplatePort{
+				Name: env.Name,
+				Port: env.Default,
+			})
+		} else {
+			envs = append(envs, env)
+		}
+	}
+	s.Env = envs
+	s.URLs = []URL{}
+	return (*TemplateV3)(s)
+}
+
+type TemplateV3 Template
+
+func (s *TemplateV3) Upgrade() *Template {
 	return (*Template)(s)
 }
 
@@ -114,6 +140,8 @@ func (s *Template) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		tmpl = &TemplateV1{}
 	case 2:
 		tmpl = &TemplateV2{}
+	case 3:
+		tmpl = &TemplateV3{}
 	}
 	err = unmarshal(tmpl)
 	if err != nil {
@@ -128,6 +156,9 @@ func (s *Template) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		fallthrough
 	case 2:
 		tmpl = tmpl.(*TemplateV2).Upgrade()
+		fallthrough
+	case 3:
+		tmpl = tmpl.(*TemplateV3).Upgrade()
 	}
 
 	if serv, ok := tmpl.(*Template); ok {
@@ -212,6 +243,14 @@ type TemplateEnv struct {
 	Description string `yaml:"description" json:"description" example:"The port where the server will listen."`
 }
 
+type TemplatePort struct {
+	// Name is the name displayed to the used describing this port.
+	Name string `yaml:"name" json:"name" example:"Server Port"`
+
+	// Port is the port where this port is supposed to be.
+	Port string `yaml:"port" json:"port" example:"3000"`
+}
+
 type TemplateDependency struct{}
 
 type TemplateClone struct {
@@ -230,6 +269,7 @@ type TemplateMethodDocker struct {
 
 	// Ports is a map containing docker port as a key, and output port as a value.
 	// The output port is automatically adjusted with PORT environment variables.
+	// Deprecated: Use the root Ports variable instead.
 	Ports *map[string]string `yaml:"ports,omitempty" json:"ports,omitempty"`
 
 	// Volumes is a map containing output folder as a key, and input folder from Docker
@@ -251,6 +291,7 @@ type TemplateMethods struct {
 	Docker *TemplateMethodDocker `yaml:"docker,omitempty" json:"docker,omitempty"`
 }
 
+// Deprecated: Deleted in version 3.
 type URL struct {
 	// Name is the name displayed to the used describing this URL.
 	Name string `yaml:"name" json:"name" example:"Vertex Client"`
