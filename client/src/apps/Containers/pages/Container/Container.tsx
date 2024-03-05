@@ -25,6 +25,7 @@ import {
     Cube,
     Gear,
     House,
+    ShareNetwork,
     TerminalWindow,
     Textbox,
     Trash,
@@ -106,6 +107,11 @@ export default function ContainerDetails() {
                     label="Environment"
                     icon={<Textbox />}
                     link={l(`/containers/${uuid}/environment`)}
+                />
+                <Sidebar.Item
+                    label="Ports"
+                    icon={<ShareNetwork />}
+                    link={l(`/containers/${uuid}/ports`)}
                 />
                 {container?.databases && (
                     <Sidebar.Item

@@ -49,6 +49,7 @@ import useUser from "./apps/Auth/hooks/useUser";
 import AccountEmails from "./apps/Auth/pages/Account/AccountEmails";
 import { getAuthToken } from "./backend/server";
 import AccountTheme from "./apps/Auth/pages/Account/AccountTheme";
+import ContainerPorts from "./apps/Containers/pages/ContainerPorts/ContainerPorts";
 
 const queryClient = new QueryClient();
 
@@ -178,6 +179,10 @@ function AllRoutes() {
                             <Route
                                 path="/containers/:uuid/environment"
                                 element={<ContainerEnv />}
+                            />
+                            <Route
+                                path="/containers/:uuid/ports"
+                                element={<ContainerPorts />}
                             />
                             <Route
                                 path="/containers/:uuid/database"

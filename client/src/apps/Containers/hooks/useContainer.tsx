@@ -36,3 +36,15 @@ export function useContainerEnv(id?: string) {
         errorEnv: queryEnv.error,
     };
 }
+
+export function useContainerPorts(id?: string) {
+    const queryPorts = useQuery({
+        queryKey: ["container_ports", id],
+        queryFn: () => API.getContainerPorts(id),
+    });
+    return {
+        ports: queryPorts.data,
+        isLoadingPorts: queryPorts.isLoading,
+        errorPorts: queryPorts.error,
+    };
+}
