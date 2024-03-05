@@ -46,3 +46,12 @@ func (a *portDBAdapter) DeleteContainerPorts(ctx context.Context, id uuid.UUID) 
 	`, id)
 	return err
 }
+
+func (a *portDBAdapter) UpdateContainerPortByID(ctx context.Context, port types.Port) error {
+	_, err := a.db.NamedExec(`
+        UPDATE ports
+        SET internal_port = :internal_port, external_port = :external_port
+        WHERE id = :id
+    `, port)
+	return err
+}

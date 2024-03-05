@@ -623,10 +623,6 @@ func (s *containerService) GetContainerEnv(ctx context.Context, id uuid.UUID) (t
 	return s.vars.GetContainerVariables(ctx, id)
 }
 
-func (s *containerService) GetContainerPorts(ctx context.Context, id uuid.UUID) (types.Ports, error) {
-	return s.ports.GetContainerPorts(ctx, id)
-}
-
 // remapDatabaseEnv remaps the environment variables of a container.
 func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Container, options map[string]*types.SetDatabasesOptions) error {
 	for databaseID, databaseContainerID := range c.Databases {
@@ -729,6 +725,20 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 func (s *containerService) SaveEnv(ctx context.Context, id uuid.UUID, env types.EnvVariables) error {
 	for _, e := range env {
 		err := s.vars.UpdateContainerVariableByID(ctx, e)
+		if err != nil {
+			return err
+		}
+	}
+	return s.RecreateContainer(ctx, id)
+}
+
+func (s *containerService) GetContainerPorts(ctx context.Context, id uuid.UUID) (types.Ports, error) {
+	return s.ports.GetContainerPorts(ctx, id)
+}
+
+func (s *containerService) SaveContainerPorts(ctx context.Context, id uuid.UUID, ports []types.Port) error {
+	for _, p := range ports {
+		err := s.ports.UpdateContainerPortByID(ctx, p)
 		if err != nil {
 			return err
 		}

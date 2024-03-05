@@ -99,6 +99,11 @@ func (m *MockContainerService) GetContainerPorts(ctx context.Context, id uuid.UU
 	return args.Get(0).(types.Ports), args.Error(1)
 }
 
+func (m *MockContainerService) SaveContainerPorts(ctx context.Context, id uuid.UUID, ports []types.Port) error {
+	args := m.Called(ctx, id, ports)
+	return args.Error(0)
+}
+
 func (m *MockContainerService) RecreateContainer(ctx context.Context, uuid uuid.UUID) error {
 	args := m.Called(ctx, uuid)
 	return args.Error(0)
