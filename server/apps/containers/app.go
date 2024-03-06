@@ -240,9 +240,22 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	ports.PATCH("/:port_id", []fizz.OperationOption{
 		fizz.ID("patchContainerPort"),
 		fizz.Summary("Patch container ports"),
-		fizz.Response("404", "Container or port not found", nil, nil, map[string]interface{}{"error": "container not found"}),
-		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to patch container port"}),
-	}, containersHandler.PatchContainerPort())
+		fizz.Response("404", "Port not found", nil, nil, map[string]interface{}{"error": "port not found"}),
+		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to patch port"}),
+	}, containersHandler.PatchPort())
+
+	ports.DELETE("/:port_id", []fizz.OperationOption{
+		fizz.ID("deleteContainerPort"),
+		fizz.Summary("Delete container port"),
+		fizz.Response("404", "Port not found", nil, nil, map[string]interface{}{"error": "container not found"}),
+		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to delete port"}),
+	}, containersHandler.DeletePort())
+
+	ports.POST("", []fizz.OperationOption{
+		fizz.ID("createContainerPort"),
+		fizz.Summary("Create container port"),
+		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to create port"}),
+	}, containersHandler.CreatePort())
 
 	// Tags
 

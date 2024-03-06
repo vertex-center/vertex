@@ -27,6 +27,7 @@ type (
 	PortAdapter interface {
 		GetContainerPorts(ctx context.Context, id uuid.UUID) (types.Ports, error)
 		CreatePort(ctx context.Context, port types.Port) error
+		DeletePort(ctx context.Context, id uuid.UUID) error
 		DeleteContainerPorts(ctx context.Context, id uuid.UUID) error
 		UpdateContainerPortByID(ctx context.Context, port types.Port) error
 	}

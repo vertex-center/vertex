@@ -39,6 +39,14 @@ func (a *portDBAdapter) CreatePort(ctx context.Context, port types.Port) error {
 	return err
 }
 
+func (a *portDBAdapter) DeletePort(ctx context.Context, id uuid.UUID) error {
+	_, err := a.db.Exec(`
+        DELETE FROM ports
+        WHERE id = $1
+    `, id)
+	return err
+}
+
 func (a *portDBAdapter) DeleteContainerPorts(ctx context.Context, id uuid.UUID) error {
 	_, err := a.db.Exec(`
 		DELETE FROM ports

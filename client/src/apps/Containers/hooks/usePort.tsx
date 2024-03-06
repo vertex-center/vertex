@@ -15,3 +15,31 @@ export function usePatchPort(
     });
     return { patchPort, patchPortAsync, ...rest };
 }
+
+export function useDeletePort(
+    options?: UseMutationOptions<unknown, unknown, string>
+) {
+    const {
+        mutate: deletePort,
+        mutateAsync: deletePortAsync,
+        ...rest
+    } = useMutation({
+        ...options,
+        mutationFn: (id: string) => API.deletePort(id),
+    });
+    return { deletePort, deletePortAsync, ...rest };
+}
+
+export function useCreatePort(
+    options?: UseMutationOptions<unknown, unknown, Port>
+) {
+    const {
+        mutate: createPort,
+        mutateAsync: createPortAsync,
+        ...rest
+    } = useMutation({
+        ...options,
+        mutationFn: (port: Port) => API.createPort(port),
+    });
+    return { createPort, createPortAsync, ...rest };
+}

@@ -736,12 +736,25 @@ func (s *containerService) GetContainerPorts(ctx context.Context, id uuid.UUID) 
 	return s.ports.GetContainerPorts(ctx, id)
 }
 
-func (s *containerService) PatchContainerPort(ctx context.Context, p types.Port) error {
+func (s *containerService) PatchPort(ctx context.Context, p types.Port) error {
 	err := p.Validate()
 	if err != nil {
 		return err
 	}
 	return s.ports.UpdateContainerPortByID(ctx, p)
+}
+
+func (s *containerService) DeletePort(ctx context.Context, id uuid.UUID) error {
+	return s.ports.DeletePort(ctx, id)
+}
+
+func (s *containerService) CreatePort(ctx context.Context, p types.Port) error {
+	p.ID = uuid.New()
+	err := p.Validate()
+	if err != nil {
+		return err
+	}
+	return s.ports.CreatePort(ctx, p)
 }
 
 func (s *containerService) GetAllVersions(ctx context.Context, id uuid.UUID, useCache bool) ([]string, error) {

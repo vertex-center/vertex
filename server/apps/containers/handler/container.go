@@ -177,20 +177,46 @@ func (h *containerHandler) GetContainerPorts() gin.HandlerFunc {
 	}, http.StatusOK)
 }
 
-type PatchContainerPortParams struct {
+type PatchPortParams struct {
 	PortID uuid.NullUUID `path:"port_id"`
 	In     string        `body:"in"`
 	Out    string        `body:"out"`
 }
 
-func (h *containerHandler) PatchContainerPort() gin.HandlerFunc {
-	return tonic.Handler(func(ctx *gin.Context, params *PatchContainerPortParams) error {
-		return h.containerService.PatchContainerPort(ctx, types.Port{
+func (h *containerHandler) PatchPort() gin.HandlerFunc {
+	return tonic.Handler(func(ctx *gin.Context, params *PatchPortParams) error {
+		return h.containerService.PatchPort(ctx, types.Port{
 			ID:  params.PortID.UUID,
 			In:  params.In,
 			Out: params.Out,
 		})
 	}, http.StatusOK)
+}
+
+type DeletePortParams struct {
+	PortID uuid.NullUUID `path:"port_id"`
+}
+
+func (h *containerHandler) DeletePort() gin.HandlerFunc {
+	return tonic.Handler(func(ctx *gin.Context, params *DeletePortParams) error {
+		return h.containerService.DeletePort(ctx, params.PortID.UUID)
+	}, http.StatusOK)
+}
+
+type CreatePortParams struct {
+	ContainerID uuid.NullUUID `json:"container_id"`
+	In          string        `json:"in"`
+	Out         string        `json:"out"`
+}
+
+func (h *containerHandler) CreatePort() gin.HandlerFunc {
+	return tonic.Handler(func(ctx *gin.Context, params *CreatePortParams) error {
+		return h.containerService.CreatePort(ctx, types.Port{
+			ContainerID: params.ContainerID.UUID,
+			In:          params.In,
+			Out:         params.Out,
+		})
+	}, http.StatusCreated)
 }
 
 func (h *containerHandler) GetDocker() gin.HandlerFunc {

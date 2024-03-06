@@ -28,17 +28,24 @@ import { Fragment, ReactNode, useEffect } from "react";
 import { Port } from "../../backend/models";
 import NoItems from "../../../../components/NoItems/NoItems";
 import { diffArrays, diffJson } from "diff";
-import { usePatchPort } from "../../hooks/usePort";
+import {
+    useCreatePort,
+    useDeletePort,
+    usePatchPort,
+} from "../../hooks/usePort";
+import { useQueryClient } from "@tanstack/react-query";
 
 type PortTableProps = {
     ports: Port[];
 };
 
 function PortTable(props: PortTableProps) {
+    const queryClient = useQueryClient();
+
     const { uuid } = useParams();
     const { ports } = props;
 
-    if (!ports) return;
+    if (ports === undefined) return;
 
     const {
         control,
@@ -59,11 +66,9 @@ function PortTable(props: PortTableProps) {
         keyName: "_id",
     });
 
-    const { patchPortAsync, isPending, error } = usePatchPort({
-        onSuccess: () => {
-            // reset({}, { keepValues: true });
-        },
-    });
+    const { patchPortAsync, isPending, error } = usePatchPort();
+    const { deletePortAsync } = useDeletePort();
+    const { createPortAsync } = useCreatePort();
 
     const onAdd = () => {
         append({
@@ -75,7 +80,8 @@ function PortTable(props: PortTableProps) {
     };
 
     const onSubmit = handleSubmit(async (d) => {
-        let patch = diffArrays(ports, d.ports, {
+        const _ports = ports === null ? [] : ports;
+        let patch = diffArrays(_ports, d.ports, {
             comparator: (a, b) => diffJson(a, b).length === 1,
         });
 
@@ -98,11 +104,24 @@ function PortTable(props: PortTableProps) {
         const deleted = new Set([..._deleted].filter((x) => !modified.has(x)));
         const added = new Set([..._added].filter((x) => !modified.has(x)));
 
+        const requests = [];
         for (const p of d.ports) {
+            console.log(p);
             if (modified.has(p.id)) {
-                await patchPortAsync(p);
+                requests.push(patchPortAsync(p));
+            } else if (added.has(p.id)) {
+                requests.push(createPortAsync(p));
             }
         }
+        for (const p of _ports) {
+            if (deleted.has(p.id)) {
+                requests.push(deletePortAsync(p.id));
+            }
+        }
+        await Promise.all(requests);
+        await queryClient.invalidateQueries({
+            queryKey: ["ports"],
+        });
     });
 
     const isLoading = isPending;

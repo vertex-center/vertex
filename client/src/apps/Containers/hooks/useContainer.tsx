@@ -39,8 +39,8 @@ export function useContainerEnv(id?: string) {
 
 export function useContainerPorts(id?: string) {
     const queryPorts = useQuery({
-        queryKey: ["container_ports", id],
-        queryFn: () => API.getContainerPorts(id),
+        queryKey: ["ports", id],
+        queryFn: () => API.getPorts(id),
     });
     return {
         ...queryPorts,

@@ -17,7 +17,9 @@ type (
 		GetContainerEnv() gin.HandlerFunc
 		PatchEnvironment() gin.HandlerFunc
 		GetContainerPorts() gin.HandlerFunc
-		PatchContainerPort() gin.HandlerFunc
+		PatchPort() gin.HandlerFunc
+		DeletePort() gin.HandlerFunc
+		CreatePort() gin.HandlerFunc
 		GetDocker() gin.HandlerFunc
 		RecreateDocker() gin.HandlerFunc
 		GetLogs() gin.HandlerFunc

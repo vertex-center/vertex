@@ -78,13 +78,21 @@ const saveEnv = (id: string, env: EnvVariables) => {
     return server.patch(`/containers/${id}/environment`, { env });
 };
 
-const getContainerPorts = async (id: string) => {
+const getPorts = async (id: string) => {
     const { data } = await server.get(`/containers/${id}/ports`);
     return data;
 };
 
 const patchPort = (port: Port) => {
     return server.patch(`ports/${port.id}`, port);
+};
+
+const deletePort = (id: string) => {
+    return server.delete(`ports/${id}`);
+};
+
+const createPort = (port: Port) => {
+    return server.post(`ports`, port);
 };
 
 const getDocker = async (id: string) => {
@@ -121,8 +129,10 @@ export const API = {
     getLogs,
     getContainerEnvironment,
     saveEnv,
-    getContainerPorts,
+    getPorts,
     patchPort,
+    deletePort,
+    createPort,
     getDockerInfo: getDocker,
     recreateDocker,
     updateService,
