@@ -26,7 +26,7 @@ import {
     useSaveContainerPorts,
 } from "../../hooks/useContainer";
 import Spacer from "../../../../components/Spacer/Spacer";
-import { Fragment } from "react";
+import { Fragment, ReactNode, useEffect } from "react";
 import { Port } from "../../backend/models";
 import NoItems from "../../../../components/NoItems/NoItems";
 
@@ -38,9 +38,7 @@ function PortTable(props: PortTableProps) {
     const { uuid } = useParams();
     const { ports } = props;
 
-    if (!ports) {
-        return;
-    }
+    if (!ports) return;
 
     const {
         control,
@@ -50,6 +48,10 @@ function PortTable(props: PortTableProps) {
     } = useForm({
         defaultValues: { ports },
     });
+
+    useEffect(() => {
+        reset({ ports });
+    }, [ports]);
 
     const { fields, append } = useFieldArray({
         control,
@@ -67,7 +69,7 @@ function PortTable(props: PortTableProps) {
 
     const isLoading = isPending;
 
-    let table;
+    let table: ReactNode;
     if (ports && ports?.length === 0) {
         table = (
             <NoItems
@@ -179,15 +181,14 @@ function PortTable(props: PortTableProps) {
 export default function ContainerPorts() {
     const { uuid } = useParams();
 
-    const { ports, dataUpdatedAt, isLoadingPorts, errorPorts } =
-        useContainerPorts(uuid);
+    const { ports, isLoadingPorts, errorPorts } = useContainerPorts(uuid);
 
     return (
         <Vertical gap={24}>
             <Title variant="h2">Ports</Title>
             <APIError error={errorPorts} />
             <ProgressOverlay show={isLoadingPorts} />
-            <PortTable key={dataUpdatedAt} ports={ports} />
+            <PortTable ports={ports} />
         </Vertical>
     );
 }

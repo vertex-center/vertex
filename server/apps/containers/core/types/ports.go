@@ -1,6 +1,11 @@
 package types
 
-import "github.com/vertex-center/uuid"
+import (
+	"github.com/juju/errors"
+	"github.com/vertex-center/uuid"
+)
+
+var ErrInvalidPort = errors.NotValidf("port")
 
 type (
 	Ports []Port
@@ -11,3 +16,10 @@ type (
 		Out         string    `json:"out"          db:"external_port" example:"5432"` // Port exposed
 	}
 )
+
+func (p *Port) Validate() error {
+	if len(p.In) == 0 || len(p.Out) == 0 {
+		return ErrInvalidPort
+	}
+	return nil
+}
