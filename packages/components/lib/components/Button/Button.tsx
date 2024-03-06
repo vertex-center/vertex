@@ -8,6 +8,7 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
     variant?: ButtonType;
     leftIcon?: React.JSX.Element;
     rightIcon?: React.JSX.Element;
+    borderless?: boolean;
 };
 
 export function Button(props: Readonly<ButtonProps>) {
@@ -18,6 +19,7 @@ export function Button(props: Readonly<ButtonProps>) {
         children,
         leftIcon,
         rightIcon,
+        borderless,
         ...others
     } = props;
 
@@ -26,6 +28,7 @@ export function Button(props: Readonly<ButtonProps>) {
             disabled={disabled}
             className={classNames(className, "button", `button-${variant}`, {
                 "button-disabled": disabled,
+                "button-borderless": borderless,
             })}
             {...others}
         >

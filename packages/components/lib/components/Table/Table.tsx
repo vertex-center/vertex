@@ -37,9 +37,16 @@ export function TableRow(props: Readonly<TableRowProps>) {
     return <tr className={cx("table-row", className)} {...others} />;
 }
 
-export type TableCellProps = HTMLProps<HTMLTableCellElement>;
+export type TableCellProps = HTMLProps<HTMLTableCellElement> & {
+    right?: boolean;
+};
 
 export function TableCell(props: Readonly<TableCellProps>) {
-    const { className, ...others } = props;
-    return <td className={cx("table-cell", className)} {...others} />;
+    const { className, right, ...others } = props;
+    return (
+        <td
+            className={cx("table-cell", right && "table-cell-right", className)}
+            {...others}
+        />
+    );
 }

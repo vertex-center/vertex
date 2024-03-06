@@ -14,15 +14,25 @@
 
         &:has(> .input)
             padding: 0
+            vertical-align: middle
 
             & > .input
                 width: 100%
+                height: 48px
+                display: flex
                 border-radius: 0
                 border: none
                 background-color: transparent
 
                 &:hover
                     background-color: colors.$bg-secondary-hover
+
+        &:has(> .button)
+            padding: 4px
+
+        &-right
+            & > *
+                float: right
 
     & &-cell:not(:last-child), & &-head-cell:not(:last-child), th:not(:last-child), td:not(:last-child)
         border-right: none
