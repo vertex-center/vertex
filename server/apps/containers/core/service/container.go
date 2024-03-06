@@ -738,7 +738,14 @@ func (s *containerService) GetContainerPorts(ctx context.Context, id uuid.UUID) 
 
 func (s *containerService) SaveContainerPorts(ctx context.Context, id uuid.UUID, ports []types.Port) error {
 	for _, p := range ports {
-		err := s.ports.UpdateContainerPortByID(ctx, p)
+		var err error
+		if p.ID == uuid.Nil {
+			p.ID = uuid.New()
+			p.ContainerID = id
+			err = s.ports.CreatePort(ctx, p)
+		} else {
+			err = s.ports.UpdateContainerPortByID(ctx, p)
+		}
 		if err != nil {
 			return err
 		}
