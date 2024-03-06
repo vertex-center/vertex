@@ -20,15 +20,15 @@ import {
     FloppyDiskBack,
     Plus,
     ShareNetwork,
+    Trash,
 } from "@phosphor-icons/react";
-import {
-    useContainerPorts,
-    useSaveContainerPorts,
-} from "../../hooks/useContainer";
+import { useContainerPorts } from "../../hooks/useContainer";
 import Spacer from "../../../../components/Spacer/Spacer";
 import { Fragment, ReactNode, useEffect } from "react";
 import { Port } from "../../backend/models";
 import NoItems from "../../../../components/NoItems/NoItems";
+import { diffArrays, diffJson } from "diff";
+import { usePatchPort } from "../../hooks/usePort";
 
 type PortTableProps = {
     ports: Port[];
@@ -53,24 +53,62 @@ function PortTable(props: PortTableProps) {
         reset({ ports });
     }, [ports]);
 
-    const { fields, append } = useFieldArray({
+    const { fields, append, remove } = useFieldArray({
         control,
         name: "ports",
+        keyName: "_id",
     });
 
-    const { savePorts, isPending, error } = useSaveContainerPorts(uuid, {
+    const { patchPortAsync, isPending, error } = usePatchPort({
         onSuccess: () => {
-            reset({}, { keepValues: true });
+            // reset({}, { keepValues: true });
         },
     });
 
-    const onAdd = () => append({ container_id: uuid, in: "", out: "" });
-    const onSubmit = handleSubmit((d) => savePorts(d.ports));
+    const onAdd = () => {
+        append({
+            id: `TEMP_${Date.now()}`,
+            container_id: uuid,
+            in: "",
+            out: "",
+        });
+    };
+
+    const onSubmit = handleSubmit(async (d) => {
+        let patch = diffArrays(ports, d.ports, {
+            comparator: (a, b) => diffJson(a, b).length === 1,
+        });
+
+        const _deleted = new Set(
+            patch
+                .filter((p) => p.removed)
+                .map((p) => p.value)
+                .flat()
+                .map((p) => p.id)
+        );
+        const _added = new Set(
+            patch
+                .filter((p) => p.added)
+                .map((p) => p.value)
+                .flat()
+                .map((p) => p.id)
+        );
+
+        const modified = new Set([..._deleted].filter((x) => _added.has(x)));
+        const deleted = new Set([..._deleted].filter((x) => !modified.has(x)));
+        const added = new Set([..._added].filter((x) => !modified.has(x)));
+
+        for (const p of d.ports) {
+            if (modified.has(p.id)) {
+                await patchPortAsync(p);
+            }
+        }
+    });
 
     const isLoading = isPending;
 
     let table: ReactNode;
-    if (ports && ports?.length === 0) {
+    if (fields?.length === 0) {
         table = (
             <NoItems
                 icon={<ShareNetwork />}
@@ -84,6 +122,7 @@ function PortTable(props: PortTableProps) {
                     <TableRow>
                         <TableHeadCell>Port inside container</TableHeadCell>
                         <TableHeadCell>Port outside container</TableHeadCell>
+                        <TableHeadCell />
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -93,38 +132,24 @@ function PortTable(props: PortTableProps) {
                                 <Controller
                                     control={control}
                                     name={`ports.${i}.in`}
-                                    render={({
-                                        field,
-                                        formState: { dirtyFields },
-                                    }) => (
-                                        <Input
-                                            {...field}
-                                            style={{
-                                                color:
-                                                    dirtyFields?.ports?.[`${i}`]
-                                                        ?.in && "var(--blue)",
-                                            }}
-                                        />
-                                    )}
+                                    render={({ field }) => <Input {...field} />}
                                 />
                             </TableCell>
                             <TableCell>
                                 <Controller
                                     control={control}
                                     name={`ports.${i}.out`}
-                                    render={({
-                                        field,
-                                        formState: { dirtyFields },
-                                    }) => (
-                                        <Input
-                                            {...field}
-                                            style={{
-                                                color:
-                                                    dirtyFields?.ports?.[`${i}`]
-                                                        ?.out && "var(--blue)",
-                                            }}
-                                        />
-                                    )}
+                                    render={({ field }) => <Input {...field} />}
+                                />
+                            </TableCell>
+                            <TableCell right>
+                                <Button
+                                    type="button"
+                                    onClick={() => remove(i)}
+                                    variant="danger"
+                                    borderless
+                                    disabled={isLoading}
+                                    rightIcon={<Trash />}
                                 />
                             </TableCell>
                         </TableRow>
@@ -166,7 +191,7 @@ function PortTable(props: PortTableProps) {
                                     rightIcon={<FloppyDiskBack />}
                                     disabled={isLoading}
                                 >
-                                    Save
+                                    Save changes
                                 </Button>
                             </Fragment>
                         )}

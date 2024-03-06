@@ -177,14 +177,19 @@ func (h *containerHandler) GetContainerPorts() gin.HandlerFunc {
 	}, http.StatusOK)
 }
 
-type PatchContainerPortsParams struct {
-	ContainerID uuid.NullUUID `path:"container_id"`
-	Ports       []types.Port  `body:"ports"`
+type PatchContainerPortParams struct {
+	PortID uuid.NullUUID `path:"port_id"`
+	In     string        `body:"in"`
+	Out    string        `body:"out"`
 }
 
-func (h *containerHandler) PatchContainerPorts() gin.HandlerFunc {
-	return tonic.Handler(func(ctx *gin.Context, params *PatchContainerPortsParams) error {
-		return h.containerService.SaveContainerPorts(ctx, params.ContainerID.UUID, params.Ports)
+func (h *containerHandler) PatchContainerPort() gin.HandlerFunc {
+	return tonic.Handler(func(ctx *gin.Context, params *PatchContainerPortParams) error {
+		return h.containerService.PatchContainerPort(ctx, types.Port{
+			ID:  params.PortID.UUID,
+			In:  params.In,
+			Out: params.Out,
+		})
 	}, http.StatusOK)
 }
 

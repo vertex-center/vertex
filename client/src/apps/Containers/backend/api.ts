@@ -83,8 +83,8 @@ const getContainerPorts = async (id: string) => {
     return data;
 };
 
-const saveContainerPorts = (id: string, ports: Port[]) => {
-    return server.patch(`/containers/${id}/ports`, { ports });
+const patchPort = (port: Port) => {
+    return server.patch(`ports/${port.id}`, port);
 };
 
 const getDocker = async (id: string) => {
@@ -122,7 +122,7 @@ export const API = {
     getContainerEnvironment,
     saveEnv,
     getContainerPorts,
-    saveContainerPorts,
+    patchPort,
     getDockerInfo: getDocker,
     recreateDocker,
     updateService,

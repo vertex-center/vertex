@@ -16,6 +16,7 @@
         "@vertex-center/components": "workspace:packages/components",
         "axios": "^1.6.7",
         "byte-size": "^8.1.1",
+        "diff": "^5.2.0",
         "event-source-polyfill": "^1.0.31",
         "immer": "^10.0.3",
         "javascript-time-ago": "^2.5.9",
@@ -52,6 +53,7 @@
         ]
     },
     "devDependencies": {
+        "@types/diff": "^5.0.9",
         "@types/event-source-polyfill": "^1.0.5",
         "@types/jest": "^29.4.0",
         "@types/node": "^20.11.19",
