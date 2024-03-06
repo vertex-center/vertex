@@ -22,7 +22,10 @@ import {
     ShareNetwork,
     Trash,
 } from "@phosphor-icons/react";
-import { useContainerPorts } from "../../hooks/useContainer";
+import {
+    useContainerPorts,
+    useRecreateContainer,
+} from "../../hooks/useContainer";
 import Spacer from "../../../../components/Spacer/Spacer";
 import { Fragment, ReactNode, useEffect } from "react";
 import { Port } from "../../backend/models";
@@ -66,9 +69,12 @@ function PortTable(props: PortTableProps) {
         keyName: "_id",
     });
 
-    const { patchPortAsync, isPending, error } = usePatchPort();
+    const { patchPortAsync } = usePatchPort();
     const { deletePortAsync } = useDeletePort();
     const { createPortAsync } = useCreatePort();
+
+    const { recreateContainer, isPendingRecreate, errorRecreate } =
+        useRecreateContainer();
 
     const onAdd = () => {
         append({
@@ -122,9 +128,11 @@ function PortTable(props: PortTableProps) {
         await queryClient.invalidateQueries({
             queryKey: ["ports"],
         });
+        recreateContainer(uuid);
     });
 
-    const isLoading = isPending;
+    const isLoading = isPendingRecreate;
+    const error = errorRecreate;
 
     let table: ReactNode;
     if (fields?.length === 0) {

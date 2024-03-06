@@ -1,4 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import {
+    useMutation,
+    UseMutationOptions,
+    useQuery,
+} from "@tanstack/react-query";
 import { API } from "../backend/api";
 
 export default function useContainer(id?: string) {
@@ -47,5 +51,20 @@ export function useContainerPorts(id?: string) {
         ports: queryPorts.data,
         isLoadingPorts: queryPorts.isLoading,
         errorPorts: queryPorts.error,
+    };
+}
+
+export function useRecreateContainer(
+    options?: UseMutationOptions<unknown, unknown, string>
+) {
+    const queryRecreate = useMutation({
+        ...options,
+        mutationFn: (id: string) => API.recreateDocker(id),
+    });
+    return {
+        ...queryRecreate,
+        recreateContainer: queryRecreate.mutate,
+        isPendingRecreate: queryRecreate.isPending,
+        errorRecreate: queryRecreate.error,
     };
 }
