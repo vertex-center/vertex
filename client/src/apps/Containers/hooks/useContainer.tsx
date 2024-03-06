@@ -49,6 +49,7 @@ export function useContainerPorts(id?: string) {
         queryFn: () => API.getContainerPorts(id),
     });
     return {
+        ...queryPorts,
         ports: queryPorts.data,
         isLoadingPorts: queryPorts.isLoading,
         errorPorts: queryPorts.error,

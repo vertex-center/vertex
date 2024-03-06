@@ -33,7 +33,7 @@ export type EnvVariable = {
 };
 
 export type Port = {
-    id: string;
+    id?: string;
     container_id: string;
     in: string;
     out: string;
