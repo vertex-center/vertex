@@ -72,8 +72,10 @@ export type SelectFieldProps<T> = Omit<InputProps, "onChange" | "value"> &
     PropsWithChildren<{
         multiple?: boolean;
         value?: ReactNode;
+        leftIcon?: ReactNode;
         onChange?: (value: T) => void;
         filter?: (value: T, search: string) => boolean;
+        textNoResults?: string;
     }>;
 
 function _SelectField<T>(
@@ -85,7 +87,9 @@ function _SelectField<T>(
         multiple,
         onChange: onChangeProp,
         value,
+        leftIcon,
         filter,
+        textNoResults = "No results found.",
         ...others
     } = props;
 
@@ -103,6 +107,17 @@ function _SelectField<T>(
 
     const toggle = () => setShow(!show);
 
+    const items = Children.map(children, (child) => {
+        if (!child) return null;
+        // @ts-expect-error props are too hard to type
+        if (filter && !filter(child.props.value, search)) return null;
+        // @ts-expect-error cloneElement is too hard to type
+        return cloneElement(child, {
+            onClick: onChange,
+            multiple: multiple,
+        });
+    })?.filter((v) => v);
+
     return (
         <div
             className={cx("select-field", {
@@ -116,6 +131,7 @@ function _SelectField<T>(
                 onClick={() => setShow(true)}
                 className="select-field-input"
             >
+                {leftIcon}
                 {value}
                 <MaterialIcon
                     className="select-field-icon"
@@ -133,17 +149,12 @@ function _SelectField<T>(
                     </Fragment>
                 )}
                 <div className="select-field-values">
-                    {Children.map(children, (child) => {
-                        if (!child) return;
-                        // @ts-expect-error props are too hard to type
-                        if (filter && !filter(child.props.value, search))
-                            return;
-                        // @ts-expect-error cloneElement is too hard to type
-                        return cloneElement(child, {
-                            onClick: onChange,
-                            multiple: multiple,
-                        });
-                    })}
+                    {items}
+                    {(!items || items?.length === 0) && (
+                        <div className="select-field-no-results">
+                            {textNoResults}
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="select-field-overlay" onClick={toggle} />

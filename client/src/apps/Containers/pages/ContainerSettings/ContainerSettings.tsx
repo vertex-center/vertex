@@ -23,6 +23,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Content from "../../../../components/Content/Content";
 import { API } from "../../backend/api";
 import { ArrowClockwise, FloppyDiskBack } from "@phosphor-icons/react";
+import NoItems from "../../../../components/NoItems/NoItems";
 
 export default function ContainerSettings() {
     const { uuid } = useParams();
@@ -139,6 +140,7 @@ export default function ContainerSettings() {
                         value={versionValue}
                         // @ts-expect-error
                         filter={(v, search) => v.includes(search)}
+                        textNoResults="No versions found."
                     >
                         {imageTags?.includes("latest") && (
                             <SelectOption value="latest">

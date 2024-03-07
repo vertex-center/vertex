@@ -1,5 +1,7 @@
 import { SelectField, SelectOption } from "@vertex-center/components";
 import { useContainersTags } from "../../hooks/useContainers";
+import { Tag } from "@phosphor-icons/react";
+import { Fragment } from "react";
 
 type Props = {
     selected?: string[];
@@ -27,9 +29,11 @@ export default function SelectTags(props: Readonly<Props>) {
     return (
         <SelectField
             multiple
+            leftIcon={<Tag />}
             value={`Tags${count !== 0 ? ` (${count})` : ""}`}
             onChange={onChange}
             disabled={isLoading || isError || !tags || tags.length === 0}
+            textNoResults="No tags found."
         >
             {tags?.map((tag) => (
                 <SelectOption
