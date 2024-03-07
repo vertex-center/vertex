@@ -28,7 +28,7 @@ type (
 		DeleteAll(ctx context.Context) error
 		CheckForUpdates(ctx context.Context) (types.Containers, error)
 		SetDatabases(ctx context.Context, c *types.Container, databases map[string]uuid.UUID, options map[string]*types.SetDatabasesOptions) error
-		GetEnvs(ctx context.Context, id uuid.UUID) (types.EnvVariables, error)
+		GetEnvs(ctx context.Context, id uuid.UUID) ([]types.EnvVariable, error)
 		PatchEnv(ctx context.Context, env types.EnvVariable) error
 		DeleteEnv(ctx context.Context, id uuid.UUID) error
 		CreateEnv(ctx context.Context, env types.EnvVariable) error

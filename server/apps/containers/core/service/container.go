@@ -619,7 +619,7 @@ func (s *containerService) SetDatabases(ctx context.Context, c *types.Container,
 	return s.remapDatabaseEnv(ctx, c, options)
 }
 
-func (s *containerService) GetEnvs(ctx context.Context, id uuid.UUID) (types.EnvVariables, error) {
+func (s *containerService) GetEnvs(ctx context.Context, id uuid.UUID) ([]types.EnvVariable, error) {
 	return s.vars.GetEnvs(ctx, id)
 }
 
@@ -651,6 +651,19 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 			return err
 		}
 
+		var port, username, password, name string
+		for _, v := range dbVars {
+			if v.Name == dbEnvNames.Port {
+				port = v.Value
+			} else if dbEnvNames.Username != nil && v.Name == *dbEnvNames.Username {
+				username = v.Value
+			} else if dbEnvNames.Password != nil && v.Name == *dbEnvNames.Password {
+				password = v.Value
+			} else if dbEnvNames.DefaultDatabase != nil && v.Name == *dbEnvNames.DefaultDatabase {
+				name = v.Value
+			}
+		}
+
 		err = s.vars.UpdateEnvByName(ctx, types.EnvVariable{
 			ContainerID: c.ID,
 			Name:        cEnvNames.Host,
@@ -659,10 +672,11 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 		if err != nil {
 			return err
 		}
+
 		err = s.vars.UpdateEnvByName(ctx, types.EnvVariable{
 			ContainerID: c.ID,
 			Name:        cEnvNames.Port,
-			Value:       dbVars.Get(dbEnvNames.Port),
+			Value:       port,
 		})
 		if err != nil {
 			return err
@@ -672,17 +686,18 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 			err = s.vars.UpdateEnvByName(ctx, types.EnvVariable{
 				ContainerID: c.ID,
 				Name:        cEnvNames.Username,
-				Value:       dbVars.Get(*dbEnvNames.Username),
+				Value:       username,
 			})
 			if err != nil {
 				return err
 			}
 		}
+
 		if dbEnvNames.Password != nil {
 			err = s.vars.UpdateEnvByName(ctx, types.EnvVariable{
 				ContainerID: c.ID,
 				Name:        cEnvNames.Password,
-				Value:       dbVars.Get(*dbEnvNames.Password),
+				Value:       password,
 			})
 			if err != nil {
 				return err
@@ -709,7 +724,7 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 			err = s.vars.UpdateEnvByName(ctx, types.EnvVariable{
 				ContainerID: c.ID,
 				Name:        cEnvNames.Database,
-				Value:       dbVars.Get(*dbEnvNames.DefaultDatabase),
+				Value:       name,
 			})
 			if err != nil {
 				return err

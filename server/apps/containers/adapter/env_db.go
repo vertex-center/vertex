@@ -19,8 +19,8 @@ func NewEnvDBAdapter(db storage.DB) port.EnvAdapter {
 	return &envDBAdapter{db}
 }
 
-func (a *envDBAdapter) GetEnvs(ctx context.Context, id uuid.UUID) (types.EnvVariables, error) {
-	var env types.EnvVariables
+func (a *envDBAdapter) GetEnvs(ctx context.Context, id uuid.UUID) ([]types.EnvVariable, error) {
+	var env []types.EnvVariable
 	err := a.db.Select(&env, `
 		SELECT * FROM env_variables
 		WHERE container_id = $1

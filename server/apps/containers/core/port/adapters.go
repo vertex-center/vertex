@@ -45,7 +45,7 @@ type (
 	}
 
 	EnvAdapter interface {
-		GetEnvs(ctx context.Context, id uuid.UUID) (types.EnvVariables, error)
+		GetEnvs(ctx context.Context, id uuid.UUID) ([]types.EnvVariable, error)
 		CreateEnv(ctx context.Context, variable types.EnvVariable) error
 		DeleteEnv(ctx context.Context, id uuid.UUID) error
 		DeleteEnvs(ctx context.Context, id uuid.UUID) error
@@ -79,7 +79,7 @@ type (
 	RunnerAdapter interface {
 		DeleteContainer(ctx context.Context, c *types.Container, volumes []string) error
 		DeleteMounts(ctx context.Context, c *types.Container) error
-		Start(ctx context.Context, c *types.Container, ports types.Ports, volumes types.Volumes, env types.EnvVariables, caps types.Capabilities, sysctls types.Sysctls, setStatus func(status string)) (stdout io.ReadCloser, stderr io.ReadCloser, err error)
+		Start(ctx context.Context, c *types.Container, ports types.Ports, volumes types.Volumes, env []types.EnvVariable, caps types.Capabilities, sysctls types.Sysctls, setStatus func(status string)) (stdout io.ReadCloser, stderr io.ReadCloser, err error)
 		Stop(ctx context.Context, c *types.Container) error
 		Info(ctx context.Context, c types.Container) (map[string]any, error)
 		WaitCondition(ctx context.Context, c *types.Container, cond types.WaitContainerCondition) error

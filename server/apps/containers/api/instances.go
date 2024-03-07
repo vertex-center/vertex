@@ -73,7 +73,7 @@ func (c *Client) AddContainerTag(ctx context.Context, id uuid.UUID, tagID uuid.U
 		Fetch(ctx)
 }
 
-func (c *Client) PatchContainerEnvironment(ctx context.Context, id uuid.UUID, env types.EnvVariables) error {
+func (c *Client) PatchContainerEnvironment(ctx context.Context, id uuid.UUID, env []types.EnvVariable) error {
 	return c.Request().
 		Pathf("./containers/%s/environment", id).
 		Patch().

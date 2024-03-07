@@ -38,7 +38,7 @@ func (b *ContainerBuilder) WithCommand(cmd *string) *ContainerBuilder {
 	return b
 }
 
-func (b *ContainerBuilder) WithEnv(env types.EnvVariables) *ContainerBuilder {
+func (b *ContainerBuilder) WithEnv(env []types.EnvVariable) *ContainerBuilder {
 	for _, e := range env {
 		b.opts.Env = append(b.opts.Env, e.Name+"="+e.Value)
 	}

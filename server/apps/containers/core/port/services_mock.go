@@ -89,9 +89,9 @@ func (m *MockContainerService) AddContainerTag(ctx context.Context, id uuid.UUID
 	return args.Error(0)
 }
 
-func (m *MockContainerService) GetEnvs(ctx context.Context, id uuid.UUID) (types.EnvVariables, error) {
+func (m *MockContainerService) GetEnvs(ctx context.Context, id uuid.UUID) ([]types.EnvVariable, error) {
 	args := m.Called(ctx, id)
-	return args.Get(0).(types.EnvVariables), args.Error(1)
+	return args.Get(0).([]types.EnvVariable), args.Error(1)
 }
 
 func (m *MockContainerService) PatchEnv(ctx context.Context, env types.EnvVariable) error {

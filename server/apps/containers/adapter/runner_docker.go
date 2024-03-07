@@ -64,7 +64,7 @@ func (a runnerDockerAdapter) Start(
 	c *types.Container,
 	ports types.Ports,
 	volumes types.Volumes,
-	env types.EnvVariables,
+	env []types.EnvVariable,
 	caps types.Capabilities,
 	sysctls types.Sysctls,
 	setStatus func(status string),

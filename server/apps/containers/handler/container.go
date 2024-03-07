@@ -151,7 +151,7 @@ type GetContainerEnvParams struct {
 }
 
 func (h *containerHandler) GetEnv() gin.HandlerFunc {
-	return tonic.Handler(func(ctx *gin.Context, params *GetContainerEnvParams) (types.EnvVariables, error) {
+	return tonic.Handler(func(ctx *gin.Context, params *GetContainerEnvParams) ([]types.EnvVariable, error) {
 		return h.containerService.GetEnvs(ctx, params.ContainerID.UUID)
 	}, http.StatusOK)
 }
