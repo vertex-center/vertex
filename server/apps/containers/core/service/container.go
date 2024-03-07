@@ -163,7 +163,7 @@ func (s *containerService) CreateContainer(ctx context.Context, opts types.Creat
 
 	// Set default env
 	for _, e := range env {
-		err = s.vars.CreateVariable(ctx, types.EnvVariable{
+		err = s.vars.CreateEnv(ctx, types.EnvVariable{
 			ID:          uuid.New(),
 			ContainerID: id,
 			Type:        types.EnvVariableType(e.Type),
@@ -281,7 +281,7 @@ func (s *containerService) Delete(ctx context.Context, id uuid.UUID) error {
 		s.ports.DeleteContainerPorts,
 		s.volumes.DeleteContainerVolumes,
 		s.sysctls.DeleteContainerSysctls,
-		s.vars.DeleteContainerVariables,
+		s.vars.DeleteEnvs,
 		s.containers.DeleteTags,
 		s.containers.DeleteContainer,
 	}
@@ -360,7 +360,7 @@ func (s *containerService) Start(ctx context.Context, id uuid.UUID) error {
 		return err
 	}
 
-	env, err := s.vars.GetContainerVariables(ctx, id)
+	env, err := s.vars.GetEnvs(ctx, id)
 	if err != nil {
 		s.setStatus(c, types.ContainerStatusError)
 		return err
@@ -619,8 +619,8 @@ func (s *containerService) SetDatabases(ctx context.Context, c *types.Container,
 	return s.remapDatabaseEnv(ctx, c, options)
 }
 
-func (s *containerService) GetContainerEnv(ctx context.Context, id uuid.UUID) (types.EnvVariables, error) {
-	return s.vars.GetContainerVariables(ctx, id)
+func (s *containerService) GetEnvs(ctx context.Context, id uuid.UUID) (types.EnvVariables, error) {
+	return s.vars.GetEnvs(ctx, id)
 }
 
 // remapDatabaseEnv remaps the environment variables of a container.
@@ -646,12 +646,12 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 		dbEnvNames := (*dbService.Features.Databases)[0]
 		cEnvNames := cService.Databases[databaseID].Names
 
-		dbVars, err := s.vars.GetContainerVariables(ctx, db.ID)
+		dbVars, err := s.vars.GetEnvs(ctx, db.ID)
 		if err != nil {
 			return err
 		}
 
-		err = s.vars.UpdateContainerVariableByName(ctx, types.EnvVariable{
+		err = s.vars.UpdateEnvByName(ctx, types.EnvVariable{
 			ContainerID: c.ID,
 			Name:        cEnvNames.Host,
 			Value:       host,
@@ -659,7 +659,7 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 		if err != nil {
 			return err
 		}
-		err = s.vars.UpdateContainerVariableByName(ctx, types.EnvVariable{
+		err = s.vars.UpdateEnvByName(ctx, types.EnvVariable{
 			ContainerID: c.ID,
 			Name:        cEnvNames.Port,
 			Value:       dbVars.Get(dbEnvNames.Port),
@@ -669,7 +669,7 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 		}
 
 		if dbEnvNames.Username != nil {
-			err = s.vars.UpdateContainerVariableByName(ctx, types.EnvVariable{
+			err = s.vars.UpdateEnvByName(ctx, types.EnvVariable{
 				ContainerID: c.ID,
 				Name:        cEnvNames.Username,
 				Value:       dbVars.Get(*dbEnvNames.Username),
@@ -679,7 +679,7 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 			}
 		}
 		if dbEnvNames.Password != nil {
-			err = s.vars.UpdateContainerVariableByName(ctx, types.EnvVariable{
+			err = s.vars.UpdateEnvByName(ctx, types.EnvVariable{
 				ContainerID: c.ID,
 				Name:        cEnvNames.Password,
 				Value:       dbVars.Get(*dbEnvNames.Password),
@@ -692,7 +692,7 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 		if options != nil {
 			if modifiedFeature, ok := options[databaseID]; ok {
 				if modifiedFeature != nil && modifiedFeature.DatabaseName != nil {
-					err = s.vars.UpdateContainerVariableByName(ctx, types.EnvVariable{
+					err = s.vars.UpdateEnvByName(ctx, types.EnvVariable{
 						ContainerID: c.ID,
 						Name:        cEnvNames.Database,
 						Value:       *modifiedFeature.DatabaseName,
@@ -706,7 +706,7 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 		}
 
 		if dbEnvNames.DefaultDatabase != nil {
-			err = s.vars.UpdateContainerVariableByName(ctx, types.EnvVariable{
+			err = s.vars.UpdateEnvByName(ctx, types.EnvVariable{
 				ContainerID: c.ID,
 				Name:        cEnvNames.Database,
 				Value:       dbVars.Get(*dbEnvNames.DefaultDatabase),
@@ -720,19 +720,28 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 	return nil
 }
 
-// SaveEnv saves the environment variables of a container
-// and applies them by recreating the container.
-func (s *containerService) SaveEnv(ctx context.Context, id uuid.UUID, env types.EnvVariables) error {
-	for _, e := range env {
-		err := s.vars.UpdateContainerVariableByID(ctx, e)
-		if err != nil {
-			return err
-		}
+func (s *containerService) PatchEnv(ctx context.Context, env types.EnvVariable) error {
+	err := env.Validate()
+	if err != nil {
+		return err
 	}
-	return s.RecreateContainer(ctx, id)
+	return s.vars.UpdateEnvByID(ctx, env)
 }
 
-func (s *containerService) GetContainerPorts(ctx context.Context, id uuid.UUID) (types.Ports, error) {
+func (s *containerService) DeleteEnv(ctx context.Context, id uuid.UUID) error {
+	return s.vars.DeleteEnv(ctx, id)
+}
+
+func (s *containerService) CreateEnv(ctx context.Context, env types.EnvVariable) error {
+	env.ID = uuid.New()
+	err := env.Validate()
+	if err != nil {
+		return err
+	}
+	return s.vars.CreateEnv(ctx, env)
+}
+
+func (s *containerService) GetPorts(ctx context.Context, id uuid.UUID) (types.Ports, error) {
 	return s.ports.GetContainerPorts(ctx, id)
 }
 

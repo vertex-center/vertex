@@ -31,8 +31,8 @@ export function useDockerInfo(id?: string) {
 
 export function useContainerEnv(id?: string) {
     const queryEnv = useQuery({
-        queryKey: ["container_env", id],
-        queryFn: () => API.getContainerEnvironment(id),
+        queryKey: ["environments", id],
+        queryFn: () => API.getEnv(id),
     });
     return {
         env: queryEnv.data,

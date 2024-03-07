@@ -89,12 +89,27 @@ func (m *MockContainerService) AddContainerTag(ctx context.Context, id uuid.UUID
 	return args.Error(0)
 }
 
-func (m *MockContainerService) GetContainerEnv(ctx context.Context, id uuid.UUID) (types.EnvVariables, error) {
+func (m *MockContainerService) GetEnvs(ctx context.Context, id uuid.UUID) (types.EnvVariables, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).(types.EnvVariables), args.Error(1)
 }
 
-func (m *MockContainerService) GetContainerPorts(ctx context.Context, id uuid.UUID) (types.Ports, error) {
+func (m *MockContainerService) PatchEnv(ctx context.Context, env types.EnvVariable) error {
+	args := m.Called(ctx, env)
+	return args.Error(0)
+}
+
+func (m *MockContainerService) DeleteEnv(ctx context.Context, id uuid.UUID) error {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}
+
+func (m *MockContainerService) CreateEnv(ctx context.Context, env types.EnvVariable) error {
+	args := m.Called(ctx, env)
+	return args.Error(0)
+}
+
+func (m *MockContainerService) GetPorts(ctx context.Context, id uuid.UUID) (types.Ports, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).(types.Ports), args.Error(1)
 }
@@ -126,11 +141,6 @@ func (m *MockContainerService) CheckForUpdates(ctx context.Context) (types.Conta
 
 func (m *MockContainerService) SetDatabases(ctx context.Context, inst *types.Container, databases map[string]uuid.UUID, options map[string]*types.SetDatabasesOptions) error {
 	args := m.Called(ctx, inst, databases, options)
-	return args.Error(0)
-}
-
-func (m *MockContainerService) SaveEnv(ctx context.Context, id uuid.UUID, env types.EnvVariables) error {
-	args := m.Called(ctx, id, env)
 	return args.Error(0)
 }
 

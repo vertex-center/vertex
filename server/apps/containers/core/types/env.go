@@ -1,8 +1,15 @@
 package types
 
-import "github.com/vertex-center/uuid"
+import (
+	"github.com/juju/errors"
+	"github.com/vertex-center/uuid"
+)
 
 const EnvVariableTypePort EnvVariableType = "port"
+
+var (
+	ErrInvalidEnvVariableName = errors.NotValidf("environment variable name")
+)
 
 type (
 	EnvVariableType string
@@ -19,6 +26,13 @@ type (
 		Secret      bool            `json:"secret"                db:"secret"        example:"true"`
 	}
 )
+
+func (v EnvVariable) Validate() error {
+	if v.Name == "" {
+		return ErrInvalidEnvVariableName
+	}
+	return nil
+}
 
 func (e *EnvVariables) Get(key string) string {
 	for _, v := range *e {

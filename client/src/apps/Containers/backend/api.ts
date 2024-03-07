@@ -3,7 +3,7 @@ import {
     Container,
     ContainerFilters,
     Containers,
-    EnvVariables,
+    EnvVariable,
     Port,
     Tags,
 } from "./models";
@@ -67,15 +67,23 @@ const getLogs = async (id: string) => {
     return data;
 };
 
-const getContainerEnvironment = async (id: string) => {
-    const { data } = await server.get<EnvVariables>(
+const getEnv = async (id: string) => {
+    const { data } = await server.get<EnvVariable[]>(
         `/containers/${id}/environment`
     );
     return data;
 };
 
-const saveEnv = (id: string, env: EnvVariables) => {
-    return server.patch(`/containers/${id}/environment`, { env });
+const patchEnv = (env: EnvVariable) => {
+    return server.patch(`/environments/${env.id}`, env);
+};
+
+const deleteEnv = (id: string) => {
+    return server.delete(`/environments/${id}`);
+};
+
+const createEnv = (env: EnvVariable) => {
+    return server.post(`/environments`, env);
 };
 
 const getPorts = async (id: string) => {
@@ -127,8 +135,10 @@ export const API = {
     stopContainer,
     patchContainer,
     getLogs,
-    getContainerEnvironment,
-    saveEnv,
+    getEnv,
+    patchEnv,
+    deleteEnv,
+    createEnv,
     getPorts,
     patchPort,
     deletePort,

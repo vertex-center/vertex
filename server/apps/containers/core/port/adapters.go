@@ -45,11 +45,12 @@ type (
 	}
 
 	EnvAdapter interface {
-		GetContainerVariables(ctx context.Context, id uuid.UUID) (types.EnvVariables, error)
-		CreateVariable(ctx context.Context, variable types.EnvVariable) error
-		DeleteContainerVariables(ctx context.Context, id uuid.UUID) error
-		UpdateContainerVariableByID(ctx context.Context, variable types.EnvVariable) error
-		UpdateContainerVariableByName(ctx context.Context, variable types.EnvVariable) error
+		GetEnvs(ctx context.Context, id uuid.UUID) (types.EnvVariables, error)
+		CreateEnv(ctx context.Context, variable types.EnvVariable) error
+		DeleteEnv(ctx context.Context, id uuid.UUID) error
+		DeleteEnvs(ctx context.Context, id uuid.UUID) error
+		UpdateEnvByID(ctx context.Context, variable types.EnvVariable) error
+		UpdateEnvByName(ctx context.Context, variable types.EnvVariable) error
 	}
 
 	CapAdapter interface {

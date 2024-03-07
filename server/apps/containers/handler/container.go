@@ -150,30 +150,57 @@ type GetContainerEnvParams struct {
 	ContainerID uuid.NullUUID `path:"container_id"`
 }
 
-func (h *containerHandler) GetContainerEnv() gin.HandlerFunc {
+func (h *containerHandler) GetEnv() gin.HandlerFunc {
 	return tonic.Handler(func(ctx *gin.Context, params *GetContainerEnvParams) (types.EnvVariables, error) {
-		return h.containerService.GetContainerEnv(ctx, params.ContainerID.UUID)
+		return h.containerService.GetEnvs(ctx, params.ContainerID.UUID)
 	}, http.StatusOK)
 }
 
 type PatchEnvironmentParams struct {
-	ContainerID uuid.NullUUID      `path:"container_id"`
-	Env         types.EnvVariables `body:"env"`
+	EnvID uuid.NullUUID `path:"env_id"`
+	types.EnvVariable
 }
 
-func (h *containerHandler) PatchEnvironment() gin.HandlerFunc {
+func (h *containerHandler) PatchEnv() gin.HandlerFunc {
 	return tonic.Handler(func(ctx *gin.Context, params *PatchEnvironmentParams) error {
-		return h.containerService.SaveEnv(ctx, params.ContainerID.UUID, params.Env)
+		params.EnvVariable.ID = params.EnvID.UUID
+		return h.containerService.PatchEnv(ctx, params.EnvVariable)
 	}, http.StatusOK)
+}
+
+type DeleteEnvironmentParams struct {
+	EnvID uuid.NullUUID `path:"env_id"`
+}
+
+func (h *containerHandler) DeleteEnv() gin.HandlerFunc {
+	return tonic.Handler(func(ctx *gin.Context, params *DeleteEnvironmentParams) error {
+		return h.containerService.DeleteEnv(ctx, params.EnvID.UUID)
+	}, http.StatusOK)
+}
+
+type CreateEnvironmentParams struct {
+	ContainerID uuid.NullUUID `json:"container_id"`
+	Name        string        `json:"name"`
+	Value       string        `json:"value"`
+}
+
+func (h *containerHandler) CreateEnv() gin.HandlerFunc {
+	return tonic.Handler(func(ctx *gin.Context, params *CreateEnvironmentParams) error {
+		return h.containerService.CreateEnv(ctx, types.EnvVariable{
+			ContainerID: params.ContainerID.UUID,
+			Name:        params.Name,
+			Value:       params.Value,
+		})
+	}, http.StatusCreated)
 }
 
 type GetContainerPortsParams struct {
 	ContainerID uuid.NullUUID `path:"container_id"`
 }
 
-func (h *containerHandler) GetContainerPorts() gin.HandlerFunc {
+func (h *containerHandler) GetPorts() gin.HandlerFunc {
 	return tonic.Handler(func(ctx *gin.Context, params *GetContainerPortsParams) (types.Ports, error) {
-		return h.containerService.GetContainerPorts(ctx, params.ContainerID.UUID)
+		return h.containerService.GetPorts(ctx, params.ContainerID.UUID)
 	}, http.StatusOK)
 }
 

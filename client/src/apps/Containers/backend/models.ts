@@ -19,17 +19,16 @@ export type Tag = {
     name: string;
 };
 
-export type EnvVariables = EnvVariable[];
 export type EnvVariable = {
     id: string;
     container_id: string;
     type: string;
     name: string;
-    display_name: string;
+    display_name?: string;
     value: string;
-    default: string;
-    description: string;
-    secret: boolean;
+    default?: string;
+    description?: string;
+    secret?: boolean;
 };
 
 export type Port = {
@@ -53,7 +52,7 @@ export type Container = {
     color?: string;
     icon?: string;
     command?: string;
-    environment: EnvVariables;
+    environment: EnvVariable[];
     capabilities: {
         container_id: string;
         name: string;

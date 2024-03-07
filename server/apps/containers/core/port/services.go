@@ -28,9 +28,11 @@ type (
 		DeleteAll(ctx context.Context) error
 		CheckForUpdates(ctx context.Context) (types.Containers, error)
 		SetDatabases(ctx context.Context, c *types.Container, databases map[string]uuid.UUID, options map[string]*types.SetDatabasesOptions) error
-		GetContainerEnv(ctx context.Context, id uuid.UUID) (types.EnvVariables, error)
-		SaveEnv(ctx context.Context, id uuid.UUID, env types.EnvVariables) error
-		GetContainerPorts(ctx context.Context, id uuid.UUID) (types.Ports, error)
+		GetEnvs(ctx context.Context, id uuid.UUID) (types.EnvVariables, error)
+		PatchEnv(ctx context.Context, env types.EnvVariable) error
+		DeleteEnv(ctx context.Context, id uuid.UUID) error
+		CreateEnv(ctx context.Context, env types.EnvVariable) error
+		GetPorts(ctx context.Context, id uuid.UUID) (types.Ports, error)
 		PatchPort(ctx context.Context, p types.Port) error
 		DeletePort(ctx context.Context, id uuid.UUID) error
 		CreatePort(ctx context.Context, p types.Port) error

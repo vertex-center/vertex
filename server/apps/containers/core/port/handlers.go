@@ -14,9 +14,11 @@ type (
 		Start() gin.HandlerFunc
 		Stop() gin.HandlerFunc
 		AddContainerTag() gin.HandlerFunc
-		GetContainerEnv() gin.HandlerFunc
-		PatchEnvironment() gin.HandlerFunc
-		GetContainerPorts() gin.HandlerFunc
+		GetEnv() gin.HandlerFunc
+		PatchEnv() gin.HandlerFunc
+		DeleteEnv() gin.HandlerFunc
+		CreateEnv() gin.HandlerFunc
+		GetPorts() gin.HandlerFunc
 		PatchPort() gin.HandlerFunc
 		DeletePort() gin.HandlerFunc
 		CreatePort() gin.HandlerFunc

@@ -1,4 +1,10 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, {
+    ChangeEvent,
+    Fragment,
+    ReactNode,
+    useEffect,
+    useState,
+} from "react";
 import { useParams } from "react-router-dom";
 import {
     Button,
@@ -10,156 +16,239 @@ import {
     TableHeadCell,
     TableRow,
     Title,
+    Vertical,
 } from "@vertex-center/components";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
-import { useContainerEnv } from "../../hooks/useContainer";
+import {
+    useContainerEnv,
+    useRecreateContainer,
+} from "../../hooks/useContainer";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import Content from "../../../../components/Content/Content";
-import { API } from "../../backend/api";
-import { EnvVariables } from "../../backend/models";
-import styles from "./ContainerEnv.module.sass";
-import { ArrowUUpLeft, FloppyDiskBack } from "@phosphor-icons/react";
+import { EnvVariable } from "../../backend/models";
+import {
+    ArrowUUpLeft,
+    FloppyDiskBack,
+    Plus,
+    Textbox,
+    Trash,
+} from "@phosphor-icons/react";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { diffArrays, diffJson } from "diff";
+import NoItems from "../../../../components/NoItems/NoItems";
+import {
+    useCreateEnv,
+    useDeleteEnv,
+    usePatchEnv,
+} from "../../hooks/useEnvironment";
+import Spacer from "../../../../components/Spacer/Spacer";
 
-export default function ContainerEnv() {
-    const { uuid } = useParams();
+type EnvTableProps = {
+    env: EnvVariable[];
+};
+
+function EnvTable(props: EnvTableProps) {
     const queryClient = useQueryClient();
 
-    const { env: currentEnv, isLoadingEnv, errorEnv } = useContainerEnv(uuid);
-    const [env, setEnv] = useState<EnvVariables>();
+    const { uuid } = useParams();
+    const { env } = props;
+
+    if (env === undefined) return;
+
+    const {
+        control,
+        handleSubmit,
+        reset,
+        formState: { isDirty },
+    } = useForm({
+        defaultValues: { env },
+    });
 
     useEffect(() => {
-        if (!currentEnv) return;
-        setEnv(JSON.parse(JSON.stringify(currentEnv)));
-        setSaved(true);
-    }, [currentEnv]);
+        reset({ env });
+    }, [env]);
 
-    const [saved, setSaved] = useState<boolean>(true);
-
-    const mutationSaveEnv = useMutation({
-        mutationFn: async (env: EnvVariables) => {
-            await API.saveEnv(uuid, env);
-        },
-        onSuccess: () => setSaved(true),
-        onSettled: () => {
-            queryClient.invalidateQueries({
-                queryKey: ["containers", uuid],
-            });
-            queryClient.invalidateQueries({
-                queryKey: ["container_env", uuid],
-            });
-        },
+    const { fields, append, remove } = useFieldArray({
+        control,
+        name: "env",
+        keyName: "_id",
     });
-    const { isPending: isUploading } = mutationSaveEnv;
 
-    const save = () => {
-        let patch = [...env];
-        patch = patch.filter(
-            (env, i) =>
-                env.name !== currentEnv[i].name ||
-                env.value !== currentEnv[i].value
+    const { patchEnvAsync } = usePatchEnv();
+    const { deleteEnvAsync } = useDeleteEnv();
+    const { createEnvAsync } = useCreateEnv();
+
+    const { recreateContainer, isPendingRecreate, errorRecreate } =
+        useRecreateContainer();
+
+    const onAdd = () => {
+        append({
+            id: `TEMP_${Date.now()}`,
+            container_id: uuid,
+            type: "string",
+            name: "",
+            value: "",
+        });
+    };
+
+    const onSubmit = handleSubmit(async (d) => {
+        const _env = env === null ? [] : env;
+        let patch = diffArrays(_env, d.env, {
+            comparator: (a, b) => diffJson(a, b).length === 1,
+        });
+
+        const _deleted = new Set(
+            patch
+                .filter((p) => p.removed)
+                .map((p) => p.value)
+                .flat()
+                .map((p) => p.id)
         );
-        mutationSaveEnv.mutate(patch);
-    };
+        const _added = new Set(
+            patch
+                .filter((p) => p.added)
+                .map((p) => p.value)
+                .flat()
+                .map((p) => p.id)
+        );
 
-    const onNameChange = (i: number, e: ChangeEvent<HTMLInputElement>) => {
-        const newEnv = [...env];
-        newEnv[i].name = e.target.value;
-        updateEnv(newEnv);
-    };
+        const modified = new Set([..._deleted].filter((x) => _added.has(x)));
+        const deleted = new Set([..._deleted].filter((x) => !modified.has(x)));
+        const added = new Set([..._added].filter((x) => !modified.has(x)));
 
-    const onValueChange = (i: number, e: ChangeEvent<HTMLInputElement>) => {
-        const newEnv = [...env];
-        newEnv[i].value = e.target.value;
-        updateEnv(newEnv);
-    };
-
-    const updateEnv = (env: EnvVariables) => {
-        setEnv(env);
-        setSaved(isSaved());
-    };
-
-    const isSaved = () => {
-        for (let i = 0; i < env.length; i++) {
-            if (env[i].value !== currentEnv[i].value) return false;
-            if (env[i].name !== currentEnv[i].name) return false;
+        const requests = [];
+        for (const p of d.env) {
+            console.log(p);
+            if (modified.has(p.id)) {
+                requests.push(patchEnvAsync(p));
+            } else if (added.has(p.id)) {
+                requests.push(createEnvAsync(p));
+            }
         }
-        return true;
-    };
+        for (const p of _env) {
+            if (deleted.has(p.id)) {
+                requests.push(deleteEnvAsync(p.id));
+            }
+        }
+        await Promise.all(requests);
+        await queryClient.invalidateQueries({
+            queryKey: ["environments"],
+        });
+        recreateContainer(uuid);
+    });
 
-    const reset = () => {
-        setEnv(JSON.parse(JSON.stringify(currentEnv)));
-        setSaved(true);
-    };
+    const isLoading = isPendingRecreate;
+    const error = errorRecreate;
 
-    return (
-        <Content>
-            <Title variant="h2">Environment</Title>
+    let table: ReactNode;
+    if (fields?.length === 0) {
+        table = (
+            <NoItems
+                icon={<Textbox />}
+                text="This container has no environment variables."
+            />
+        );
+    } else {
+        table = (
             <Table>
                 <TableHead>
                     <TableRow>
                         <TableHeadCell>Name</TableHeadCell>
                         <TableHeadCell>Value</TableHeadCell>
+                        <TableHeadCell />
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {env?.map((env, i) => (
-                        <TableRow key={currentEnv[i].name}>
+                    {fields?.map((port, i) => (
+                        <TableRow key={port.id}>
                             <TableCell>
-                                <Input
-                                    value={env.name}
-                                    name={currentEnv[i].name + "_name"}
-                                    onChange={(e) => onNameChange(i, e)}
-                                    disabled={isUploading}
-                                    className={styles.input}
-                                    style={{
-                                        color:
-                                            env.name !== currentEnv[i].name &&
-                                            "var(--blue)",
-                                    }}
+                                <Controller
+                                    control={control}
+                                    name={`env.${i}.name`}
+                                    render={({ field }) => <Input {...field} />}
                                 />
                             </TableCell>
                             <TableCell>
-                                <Input
-                                    value={env.value}
-                                    name={currentEnv[i].name}
-                                    placeholder={env.default}
-                                    onChange={(e) => onValueChange(i, e)}
-                                    type={env.secret ? "password" : undefined}
-                                    disabled={isUploading}
-                                    className={styles.input}
-                                    style={{
-                                        color:
-                                            env.value !== currentEnv[i].value &&
-                                            "var(--blue)",
-                                    }}
+                                <Controller
+                                    control={control}
+                                    name={`env.${i}.value`}
+                                    render={({ field }) => <Input {...field} />}
+                                />
+                            </TableCell>
+                            <TableCell right>
+                                <Button
+                                    type="button"
+                                    onClick={() => remove(i)}
+                                    variant="danger"
+                                    borderless
+                                    disabled={isLoading}
+                                    rightIcon={<Trash />}
                                 />
                             </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
             </Table>
-            <ProgressOverlay show={isLoadingEnv ?? isUploading} />
-            <Horizontal justifyContent="flex-end" gap={10}>
-                <Button
-                    variant="outlined"
-                    onClick={reset}
-                    rightIcon={<ArrowUUpLeft />}
-                    disabled={isUploading || saved}
-                >
-                    Cancel
-                </Button>
-                <Button
-                    variant="colored"
-                    onClick={save}
-                    rightIcon={<FloppyDiskBack />}
-                    disabled={isUploading || saved || saved === undefined}
-                >
-                    Save
-                </Button>
-            </Horizontal>
+        );
+    }
+
+    return (
+        <Fragment>
+            <APIError error={error} />
+            <ProgressOverlay show={isLoading} />
+            <form onSubmit={onSubmit}>
+                <Vertical gap={12}>
+                    <Horizontal justifyContent="flex-end" gap={10}>
+                        <Button
+                            type="button"
+                            variant="outlined"
+                            onClick={onAdd}
+                            rightIcon={<Plus />}
+                            disabled={isLoading}
+                        >
+                            Add variable
+                        </Button>
+                        <Spacer />
+                        {isDirty && (
+                            <Fragment>
+                                <Button
+                                    type="reset"
+                                    variant="outlined"
+                                    onClick={() => reset()}
+                                    rightIcon={<ArrowUUpLeft />}
+                                    disabled={isLoading}
+                                />
+                                <Button
+                                    type="submit"
+                                    variant="colored"
+                                    rightIcon={<FloppyDiskBack />}
+                                    disabled={isLoading}
+                                >
+                                    Save changes
+                                </Button>
+                            </Fragment>
+                        )}
+                    </Horizontal>
+                    {table}
+                </Vertical>
+            </form>
+        </Fragment>
+    );
+}
+
+export default function ContainerEnv() {
+    const { uuid } = useParams();
+
+    const { env, isLoadingEnv, errorEnv } = useContainerEnv(uuid);
+
+    return (
+        <Content>
+            <Title variant="h2">Environment</Title>
+            <ProgressOverlay show={isLoadingEnv} />
             <APIError error={errorEnv} />
+            <EnvTable env={env} />
         </Content>
     );
 }
