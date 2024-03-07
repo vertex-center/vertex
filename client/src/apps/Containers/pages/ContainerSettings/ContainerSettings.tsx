@@ -85,7 +85,7 @@ export default function ContainerSettings() {
         setSaved(false);
     };
 
-    const versionValue = (
+    const versionValue = (value: string) => (
         <div
             className={classNames({
                 [styles.versionValue]: imageTag !== "latest",
@@ -137,7 +137,8 @@ export default function ContainerSettings() {
                         id="container-version"
                         onChange={onVersionChange}
                         disabled={isLoadingContainer || imageTagsLoading}
-                        value={versionValue}
+                        value={imageTag}
+                        valueRender={versionValue}
                         // @ts-expect-error
                         filter={(v, search) => v.includes(search)}
                         textNoResults="No versions found."

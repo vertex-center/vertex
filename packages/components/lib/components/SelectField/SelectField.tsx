@@ -1,5 +1,4 @@
 import { Input, InputProps, InputRef } from "../Input/Input.tsx";
-import { Checkbox } from "../Checkbox/Checkbox.tsx";
 import {
     Children,
     cloneElement,
@@ -14,39 +13,25 @@ import {
 import { MaterialIcon } from "../MaterialIcon/MaterialIcon.tsx";
 import "./SelectField.sass";
 import cx from "classnames";
+import { Check } from "@phosphor-icons/react";
 
 export type SelectOptionProps<T> = HTMLAttributes<HTMLDivElement> &
     PropsWithChildren<{
         onClick?: (value: T) => void;
         value: T;
-        multiple?: boolean;
-        selected?: boolean;
+        left?: ReactNode;
     }>;
 
 export function SelectOption<T>(props: Readonly<SelectOptionProps<T>>) {
-    const {
-        onClick,
-        multiple,
-        className,
-        value,
-        children,
-        selected,
-        ...others
-    } = props;
+    const { onClick, className, value, children, left, ...others } = props;
 
     return (
         <div
             onClick={() => onClick?.(value)}
-            className={cx(
-                "select-field-option",
-                {
-                    "select-field-option-multiple": multiple,
-                },
-                className,
-            )}
+            className={cx("select-field-option", className)}
             {...others}
         >
-            {multiple === true && <Checkbox checked={selected} />}
+            <div className="select-field-option-left">{left}</div>
             {children}
         </div>
     );
@@ -71,7 +56,8 @@ export type SelectFieldRef = InputRef;
 export type SelectFieldProps<T> = Omit<InputProps, "onChange" | "value"> &
     PropsWithChildren<{
         multiple?: boolean;
-        value?: ReactNode;
+        value?: T;
+        valueRender?: (value?: T) => ReactNode;
         leftIcon?: ReactNode;
         onChange?: (value: T) => void;
         filter?: (value: T, search: string) => boolean;
@@ -87,6 +73,7 @@ function _SelectField<T>(
         multiple,
         onChange: onChangeProp,
         value,
+        valueRender,
         leftIcon,
         filter,
         textNoResults = "No results found.",
@@ -110,11 +97,13 @@ function _SelectField<T>(
     const items = Children.map(children, (child) => {
         if (!child) return null;
         // @ts-expect-error props are too hard to type
-        if (filter && !filter(child.props.value, search)) return null;
+        const v = child.props.value;
+        if (filter && !filter(v, search)) return null;
         // @ts-expect-error cloneElement is too hard to type
         return cloneElement(child, {
             onClick: onChange,
             multiple: multiple,
+            left: v === value && <Check />,
         });
     })?.filter((v) => v);
 
@@ -132,7 +121,7 @@ function _SelectField<T>(
                 className="select-field-input"
             >
                 {leftIcon}
-                {value}
+                {valueRender?.(value) || value?.toString()}
                 <MaterialIcon
                     className="select-field-icon"
                     icon="expand_more"
