@@ -180,6 +180,7 @@ func (h *containerHandler) DeleteEnv() gin.HandlerFunc {
 
 type CreateEnvironmentParams struct {
 	ContainerID uuid.NullUUID `json:"container_id"`
+	Type        string        `json:"type"`
 	Name        string        `json:"name"`
 	Value       string        `json:"value"`
 }
@@ -188,6 +189,7 @@ func (h *containerHandler) CreateEnv() gin.HandlerFunc {
 	return tonic.Handler(func(ctx *gin.Context, params *CreateEnvironmentParams) error {
 		return h.containerService.CreateEnv(ctx, types.EnvVariable{
 			ContainerID: params.ContainerID.UUID,
+			Type:        types.EnvVariableType(params.Type),
 			Name:        params.Name,
 			Value:       params.Value,
 		})

@@ -5,7 +5,10 @@ import (
 	"github.com/vertex-center/uuid"
 )
 
-const EnvVariableTypePort EnvVariableType = "port"
+const (
+	EnvVariableTypeString EnvVariableType = "string"
+	EnvVariableTypePort   EnvVariableType = "port"
+)
 
 var (
 	ErrInvalidEnvVariableName = errors.NotValidf("environment variable name")
@@ -27,9 +30,12 @@ type (
 	}
 )
 
-func (v EnvVariable) Validate() error {
+func (v *EnvVariable) Validate() error {
 	if v.Name == "" {
 		return ErrInvalidEnvVariableName
+	}
+	if v.Type == "" {
+		v.Type = EnvVariableTypeString
 	}
 	return nil
 }
