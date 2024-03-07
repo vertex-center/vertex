@@ -109,18 +109,18 @@ func (s *sqlService) Install(ctx context.Context, dbms string) (containerstypes.
 		return c, err
 	}
 
-	feature, err := s.getDbFeature(&c)
-	if err != nil {
-		return c, err
-	}
+	//feature, err := s.getDbFeature(&c)
+	//if err != nil {
+	//	return c, err
+	//}
 
 	var env []containerstypes.EnvVariable
-	if feature.Username != nil {
-		//env.Set(*feature.Username, "postgres")
-	}
-	if feature.Password != nil {
-		//env.Set(*feature.Password, "postgres")
-	}
+	//if feature.Username != nil {
+	//env.Set(*feature.Username, "postgres")
+	//}
+	//if feature.Password != nil {
+	//env.Set(*feature.Password, "postgres")
+	//}
 
 	err = client.PatchContainerEnvironment(ctx, c.ID, env)
 	return c, err
