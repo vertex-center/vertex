@@ -93,7 +93,7 @@ export default function ContainerInstaller(props: Readonly<Props>) {
                     container={{
                         value: container,
                         to: container?.id
-                            ? `/containers/${container?.id}`
+                            ? `/containers/${container?.id}/logs`
                             : undefined,
                         onInstall: onInstall,
                         onPower: () => onPower(container),

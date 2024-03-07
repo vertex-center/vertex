@@ -99,7 +99,7 @@ export default function SqlDatabase() {
                         value: container ?? {
                             id: uuidv4(),
                         },
-                        to: `/containers/${container?.id}`,
+                        to: `/containers/${container?.id}/logs`,
                         onPower: () => onPower(container),
                     }}
                 />

@@ -107,7 +107,7 @@ export default function ContainersApp() {
                                 key={c.id}
                                 container={{
                                     value: c,
-                                    to: `/containers/${c.id}/`,
+                                    to: `/containers/${c.id}/logs`,
                                     onPower: async () =>
                                         mutationPower.mutate(c.id),
                                 }}
