@@ -10,7 +10,6 @@ import ContainersApp from "./apps/Containers/pages/ContainersApp/ContainersApp";
 import ContainerDetails from "./apps/Containers/pages/Container/Container";
 import ContainerLogs from "./apps/Containers/pages/ContainerLogs/ContainerLogs";
 import ContainerEnv from "./apps/Containers/pages/ContainerEnv/ContainerEnv";
-import ContainerHome from "./apps/Containers/pages/ContainerHome/ContainerHome";
 import SettingsApp from "./apps/AdminSettings/SettingsApp/SettingsApp";
 import { Fragment, useContext } from "react";
 import { ThemeContext } from "./main";
@@ -164,10 +163,6 @@ function AllRoutes() {
                             path="/containers/:uuid/"
                             element={<ContainerDetails />}
                         >
-                            <Route
-                                path="/containers/:uuid/home"
-                                element={<ContainerHome />}
-                            />
                             <Route
                                 path="/containers/:uuid/docker"
                                 element={<ContainerDocker />}

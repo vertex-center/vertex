@@ -24,7 +24,6 @@ import {
     ClockClockwise,
     Cube,
     Gear,
-    House,
     ShareNetwork,
     TerminalWindow,
     Textbox,
@@ -83,13 +82,6 @@ export default function ContainerDetails() {
 
     const sidebar = useSidebar(
         <Sidebar>
-            <Sidebar.Group>
-                <Sidebar.Item
-                    label="Home"
-                    icon={<House />}
-                    link={l(`/containers/${uuid}/home`)}
-                />
-            </Sidebar.Group>
             <Sidebar.Group title="Analyze">
                 <Sidebar.Item
                     label="Logs"
