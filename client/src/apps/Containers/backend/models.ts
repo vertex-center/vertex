@@ -31,6 +31,10 @@ export type EnvVariable = {
     secret?: boolean;
 };
 
+export type EnvVariableFilters = {
+    container_id?: string;
+};
+
 export type Port = {
     id?: string;
     container_id: string;

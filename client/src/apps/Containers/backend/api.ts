@@ -4,6 +4,7 @@ import {
     ContainerFilters,
     Containers,
     EnvVariable,
+    EnvVariableFilters,
     Port,
     PortFilters,
     Tags,
@@ -68,10 +69,10 @@ const getLogs = async (id: string) => {
     return data;
 };
 
-const getEnv = async (id: string) => {
-    const { data } = await server.get<EnvVariable[]>(
-        `/containers/${id}/environment`
-    );
+const getEnv = async (filters?: EnvVariableFilters) => {
+    const { data } = await server.get<EnvVariable[]>(`/environments`, {
+        params: filters,
+    });
     return data;
 };
 

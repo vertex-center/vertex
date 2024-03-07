@@ -19,10 +19,7 @@ import {
     Vertical,
 } from "@vertex-center/components";
 import { Horizontal } from "../../../../components/Layouts/Layouts";
-import {
-    useContainerEnv,
-    useRecreateContainer,
-} from "../../hooks/useContainer";
+import { useRecreateContainer } from "../../hooks/useContainer";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useQueryClient } from "@tanstack/react-query";
@@ -41,6 +38,7 @@ import NoItems from "../../../../components/NoItems/NoItems";
 import {
     useCreateEnv,
     useDeleteEnv,
+    useEnvironment,
     usePatchEnv,
 } from "../../hooks/useEnvironment";
 import Spacer from "../../../../components/Spacer/Spacer";
@@ -241,7 +239,9 @@ function EnvTable(props: EnvTableProps) {
 export default function ContainerEnv() {
     const { uuid } = useParams();
 
-    const { env, isLoadingEnv, errorEnv } = useContainerEnv(uuid);
+    const { env, isLoadingEnv, errorEnv } = useEnvironment({
+        container_id: uuid,
+    });
 
     return (
         <Content>

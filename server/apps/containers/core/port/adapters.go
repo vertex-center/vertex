@@ -45,7 +45,7 @@ type (
 	}
 
 	EnvAdapter interface {
-		GetEnvs(ctx context.Context, id uuid.UUID) ([]types.EnvVariable, error)
+		GetEnvs(ctx context.Context, filters types.EnvVariableFilters) ([]types.EnvVariable, error)
 		CreateEnv(ctx context.Context, variable types.EnvVariable) error
 		DeleteEnv(ctx context.Context, id uuid.UUID) error
 		DeleteEnvs(ctx context.Context, id uuid.UUID) error

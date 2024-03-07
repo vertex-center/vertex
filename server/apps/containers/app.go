@@ -23,6 +23,7 @@ import (
 
 var (
 	containerService port.ContainerService
+	envService       port.EnvService
 	tagsService      port.TagsService
 	metricsService   port.MetricsService
 	portsService     port.PortsService
@@ -84,6 +85,7 @@ func (a *App) Initialize() error {
 	)
 
 	containerService = service.NewContainerService(a.ctx, caps, containers, env, ports, volumes, tags, sysctls, runner, services, logs)
+	envService = service.NewEnvService(env)
 	tagsService = service.NewTagsService(tags)
 	metricsService = service.NewMetricsService(a.ctx)
 	portsService = service.NewPortsService(ports)
@@ -98,6 +100,7 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 
 	var (
 		templatesHandler  = handler.NewTemplateHandler(containerService)
+		envHandler        = handler.NewEnvHandler(envService)
 		tagsHandler       = handler.NewTagsHandler(tagsService)
 		containersHandler = handler.NewContainerHandler(a.ctx, containerService)
 		portsHandler      = handler.NewPortsHandler(portsService)
@@ -221,58 +224,58 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 
 	// Environment
 
-	containers.GET("/:container_id/environment", []fizz.OperationOption{
-		fizz.ID("getContainerEnvironment"),
-		fizz.Summary("Get container environment"),
+	environments.GET("", []fizz.OperationOption{
+		fizz.ID("getEnvironment"),
+		fizz.Summary("Get an environment variables"),
 		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to get container environment"}),
-	}, containersHandler.GetEnv())
+	}, envHandler.GetEnv())
 
 	environments.PATCH("/:env_id", []fizz.OperationOption{
-		fizz.ID("patchContainerEnvironment"),
-		fizz.Summary("Patch a container environment"),
+		fizz.ID("patchEnvironment"),
+		fizz.Summary("Patch an environment variable"),
 		fizz.Response("404", "Environment variable not found", nil, nil, map[string]interface{}{"error": "environment variable not found"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to patch container environment"}),
-	}, containersHandler.PatchEnv())
+	}, envHandler.PatchEnv())
 
 	environments.DELETE("/:env_id", []fizz.OperationOption{
-		fizz.ID("deleteContainerEnvironment"),
-		fizz.Summary("Delete a container environment"),
+		fizz.ID("deleteEnvironment"),
+		fizz.Summary("Delete an environment variable"),
 		fizz.Response("404", "Environment variable not found", nil, nil, map[string]interface{}{"error": "environment variable not found"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to delete container environment"}),
-	}, containersHandler.DeleteEnv())
+	}, envHandler.DeleteEnv())
 
 	environments.POST("", []fizz.OperationOption{
-		fizz.ID("createContainerEnvironment"),
-		fizz.Summary("Create a container environment"),
+		fizz.ID("createEnvironment"),
+		fizz.Summary("Create an environment variable"),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to create container environment"}),
-	}, containersHandler.CreateEnv())
+	}, envHandler.CreateEnv())
 
 	// Ports
 
 	ports.GET("", []fizz.OperationOption{
-		fizz.ID("getContainerPorts"),
-		fizz.Summary("Get container ports"),
+		fizz.ID("getPorts"),
+		fizz.Summary("Get ports"),
 		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
 	}, portsHandler.GetPorts())
 
 	ports.PATCH("/:port_id", []fizz.OperationOption{
-		fizz.ID("patchContainerPort"),
-		fizz.Summary("Patch container ports"),
+		fizz.ID("patchPort"),
+		fizz.Summary("Patch ports"),
 		fizz.Response("404", "Port not found", nil, nil, map[string]interface{}{"error": "port not found"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to patch port"}),
 	}, portsHandler.PatchPort())
 
 	ports.DELETE("/:port_id", []fizz.OperationOption{
-		fizz.ID("deleteContainerPort"),
-		fizz.Summary("Delete container port"),
+		fizz.ID("deletePort"),
+		fizz.Summary("Delete port"),
 		fizz.Response("404", "Port not found", nil, nil, map[string]interface{}{"error": "container not found"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to delete port"}),
 	}, portsHandler.DeletePort())
 
 	ports.POST("", []fizz.OperationOption{
-		fizz.ID("createContainerPort"),
-		fizz.Summary("Create container port"),
+		fizz.ID("createPort"),
+		fizz.Summary("Create port"),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to create port"}),
 	}, portsHandler.CreatePort())
 

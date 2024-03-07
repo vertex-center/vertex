@@ -1,6 +1,22 @@
 import { API } from "../backend/api";
-import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { EnvVariable } from "../backend/models";
+import {
+    useMutation,
+    UseMutationOptions,
+    useQuery,
+} from "@tanstack/react-query";
+import { EnvVariable, EnvVariableFilters } from "../backend/models";
+
+export function useEnvironment(filters?: EnvVariableFilters) {
+    const queryEnv = useQuery({
+        queryKey: ["environments", filters],
+        queryFn: () => API.getEnv(filters),
+    });
+    return {
+        env: queryEnv.data,
+        isLoadingEnv: queryEnv.isLoading,
+        errorEnv: queryEnv.error,
+    };
+}
 
 export function usePatchEnv(
     options?: UseMutationOptions<unknown, unknown, EnvVariable>

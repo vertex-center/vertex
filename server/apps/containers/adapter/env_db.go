@@ -19,13 +19,16 @@ func NewEnvDBAdapter(db storage.DB) port.EnvAdapter {
 	return &envDBAdapter{db}
 }
 
-func (a *envDBAdapter) GetEnvs(ctx context.Context, id uuid.UUID) ([]types.EnvVariable, error) {
+func (a *envDBAdapter) GetEnvs(ctx context.Context, filters types.EnvVariableFilters) ([]types.EnvVariable, error) {
 	var env []types.EnvVariable
-	err := a.db.Select(&env, `
-		SELECT * FROM env_variables
-		WHERE container_id = $1
-		ORDER BY name
-	`, id)
+	query := `SELECT * FROM env_variables`
+	var args []interface{}
+	if filters.ContainerID != nil {
+		query += ` WHERE container_id = $1`
+		args = append(args, *filters.ContainerID)
+	}
+	query += ` ORDER BY name`
+	err := a.db.Select(&env, query, args...)
 	if errors.Is(err, sql.ErrNoRows) {
 		return env, nil
 	}

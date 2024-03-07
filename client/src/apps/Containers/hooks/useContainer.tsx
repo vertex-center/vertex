@@ -29,18 +29,6 @@ export function useDockerInfo(id?: string) {
     return { dockerInfo: queryDockerInfo.data, ...queryDockerInfo };
 }
 
-export function useContainerEnv(id?: string) {
-    const queryEnv = useQuery({
-        queryKey: ["environments", id],
-        queryFn: () => API.getEnv(id),
-    });
-    return {
-        env: queryEnv.data,
-        isLoadingEnv: queryEnv.isLoading,
-        errorEnv: queryEnv.error,
-    };
-}
-
 export function useRecreateContainer(
     options?: UseMutationOptions<unknown, unknown, string>
 ) {

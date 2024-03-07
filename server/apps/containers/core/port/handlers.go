@@ -14,10 +14,6 @@ type (
 		Start() gin.HandlerFunc
 		Stop() gin.HandlerFunc
 		AddContainerTag() gin.HandlerFunc
-		GetEnv() gin.HandlerFunc
-		PatchEnv() gin.HandlerFunc
-		DeleteEnv() gin.HandlerFunc
-		CreateEnv() gin.HandlerFunc
 		GetDocker() gin.HandlerFunc
 		RecreateDocker() gin.HandlerFunc
 		GetLogs() gin.HandlerFunc
@@ -26,6 +22,13 @@ type (
 		CheckForUpdates() gin.HandlerFunc
 		ContainerEvents() gin.HandlerFunc
 		ContainersEvents() gin.HandlerFunc
+	}
+
+	EnvHandler interface {
+		GetEnv() gin.HandlerFunc
+		PatchEnv() gin.HandlerFunc
+		DeleteEnv() gin.HandlerFunc
+		CreateEnv() gin.HandlerFunc
 	}
 
 	PortsHandler interface {

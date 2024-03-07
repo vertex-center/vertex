@@ -28,16 +28,19 @@ type (
 		DeleteAll(ctx context.Context) error
 		CheckForUpdates(ctx context.Context) (types.Containers, error)
 		SetDatabases(ctx context.Context, c *types.Container, databases map[string]uuid.UUID, options map[string]*types.SetDatabasesOptions) error
-		GetEnvs(ctx context.Context, id uuid.UUID) ([]types.EnvVariable, error)
-		PatchEnv(ctx context.Context, env types.EnvVariable) error
-		DeleteEnv(ctx context.Context, id uuid.UUID) error
-		CreateEnv(ctx context.Context, env types.EnvVariable) error
 		GetAllVersions(ctx context.Context, id uuid.UUID, useCache bool) ([]string, error)
 		GetContainerInfo(ctx context.Context, id uuid.UUID) (map[string]any, error)
 		WaitStatus(ctx context.Context, id uuid.UUID, status string) error
 		GetLatestLogs(id uuid.UUID) ([]types.LogLine, error)
 		GetTemplateByID(ctx context.Context, id string) (*types.Template, error)
 		GetTemplates(ctx context.Context) []types.Template
+	}
+
+	EnvService interface {
+		GetEnvs(ctx context.Context, filters types.EnvVariableFilters) ([]types.EnvVariable, error)
+		PatchEnv(ctx context.Context, env types.EnvVariable) error
+		DeleteEnv(ctx context.Context, id uuid.UUID) error
+		CreateEnv(ctx context.Context, env types.EnvVariable) error
 	}
 
 	MetricsService interface {

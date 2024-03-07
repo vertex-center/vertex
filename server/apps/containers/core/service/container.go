@@ -362,7 +362,9 @@ func (s *containerService) Start(ctx context.Context, id uuid.UUID) error {
 		return err
 	}
 
-	env, err := s.vars.GetEnvs(ctx, id)
+	env, err := s.vars.GetEnvs(ctx, types.EnvVariableFilters{
+		ContainerID: &id,
+	})
 	if err != nil {
 		s.setStatus(c, types.ContainerStatusError)
 		return err
@@ -621,10 +623,6 @@ func (s *containerService) SetDatabases(ctx context.Context, c *types.Container,
 	return s.remapDatabaseEnv(ctx, c, options)
 }
 
-func (s *containerService) GetEnvs(ctx context.Context, id uuid.UUID) ([]types.EnvVariable, error) {
-	return s.vars.GetEnvs(ctx, id)
-}
-
 // remapDatabaseEnv remaps the environment variables of a container.
 func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Container, options map[string]*types.SetDatabasesOptions) error {
 	for databaseID, databaseContainerID := range c.Databases {
@@ -648,7 +646,9 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 		dbEnvNames := (*dbService.Features.Databases)[0]
 		cEnvNames := cService.Databases[databaseID].Names
 
-		dbVars, err := s.vars.GetEnvs(ctx, db.ID)
+		dbVars, err := s.vars.GetEnvs(ctx, types.EnvVariableFilters{
+			ContainerID: &db.ID,
+		})
 		if err != nil {
 			return err
 		}
@@ -735,27 +735,6 @@ func (s *containerService) remapDatabaseEnv(ctx context.Context, c *types.Contai
 		}
 	}
 	return nil
-}
-
-func (s *containerService) PatchEnv(ctx context.Context, env types.EnvVariable) error {
-	err := env.Validate()
-	if err != nil {
-		return err
-	}
-	return s.vars.UpdateEnvByID(ctx, env)
-}
-
-func (s *containerService) DeleteEnv(ctx context.Context, id uuid.UUID) error {
-	return s.vars.DeleteEnv(ctx, id)
-}
-
-func (s *containerService) CreateEnv(ctx context.Context, env types.EnvVariable) error {
-	env.ID = uuid.New()
-	err := env.Validate()
-	if err != nil {
-		return err
-	}
-	return s.vars.CreateEnv(ctx, env)
 }
 
 func (s *containerService) GetAllVersions(ctx context.Context, id uuid.UUID, useCache bool) ([]string, error) {
