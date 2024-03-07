@@ -47,6 +47,7 @@ func (a *containerDBAdapter) GetContainersWithFilters(ctx context.Context, filte
 		tags := strings.Join(*filters.Tags, ", ")
 		args = append(args, tags)
 	}
+	query += ` ORDER BY containers.name`
 	err := a.db.Select(&containers, query, args...)
 	if errors.Is(err, sql.ErrNoRows) {
 		return containers, nil
