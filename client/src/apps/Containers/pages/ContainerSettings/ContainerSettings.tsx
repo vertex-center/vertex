@@ -77,7 +77,7 @@ export default function ContainerSettings() {
             });
         },
     });
-    const { isLoading: isUploading } = mutationSave;
+    const { isPending: isUploading } = mutationSave;
 
     const onVersionChange = (v: any) => {
         setImageTag(v);
@@ -136,8 +136,9 @@ export default function ContainerSettings() {
                         id="container-version"
                         onChange={onVersionChange}
                         disabled={isLoadingContainer || imageTagsLoading}
-                        // @ts-ignore
                         value={versionValue}
+                        // @ts-expect-error
+                        filter={(v, search) => v.includes(search)}
                     >
                         {imageTags?.includes("latest") && (
                             <SelectOption value="latest">

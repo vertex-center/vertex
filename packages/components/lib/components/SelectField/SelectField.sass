@@ -10,7 +10,7 @@
         padding-right: 12px
         cursor: pointer
 
-    &-values
+    &-dropdown
         position: absolute
         background-color: colors.$bg-secondary
         border-radius: dimensions.$border-radius
@@ -22,14 +22,26 @@
         min-width: min(85vw, 400px)
         box-sizing: border-box
         margin-top: 6px
-        padding: 4px
         display: none
         z-index: 2
         max-height: 500px
         overflow: scroll
 
-    &-opened &-values
+    &-opened &-dropdown
         display: block
+        cursor: default
+
+    &-search
+        width: calc(100% - 16px)
+        margin: 8px
+        border-radius: dimensions.$border-radius
+
+    &-values
+        padding: 8px
+
+    &-divider
+        height: 1px
+        background-color: colors.$bg-tertiary
 
     &-icon
         padding-left: 10px
@@ -45,9 +57,9 @@
         gap: 15px
         align-items: center
         height: 40px
-        padding: 0 20px
+        padding: 0 16px
         cursor: pointer
-        border-radius: calc(dimensions.$border-radius-lg - 6px)
+        border-radius: dimensions.$border-radius
         white-space: nowrap
 
         &:hover
