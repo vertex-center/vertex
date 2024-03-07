@@ -25,11 +25,11 @@ type (
 	}
 
 	PortAdapter interface {
-		GetContainerPorts(ctx context.Context, id uuid.UUID) (types.Ports, error)
+		GetPorts(ctx context.Context, filters types.PortFilters) (types.Ports, error)
 		CreatePort(ctx context.Context, port types.Port) error
 		DeletePort(ctx context.Context, id uuid.UUID) error
-		DeleteContainerPorts(ctx context.Context, id uuid.UUID) error
-		UpdateContainerPortByID(ctx context.Context, port types.Port) error
+		DeletePorts(ctx context.Context, id uuid.UUID) error
+		UpdatePortByID(ctx context.Context, port types.Port) error
 	}
 
 	VolumeAdapter interface {

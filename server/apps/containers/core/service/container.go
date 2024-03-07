@@ -278,7 +278,7 @@ func (s *containerService) Delete(ctx context.Context, id uuid.UUID) error {
 
 	deletes := []func(context.Context, uuid.UUID) error{
 		s.caps.DeleteContainerCaps,
-		s.ports.DeleteContainerPorts,
+		s.ports.DeletePorts,
 		s.volumes.DeleteContainerVolumes,
 		s.sysctls.DeleteContainerSysctls,
 		s.vars.DeleteEnvs,
@@ -348,7 +348,9 @@ func (s *containerService) Start(ctx context.Context, id uuid.UUID) error {
 		s.setStatus(c, status)
 	}
 
-	ports, err := s.ports.GetContainerPorts(ctx, id)
+	ports, err := s.ports.GetPorts(ctx, types.PortFilters{
+		ContainerID: &id,
+	})
 	if err != nil {
 		s.setStatus(c, types.ContainerStatusError)
 		return err
@@ -754,31 +756,6 @@ func (s *containerService) CreateEnv(ctx context.Context, env types.EnvVariable)
 		return err
 	}
 	return s.vars.CreateEnv(ctx, env)
-}
-
-func (s *containerService) GetPorts(ctx context.Context, id uuid.UUID) (types.Ports, error) {
-	return s.ports.GetContainerPorts(ctx, id)
-}
-
-func (s *containerService) PatchPort(ctx context.Context, p types.Port) error {
-	err := p.Validate()
-	if err != nil {
-		return err
-	}
-	return s.ports.UpdateContainerPortByID(ctx, p)
-}
-
-func (s *containerService) DeletePort(ctx context.Context, id uuid.UUID) error {
-	return s.ports.DeletePort(ctx, id)
-}
-
-func (s *containerService) CreatePort(ctx context.Context, p types.Port) error {
-	p.ID = uuid.New()
-	err := p.Validate()
-	if err != nil {
-		return err
-	}
-	return s.ports.CreatePort(ctx, p)
 }
 
 func (s *containerService) GetAllVersions(ctx context.Context, id uuid.UUID, useCache bool) ([]string, error) {

@@ -22,10 +22,7 @@ import {
     ShareNetwork,
     Trash,
 } from "@phosphor-icons/react";
-import {
-    useContainerPorts,
-    useRecreateContainer,
-} from "../../hooks/useContainer";
+import { useRecreateContainer } from "../../hooks/useContainer";
 import Spacer from "../../../../components/Spacer/Spacer";
 import { Fragment, ReactNode, useEffect } from "react";
 import { Port } from "../../backend/models";
@@ -35,6 +32,7 @@ import {
     useCreatePort,
     useDeletePort,
     usePatchPort,
+    usePorts,
 } from "../../hooks/usePort";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -233,7 +231,9 @@ function PortTable(props: PortTableProps) {
 export default function ContainerPorts() {
     const { uuid } = useParams();
 
-    const { ports, isLoadingPorts, errorPorts } = useContainerPorts(uuid);
+    const { ports, isLoadingPorts, errorPorts } = usePorts({
+        container_id: uuid,
+    });
 
     return (
         <Vertical gap={24}>

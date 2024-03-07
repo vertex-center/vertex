@@ -32,10 +32,6 @@ type (
 		PatchEnv(ctx context.Context, env types.EnvVariable) error
 		DeleteEnv(ctx context.Context, id uuid.UUID) error
 		CreateEnv(ctx context.Context, env types.EnvVariable) error
-		GetPorts(ctx context.Context, id uuid.UUID) (types.Ports, error)
-		PatchPort(ctx context.Context, p types.Port) error
-		DeletePort(ctx context.Context, id uuid.UUID) error
-		CreatePort(ctx context.Context, p types.Port) error
 		GetAllVersions(ctx context.Context, id uuid.UUID, useCache bool) ([]string, error)
 		GetContainerInfo(ctx context.Context, id uuid.UUID) (map[string]any, error)
 		WaitStatus(ctx context.Context, id uuid.UUID, status string) error
@@ -46,6 +42,13 @@ type (
 
 	MetricsService interface {
 		metric.RegistryProvider
+	}
+
+	PortsService interface {
+		GetPorts(ctx context.Context, filters types.PortFilters) (types.Ports, error)
+		PatchPort(ctx context.Context, p types.Port) error
+		DeletePort(ctx context.Context, id uuid.UUID) error
+		CreatePort(ctx context.Context, p types.Port) error
 	}
 
 	TagsService interface {

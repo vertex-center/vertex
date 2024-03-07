@@ -38,6 +38,10 @@ export type Port = {
     out: string;
 };
 
+export type PortFilters = {
+    container_id?: string;
+};
+
 export type Containers = Container[];
 export type Container = {
     id: string;

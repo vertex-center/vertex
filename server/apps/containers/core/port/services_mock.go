@@ -114,21 +114,6 @@ func (m *MockContainerService) GetPorts(ctx context.Context, id uuid.UUID) (type
 	return args.Get(0).(types.Ports), args.Error(1)
 }
 
-func (m *MockContainerService) PatchPort(ctx context.Context, port types.Port) error {
-	args := m.Called(ctx, port)
-	return args.Error(0)
-}
-
-func (m *MockContainerService) DeletePort(ctx context.Context, id uuid.UUID) error {
-	args := m.Called(ctx, id)
-	return args.Error(0)
-}
-
-func (m *MockContainerService) CreatePort(ctx context.Context, port types.Port) error {
-	args := m.Called(ctx, port)
-	return args.Error(0)
-}
-
 func (m *MockContainerService) RecreateContainer(ctx context.Context, uuid uuid.UUID) error {
 	args := m.Called(ctx, uuid)
 	return args.Error(0)

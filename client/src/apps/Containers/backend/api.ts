@@ -5,6 +5,7 @@ import {
     Containers,
     EnvVariable,
     Port,
+    PortFilters,
     Tags,
 } from "./models";
 import { DockerContainerInfo } from "../../../models/docker";
@@ -86,8 +87,8 @@ const createEnv = (env: EnvVariable) => {
     return server.post(`/environments`, env);
 };
 
-const getPorts = async (id: string) => {
-    const { data } = await server.get(`/containers/${id}/ports`);
+const getPorts = async (filters?: PortFilters) => {
+    const { data } = await server.get(`/ports`, { params: filters });
     return data;
 };
 

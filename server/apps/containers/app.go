@@ -22,9 +22,10 @@ import (
 )
 
 var (
-	containerTemplate port.ContainerService
-	tagsService       port.TagsService
-	metricsService    port.MetricsService
+	containerService port.ContainerService
+	tagsService      port.TagsService
+	metricsService   port.MetricsService
+	portsService     port.PortsService
 
 	dockerKernelService port.DockerService
 )
@@ -82,9 +83,10 @@ func (a *App) Initialize() error {
 		services   = adapter.NewTemplateFSAdapter(nil)
 	)
 
-	containerTemplate = service.NewContainerService(a.ctx, caps, containers, env, ports, volumes, tags, sysctls, runner, services, logs)
+	containerService = service.NewContainerService(a.ctx, caps, containers, env, ports, volumes, tags, sysctls, runner, services, logs)
 	tagsService = service.NewTagsService(tags)
 	metricsService = service.NewMetricsService(a.ctx)
+	portsService = service.NewPortsService(ports)
 
 	return nil
 }
@@ -95,9 +97,10 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 	metric.Serve(r, metricsService)
 
 	var (
-		templatesHandler  = handler.NewTemplateHandler(containerTemplate)
+		templatesHandler  = handler.NewTemplateHandler(containerService)
 		tagsHandler       = handler.NewTagsHandler(tagsService)
-		containersHandler = handler.NewContainerHandler(a.ctx, containerTemplate)
+		containersHandler = handler.NewContainerHandler(a.ctx, containerService)
+		portsHandler      = handler.NewPortsHandler(portsService)
 
 		containers   = r.Group("/containers", "Containers", "", authmiddleware.Authenticated)
 		environments = r.Group("/environments", "Environment variables", "", authmiddleware.Authenticated)
@@ -247,31 +250,31 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 
 	// Ports
 
-	containers.GET("/:container_id/ports", []fizz.OperationOption{
+	ports.GET("", []fizz.OperationOption{
 		fizz.ID("getContainerPorts"),
 		fizz.Summary("Get container ports"),
 		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
-	}, containersHandler.GetPorts())
+	}, portsHandler.GetPorts())
 
 	ports.PATCH("/:port_id", []fizz.OperationOption{
 		fizz.ID("patchContainerPort"),
 		fizz.Summary("Patch container ports"),
 		fizz.Response("404", "Port not found", nil, nil, map[string]interface{}{"error": "port not found"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to patch port"}),
-	}, containersHandler.PatchPort())
+	}, portsHandler.PatchPort())
 
 	ports.DELETE("/:port_id", []fizz.OperationOption{
 		fizz.ID("deleteContainerPort"),
 		fizz.Summary("Delete container port"),
 		fizz.Response("404", "Port not found", nil, nil, map[string]interface{}{"error": "container not found"}),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to delete port"}),
-	}, containersHandler.DeletePort())
+	}, portsHandler.DeletePort())
 
 	ports.POST("", []fizz.OperationOption{
 		fizz.ID("createContainerPort"),
 		fizz.Summary("Create container port"),
 		fizz.Response("500", "", nil, nil, map[string]interface{}{"error": "failed to create port"}),
-	}, containersHandler.CreatePort())
+	}, portsHandler.CreatePort())
 
 	// Tags
 

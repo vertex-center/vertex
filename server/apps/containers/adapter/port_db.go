@@ -19,12 +19,15 @@ func NewPortDBAdapter(db storage.DB) port.PortAdapter {
 	return &portDBAdapter{db}
 }
 
-func (a *portDBAdapter) GetContainerPorts(ctx context.Context, id uuid.UUID) (types.Ports, error) {
+func (a *portDBAdapter) GetPorts(ctx context.Context, filters types.PortFilters) (types.Ports, error) {
 	var ports types.Ports
-	err := a.db.Select(&ports, `
-		SELECT * FROM ports
-		WHERE container_id = $1
-	`, id)
+	query := `SELECT * FROM ports`
+	var args []interface{}
+	if filters.ContainerID != nil {
+		query += ` WHERE container_id = $1`
+		args = append(args, *filters.ContainerID)
+	}
+	err := a.db.Select(&ports, query, args...)
 	if errors.Is(err, sql.ErrNoRows) {
 		return ports, nil
 	}
@@ -47,7 +50,7 @@ func (a *portDBAdapter) DeletePort(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
-func (a *portDBAdapter) DeleteContainerPorts(ctx context.Context, id uuid.UUID) error {
+func (a *portDBAdapter) DeletePorts(ctx context.Context, id uuid.UUID) error {
 	_, err := a.db.Exec(`
 		DELETE FROM ports
 		WHERE container_id = $1
@@ -55,7 +58,7 @@ func (a *portDBAdapter) DeleteContainerPorts(ctx context.Context, id uuid.UUID) 
 	return err
 }
 
-func (a *portDBAdapter) UpdateContainerPortByID(ctx context.Context, port types.Port) error {
+func (a *portDBAdapter) UpdatePortByID(ctx context.Context, port types.Port) error {
 	_, err := a.db.NamedExec(`
         UPDATE ports
         SET internal_port = :internal_port, external_port = :external_port

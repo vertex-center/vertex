@@ -18,10 +18,6 @@ type (
 		PatchEnv() gin.HandlerFunc
 		DeleteEnv() gin.HandlerFunc
 		CreateEnv() gin.HandlerFunc
-		GetPorts() gin.HandlerFunc
-		PatchPort() gin.HandlerFunc
-		DeletePort() gin.HandlerFunc
-		CreatePort() gin.HandlerFunc
 		GetDocker() gin.HandlerFunc
 		RecreateDocker() gin.HandlerFunc
 		GetLogs() gin.HandlerFunc
@@ -30,6 +26,13 @@ type (
 		CheckForUpdates() gin.HandlerFunc
 		ContainerEvents() gin.HandlerFunc
 		ContainersEvents() gin.HandlerFunc
+	}
+
+	PortsHandler interface {
+		GetPorts() gin.HandlerFunc
+		PatchPort() gin.HandlerFunc
+		DeletePort() gin.HandlerFunc
+		CreatePort() gin.HandlerFunc
 	}
 
 	TemplateHandler interface {

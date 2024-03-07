@@ -41,19 +41,6 @@ export function useContainerEnv(id?: string) {
     };
 }
 
-export function useContainerPorts(id?: string) {
-    const queryPorts = useQuery({
-        queryKey: ["ports", id],
-        queryFn: () => API.getPorts(id),
-    });
-    return {
-        ...queryPorts,
-        ports: queryPorts.data,
-        isLoadingPorts: queryPorts.isLoading,
-        errorPorts: queryPorts.error,
-    };
-}
-
 export function useRecreateContainer(
     options?: UseMutationOptions<unknown, unknown, string>
 ) {

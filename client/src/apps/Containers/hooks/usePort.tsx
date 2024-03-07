@@ -1,6 +1,23 @@
-import { Port } from "../backend/models";
+import { Port, PortFilters } from "../backend/models";
 import { API } from "../backend/api";
-import { useMutation, UseMutationOptions } from "@tanstack/react-query";
+import {
+    useMutation,
+    UseMutationOptions,
+    useQuery,
+} from "@tanstack/react-query";
+
+export function usePorts(filters?: PortFilters) {
+    const queryPorts = useQuery({
+        queryKey: ["ports", filters],
+        queryFn: () => API.getPorts(filters),
+    });
+    return {
+        ...queryPorts,
+        ports: queryPorts.data,
+        isLoadingPorts: queryPorts.isLoading,
+        errorPorts: queryPorts.error,
+    };
+}
 
 export function usePatchPort(
     options?: UseMutationOptions<unknown, unknown, Port>
