@@ -1,5 +1,5 @@
 import styles from "./Popup.module.sass";
-import { HTMLProps, PropsWithChildren, ReactNode } from "react";
+import { HTMLProps, PropsWithChildren } from "react";
 import classNames from "classnames";
 import { Title, Vertical } from "@vertex-center/components";
 
@@ -19,21 +19,12 @@ type Props = PropsWithChildren<{
 export default function Popup(props: Readonly<Props>) {
     const { show, onDismiss, title, children } = props;
 
+    if (!show) return null;
+
     return (
         <div>
-            <div
-                className={classNames({
-                    [styles.overlay]: true,
-                    [styles.overlayActive]: show,
-                })}
-                onClick={onDismiss}
-            />
-            <div
-                className={classNames({
-                    [styles.popup]: true,
-                    [styles.popupActive]: show,
-                })}
-            >
+            <div className={styles.overlay} onClick={onDismiss} />
+            <div className={styles.popup}>
                 <div className={styles.header}>
                     <Title variant="h3">{title}</Title>
                 </div>

@@ -11,16 +11,13 @@
     transform: translate(-50%, -50%)
     z-index: 1001
     border: 1px solid colors.$bg-secondary
-    display: none
+    display: flex
     flex-direction: column
     min-width: 500px
 
     @include dimensions.small-or-less
         width: calc(100vw - 100px)
         min-width: inherit
-
-    &Active
-        display: flex
 
 .actions
     display: flex
@@ -46,7 +43,4 @@
     bottom: 0
     background-color: rgba(0, 0, 0, 0.6)
     z-index: 1000
-    display: none
-
-    &Active
-        display: block
+    display: block
