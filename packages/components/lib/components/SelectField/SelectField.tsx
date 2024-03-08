@@ -10,10 +10,9 @@ import {
     ChangeEvent,
     Fragment,
 } from "react";
-import { MaterialIcon } from "../MaterialIcon/MaterialIcon.tsx";
 import "./SelectField.sass";
 import cx from "classnames";
-import { Check } from "@phosphor-icons/react";
+import { CaretDown, Check } from "@phosphor-icons/react";
 
 export type SelectOptionProps<T> = HTMLAttributes<HTMLDivElement> &
     PropsWithChildren<{
@@ -122,10 +121,7 @@ function _SelectField<T>(
             >
                 {leftIcon}
                 {valueRender?.(value) || value?.toString()}
-                <MaterialIcon
-                    className="select-field-icon"
-                    icon="expand_more"
-                />
+                <CaretDown className="select-field-icon" />
             </Input>
             <div className="select-field-dropdown">
                 {filter && (
