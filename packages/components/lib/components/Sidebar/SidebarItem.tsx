@@ -1,7 +1,7 @@
 import React, { Fragment, PropsWithChildren, ReactNode, useState } from "react";
 import cx from "classnames";
 import { NavLink, NavLinkProps } from "../NavLink/NavLink.tsx";
-import { MaterialIcon } from "../MaterialIcon/MaterialIcon.tsx";
+import { CaretDown } from "@phosphor-icons/react";
 
 export type SidebarItemVariant = "default" | "red";
 
@@ -34,12 +34,7 @@ export function SidebarItem<T>(props: Readonly<SidebarItemProps<T>>) {
                 </div>
             )}
             <div className="sidebar-item-trailing">{trailing}</div>
-            {hasChildren && (
-                <MaterialIcon
-                    className="sidebar-item-expand"
-                    icon="expand_more"
-                />
-            )}
+            {hasChildren && <CaretDown className="sidebar-item-expand" />}
         </Fragment>
     );
 
