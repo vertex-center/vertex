@@ -19,11 +19,16 @@ import {
     IdentificationBadge,
     Tag,
 } from "@phosphor-icons/react";
+import { useReloadContainer } from "../../hooks/useContainers";
 
 export default function ContainerDocker() {
     const { uuid } = useParams();
 
-    const { dockerInfo: info, isLoading, error } = useDockerInfo(uuid);
+    const {
+        dockerInfo: info,
+        isLoading,
+        error: errorDockerInfo,
+    } = useDockerInfo(uuid);
 
     const [recreatingContainer, setRecreatingContainer] = useState(false);
     const [recreatingContainerError, setRecreatingContainerError] = useState();
@@ -43,6 +48,15 @@ export default function ContainerDocker() {
                 setRecreatingContainer(false);
             });
     };
+
+    const {
+        reloadContainer,
+        isPending,
+        error: reloadContainerError,
+    } = useReloadContainer();
+
+    const error =
+        errorDockerInfo || recreatingContainerError || reloadContainerError;
 
     if (error) return <APIError error={error} />;
 
@@ -126,15 +140,21 @@ export default function ContainerDocker() {
                     <Button
                         leftIcon={<ArrowClockwise />}
                         onClick={recreateContainer}
-                        disabled={recreatingContainer ?? isLoading}
+                        disabled={recreatingContainer || isLoading}
                     >
                         Recreate container
+                    </Button>
+                    <Button
+                        leftIcon={<ArrowClockwise />}
+                        onClick={() => reloadContainer(uuid)}
+                        disabled={isPending || isLoading}
+                    >
+                        Reload status
                     </Button>
                 </Horizontal>
             </Vertical>
 
-            <ProgressOverlay show={isLoading} />
-            <APIError error={recreatingContainerError} />
+            <ProgressOverlay show={isLoading || isPending} />
         </Content>
     );
 }

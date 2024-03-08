@@ -77,6 +77,7 @@ type (
 	}
 
 	RunnerAdapter interface {
+		GetDockerContainers(ctx context.Context) ([]types.DockerContainer, error)
 		DeleteContainer(ctx context.Context, c *types.Container, volumes []string) error
 		DeleteMounts(ctx context.Context, c *types.Container) error
 		Start(ctx context.Context, c *types.Container, ports types.Ports, volumes types.Volumes, env []types.EnvVariable, caps types.Capabilities, sysctls types.Sysctls, setStatus func(status string)) (stdout io.ReadCloser, stderr io.ReadCloser, err error)

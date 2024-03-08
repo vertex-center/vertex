@@ -819,6 +819,34 @@ func (s *containerService) GetTemplates(ctx context.Context) []types.Template {
 	return s.templates.GetAll()
 }
 
+func (s *containerService) ReloadContainer(ctx context.Context, id uuid.UUID) error {
+	dockerContainers, err := s.runner.GetDockerContainers(ctx)
+	if err != nil {
+		return err
+	}
+
+	container, err := s.containers.GetContainer(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	// Reload status
+	for _, dc := range dockerContainers {
+		if strings.TrimPrefix(dc.Names[0], "/VERTEX_CONTAINER_") == container.ID.String() {
+			if dc.State != container.Status {
+				log.Info("reloading container status",
+					vlog.String("id", container.ID.String()),
+					vlog.String("status", dc.State),
+				)
+				s.setStatus(container, dc.State)
+			}
+			break
+		}
+	}
+
+	return nil
+}
+
 func (s *containerService) setStatus(c *types.Container, status string) {
 	if c.Status == status {
 		return

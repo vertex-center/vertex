@@ -162,6 +162,16 @@ func (h *containerHandler) RecreateDocker() gin.HandlerFunc {
 	}, http.StatusNoContent)
 }
 
+type ReloadContainerParams struct {
+	ContainerID uuid.NullUUID `path:"container_id"`
+}
+
+func (h *containerHandler) ReloadContainer() gin.HandlerFunc {
+	return tonic.Handler(func(ctx *gin.Context, params *ReloadContainerParams) error {
+		return h.containerService.ReloadContainer(ctx, params.ContainerID.UUID)
+	}, http.StatusNoContent)
+}
+
 type LogsContainerParams struct {
 	ContainerID uuid.NullUUID `path:"container_id"`
 }

@@ -12,6 +12,7 @@ type DockerContainer struct {
 	ImageID string   `json:"image_id,omitempty"`
 	Names   []string `json:"names,omitempty"`
 	Mounts  []Mount  `json:"mounts,omitempty"`
+	State   string   `json:"state,omitempty"`
 }
 
 type Mount struct {
@@ -70,11 +71,28 @@ type InfoImageResponse struct {
 type WaitContainerCondition container.WaitCondition
 
 func NewDockerContainer(c dockertypes.Container) DockerContainer {
+	state := c.State
+	switch state {
+	case "created":
+		state = ContainerStatusOff
+	case "running":
+		state = ContainerStatusRunning
+	case "paused":
+		state = "Paused"
+	case "restarting":
+		state = ContainerStatusStarting
+	case "removing":
+		state = ContainerStatusStopping
+	case "exited":
+		state = ContainerStatusOff
+	}
+
 	return DockerContainer{
 		ID:      c.ID,
 		ImageID: c.ImageID,
 		Names:   c.Names,
 		Mounts:  NewMounts(c.Mounts),
+		State:   state,
 	}
 }
 

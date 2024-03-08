@@ -34,6 +34,7 @@ type (
 		GetLatestLogs(id uuid.UUID) ([]types.LogLine, error)
 		GetTemplateByID(ctx context.Context, id string) (*types.Template, error)
 		GetTemplates(ctx context.Context) []types.Template
+		ReloadContainer(ctx context.Context, id uuid.UUID) error
 	}
 
 	EnvService interface {

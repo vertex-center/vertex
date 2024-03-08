@@ -162,6 +162,11 @@ func (m *MockContainerService) GetTemplates(ctx context.Context) []types.Templat
 	return args.Get(0).([]types.Template)
 }
 
+func (m *MockContainerService) ReloadContainer(ctx context.Context, id uuid.UUID) error {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}
+
 func (m *MockTagsService) GetTag(ctx context.Context, userID uuid.UUID, name string) (types.Tag, error) {
 	args := m.Called(ctx, userID, name)
 	return args.Get(0).(types.Tag), args.Error(1)

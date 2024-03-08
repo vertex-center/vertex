@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { API } from "../backend/api";
 import { ContainerFilters } from "../backend/models";
 
@@ -18,4 +18,15 @@ export function useContainers(query: ContainerFilters) {
     });
     const { data: containers } = queryContainers;
     return { containers, ...queryContainers };
+}
+
+export function useReloadContainer() {
+    const mutationReload = useMutation({
+        mutationKey: ["containers"],
+        mutationFn: (id: string) => API.reloadContainer(id),
+    });
+    return {
+        ...mutationReload,
+        reloadContainer: mutationReload.mutate,
+    };
 }

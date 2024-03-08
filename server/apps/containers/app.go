@@ -125,6 +125,11 @@ func (a *App) InitializeRouter(r *fizz.RouterGroup) error {
 		fizz.Response("404", "Container not found", nil, nil, map[string]interface{}{"error": "container not found"}),
 	}, containersHandler.Get())
 
+	containers.POST("/:container_id/reload", []fizz.OperationOption{
+		fizz.ID("reloadContainer"),
+		fizz.Summary("Reload a container"),
+	}, containersHandler.ReloadContainer())
+
 	containers.POST("", []fizz.OperationOption{
 		fizz.ID("createContainer"),
 		fizz.Summary("Create a container"),

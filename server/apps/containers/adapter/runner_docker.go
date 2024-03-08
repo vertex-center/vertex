@@ -27,6 +27,11 @@ func NewRunnerDockerAdapter() port.RunnerAdapter {
 	return runnerDockerAdapter{}
 }
 
+func (a runnerDockerAdapter) GetDockerContainers(ctx context.Context) ([]types.DockerContainer, error) {
+	cli := containersapi.NewContainersKernelClient(ctx)
+	return cli.GetContainers(context.Background())
+}
+
 func (a runnerDockerAdapter) DeleteContainer(ctx context.Context, c *types.Container, volumes []string) error {
 	id, err := a.getContainerID(ctx, *c)
 	if err != nil {

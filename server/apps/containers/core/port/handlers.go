@@ -16,6 +16,7 @@ type (
 		AddContainerTag() gin.HandlerFunc
 		GetDocker() gin.HandlerFunc
 		RecreateDocker() gin.HandlerFunc
+		ReloadContainer() gin.HandlerFunc
 		GetLogs() gin.HandlerFunc
 		GetVersions() gin.HandlerFunc
 		WaitStatus() gin.HandlerFunc

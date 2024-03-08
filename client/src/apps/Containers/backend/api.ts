@@ -64,6 +64,11 @@ const patchContainer = (id: string, params: any) => {
     return server.patch(`/containers/${id}`, params);
 };
 
+const reloadContainer = async (id: string) => {
+    const { data } = await server.post(`/containers/${id}/reload`);
+    return data;
+};
+
 const getLogs = async (id: string) => {
     const { data } = await server.get(`/containers/${id}/logs`);
     return data;
@@ -130,6 +135,7 @@ const getVersions = async (id: string, cache?: boolean) => {
 export const API = {
     getContainer,
     getContainers,
+    reloadContainer,
     getAllTags,
     createContainer,
     deleteContainer,
