@@ -10,7 +10,6 @@ import {
     ListInfo,
     ListItem,
     ListTitle,
-    MaterialIcon,
     Paragraph,
     Title,
     Vertical,
@@ -26,9 +25,9 @@ import Progress, {
 import { APIError } from "../../../../components/Error/APIError";
 import NoItems from "../../../../components/NoItems/NoItems";
 import Popup, { PopupActions } from "../../../../components/Popup/Popup";
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Envelope, Plus } from "@phosphor-icons/react";
+import { Envelope, Plus, Trash } from "@phosphor-icons/react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -69,7 +68,7 @@ function DeleteEmailPopup(props: DeleteEmailPopupProps) {
                 </Button>
                 <Button
                     variant="danger"
-                    rightIcon={<MaterialIcon icon="delete" />}
+                    rightIcon={<Trash />}
                     onClick={() => deleteEmail(email)}
                 >
                     Delete
@@ -195,7 +194,7 @@ export default function AccountEmails() {
                             <ListActions>
                                 <Button
                                     variant="danger"
-                                    rightIcon={<MaterialIcon icon="delete" />}
+                                    rightIcon={<Trash />}
                                     onClick={() => openDeletePopup(m)}
                                 >
                                     Delete
