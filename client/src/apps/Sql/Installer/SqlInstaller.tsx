@@ -92,19 +92,6 @@ export default function SqlInstaller() {
                                 key={template.id}
                                 template={template}
                                 onInstall={() => open(template)}
-                                downloading={downloading.some(
-                                    ({ service: s }) => s.id === template.id
-                                )}
-                                installedCount={
-                                    containers === undefined
-                                        ? undefined
-                                        : Object.values(
-                                              containers ?? []
-                                          )?.filter(
-                                              ({ template_id }) =>
-                                                  template_id === template.id
-                                          )?.length
-                                }
                             />
                         );
                     })}

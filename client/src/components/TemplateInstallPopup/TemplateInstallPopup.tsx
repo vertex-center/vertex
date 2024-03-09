@@ -1,5 +1,5 @@
 import { APIError } from "../Error/APIError";
-import { Button, Paragraph } from "@vertex-center/components";
+import { Button, Link, Paragraph } from "@vertex-center/components";
 import Popup, { PopupActions } from "../Popup/Popup";
 import { Template as ServiceModel } from "../../apps/Containers/backend/template";
 import { useState } from "react";

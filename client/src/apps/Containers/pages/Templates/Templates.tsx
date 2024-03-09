@@ -126,14 +126,6 @@ export default function Templates() {
                             key={template.id}
                             template={template}
                             onInstall={() => openInstallPopup(template)}
-                            downloading={downloading.some(
-                                ({ service: s }) => s.id === template.id
-                            )}
-                            installedCount={
-                                containers?.filter(
-                                    (c) => c.template_id === template.id
-                                )?.length
-                            }
                         />
                     ))}
                 </Grid>
