@@ -120,7 +120,7 @@ export default function Templates() {
                         Or install manually
                     </Button>
                 </Toolbar>
-                <Grid rowSize={200}>
+                <Grid columnSize={200}>
                     {services?.map((template) => (
                         <Service
                             key={template.id}
