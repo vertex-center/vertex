@@ -1,0 +1,14 @@
+@use "../../styles/colors"
+
+.spinner
+    color: colors.$fg-secondary
+    animation: spin 1s linear infinite
+
+    @keyframes spin
+        0%
+            transform: rotate(0deg)
+        100%
+            transform: rotate(360deg)
+
+    &-label
+        color: colors.$fg-secondary

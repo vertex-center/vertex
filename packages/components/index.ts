@@ -66,6 +66,7 @@ import {
 import { Sidebar, SidebarProps } from "./lib/components/Sidebar/Sidebar";
 import { SidebarItemProps } from "./lib/components/Sidebar/SidebarItem";
 import { SidebarGroupProps } from "./lib/components/Sidebar/SidebarGroup";
+import { Spinner, SpinnerProps } from "./lib/components/Spinner/Spinner";
 import { Tabs } from "./lib/components/Tabs/Tabs";
 import { TabItem } from "./lib/components/Tabs/TabItem";
 import {
@@ -123,6 +124,7 @@ export type {
     SidebarProps,
     SidebarItemProps,
     SidebarGroupProps,
+    SpinnerProps,
     TableProps,
     TableRowProps,
     TableCellProps,
@@ -165,6 +167,7 @@ export {
     SelectField,
     SelectOption,
     Sidebar,
+    Spinner,
     Tabs,
     TabItem,
     Table,
