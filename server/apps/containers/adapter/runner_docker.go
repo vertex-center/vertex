@@ -239,7 +239,7 @@ func (a runnerDockerAdapter) Start(
 		} else {
 			setStatus(types.ContainerStatusOff)
 		}
-	}(ctx)
+	}(context.WithoutCancel(ctx))
 
 	return rOut, rErr, nil
 }

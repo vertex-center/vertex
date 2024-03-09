@@ -320,6 +320,9 @@ func (s *containerService) Start(ctx context.Context, id uuid.UUID) error {
 		return nil
 	}
 
+	// We don't want to cancel a container start operation.
+	ctx = context.WithoutCancel(ctx)
+
 	if !s.logs.Exists(id) {
 		err = s.logs.Register(id)
 		if err != nil {
@@ -501,6 +504,8 @@ func (s *containerService) Stop(ctx context.Context, id uuid.UUID) error {
 		})
 		return ErrContainerNotRunning
 	}
+
+	ctx = context.WithoutCancel(ctx)
 
 	// Log stopped
 	s.ctx.DispatchEvent(types.EventContainerLog{
