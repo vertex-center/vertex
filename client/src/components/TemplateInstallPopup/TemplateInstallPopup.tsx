@@ -38,7 +38,7 @@ export default function TemplateInstallPopup(props: Readonly<Props>) {
     };
 
     const open = () => {
-        navigate(`/containers/${container.id}`);
+        navigate(`/containers/${container.id}/logs`);
     };
 
     const { createContainer, isCreatingContainer, errorCreatingContainer } =
