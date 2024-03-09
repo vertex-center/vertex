@@ -134,7 +134,6 @@ export default function Templates() {
                 service={selectedTemplate}
                 show={showInstallPopup}
                 dismiss={closeInstallPopup}
-                install={install}
             />
             <ManualInstallPopup
                 show={showManualInstallPopup}
