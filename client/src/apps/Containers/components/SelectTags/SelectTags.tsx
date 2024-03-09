@@ -1,7 +1,6 @@
 import { SelectField, SelectOption } from "@vertex-center/components";
 import { useContainersTags } from "../../hooks/useContainers";
 import { Tag } from "@phosphor-icons/react";
-import { Fragment } from "react";
 
 type Props = {
     selected?: string[];

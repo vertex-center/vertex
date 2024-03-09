@@ -10,7 +10,6 @@ import {
 } from "@vertex-center/components";
 import Spacer from "../../../../components/Spacer/Spacer";
 import { APIError } from "../../../../components/Error/APIError";
-import { useState } from "react";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import { useLogin } from "../../hooks/useLogin";
 import { Link, useNavigate } from "react-router-dom";

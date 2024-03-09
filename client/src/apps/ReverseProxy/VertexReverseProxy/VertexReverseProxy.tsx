@@ -1,5 +1,5 @@
 import { api } from "../../../backend/api/backend";
-import React, { Fragment, useState } from "react";
+import React, { useState } from "react";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import styles from "./VertexReverseProxy.module.sass";
 import { APIError } from "../../../components/Error/APIError";

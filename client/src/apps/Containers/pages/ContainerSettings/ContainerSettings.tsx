@@ -23,7 +23,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Content from "../../../../components/Content/Content";
 import { API } from "../../backend/api";
 import { ArrowClockwise, FloppyDiskBack } from "@phosphor-icons/react";
-import NoItems from "../../../../components/NoItems/NoItems";
 
 export default function ContainerSettings() {
     const { uuid } = useParams();

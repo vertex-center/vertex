@@ -17,7 +17,7 @@ import {
 import { SiPostgresql, SiSqlite } from "@icons-pack/react-simple-icons";
 import styles from "./SettingsDb.module.sass";
 import Popup, { PopupActions } from "../../../components/Popup/Popup";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { useDBMS } from "../hooks/useDBMS";
 import Progress, {
     ProgressOverlay,

@@ -1,5 +1,4 @@
 import "../Login/Login.sass";
-import { useState } from "react";
 import { useRegister } from "../../hooks/useRegister";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import {

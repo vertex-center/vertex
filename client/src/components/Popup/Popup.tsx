@@ -1,5 +1,5 @@
 import styles from "./Popup.module.sass";
-import { HTMLProps, PropsWithChildren, ReactNode, useEffect } from "react";
+import { HTMLProps, ReactNode, useEffect } from "react";
 import classNames from "classnames";
 import { Title, Vertical } from "@vertex-center/components";
 

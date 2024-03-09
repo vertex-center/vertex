@@ -1,6 +1,5 @@
 import Popup, { PopupActions } from "../../../../components/Popup/Popup";
 import { Button, FormItem, Input, Vertical } from "@vertex-center/components";
-import { Fragment } from "react";
 import { APIError } from "../../../../components/Error/APIError";
 import { useCreateContainer } from "../../hooks/useCreateContainer";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
