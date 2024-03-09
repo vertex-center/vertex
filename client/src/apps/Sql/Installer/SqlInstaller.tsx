@@ -2,7 +2,7 @@ import { api } from "../../../backend/api/backend";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import Service from "../../../components/Service/Service";
 import { Template as ServiceModel } from "../../Containers/backend/template";
-import ServiceInstallPopup from "../../../components/ServiceInstallPopup/ServiceInstallPopup";
+import TemplateInstallPopup from "../../../components/TemplateInstallPopup/TemplateInstallPopup";
 import { useState } from "react";
 import { APIError } from "../../../components/Error/APIError";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -109,7 +109,7 @@ export default function SqlInstaller() {
                         );
                     })}
             </List>
-            <ServiceInstallPopup
+            <TemplateInstallPopup
                 service={selectedService}
                 show={showPopup}
                 dismiss={dismiss}

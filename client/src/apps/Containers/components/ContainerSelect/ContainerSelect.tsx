@@ -37,7 +37,7 @@ export default function ContainerSelect(props: Readonly<Props>) {
 
     const value = (
         <Fragment>
-            {container && <ServiceLogo service={container?.service} />}
+            {container && <ServiceLogo template={container?.service} />}
             {container?.name ?? "Select an container"}
         </Fragment>
     );
@@ -48,7 +48,7 @@ export default function ContainerSelect(props: Readonly<Props>) {
             <SelectOption value="">None</SelectOption>
             {Object.entries(containers ?? [])?.map(([, c]) => (
                 <SelectOption key={c?.id} value={c?.id}>
-                    <ServiceLogo service={c?.service} />
+                    <ServiceLogo template={c?.service} />
                     {c?.name}
                 </SelectOption>
             ))}

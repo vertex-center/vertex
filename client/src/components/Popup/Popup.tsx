@@ -1,5 +1,5 @@
 import styles from "./Popup.module.sass";
-import { HTMLProps, PropsWithChildren, useEffect } from "react";
+import { HTMLProps, PropsWithChildren, ReactNode, useEffect } from "react";
 import classNames from "classnames";
 import { Title, Vertical } from "@vertex-center/components";
 
@@ -10,14 +10,15 @@ export function PopupActions(props: HTMLProps<HTMLDivElement>) {
     );
 }
 
-type Props = PropsWithChildren<{
+type Props = HTMLProps<HTMLDivElement> & {
     show: boolean;
     onDismiss: () => void;
     title: string;
-}>;
+    image?: ReactNode;
+};
 
 export default function Popup(props: Readonly<Props>) {
-    const { show, onDismiss, title, children } = props;
+    const { show, onDismiss, title, image, children, ...others } = props;
 
     if (!show) return null;
 
@@ -34,11 +35,14 @@ export default function Popup(props: Readonly<Props>) {
     return (
         <div>
             <div className={styles.overlay} onClick={onDismiss} />
-            <div className={styles.popup}>
-                <div className={styles.header}>
-                    <Title variant="h3">{title}</Title>
+            <div className={styles.popup} {...others}>
+                <div className={styles.image}>{image}</div>
+                <div className={styles.content}>
+                    <div className={styles.header}>
+                        <Title variant="h3">{title}</Title>
+                    </div>
+                    <Vertical gap={20}>{children}</Vertical>
                 </div>
-                <Vertical gap={20}>{children}</Vertical>
             </div>
         </div>
     );

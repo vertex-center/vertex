@@ -4,7 +4,7 @@ import styles from "./Templates.module.sass";
 import Service from "../../../../components/Service/Service";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
-import ServiceInstallPopup from "../../../../components/ServiceInstallPopup/ServiceInstallPopup";
+import TemplateInstallPopup from "../../../../components/TemplateInstallPopup/TemplateInstallPopup";
 import { useQuery } from "@tanstack/react-query";
 import {
     Button,
@@ -138,7 +138,7 @@ export default function Templates() {
                     ))}
                 </Grid>
             </Vertical>
-            <ServiceInstallPopup
+            <TemplateInstallPopup
                 service={selectedTemplate}
                 show={showInstallPopup}
                 dismiss={closeInstallPopup}

@@ -5,7 +5,6 @@
     border-radius: dimensions.$border-radius-lg
     background-color: colors.$bg-primary
     position: fixed
-    padding: 25px
     top: 50%
     left: 50%
     transform: translate(-50%, -50%)
@@ -14,6 +13,16 @@
     display: flex
     flex-direction: column
     min-width: 500px
+    overflow: hidden
+    animation: fadeIn 0.2s ease
+
+    @keyframes fadeIn
+        from
+            transform: translate(-50%, -50%) scale(0.95)
+            opacity: 0
+        to
+            transform: translate(-50%, -50%) scale(1)
+            opacity: 1
 
     @include dimensions.small-or-less
         width: calc(100vw - 100px)
@@ -24,6 +33,15 @@
     flex-direction: row
     gap: 10px
     justify-content: flex-end
+
+.image
+    border-radius: dimensions.$border-radius
+    background-color: colors.$bg-secondary
+    text-align: center
+    overflow: hidden
+
+.content
+    padding: 24px
 
 .header
     margin-top: 0

@@ -1,5 +1,4 @@
 import { Template } from "../../apps/Containers/backend/template";
-import { MaterialIcon } from "@vertex-center/components";
 import { PuzzlePiece } from "@phosphor-icons/react";
 
 type Props = {
