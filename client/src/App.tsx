@@ -18,7 +18,7 @@ import SettingsAbout from "./apps/AdminSettings/SettingsAbout/SettingsAbout";
 import SettingsUpdates from "./apps/AdminSettings/SettingsUpdates/SettingsUpdates";
 import ContainerDocker from "./apps/Containers/pages/ContainerDocker/ContainerDocker";
 import ContainerSettings from "./apps/Containers/pages/ContainerSettings/ContainerSettings";
-import ContainersStore from "./apps/Containers/pages/ContainersStore/ContainersStore";
+import Templates from "./apps/Containers/pages/Templates/Templates";
 import Dock from "./components/Dock/Dock";
 import ContainerUpdate from "./apps/Containers/pages/ContainerUpdate/ContainerUpdate";
 import ReverseProxyApp from "./apps/ReverseProxy/ReverseProxyApp/ReverseProxyApp";
@@ -121,8 +121,8 @@ function AllRoutes() {
                         />
                         <Route path="/containers" element={<ContainersApp />} />
                         <Route
-                            path="/containers/add"
-                            element={<ContainersStore />}
+                            path="/containers/templates"
+                            element={<Templates />}
                         />
                         <Route path="/sql" element={<SqlApp />}>
                             <Route

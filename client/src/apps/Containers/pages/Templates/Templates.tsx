@@ -1,20 +1,15 @@
 import { Template as ServiceModel } from "../../backend/template";
 import React, { useState } from "react";
-import styles from "./ContainersStore.module.sass";
+import styles from "./Templates.module.sass";
 import Service from "../../../../components/Service/Service";
 import { APIError } from "../../../../components/Error/APIError";
 import { ProgressOverlay } from "../../../../components/Progress/Progress";
 import ServiceInstallPopup from "../../../../components/ServiceInstallPopup/ServiceInstallPopup";
 import { useQuery } from "@tanstack/react-query";
 import {
-    List,
-    ListActions,
-    ListDescription,
-    ListIcon,
-    ListInfo,
-    ListItem,
-    ListTitle,
-    Title,
+    Button,
+    Grid,
+    Input,
     useTitle,
     Vertical,
 } from "@vertex-center/components";
@@ -23,13 +18,14 @@ import Content from "../../../../components/Content/Content";
 import { SiDocker } from "@icons-pack/react-simple-icons";
 import ManualInstallPopup from "./ManualInstallPopup";
 import { useCreateContainer } from "../../hooks/useCreateContainer";
-import { DownloadSimple } from "@phosphor-icons/react";
+import Spacer from "../../../../components/Spacer/Spacer";
+import Toolbar from "../../../../components/Toolbar/Toolbar";
 
 type Downloading = {
     service: ServiceModel;
 };
 
-export default function ContainersStore() {
+export default function Templates() {
     useTitle("Create container");
 
     const queryServices = useQuery({
@@ -107,28 +103,24 @@ export default function ContainersStore() {
                     isCreatingContainer
                 }
             />
-            <Vertical gap={30} className={styles.content}>
-                <List>
-                    <ListItem onClick={openManualInstallPopup}>
-                        <ListIcon>
-                            <SiDocker />
-                        </ListIcon>
-                        <ListInfo>
-                            <ListTitle>
-                                Manually from a Docker Registry
-                            </ListTitle>
-                            <ListDescription>
-                                This will need manual configuration
-                            </ListDescription>
-                        </ListInfo>
-                        <ListActions>
-                            <DownloadSimple />
-                        </ListActions>
-                    </ListItem>
-                </List>
-                <Title variant="h2">From template</Title>
+            <Vertical gap={12} className={styles.content}>
                 <APIError error={error} />
-                <List>
+                <Toolbar>
+                    <Input
+                        placeholder="Search templates..."
+                        style={{ width: 300 }}
+                        disabled
+                    />
+                    <Spacer />
+                    <Button
+                        variant="colored"
+                        rightIcon={<SiDocker size={20} />}
+                        onClick={openManualInstallPopup}
+                    >
+                        Or install manually
+                    </Button>
+                </Toolbar>
+                <Grid rowSize={200}>
                     {services?.map((template) => (
                         <Service
                             key={template.id}
@@ -144,7 +136,7 @@ export default function ContainersStore() {
                             }
                         />
                     ))}
-                </List>
+                </Grid>
             </Vertical>
             <ServiceInstallPopup
                 service={selectedTemplate}

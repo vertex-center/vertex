@@ -33,7 +33,7 @@ const ToolbarContainers = (props: ToolbarProps) => {
             <Spacer />
             <Button
                 variant="colored"
-                onClick={() => navigate("/containers/add")}
+                onClick={() => navigate("/containers/templates")}
                 rightIcon={<Plus />}
             >
                 Create container

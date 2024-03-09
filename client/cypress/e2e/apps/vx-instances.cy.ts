@@ -17,7 +17,7 @@ describe("The Vertex Containers app", () => {
         // Navigate to the create container page
         cy.visit("/containers");
         cy.contains("Create container").click();
-        cy.url().should("include", "/containers/add");
+        cy.url().should("include", "/containers/templates");
 
         // Create an container
         cy.contains("Postgres").click();
