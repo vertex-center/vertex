@@ -19,7 +19,7 @@ func NewPortsHandler(service port.PortsService) port.PortsHandler {
 }
 
 type GetContainerPortsParams struct {
-	ContainerID uuid.NullUUID `json:"container_id"`
+	ContainerID uuid.NullUUID `query:"container_id"`
 }
 
 func (h *portsHandler) GetPorts() gin.HandlerFunc {

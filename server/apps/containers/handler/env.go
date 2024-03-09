@@ -19,7 +19,7 @@ func NewEnvHandler(service port.EnvService) port.EnvHandler {
 }
 
 type GetContainerEnvParams struct {
-	ContainerID uuid.NullUUID `json:"container_id"`
+	ContainerID uuid.NullUUID `query:"container_id"`
 }
 
 func (h *envHandler) GetEnv() gin.HandlerFunc {
