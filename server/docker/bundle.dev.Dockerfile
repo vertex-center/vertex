@@ -12,4 +12,4 @@ ARG APP_KIND=main
 
 EXPOSE 80 7500 7502 7504 7505 7506 7508 7510 7512 7514 7516 7518
 
-ENTRYPOINT CompileDaemon -build='go build -o binary ./cmd/'"$APP_KIND" -directory=. -command=./binary
+ENTRYPOINT CompileDaemon -build='go build -o binary-'"$APP_KIND"' ./cmd/'"$APP_KIND" -directory=. -command=./binary-$APP_KIND
