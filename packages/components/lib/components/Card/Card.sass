@@ -1,0 +1,14 @@
+@use "../../styles/colors"
+@use "../../styles/dimensions"
+
+.card
+    display: flex
+    flex-direction: column
+    gap: 12px
+    border-radius: dimensions.$border-radius-lg
+    background-color: colors.$bg-secondary
+    padding: 20px
+    cursor: pointer
+
+    &:hover
+        background-color: colors.$bg-secondary-hover

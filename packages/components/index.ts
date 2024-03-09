@@ -1,5 +1,6 @@
 import { Box, BoxProps, BoxType } from "./lib/components/Box/Box";
 import { Button, ButtonProps } from "./lib/components/Button/Button";
+import { Card, CardProps } from "./lib/components/Card/Card";
 import { Checkbox, CheckboxProps } from "./lib/components/Checkbox/Checkbox";
 import { Code, CodeProps } from "./lib/components/Code/Code";
 import {
@@ -12,6 +13,7 @@ import {
     FormItem,
     FormItemProps,
 } from "./lib/components/FormItem/FormItem.tsx";
+import { Grid, GridProps } from "./lib/components/Grid/Grid";
 import { Header, HeaderProps } from "./lib/components/Header/Header";
 import {
     HeaderItem,
@@ -93,11 +95,13 @@ export type {
     BoxProps,
     BoxType,
     ButtonProps,
+    CardProps,
     CheckboxProps,
     CodeProps,
     DropdownProps,
     DropdownItemProps,
     FormItemProps,
+    GridProps,
     HeaderProps,
     HeaderItemProps,
     InlineCodeProps,
@@ -131,11 +135,13 @@ export type {
 export {
     Box,
     Button,
+    Card,
     Checkbox,
     Code,
     Dropdown,
     DropdownItem,
     FormItem,
+    Grid,
     Header,
     HeaderItem,
     PageContext,
