@@ -87,8 +87,9 @@ func (a runnerDockerAdapter) Start(
 		// Build
 		stdout, err := a.buildImageFromName(ctx, c.GetImageNameWithTag())
 		if err != nil {
-			log.Error(err)
+			log.Error(err, vlog.String("step", "build"))
 			setStatus(types.ContainerStatusError)
+			_, _ = wErr.Write([]byte(err.Error() + "\n"))
 			return
 		}
 
@@ -105,8 +106,10 @@ func (a runnerDockerAdapter) Start(
 				err := json.Unmarshal(scanner.Bytes(), &msg)
 				if err != nil {
 					log.Error(err,
+						vlog.String("step", "build"),
 						vlog.String("text", scanner.Text()),
 						vlog.String("id", c.ID.String()))
+					_, _ = wErr.Write([]byte(err.Error() + "\n"))
 					continue
 				}
 
@@ -123,24 +126,30 @@ func (a runnerDockerAdapter) Start(
 				progressJSON, err := json.Marshal(progress)
 				if err != nil {
 					log.Error(err,
+						vlog.String("step", "build"),
 						vlog.String("text", scanner.Text()),
 						vlog.String("id", c.ID.String()))
+					_, _ = wErr.Write([]byte(err.Error() + "\n"))
 					continue
 				}
 
 				_, err = fmt.Fprintf(wOut, "%s %s\n", "DOWNLOAD", progressJSON)
 				if err != nil {
 					log.Error(err,
+						vlog.String("step", "build"),
 						vlog.String("text", scanner.Text()),
 						vlog.String("id", c.ID.String()))
 					setStatus(types.ContainerStatusError)
+					_, _ = wErr.Write([]byte(err.Error() + "\n"))
 					return
 				}
 			}
 			if scanner.Err() != nil {
 				log.Error(scanner.Err(),
+					vlog.String("step", "build"),
 					vlog.String("id", c.ID.String()))
 				setStatus(types.ContainerStatusError)
+				_, _ = wErr.Write([]byte(err.Error() + "\n"))
 				return
 			}
 		}()
@@ -182,13 +191,15 @@ func (a runnerDockerAdapter) Start(
 
 			id, err = a.createContainer(ctx, opts)
 			if err != nil {
-				log.Error(err)
+				log.Error(err, vlog.String("step", "create"))
 				setStatus(types.ContainerStatusError)
+				_, _ = wErr.Write([]byte(err.Error() + "\n"))
 				return
 			}
 		} else if err != nil {
-			log.Error(err)
+			log.Error(err, vlog.String("step", "create"))
 			setStatus(types.ContainerStatusError)
+			_, _ = wErr.Write([]byte(err.Error() + "\n"))
 			return
 		}
 
@@ -196,8 +207,9 @@ func (a runnerDockerAdapter) Start(
 		cli := containersapi.NewContainersKernelClient(ctx)
 		err = cli.StartContainer(context.Background(), id)
 		if err != nil {
-			log.Error(err)
+			log.Error(err, vlog.String("step", "start"))
 			setStatus(types.ContainerStatusError)
+			_, _ = wErr.Write([]byte(err.Error() + "\n"))
 			return
 		}
 		setStatus(types.ContainerStatusRunning)
@@ -205,8 +217,9 @@ func (a runnerDockerAdapter) Start(
 		var stderr io.ReadCloser
 		stdout, stderr, err = a.readLogs(ctx, id)
 		if err != nil {
-			log.Error(err)
+			log.Error(err, vlog.String("step", "read logs"))
 			setStatus(types.ContainerStatusError)
+			_, _ = wErr.Write([]byte(err.Error() + "\n"))
 			return
 		}
 
@@ -234,8 +247,9 @@ func (a runnerDockerAdapter) Start(
 
 		err = a.WaitCondition(ctx, c, types.WaitContainerCondition(container.WaitConditionNotRunning))
 		if err != nil {
-			log.Error(err)
+			log.Error(err, vlog.String("step", "wait condition"))
 			setStatus(types.ContainerStatusError)
+			_, _ = wErr.Write([]byte(err.Error() + "\n"))
 		} else {
 			setStatus(types.ContainerStatusOff)
 		}

@@ -388,6 +388,13 @@ func (s *containerService) Start(ctx context.Context, id uuid.UUID) error {
 	stdout, stderr, err := s.runner.Start(ctx, c, ports, volumes, env, caps, sysctls, setStatus)
 	if err != nil {
 		s.setStatus(c, types.ContainerStatusError)
+
+		s.ctx.DispatchEvent(types.EventContainerLog{
+			ContainerID: id,
+			Kind:        types.LogKindVertexErr,
+			Message:     types.NewLogLineMessageString(err.Error()),
+		})
+
 		return err
 	}
 
@@ -401,6 +408,13 @@ func (s *containerService) Start(ctx context.Context, id uuid.UUID) error {
 				err := json.Unmarshal([]byte(msg), &downloadProgress)
 				if err != nil {
 					log.Error(err)
+
+					s.ctx.DispatchEvent(types.EventContainerLog{
+						ContainerID: id,
+						Kind:        types.LogKindOut,
+						Message:     types.NewLogLineMessageString(err.Error()),
+					})
+
 					continue
 				}
 
@@ -420,6 +434,12 @@ func (s *containerService) Start(ctx context.Context, id uuid.UUID) error {
 		}
 		if scanner.Err() != nil {
 			log.Error(scanner.Err())
+
+			s.ctx.DispatchEvent(types.EventContainerLog{
+				ContainerID: id,
+				Kind:        types.LogKindErr,
+				Message:     types.NewLogLineMessageString(scanner.Err().Error()),
+			})
 		}
 	}()
 
@@ -432,8 +452,15 @@ func (s *containerService) Start(ctx context.Context, id uuid.UUID) error {
 				Message:     types.NewLogLineMessageString(scanner.Text()),
 			})
 		}
+
 		if scanner.Err() != nil {
 			log.Error(scanner.Err())
+
+			s.ctx.DispatchEvent(types.EventContainerLog{
+				ContainerID: id,
+				Kind:        types.LogKindErr,
+				Message:     types.NewLogLineMessageString(scanner.Err().Error()),
+			})
 		}
 	}()
 
@@ -446,6 +473,12 @@ func (s *containerService) Start(ctx context.Context, id uuid.UUID) error {
 		err := s.WaitStatus(ctx, id, types.ContainerStatusRunning)
 		if err != nil {
 			log.Error(err)
+
+			s.ctx.DispatchEvent(types.EventContainerLog{
+				ContainerID: id,
+				Kind:        types.LogKindVertexErr,
+				Message:     types.NewLogLineMessageString(err.Error()),
+			})
 		}
 	}()
 	wg.Wait()
