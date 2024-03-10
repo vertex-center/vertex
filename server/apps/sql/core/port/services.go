@@ -3,8 +3,8 @@ package port
 import (
 	"context"
 
-	"github.com/vertex-center/vertex/apps/containers/core/types"
-	sqltypes "github.com/vertex-center/vertex/apps/sql/core/types"
+	"github.com/vertex-center/vertex/server/apps/containers/core/types"
+	sqltypes "github.com/vertex-center/vertex/server/apps/sql/core/types"
 )
 
 type SqlService interface {

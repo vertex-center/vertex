@@ -6,9 +6,9 @@ import (
 
 	"github.com/juju/errors"
 	"github.com/vertex-center/uuid"
-	"github.com/vertex-center/vertex/apps/containers/core/port"
-	"github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/common/storage"
+	"github.com/vertex-center/vertex/server/apps/containers/core/port"
+	"github.com/vertex-center/vertex/server/apps/containers/core/types"
+	"github.com/vertex-center/vertex/server/common/storage"
 )
 
 type sysctlDBAdapter struct {

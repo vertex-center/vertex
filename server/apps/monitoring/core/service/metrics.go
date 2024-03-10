@@ -5,10 +5,10 @@ import (
 
 	"github.com/juju/errors"
 	"github.com/vertex-center/uuid"
-	containersapi "github.com/vertex-center/vertex/apps/containers/api"
-	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/apps/monitoring/core/port"
-	"github.com/vertex-center/vertex/apps/monitoring/core/types"
+	containersapi "github.com/vertex-center/vertex/server/apps/containers/api"
+	containerstypes "github.com/vertex-center/vertex/server/apps/containers/core/types"
+	"github.com/vertex-center/vertex/server/apps/monitoring/core/port"
+	"github.com/vertex-center/vertex/server/apps/monitoring/core/types"
 )
 
 type metricsService struct {

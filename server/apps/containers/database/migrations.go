@@ -2,7 +2,7 @@ package database
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/vertex-center/vertex/pkg/vsql"
+	"github.com/vertex-center/vertex/server/pkg/vsql"
 )
 
 var Migrations = []vsql.Migration{

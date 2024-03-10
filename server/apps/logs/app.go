@@ -1,13 +1,13 @@
 package logs
 
 import (
-	"github.com/vertex-center/vertex/apps/logs/adapter"
-	"github.com/vertex-center/vertex/apps/logs/core/port"
-	"github.com/vertex-center/vertex/apps/logs/core/service"
-	"github.com/vertex-center/vertex/apps/logs/handler"
-	"github.com/vertex-center/vertex/apps/logs/meta"
-	"github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/common/app/appmeta"
+	"github.com/vertex-center/vertex/server/apps/logs/adapter"
+	"github.com/vertex-center/vertex/server/apps/logs/core/port"
+	"github.com/vertex-center/vertex/server/apps/logs/core/service"
+	"github.com/vertex-center/vertex/server/apps/logs/handler"
+	"github.com/vertex-center/vertex/server/apps/logs/meta"
+	"github.com/vertex-center/vertex/server/common/app"
+	"github.com/vertex-center/vertex/server/common/app/appmeta"
 	"github.com/wI2L/fizz"
 )
 

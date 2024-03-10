@@ -1,8 +1,8 @@
 package meta
 
 import (
-	logsmeta "github.com/vertex-center/vertex/apps/logs/meta"
-	"github.com/vertex-center/vertex/common/app/appmeta"
+	logsmeta "github.com/vertex-center/vertex/server/apps/logs/meta"
+	"github.com/vertex-center/vertex/server/common/app/appmeta"
 )
 
 var Meta = appmeta.Meta{

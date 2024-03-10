@@ -5,7 +5,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/vertex-center/vertex/common/baseline"
+	"github.com/vertex-center/vertex/server/common/baseline"
 )
 
 type About struct {

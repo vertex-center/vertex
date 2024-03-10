@@ -4,11 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/juju/errors"
 	"github.com/vertex-center/uuid"
-	containersapi "github.com/vertex-center/vertex/apps/containers/api"
-	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/apps/sql/core/port"
-	"github.com/vertex-center/vertex/apps/sql/core/types"
-	"github.com/vertex-center/vertex/pkg/router"
+	containersapi "github.com/vertex-center/vertex/server/apps/containers/api"
+	containerstypes "github.com/vertex-center/vertex/server/apps/containers/core/types"
+	"github.com/vertex-center/vertex/server/apps/sql/core/port"
+	"github.com/vertex-center/vertex/server/apps/sql/core/types"
+	"github.com/vertex-center/vertex/server/pkg/router"
 )
 
 type dbmsHandler struct {

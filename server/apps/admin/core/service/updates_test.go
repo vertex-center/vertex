@@ -6,9 +6,9 @@ import (
 
 	"github.com/h2non/gock"
 	"github.com/stretchr/testify/suite"
-	"github.com/vertex-center/vertex/common"
-	apptypes "github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/common/baseline"
+	"github.com/vertex-center/vertex/server/common"
+	apptypes "github.com/vertex-center/vertex/server/common/app"
+	"github.com/vertex-center/vertex/server/common/baseline"
 )
 
 type UpdateServiceTestSuite struct {

@@ -1,7 +1,7 @@
 package meta
 
 import (
-	"github.com/vertex-center/vertex/common/app/appmeta"
+	"github.com/vertex-center/vertex/server/common/app/appmeta"
 )
 
 var Meta = appmeta.Meta{

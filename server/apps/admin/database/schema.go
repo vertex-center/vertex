@@ -3,7 +3,7 @@ package database
 import (
 	"time"
 
-	"github.com/vertex-center/vertex/pkg/vsql"
+	"github.com/vertex-center/vertex/server/pkg/vsql"
 )
 
 func GetSchema(driver vsql.Driver) string {

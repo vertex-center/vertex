@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"github.com/vertex-center/vertex/common/baseline"
+	"github.com/vertex-center/vertex/server/common/baseline"
 )
 
 type AboutTestSuite struct {

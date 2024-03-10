@@ -1,16 +1,16 @@
 package auth
 
 import (
-	"github.com/vertex-center/vertex/apps/auth/adapter"
-	"github.com/vertex-center/vertex/apps/auth/core/port"
-	"github.com/vertex-center/vertex/apps/auth/core/service"
-	"github.com/vertex-center/vertex/apps/auth/database"
-	"github.com/vertex-center/vertex/apps/auth/handler"
-	"github.com/vertex-center/vertex/apps/auth/meta"
-	"github.com/vertex-center/vertex/apps/auth/middleware"
-	"github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/common/app/appmeta"
-	"github.com/vertex-center/vertex/common/storage"
+	"github.com/vertex-center/vertex/server/apps/auth/adapter"
+	"github.com/vertex-center/vertex/server/apps/auth/core/port"
+	"github.com/vertex-center/vertex/server/apps/auth/core/service"
+	"github.com/vertex-center/vertex/server/apps/auth/database"
+	"github.com/vertex-center/vertex/server/apps/auth/handler"
+	"github.com/vertex-center/vertex/server/apps/auth/meta"
+	"github.com/vertex-center/vertex/server/apps/auth/middleware"
+	"github.com/vertex-center/vertex/server/common/app"
+	"github.com/vertex-center/vertex/server/common/app/appmeta"
+	"github.com/vertex-center/vertex/server/common/storage"
 	"github.com/wI2L/fizz"
 )
 

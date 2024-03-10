@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/vertex-center/uuid"
-	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
+	containerstypes "github.com/vertex-center/vertex/server/apps/containers/core/types"
 
 	"github.com/stretchr/testify/suite"
 )

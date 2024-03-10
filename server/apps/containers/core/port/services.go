@@ -7,8 +7,8 @@ import (
 	vtypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/vertex-center/uuid"
-	"github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/apps/monitoring/core/types/metric"
+	"github.com/vertex-center/vertex/server/apps/containers/core/types"
+	"github.com/vertex-center/vertex/server/apps/monitoring/core/types/metric"
 )
 
 type (

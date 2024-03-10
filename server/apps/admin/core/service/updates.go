@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/vertex-center/vertex/apps/admin/core/port"
-	"github.com/vertex-center/vertex/apps/admin/core/types"
-	apptypes "github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/common/baseline"
+	"github.com/vertex-center/vertex/server/apps/admin/core/port"
+	"github.com/vertex-center/vertex/server/apps/admin/core/types"
+	apptypes "github.com/vertex-center/vertex/server/common/app"
+	"github.com/vertex-center/vertex/server/common/baseline"
 )
 
 type updateService struct {

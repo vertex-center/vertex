@@ -4,8 +4,8 @@ import (
 	"path"
 	"sync"
 
-	"github.com/vertex-center/vertex/apps/logs/core/port"
-	"github.com/vertex-center/vertex/common/storage"
+	"github.com/vertex-center/vertex/server/apps/logs/core/port"
+	"github.com/vertex-center/vertex/server/common/storage"
 	"github.com/vertex-center/vlog"
 )
 

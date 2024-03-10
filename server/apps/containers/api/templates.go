@@ -3,7 +3,7 @@ package containersapi
 import (
 	"context"
 
-	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/server/apps/containers/core/types"
 )
 
 func (c *Client) GetTemplate(ctx context.Context, templateID string) (types.Template, error) {

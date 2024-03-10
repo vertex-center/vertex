@@ -1,8 +1,8 @@
 package adapter
 
 import (
-	"github.com/vertex-center/vertex/apps/sql/core/port"
-	"github.com/vertex-center/vertex/apps/sql/core/types"
+	"github.com/vertex-center/vertex/server/apps/sql/core/port"
+	"github.com/vertex-center/vertex/server/apps/sql/core/types"
 )
 
 type sqlDBMSAdapter struct{}

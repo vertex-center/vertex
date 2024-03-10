@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 
-	"github.com/vertex-center/vertex/apps/auth/core/types"
+	"github.com/vertex-center/vertex/server/apps/auth/core/types"
 )
 
 func (c *Client) Verify(ctx context.Context) (types.Session, error) {

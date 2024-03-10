@@ -1,6 +1,6 @@
 package vsql
 
-import "github.com/vertex-center/vertex/pkg/vsql/driver"
+import "github.com/vertex-center/vertex/server/pkg/vsql/driver"
 
 type Driver interface {
 	AutoIncrement() string

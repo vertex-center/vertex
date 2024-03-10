@@ -1,17 +1,17 @@
 package admin
 
 import (
-	"github.com/vertex-center/vertex/apps/admin/adapter"
-	"github.com/vertex-center/vertex/apps/admin/core/port"
-	"github.com/vertex-center/vertex/apps/admin/core/service"
-	"github.com/vertex-center/vertex/apps/admin/database"
-	"github.com/vertex-center/vertex/apps/admin/handler"
-	"github.com/vertex-center/vertex/apps/admin/meta"
-	authmiddleware "github.com/vertex-center/vertex/apps/auth/middleware"
-	"github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/common/app/appmeta"
-	"github.com/vertex-center/vertex/common/middleware"
-	"github.com/vertex-center/vertex/common/storage"
+	"github.com/vertex-center/vertex/server/apps/admin/adapter"
+	"github.com/vertex-center/vertex/server/apps/admin/core/port"
+	"github.com/vertex-center/vertex/server/apps/admin/core/service"
+	"github.com/vertex-center/vertex/server/apps/admin/database"
+	"github.com/vertex-center/vertex/server/apps/admin/handler"
+	"github.com/vertex-center/vertex/server/apps/admin/meta"
+	authmiddleware "github.com/vertex-center/vertex/server/apps/auth/middleware"
+	"github.com/vertex-center/vertex/server/common/app"
+	"github.com/vertex-center/vertex/server/common/app/appmeta"
+	"github.com/vertex-center/vertex/server/common/middleware"
+	"github.com/vertex-center/vertex/server/common/storage"
 	"github.com/wI2L/fizz"
 )
 

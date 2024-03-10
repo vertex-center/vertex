@@ -11,14 +11,14 @@ import (
 
 	"github.com/juju/errors"
 	"github.com/vertex-center/uuid"
-	"github.com/vertex-center/vertex/apps/containers/core/port"
-	"github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/common/log"
-	"github.com/vertex-center/vertex/common/storage"
-	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/pkg/event"
-	vstorage "github.com/vertex-center/vertex/pkg/storage"
+	"github.com/vertex-center/vertex/server/apps/containers/core/port"
+	"github.com/vertex-center/vertex/server/apps/containers/core/types"
+	"github.com/vertex-center/vertex/server/common/app"
+	"github.com/vertex-center/vertex/server/common/log"
+	"github.com/vertex-center/vertex/server/common/storage"
+	"github.com/vertex-center/vertex/server/config"
+	"github.com/vertex-center/vertex/server/pkg/event"
+	vstorage "github.com/vertex-center/vertex/server/pkg/storage"
 	"github.com/vertex-center/vlog"
 )
 

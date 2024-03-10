@@ -1,6 +1,6 @@
 package service
 
-import "github.com/vertex-center/vertex/apps/logs/core/port"
+import "github.com/vertex-center/vertex/server/apps/logs/core/port"
 
 type logsService struct {
 	adapter port.LogsAdapter

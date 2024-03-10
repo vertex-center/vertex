@@ -9,8 +9,8 @@ import (
 	"github.com/docker/docker/api/types/volume"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"github.com/vertex-center/vertex/apps/containers/core/port"
-	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/server/apps/containers/core/port"
+	"github.com/vertex-center/vertex/server/apps/containers/core/types"
 )
 
 type DockerKernelServiceTestSuite struct {

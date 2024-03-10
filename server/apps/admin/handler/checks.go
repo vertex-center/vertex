@@ -6,8 +6,8 @@ import (
 
 	"github.com/gin-contrib/sse"
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/apps/admin/core/port"
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/server/apps/admin/core/port"
+	"github.com/vertex-center/vertex/server/pkg/router"
 	"golang.org/x/net/context"
 )
 

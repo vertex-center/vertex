@@ -4,10 +4,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/vertex-center/vertex/apps/admin/core/port"
-	"github.com/vertex-center/vertex/apps/admin/core/types"
-	"github.com/vertex-center/vertex/common/baseline"
-	"github.com/vertex-center/vertex/common/storage"
+	"github.com/vertex-center/vertex/server/apps/admin/core/port"
+	"github.com/vertex-center/vertex/server/apps/admin/core/types"
+	"github.com/vertex-center/vertex/server/common/baseline"
+	"github.com/vertex-center/vertex/server/common/storage"
 )
 
 type settingsDbAdapter struct {

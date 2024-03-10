@@ -1,8 +1,8 @@
 package common
 
 import (
-	"github.com/vertex-center/vertex/common/log"
-	"github.com/vertex-center/vertex/pkg/event"
+	"github.com/vertex-center/vertex/server/common/log"
+	"github.com/vertex-center/vertex/server/pkg/event"
 )
 
 type VertexContext struct {

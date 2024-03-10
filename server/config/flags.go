@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/alecthomas/kingpin/v2"
-	"github.com/vertex-center/vertex/common"
+	"github.com/vertex-center/vertex/server/common"
 )
 
 var (

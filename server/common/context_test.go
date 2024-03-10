@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"github.com/vertex-center/vertex/pkg/event"
+	"github.com/vertex-center/vertex/server/pkg/event"
 )
 
 type VertexContextTestSuite struct {

@@ -8,9 +8,9 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/vertex-center/vertex/common/log"
-	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/pkg/vsql"
+	"github.com/vertex-center/vertex/server/common/log"
+	"github.com/vertex-center/vertex/server/config"
+	"github.com/vertex-center/vertex/server/pkg/vsql"
 	"github.com/vertex-center/vlog"
 	_ "modernc.org/sqlite"
 )

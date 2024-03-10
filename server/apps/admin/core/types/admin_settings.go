@@ -1,6 +1,6 @@
 package types
 
-import "github.com/vertex-center/vertex/common/baseline"
+import "github.com/vertex-center/vertex/server/common/baseline"
 
 type AdminSettings struct {
 	ID             uint             `json:"id" db:"id"`
