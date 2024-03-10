@@ -143,31 +143,37 @@ export default function ContainerDetails() {
                     <Outlet />
                 </div>
             )}
-            <Popup
-                show={showDeletePopup}
-                onDismiss={dismissDeletePopup}
-                title={`Delete ${container?.name}?`}
-            >
-                <Paragraph>
-                    Are you sure you want to delete {container?.name}? All data
-                    will be permanently deleted.
-                </Paragraph>
-                {isDeleting && <Progress infinite />}
-                <APIError style={{ margin: 0 }} error={errorDeleting} />
-                <PopupActions>
-                    <Button onClick={dismissDeletePopup} disabled={isDeleting}>
-                        Cancel
-                    </Button>
-                    <Button
-                        variant="danger"
-                        onClick={async () => mutationDeleteContainer.mutate()}
-                        disabled={isDeleting}
-                        rightIcon={<Trash />}
-                    >
-                        Confirm
-                    </Button>
-                </PopupActions>
-            </Popup>
+            {showDeletePopup && container && (
+                <Popup
+                    onDismiss={dismissDeletePopup}
+                    title={`Delete ${container?.name}?`}
+                >
+                    <Paragraph>
+                        Are you sure you want to delete {container?.name}? All
+                        data will be permanently deleted.
+                    </Paragraph>
+                    {isDeleting && <Progress infinite />}
+                    <APIError style={{ margin: 0 }} error={errorDeleting} />
+                    <PopupActions>
+                        <Button
+                            onClick={dismissDeletePopup}
+                            disabled={isDeleting}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="danger"
+                            onClick={async () =>
+                                mutationDeleteContainer.mutate()
+                            }
+                            disabled={isDeleting}
+                            rightIcon={<Trash />}
+                        >
+                            Confirm
+                        </Button>
+                    </PopupActions>
+                </Popup>
+            )}
         </Horizontal>
     );
 

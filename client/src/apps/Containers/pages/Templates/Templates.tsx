@@ -17,13 +17,8 @@ import { API } from "../../backend/api";
 import Content from "../../../../components/Content/Content";
 import { SiDocker } from "@icons-pack/react-simple-icons";
 import ManualInstallPopup from "./ManualInstallPopup";
-import { useCreateContainer } from "../../hooks/useCreateContainer";
 import Spacer from "../../../../components/Spacer/Spacer";
 import Toolbar from "../../../../components/Toolbar/Toolbar";
-
-type Downloading = {
-    service: ServiceModel;
-};
 
 export default function Templates() {
     useTitle("Create container");
@@ -38,41 +33,10 @@ export default function Templates() {
         error: servicesError,
     } = queryServices;
 
-    const queryContainers = useQuery({
-        queryKey: ["containers"],
-        queryFn: () => API.getContainers(),
-    });
-    const {
-        data: containers,
-        isLoading: isContainersLoading,
-        error: containersError,
-    } = queryContainers;
-
-    const { createContainer, isCreatingContainer, errorCreatingContainer } =
-        useCreateContainer({
-            onSettled: (data, error, options) => {
-                setDownloading(
-                    downloading.filter(
-                        ({ service: s }) => s.id !== options.template_id
-                    )
-                );
-            },
-        });
-
-    const install = () => {
-        const template = selectedTemplate;
-        setDownloading((prev) => [...prev, { service: template }]);
-        setShowInstallPopup(false);
-        createContainer({
-            template_id: template.id,
-        });
-    };
-
     const [showInstallPopup, setShowInstallPopup] = useState<boolean>(false);
     const [showManualInstallPopup, setShowManualInstallPopup] =
         useState<boolean>(false);
     const [selectedTemplate, setSelectedTemplate] = useState<ServiceModel>();
-    const [downloading, setDownloading] = useState<Downloading[]>([]);
 
     const openInstallPopup = (template: ServiceModel) => {
         setSelectedTemplate(template);
@@ -92,17 +56,11 @@ export default function Templates() {
         setShowManualInstallPopup(false);
     };
 
-    const error = servicesError ?? containersError ?? errorCreatingContainer;
+    const error = servicesError;
 
     return (
         <Content>
-            <ProgressOverlay
-                show={
-                    isContainersLoading ??
-                    isServicesLoading ??
-                    isCreatingContainer
-                }
-            />
+            <ProgressOverlay show={isServicesLoading} />
             <Vertical gap={12} className={styles.content}>
                 <APIError error={error} />
                 <Toolbar>
@@ -130,15 +88,15 @@ export default function Templates() {
                     ))}
                 </Grid>
             </Vertical>
-            <TemplateInstallPopup
-                service={selectedTemplate}
-                show={showInstallPopup}
-                dismiss={closeInstallPopup}
-            />
-            <ManualInstallPopup
-                show={showManualInstallPopup}
-                dismiss={closeManualInstallPopup}
-            />
+            {showInstallPopup && (
+                <TemplateInstallPopup
+                    service={selectedTemplate}
+                    dismiss={closeInstallPopup}
+                />
+            )}
+            {showManualInstallPopup && (
+                <ManualInstallPopup dismiss={closeManualInstallPopup} />
+            )}
         </Content>
     );
 }

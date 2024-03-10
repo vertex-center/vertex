@@ -34,8 +34,8 @@ export default function VertexReverseProxy() {
         onSuccess: () => {
             closeNewRedirectPopup();
         },
-        onSettled: () => {
-            queryClient.invalidateQueries({
+        onSettled: async () => {
+            await queryClient.invalidateQueries({
                 queryKey: ["redirects"],
             });
         },
@@ -47,8 +47,8 @@ export default function VertexReverseProxy() {
         onSuccess: () => {
             closeNewRedirectPopup();
         },
-        onSettled: () => {
-            queryClient.invalidateQueries({
+        onSettled: async () => {
+            await queryClient.invalidateQueries({
                 queryKey: ["redirects"],
             });
         },
@@ -104,34 +104,35 @@ export default function VertexReverseProxy() {
                     </Button>
                 </Horizontal>
             </Vertical>
-            <Popup
-                show={showNewRedirectPopup}
-                onDismiss={closeNewRedirectPopup}
-                title="New redirection"
-            >
-                <FormItem label="Source">
-                    <Input
-                        className={styles.input}
-                        value={source}
-                        onChange={onSourceChange}
-                    />
-                </FormItem>
-                <FormItem label="Target">
-                    <Input value={target} onChange={onTargetChange} />
-                </FormItem>
-                <PopupActions>
-                    <Button onClick={closeNewRedirectPopup}>Cancel</Button>
-                    <Button
-                        variant="colored"
-                        onClick={async () =>
-                            mutationAdd.mutate({ source, target })
-                        }
-                        rightIcon={<MaterialIcon icon="send" />}
-                    >
-                        Send
-                    </Button>
-                </PopupActions>
-            </Popup>
+            {showNewRedirectPopup && (
+                <Popup
+                    onDismiss={closeNewRedirectPopup}
+                    title="New redirection"
+                >
+                    <FormItem label="Source">
+                        <Input
+                            className={styles.input}
+                            value={source}
+                            onChange={onSourceChange}
+                        />
+                    </FormItem>
+                    <FormItem label="Target">
+                        <Input value={target} onChange={onTargetChange} />
+                    </FormItem>
+                    <PopupActions>
+                        <Button onClick={closeNewRedirectPopup}>Cancel</Button>
+                        <Button
+                            variant="colored"
+                            onClick={async () =>
+                                mutationAdd.mutate({ source, target })
+                            }
+                            rightIcon={<MaterialIcon icon="send" />}
+                        >
+                            Send
+                        </Button>
+                    </PopupActions>
+                </Popup>
+            )}
         </Content>
     );
 }

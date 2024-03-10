@@ -9,7 +9,6 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 type Props = {
-    show: boolean;
     dismiss: () => void;
 };
 
@@ -20,7 +19,7 @@ const schema = yup
     .required();
 
 export default function ManualInstallPopup(props: Readonly<Props>) {
-    const { show, dismiss } = props;
+    const { dismiss } = props;
 
     const {
         register,
@@ -78,11 +77,7 @@ export default function ManualInstallPopup(props: Readonly<Props>) {
     }
 
     return (
-        <Popup
-            show={show}
-            onDismiss={dismiss}
-            title="Install from Docker Registry"
-        >
+        <Popup onDismiss={dismiss} title="Install from Docker Registry">
             <form onSubmit={onSubmit}>
                 <Vertical gap={20}>
                     <FormItem

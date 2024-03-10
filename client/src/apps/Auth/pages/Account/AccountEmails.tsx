@@ -34,7 +34,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Email } from "../../backend/models";
 
 type DeleteEmailPopupProps = {
-    show: boolean;
     onDismiss: () => void;
     email: Partial<Email>;
 };
@@ -42,7 +41,7 @@ type DeleteEmailPopupProps = {
 function DeleteEmailPopup(props: DeleteEmailPopupProps) {
     const queryClient = useQueryClient();
 
-    const { show, onDismiss, email } = props;
+    const { onDismiss, email } = props;
 
     const { deleteEmail, isDeletingEmail, errorDeleteEmail } =
         useDeleteCurrentUserEmail({
@@ -55,7 +54,7 @@ function DeleteEmailPopup(props: DeleteEmailPopupProps) {
         });
 
     return (
-        <Popup show={show} onDismiss={onDismiss} title="Delete email?">
+        <Popup onDismiss={onDismiss} title="Delete email?">
             <Paragraph>
                 Are you sure you want to delete this email address?
             </Paragraph>
@@ -79,7 +78,6 @@ function DeleteEmailPopup(props: DeleteEmailPopupProps) {
 }
 
 type CreateEmailPopupProps = {
-    show: boolean;
     onDismiss: () => void;
 };
 
@@ -90,7 +88,7 @@ const createEmailSchema = yup.object().shape({
 function CreateEmailPopup(props: CreateEmailPopupProps) {
     const queryClient = useQueryClient();
 
-    const { show, onDismiss: _onDismiss } = props;
+    const { onDismiss: _onDismiss } = props;
 
     const {
         register,
@@ -101,11 +99,6 @@ function CreateEmailPopup(props: CreateEmailPopupProps) {
         resolver: yupResolver(createEmailSchema),
     });
 
-    const onDismiss = () => {
-        reset();
-        _onDismiss();
-    };
-
     const { createEmail, isCreatingEmail, errorCreateEmail } =
         useCreateCurrentUserEmail({
             onSuccess: async () => {
@@ -113,16 +106,20 @@ function CreateEmailPopup(props: CreateEmailPopupProps) {
                     queryKey: ["user_emails"],
                 });
                 onDismiss();
-                reset();
             },
         });
+
+    const onDismiss = () => {
+        reset();
+        _onDismiss();
+    };
 
     const onSubmit = handleSubmit((data) => {
         createEmail(data);
     });
 
     return (
-        <Popup show={show} onDismiss={onDismiss} title="Add email address">
+        <Popup onDismiss={onDismiss} title="Add email address">
             <form onSubmit={onSubmit}>
                 <Vertical gap={12}>
                     <FormItem
@@ -135,7 +132,11 @@ function CreateEmailPopup(props: CreateEmailPopupProps) {
                     <APIError error={errorCreateEmail} />
                     {isCreatingEmail && <Progress />}
                     <PopupActions>
-                        <Button variant="outlined" onClick={onDismiss}>
+                        <Button
+                            type="button"
+                            variant="outlined"
+                            onClick={onDismiss}
+                        >
                             Cancel
                         </Button>
                         <Button
@@ -214,15 +215,15 @@ export default function AccountEmails() {
                     Add email
                 </Button>
             </div>
-            <CreateEmailPopup
-                show={showCreatePopup}
-                onDismiss={dismissCreatePopup}
-            />
-            <DeleteEmailPopup
-                show={showDeletePopup}
-                onDismiss={dismissDeletePopup}
-                email={email}
-            />
+            {showCreatePopup && (
+                <CreateEmailPopup onDismiss={dismissCreatePopup} />
+            )}
+            {showDeletePopup && (
+                <DeleteEmailPopup
+                    onDismiss={dismissDeletePopup}
+                    email={email}
+                />
+            )}
         </Content>
     );
 }

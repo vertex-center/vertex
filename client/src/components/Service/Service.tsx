@@ -13,7 +13,7 @@ export default function Service(props: Readonly<Props>) {
     return (
         <Card onClick={onInstall}>
             <Vertical gap={40}>
-                <ServiceLogo template={template} />
+                <ServiceLogo icon={template?.icon} color={template?.color} />
                 <Title>{template?.name}</Title>
             </Vertical>
         </Card>

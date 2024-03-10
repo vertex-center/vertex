@@ -1,19 +1,15 @@
-import { api } from "../../../backend/api/backend";
 import { ProgressOverlay } from "../../../components/Progress/Progress";
 import Service from "../../../components/Service/Service";
 import { Template as ServiceModel } from "../../Containers/backend/template";
 import TemplateInstallPopup from "../../../components/TemplateInstallPopup/TemplateInstallPopup";
 import { useState } from "react";
 import { APIError } from "../../../components/Error/APIError";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { List, Title } from "@vertex-center/components";
 import Content from "../../../components/Content/Content";
 import { API } from "../../Containers/backend/api";
-import { useContainers } from "../../Containers/hooks/useContainers";
 
 export default function SqlInstaller() {
-    const queryClient = useQueryClient();
-
     const queryServices = useQuery({
         queryKey: ["templates"],
         queryFn: API.getAllTemplates,
@@ -24,19 +20,8 @@ export default function SqlInstaller() {
         error: servicesError,
     } = queryServices;
 
-    const {
-        containers,
-        isLoading: isLoadingContainers,
-        error: containersError,
-    } = useContainers({});
-
     const [selectedService, setSelectedService] = useState<ServiceModel>();
     const [showPopup, setShowPopup] = useState(false);
-    const [downloading, setDownloading] = useState<
-        {
-            service: ServiceModel;
-        }[]
-    >([]);
 
     const open = (service: ServiceModel) => {
         setSelectedService(service);
@@ -48,36 +33,11 @@ export default function SqlInstaller() {
         setShowPopup(false);
     };
 
-    const mutationCreateContainer = useMutation({
-        mutationFn: async (templateID: string) => {
-            await api.vxSql.dbms(templateID).install();
-        },
-        onSettled: (data, error, templateID) => {
-            setDownloading(
-                downloading.filter(({ service: s }) => s.id !== templateID)
-            );
-            queryClient.invalidateQueries({
-                queryKey: ["containers"],
-            });
-        },
-    });
-    const { isPending: isInstalling, error: installError } =
-        mutationCreateContainer;
-
-    const install = () => {
-        const service = selectedService;
-        setDownloading((prev) => [...prev, { service }]);
-        setShowPopup(false);
-        mutationCreateContainer.mutate(service.id);
-    };
-
-    const error = servicesError ?? containersError ?? installError;
-
     return (
         <Content>
-            <ProgressOverlay show={isLoadingContainers ?? isServicesLoading} />
+            <ProgressOverlay show={isServicesLoading} />
             <Title variant="h2">Installer</Title>
-            <APIError error={error} />
+            <APIError error={servicesError} />
             <List>
                 {templates
                     ?.filter((s) => s?.features?.databases?.length >= 1)
@@ -96,12 +56,12 @@ export default function SqlInstaller() {
                         );
                     })}
             </List>
-            <TemplateInstallPopup
-                service={selectedService}
-                show={showPopup}
-                dismiss={dismiss}
-                install={install}
-            />
+            {showPopup && selectedService && (
+                <TemplateInstallPopup
+                    service={selectedService}
+                    dismiss={dismiss}
+                />
+            )}
         </Content>
     );
 }

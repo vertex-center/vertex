@@ -90,8 +90,8 @@ export default function SettingsDb() {
         onMutate: () => {
             setShowPopup(false);
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
                 queryKey: ["admin_db_dbms"],
             });
         },
@@ -141,30 +141,28 @@ export default function SettingsDb() {
                     <Progress infinite />
                 </Vertical>
             )}
-            <Popup
-                show={showPopup}
-                onDismiss={dismissPopup}
-                title="Migrate database?"
-            >
-                <Paragraph>
-                    Are you sure you want to migrate from {dbms} to {selectedDB}
-                    ? All the data will be copied to the new database. The
-                    previous database will deleted if the migration is
-                    successful.
-                </Paragraph>
-                <PopupActions>
-                    <Button variant="outlined" onClick={dismissPopup}>
-                        Cancel
-                    </Button>
-                    <Button
-                        variant="danger"
-                        rightIcon={<MaterialIcon icon="restart_alt" />}
-                        onClick={() => migrate(selectedDB)}
-                    >
-                        Migrate
-                    </Button>
-                </PopupActions>
-            </Popup>
+            {showPopup && (
+                <Popup onDismiss={dismissPopup} title="Migrate database?">
+                    <Paragraph>
+                        Are you sure you want to migrate from {dbms} to{" "}
+                        {selectedDB}? All the data will be copied to the new
+                        database. The previous database will deleted if the
+                        migration is successful.
+                    </Paragraph>
+                    <PopupActions>
+                        <Button variant="outlined" onClick={dismissPopup}>
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="danger"
+                            rightIcon={<MaterialIcon icon="restart_alt" />}
+                            onClick={() => migrate(selectedDB)}
+                        >
+                            Migrate
+                        </Button>
+                    </PopupActions>
+                </Popup>
+            )}
         </Content>
     );
 }

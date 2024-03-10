@@ -11,16 +11,13 @@ export function PopupActions(props: HTMLProps<HTMLDivElement>) {
 }
 
 type Props = HTMLProps<HTMLDivElement> & {
-    show: boolean;
     onDismiss: () => void;
     title: string;
     image?: ReactNode;
 };
 
 export default function Popup(props: Readonly<Props>) {
-    const { show, onDismiss, title, image, children, ...others } = props;
-
-    if (!show) return null;
+    const { onDismiss, title, image, children, ...others } = props;
 
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
@@ -30,7 +27,7 @@ export default function Popup(props: Readonly<Props>) {
         };
         window.addEventListener("keydown", handleKeyPress);
         return () => window.removeEventListener("keydown", handleKeyPress);
-    }, [show, onDismiss]);
+    }, [onDismiss]);
 
     return (
         <div>
