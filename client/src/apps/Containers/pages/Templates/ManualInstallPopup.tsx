@@ -7,6 +7,9 @@ import { DownloadSimple } from "@phosphor-icons/react";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { Container } from "../../backend/models";
+import { useState } from "react";
+import ContainerInstalledPopup from "../../components/ContainerInstalledPopup/ContainerInstalledPopup";
 
 type Props = {
     dismiss: () => void;
@@ -30,10 +33,23 @@ export default function ManualInstallPopup(props: Readonly<Props>) {
         resolver: yupResolver(schema),
     });
 
+    const [container, setContainer] = useState<Container>(null);
+
     const { createContainer, isCreatingContainer, errorCreatingContainer } =
         useCreateContainer({
-            onSuccess: dismiss,
+            onSuccess: (data) => {
+                setContainer(data as Container);
+            },
         });
+
+    if (container) {
+        return (
+            <ContainerInstalledPopup
+                container={container}
+                onDismiss={dismiss}
+            />
+        );
+    }
 
     const onSubmit = handleSubmit((data) => {
         const req = formattedImage(data.image);
