@@ -5,10 +5,10 @@ import (
 
 	"github.com/juju/errors"
 	"github.com/vertex-center/uuid"
-	"github.com/vertex-center/vertex/apps/containers/core/types"
-	ev "github.com/vertex-center/vertex/common/event"
-	"github.com/vertex-center/vertex/common/log"
-	"github.com/vertex-center/vertex/pkg/event"
+	"github.com/vertex-center/vertex/server/apps/containers/core/types"
+	ev "github.com/vertex-center/vertex/server/common/event"
+	"github.com/vertex-center/vertex/server/common/log"
+	"github.com/vertex-center/vertex/server/pkg/event"
 )
 
 func (s *containerService) GetUUID() uuid.UUID {

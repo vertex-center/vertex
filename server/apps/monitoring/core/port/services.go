@@ -3,8 +3,8 @@ package port
 import (
 	"context"
 
-	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/apps/monitoring/core/types"
+	containerstypes "github.com/vertex-center/vertex/server/apps/containers/core/types"
+	"github.com/vertex-center/vertex/server/apps/monitoring/core/types"
 )
 
 type (

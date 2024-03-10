@@ -3,12 +3,12 @@ package main
 import (
 	"os"
 
-	"github.com/vertex-center/vertex/apps"
-	logsmeta "github.com/vertex-center/vertex/apps/logs/meta"
-	"github.com/vertex-center/vertex/common"
-	"github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/common/log"
-	"github.com/vertex-center/vertex/config"
+	"github.com/vertex-center/vertex/server/apps"
+	logsmeta "github.com/vertex-center/vertex/server/apps/logs/meta"
+	"github.com/vertex-center/vertex/server/common"
+	"github.com/vertex-center/vertex/server/common/app"
+	"github.com/vertex-center/vertex/server/common/log"
+	"github.com/vertex-center/vertex/server/config"
 )
 
 // goreleaser will override version, commit and date

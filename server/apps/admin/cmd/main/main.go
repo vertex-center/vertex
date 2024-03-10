@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/vertex-center/vertex/apps/admin"
-	"github.com/vertex-center/vertex/common"
-	"github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/config"
+	"github.com/vertex-center/vertex/server/apps/admin"
+	"github.com/vertex-center/vertex/server/common"
+	"github.com/vertex-center/vertex/server/common/app"
+	"github.com/vertex-center/vertex/server/config"
 )
 
 // goreleaser will override version, commit and date

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/juju/errors"
-	"github.com/vertex-center/vertex/common/log"
+	"github.com/vertex-center/vertex/server/common/log"
 	"github.com/vertex-center/vlog"
 )
 

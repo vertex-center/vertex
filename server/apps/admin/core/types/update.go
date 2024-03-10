@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/vertex-center/vertex/common/baseline"
+	"github.com/vertex-center/vertex/server/common/baseline"
 )
 
 type Update struct {

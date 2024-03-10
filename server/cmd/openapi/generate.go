@@ -8,11 +8,11 @@ import (
 	"path"
 
 	"github.com/carlmjohnson/requests"
-	"github.com/vertex-center/vertex/apps"
-	"github.com/vertex-center/vertex/common"
-	"github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/common/app/appmeta"
-	"github.com/vertex-center/vertex/common/server"
+	"github.com/vertex-center/vertex/server/apps"
+	"github.com/vertex-center/vertex/server/common"
+	"github.com/vertex-center/vertex/server/common/app"
+	"github.com/vertex-center/vertex/server/common/app/appmeta"
+	"github.com/vertex-center/vertex/server/common/server"
 	"github.com/wI2L/fizz"
 	"github.com/wI2L/fizz/openapi"
 )

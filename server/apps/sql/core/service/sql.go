@@ -6,14 +6,14 @@ import (
 
 	"github.com/juju/errors"
 	"github.com/vertex-center/uuid"
-	containersapi "github.com/vertex-center/vertex/apps/containers/api"
-	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
-	sqladapter "github.com/vertex-center/vertex/apps/sql/adapter"
-	"github.com/vertex-center/vertex/apps/sql/core/port"
-	sqltypes "github.com/vertex-center/vertex/apps/sql/core/types"
-	"github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/common/log"
-	"github.com/vertex-center/vertex/config"
+	containersapi "github.com/vertex-center/vertex/server/apps/containers/api"
+	containerstypes "github.com/vertex-center/vertex/server/apps/containers/core/types"
+	sqladapter "github.com/vertex-center/vertex/server/apps/sql/adapter"
+	"github.com/vertex-center/vertex/server/apps/sql/core/port"
+	sqltypes "github.com/vertex-center/vertex/server/apps/sql/core/types"
+	"github.com/vertex-center/vertex/server/common/app"
+	"github.com/vertex-center/vertex/server/common/log"
+	"github.com/vertex-center/vertex/server/config"
 	"github.com/vertex-center/vlog"
 )
 

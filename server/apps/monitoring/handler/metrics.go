@@ -2,9 +2,9 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/apps/monitoring/core/port"
-	"github.com/vertex-center/vertex/apps/monitoring/core/types"
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/server/apps/monitoring/core/port"
+	"github.com/vertex-center/vertex/server/apps/monitoring/core/types"
+	"github.com/vertex-center/vertex/server/pkg/router"
 )
 
 type metricsHandler struct {

@@ -2,9 +2,9 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/apps/containers/core/port"
-	"github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/server/apps/containers/core/port"
+	"github.com/vertex-center/vertex/server/apps/containers/core/types"
+	"github.com/vertex-center/vertex/server/pkg/router"
 )
 
 type templateHandler struct {

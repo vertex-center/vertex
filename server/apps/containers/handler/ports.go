@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/loopfz/gadgeto/tonic"
 	"github.com/vertex-center/uuid"
-	"github.com/vertex-center/vertex/apps/containers/core/port"
-	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/server/apps/containers/core/port"
+	"github.com/vertex-center/vertex/server/apps/containers/core/types"
 )
 
 type portsHandler struct {

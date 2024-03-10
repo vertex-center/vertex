@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/vertex-center/vertex/common"
-	"github.com/vertex-center/vertex/pkg/event"
+	"github.com/vertex-center/vertex/server/common"
+	"github.com/vertex-center/vertex/server/pkg/event"
 )
 
 type Context struct {

@@ -1,15 +1,15 @@
 package sql
 
 import (
-	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
-	"github.com/vertex-center/vertex/apps/auth/middleware"
-	containersmeta "github.com/vertex-center/vertex/apps/containers/meta"
-	logsmeta "github.com/vertex-center/vertex/apps/logs/meta"
-	"github.com/vertex-center/vertex/apps/sql/core/port"
-	"github.com/vertex-center/vertex/apps/sql/core/service"
-	"github.com/vertex-center/vertex/apps/sql/handler"
-	"github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/common/app/appmeta"
+	authmeta "github.com/vertex-center/vertex/server/apps/auth/meta"
+	"github.com/vertex-center/vertex/server/apps/auth/middleware"
+	containersmeta "github.com/vertex-center/vertex/server/apps/containers/meta"
+	logsmeta "github.com/vertex-center/vertex/server/apps/logs/meta"
+	"github.com/vertex-center/vertex/server/apps/sql/core/port"
+	"github.com/vertex-center/vertex/server/apps/sql/core/service"
+	"github.com/vertex-center/vertex/server/apps/sql/handler"
+	"github.com/vertex-center/vertex/server/common/app"
+	"github.com/vertex-center/vertex/server/common/app/appmeta"
 	"github.com/wI2L/fizz"
 )
 

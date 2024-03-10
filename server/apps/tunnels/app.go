@@ -1,13 +1,13 @@
 package tunnels
 
 import (
-	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
-	"github.com/vertex-center/vertex/apps/auth/middleware"
-	containersmeta "github.com/vertex-center/vertex/apps/containers/meta"
-	logsmeta "github.com/vertex-center/vertex/apps/logs/meta"
-	"github.com/vertex-center/vertex/apps/tunnels/handler"
-	"github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/common/app/appmeta"
+	authmeta "github.com/vertex-center/vertex/server/apps/auth/meta"
+	"github.com/vertex-center/vertex/server/apps/auth/middleware"
+	containersmeta "github.com/vertex-center/vertex/server/apps/containers/meta"
+	logsmeta "github.com/vertex-center/vertex/server/apps/logs/meta"
+	"github.com/vertex-center/vertex/server/apps/tunnels/handler"
+	"github.com/vertex-center/vertex/server/common/app"
+	"github.com/vertex-center/vertex/server/common/app/appmeta"
 	"github.com/wI2L/fizz"
 )
 

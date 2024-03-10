@@ -4,11 +4,11 @@ import (
 	"math"
 
 	"github.com/vertex-center/uuid"
-	"github.com/vertex-center/vertex/apps/containers/core/port"
-	"github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/apps/monitoring/core/types/metric"
-	apptypes "github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/pkg/event"
+	"github.com/vertex-center/vertex/server/apps/containers/core/port"
+	"github.com/vertex-center/vertex/server/apps/containers/core/types"
+	"github.com/vertex-center/vertex/server/apps/monitoring/core/types/metric"
+	apptypes "github.com/vertex-center/vertex/server/common/app"
+	"github.com/vertex-center/vertex/server/pkg/event"
 )
 
 const (

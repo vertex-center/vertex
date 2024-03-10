@@ -8,14 +8,14 @@ services:
 
   vertex:
     build:
-      context: ../server
-      dockerfile: docker/bundle.Dockerfile
+      context: ..
+      dockerfile: server/docker/bundle.Dockerfile
       args:
         - APP_KIND=main
 
   vertex-kernel:
     build:
-      context: ../server
-      dockerfile: docker/bundle.Dockerfile
+      context: ..
+      dockerfile: server/docker/bundle.Dockerfile
       args:
         - APP_KIND=kernel

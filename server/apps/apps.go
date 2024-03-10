@@ -1,15 +1,15 @@
 package apps
 
 import (
-	"github.com/vertex-center/vertex/apps/admin"
-	"github.com/vertex-center/vertex/apps/auth"
-	"github.com/vertex-center/vertex/apps/containers"
-	"github.com/vertex-center/vertex/apps/logs"
-	"github.com/vertex-center/vertex/apps/monitoring"
-	"github.com/vertex-center/vertex/apps/reverseproxy"
-	"github.com/vertex-center/vertex/apps/sql"
-	"github.com/vertex-center/vertex/apps/tunnels"
-	"github.com/vertex-center/vertex/common/app"
+	"github.com/vertex-center/vertex/server/apps/admin"
+	"github.com/vertex-center/vertex/server/apps/auth"
+	"github.com/vertex-center/vertex/server/apps/containers"
+	"github.com/vertex-center/vertex/server/apps/logs"
+	"github.com/vertex-center/vertex/server/apps/monitoring"
+	"github.com/vertex-center/vertex/server/apps/reverseproxy"
+	"github.com/vertex-center/vertex/server/apps/sql"
+	"github.com/vertex-center/vertex/server/apps/tunnels"
+	"github.com/vertex-center/vertex/server/common/app"
 )
 
 var Apps = []app.Interface{

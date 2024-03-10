@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/mock"
 	"github.com/vertex-center/uuid"
-	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/server/apps/containers/core/types"
 )
 
 type (

@@ -3,7 +3,7 @@ package updater
 import (
 	"fmt"
 
-	"github.com/vertex-center/vertex/common/baseline"
+	"github.com/vertex-center/vertex/server/common/baseline"
 )
 
 type Updater interface {

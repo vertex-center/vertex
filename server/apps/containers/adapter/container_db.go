@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/vertex-center/uuid"
-	"github.com/vertex-center/vertex/apps/containers/core/port"
-	"github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/common/storage"
+	"github.com/vertex-center/vertex/server/apps/containers/core/port"
+	"github.com/vertex-center/vertex/server/apps/containers/core/types"
+	"github.com/vertex-center/vertex/server/common/storage"
 )
 
 type containerDBAdapter struct {

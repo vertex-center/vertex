@@ -1,6 +1,6 @@
 package database
 
-import "github.com/vertex-center/vertex/pkg/vsql"
+import "github.com/vertex-center/vertex/server/pkg/vsql"
 
 func GetSchema(driver vsql.Driver) string {
 	return vsql.BuildSchema(driver,

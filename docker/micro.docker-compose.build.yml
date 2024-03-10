@@ -8,64 +8,64 @@ services:
 
   admin:
     build:
-      context: ../server
-      dockerfile: docker/micro.Dockerfile
+      context: ..
+      dockerfile: server/docker/micro.Dockerfile
       args:
         - APP_ID=admin
 
   auth:
     build:
-      context: ../server
-      dockerfile: docker/micro.Dockerfile
+      context: ..
+      dockerfile: server/docker/micro.Dockerfile
       args:
         - APP_ID=auth
 
   containers:
     build:
-      context: ../server
-      dockerfile: docker/micro.Dockerfile
+      context: ..
+      dockerfile: server/docker/micro.Dockerfile
       args:
         - APP_ID=containers
 
   containers-kernel:
     build:
-      context: ../server
-      dockerfile: docker/micro.Dockerfile
+      context: ..
+      dockerfile: server/docker/micro.Dockerfile
       args:
         - APP_ID=containers
         - APP_KIND=kernel
 
   monitoring:
     build:
-      context: ../server
-      dockerfile: docker/micro.Dockerfile
+      context: ..
+      dockerfile: server/docker/micro.Dockerfile
       args:
         - APP_ID=monitoring
 
   reverseproxy:
     build:
-      context: ../server
-      dockerfile: docker/micro.Dockerfile
+      context: ..
+      dockerfile: server/docker/micro.Dockerfile
       args:
         - APP_ID=reverseproxy
 
   sql:
     build:
-      context: ../server
-      dockerfile: docker/micro.Dockerfile
+      context: ..
+      dockerfile: server/docker/micro.Dockerfile
       args:
         - APP_ID=sql
 
   tunnels:
     build:
-      context: ../server
-      dockerfile: docker/micro.Dockerfile
+      context: ..
+      dockerfile: server/docker/micro.Dockerfile
       args:
         - APP_ID=tunnels
 
   logs:
     build:
-      context: ../server
-      dockerfile: docker/micro.Dockerfile
+      context: ..
+      dockerfile: server/docker/micro.Dockerfile
       args:
         - APP_ID=logs

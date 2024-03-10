@@ -1,16 +1,16 @@
 package reverseproxy
 
 import (
-	authmeta "github.com/vertex-center/vertex/apps/auth/meta"
-	"github.com/vertex-center/vertex/apps/auth/middleware"
-	logsmeta "github.com/vertex-center/vertex/apps/logs/meta"
-	"github.com/vertex-center/vertex/apps/reverseproxy/adapter"
-	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
-	"github.com/vertex-center/vertex/apps/reverseproxy/core/service"
-	"github.com/vertex-center/vertex/apps/reverseproxy/handler"
-	"github.com/vertex-center/vertex/common/app"
-	"github.com/vertex-center/vertex/common/app/appmeta"
-	"github.com/vertex-center/vertex/common/log"
+	authmeta "github.com/vertex-center/vertex/server/apps/auth/meta"
+	"github.com/vertex-center/vertex/server/apps/auth/middleware"
+	logsmeta "github.com/vertex-center/vertex/server/apps/logs/meta"
+	"github.com/vertex-center/vertex/server/apps/reverseproxy/adapter"
+	"github.com/vertex-center/vertex/server/apps/reverseproxy/core/port"
+	"github.com/vertex-center/vertex/server/apps/reverseproxy/core/service"
+	"github.com/vertex-center/vertex/server/apps/reverseproxy/handler"
+	"github.com/vertex-center/vertex/server/common/app"
+	"github.com/vertex-center/vertex/server/common/app/appmeta"
+	"github.com/vertex-center/vertex/server/common/log"
 	"github.com/wI2L/fizz"
 )
 

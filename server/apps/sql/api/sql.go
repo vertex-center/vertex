@@ -3,8 +3,8 @@ package api
 import (
 	"context"
 
-	containerstypes "github.com/vertex-center/vertex/apps/containers/core/types"
-	"github.com/vertex-center/vertex/apps/sql/core/types"
+	containerstypes "github.com/vertex-center/vertex/server/apps/containers/core/types"
+	"github.com/vertex-center/vertex/server/apps/sql/core/types"
 )
 
 func (c *Client) GetDBMS(ctx context.Context, containerUuid string) (types.DBMS, error) {

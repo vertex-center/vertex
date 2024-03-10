@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/vertex-center/vertex/apps/reverseproxy"
-	"github.com/vertex-center/vertex/common"
-	"github.com/vertex-center/vertex/common/app"
+	"github.com/vertex-center/vertex/server/apps/reverseproxy"
+	"github.com/vertex-center/vertex/server/common"
+	"github.com/vertex-center/vertex/server/common/app"
 )
 
 // goreleaser will override version, commit and date

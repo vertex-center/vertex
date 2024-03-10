@@ -10,10 +10,10 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/vertex-center/vertex/apps/reverseproxy/core/port"
-	"github.com/vertex-center/vertex/common/log"
-	"github.com/vertex-center/vertex/config"
-	"github.com/vertex-center/vertex/pkg/router"
+	"github.com/vertex-center/vertex/server/apps/reverseproxy/core/port"
+	"github.com/vertex-center/vertex/server/common/log"
+	"github.com/vertex-center/vertex/server/config"
+	"github.com/vertex-center/vertex/server/pkg/router"
 	"github.com/vertex-center/vlog"
 )
 

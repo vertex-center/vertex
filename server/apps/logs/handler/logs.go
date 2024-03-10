@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/juju/errors"
 	"github.com/loopfz/gadgeto/tonic"
-	"github.com/vertex-center/vertex/apps/logs/core/port"
+	"github.com/vertex-center/vertex/server/apps/logs/core/port"
 )
 
 type logsHandler struct {

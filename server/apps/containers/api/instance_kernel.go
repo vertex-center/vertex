@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/docker/docker/api/types/volume"
-	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/server/apps/containers/core/types"
 )
 
 func (c *KernelClient) CreateContainer(ctx context.Context, options types.CreateDockerContainerOptions) (types.CreateContainerResponse, error) {

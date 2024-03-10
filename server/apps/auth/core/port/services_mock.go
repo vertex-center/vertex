@@ -2,7 +2,7 @@ package port
 
 import (
 	"github.com/stretchr/testify/mock"
-	"github.com/vertex-center/vertex/apps/auth/core/types"
+	"github.com/vertex-center/vertex/server/apps/auth/core/types"
 )
 
 type MockAuthService struct{ mock.Mock }

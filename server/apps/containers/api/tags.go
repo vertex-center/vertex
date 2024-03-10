@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/vertex-center/uuid"
-	"github.com/vertex-center/vertex/apps/containers/core/types"
+	"github.com/vertex-center/vertex/server/apps/containers/core/types"
 )
 
 func (c *Client) GetTag(ctx context.Context, name string) (types.Tag, error) {
