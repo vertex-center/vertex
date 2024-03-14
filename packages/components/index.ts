@@ -1,7 +1,6 @@
 import { Box, BoxProps, BoxType } from "./lib/components/Box/Box";
 import { Button, ButtonProps } from "./lib/components/Button/Button";
 import { Card, CardProps } from "./lib/components/Card/Card";
-import { Checkbox, CheckboxProps } from "./lib/components/Checkbox/Checkbox";
 import { Code, CodeProps } from "./lib/components/Code/Code";
 import {
     Dropdown,
@@ -97,7 +96,6 @@ export type {
     BoxType,
     ButtonProps,
     CardProps,
-    CheckboxProps,
     CodeProps,
     DropdownProps,
     DropdownItemProps,
@@ -138,7 +136,6 @@ export {
     Box,
     Button,
     Card,
-    Checkbox,
     Code,
     Dropdown,
     DropdownItem,
