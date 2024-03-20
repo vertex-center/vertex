@@ -6,7 +6,7 @@ require (
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/carlmjohnson/requests v0.23.5
 	github.com/disgoorg/disgo v0.17.2
-	github.com/docker/docker v25.0.4+incompatible
+	github.com/docker/docker v25.0.5+incompatible
 	github.com/docker/go-connections v0.5.0
 	github.com/gin-contrib/cors v1.7.0
 	github.com/gin-contrib/sse v0.1.0
