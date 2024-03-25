@@ -6,22 +6,22 @@ require (
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/carlmjohnson/requests v0.23.5
 	github.com/disgoorg/disgo v0.17.2
-	github.com/docker/docker v25.0.4+incompatible
+	github.com/docker/docker v26.0.0+incompatible
 	github.com/docker/go-connections v0.5.0
-	github.com/gin-contrib/cors v1.7.0
+	github.com/gin-contrib/cors v1.7.1
 	github.com/gin-contrib/sse v0.1.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-co-op/gocron v1.37.0
 	github.com/go-git/go-git-fixtures/v4 v4.3.2-0.20231010084843-55a94097c399
 	github.com/go-git/go-git/v5 v5.11.0
-	github.com/google/go-containerregistry v0.19.0
+	github.com/google/go-containerregistry v0.19.1
 	github.com/google/go-github/v50 v50.2.0
 	github.com/gorilla/websocket v1.5.1
 	github.com/h2non/gock v1.2.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/juju/errors v1.0.0
 	github.com/lib/pq v1.10.9
-	github.com/loopfz/gadgeto v0.11.3
+	github.com/loopfz/gadgeto v0.11.4
 	github.com/prometheus/client_golang v1.19.0
 	github.com/stretchr/testify v1.9.0
 	github.com/vertex-center/uuid v1.5.1
@@ -32,8 +32,8 @@ require (
 	golang.org/x/net v0.22.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/postgres v1.5.7
-	gorm.io/gorm v1.25.7
-	modernc.org/sqlite v1.29.3
+	gorm.io/gorm v1.25.8
+	modernc.org/sqlite v1.29.5
 )
 
 require (
@@ -43,7 +43,7 @@ require (
 	github.com/ProtonMail/go-crypto v0.0.0-20230828082145-3c4c8a2d2371 // indirect
 	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bytedance/sonic v1.11.2 // indirect
+	github.com/bytedance/sonic v1.11.3 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
@@ -97,6 +97,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
+	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/moby/patternmatcher v0.5.0 // indirect
 	github.com/moby/sys/sequential v0.5.0 // indirect
 	github.com/moby/sys/user v0.1.0 // indirect
@@ -107,7 +108,7 @@ require (
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0-rc3 // indirect
-	github.com/pelletier/go-toml/v2 v2.1.1 // indirect
+	github.com/pelletier/go-toml/v2 v2.2.0 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -143,7 +144,6 @@ require (
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gotest.tools/v3 v3.4.0 // indirect
 	modernc.org/gc/v3 v3.0.0-20240107210532-573471604cb6 // indirect
 	modernc.org/libc v1.41.0 // indirect
@@ -151,7 +151,7 @@ require (
 	modernc.org/memory v1.7.2 // indirect
 	modernc.org/strutil v1.2.0 // indirect
 	modernc.org/token v1.1.0 // indirect
-	sigs.k8s.io/yaml v1.3.0 // indirect
+	sigs.k8s.io/yaml v1.4.0 // indirect
 )
 
 replace github.com/vertex-center/vertex => ..
